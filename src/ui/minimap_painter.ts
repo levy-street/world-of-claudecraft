@@ -82,6 +82,11 @@ const MOB_DOT_RADIUS = 2.25;
 const MOB_AGGRO_DIAMOND_RADIUS = 3.5;
 const MOB_LOOT_SIZE = 5;
 const MOB_LOOT_CORE_SIZE = 1.5;
+// Harvest-only corpse: an upright pelt triangle (apex one radius above the
+// point, base one radius wide each side at PELT_BASE_RATIO below it), so it
+// reads apart from the axis-aligned loot square by silhouette, not hue.
+const MOB_HARVEST_RADIUS = 3.5;
+const MOB_HARVEST_BASE_RATIO = 0.7;
 const PIP_RADIUS_RATIO = 0.35; // inner pip radius = max(PIP_MIN, disc radius * ratio)
 const PIP_MIN_RADIUS = 1;
 const PARTY_DEAD_CROSS_RATIO = 0.55;
@@ -175,6 +180,7 @@ interface MinimapPaintGeometry {
   readonly mobAggroDiamondRadius: number;
   readonly mobLootSize: number;
   readonly mobLootCoreSize: number;
+  readonly mobHarvestRadius: number;
   readonly pipMinRadius: number;
   readonly partyDiscScale: number;
   readonly partyDeadCrossWidth: number;
@@ -218,6 +224,7 @@ const MINIMAP_PAINT_GEOMETRY = Object.freeze({
     mobAggroDiamondRadius: MOB_AGGRO_DIAMOND_RADIUS,
     mobLootSize: MOB_LOOT_SIZE,
     mobLootCoreSize: MOB_LOOT_CORE_SIZE,
+    mobHarvestRadius: MOB_HARVEST_RADIUS,
     pipMinRadius: PIP_MIN_RADIUS,
     partyDiscScale: 1,
     partyDeadCrossWidth: PARTY_DEAD_CROSS_WIDTH,
@@ -256,6 +263,7 @@ const MINIMAP_PAINT_GEOMETRY = Object.freeze({
     mobAggroDiamondRadius: MOB_AGGRO_DIAMOND_RADIUS * 1.5,
     mobLootSize: MOB_LOOT_SIZE * 1.5,
     mobLootCoreSize: MOB_LOOT_CORE_SIZE * 1.5,
+    mobHarvestRadius: MOB_HARVEST_RADIUS * 1.5,
     pipMinRadius: PIP_MIN_RADIUS * 1.5,
     partyDiscScale: 1.45,
     partyDeadCrossWidth: 1.75,
@@ -288,6 +296,16 @@ function beginDiamond(ctx: CanvasRenderingContext2D, x: number, y: number, radiu
   ctx.lineTo(x + radius, y);
   ctx.lineTo(x, y + radius);
   ctx.lineTo(x - radius, y);
+  ctx.closePath();
+}
+
+/** Begin the upright pelt triangle for a harvest-only corpse. */
+function beginPelt(ctx: CanvasRenderingContext2D, x: number, y: number, radius: number): void {
+  const baseY = y + radius * MOB_HARVEST_BASE_RATIO;
+  ctx.beginPath();
+  ctx.moveTo(x, y - radius);
+  ctx.lineTo(x + radius, baseY);
+  ctx.lineTo(x - radius, baseY);
   ctx.closePath();
 }
 
@@ -1522,6 +1540,16 @@ export class MinimapPainter {
             geometry.mobLootCoreSize,
             geometry.mobLootCoreSize,
           );
+          break;
+        case 'mob-harvest':
+          // A body with only its harvest left: the pelt triangle in the same
+          // corpse-loot paint, told apart from the loot square by shape.
+          ctx.fillStyle = colors.mobLoot;
+          ctx.strokeStyle = colors.outline;
+          ctx.lineWidth = geometry.dynamicOutlineWidth;
+          beginPelt(ctx, m.mx, m.my, geometry.mobHarvestRadius);
+          ctx.fill();
+          ctx.stroke();
           break;
         case 'corpse':
           // The local player's body during a ghost run: a procedural skull.

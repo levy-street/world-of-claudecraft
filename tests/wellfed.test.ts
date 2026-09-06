@@ -648,7 +648,9 @@ describe('well fed: the retired namespace is gone (the unification landed)', () 
       }
     }
     expect(offenders, 'files still carrying a per-kind well-fed id').toEqual([]);
-  });
+    // Explicit budget: the synchronous seven-root walk plus comment-stripping
+    // over every file reproducibly exceeds the 20000ms default (isolated repro).
+  }, 60000);
 
   it('every carrier mints exactly the one id at RUNTIME, whatever the source spells', () => {
     // The sweep above reads TEXT, so a per-kind namespace ASSEMBLED at runtime

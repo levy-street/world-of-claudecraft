@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
+import { handleGatherNodeInteract } from '../src/game/gather_node_interact';
 import {
   handlePickedEntity,
   shouldApproachPickedEntity,
@@ -253,6 +254,10 @@ describe('tryNearbyInteraction default arm', () => {
       resurrectAtSpiritHealer: () => false as const,
       nodeHarvestableByMe: () => true,
       harvestNode,
+      // The press now falls through past the corpse to the bed arm, which
+      // reads these; inert here.
+      farmPatches: [],
+      myFarmPlots: [],
     } as unknown as Parameters<typeof tryNearbyInteraction>[0];
     const hud = {
       openMailbox: () => {},
@@ -268,26 +273,25 @@ describe('tryNearbyInteraction default arm', () => {
   it('dispatches a lootable corpse without any harvest-state argument (the default arm)', () => {
     const withLoot = corpse({ loot: { copper: 5, items: [] } });
     const { world, hud, lootCorpse } = nearbyRig(withLoot);
-    expect(
-      tryNearbyInteraction(world, hud, [], null, 'far', 'notReady', 'escortAway', 'nothing'),
-    ).toBe(true);
+    expect(tryNearbyInteraction(world, hud, 'escortAway', 'nothing')).toBe(true);
     expect(lootCorpse).toHaveBeenCalledWith(2);
   });
 
-  it('a harvest-only corpse now captures the interact key (unified press)', () => {
-    // The nearby-interact corpse pick keys off canOpen since the unified
-    // press: a harvest-only corpse is a target, and only its harvest half is
-    // dispatched (no loot command, so no denial toast on an empty table).
+  it('a harvest-only corpse is no interact-key target (intentional gathering: loot only)', () => {
+    // The nearby-interact corpse pick keys off hasLoot: an OPENABLE
+    // harvest-only corpse (canOpen true, the click path above) is still not
+    // a generic press target, so neither half is sent and the press reports
+    // nothing to interact rather than a loot denial toast.
     const { world, hud, lootCorpse, harvestCorpse } = nearbyRig(corpse({}));
-    expect(
-      tryNearbyInteraction(world, hud, [], null, 'far', 'notReady', 'escortAway', 'nothing'),
-    ).toBe(true);
-    expect(harvestCorpse).toHaveBeenCalledWith(2);
+    expect(corpseLootAvailability(corpse({}), 1).canOpen).toBe(true);
+    expect(tryNearbyInteraction(world, hud, 'escortAway', 'nothing')).toBe(false);
+    expect(harvestCorpse).not.toHaveBeenCalled();
     expect(lootCorpse).not.toHaveBeenCalled();
-    expect(hud.showError).not.toHaveBeenCalled();
+    expect(hud.showError).toHaveBeenCalledTimes(1);
+    expect(hud.showError).toHaveBeenCalledWith('nothing');
   });
 
-  it('lets an overlapped node win when the corpse has no loot or harvest for this player', () => {
+  it('never gathers an overlapped node from the press; the explicit node action still does', () => {
     const blockedCorpse = corpse({ loot: null, harvestClaimedBy: 9 });
     const node = {
       id: 'ore_under_corpse',
@@ -299,12 +303,27 @@ describe('tryNearbyInteraction default arm', () => {
     } as const;
     const { world, hud, lootCorpse, harvestCorpse, harvestNode } = nearbyRig(blockedCorpse);
 
-    expect(
-      tryNearbyInteraction(world, hud, [node], null, 'far', 'notReady', 'escortAway', 'nothing'),
-    ).toBe(true);
+    expect(tryNearbyInteraction(world, hud, 'escortAway', 'nothing')).toBe(false);
     expect(harvestCorpse).not.toHaveBeenCalled();
     expect(lootCorpse).not.toHaveBeenCalled();
+    expect(harvestNode).not.toHaveBeenCalled();
+    expect(hud.showError).toHaveBeenCalledWith('nothing');
+
+    // The blocked corpse does not block the deliberate node click beside it.
+    expect(
+      handleGatherNodeInteract(
+        world as unknown as Parameters<typeof handleGatherNodeInteract>[0],
+        hud,
+        world.player.pos,
+        node.id,
+        node.pos,
+        'far',
+        'notReady',
+      ),
+    ).toBe(true);
     expect(harvestNode).toHaveBeenCalledWith('ore_under_corpse');
+    expect(harvestCorpse).not.toHaveBeenCalled();
+    expect(lootCorpse).not.toHaveBeenCalled();
   });
 });
 

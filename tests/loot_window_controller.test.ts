@@ -12,6 +12,20 @@ vi.mock('../src/ui/icons', async (importOriginal) => ({
   iconDataUrl: (kind: string, id: string) => `stub:${kind}:${id}`,
 }));
 
+// A locale-switch probe: `t()` is the real resolver with an optional suffix the
+// relocalize cases flip, so a rebuild that re-resolves its text is observable
+// without loading a second locale. Empty (byte-identical to the real `t`) for
+// every other case; reset in beforeEach.
+const i18nProbe = vi.hoisted(() => ({ suffix: '' }));
+vi.mock('../src/ui/i18n', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../src/ui/i18n')>();
+  return {
+    ...actual,
+    t: (key: Parameters<typeof actual.t>[0], values?: Parameters<typeof actual.t>[1]) =>
+      actual.t(key, values) + i18nProbe.suffix,
+  };
+});
+
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
 import { ITEMS, MOBS } from '../src/sim/data';
 import { isHarvestableCorpse } from '../src/sim/professions/gathering';
@@ -84,7 +98,7 @@ function harness(
   const world = {
     entities,
     playerId: 7,
-    player: { pos: { x: 0, y: 0, z: 0 } },
+    player: { pos: { x: 0, y: 0, z: 0 }, dead: false },
     townFocus,
     lootCorpse,
     harvestCorpse,
@@ -92,6 +106,7 @@ function harness(
   } as unknown as IWorld;
   const closeTransient = vi.fn();
   const hideTooltip = vi.fn();
+  const showError = vi.fn();
   const attachTooltip = vi.fn();
   const centerPopup = vi.fn();
   const placePopup = vi.fn();
@@ -101,6 +116,14 @@ function harness(
   const confirm = vi.fn(
     (_title: string, _body: string, _ok: string, _cancel: string, onOk: () => void) => onOk(),
   );
+  // The shared window-focus bridge shape (Hud.windowFocus): capture records
+  // the opener and installs the trap, restore releases it and returns focus.
+  const opener = document.createElement('button');
+  opener.textContent = 'opener';
+  document.body.appendChild(opener);
+  const captureFocus = vi.fn(() => opener);
+  const restoreFocus = vi.fn();
+  const onVisibilityChange = vi.fn();
   const controller = new LootWindowController({
     element,
     document,
@@ -108,6 +131,7 @@ function harness(
     corpseAvailability,
     closeTransient,
     hideTooltip,
+    showError,
     entityName: (entry) => entry.name,
     money: (copper) => `money:${copper}`,
     coinIconUrl: () => 'coin.png',
@@ -117,6 +141,9 @@ function harness(
     confirm,
     centerPopup,
     placePopup,
+    captureFocus,
+    restoreFocus,
+    onVisibilityChange,
   });
   return {
     controller,
@@ -128,17 +155,120 @@ function harness(
     collectDelveChestLoot,
     closeTransient,
     hideTooltip,
+    showError,
     attachTooltip,
     confirm,
     centerPopup,
     placePopup,
+    opener,
+    captureFocus,
+    restoreFocus,
+    onVisibilityChange,
   };
 }
+
+// Intentional gathering PR1: the corpse popup is a real dialog. It registers
+// the shared focus trap through the injected bridge, marks its root, lands
+// keyboard focus on Close on a FRESH open, and never runs an action on open.
+// Re-opening the SAME body (the Professions entry pressed twice, a second
+// click on the corpse) only refreshes, keeping the player's checkbox picks and
+// focus; opening ANOTHER body is a fresh choice.
+describe('LootWindowController: focus trap and re-entry', () => {
+  beforeEach(() => {
+    document.body.innerHTML = '';
+    document.body.className = '';
+  });
+
+  const harvestOnly = (id: number, x = 0) =>
+    entity(id, { kind: 'mob', templateId: harvestMobId, pos: { x, y: 0, z: 0 } });
+
+  it('marks the dialog root, traps focus once, focuses Close, and sends nothing on a fresh open', () => {
+    const test = harness([harvestOnly(10)]);
+    test.opener.focus();
+
+    test.controller.openCorpse(10, 400, 300);
+
+    expect(test.element.getAttribute('role')).toBe('dialog');
+    expect(test.element.getAttribute('aria-label')).toBe('Entity 10');
+    expect(test.captureFocus).toHaveBeenCalledTimes(1);
+    expect(document.activeElement).toBe(test.element.querySelector('[data-close]'));
+    expect(test.onVisibilityChange).toHaveBeenCalledTimes(1);
+    expect(test.harvestCorpse).not.toHaveBeenCalled();
+    expect(test.lootCorpse).not.toHaveBeenCalled();
+  });
+
+  it('re-opening the SAME body only refreshes: picks and focus survive, the trap is not re-armed', () => {
+    const test = harness([harvestOnly(10)]);
+    test.controller.openCorpse(10, 400, 300);
+    const box = test.element.querySelector<HTMLInputElement>('.corpse-harvest-check');
+    if (!box) throw new Error('expected a harvest checkbox');
+    box.checked = false;
+    box.focus();
+
+    test.controller.openCorpse(10, 410, 310);
+
+    // The same node: no rebuild, so the unchecked pick and the focus both hold.
+    expect(test.element.querySelector('.corpse-harvest-check')).toBe(box);
+    expect(box.checked).toBe(false);
+    expect(document.activeElement).toBe(box);
+    expect(test.captureFocus).toHaveBeenCalledTimes(1);
+    expect(test.onVisibilityChange).toHaveBeenCalledTimes(1);
+    expect(test.harvestCorpse).not.toHaveBeenCalled();
+    expect(test.lootCorpse).not.toHaveBeenCalled();
+  });
+
+  it('opening ANOTHER body is a fresh choice: rebuilt, Close focused, the original opener kept', () => {
+    const test = harness([harvestOnly(10), harvestOnly(11, 2)]);
+    test.controller.openCorpse(10, 400, 300);
+    test.element.querySelector<HTMLInputElement>('.corpse-harvest-check')?.focus();
+
+    test.controller.openCorpse(11, 400, 300);
+
+    expect(test.element.querySelector('.panel-title')?.textContent).toContain('Entity 11');
+    expect(test.element.getAttribute('aria-label')).toBe('Entity 11');
+    expect(document.activeElement).toBe(test.element.querySelector('[data-close]'));
+    // One trap for the whole visit: re-capturing here would record a control
+    // inside the popup itself as the opener, which the switch just discarded.
+    expect(test.captureFocus).toHaveBeenCalledTimes(1);
+    expect(test.restoreFocus).not.toHaveBeenCalled();
+    expect(test.harvestCorpse).not.toHaveBeenCalled();
+  });
+
+  it('close releases the trap to the opener and syncs the window-open body state', () => {
+    const test = harness([harvestOnly(10)]);
+    test.controller.openCorpse(10, 400, 300);
+
+    test.controller.close();
+
+    expect(test.restoreFocus).toHaveBeenCalledTimes(1);
+    expect(test.restoreFocus).toHaveBeenCalledWith(test.opener);
+    expect(test.onVisibilityChange).toHaveBeenCalledTimes(2);
+    expect(test.element.style.display).toBe('none');
+
+    // A second close is a no-op: nothing to release twice.
+    test.controller.close();
+    expect(test.restoreFocus).toHaveBeenCalledTimes(1);
+  });
+
+  it('refuses to open for a dead viewer or a body out of the popup range', () => {
+    const dead = harness([harvestOnly(10)]);
+    (dead.world.player as { dead: boolean }).dead = true;
+    dead.controller.openCorpse(10, 400, 300);
+    expect(dead.element.style.display).not.toBe('block');
+    expect(dead.captureFocus).not.toHaveBeenCalled();
+
+    const far = harness([harvestOnly(10, 7.5)]);
+    far.controller.openCorpse(10, 400, 300);
+    expect(far.element.style.display).not.toBe('block');
+    expect(far.captureFocus).not.toHaveBeenCalled();
+  });
+});
 
 describe('LootWindowController', () => {
   beforeEach(() => {
     document.body.innerHTML = '';
     document.body.className = '';
+    i18nProbe.suffix = '';
   });
 
   it('renders only authoritative personal corpse loot and delegates Take Loot', () => {
@@ -182,8 +312,11 @@ describe('LootWindowController', () => {
     expect(tooltipFor(harvest)).toBe(
       'Gathers the checked components. Each corpse can be harvested once, first come. Does not take the loot.',
     );
+    // Intentional gathering PR1: the interact key takes ordinary loot only, so
+    // the footer hint must not promise a one-press harvest. No key name: the
+    // interact key is remappable.
     expect(test.element.querySelector('.town-focus-hint')?.textContent).toBe(
-      'The interact key loots and harvests in one press, using your town focus.',
+      'The interact key only takes the loot. To gather components, use Harvest here.',
     );
     takeLoot?.click();
 
@@ -407,7 +540,7 @@ describe('LootWindowController', () => {
       // the sentence is true and still rendered, so the gate is not a blanket
       // removal.
       expect(mixedTest.element.querySelector('.town-focus-hint')?.textContent).toBe(
-        'The interact key loots and harvests in one press, using your town focus.',
+        'The interact key only takes the loot. To gather components, use Harvest here.',
       );
     });
     // ...and on real content, where every shipped tag maps since Phase 11m:
@@ -593,5 +726,494 @@ describe('LootWindowController', () => {
     const tooltipHtml = (ghostAttach[1] as () => string)();
     expect(tooltipHtml).toContain('ghost_future_item');
     expect(tooltipHtml).not.toContain('tooltip:');
+  });
+
+  // Intentional gathering PR1: the popup is a view over a server-authoritative
+  // snapshot, and the next snapshot can retire an action it advertises (another
+  // player claims the harvest, the loot is taken or expires, the corpse decays).
+  // updateProximity is the one per-frame hook the coordinator already drives, so
+  // it re-reads corpseLootAvailability and refreshes the body ONLY when the
+  // advertised set changes, and every button re-checks the live availability
+  // before it dispatches.
+  describe('live availability after later snapshots', () => {
+    function openHarvestAndLoot(id = 50) {
+      const mob = entity(id, {
+        kind: 'mob',
+        templateId: harvestMobId,
+        loot: { copper: 25, items: [{ itemId: itemIds[0], count: 1, personalFor: [7] }] },
+      });
+      const test = harness([mob]);
+      test.controller.openCorpse(id, 400, 300);
+      expect(test.element.querySelector('.corpse-harvest')).not.toBeNull();
+      expect(test.element.querySelector('.btn:not(.corpse-harvest-btn)')).not.toBeNull();
+      return { mob, test };
+    }
+
+    it('drops the Harvest section once another player claims the harvest, keeping Take Loot', () => {
+      const { mob, test } = openHarvestAndLoot();
+
+      mob.harvestClaimedBy = 9;
+      test.controller.updateProximity();
+
+      expect(test.element.style.display).toBe('block');
+      expect(test.element.querySelector('.corpse-harvest')).toBeNull();
+      expect(test.element.querySelector('.corpse-harvest-btn')).toBeNull();
+      expect(test.element.querySelector('.town-focus-hint')).toBeNull();
+      const takeLoot = test.element.querySelector<HTMLButtonElement>(
+        '.btn:not(.corpse-harvest-btn)',
+      );
+      expect(takeLoot?.textContent).toBe('Take Loot');
+      expect(test.element.innerHTML).toContain('money:25');
+      // A refresh never re-places the popup: the player is looking at it.
+      expect(test.placePopup).toHaveBeenCalledTimes(1);
+      expect(test.closeTransient).toHaveBeenCalledTimes(1);
+    });
+
+    it('drops the loot rows and Take Loot once the loot is gone, keeping the Harvest picker', () => {
+      const { mob, test } = openHarvestAndLoot();
+
+      mob.loot = null;
+      test.controller.updateProximity();
+
+      expect(test.element.style.display).toBe('block');
+      expect(test.element.innerHTML).not.toContain('money:25');
+      expect(test.element.innerHTML).not.toContain(`data-item="${itemIds[0]}"`);
+      expect(test.element.querySelector('.btn:not(.corpse-harvest-btn)')).toBeNull();
+      expect(test.element.querySelector('.corpse-harvest-btn')).not.toBeNull();
+    });
+
+    it('closes when nothing advertised remains (claimed harvest AND emptied loot)', () => {
+      const { mob, test } = openHarvestAndLoot();
+
+      mob.harvestClaimedBy = 9;
+      mob.loot = null;
+      test.controller.updateProximity();
+
+      expect(test.element.style.display).toBe('none');
+      expect(test.hideTooltip).toHaveBeenCalledTimes(1);
+    });
+
+    it('closes when the corpse entity leaves the snapshot', () => {
+      const { test } = openHarvestAndLoot(51);
+
+      test.entities.delete(51);
+      test.controller.updateProximity();
+
+      expect(test.element.style.display).toBe('none');
+    });
+
+    it('leaves the DOM untouched across identical frames', () => {
+      const { test } = openHarvestAndLoot();
+      const before = test.element.innerHTML;
+      const takeLoot = test.element.querySelector<HTMLButtonElement>(
+        '.btn:not(.corpse-harvest-btn)',
+      );
+      const attachCalls = test.attachTooltip.mock.calls.length;
+
+      test.controller.updateProximity();
+      test.controller.updateProximity();
+
+      expect(test.element.innerHTML).toBe(before);
+      // Same node identity: no rebuild happened, so no listener was re-attached.
+      expect(test.element.querySelector('.btn:not(.corpse-harvest-btn)')).toBe(takeLoot);
+      expect(test.attachTooltip).toHaveBeenCalledTimes(attachCalls);
+    });
+
+    it("a refresh keeps the player's checkbox choices and their keyboard focus", () => {
+      const tags = harvestMobTags;
+      const mob = entity(52, {
+        kind: 'mob',
+        templateId: harvestMobId,
+        loot: { copper: 25, items: [] },
+      });
+      const test = harness([mob], (entry) => corpseLootAvailability(entry, 7), { [tags[0]]: 5 });
+      test.controller.openCorpse(52, 400, 300);
+      const boxes = [...test.element.querySelectorAll<HTMLInputElement>('.corpse-harvest-check')];
+      // Invert the town-focus default: uncheck the focused box, check the second.
+      boxes[0].checked = false;
+      boxes[1].checked = true;
+      boxes[1].focus();
+      expect(document.activeElement).toBe(boxes[1]);
+
+      // The coin is taken by a party member: the loot half changes, the harvest half stays.
+      mob.loot = null;
+      test.controller.updateProximity();
+
+      const after = [...test.element.querySelectorAll<HTMLInputElement>('.corpse-harvest-check')];
+      expect(after.map((box) => [box.value, box.checked])).toEqual(
+        tags.map((tag) => [tag, tag === tags[1]]),
+      );
+      expect(document.activeElement).toBe(after[1]);
+      expect(test.element.innerHTML).not.toContain('money:25');
+
+      // The rebuilt picker still submits the carried selection.
+      test.element.querySelector<HTMLButtonElement>('.corpse-harvest-btn')?.click();
+      expect(test.harvestCorpse).toHaveBeenCalledWith(52, [tags[1]]);
+    });
+
+    it('a refresh keeps focus on Take Loot when the harvest half disappears', () => {
+      const { mob, test } = openHarvestAndLoot();
+      const takeLoot = test.element.querySelector<HTMLButtonElement>(
+        '.btn:not(.corpse-harvest-btn)',
+      );
+      takeLoot?.focus();
+      expect(document.activeElement).toBe(takeLoot);
+
+      mob.harvestClaimedBy = 9;
+      test.controller.updateProximity();
+
+      const rebuilt = test.element.querySelector<HTMLButtonElement>(
+        '.btn:not(.corpse-harvest-btn)',
+      );
+      expect(rebuilt).not.toBeNull();
+      expect(document.activeElement).toBe(rebuilt);
+    });
+
+    it('a refresh never promotes focus from Harvest to Take Loot: it degrades to Close', () => {
+      // Focus was on the destructive control that just disappeared. Landing on
+      // the OTHER destructive control would turn the player's pending Enter into
+      // a take they never chose; Close is the only safe rung.
+      const { mob, test } = openHarvestAndLoot();
+      test.element.querySelector<HTMLButtonElement>('.corpse-harvest-btn')?.focus();
+
+      mob.harvestClaimedBy = 9;
+      test.controller.updateProximity();
+
+      expect(test.element.querySelector('.corpse-harvest-btn')).toBeNull();
+      expect(document.activeElement).toBe(test.element.querySelector('[data-close]'));
+      expect(document.activeElement).not.toBe(
+        test.element.querySelector('.btn:not(.corpse-harvest-btn)'),
+      );
+    });
+
+    it('a refresh never promotes focus from Take Loot to Harvest: it degrades to Close', () => {
+      const { mob, test } = openHarvestAndLoot();
+      test.element.querySelector<HTMLButtonElement>('.btn:not(.corpse-harvest-btn)')?.focus();
+
+      mob.loot = null;
+      test.controller.updateProximity();
+
+      expect(test.element.querySelector('.btn:not(.corpse-harvest-btn)')).toBeNull();
+      expect(document.activeElement).toBe(test.element.querySelector('[data-close]'));
+      expect(document.activeElement).not.toBe(test.element.querySelector('.corpse-harvest-btn'));
+    });
+
+    it('a focused checkbox whose picker disappears degrades to Close, never to Take Loot', () => {
+      const { mob, test } = openHarvestAndLoot();
+      test.element.querySelector<HTMLInputElement>('.corpse-harvest-check')?.focus();
+
+      mob.harvestClaimedBy = 9;
+      test.controller.updateProximity();
+
+      expect(document.activeElement).toBe(test.element.querySelector('[data-close]'));
+    });
+
+    it('a changed loot pool repaints the rows (copper moved) and keeps the popup open', () => {
+      const { mob, test } = openHarvestAndLoot();
+      expect(test.element.innerHTML).toContain('money:25');
+
+      if (mob.loot) mob.loot.copper = 10;
+      test.controller.updateProximity();
+
+      expect(test.element.style.display).toBe('block');
+      expect(test.element.innerHTML).toContain('money:10');
+      expect(test.element.innerHTML).not.toContain('money:25');
+    });
+
+    it("a detached Take Loot button from a previous corpse never acts on the new corpse's availability", () => {
+      // Corpse A is open; the player opens corpse B (a new open replaces the
+      // body). A's button is detached but still holds its handler. Clicking it
+      // must neither take A (the popup no longer stands for A) nor close B.
+      const a = entity(70, {
+        kind: 'mob',
+        templateId: harvestMobId,
+        loot: { copper: 5, items: [] },
+      });
+      const b = entity(71, {
+        kind: 'mob',
+        templateId: harvestMobId,
+        loot: { copper: 6, items: [] },
+      });
+      const test = harness([a, b]);
+      test.controller.openCorpse(70, 0, 0);
+      const staleTakeLoot = test.element.querySelector<HTMLButtonElement>(
+        '.btn:not(.corpse-harvest-btn)',
+      );
+      const staleHarvest = test.element.querySelector<HTMLButtonElement>('.corpse-harvest-btn');
+      test.controller.openCorpse(71, 0, 0);
+
+      staleTakeLoot?.click();
+      staleHarvest?.click();
+
+      expect(test.lootCorpse).not.toHaveBeenCalled();
+      expect(test.harvestCorpse).not.toHaveBeenCalled();
+      expect(test.element.style.display).toBe('block');
+      expect(test.element.innerHTML).toContain('money:6');
+    });
+
+    function openBindingLoot(id = 80) {
+      const mob = entity(id, {
+        kind: 'mob',
+        templateId: harvestMobId,
+        loot: { copper: 0, items: [{ itemId: 'heroic_mark', count: 1, personalFor: [7] }] },
+      });
+      const test = harness([mob]);
+      // Hold the confirm open: capture onOk instead of accepting.
+      let pendingOk: (() => void) | null = null;
+      test.confirm.mockImplementation((_t, _b, _o, _c, onOk) => {
+        pendingOk = onOk;
+      });
+      test.controller.openCorpse(id, 0, 0);
+      test.element.querySelector<HTMLButtonElement>('.btn:not(.corpse-harvest-btn)')?.click();
+      expect(test.confirm).toHaveBeenCalledTimes(1);
+      const accept = (): void => {
+        if (!pendingOk) throw new Error('confirm was not opened');
+        pendingOk();
+      };
+      return { mob, test, accept };
+    }
+
+    it('a pending bind confirm re-checks the loot when accepted (loot gone: no take)', () => {
+      const { mob, test, accept } = openBindingLoot();
+
+      mob.loot = null;
+      accept();
+
+      expect(test.lootCorpse).not.toHaveBeenCalled();
+    });
+
+    it('a pending bind confirm never takes a DIFFERENT corpse opened meanwhile', () => {
+      const { test, accept } = openBindingLoot(81);
+      const other = entity(82, {
+        kind: 'mob',
+        templateId: harvestMobId,
+        loot: { copper: 9, items: [] },
+      });
+      test.entities.set(82, other);
+      test.controller.openCorpse(82, 0, 0);
+
+      accept();
+
+      expect(test.lootCorpse).not.toHaveBeenCalled();
+      // The switched-to popup is left standing.
+      expect(test.element.style.display).toBe('block');
+      expect(test.element.innerHTML).toContain('money:9');
+    });
+
+    it('closing and reopening the same corpse retires its old confirmation', () => {
+      const { test, accept } = openBindingLoot(89);
+      test.controller.close();
+      test.controller.openCorpse(89, 0, 0);
+
+      accept();
+
+      expect(test.lootCorpse).not.toHaveBeenCalled();
+      expect(test.element.style.display).toBe('block');
+    });
+
+    it('closing and reopening the same corpse retires its old harvest choice', () => {
+      const { test } = openHarvestAndLoot(90);
+      const oldHarvest = test.element.querySelector<HTMLButtonElement>('.corpse-harvest-btn');
+      expect(oldHarvest).not.toBeNull();
+      test.controller.close();
+      test.controller.openCorpse(90, 0, 0);
+
+      oldHarvest?.click();
+
+      expect(test.harvestCorpse).not.toHaveBeenCalled();
+      expect(test.element.style.display).toBe('block');
+    });
+
+    it('a pending bind confirm does nothing once the player has died', () => {
+      const { test, accept } = openBindingLoot(83);
+
+      (test.world.player as { dead: boolean }).dead = true;
+      accept();
+
+      expect(test.lootCorpse).not.toHaveBeenCalled();
+    });
+
+    it('a pending bind confirm does nothing once the corpse left the snapshot', () => {
+      const { test, accept } = openBindingLoot(84);
+
+      test.entities.delete(84);
+      accept();
+
+      expect(test.lootCorpse).not.toHaveBeenCalled();
+      expect(test.element.style.display).toBe('none');
+    });
+
+    it('a pending bind confirm still takes when everything is unchanged', () => {
+      const { test, accept } = openBindingLoot(85);
+
+      accept();
+
+      expect(test.lootCorpse).toHaveBeenCalledWith(85);
+      expect(test.element.style.display).toBe('none');
+    });
+
+    it("closes the corpse popup on the player's death (nothing here can be taken while dead)", () => {
+      const { test } = openHarvestAndLoot(86);
+
+      (test.world.player as { dead: boolean }).dead = true;
+      test.controller.updateProximity();
+
+      expect(test.element.style.display).toBe('none');
+    });
+
+    it('Take Loot re-checks the live loot before dispatching (stale snapshot, no take)', () => {
+      const { mob, test } = openHarvestAndLoot();
+      const takeLoot = test.element.querySelector<HTMLButtonElement>(
+        '.btn:not(.corpse-harvest-btn)',
+      );
+
+      // The snapshot moved but no frame has refreshed the popup yet.
+      mob.loot = null;
+      takeLoot?.click();
+
+      expect(test.lootCorpse).not.toHaveBeenCalled();
+      expect(test.confirm).not.toHaveBeenCalled();
+      // The click brought the popup up to date instead: the harvest half stays.
+      expect(test.element.style.display).toBe('block');
+      expect(test.element.querySelector('.btn:not(.corpse-harvest-btn)')).toBeNull();
+      expect(test.element.querySelector('.corpse-harvest-btn')).not.toBeNull();
+    });
+
+    it('Take Loot never harvests, even when it is the only action left', () => {
+      const { mob, test } = openHarvestAndLoot();
+      mob.harvestClaimedBy = 9;
+      test.controller.updateProximity();
+
+      test.element.querySelector<HTMLButtonElement>('.btn:not(.corpse-harvest-btn)')?.click();
+
+      expect(test.lootCorpse).toHaveBeenCalledWith(50);
+      expect(test.harvestCorpse).not.toHaveBeenCalled();
+    });
+
+    it('Harvest re-checks the live claim before dispatching (stale snapshot, no harvest)', () => {
+      const { mob, test } = openHarvestAndLoot();
+      const harvest = test.element.querySelector<HTMLButtonElement>('.corpse-harvest-btn');
+
+      mob.harvestClaimedBy = 9;
+      harvest?.click();
+
+      expect(test.harvestCorpse).not.toHaveBeenCalled();
+      expect(test.lootCorpse).not.toHaveBeenCalled();
+      expect(test.element.style.display).toBe('block');
+      expect(test.element.querySelector('.corpse-harvest')).toBeNull();
+      expect(test.element.querySelector('.btn:not(.corpse-harvest-btn)')).not.toBeNull();
+    });
+
+    it('a stale click with nothing left closes the popup without dispatching', () => {
+      const { mob, test } = openHarvestAndLoot();
+      const takeLoot = test.element.querySelector<HTMLButtonElement>(
+        '.btn:not(.corpse-harvest-btn)',
+      );
+
+      mob.loot = null;
+      mob.harvestClaimedBy = 9;
+      takeLoot?.click();
+
+      expect(test.lootCorpse).not.toHaveBeenCalled();
+      expect(test.harvestCorpse).not.toHaveBeenCalled();
+      expect(test.element.style.display).toBe('none');
+    });
+
+    it('Harvest never takes the loot', () => {
+      const { test } = openHarvestAndLoot();
+
+      test.element.querySelector<HTMLButtonElement>('.corpse-harvest-btn')?.click();
+
+      expect(test.harvestCorpse).toHaveBeenCalledTimes(1);
+      expect(test.lootCorpse).not.toHaveBeenCalled();
+    });
+
+    it('relocalize() rebuilds an open corpse popup once with fresh text, keeping picks and focus', () => {
+      // The body is repaint-signature gated on DATA, so a language switch alone
+      // never moves it; the Hud fan-out calls relocalize() (the
+      // tests/language_fanout_registry contract): exactly one rebuild, re-latched.
+      const tags = harvestMobTags;
+      const mob = entity(90, {
+        kind: 'mob',
+        templateId: harvestMobId,
+        loot: { copper: 3, items: [] },
+      });
+      const test = harness([mob], (entry) => corpseLootAvailability(entry, 7), { [tags[0]]: 5 });
+      test.controller.openCorpse(90, 0, 0);
+      const boxes = [...test.element.querySelectorAll<HTMLInputElement>('.corpse-harvest-check')];
+      boxes[0].checked = false;
+      boxes[1].checked = true;
+      boxes[1].focus();
+      const hintBefore = test.element.querySelector('.town-focus-hint')?.textContent ?? '';
+
+      i18nProbe.suffix = ' [xx]';
+      test.controller.relocalize();
+
+      const hint = test.element.querySelector('.town-focus-hint');
+      expect(hint?.textContent).toBe(`${hintBefore} [xx]`);
+      expect(test.element.querySelector('.btn:not(.corpse-harvest-btn)')?.textContent).toBe(
+        'Take Loot [xx]',
+      );
+      const after = [...test.element.querySelectorAll<HTMLInputElement>('.corpse-harvest-check')];
+      expect(after.map((box) => [box.value, box.checked])).toEqual(
+        tags.map((tag) => [tag, tag === tags[1]]),
+      );
+      expect(document.activeElement).toBe(after[1]);
+      // Re-latched, not cleared: the next poll rebuilds nothing.
+      test.controller.updateProximity();
+      expect(test.element.querySelector('.town-focus-hint')).toBe(hint);
+    });
+
+    it('relocalize() is a no-op while nothing is open and while a chest is open', () => {
+      const chest = entity(91, { kind: 'object', templateId: 'delve_chest' });
+      const test = harness([chest]);
+      test.controller.relocalize();
+      expect(test.element.innerHTML).toBe('');
+      expect(test.element.style.display).not.toBe('block');
+
+      test.controller.openChest(91, [{ itemId: itemIds[0], count: 1 }]);
+      const takeAll = test.element.querySelector<HTMLButtonElement>('.btn');
+      i18nProbe.suffix = ' [xx]';
+      test.controller.relocalize();
+      // The chest body is built once on open and is not rebuilt here (no signature,
+      // nothing to re-latch); its node survives.
+      expect(test.element.querySelector<HTMLButtonElement>('.btn')).toBe(takeAll);
+    });
+
+    it('the chest arm is untouched: Take All still collects and proximity only checks the entity', () => {
+      const chest = entity(60, { kind: 'object', templateId: 'delve_chest' });
+      const corpseAvailability = vi.fn(() => {
+        throw new Error('the chest arm must never consult corpse availability');
+      });
+      const test = harness([chest], corpseAvailability);
+
+      test.controller.openChest(60, [{ itemId: itemIds[0], count: 1 }]);
+      test.controller.updateProximity();
+      expect(corpseAvailability).not.toHaveBeenCalled();
+      expect(test.element.style.display).toBe('block');
+      test.element.querySelector<HTMLButtonElement>('.btn')?.click();
+      expect(test.collectDelveChestLoot).toHaveBeenCalledWith(60);
+    });
+  });
+});
+
+describe('LootWindowController: Professions entry orchestration', () => {
+  it('opens a centered choice without collecting either loot half', () => {
+    const h = harness([
+      entity(90, { kind: 'mob', templateId: harvestMobId, dead: true, corpseTimer: 10 }),
+    ]);
+    h.controller.openHarvestBodyChoice();
+    expect(h.element.style.display).toBe('block');
+    expect(h.centerPopup).toHaveBeenCalledWith(h.element);
+    expect(h.lootCorpse).not.toHaveBeenCalled();
+    expect(h.harvestCorpse).not.toHaveBeenCalled();
+  });
+
+  it('reports no body in reach and leaves the dialog closed', () => {
+    const h = harness([]);
+    h.controller.openHarvestBodyChoice();
+    expect(h.showError).toHaveBeenCalledWith('Nothing to interact with.');
+    expect(h.element.style.display).not.toBe('block');
+    expect(h.harvestCorpse).not.toHaveBeenCalled();
   });
 });

@@ -3,6 +3,7 @@
 // projection, decluttering, text/image caches, and the single canvas surface.
 
 import * as THREE from 'three';
+import { corpseIndicatorFor } from '../sim/corpse_loot_state';
 import { ABILITIES, MOBS, QUESTS } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
 import { isQuestGatedEntityHidden } from '../sim/quest_gated_entity';
@@ -145,6 +146,10 @@ export class NameplatePainter {
     questsDone: ReadonlySet<string>;
     cadenceBlocked: ReadonlySet<string> | undefined;
   } | null = null;
+  // The viewer's party roster (pids), refilled in place at the top of every
+  // pass so the corpse indicator (corpseIndicatorFor) can answer loot rights
+  // without a per-plate allocation; empty when solo.
+  private readonly viewerPartyIds: number[] = [];
 
   constructor(deps: NameplatePainterDeps) {
     this.views = deps.views;
@@ -182,6 +187,11 @@ export class NameplatePainter {
     // Drop the quest-marker snapshot at every full pass so it re-resolves
     // lazily below; throttled passes reuse it (see the field's rationale).
     if (fullPass) this.questMarkerCtx = null;
+    this.viewerPartyIds.length = 0;
+    const partyMembers = world.partyInfo?.members;
+    if (partyMembers) {
+      for (const member of partyMembers) this.viewerPartyIds.push(member.pid);
+    }
 
     for (const [id, view] of this.views) {
       const entity = world.entities.get(id);
@@ -502,8 +512,14 @@ export class NameplatePainter {
         });
     state.levelColor = mobNameColor(entity.level - player.level, entity.dead, state.friendlyPet);
     state.hpVisible = !entity.dead;
-    state.marker = entity.lootable ? 'loot' : elite && !entity.dead ? '◆' : '';
-    state.markerTone = entity.lootable ? 'loot' : 'none';
+    // What this body still offers THIS viewer, never the bare lootable flag: a
+    // harvest-only body keeps `lootable` true through its grace window, and a
+    // stranger's owner-locked kill is lootable for someone else. Ordinary loot
+    // wins the satchel; an open harvest with no ordinary loot shows the blade;
+    // neither shows nothing.
+    const corpse = corpseIndicatorFor(entity, player.id, this.viewerPartyIds);
+    state.marker = corpse !== 'none' ? corpse : elite && !entity.dead ? '◆' : '';
+    state.markerTone = corpse;
     state.frame = entity.dead ? '' : boss ? 'boss' : elite ? 'elite' : '';
   }
 

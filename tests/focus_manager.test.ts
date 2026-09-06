@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { FOCUSABLE_SELECTOR, FocusManager } from '../src/ui/focus_manager';
 import { MobileMoreDialogController } from '../src/ui/mobile_more_dialog';
 import { dropPointerFocus } from '../src/ui/pointer_blur';
+import { makeWindowFocus } from '../src/ui/window_focus';
 
 // The shared focus-manager TRAP wiring. The pure boundary math (nextFocusIndex)
 // is covered by focus_order.test.ts; this file exercises the wiring the manager layers on
@@ -62,8 +63,12 @@ class FakeHTMLElement {
 
   // visible -> a non-empty rect list (rendered); hidden -> [] (the manager treats a
   // zero-rect element as unfocusable, matching getClientRects().length on a real DOM).
+  // Rendering is INHERITED, so an ancestor being hidden empties this too: a button
+  // inside a closed window has no rects of its own, which is exactly what makes
+  // focusing it a silent no-op in a browser.
   getClientRects(): { length: number }[] {
-    return this.visible ? [{ length: 1 }] : [];
+    for (let n: FakeHTMLElement | null = this; n; n = n.parent) if (!n.visible) return [];
+    return [{ length: 1 }];
   }
 
   contains(el: FakeHTMLElement | null): boolean {
@@ -360,6 +365,142 @@ describe('FocusManager open/release stack', () => {
   });
 });
 
+// A window can go away UNDER a modal it opened: the corpse popup despawns while
+// its bind-on-pickup confirmation is still on screen. The window's own close then
+// hands focus back to ITS opener, which used to yank the caret straight out of the
+// live confirmation (and left that confirmation pointing at a return target inside
+// the hidden window). The trap chain is the owner of both halves.
+describe('a window released UNDER a live trap above it', () => {
+  function rig() {
+    const opener = new FakeHTMLElement({ focusable: true }); // the Professions entry
+    const windowRoot = new FakeHTMLElement(); // the corpse popup
+    const take = new FakeHTMLElement({ focusable: true }); // its Take Loot button
+    windowRoot.append(take);
+    const modalRoot = new FakeHTMLElement(); // the bind confirmation
+    const ok = new FakeHTMLElement({ focusable: true });
+    modalRoot.append(ok);
+    const fm = new FocusManager();
+
+    opener.focus();
+    const windowTrap = fm.open({ root: () => el(windowRoot) }); // opener recorded
+    take.focus();
+    const modalTrap = fm.open({ root: () => el(modalRoot) }); // opener = take
+    ok.focus();
+    return { fm, opener, windowRoot, take, modalRoot, modalTrap, ok, windowTrap };
+  }
+
+  it('leaves focus in the modal instead of returning it to the closing window opener', () => {
+    const { windowRoot, windowTrap, ok } = rig();
+    windowRoot.visible = false; // the corpse despawned; the popup hid itself
+    windowTrap.release(true);
+    expect(fakeDoc.activeElement).toBe(ok);
+  });
+
+  it('bequeaths its opener to the modal, whose own opener died with the window', () => {
+    const { windowRoot, windowTrap, modalTrap, opener } = rig();
+    windowRoot.visible = false;
+    windowTrap.release(true);
+    expect(modalTrap.opener()).toBe(opener);
+    modalTrap.release(true); // the player answers the confirmation
+    expect(fakeDoc.activeElement).toBe(opener); // ... and lands somewhere real
+  });
+
+  it('carries an EXPLICIT return target up, not just the recorded opener', () => {
+    // The window-focus bridge passes the target the window stored for itself.
+    const { windowRoot, windowTrap, modalTrap } = rig();
+    const elsewhere = new FakeHTMLElement({ focusable: true });
+    windowRoot.visible = false;
+    windowTrap.release(true, elsewhere as unknown as HTMLElement);
+    expect(modalTrap.opener()).toBe(elsewhere);
+  });
+
+  it('still inherits when the window REBUILT the opener away before closing', () => {
+    // These popups are live views: an ordinary loot change repaints the body and
+    // destroys the element the modal was opened from, long before the corpse
+    // itself goes. Ownership is recorded at open() precisely so the answer does
+    // not depend on interrogating a node that no longer has a parent.
+    const { windowRoot, windowTrap, modalTrap, take, opener } = rig();
+    windowRoot.children.length = 0; // the popup repainted its body
+    take.parent = null;
+    take.isConnected = false;
+    windowTrap.release(true); // ... and only then did the body despawn
+    expect(modalTrap.opener()).toBe(opener);
+    modalTrap.release(true);
+    expect(fakeDoc.activeElement).toBe(opener);
+  });
+
+  it('keeps a still-focusable child opener when the window merely released its trap', () => {
+    // Not every release is a close: the window is still on screen and the control
+    // the modal came from still works, so the player's own return point wins.
+    const { windowTrap, modalTrap, take } = rig();
+    windowTrap.release(true);
+    expect(modalTrap.opener()).toBe(take);
+  });
+
+  it('hands a grandchild up the chain when two windows close under one modal', () => {
+    // professions -> corpse popup -> confirmation: with the middle window gone the
+    // confirmation belongs to the professions window, so THAT closing under it
+    // hands the chain up once more rather than stranding the return.
+    const rail = new FakeHTMLElement({ focusable: true });
+    const outerRoot = new FakeHTMLElement();
+    const entry = new FakeHTMLElement({ focusable: true });
+    outerRoot.append(entry);
+    const innerRoot = new FakeHTMLElement();
+    const take = new FakeHTMLElement({ focusable: true });
+    innerRoot.append(take);
+    const modalRoot = new FakeHTMLElement();
+    const ok = new FakeHTMLElement({ focusable: true });
+    modalRoot.append(ok);
+    const fm = new FocusManager();
+
+    rail.focus();
+    const outer = fm.open({ root: () => el(outerRoot) });
+    entry.focus();
+    const inner = fm.open({ root: () => el(innerRoot) });
+    take.focus();
+    const modal = fm.open({ root: () => el(modalRoot) });
+    ok.focus();
+
+    innerRoot.visible = false;
+    inner.release(true);
+    expect(modal.opener()).toBe(entry); // the professions entry, still on screen
+    outerRoot.visible = false;
+    entry.visible = false;
+    outer.release(true);
+    expect(modal.opener()).toBe(rail); // ... and now the rail behind it
+    expect(fakeDoc.activeElement).toBe(ok); // focus never left the confirmation
+    modal.release(true);
+    expect(fakeDoc.activeElement).toBe(rail);
+  });
+
+  it('leaves a modal opened from OUTSIDE the closing window pointing where it was', () => {
+    const { fm, windowRoot, windowTrap } = rig();
+    const outside = new FakeHTMLElement({ focusable: true });
+    outside.focus();
+    const later = fm.open({ root: () => el(new FakeHTMLElement()) });
+    windowRoot.visible = false;
+    windowTrap.release(true);
+    expect(later.opener()).toBe(outside); // not adopted: it never lived in the window
+  });
+
+  it('still returns focus when the trap above was itself already released', () => {
+    const { windowRoot, windowTrap, modalTrap, opener } = rig();
+    modalTrap.release(false); // the confirmation was answered first
+    windowRoot.visible = false;
+    windowTrap.release(true);
+    expect(fakeDoc.activeElement).toBe(opener); // the ordinary return is intact
+  });
+
+  it('still returns focus when the window above it is gone from the screen', () => {
+    // A leaked trap (window torn down without release) must not strand the return.
+    const { windowRoot, modalRoot, windowTrap, opener } = rig();
+    modalRoot.visible = false;
+    windowRoot.visible = false;
+    windowTrap.release(true);
+    expect(fakeDoc.activeElement).toBe(opener);
+  });
+});
+
 describe('FocusManager listener lifecycle', () => {
   it('installs the keydown listener only while a trap is open', () => {
     const root = new FakeHTMLElement();
@@ -410,6 +551,58 @@ describe('opener capture vs the pointer-only focus drop (src/ui/pointer_blur.ts)
     const trap = new FocusManager().open({ root: () => el(nextRoot) });
     expect(trap.opener()).toBe(parkedRoot);
     trap.release(false);
+  });
+});
+
+// The {captureFocus, restoreFocus} bridge every painter window is wired through
+// (src/ui/window_focus.ts), over the real manager: it is the ONE glue hud.ts and
+// the browser E2E share, so its three cases belong beside the trap chain they use.
+describe('the window-focus bridge', () => {
+  function rig() {
+    const opener = new FakeHTMLElement({ focusable: true });
+    const root = new FakeHTMLElement();
+    const a = new FakeHTMLElement({ focusable: true });
+    const b = new FakeHTMLElement({ focusable: true });
+    root.append(a, b);
+    const fm = new FocusManager();
+    const bridge = makeWindowFocus(fm, () => el(root));
+    return { fm, bridge, opener, root, a, b };
+  }
+
+  it('returns focus to the opener it captured when the window closes', () => {
+    const { bridge, opener, a } = rig();
+    opener.focus();
+    expect(bridge.captureFocus()).toBe(opener);
+    a.focus();
+    bridge.restoreFocus(opener as unknown as HTMLElement);
+    expect(fakeDoc.activeElement).toBe(opener);
+  });
+
+  it('keeps the trap armed for an in-window refocus (a rebuilt row taking focus back)', () => {
+    const { bridge, opener, a, b } = rig();
+    opener.focus();
+    bridge.captureFocus();
+    bridge.restoreFocus(b as unknown as HTMLElement);
+    expect(fakeDoc.activeElement).toBe(b);
+    expect(tab()).toBe(true); // the window still owns Tab
+    expect(fakeDoc.activeElement).toBe(a); // wrapped inside the window
+  });
+
+  it('leaves focus in a modal opened over it, and hands that modal its opener', () => {
+    const { fm, bridge, opener, root, a } = rig();
+    opener.focus();
+    bridge.captureFocus();
+    a.focus(); // the control that opened the prompt
+    const modalRoot = new FakeHTMLElement();
+    const ok = new FakeHTMLElement({ focusable: true });
+    modalRoot.append(ok);
+    const modal = fm.open({ root: () => el(modalRoot) });
+    ok.focus();
+
+    root.visible = false; // the window closed under the prompt
+    bridge.restoreFocus(opener as unknown as HTMLElement);
+    expect(fakeDoc.activeElement).toBe(ok);
+    expect(modal.opener()).toBe(opener);
   });
 });
 

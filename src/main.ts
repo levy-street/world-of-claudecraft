@@ -3425,10 +3425,11 @@ async function startGame(
     if (world.bgInfo?.match) world.bgFlagAction();
   }
 
-  // The R40 per-use effect confirm gate, shared by every gather entry point
-  // (world click, interact key, gathering-tool use): the pure question from
-  // the view core, the ask through the HUD's confirm-dialog family. The
-  // harvest proceeds on either answer; only the charge follows it.
+  // The R40 per-use effect confirm gate, shared by the explicit gather entry
+  // points (world click, gathering-tool use): the pure question from the view
+  // core, the ask through the HUD's confirm-dialog family. The harvest
+  // proceeds on either answer; only the charge follows it. The generic
+  // interact key never gathers, so it takes no part in this.
   const gatherEffectConfirm = {
     needed: (nodeId: string) => gatherEffectPrompt(world, nodeId),
     ask: (prompt: { effectId: string; charges: number }, proceed: (confirmed: boolean) => void) =>
@@ -3443,14 +3444,9 @@ async function startGame(
       tryNearbyInteraction(
         world,
         hud,
-        GATHER_NODES,
-        (node) => gatherNodeToolGateFor(world, node),
-        t('questUi.errors.tooFar'),
-        t('hudChrome.gathering.notReady'),
         t('questUi.errors.escortAway'),
         t('errors.nothingInteract'),
         undefined,
-        gatherEffectConfirm,
         preferNpcId,
       ),
       input,

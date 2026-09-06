@@ -51,9 +51,15 @@ export function makeWindowFocus(fm: FocusManager, root: () => HTMLElement): Wind
         fm.restore(target);
         return;
       }
-      handle?.release(false);
+      const closing = handle;
       handle = null;
-      fm.restore(target);
+      // The RELEASE carries the return, rather than a release plus a bare
+      // restore: only the manager knows whether a live trap opened over this
+      // window (a confirm prompt still on screen when the window's own subject
+      // goes away), in which case focus stays there and this window's opener is
+      // handed up the chain instead of being planted under the prompt.
+      if (closing) closing.release(true, target);
+      else fm.restore(target);
     },
   };
 }

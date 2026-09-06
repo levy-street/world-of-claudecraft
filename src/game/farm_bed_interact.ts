@@ -36,9 +36,11 @@ export function nearestInteractableBed(
   return bestId;
 }
 
-/** What the press does at a bed: 'harvest' when the caller has a plot there
- *  (ANY status: the sim's own farmDenied not_ready answers a growing plot,
- *  so the client never reads plot.status), else 'plant' (open the sheet). */
+/** Which MODE the bed window opens in for this bed, and which sentence the
+ *  press affordance states: 'harvest' when the caller has a plot there (ANY
+ *  status; the window shows the status and its Harvest control is the only
+ *  harvestCrop send), else 'plant'. The generic press itself only OPENS the
+ *  window either way (intentional gathering PR1); it never harvests. */
 export function decideFarmBedAction(
   world: FarmBedInteractWorld,
   bedId: string,

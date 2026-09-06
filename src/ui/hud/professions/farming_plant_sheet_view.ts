@@ -20,7 +20,7 @@ import {
 } from '../../../sim/content/farm_crops';
 import { ITEMS } from '../../../sim/data';
 import { countRawInSlots, countUnlockedInSlots } from '../../../sim/item_lock';
-import type { FarmPlotView } from '../../../sim/professions/farm_projection';
+import type { FarmPlotStatus, FarmPlotView } from '../../../sim/professions/farm_projection';
 import { planWatchFee } from '../../../sim/professions/farm_watch_fee';
 import { canPlantCrop } from '../../../sim/professions/farming';
 import { canGatherTier, NO_TOOL_OWNED } from '../../../sim/professions/tools';
@@ -98,12 +98,85 @@ export interface PlantSheetViewModel {
   knobs: readonly PlantSheetKnob[];
 }
 
-/** Whether the sheet may open for this bed at all: only a bed the caller has
- *  no plot in. Shared by the window and the Hud-side caller so the guard
- *  cannot drift between them. Occupied beds are the harvest verb's business
- *  (the nearby-interaction bed arm), never this window's. */
+/** Whether the bed is free of the caller's own plot, so the sheet's PLANT mode
+ *  applies. An occupied bed opens the same window in HARVEST mode (bedSheetMode
+ *  below); `buildPlantSheetView` still refuses an occupied bed so the seed list
+ *  can never be painted over a growing crop. */
 export function canOpenPlantSheet(bedId: string, myFarmPlots: readonly FarmPlotView[]): boolean {
   return !myFarmPlots.some((plot) => plot.bedId === bedId);
+}
+
+/** The bed sheet's two modes (intentional gathering PR1). Decided ONCE at a
+ *  fresh open and frozen for that open: a bed whose subject changes underneath
+ *  the sheet closes rather than silently switching the verb on the button. */
+export type BedSheetMode = 'plant' | 'harvest';
+
+export function bedSheetMode(bedId: string, myFarmPlots: readonly FarmPlotView[]): BedSheetMode {
+  return canOpenPlantSheet(bedId, myFarmPlots) ? 'plant' : 'harvest';
+}
+
+/** The harvest-mode model: what the sheet says about MY plot in this bed, and
+ *  whether the explicit Harvest control may send. `canHarvest` follows the
+ *  AUTHORITY'S `status` alone (ready or withered), never the clock: an overdue
+ *  plot the server still calls growing stays disabled, so the button can never
+ *  promise a harvest the sim would refuse with not_ready. */
+export interface HarvestSheetView {
+  bedId: string;
+  cropId: string;
+  /** The produce item the crop pays, the id the sheet names the row after
+   *  (a withered plot still names its crop: the player knows what was lost). */
+  produceItemId: string;
+  status: FarmPlotStatus;
+  canHarvest: boolean;
+  /** The status line: the journal's ready/withered labels, and for a growing
+   *  plot the same still-growing sentence the sim's not_ready deny toasts. */
+  statusKey: TranslationKey;
+}
+
+/** The planting a harvest sheet opened on: the bed, the crop, and WHEN it was
+ *  sown. `plantedAtMs` is what tells one planting from the next in the same
+ *  bed (a harvested-and-re-sown bed carries a new one), so a sheet frozen on
+ *  this refuses a replacement crop even of the same kind. */
+export interface HarvestSubject {
+  readonly bedId: string;
+  readonly cropId: string;
+  readonly plantedAtMs: number;
+}
+
+export function harvestSubjectOf(plot: FarmPlotView): HarvestSubject {
+  return { bedId: plot.bedId, cropId: plot.cropId, plantedAtMs: plot.plantedAtMs };
+}
+
+/** Build the harvest model for `bedId`, or null when the bed holds no plot of
+ *  mine, or (with `subject`) a plot that is not the planting the sheet opened
+ *  on. Status may move freely on the same planting; identity may not. */
+export function buildHarvestSheetView(
+  bedId: string,
+  myFarmPlots: readonly FarmPlotView[],
+  subject?: HarvestSubject,
+): HarvestSheetView | null {
+  const plot = myFarmPlots.find((row) => row.bedId === bedId);
+  if (!plot) return null;
+  if (subject && (plot.cropId !== subject.cropId || plot.plantedAtMs !== subject.plantedAtMs)) {
+    return null;
+  }
+  const crop = FARM_CROPS[plot.cropId];
+  const statusKey: TranslationKey =
+    plot.status === 'ready'
+      ? 'hudChrome.harvestJournal.ready'
+      : plot.status === 'withered'
+        ? 'hudChrome.harvestJournal.withered'
+        : farmDeniedLineKey('not_ready');
+  return {
+    bedId,
+    cropId: plot.cropId,
+    // A crop id the client's catalog does not carry (a stale bundle) degrades
+    // to the raw id, the farmPlantedTokenId contract; never an empty label.
+    produceItemId: crop?.produceItemId ?? plot.cropId,
+    status: plot.status,
+    canHarvest: plot.status === 'ready' || plot.status === 'withered',
+    statusKey,
+  };
 }
 
 /** The compost / tonic knob: one unlocked unit of the supply item affords it.

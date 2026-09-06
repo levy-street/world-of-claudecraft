@@ -925,14 +925,8 @@ export function interact(
     if (target && dist2d(p.pos, target.pos) <= INTERACT_RANGE + 2) {
       if (target.kind === 'mob' && target.lootable) {
         const availability = corpseInteractionAvailability(ctx, target, p.id, true);
-        if (availability.canInteract) {
-          // Unified press, targeted arm: same composition as the
-          // proximity-scan arm below (harvest while the corpse still owes its
-          // unclaimed half, omitted components = the town focus default, then
-          // loot; separate calls so neither refusal blocks the other).
-          if (availability.harvestable) {
-            harvestCorpse(ctx, target.id, undefined, p.id);
-          }
+        if (availability.hasLoot) {
+          // Ordinary interaction never spends the independent harvest claim.
           lootCorpse(ctx, target.id, p.id);
           return;
         }
@@ -1000,7 +994,7 @@ export function interact(
     if (
       e.kind === 'mob' &&
       e.lootable &&
-      corpseInteractionAvailability(ctx, e, p.id, true).canInteract &&
+      corpseInteractionAvailability(ctx, e, p.id, true).hasLoot &&
       d2 < bestCorpseD2
     ) {
       bestCorpse = e;
@@ -1032,13 +1026,7 @@ export function interact(
   const obj = bestObj as Entity | null;
   const questEntity = bestQuestEntity as Entity | null;
   if (corpse) {
-    // Unified press: one interact both harvests (while the corpse
-    // still owes its unclaimed harvest half; omitted components = the town
-    // focus default) and loots. Two separate calls on purpose: a harvest
-    // refusal never blocks the loot half, and vice versa.
-    if (corpseInteractionAvailability(ctx, corpse, p.id, true).harvestable) {
-      harvestCorpse(ctx, corpse.id, undefined, p.id);
-    }
+    // Harvesting requires its own command, including after ordinary loot is gone.
     lootCorpse(ctx, corpse.id, p.id);
     return;
   }

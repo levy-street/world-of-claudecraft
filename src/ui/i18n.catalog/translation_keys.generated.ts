@@ -10775,6 +10775,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.professions.disenchantingProgress'
   | 'hudChrome.professions.enchantingProgress'
   | 'hudChrome.professions.gatheringHeader'
+  | 'hudChrome.professions.harvestBodyButton'
+  | 'hudChrome.professions.harvestBodyHint'
   | 'hudChrome.professions.hobbyLabel'
   | 'hudChrome.professions.identityHeader'
   | 'hudChrome.professions.majorsLabel'

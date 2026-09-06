@@ -18,8 +18,11 @@ import { FARM_WATCH_FEE_BY_TIER } from '../src/sim/professions/farm_watch_fee';
 import { wieldRequirementForTier } from '../src/sim/professions/wield_gate';
 import type { InvSlot } from '../src/sim/types';
 import {
+  bedSheetMode,
+  buildHarvestSheetView,
   buildPlantSheetView,
   canOpenPlantSheet,
+  harvestSubjectOf,
   type PlantSheetInput,
 } from '../src/ui/hud/professions/farming_plant_sheet_view';
 
@@ -286,5 +289,79 @@ describe('plant sheet core: the two world shapes', () => {
     const compost = view?.knobs.find((k) => k.id === 'compost');
     expect(compost?.affordable).toBe(false);
     expect(compost?.shortKey).toBe('hudChrome.farming.denied.no_compost');
+  });
+});
+
+// Intentional gathering PR1: the sheet doubles as the bed window. A bed that
+// holds MY plot opens in harvest mode; the pure core decides the mode and the
+// harvest model (produce name source, authoritative status, whether the one
+// explicit Harvest control may send) from the live plot rows alone.
+describe('bed sheet core: mode and the harvest model', () => {
+  const plot = (status: FarmPlotView['status'], bedId = 'bed_eastbrook_1'): FarmPlotView => ({
+    bedId,
+    cropId: WHEAT.id,
+    plantedAtMs: 0,
+    readyAtMs: 1000,
+    compost: false,
+    watch: false,
+    tonic: false,
+    notified: false,
+    status,
+  });
+
+  it('a free bed is plant mode, my planted bed is harvest mode', () => {
+    expect(bedSheetMode('bed_eastbrook_1', [])).toBe('plant');
+    expect(bedSheetMode('bed_eastbrook_1', [plot('growing')])).toBe('harvest');
+    expect(bedSheetMode('bed_eastbrook_2', [plot('ready')])).toBe('plant');
+  });
+
+  it('builds the harvest model from the plot: produce item, status, and the send gate', () => {
+    expect(buildHarvestSheetView('bed_eastbrook_1', [plot('ready')])).toEqual({
+      bedId: 'bed_eastbrook_1',
+      cropId: WHEAT.id,
+      produceItemId: WHEAT.produceItemId,
+      status: 'ready',
+      canHarvest: true,
+      statusKey: 'hudChrome.harvestJournal.ready',
+    });
+    expect(buildHarvestSheetView('bed_eastbrook_1', [plot('withered')])).toMatchObject({
+      status: 'withered',
+      canHarvest: true,
+      statusKey: 'hudChrome.harvestJournal.withered',
+    });
+    // Growing: the control is offered disabled and the line says the crop is
+    // still growing (the same sentence the sim's not_ready deny toasts).
+    expect(buildHarvestSheetView('bed_eastbrook_1', [plot('growing')])).toMatchObject({
+      status: 'growing',
+      canHarvest: false,
+      statusKey: 'hudChrome.farming.denied.not_ready',
+    });
+  });
+
+  it('returns null for a bed with no plot of mine (the subject is gone)', () => {
+    expect(buildHarvestSheetView('bed_eastbrook_1', [])).toBeNull();
+    expect(buildHarvestSheetView('bed_eastbrook_1', [plot('ready', 'bed_eastbrook_2')])).toBeNull();
+  });
+
+  it('never reads the clock: an overdue growing plot stays growing until the authority says ready', () => {
+    const overdue = { ...plot('growing'), readyAtMs: -1 };
+    expect(buildHarvestSheetView('bed_eastbrook_1', [overdue])?.canHarvest).toBe(false);
+  });
+
+  it('a frozen subject refuses a REPLACEMENT plot in the same bed (new crop, or same crop re-planted)', () => {
+    // The sheet freezes the plot it opened on (crop plus planting time). A plot
+    // that is a different planting, even of the same crop, is somebody's new
+    // choice the player has not looked at: no model, so the sheet closes.
+    const opened = plot('ready');
+    const subject = harvestSubjectOf(opened);
+    expect(buildHarvestSheetView('bed_eastbrook_1', [opened], subject)).not.toBeNull();
+    const replanted = { ...plot('ready'), plantedAtMs: 5000 };
+    expect(buildHarvestSheetView('bed_eastbrook_1', [replanted], subject)).toBeNull();
+    const otherCrop = { ...plot('ready'), cropId: CARROT.id };
+    expect(buildHarvestSheetView('bed_eastbrook_1', [otherCrop], subject)).toBeNull();
+    // The same planting flipping status is the SAME subject and still builds.
+    expect(buildHarvestSheetView('bed_eastbrook_1', [plot('growing')], subject)?.status).toBe(
+      'growing',
+    );
   });
 });

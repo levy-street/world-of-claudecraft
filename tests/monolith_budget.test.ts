@@ -1732,7 +1732,8 @@ const MONOLITHS: MonolithRow[] = [
     // disagreement about TEXT; this gate is about SIZE). BOTH parent pins for
     // the record: ours 864, the release 864. Measured on the merged tree,
     // never reconciled by arithmetic. Exact merged count, zero slack.
-    ceiling: 863,
+    // Corpse icon dispatch and marker tones moved to nameplate_markers.
+    ceiling: 856,
     seam: 'the pure src/render/nameplate_heraldry_core.ts geometry module',
   },
   {
@@ -1953,7 +1954,8 @@ const MONOLITHS: MonolithRow[] = [
     // feature lands as a sibling module behind the domain barrel, never as
     // another method cluster here.
     file: 'src/ui/hud/professions/professions_window.ts',
-    ceiling: 845,
+    // Harvest entry chrome and bindings now live in a sibling controller.
+    ceiling: 838,
     seam: 'a pure view-core plus a thin painter sibling (src/ui/hud/CLAUDE.md)',
   },
   {

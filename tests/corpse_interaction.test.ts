@@ -33,8 +33,24 @@ describe('corpseInteractionAvailability', () => {
     expect(result).toEqual({
       harvestable: true,
       hasLootRights: false,
+      hasLoot: false,
       canInteract: true,
     });
+  });
+
+  it('distinguishes shared rights from ordinary contents remaining for this viewer', () => {
+    const mob = corpse({
+      lootable: true,
+      loot: { copper: 0, items: [{ itemId: 'wolf_fang', count: 1, personalFor: [9] }] },
+    });
+    expect(corpseInteractionAvailability(ctx(), mob, 1, true)).toMatchObject({
+      hasLootRights: true,
+      hasLoot: false,
+      harvestable: true,
+    });
+    expect(corpseInteractionAvailability(ctx(), mob, 9, true).hasLoot).toBe(true);
+    mob.loot!.items[0].count = 0;
+    expect(corpseInteractionAvailability(ctx(), mob, 9, true).hasLoot).toBe(false);
   });
 
   it('refuses owned tagged corpses even when the wild template is harvestable', () => {
@@ -43,6 +59,7 @@ describe('corpseInteractionAvailability', () => {
     expect(result).toEqual({
       harvestable: false,
       hasLootRights: false,
+      hasLoot: false,
       canInteract: false,
     });
   });

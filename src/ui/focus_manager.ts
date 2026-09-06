@@ -73,9 +73,16 @@ export interface FocusTrapHandle {
   focusFirst(preferredSelector?: string): void;
   /**
    * Remove this trap. When returnFocus is true (the default) focus returns to the
-   * recorded opener (the old restoreFocus behavior).
+   * recorded opener (the old restoreFocus behavior), or to `returnTo` when the
+   * caller names one (the window-focus bridge hands back the opener the window
+   * stored for itself; pass null to return focus nowhere).
+   *
+   * A trap released while a LIVE trap sits above it returns no focus at all: the
+   * window that went away is under a modal the player is still using. It hands
+   * its return target UP instead, to the traps it OWNS (recorded when they opened,
+   * see TrapState.owner) whose own opener can no longer take focus.
    */
-  release(returnFocus?: boolean): void;
+  release(returnFocus?: boolean, returnTo?: HTMLElement | null): void;
   /**
    * The element recorded as this trap's opener (what release() would restore focus
    * to). Exposed so a successor window opened FROM WITHIN the trapped window (e.g.
@@ -89,6 +96,18 @@ export interface FocusTrapHandle {
 interface TrapState {
   root: () => HTMLElement | null;
   opener: HTMLElement | null;
+  /**
+   * The trap that OWNS this one: the window whose root held the opener at the
+   * moment this trap opened (a bind confirmation opened from a button inside the
+   * corpse popup is owned by the corpse popup's trap).
+   *
+   * Recorded at open() rather than derived at release() BECAUSE the owning window
+   * is live at open and may not be later: these windows repaint themselves from
+   * the world, and a rebuild destroys the opener element outright. Asking "is this
+   * opener still inside that root" once the answer matters is asking about a node
+   * that no longer has a parent, and the honest answer, no, is the wrong one.
+   */
+  owner: TrapState | null;
 }
 
 /**
@@ -163,10 +182,8 @@ export class FocusManager {
    * reactivates the one beneath it.
    */
   open(opts: FocusTrapOptions): FocusTrapHandle {
-    const state: TrapState = {
-      root: opts.root,
-      opener: opts.returnFocusTo !== undefined ? opts.returnFocusTo : this.activeFocusable(),
-    };
+    const opener = opts.returnFocusTo !== undefined ? opts.returnFocusTo : this.activeFocusable();
+    const state: TrapState = { root: opts.root, opener, owner: this.ownerOf(opener) };
     this.stack.push(state);
     this.ensureListening();
     return {
@@ -174,14 +191,61 @@ export class FocusManager {
         const root = state.root();
         if (root) this.focusFirst(root, preferredSelector);
       },
-      release: (returnFocus = true) => {
+      release: (returnFocus = true, returnTo?: HTMLElement | null) => {
         const i = this.stack.lastIndexOf(state);
+        const above = i === -1 ? [] : this.stack.slice(i + 1);
         if (i !== -1) this.stack.splice(i, 1);
         if (this.stack.length === 0) this.stopListening();
-        if (returnFocus) this.restore(state.opener);
+        const target = returnTo !== undefined ? returnTo : state.opener;
+        this.reparent(state, target, above);
+        // A window can go away UNDERNEATH a modal it opened (a corpse popup whose
+        // body despawns while its bind-on-pickup confirmation is still up). The
+        // modal is what the player is looking at, so this release must not pull
+        // focus out of it; the inheritance above is what gives that modal somewhere
+        // real to return to when the player finally answers it.
+        const covering = above.filter((t) => this.stack.includes(t) && this.canFocus(t.root()));
+        if (covering.length > 0) return;
+        if (returnFocus) this.restore(target);
       },
       opener: () => state.opener,
     };
+  }
+
+  /**
+   * The live trap whose window contains `opener`, topmost first, or null when the
+   * opener is outside every trapped window (a rail button, the game world) or was
+   * never recorded (a pointer-only open, which deliberately restores nothing).
+   */
+  private ownerOf(opener: HTMLElement | null): TrapState | null {
+    if (!opener) return null;
+    for (let i = this.stack.length - 1; i >= 0; i--) {
+      const root = this.stack[i].root();
+      if (root?.contains(opener)) return this.stack[i];
+    }
+    return null;
+  }
+
+  /**
+   * Hand a closing trap's children up to its own parent: they were opened from
+   * inside a window that is now gone, so it stops being their owner, and any of
+   * them whose opener can no longer take focus (hidden with that window, or
+   * destroyed by one of its repaints) inherits the closing window's return target
+   * instead of pointing at a control that no longer exists.
+   *
+   * A child whose opener is still focusable keeps it: the window may have released
+   * its trap without going away, and the player's own return point wins over an
+   * inherited one.
+   */
+  private reparent(
+    state: TrapState,
+    target: HTMLElement | null,
+    above: readonly TrapState[],
+  ): void {
+    for (const child of above) {
+      if (child.owner !== state || !this.stack.includes(child)) continue;
+      if (!this.canFocus(child.opener)) child.opener = target;
+      child.owner = state.owner;
+    }
   }
 
   private canFocus(el: HTMLElement | null): el is HTMLElement {

@@ -898,6 +898,8 @@
 
   #loot-window {
     width: 230px;
+    /* Keep another window's text from showing through the corpse choice. */
+    background: var(--panel-base);
   }
   .loot-item {
     display: flex;
@@ -10865,6 +10867,14 @@
      Padding narrows on fine pointers; coarse pointers get the explicit
      40px target floor the sibling window buttons set (the delve board
      idiom), since .btn itself carries no floor. */
+  .prof-harvest-body {
+    margin-bottom: 12px;
+  }
+  .prof-harvest-body-hint {
+    margin: 6px 0 0;
+    font-size: 12px;
+    line-height: 1.4;
+  }
   .prof-effect-actions {
     display: flex;
     flex-wrap: wrap;
