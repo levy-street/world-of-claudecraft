@@ -220,7 +220,7 @@ describe('harvest-preference picker: real controllers, real DOM', () => {
     const h = mount(false, SETTLED_ALL);
     await openChange(h);
     const rows = radioRows(h.harvestPreferenceRoot);
-    const hideRow = rows.find((r) => r.dataset.token === 'rough_hide');
+    const hideRow = rows.find((r) => r.dataset.harvestChoice === 'rough_hide');
     if (!hideRow) throw new Error('rough_hide row not rendered');
     await userEvent.click(hideRow);
     expect(hideRow.getAttribute('aria-checked')).toBe('true');
@@ -234,7 +234,7 @@ describe('harvest-preference picker: real controllers, real DOM', () => {
     const h = mount(false, SETTLED_ALL);
     await openChange(h);
     const rows = radioRows(h.harvestPreferenceRoot);
-    const fangRow = rows.find((r) => r.dataset.token === 'wolf_fang');
+    const fangRow = rows.find((r) => r.dataset.harvestChoice === 'wolf_fang');
     if (!fangRow) throw new Error('wolf_fang row not rendered');
     await userEvent.click(fangRow);
     expect(h.world.setHarvestPreference).not.toHaveBeenCalled();
@@ -247,7 +247,9 @@ describe('harvest-preference picker: real controllers, real DOM', () => {
 
     // Reopening starts a fresh visit off the untouched stored preference (All).
     await openChange(h);
-    const allRow = radioRows(h.harvestPreferenceRoot).find((r) => r.dataset.token === 'all');
+    const allRow = radioRows(h.harvestPreferenceRoot).find(
+      (r) => r.dataset.harvestChoice === 'all',
+    );
     expect(allRow?.getAttribute('aria-checked')).toBe('true');
   });
 
@@ -256,7 +258,7 @@ describe('harvest-preference picker: real controllers, real DOM', () => {
     await openChange(h);
     const rows = radioRows(h.harvestPreferenceRoot);
     const checked = rows.find((r) => r.getAttribute('aria-checked') === 'true');
-    expect(checked?.dataset.token).toBe('all');
+    expect(checked?.dataset.harvestChoice).toBe('all');
     expect(
       h.harvestPreferenceRoot.querySelector('.harvest-preference-current-unavailable'),
     ).toBeNull();
@@ -271,7 +273,7 @@ describe('harvest-preference picker: real controllers, real DOM', () => {
     const checked = radioRows(h.harvestPreferenceRoot).find(
       (r) => r.getAttribute('aria-checked') === 'true',
     );
-    expect(checked?.dataset.token).toBe('rough_hide');
+    expect(checked?.dataset.harvestChoice).toBe('rough_hide');
   });
 
   it('names a stored material this body does not offer as unavailable, never checked', async () => {
@@ -305,7 +307,7 @@ describe('harvest-preference picker: real controllers, real DOM', () => {
     const h = mount(false, SETTLED_ALL);
     await openChange(h);
     const rows = () => radioRows(h.harvestPreferenceRoot);
-    const allRow = rows().find((r) => r.dataset.token === 'all');
+    const allRow = rows().find((r) => r.dataset.harvestChoice === 'all');
     allRow?.focus();
     expect(document.activeElement).toBe(allRow);
 
@@ -353,7 +355,9 @@ describe('harvest-preference picker: real controllers, real DOM', () => {
     const h = mount(false, SETTLED_ALL);
     await openChange(h);
     const changeBtn = button(h.lootRoot, '.corpse-harvest-change-btn');
-    const allRow = radioRows(h.harvestPreferenceRoot).find((r) => r.dataset.token === 'all');
+    const allRow = radioRows(h.harvestPreferenceRoot).find(
+      (r) => r.dataset.harvestChoice === 'all',
+    );
     if (!allRow) throw new Error('all row not rendered');
     await userEvent.click(allRow);
     await userEvent.click(button(h.harvestPreferenceRoot, '.harvest-preference-actions .btn'));

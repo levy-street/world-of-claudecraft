@@ -33,7 +33,7 @@ function radioRows(root: HTMLElement): HTMLButtonElement[] {
 }
 
 function radioRowFor(root: HTMLElement, token: string): HTMLButtonElement {
-  const found = radioRows(root).find((r) => r.dataset.token === token);
+  const found = radioRows(root).find((r) => r.dataset.harvestChoice === token);
   if (!found) throw new Error(`no radio row for token ${token}`);
   return found;
 }

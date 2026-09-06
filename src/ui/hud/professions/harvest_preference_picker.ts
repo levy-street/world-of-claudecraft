@@ -163,7 +163,7 @@ export function renderHarvestPreferencePicker(
     if (!canAct()) return;
     const button = buttons[index];
     if (!button) return;
-    const token = button.dataset.token;
+    const token = button.dataset.harvestChoice;
     if (token === undefined) return;
     draftToken = token;
     for (const b of buttons) {
@@ -184,7 +184,7 @@ export function renderHarvestPreferencePicker(
     button.type = 'button';
     button.setAttribute('role', 'radio');
     button.className = 'harvest-preference-row';
-    button.dataset.token = row.token;
+    button.dataset.harvestChoice = row.token;
     button.dataset.focusKey = `radio:${row.token}`;
     button.setAttribute('aria-checked', row.token === view.selectedToken ? 'true' : 'false');
     button.tabIndex = index === tabStop ? 0 : -1;

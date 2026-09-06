@@ -111,7 +111,7 @@ describe('shared entry: the real professions entry markup + wiring open the real
 
     expect(controller.isOpen).toBe(true);
     const checked = radioRows(root).find((r) => r.getAttribute('aria-checked') === 'true');
-    expect(checked?.dataset.token).toBe('rough_hide');
+    expect(checked?.dataset.harvestChoice).toBe('rough_hide');
     expect(world.setHarvestPreference).not.toHaveBeenCalled();
   });
 
