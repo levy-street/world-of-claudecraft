@@ -11,6 +11,7 @@ import {
   METRIC_REGISTRY,
   type MetricsSample,
   metricsPreset,
+  overlayCssOffset,
   overlayFractionFromPixel,
   overlayPixelPosition,
   PERF_COLOR_THEMES,
@@ -339,5 +340,30 @@ describe('free positioning math', () => {
     expect(resized.left).toBeLessThanOrEqual(1000 - 150 - 8);
     expect(resized.top).toBeGreaterThanOrEqual(8);
     expect(resized.top).toBeLessThanOrEqual(600 - 70 - 8);
+  });
+});
+
+describe('overlayCssOffset (author-space #ui zoom compensation)', () => {
+  it('is a no-op at UI Scale 1 (the default)', () => {
+    expect(overlayCssOffset({ left: 100, top: 200 }, 1)).toEqual({ left: 100, top: 200 });
+  });
+
+  it('divides the visual pixel offset by the live UI Scale into #ui author space, so the zoom re-multiplies it back to the intended on-screen spot', () => {
+    // Enlarged interface (uiScale > 1): the author length shrinks.
+    expect(overlayCssOffset({ left: 800, top: 400 }, 1.25)).toEqual({ left: 640, top: 320 });
+    // Reduced interface (uiScale < 1, the reported bug): the author length grows,
+    // which is what lets a corner-clamped visual position still reach the true
+    // corner once #ui's zoom shrinks it back down.
+    expect(overlayCssOffset({ left: 680, top: 680 }, 0.85)).toEqual({ left: 800, top: 800 });
+  });
+
+  it('falls back to scale 1 on a non-finite or non-positive scale, never blanking the offset', () => {
+    expect(overlayCssOffset({ left: 100, top: 50 }, 0)).toEqual({ left: 100, top: 50 });
+    expect(overlayCssOffset({ left: 100, top: 50 }, -2)).toEqual({ left: 100, top: 50 });
+    expect(overlayCssOffset({ left: 100, top: 50 }, Number.NaN)).toEqual({ left: 100, top: 50 });
+    expect(overlayCssOffset({ left: 100, top: 50 }, Number.POSITIVE_INFINITY)).toEqual({
+      left: 100,
+      top: 50,
+    });
   });
 });
