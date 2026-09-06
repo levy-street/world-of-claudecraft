@@ -11676,7 +11676,7 @@ export const en_CA: EnTranslations = {
       },
       "temporal_cascade": {
         "name": "Temporal Cascade",
-        "description": "Sends an echo cascading through your group: the target and up to four of their nearest allies are mended at once and each marked for {duration} sec, drawing part of the Arcane damage you deal back through their echoes to heal them. Aether Surge and Aether Darts create an equal healing reserve from every group Echo, shared among marked allies below 60% health according to missing health. (Chronomancy)"
+        "description": "Sends an echo cascading through your group: the target and up to four of their nearest allies are mended at once, healing for more on those who have lost the most health, and each marked for {duration} sec, drawing part of the Arcane damage you deal back through their echoes to heal them. Aether Surge and Aether Darts create an equal healing reserve from every group Echo, shared among marked allies below 60% health according to missing health. (Chronomancy)"
       },
       "temporal_reversal": {
         "name": "Temporal Reversal",

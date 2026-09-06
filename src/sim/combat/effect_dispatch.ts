@@ -108,6 +108,7 @@ import {
   placeTemporalEcho,
   selectCascadeTargets,
 } from './chronomancy';
+import { cascadeReliefMultiplier } from './chronomancy_echo_distribution';
 import {
   advanceBurningPactTick,
   applyDuskfireClaim,
@@ -1187,7 +1188,8 @@ export function runEffects(
         // selectCascadeTargets resolves and ORDERS the whole list (primary first,
         // then the members nearest the primary within radius, capped at maxTargets)
         // BEFORE any heal or aura is applied. Each target then takes a small initial
-        // heal (Spell-Power-scaled, can crit) and a 13% group echo; the overlap rule
+        // heal (Spell-Power-scaled, can crit, scaled by the ally's missing health via
+        // cascadeReliefMultiplier) and a 13% group echo; the overlap rule
         // in placeGroupEcho keeps a pre-existing individual mark at 40%. The Arcane
         // conversion lives in combat/chronomancy.ts. (mage-chronomancy.md Phase 4)
         const primary = target ?? p;
@@ -1204,9 +1206,15 @@ export function runEffects(
           // by the massTemporalEcho case in classes.ts, and talentHealMult reaches
           // the SP rider here too, so Chronoweave's "all healing" bonus applies to
           // Temporal Cascade's initial heal the same way it does every other heal.
-          const healAmount =
+          // The rng draw stays FIRST and unconditional: the relief multiplier is
+          // pure health arithmetic applied after it, so the global stream is
+          // untouched and the parity goldens still line up.
+          const healRoll =
             ctx.rng.range(eff.heal.min, eff.heal.max) +
             directHealBonus(p.healPower, res.castTime, false, talentHealMult);
+          // Cast on a healthy group this is 1 and the heal is exactly what it has
+          // always been; cast into real damage it scales up to the authored ceiling.
+          const healAmount = Math.round(healRoll * cascadeReliefMultiplier(ally.hp, ally.maxHp));
           ctx.applyHeal(p, ally, healAmount, ability.name);
           if (devPlaytest) {
             const applied = ally.hp - before;
