@@ -368,6 +368,7 @@ function makeCtx() {
     breakGhostWolf: vi.fn(),
     forceDismount: vi.fn(),
     startAutoAttack: vi.fn(),
+    tryPlayerSwing: vi.fn(),
     revivePet: vi.fn(),
     completeFishing: vi.fn(),
     completeGatherCast: vi.fn(),
