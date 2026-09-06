@@ -14113,6 +14113,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'かかしをタップしてターゲットにし、アクションバーの{ability}をタップしよう。ただの一振りではなく、君自身の技だ。三回当てること。',
   'hudChrome.bootcamp.taskHoneBodyPad':
     'かかしをターゲットにし、{ability}が入ったアクションボタンを押そう。ただの一振りではなく、君自身の技だ。三回当てること。',
+  'hudChrome.bootcamp.promptAccessInterface': 'インターフェースを開く',
+  'hudChrome.bootcamp.promptMoveToTarget': '{target}へ移動',
+  'hudChrome.bootcamp.promptSelectItem': '{item}を選択',
   'hudChrome.bootcamp.promptOpenBags': 'かばんを開く',
   'hudChrome.bootcamp.promptCharacterSheet': 'キャラクター画面を開く',
   'hudChrome.bootcamp.promptLookAround': '右クリックを押したまま動かして見回す',

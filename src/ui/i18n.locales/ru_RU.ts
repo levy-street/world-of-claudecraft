@@ -14324,6 +14324,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Коснись чучела, чтобы взять его в цель, затем коснись способности {ability} на панели действий. Это твое собственное умение, а не простой удар. Попади трижды.',
   'hudChrome.bootcamp.taskHoneBodyPad':
     'Возьми чучело в цель, затем нажми кнопку действия со способностью {ability}. Это твое собственное умение, а не простой удар. Попади трижды.',
+  'hudChrome.bootcamp.promptAccessInterface': 'Открой интерфейс',
+  'hudChrome.bootcamp.promptMoveToTarget': 'Перейди к: {target}',
+  'hudChrome.bootcamp.promptSelectItem': 'Выбери: {item}',
   'hudChrome.bootcamp.promptOpenBags': 'Открой сумки',
   'hudChrome.bootcamp.promptCharacterSheet': 'Открой лист персонажа',
   'hudChrome.bootcamp.promptLookAround': 'Зажми правую кнопку мыши и веди, чтобы осмотреться',

@@ -7,11 +7,11 @@
 
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { CrossHotbarAction } from '../src/game/cross_hotbar';
-import { GAMEPAD_CONFIRM, GAMEPAD_NONE, GP } from '../src/game/gamepad_map';
+import { GAMEPAD_CONFIRM, GAMEPAD_CYCLE_HUD, GAMEPAD_NONE, GP } from '../src/game/gamepad_map';
 import { Keybinds } from '../src/game/keybinds';
 import type { Renderer } from '../src/render/renderer';
 import { PROVING_SHORE_NPCS } from '../src/sim/content/proving_shore';
-import { CRAB_SUMMON_SITE } from '../src/sim/interactions/crab_summon';
+import { CRAB_SUMMON_SITE, LURE_ITEM_ID } from '../src/sim/interactions/crab_summon';
 import { Sim } from '../src/sim/sim';
 import { BootcampOverlay } from '../src/ui/bootcamp';
 
@@ -77,9 +77,15 @@ describe('BootcampOverlay.disengage', () => {
 });
 
 describe('BootcampOverlay controller prompt wiring', () => {
+  const visibleRect = (): DOMRect => new DOMRect(0, 0, 100, 100);
+  const markVisible = (id: string): void => {
+    const element = document.getElementById(id);
+    if (element) element.getBoundingClientRect = visibleRect;
+  };
+
   beforeEach(() => {
     document.body.innerHTML = '<div id="ui"></div>';
-    document.body.classList.add('pad-active');
+    document.body.className = 'pad-active';
   });
 
   function paintControllerPrompt(
@@ -143,6 +149,40 @@ describe('BootcampOverlay controller prompt wiring', () => {
     );
   }
 
+  function setBagControllerUiState(
+    state:
+      | 'navigateToBlockingWindowClose'
+      | 'closeBlockingWindow'
+      | 'navigateToBags'
+      | 'openBags'
+      | 'navigateToItem'
+      | 'useItem',
+    itemId = LURE_ITEM_ID,
+  ): void {
+    const ui = document.getElementById('ui');
+    if (!ui) return;
+    if (state === 'navigateToBlockingWindowClose' || state === 'closeBlockingWindow') {
+      const closeAttribute = state === 'closeBlockingWindow' ? ' data-close' : '';
+      ui.insertAdjacentHTML(
+        'beforeend',
+        `<section id="bags" class="window panel" style="display:flex"><button class="bag-item" data-coach-item="${itemId}">Item</button></section><section id="vendor-window" class="window panel" style="display:block"><button class="pad-focus" aria-label="Close vendor"${closeAttribute}>Vendor control</button></section>`,
+      );
+      markVisible('bags');
+      markVisible('vendor-window');
+    } else if (state === 'navigateToBags') {
+      ui.insertAdjacentHTML('beforeend', '<button class="pad-focus">Character</button>');
+    } else if (state === 'openBags') {
+      ui.insertAdjacentHTML('beforeend', '<button id="mm-bag" class="pad-focus">Bags</button>');
+    } else {
+      const coachItem = state === 'useItem' ? itemId : 'another_item';
+      ui.insertAdjacentHTML(
+        'beforeend',
+        `<section id="bags" style="display:flex"><button class="bag-item pad-focus" data-coach-item="${coachItem}">Item</button></section>`,
+      );
+    }
+    document.querySelector<HTMLElement>('.pad-focus')?.focus();
+  }
+
   it('paints the live detected-pad interact glyph over the quest giver', () => {
     const sim = new Sim({ seed: 4120, playerClass: 'warrior', autoEquip: true });
     const tam = PROVING_SHORE_NPCS.warden_tam;
@@ -156,6 +196,35 @@ describe('BootcampOverlay controller prompt wiring', () => {
     expect(document.querySelector('.tut-prompt .tut-keycap')?.textContent).toBe('A');
     expect(document.querySelector<HTMLElement>('.tut-prompt')?.style.display).toBe('flex');
   });
+
+  it.each([
+    [false, 'D-pad', 'Move to Close character'],
+    [true, 'A', 'Close character'],
+  ] as const)(
+    'recovers when an accidental HUD window blocks Bags (close focused: %s)',
+    (closeFocused, cap, verb) => {
+      const ui = document.getElementById('ui');
+      ui?.insertAdjacentHTML(
+        'beforeend',
+        `<section id="char-window" class="window panel" style="display:block"><button class="pad-focus"${closeFocused ? ' data-close' : ''}>Character control</button><button data-close aria-label="Close character">Close</button></section>`,
+      );
+      markVisible('char-window');
+      const focused = document.querySelector<HTMLElement>('.pad-focus');
+      if (closeFocused) focused?.setAttribute('aria-label', 'Close character');
+      focused?.focus();
+
+      const sim = new Sim({ seed: 4120, playerClass: 'warrior', autoEquip: true });
+      sim.player.pos.x = CRAB_SUMMON_SITE.x;
+      sim.player.pos.z = CRAB_SUMMON_SITE.z;
+      paintControllerPrompt(sim, { questId: 'q_ps_mother_of_pearl', state: 'active' }, [
+        { button: GP.R3, action: GAMEPAD_CYCLE_HUD },
+        { button: GP.A, action: GAMEPAD_CONFIRM },
+      ]);
+
+      expect(document.querySelector('.tut-prompt .tut-keycap')?.textContent).toBe(cap);
+      expect(document.querySelector('.tut-prompt .tut-prompt-verb')?.textContent).toBe(verb);
+    },
+  );
 
   it('paints the bare d-pad target control over an unselected training effigy', () => {
     const sim = new Sim({ seed: 4120, playerClass: 'warrior', autoEquip: true });
@@ -296,31 +365,111 @@ describe('BootcampOverlay controller prompt wiring', () => {
     );
   });
 
-  it('names the default inventory button at the Mister Crabs summon site', () => {
+  it('guides the Mister Crabs summon through HUD navigation, never the system button', () => {
     const sim = new Sim({ seed: 4120, playerClass: 'warrior', autoEquip: true });
     sim.player.pos.x = CRAB_SUMMON_SITE.x;
     sim.player.pos.z = CRAB_SUMMON_SITE.z;
 
     paintControllerPrompt(sim, { questId: 'q_ps_mother_of_pearl', state: 'active' }, [
       { button: GP.BACK, action: 'bags' },
+      { button: GP.R3, action: GAMEPAD_CYCLE_HUD },
+      { button: GP.A, action: GAMEPAD_CONFIRM },
     ]);
 
-    expect(document.querySelector('.tut-prompt .tut-keycap')?.textContent).toBe('View');
-    expect(document.querySelector('.tut-prompt .tut-prompt-verb')?.textContent).toBe('Summon');
+    expect(
+      [...document.querySelectorAll('.tut-prompt .tut-keycap')].map((el) => el.textContent),
+    ).toEqual(['R3']);
+    expect(document.querySelector('.tut-prompt')?.textContent).not.toContain('View');
+    expect(document.querySelector('.tut-prompt .tut-prompt-verb')?.textContent).toBe(
+      'Access interface',
+    );
   });
 
-  it('uses the same inventory button for centered bag lessons', () => {
+  it.each([
+    ['navigateToBags', 'D-pad', 'Move to Bags'],
+    ['openBags', 'A', 'Open your bags'],
+    ['navigateToItem', 'D-pad', 'Select Briny Lure'],
+    ['useItem', 'A', 'Summon'],
+  ] as const)('advances the Mister Crabs prompt at %s', (state, expected, verb) => {
+    setBagControllerUiState(state);
+    const sim = new Sim({ seed: 4120, playerClass: 'warrior', autoEquip: true });
+    sim.player.pos.x = CRAB_SUMMON_SITE.x;
+    sim.player.pos.z = CRAB_SUMMON_SITE.z;
+
+    paintControllerPrompt(sim, { questId: 'q_ps_mother_of_pearl', state: 'active' }, [
+      { button: GP.BACK, action: 'bags' },
+      { button: GP.R3, action: GAMEPAD_CYCLE_HUD },
+      { button: GP.A, action: GAMEPAD_CONFIRM },
+    ]);
+
+    expect(
+      [...document.querySelectorAll('.tut-prompt .tut-keycap')].map((el) => el.textContent),
+    ).toEqual([expected]);
+    expect(document.querySelector('.tut-prompt .tut-prompt-verb')?.textContent).toBe(verb);
+  });
+
+  it('uses the HUD-navigation route for centered ring lessons', () => {
     const sim = new Sim({ seed: 4120, playerClass: 'warrior', autoEquip: true });
 
     paintControllerPrompt(
       sim,
       { questId: 'q_ps_mother_of_pearl', state: 'ready' },
-      [{ button: GP.BACK, action: 'bags' }],
+      [
+        { button: GP.BACK, action: 'bags' },
+        { button: GP.R3, action: GAMEPAD_CYCLE_HUD },
+        { button: GP.A, action: GAMEPAD_CONFIRM },
+      ],
       false,
       { ringPhase: 'equip' },
     );
 
-    expect(document.querySelector('.tut-prompt .tut-keycap')?.textContent).toBe('View');
+    expect(
+      [...document.querySelectorAll('.tut-prompt .tut-keycap')].map((el) => el.textContent),
+    ).toEqual(['R3']);
+    expect(document.querySelector('.tut-prompt .tut-prompt-verb')?.textContent).toBe(
+      'Access interface',
+    );
+  });
+
+  it('keeps the centered ring lesson on keyboard guidance outside controller mode', () => {
+    document.body.className = '';
+    const sim = new Sim({ seed: 4120, playerClass: 'warrior', autoEquip: true });
+
+    paintControllerPrompt(
+      sim,
+      { questId: 'q_ps_mother_of_pearl', state: 'ready' },
+      [
+        { button: GP.R3, action: GAMEPAD_CYCLE_HUD },
+        { button: GP.A, action: GAMEPAD_CONFIRM },
+      ],
+      false,
+      { ringPhase: 'equip' },
+    );
+
+    expect(
+      [...document.querySelectorAll('.tut-prompt .tut-keycap')].map((el) => el.textContent),
+    ).toEqual(['B']);
+    expect(document.querySelector('.tut-prompt .tut-prompt-verb')?.textContent).toBe(
+      'Open your bags',
+    );
+  });
+
+  it('does not leak controller caps into the centered touch lesson', () => {
+    document.body.className = 'mobile-touch';
+    const sim = new Sim({ seed: 4120, playerClass: 'warrior', autoEquip: true });
+
+    paintControllerPrompt(
+      sim,
+      { questId: 'q_ps_mother_of_pearl', state: 'ready' },
+      [
+        { button: GP.R3, action: GAMEPAD_CYCLE_HUD },
+        { button: GP.A, action: GAMEPAD_CONFIRM },
+      ],
+      false,
+      { ringPhase: 'equip' },
+    );
+
+    expect(document.querySelectorAll('.tut-prompt .tut-keycap')).toHaveLength(0);
     expect(document.querySelector('.tut-prompt .tut-prompt-verb')?.textContent).toBe(
       'Open your bags',
     );
@@ -332,15 +481,56 @@ describe('BootcampOverlay controller prompt wiring', () => {
 
     paintControllerPrompt(sim, { questId: 'q_ps_pouch_and_purse', state: 'ready' }, [
       { button: GP.BACK, action: 'bags' },
+      { button: GP.R3, action: GAMEPAD_CYCLE_HUD },
       { button: GP.A, action: GAMEPAD_CONFIRM },
     ]);
 
-    expect(document.querySelector('.tut-prompt .tut-keycap')?.textContent).toBe('View');
+    expect(
+      [...document.querySelectorAll('.tut-prompt .tut-keycap')].map((el) => el.textContent),
+    ).toEqual(['R3']);
     expect(document.querySelector('.tut-prompt .tut-prompt-verb')?.textContent).toBe(
-      'Open your bags',
+      'Access interface',
     );
     expect(document.querySelector('.tut-prompt')?.classList.contains('tut-prompt-center')).toBe(
       true,
     );
+  });
+
+  it.each([
+    ['navigateToBlockingWindowClose', 'D-pad'],
+    ['closeBlockingWindow', 'A'],
+  ] as const)('closes the vendor before navigating to the purchased pouch at %s', (state, cap) => {
+    setBagControllerUiState(state, 'linen_pouch');
+    const sim = new Sim({ seed: 4120, playerClass: 'warrior', autoEquip: true });
+    sim.addItem('linen_pouch', 1);
+
+    paintControllerPrompt(sim, { questId: 'q_ps_pouch_and_purse', state: 'ready' }, [
+      { button: GP.BACK, action: 'bags' },
+      { button: GP.R3, action: GAMEPAD_CYCLE_HUD },
+      { button: GP.A, action: GAMEPAD_CONFIRM },
+    ]);
+
+    expect(document.querySelector('.tut-prompt .tut-keycap')?.textContent).toBe(cap);
+    expect(document.querySelector('.tut-prompt .tut-prompt-verb')?.textContent).toBe(
+      state === 'navigateToBlockingWindowClose' ? 'Move to Close vendor' : 'Close vendor',
+    );
+  });
+
+  it('uses the HUD-navigation route for the Passing Stone lesson', () => {
+    const sim = new Sim({ seed: 4120, playerClass: 'warrior', autoEquip: true });
+
+    paintControllerPrompt(sim, { questId: 'q_ps_the_long_walk', state: 'active' }, [
+      { button: GP.BACK, action: 'bags' },
+      { button: GP.R3, action: GAMEPAD_CYCLE_HUD },
+      { button: GP.A, action: GAMEPAD_CONFIRM },
+    ]);
+
+    expect(
+      [...document.querySelectorAll('.tut-prompt .tut-keycap')].map((el) => el.textContent),
+    ).toEqual(['R3']);
+    expect(document.querySelector('.tut-prompt .tut-prompt-verb')?.textContent).toBe(
+      'Access interface',
+    );
+    expect(document.querySelector('.tut-prompt')?.textContent).not.toContain('View');
   });
 });
