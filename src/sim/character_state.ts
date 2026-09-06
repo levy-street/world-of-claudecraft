@@ -149,6 +149,16 @@ export interface CharacterState {
   // to the loading sim's clock, filtered to live node ids, clamped to one
   // respawn. Closes the relog exploit that used to reset every node timer.
   nodeHarvestCooldowns?: Record<string, number>;
+  // The remembered corpse-harvest material preference (Intentional Gathering
+  // PR3; see professions/harvest_preference.ts). Absent is the legacy
+  // default, All (loadHarvestPreference(undefined)); a stored material item
+  // id is kept verbatim even after content retires it (resolution then
+  // refuses on every body rather than reviving All); explicit JSON `null` is
+  // a MALFORMED live preference the character load refused, persisted so the
+  // refusal survives a save/reload instead of silently becoming All again
+  // (savedHarvestPreference/loadHarvestPreference own the encoding; never
+  // hand-roll a second parser).
+  harvestPreference?: string | null;
   pet?: PetState | null;
   // WoW-style ghost state (JSONB; optional so pre-ghost saves load alive). A player who
   // logs out as a released spirit resumes as a ghost at the graveyard with the corpse

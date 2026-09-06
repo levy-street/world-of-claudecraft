@@ -5,6 +5,7 @@
 
 import { ABILITIES } from '../sim/data';
 import {
+  CORPSE_HARVEST_CAST_ID,
   CRAFT_CAST_ID,
   DISENCHANT_CAST_ID,
   ENCHANT_CAST_ID,
@@ -43,6 +44,9 @@ export const castDisplayName = (id: string): string => {
   if (id === FISHING_CAST_ID) return t('abilityUi.cast.fishing');
   if (id === FARMING_CAST_ID) return t('abilityUi.cast.farming');
   if (id === GATHER_CAST_ID) return t('abilityUi.cast.gathering');
+  // Corpse harvest (Intentional Gathering PR3) reuses the existing "Harvest"
+  // label the corpse loot popup already ships, rather than a new cast key.
+  if (id === CORPSE_HARVEST_CAST_ID) return t('hudChrome.corpseHarvest.title');
   if (id === CRAFT_CAST_ID) return t('abilityUi.cast.crafting');
   if (id === DISENCHANT_CAST_ID) return t('abilityUi.cast.disenchanting');
   if (id === ENCHANT_CAST_ID) return t('abilityUi.cast.enchanting_apply');

@@ -266,10 +266,27 @@ describe('createWsAuth: authenticateWebSocket reject paths', () => {
     expectNoAdmissionWork(fixture);
   });
 
+  it('2c-harvest. rejects a pre-Field-Kit auth-world-27 client before all admission work', async () => {
+    const fixture = setup();
+    const { ws, deps, req } = fixture;
+
+    await createWsAuth(deps).authenticateWebSocket(
+      asWs(ws),
+      JSON.stringify({ t: 'auth-world-27', token: 'tok', character: 7 }),
+      req,
+    );
+
+    expectSendThenClose(
+      ws,
+      errorFrame('Game and server versions are incompatible. Reload or update, then try again.'),
+    );
+    expectNoAdmissionWork(fixture);
+  });
+
   it.each([
     'auth-world',
     'auth-world-24',
-    'auth-world-28',
+    'auth-world-29',
     'auth-world-next',
     'auth-world-01',
     'auth-world-1.0',

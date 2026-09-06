@@ -1140,6 +1140,39 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.horn': '뿔',
   'hudChrome.corpseHarvest.components.tusk': '엄니',
   'hudChrome.corpseHarvest.components.cloth': '천',
+  'hudChrome.corpseHarvest.preferenceLabel': '채집 선호: {preference}',
+  'hudChrome.corpseHarvest.changeButton': '변경',
+  'hudChrome.corpseHarvest.harvestActionTooltip':
+    '현재 선호 설정으로 {seconds}초에 걸쳐 채집합니다. 야전 키트가 필요합니다. 각 시체는 한 번만 채집할 수 있습니다. 처치자와 그 파티는 {prioritySeconds}초 동안 우선권을 가집니다. 떨어진 전리품은 계속 획득할 수 있습니다.',
+  'hudChrome.corpseHarvest.checkingStatus': '채집 상태를 확인하는 중...',
+  'hudChrome.corpseHarvest.statusUnavailable': '지금은 채집 상태를 확인할 수 없습니다.',
+  'hudChrome.corpseHarvest.harvestStarting': '채집을 시작하는 중...',
+  'hudChrome.corpseHarvest.allBenefit': '이 시체에서 얻을 수 있는 모든 재료를 채집합니다.',
+  'hudChrome.corpseHarvest.focusBenefit': '채집을 {material}에 집중합니다.',
+  'hudChrome.corpseHarvest.tierBonusHint':
+    '채집을 {material}에 집중합니다: 전체 재료 대비 등급 +{tierBonus}.',
+  'hudChrome.corpseHarvest.denial.actorDead': '채집하려면 살아 있어야 합니다.',
+  'hudChrome.corpseHarvest.denial.actorInCombat': '전투 중에는 채집할 수 없습니다.',
+  'hudChrome.corpseHarvest.denial.actorBusy': '이미 다른 일을 하고 있습니다.',
+  'hudChrome.corpseHarvest.denial.corpseInvalid': '이 시체는 더 이상 채집할 수 없습니다.',
+  'hudChrome.corpseHarvest.denial.wrongWorld': '이 시체는 당신의 세계에 있지 않습니다.',
+  'hudChrome.corpseHarvest.denial.outOfRange': '이 시체를 채집하려면 더 가까이 다가가세요.',
+  'hudChrome.corpseHarvest.denial.noFieldKit': '채집하려면 야전 키트가 필요합니다.',
+  'hudChrome.corpseHarvest.denial.reservedSelf': '이미 이 시체를 채집하고 있습니다.',
+  'hudChrome.corpseHarvest.denial.reservedOther': '{name}님이 이 시체를 채집하고 있습니다.',
+  'hudChrome.corpseHarvest.denial.reservedOtherUnknown': '다른 플레이어가 이 시체를 채집하고 있습니다.',
+  'hudChrome.corpseHarvest.denial.priorityProtected':
+    '지금은 다른 플레이어가 이 시체에 우선권을 가지고 있습니다.',
+  'hudChrome.corpseHarvest.denial.corpseExpiring': '이 시체는 채집을 마칠 만큼 오래 유지되지 않습니다.',
+  'hudChrome.corpseHarvest.denial.preferenceMalformed':
+    '채집 선호 설정이 잘못되었습니다. 계속하려면 하나를 선택하세요.',
+  'hudChrome.corpseHarvest.denial.nothingToHarvest':
+    '당신의 야전 키트로는 이 시체에서 채집할 것이 없습니다.',
+  'hudChrome.corpseHarvest.denial.materialUnavailable': '{material}은(는) 이 시체에 없습니다.',
+  'hudChrome.corpseHarvest.denial.materialUnavailableWithList':
+    '{material}은(는) 이 시체에 없습니다. 사용 가능: {materials}.',
+  'hudChrome.corpseHarvest.denial.bagsFull': '가방이 가득 차서 채집할 수 없습니다.',
+  'hudChrome.corpseHarvest.denial.malformedInput': '문제가 발생했습니다. 다시 시도하세요.',
   'hudChrome.townFocus.title': '마을 집중',
   'hudChrome.townFocus.hint':
     '집중 포인트는 각 재료의 기본 산출량에 보너스를 더합니다. 집중하지 않은 재료는 기본 산출량 그대로 유지됩니다.',
@@ -9928,6 +9961,17 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.harvestJournal.noviceTitle': '아직 작물밭을 가꾼 적이 없습니다',
   'hudChrome.harvestJournal.noviceBody':
     '작물을 수확할 때마다 농사 숙련도가 올라갑니다. 아무 작물밭에나 씨앗을 심어 시작하세요.',
+  // Intentional Gathering PR3: the shared corpse-harvest preference picker
+  // (Field Kit use, Professions, corpse Change entrances). M16 fills.
+  'hudChrome.harvestPreference.title': '채집 설정',
+  'hudChrome.harvestPreference.allLabel': '모든 재료',
+  'hudChrome.harvestPreference.applyButton': '적용',
+  'hudChrome.harvestPreference.cancelButton': '취소',
+  'hudChrome.harvestPreference.pickHint': '적용하기 전에 채집할 재료를 선택하세요.',
+  'hudChrome.harvestPreference.currentUnavailable':
+    '현재 선택한 {material}은(는) 여기서 제공되지 않습니다.',
+  'hudChrome.harvestPreference.unknownMaterial': '이용할 수 없는 재료',
+  'hudChrome.harvestPreference.currentChoiceLabel': '현재: {choice}',
   'gatherEvent.pristineVein': '{finder}님이 순수한 광맥을 발견했습니다!',
   'gatherEvent.ancientHeartwood': '{finder}님이 고대 심목을 베어냈습니다!',
   'gatherEvent.moonlitBloom': '{finder}님이 달빛 꽃을 발견했습니다!',
@@ -15173,6 +15217,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   // masterwrought Phase 13, the orange promotion (M16 fills). The Deed of
   // Making noun matches the sim_i18n.ts error.legendaryDeed row.
   'entities.items.deed_of_making.name': '창조의 증서',
+  // Intentional Gathering PR3: the Field Kit's runtime item name. M16 fill.
+  'entities.items.field_kit.name': '야외 도구 키트',
   'hudChrome.materialHint.deedOfMaking':
     '명각 증서. 소모하면 완전해진 명장 제작 작품을 전설로 승격시키고 이름을 붙입니다.',
   'hudChrome.crafting.legendaryLine': '{item}이(가) {name}(으)로 다시 태어나 전설이 되었습니다!',

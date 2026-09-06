@@ -110,13 +110,16 @@ function withUsernameBanlist(env: { inline?: string; file?: string }, test: () =
 
 describe('websocket authentication', () => {
   it('pins the strict world-layout auth epoch for symmetric mixed-release rejection', () => {
-    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(27);
+    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(28);
     expect(ONLINE_WORLD_AUTH_TYPE).toBe(`auth-world-${ONLINE_WORLD_LAYOUT_VERSION}`);
-    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-27');
+    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-28');
     // The release/v0.41.0 server this branch merged accepts only `auth-world-25`
     // (the Ignivar raid ladder's tip), and the previous layout-gated servers
     // before it only `auth-world-11` and `auth-world-10`, so the new client
     // discriminator must remain necessarily unrecognizable to every one of them.
+    // `auth-world-27` (the components-array harvest client) must also stay
+    // unrecognizable: it predates the remembered harvest preference.
+    expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-27');
     expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-26');
     expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-25');
     expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-11');

@@ -30,6 +30,7 @@ import { tickTemporalHourglassGround } from './combat/temporal_hourglass';
 import { DELVES, DUNGEON_X_THRESHOLD, dungeonAt, zoneAt } from './data';
 import { clearDrownedLitanyBellsAndMarks } from './delves/drowned_litany_boss';
 import { recalcPlayerStats } from './entity';
+import { cancelCorpseHarvestForCorpse } from './professions/corpse_harvest_session';
 import { aurasSurvivingDeath } from './resurrection';
 import type { SimContext } from './sim_context';
 import type { Entity, SimEvent, Vec3 } from './types';
@@ -161,6 +162,10 @@ export function dropEntityFromRoster(ctx: SimContext, id: number): void {
   ctx.clearEntityMarker(id); // a despawned entity keeps no raid marker
   const e = ctx.entities.get(id);
   if (!e) return;
+  // A corpse about to disappear for good must not leave a live harvester
+  // reserving a body that no longer exists (Intentional Gathering, PR3); a
+  // no-op for every entity that never carried a reservation.
+  cancelCorpseHarvestForCorpse(ctx, e);
   // Paladin-sourced cleanup only when the despawner could have sourced any of
   // it (review 3050): each of these walks the full roster, two with a nested
   // per-aura loop, and a mass-despawn tick paid all three in a world with no

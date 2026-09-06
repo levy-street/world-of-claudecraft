@@ -5,6 +5,16 @@
 // harvest yields the profession materials from content/profession_items.ts
 // and the quest items remain obtainable ONLY through their quest-gated kill
 // loot (rollLoot's questId branch).
+//
+// Intentional Gathering PR3: the material-mapping assertions below (which
+// item a component tag yields) are GRANT-COMPLETION domain, independent of
+// the timed cast the public `Sim.harvestCorpse` now wraps
+// (tests/corpse_harvest_command.test.ts owns that public contract). Driven
+// directly through `grantCorpseHarvestOnMob`
+// (tests/helpers/corpse_harvest_grant.ts), which resolves the real `MOBS`
+// componentTags and calls the actual `snapshotCorpseHarvestGrantInputs` +
+// `grantCorpseHarvest` pair, exactly like a completed cast. No mapping,
+// quantity or rate literal below changed.
 import { describe, expect, it } from 'vitest';
 import {
   HARVEST_COMPONENT_ITEMS,
@@ -15,6 +25,7 @@ import { createMob } from '../src/sim/entity';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
+import { grantCorpseHarvestOnMob } from './helpers/corpse_harvest_grant';
 import { expectDefined } from './helpers/defined';
 
 type SimInternals = {
@@ -132,7 +143,7 @@ describe('harvesting no longer grants quest credit (the collision fix)', () => {
     // forest_wolf is hide-tagged but is NOT a boar: before this change the
     // harvest granted boar_hide and advanced the boar quest.
     const mob = corpse(internals, 'forest_wolf', 9999);
-    sim.harvestCorpse(mob.id, ['hide'], pid);
+    grantCorpseHarvestOnMob(sim, mob, meta, ['hide']);
     expect(mob.harvestClaimedBy).toBe(pid);
     expect(sim.countItem('rough_hide', pid)).toBeGreaterThanOrEqual(1);
     // Collect-quest progress IS the live item count: zero of the quest item
@@ -147,9 +158,9 @@ describe('harvesting no longer grants quest credit (the collision fix)', () => {
     activateQuest(meta, 'q_spiders');
     activateQuest(meta, 'q_widows');
     const spider = corpse(internals, 'webwood_spider', 9999);
-    sim.harvestCorpse(spider.id, undefined, pid);
+    grantCorpseHarvestOnMob(sim, spider, meta, undefined);
     const widow = corpse(internals, 'mire_widow', 9998);
-    sim.harvestCorpse(widow.id, undefined, pid);
+    grantCorpseHarvestOnMob(sim, widow, meta, undefined);
     expect(sim.countItem('spider_silk', pid)).toBeGreaterThanOrEqual(1);
     expect(sim.countItem('venom_gland', pid)).toBeGreaterThanOrEqual(1);
     expect(sim.countItem('webwood_silk', pid)).toBe(0);
@@ -221,8 +232,9 @@ describe('every mapped tag yields its dedicated material', () => {
   for (const [templateId, expected] of CASES) {
     it(`${templateId} yields ${expected.join(' + ')}`, () => {
       const { sim, internals, pid } = setup();
+      const meta = expectDefined(internals.players.get(pid));
       const mob = corpse(internals, templateId, 9999);
-      sim.harvestCorpse(mob.id, undefined, pid);
+      grantCorpseHarvestOnMob(sim, mob, meta, undefined);
       expect(mob.harvestClaimedBy).toBe(pid);
       for (const itemId of expected) {
         expect(sim.countItem(itemId, pid), itemId).toBeGreaterThanOrEqual(1);

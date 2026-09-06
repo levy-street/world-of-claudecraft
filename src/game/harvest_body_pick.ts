@@ -10,6 +10,7 @@
 // nearest eligible body, with a distance tie going to the lower entity id so
 // both hosts and repeated presses agree.
 
+import { CORPSE_HARVEST_POPUP_RANGE } from '../sim/professions/corpse_harvest_inspection';
 import { dist2d, type Entity, INTERACT_RANGE } from '../sim/types';
 import { corpseLootAvailability, localPartyMemberIds } from './corpse_loot_availability';
 
@@ -18,8 +19,10 @@ import { corpseLootAvailability, localPartyMemberIds } from './corpse_loot_avail
  *  closes itself. Deliberately WIDER than the reach a harvest needs, and
  *  deliberately NOT this module's gate (see pickHarvestBody): a popup that
  *  survives a step backwards is a courtesy, while an entry that NAMES a body
- *  out of harvest reach is a lie. */
-export const HARVEST_BODY_RANGE = 7;
+ *  out of harvest reach is a lie. Sim-owned (`CORPSE_HARVEST_POPUP_RANGE`) so
+ *  the popup and the cold-read inspection agree on one number; aliased here
+ *  under its established name so no caller of this module moves. */
+export const HARVEST_BODY_RANGE = CORPSE_HARVEST_POPUP_RANGE;
 
 export interface HarvestBodyPickWorld {
   player: Entity;

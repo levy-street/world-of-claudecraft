@@ -54,6 +54,7 @@ import { isPrimaryOwnedPetEntity } from '../sim/pet/pet_selection';
 import { getArchetypeTitle, getHobbyCraft } from '../sim/professions/archetype';
 import type { RespecPaymentTier } from '../sim/professions/focus';
 import type { MaterialRarity } from '../sim/professions/gathering';
+import type { HarvestPreference } from '../sim/professions/harvest_preference';
 import { perfectingInfoFrom } from '../sim/professions/perfecting';
 import { emptyCraftSkills } from '../sim/professions/wheel';
 import {
@@ -118,6 +119,7 @@ import {
   type CharacterSearchResult,
   type CivicServicePlacement,
   type ClientCommand,
+  type CorpseHarvestInfo,
   type CraftingIdentityView,
   type CraftResultView,
   type DailyRewardHistory,
@@ -213,6 +215,7 @@ import {
   decodeVarkhulForgestormWarnings,
 } from './ground_telegraph_wire';
 import { decodeGuildBankLogFrame, GUILD_BANK_LOG_TTL_MS } from './guild_bank_log_wire';
+import { decodeHarvestPreferenceWire } from './harvest_preference_wire';
 import { foldInputAck } from './input_ack';
 import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
 import { inputSignature } from './input_signature';
@@ -250,6 +253,7 @@ import {
 } from './varkhul_cinder_orb_wire';
 import { vaultWithdrawPayload } from './vault_snapshot_wire';
 import { buildWebSocketAuthMessage } from './world_auth_message';
+import { WorldInteractionRequests } from './world_interaction_requests';
 
 export { buildWebSocketAuthMessage } from './world_auth_message';
 
@@ -1755,6 +1759,10 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // never slotted an effect, which is the server's own default: the sim leaves
   // the backing PlayerMeta field absent and projects [] for it.
   toolEffectSlots: readonly ToolEffectSlotView[] = [];
+  // Corpse-harvest preference (Intentional Gathering PR3), mirrored from
+  // `hpref` below. null until the mirror syncs; reset null on reconnect
+  // hello (the marketInfo precedent) so a resume never shows a stale choice.
+  harvestPreference: HarvestPreference | null = null;
   // Static content read (the recipeList precedent below): the garden-bed
   // geography ships with the client bundle like every other content table, so
   // this needs no wire round-trip. See src/world_api/farming.ts.
@@ -1999,11 +2007,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // the server echoes it or the snapshot budget runs out (server authority is
   // untouched: a refusal still wins via that valve).
   private pendingTargetEcho: { id: number | null; snapshotsLeft: number } | null = null;
-  private nextCommandOutcomeId = 1;
-  private pendingCommandOutcomes = new Map<
-    number,
-    { resolve: (succeeded: boolean) => void; timeout: ReturnType<typeof setTimeout> }
-  >();
+  // Lazy holder (the bareClient idiom): requests() below creates this on first use.
+  private worldInteractionRequests: WorldInteractionRequests | undefined;
   private mouselookFacing: number | null = null;
   private sendTimer: number | undefined;
   private lastInputSentAt = 0;
@@ -2172,7 +2177,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     // A reconnect may land on an older binary. Drop optional behavior before
     // any new transport can accept input; the next capable snapshot re-arms it.
     this.petSpecialCommandsSupported = false;
-    this.failPendingCommandOutcomes();
+    this.worldInteractionRequests?.reset();
     if (this.sessionEnded) return;
     // A pending reconnect timer means this close is a duplicate signal of the
     // SAME physical drop: on the zombie-socket path the visibility handler
@@ -2218,7 +2223,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     // lost to a deliberate logout within the debounce window.
     this.flushActionBarLayoutSave();
     this.sessionEnded = true;
-    this.failPendingCommandOutcomes();
+    this.worldInteractionRequests?.reset();
     // RIFT_REGIONS (src/sim/colliders.ts) is a module-level registry keyed by
     // riftCollisionToken, outside this instance: a session that ends while
     // mirroring a floor would otherwise strand that region under a token
@@ -2496,39 +2501,20 @@ export class ClientWorld extends ReconWireState implements IWorld {
   private cmdWithOutcome(
     payload: { cmd: ClientCommand } & Record<string, unknown>,
   ): Promise<boolean> {
-    if (typeof this.spectating === 'string' || !this.canSendCommand()) {
-      return Promise.resolve(false);
-    }
-    if (!this.pendingCommandOutcomes) this.pendingCommandOutcomes = new Map();
-    const rid = this.nextCommandOutcomeId ?? 1;
-    this.nextCommandOutcomeId = rid >= Number.MAX_SAFE_INTEGER ? 1 : rid + 1;
-    return new Promise<boolean>((resolve) => {
-      const timeout = setTimeout(() => {
-        const pending = this.pendingCommandOutcomes?.get(rid);
-        if (!pending) return;
-        this.pendingCommandOutcomes.delete(rid);
-        pending.resolve(false);
-      }, 5000);
-      this.pendingCommandOutcomes.set(rid, { resolve, timeout });
-      this.rawCmd({ ...payload, rid });
-    });
+    return this.requests().command(payload);
   }
 
-  private resolveCommandOutcome(rid: number, succeeded: boolean): void {
-    const pending = this.pendingCommandOutcomes?.get(rid);
-    if (!pending) return;
-    clearTimeout(pending.timeout);
-    this.pendingCommandOutcomes.delete(rid);
-    pending.resolve(succeeded);
-  }
-
-  private failPendingCommandOutcomes(): void {
-    if (!this.pendingCommandOutcomes) return;
-    for (const pending of this.pendingCommandOutcomes.values()) {
-      clearTimeout(pending.timeout);
-      pending.resolve(false);
+  // Lazy accessor for the shared request owner (world_interaction_requests.ts).
+  private requests(): WorldInteractionRequests {
+    if (!this.worldInteractionRequests) {
+      this.worldInteractionRequests = new WorldInteractionRequests({
+        canSend: () => typeof this.spectating !== 'string' && this.canSendCommand(),
+        sendRawCommand: (payload) => this.rawCmd(payload),
+        sendInspectCorpseHarvest: (id, rid) =>
+          this.rawCmd({ cmd: 'inspectCorpseHarvest', id, rid }),
+      });
     }
-    this.pendingCommandOutcomes.clear();
+    return this.worldInteractionRequests;
   }
 
   /** Raw WS command — used by dev scripts and browser console when online. */
@@ -2557,15 +2543,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
       return;
     }
     const parseMs = performance.now() - parseStart;
-    if (
-      msg.t === 'commandOutcome' &&
-      Number.isSafeInteger(msg.rid) &&
-      msg.rid > 0 &&
-      typeof msg.ok === 'boolean'
-    ) {
-      this.resolveCommandOutcome(msg.rid, msg.ok);
-      return;
-    }
+    // A commandOutcome/corpseHarvestInfo reply routes to its owner; anything
+    // else falls through unchanged.
+    if (this.requests().onMessage(msg)) return;
     if (msg.t === 'hello') {
       this.movementWireVersion = msg.movementWire === 2 ? 2 : 1;
       this.movementFrameOutbox?.reset();
@@ -2619,6 +2599,11 @@ export class ClientWorld extends ReconWireState implements IWorld {
         // resync as pending until a genuinely post-reconnect market snapshot
         // decodes.
         this.marketInfo = null;
+        // Same reasoning as marketInfo above: hpref is delta-omitted, so this
+        // resets it to the unsynced state rather than showing a stale choice.
+        this.harvestPreference = null;
+        // Same idea for a corpse-harvest-info query issued just before the drop.
+        this.worldInteractionRequests?.resetQuery();
         this.onReconnected?.();
       }
       this.connected = true;
@@ -2632,7 +2617,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       return;
     }
     if (msg.t === 'spectate') {
-      if (typeof msg.name === 'string') this.failPendingCommandOutcomes();
+      if (typeof msg.name === 'string') this.worldInteractionRequests?.reset();
       this.spectating = typeof msg.name === 'string' ? msg.name : null;
       this.spectateFacingPending = true;
       this.pendingSpectateFacing = null;
@@ -3703,6 +3688,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
       if (s.salv !== undefined) this.lastSalvageResult = s.salv ?? null;
       if (s.gprof !== undefined) this.gatheringProficiency = s.gprof ?? {};
       if (s.tslot !== undefined) this.toolEffectSlots = s.tslot ?? [];
+      // hpref: delta-omitted; present decodes via the shared wire leaf, which
+      // refuses a malformed value to null rather than reviving All.
+      if (s.hpref !== undefined) this.harvestPreference = decodeHarvestPreferenceWire(s.hpref);
       if (s.fplot !== undefined) this.myFarmPlots = s.fplot ?? [];
       if (s.prof !== undefined) this.professionsState = s.prof ?? { skills: [] };
       if (s.cprof !== undefined && s.cprof) {
@@ -4026,8 +4014,13 @@ export class ClientWorld extends ReconWireState implements IWorld {
   autoLoot(id: number): void {
     this.cmd({ cmd: 'autoloot', id });
   }
-  harvestCorpse(id: number, components?: string[]): void {
-    this.cmd({ cmd: 'harvestCorpse', id, components });
+  harvestCorpse(id: number): Promise<boolean> {
+    return this.cmdWithOutcome({ cmd: 'harvestCorpse', id });
+  }
+  // The selected-corpse status query (corpse-status-contract.md): always a
+  // Promise here, settled by the correlated reply requests().onMessage routes.
+  corpseHarvestInfo(id: number): Promise<CorpseHarvestInfo | null> {
+    return this.requests().inspectCorpse(id);
   }
   setTownFocus(allocation: Record<string, number>, tier: RespecPaymentTier): void {
     this.cmd({ cmd: 'set_town_focus', allocation, tier });
@@ -4191,6 +4184,12 @@ export class ClientWorld extends ReconWireState implements IWorld {
       return this.cmdWithOutcome({ cmd: 'harvest_node', node: nodeId, confirmUse: true });
     }
     return this.cmdWithOutcome({ cmd: 'harvest_node', node: nodeId });
+  }
+  // Corpse-harvest preference: command only, no optimistic write (the
+  // setActiveTitle precedent). The server re-validates `raw` and derives pid
+  // from the authenticated session, never from this payload.
+  setHarvestPreference(raw: string): void {
+    this.cmd({ cmd: 'set_harvest_preference', raw });
   }
   // `commission` (Professions 2.0): the boolean Maker's Bond
   // opt-in, sent ONLY when true so a non-commission craft's wire message

@@ -785,15 +785,26 @@ describe('Masterwrought art completion evidence', () => {
     const currentBatch = mapping.generatedBatches.find(({ batchId: id }) => id === batchId);
     expect(currentBatch?.itemIds).toEqual(value.targetSets.items);
 
+    // The union math below is sealed against this dated audit's own passIds, not a
+    // fresh read of every current mapping owner: the mapping has grown past 1209
+    // since this audit (additive art lands afterward), so "current mapping owners"
+    // is no longer the same universe the equation below describes.
+    const datedVerdict = readJson<{ visualVerdict: { passIds: string[] } }>(
+      `${evidenceDir}/final-item-art-audit-verdict.json`,
+    );
+    const datedIds = sorted(datedVerdict.visualVerdict.passIds);
+    expect(duplicateValues(datedIds)).toEqual([]);
+    expect(datedIds).toHaveLength(1209);
+
     const currentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(duplicateValues(currentOwnerIds)).toEqual([]);
-    expect(currentOwnerIds).toHaveLength(1209);
-    const retainedHistoricalIds = currentOwnerIds.filter(
-      (id) => !value.targetSets.items.includes(id),
-    );
+    for (const id of datedIds) {
+      expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
+    }
+
+    const retainedHistoricalIds = datedIds.filter((id) => !value.targetSets.items.includes(id));
     expect(retainedHistoricalIds).toHaveLength(1044);
     expect(retainedHistoricalIds.length + value.targetSets.replacedItems.length).toBe(1128);
     expect(retainedHistoricalIds.length + value.targetSets.items.length).toBe(1209);

@@ -3262,26 +3262,23 @@ export const TARGETS = [
     },
   },
   {
-    key: 'corpse-unified-press',
-    label: 'Unified corpse press: one interact loots AND harvests (Professions 2.0)',
+    key: 'corpse-intentional-interaction',
+    label: 'Corpse interaction: ordinary loot and deliberate harvest choices',
     when: [
       'loot_window_controller',
       'corpse_harvest_window',
       'corpse_harvest_view',
       'nearby_interaction',
     ],
-    // Kill the nearest forest wolf beside the player, then either press the real
-    // interact key (chat shows the loot line AND the gather line from one press;
-    // the base tree honestly shows the loot line alone) or open the loot window
-    // to show the harvest picker pre-checked from the player's town focus (the
-    // base tree opens it empty).
+    // Compare the real Interact outcome and corpse choices on each revision.
+    // The current revision keeps harvesting separate from ordinary loot.
     variants: [
       { key: 'chat-outcome' },
-      { key: 'picker-preselected', picker: true },
+      { key: 'picker', picker: true },
       // The centered mobile-touch layout of the same picker window (the
       // legibility pass renamed the corpse arm's button and added the footer
       // hint, both of which render on mobile too).
-      { key: 'picker-preselected-mobile', picker: true, mobile: true },
+      { key: 'picker-mobile', picker: true, mobile: true },
       // A MIXED corpse (#2514). forest_wolf's tags both map to an item, so its
       // picker can never show a marked row: the wild boar carries `tusk` beside
       // hide and meat, which is the shape the whole issue is about. Same rig,
@@ -3300,12 +3297,14 @@ export const TARGETS = [
         const sim = game?.sim;
         const p = sim?.player;
         if (!sim || !p) return;
-        // Town focus first, while the fresh spawn still stands in the Eastbrook
-        // hub circle (the setter is in-town-only); hide drives every variant,
-        // and both templates below carry it.
-        try {
-          sim.setTownFocus?.({ hide: 5 });
-        } catch {}
+        // Match the intended hide choice through each revision's public setting.
+        // The older baseline has town focus; the new explicit harvest path also
+        // needs its reusable kit and remembered material preference.
+        sim.setTownFocus?.({ hide: 5 });
+        if (typeof sim.setHarvestPreference === 'function') {
+          sim.addItem('field_kit', 1);
+          sim.setHarvestPreference('rough_hide');
+        }
         let wolf = null;
         let best = Infinity;
         for (const e of sim.entities.values()) {
@@ -3342,8 +3341,8 @@ export const TARGETS = [
         return { clip: '#loot-window' };
       }
       await page.evaluate(() => {
-        // The real bound interact key (KeyF), not the debug hook: the unified
-        // press is exactly what this shot is evidence for.
+        // Use the real bound Interact key so the capture shows that revision
+        // executing its own input behavior.
         const down = new KeyboardEvent('keydown', { code: 'KeyF', key: 'f', bubbles: true });
         const up = new KeyboardEvent('keyup', { code: 'KeyF', key: 'f', bubbles: true });
         window.dispatchEvent(down);
@@ -3432,7 +3431,15 @@ export const TARGETS = [
   {
     key: 'corpse-harvest-lines',
     label: 'Chat log: one line and one cue per corpse harvest (#2457)',
-    when: ['sim/interaction', 'professions/harvest_yields', 'ui/grant_line_view'],
+    when: [
+      'sim/interaction',
+      'professions/harvest_yields',
+      'ui/grant_line_view',
+      'professions/corpse_harvest_session',
+      'professions/harvest_admission',
+      'professions/corpse_harvest_grant',
+      'ui/hud/professions/gathering_result_feedback',
+    ],
     // Corpse harvest is the sibling of the profession-grant-lines target above:
     // it was the last flow still logging through the grant hub, so it printed a
     // flat "You receive:" line and a generic ding PER COMPONENT. It is a
@@ -3442,9 +3449,21 @@ export const TARGETS = [
     // Two forest_wolf corpses are harvested back to back: that template carries
     // hide and fang, the two-component everyday case, so the pair shows four
     // grant lines from two keypresses. The shared rng stream is pinned to a
-    // fixed value immediately before the harvests, so the before and after
-    // shots differ ONLY by this change; without it the tier and rarity rolls
-    // land differently in each run and the quantities would not line up.
+    // fixed value immediately before the first cast starts, so the before and
+    // after shots differ ONLY by this change; the exact rolled tier/rarity
+    // quantities are NOT pinned or asserted here (the real 1.5s cast between
+    // the two harvests advances the sim's own tick loop, which can draw rng on
+    // paths unrelated to this pinned start, e.g. mob AI elsewhere in the
+    // offline world), so this is a starting-stream pin for run-to-run shot
+    // stability, never a claim that the two runs draw byte-identical grants.
+    // Real API (PR3): `sim.harvestCorpse(id, pid?)` starts a real 1.5s cast
+    // (requires a carried Field Kit, refuses dead/inCombat/busy) rather than
+    // granting instantly, so each corpse is harvested sequentially: start the
+    // cast, let the real game loop tick it to completion (exact claim landed
+    // for THIS player), then start the next. The stored harvest preference
+    // alone resolves what a cast extracts (PR3), so it is set to 'all'
+    // explicitly during staging rather than trusting whatever a prior target
+    // or a loaded save left on the account.
     variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
     async capture(page, variant) {
       await page.evaluate(() => {
@@ -3478,27 +3497,63 @@ export const TARGETS = [
           wolf.lootable = false;
           wolf.loot = null;
         }
+        // The real cast's admission requires a carried Field Kit; it is never
+        // consumed, so one grant covers both sequential harvests. The actor
+        // is already grounded and at rest beside the corpses (their position
+        // was just snapped to the player's own), so admission's range and
+        // displacement checks are satisfied without touching movement.
+        sim.addItem('field_kit', 1, pid);
+        // PR3: the stored harvest preference alone resolves what a cast
+        // extracts, not a per-call components override; set it explicitly
+        // rather than leaving whatever a prior target or a loaded save left
+        // on this account to silently narrow the two-component shot.
+        sim.setHarvestPreference('all', pid);
+        // Clear so the shot holds only the two harvests below.
+        document.querySelector('#chatlog')?.replaceChildren();
         return { ok: true, ids: wolves.map((wolf) => wolf.id) };
       });
       if (!staged.ok) throw new Error(staged.reason);
       await wait(400);
-      const harvested = await page.evaluate((ids) => {
+      // Pin the shared stream immediately before the FIRST cast starts, not
+      // during staging above: `wait(400)` runs real game-loop frames first,
+      // and those frames CAN draw ambient rng (mob AI etc.) elsewhere in the
+      // offline world, so pinning any earlier would not guarantee this is the
+      // stream value in effect when the first cast's own rolls actually run.
+      const pinned = await page.evaluate(() => {
         const sim = window.__game?.sim;
-        const pid = sim?.playerId;
-        if (!sim || pid === undefined) return { ok: false, reason: 'world went away' };
-        // Clear first so the shot holds only these two harvests.
-        document.querySelector('#chatlog')?.replaceChildren();
-        // Pin the shared stream. `s` is TypeScript-private, which is compile
-        // time only, and both harvests run inside this one evaluate so no tick
-        // draws between them: the two commands consume the same draws in the
-        // same order on either branch.
+        if (!sim) return { ok: false, reason: 'world went away' };
+        // `s` is TypeScript-private, which is compile time only.
         sim.rng.s = 20457;
-        for (const id of ids) sim.harvestCorpse(id, undefined, pid);
         return { ok: true };
-      }, staged.ids);
-      if (!harvested.ok) throw new Error(harvested.reason);
-      // The commands resolve on arrival but the events reach the HUD through
-      // the live 20 Hz drain, so give the loop real time.
+      });
+      if (!pinned.ok) throw new Error(pinned.reason);
+      for (const id of staged.ids) {
+        const started = await page.evaluate((id) => {
+          const sim = window.__game?.sim;
+          const pid = sim?.playerId;
+          if (!sim || pid === undefined) return { ok: false, reason: 'world went away' };
+          return { ok: sim.harvestCorpse(id, pid) };
+        }, id);
+        if (!started.ok) {
+          throw new Error(started.reason ?? `corpse harvest cast did not start for id ${id}`);
+        }
+        // The cast resolves over real game-loop ticks (HARVEST_CAST_SECONDS,
+        // 1.5s); wait for the EXACT claim (this player, not merely "someone")
+        // rather than draining ticks by hand or assuming a fixed delay, and
+        // require it before starting the next corpse's cast.
+        await page.waitForFunction(
+          (id) => {
+            const sim = window.__game?.sim;
+            const pid = sim?.playerId;
+            const mob = sim?.entities?.get(id);
+            return !!sim && pid !== undefined && !!mob && mob.harvestClaimedBy === pid;
+          },
+          { timeout: 5000 },
+          id,
+        );
+      }
+      // The events reach the HUD through the live 20 Hz drain; give the loop
+      // real time after the second claim before clipping the log.
       await wait(1500);
       if (variant?.mobile) {
         // The touch layout parks the chat panel behind its own button; without

@@ -35,6 +35,7 @@ import { MOBS } from '../data';
 import * as deedsMod from '../deeds';
 import { resetIgnivarEncounter } from '../encounters/ignivar';
 import { resetVarkhulEncounter, VARKHUL_BOSS_ID } from '../encounters/varkhul';
+import { cancelCorpseHarvestForCorpse } from '../professions/corpse_harvest_session';
 import type { SimContext } from '../sim_context';
 import { clearThreat } from '../threat';
 import { dist2d, type Entity, IGNIVAR_BOSS_ID, NYTHRAXIS_BOSS_ID } from '../types';
@@ -52,6 +53,11 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
     return;
   }
   ctx.clearNonPlayerStatAuras(mob);
+  // The entity id is about to be reused for a live mob: a corpse-harvest
+  // reservation must not survive it (Intentional Gathering, PR3). A no-op
+  // when nobody was harvesting; draws no rng.
+  cancelCorpseHarvestForCorpse(ctx, mob);
+  mob.corpseHarvestState = undefined;
   mob.dead = false;
   mob.lootable = false;
   mob.loot = null;

@@ -2412,6 +2412,35 @@ export const pl_PL: EnTranslations = {
         "tusk": "Cios",
         "meat": "Mięso",
         "cloth": "Tkanina"
+      },
+      "preferenceLabel": "Harvest preference: {preference}",
+      "changeButton": "Change",
+      "harvestActionTooltip": "Harvests with your current preference over {seconds} seconds. Requires a Field Kit. Each body can be harvested once. The killer and their party have priority for {prioritySeconds} seconds. Dropped loot stays available.",
+      "checkingStatus": "Checking harvest status...",
+      "statusUnavailable": "Harvest status is not available right now.",
+      "harvestStarting": "Starting harvest...",
+      "allBenefit": "Gathers every available material from this body.",
+      "focusBenefit": "Focuses the harvest on {material}.",
+      "tierBonusHint": "Focuses the harvest on {material}: +{tierBonus} tier over All materials.",
+      "denial": {
+        "actorDead": "You must be alive to harvest.",
+        "actorInCombat": "You cannot harvest while in combat.",
+        "actorBusy": "You are already busy.",
+        "corpseInvalid": "This corpse can no longer be harvested.",
+        "wrongWorld": "This corpse is not in your world.",
+        "outOfRange": "Move closer to harvest this body.",
+        "noFieldKit": "You need a Field Kit to harvest.",
+        "reservedSelf": "You are already harvesting this body.",
+        "reservedOther": "{name} is harvesting this body.",
+        "reservedOtherUnknown": "Another player is harvesting this body.",
+        "priorityProtected": "Another player has priority on this body right now.",
+        "corpseExpiring": "This body will not last long enough to harvest.",
+        "preferenceMalformed": "Your harvest preference is invalid. Choose one to continue.",
+        "nothingToHarvest": "This body has nothing your Field Kit can harvest.",
+        "materialUnavailable": "{material} is not on this body.",
+        "materialUnavailableWithList": "{material} is not on this body. Available: {materials}.",
+        "bagsFull": "Your bags are too full to harvest.",
+        "malformedInput": "Something went wrong. Try again."
       }
     },
     "townFocus": {
@@ -2430,6 +2459,16 @@ export const pl_PL: EnTranslations = {
       "respecTierInstantOption": "Natychmiastowy (pełny koszt)",
       "respecCostFree": "Za darmo",
       "respecCostLine": "Kosztuje {coin} i {materials}"
+    },
+    "harvestPreference": {
+      "title": "Harvest Preference",
+      "allLabel": "All materials",
+      "applyButton": "Apply",
+      "cancelButton": "Cancel",
+      "pickHint": "Choose what to harvest before applying.",
+      "currentUnavailable": "Your current choice, {material}, is not offered here.",
+      "unknownMaterial": "Unavailable material",
+      "currentChoiceLabel": "Current: {choice}"
     },
     "party": {
       "promoteLeader": "Mianuj przywódcą",
@@ -14760,6 +14799,9 @@ export const pl_PL: EnTranslations = {
       },
       "deed_of_making": {
         "name": "Deed of Making"
+      },
+      "field_kit": {
+        "name": "Field Kit"
       },
       "conjured_water4": {
         "name": "Wyczarowana woda źródlana"

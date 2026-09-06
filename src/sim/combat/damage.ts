@@ -38,6 +38,10 @@ import {
 import { spawnWidowHatchlingOnEggDeath } from '../mob/egg_hatchling';
 import { grantAbilityDevotion } from '../paladin_devotion';
 import { snapshotPetOnOwnerDeath } from '../pet/pet_owner_revive';
+import {
+  recordCorpseHarvestDeath,
+  releaseCorpseHarvest,
+} from '../professions/corpse_harvest_session';
 import { pvpDamageMultiplier } from '../pvp';
 import { resolveRespawnSeconds } from '../respawn_policy';
 import { aurasSurvivingDeath } from '../resurrection';
@@ -1346,6 +1350,11 @@ export function handleDeath(
   e.ccDr.clear();
   stopChannelVisual(ctx, e);
   emitRainOfFireStop(ctx, e);
+  // Death is a cast cancel (see the comment below), and this hub bypasses
+  // cancelCast's own teardown entirely, so the corpse-harvest release must be
+  // called explicitly here too, before the field it reads is cleared.
+  // Idempotent: a no-op for every death that was never mid-harvest.
+  releaseCorpseHarvest(ctx, e.id);
   e.castingAbility = null;
   e.castTargetId = null;
   // Death is a cast cancel: mirror cancelCast's teardown of the channel and
@@ -1761,6 +1770,11 @@ export function handleDeath(
     // only the participation snapshot above receives marks.
     lockNormalDungeonResetOnBossKill(ctx, e);
     ctx.awardHeroicMarks(e, heroicRewardRecipients, claimedInst);
+    // Intentional Gathering PR3: the kill-credit priority snapshot for a
+    // future corpse-harvest cast, taken from the exact same eligible list the
+    // heroic-reward award above uses (empty means the corpse is public at
+    // once). Owned pets return earlier in this function and never reach here.
+    recordCorpseHarvestDeath(ctx, e, heroicRewardRecipients);
     // A bossExitPortal dungeon opens its far-end exit the moment the final
     // boss falls (both difficulties; no-op everywhere else).
     spawnBossExitPortal(ctx, e);

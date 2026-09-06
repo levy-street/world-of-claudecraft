@@ -15,6 +15,8 @@ const BATCH_ID = 'item-art-consistency-2026-08-09';
 const CURRENT_EVIDENCE_DIR = 'docs/achievements/masterwrought-art-completion-2026-09-02';
 const CURRENT_VERDICT_PATH = `${CURRENT_EVIDENCE_DIR}/final-item-art-audit-verdict.json`;
 const CURRENT_BATCH_ID = 'masterwrought-art-completion-2026-09-02';
+const FIELD_KIT_EVIDENCE_DIR = 'docs/achievements/intentional-gathering-field-kit-2026-09-06';
+const FIELD_KIT_BATCH_ID = 'intentional-gathering-field-kit-2026-09-06';
 const LICENSE = 'World of ClaudeCraft project-generated art, project asset, rights reserved';
 
 type ReportPin = {
@@ -124,6 +126,7 @@ type ItemMapping = {
     commonPrompt: string;
     provenanceRecord?: string;
     provenanceRecords?: string[];
+    provenance?: string;
     itemIds: string[];
   }>;
 };
@@ -765,21 +768,21 @@ describe('item-art consistency accepted-art provenance', () => {
     );
   });
 
-  it('binds the current Masterwrought verdict to the complete live item-art catalog', () => {
+  it('binds the historical Masterwrought verdict to its dated item-art snapshot', () => {
     expect(existsSync(path.join(repoRoot, CURRENT_VERDICT_PATH)), 'current item-art verdict').toBe(
       true,
     );
     const verdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const mapping = readJson<ItemMapping>('public/ui/items/mapping.json');
-    const currentIds = sorted([
+    // This verdict is a dated, frozen snapshot (1209 files / 1224 defs): additive art
+    // (the Field Kit) has landed since, so the live mapping and live ITEMS have grown
+    // past it. The checks below bind the verdict to its own recorded passIds, not to
+    // a fresh read of the complete current catalog.
+    const datedIds = sorted(verdict.visualVerdict.passIds);
+    const currentOwnerIds = new Set([
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ]);
-    const shippingIds = sorted(
-      readdirSync(path.join(repoRoot, 'public/ui/items'))
-        .filter((name) => name.endsWith('.webp'))
-        .map((name) => name.slice(0, -'.webp'.length)),
-    );
 
     expect(verdict.schemaVersion).toBe(1);
     expect(verdict.auditScope).toMatchObject({
@@ -790,21 +793,22 @@ describe('item-art consistency accepted-art provenance', () => {
       heroicDefinitionsWithOwnWebp: 48,
       heroicWeaponArtAliases: 16,
     });
-    expect(Object.keys(ITEMS)).toHaveLength(1224);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1209,
     );
     expect(Object.keys(verdict.auditScope.groups)).toHaveLength(25);
-    expect(currentIds).toHaveLength(1209);
-    expect(new Set(currentIds).size).toBe(1209);
-    expect(shippingIds).toEqual(currentIds);
+    expect(datedIds).toHaveLength(1209);
+    expect(new Set(datedIds).size).toBe(1209);
+    for (const id of datedIds) {
+      expect(currentOwnerIds.has(id), `${id} still has a current mapping owner`).toBe(true);
+    }
 
     const generatedHeroics = Object.entries(ITEMS).filter(
       ([, item]) => 'heroicOf' in item && typeof item.heroicOf === 'string',
     );
-    const currentIdSet = new Set(currentIds);
-    const heroicWithOwnWebp = generatedHeroics.filter(([id]) => currentIdSet.has(id));
-    const heroicArtAliases = generatedHeroics.filter(([id]) => !currentIdSet.has(id));
+    const datedIdSet = new Set(datedIds);
+    const heroicWithOwnWebp = generatedHeroics.filter(([id]) => datedIdSet.has(id));
+    const heroicArtAliases = generatedHeroics.filter(([id]) => !datedIdSet.has(id));
     expect(generatedHeroics).toHaveLength(64);
     expect(heroicWithOwnWebp).toHaveLength(48);
     expect(heroicArtAliases).toHaveLength(16);
@@ -842,7 +846,7 @@ describe('item-art consistency accepted-art provenance', () => {
       rejectCount: 0,
       reject: [],
     });
-    expect(verdict.visualVerdict.passIds).toEqual(currentIds);
+    expect(verdict.visualVerdict.passIds).toEqual(datedIds);
 
     expect(verdict.evidence.catalog).toEqual({
       path: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
@@ -871,8 +875,10 @@ describe('item-art consistency accepted-art provenance', () => {
     }
     expect(sheetSetDigest.digest('hex')).toBe(verdict.evidence.sheetSetSha256);
 
+    // Recomputed over exactly the dated passIds set (not the live shipping
+    // directory), so this stays a check on the frozen snapshot's own bytes.
     const shippingCatalogDigest = createHash('sha256');
-    for (const id of currentIds) {
+    for (const id of datedIds) {
       const bytes = readFileSync(path.join(repoRoot, `public/ui/items/${id}.webp`));
       shippingCatalogDigest.update(`${id}\0${sha256(bytes)}\0${bytes.length}\n`);
     }
@@ -880,6 +886,66 @@ describe('item-art consistency accepted-art provenance', () => {
       'bdec0afdcd3349a34b74bca9b0e01aee5b3ab2b3a82568bd9019fe0b0bb0b38c',
     );
     expect(shippingCatalogDigest.digest('hex')).toBe(verdict.evidence.shippingCatalogSha256);
+  });
+
+  it('extends the dated catalog with the Field Kit as one additive current owner', () => {
+    const mapping = readJson<ItemMapping>('public/ui/items/mapping.json');
+    const currentOwnerIds = [
+      ...mapping.entries.map(({ itemId }) => itemId),
+      ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
+    ];
+    const shippingIds = readdirSync(path.join(repoRoot, 'public/ui/items'))
+      .filter((name) => name.endsWith('.webp'))
+      .map((name) => name.slice(0, -'.webp'.length));
+    expect(sorted(currentOwnerIds)).toEqual(sorted(shippingIds));
+    expect(new Set(currentOwnerIds).size).toBe(1210);
+    expect(shippingIds).toHaveLength(1210);
+    expect(Object.keys(ITEMS)).toHaveLength(1225);
+
+    const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
+    const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
+    expect(oldPassIds).toHaveLength(1209);
+    expect(oldPassIds).not.toContain('field_kit');
+    expect(sorted([...oldPassIds, 'field_kit'])).toEqual(sorted(currentOwnerIds));
+
+    const fieldKitManifest = readJson<{
+      targetSets: { items: string[] };
+      assets: Array<{ id: string; acceptedSha256: string; acceptedBytes: number }>;
+      review: { sizesInspected: Array<number | string> };
+    }>(`${FIELD_KIT_EVIDENCE_DIR}/accepted-art.json`);
+    expect(fieldKitManifest.targetSets.items).toEqual(['field_kit']);
+    expect(fieldKitManifest.assets.map(({ id }) => id)).toEqual(['field_kit']);
+    const asset = fieldKitManifest.assets[0];
+    expect(asset.acceptedBytes).toBe(2914);
+    expect(asset.acceptedSha256).toBe(
+      '603d3b5da0f2aeee5773b7ca755c76ee5cc60b18a926abb0e81790f83d734d9d',
+    );
+    const shippingBytes = readFileSync(path.join(repoRoot, 'public/ui/items/field_kit.webp'));
+    expect(shippingBytes.length).toBe(asset.acceptedBytes);
+    expect(sha256(shippingBytes)).toBe(asset.acceptedSha256);
+    // Only the review modes this record actually names: this batch was not put
+    // through the full identity-display-name-and-id sheet review, and there is
+    // no fresh global visual verdict over the 1210-icon catalog.
+    expect(fieldKitManifest.review.sizesInspected).toEqual([
+      512,
+      128,
+      40,
+      28,
+      22,
+      '28-grayscale',
+      '64-circle',
+    ]);
+
+    const fieldKitOwners = [
+      ...mapping.entries.filter(({ itemId }) => itemId === 'field_kit'),
+      ...mapping.generatedBatches.filter(({ itemIds }) => itemIds.includes('field_kit')),
+    ];
+    expect(fieldKitOwners).toHaveLength(1);
+    expect(fieldKitOwners[0]).toMatchObject({
+      batchId: FIELD_KIT_BATCH_ID,
+      provenance: `${FIELD_KIT_EVIDENCE_DIR}/accepted-art.json`,
+      itemIds: ['field_kit'],
+    });
   });
 
   it('keeps an exact, non-dangling supersession graph and one current mapping owner', () => {
@@ -991,7 +1057,7 @@ describe('item-art consistency accepted-art provenance', () => {
     // one generated batch. The surviving ordinary-art cohort stays explicit.
     expect(mapping.entries).toHaveLength(43);
     expect(mapping.entries.every(({ license }) => Boolean(license))).toBe(true);
-    expect(mapping.generatedBatches).toHaveLength(25);
+    expect(mapping.generatedBatches).toHaveLength(26);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -1038,13 +1104,15 @@ describe('item-art consistency accepted-art provenance', () => {
     const priorGeneratedIds = mapping.generatedBatches
       .filter(({ batchId }) => batchId !== BATCH_ID && batchId !== CURRENT_BATCH_ID)
       .flatMap(({ itemIds }) => itemIds);
-    expect(priorGeneratedIds).toHaveLength(727);
+    // 727 was the prior baseline before the Field Kit batch (one additional owner)
+    // joined this same "everything else" bucket.
+    expect(priorGeneratedIds).toHaveLength(728);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(1209);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1209);
+    expect(allCurrentOwnerIds).toHaveLength(1210);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1210);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1052,7 +1120,7 @@ describe('item-art consistency accepted-art provenance', () => {
       masterwroughtCompletion: completionBatch?.itemIds.length,
     }).toEqual({
       entries: 43,
-      priorGenerated: 727,
+      priorGenerated: 728,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
     });
@@ -1065,13 +1133,16 @@ describe('item-art consistency accepted-art provenance', () => {
     );
     expect(historicalVerdict.visualVerdict.passIds).toHaveLength(1128);
     expect(supersededHistoricalIds).toHaveLength(84);
+    // Bound against the dated Masterwrought verdict's own passIds (1209), not the
+    // live mapping: the Field Kit joined the mapping after that verdict was sealed.
+    const datedMasterwroughtVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     expect(
       sorted([
         ...historicalVerdict.visualVerdict.passIds.filter((id) => !completionIdSet.has(id)),
         ...(completionBatch?.itemIds ?? []),
       ]),
-      'historical carry-forward plus the completion wave is the current catalog',
-    ).toEqual(sorted(allCurrentOwnerIds));
+      'historical carry-forward plus the completion wave is the dated Masterwrought catalog',
+    ).toEqual(sorted(datedMasterwroughtVerdict.visualVerdict.passIds));
     expect(batch?.provenanceRecords).toEqual([
       `${evidenceDir}/accepted-art.json`,
       `${evidenceDir}/supersession-audit.json`,
@@ -1196,9 +1267,9 @@ describe('item-art consistency accepted-art provenance', () => {
     for (const id of ownerIds) ownerCountById.set(id, (ownerCountById.get(id) ?? 0) + 1);
 
     const violations: string[] = [];
-    if (ownerIds.length !== 1209)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1209`);
-    if (fileIds.length !== 1209) violations.push(`shipping WebP count: ${fileIds.length} != 1209`);
+    if (ownerIds.length !== 1210)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1210`);
+    if (fileIds.length !== 1210) violations.push(`shipping WebP count: ${fileIds.length} != 1210`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

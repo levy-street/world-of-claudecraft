@@ -1113,6 +1113,37 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.horn': '角',
   'hudChrome.corpseHarvest.components.tusk': '獠牙',
   'hudChrome.corpseHarvest.components.cloth': '布',
+  'hudChrome.corpseHarvest.preferenceLabel': '採集偏好：{preference}',
+  'hudChrome.corpseHarvest.changeButton': '更改',
+  'hudChrome.corpseHarvest.harvestActionTooltip':
+    '依照你目前的偏好採集，耗時{seconds}秒。需要一個野外工具包。每具屍體只能被採集一次。擊殺者及其隊伍在{prioritySeconds}秒內擁有優先權。掉落的戰利品仍可拾取。',
+  'hudChrome.corpseHarvest.checkingStatus': '正在檢查採集狀態……',
+  'hudChrome.corpseHarvest.statusUnavailable': '目前無法取得採集狀態。',
+  'hudChrome.corpseHarvest.harvestStarting': '正在開始採集……',
+  'hudChrome.corpseHarvest.allBenefit': '從這具屍體上採集所有可用材料。',
+  'hudChrome.corpseHarvest.focusBenefit': '將採集集中於{material}。',
+  'hudChrome.corpseHarvest.tierBonusHint':
+    '將採集集中於{material}：相較於全部材料，品階+{tierBonus}。',
+  'hudChrome.corpseHarvest.denial.actorDead': '你必須存活才能採集。',
+  'hudChrome.corpseHarvest.denial.actorInCombat': '你在戰鬥中無法採集。',
+  'hudChrome.corpseHarvest.denial.actorBusy': '你正忙於其他事情。',
+  'hudChrome.corpseHarvest.denial.corpseInvalid': '這具屍體已無法採集。',
+  'hudChrome.corpseHarvest.denial.wrongWorld': '這具屍體不在你的世界中。',
+  'hudChrome.corpseHarvest.denial.outOfRange': '靠近一點才能採集這具屍體。',
+  'hudChrome.corpseHarvest.denial.noFieldKit': '你需要一個野外工具包才能採集。',
+  'hudChrome.corpseHarvest.denial.reservedSelf': '你已經在採集這具屍體了。',
+  'hudChrome.corpseHarvest.denial.reservedOther': '{name}正在採集這具屍體。',
+  'hudChrome.corpseHarvest.denial.reservedOtherUnknown': '另一名玩家正在採集這具屍體。',
+  'hudChrome.corpseHarvest.denial.priorityProtected': '目前另一名玩家對這具屍體擁有優先權。',
+  'hudChrome.corpseHarvest.denial.corpseExpiring': '這具屍體維持的時間不足以完成採集。',
+  'hudChrome.corpseHarvest.denial.preferenceMalformed': '你的採集偏好無效，請選擇一個以繼續。',
+  'hudChrome.corpseHarvest.denial.nothingToHarvest':
+    '你的野外工具包無法從這具屍體上採集到任何東西。',
+  'hudChrome.corpseHarvest.denial.materialUnavailable': '{material}不在這具屍體上。',
+  'hudChrome.corpseHarvest.denial.materialUnavailableWithList':
+    '{material}不在這具屍體上。可用：{materials}。',
+  'hudChrome.corpseHarvest.denial.bagsFull': '你的背包太滿，無法採集。',
+  'hudChrome.corpseHarvest.denial.malformedInput': '出了點問題，請再試一次。',
   'hudChrome.townFocus.title': '城鎮專注',
   'hudChrome.townFocus.hint':
     '專注點會在每種材料的基礎產出上疊加加成。未專注的材料保持基礎產出不變。',
@@ -9484,6 +9515,16 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.harvestJournal.emptyBody': '在任意田畦播下種子，這塊田就會帶著計時出現在這裡。',
   'hudChrome.harvestJournal.noviceTitle': '你還沒有打理過田畦',
   'hudChrome.harvestJournal.noviceBody': '每收成一次作物，耕作技能都會提升。在任意田畦播下種子即可開始。',
+  // Intentional Gathering PR3: the shared corpse-harvest preference picker
+  // (Field Kit use, Professions, corpse Change entrances). M16 fills.
+  'hudChrome.harvestPreference.title': '採集偏好',
+  'hudChrome.harvestPreference.allLabel': '全部材料',
+  'hudChrome.harvestPreference.applyButton': '套用',
+  'hudChrome.harvestPreference.cancelButton': '取消',
+  'hudChrome.harvestPreference.pickHint': '套用前請選擇要採集的材料。',
+  'hudChrome.harvestPreference.currentUnavailable': '你目前選擇的{material}在此處不可用。',
+  'hudChrome.harvestPreference.unknownMaterial': '不可用的材料',
+  'hudChrome.harvestPreference.currentChoiceLabel': '目前：{choice}',
   'gatherEvent.pristineVein': '{finder}挖到了一條純淨的礦脈！',
   'gatherEvent.ancientHeartwood': '{finder}砍倒了一棵遠古心木！',
   'gatherEvent.moonlitBloom': '{finder}發現了一朵月光之花！',
@@ -14850,6 +14891,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   // masterwrought Phase 13, the orange promotion (M16 fills). The Deed of
   // Making noun matches the sim_i18n.ts error.legendaryDeed row.
   'entities.items.deed_of_making.name': '造物契據',
+  // Intentional Gathering PR3: the Field Kit's runtime item name. M16 fill.
+  'entities.items.field_kit.name': '野外工具包',
   'hudChrome.materialHint.deedOfMaking':
     '銘文契據。消耗後將一件已臻至完美的大師鍛造作品提升為傳說，並為其命名。',
   'hudChrome.crafting.legendaryLine': '{item}以{name}之名重生，成為傳說！',

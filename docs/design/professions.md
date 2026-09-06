@@ -243,10 +243,11 @@ cadence knob is what the post-launch watch tunes; zone-flavored moments
 become worth their content cost when a zone ships a signature material
 family of its own, the zone-4 design pass's call. Corpse harvesting grants ALL
 plain yields before any signed instance, specimens last, with rarity draws
-staying in the first loop in yield order (`harvestCorpse`,
-`src/sim/interaction.ts`; the draw order is pinned by the corpse suites' own
+staying in the first loop in yield order (`grantCorpseHarvest`,
+`src/sim/professions/corpse_harvest_grant.ts`; the draw order is pinned by the corpse suites' own
 draw-count cases, not by the parity goldens, which drive no corpse harvest).
-The per-corpse focus picker's concentration bonus counts the families the
+The remembered material preference resolves through the existing concentration
+bonus, which counts the families the
 harvest could not EXTRACT, not the ones the player named: a component family
 `HARVEST_COMPONENT_ITEMS` does not map is never extracted, so it is always
 forfeited breadth, costs no rng draw, and never dilutes the bonus
@@ -268,10 +269,31 @@ every legal pick collapses to the same outcome (no shipped template is in
 either shape since Phase 11m).
 The premium arm
 gates on `MONSTER_MATERIAL_TIERS` (every wave-one family is tier 1, so the
-gate is live but never fires yet). One interact press loots AND harvests an
-eligible corpse, client-composed with no new wire command
-(`src/game/corpse_loot_availability.ts` and the interact dispatch); a claimed
-harvest mirrors online via the sparse per-entity `hcb` wire key.
+gate is live but never fires yet). Looting and harvesting are deliberately
+SEPARATE actions (Intentional Gathering PR3). F / Take Loot only ever touches
+ordinary corpse loot (`interact`/`lootCorpse`, `src/sim/interaction.ts`);
+harvesting needs a Field Kit (`field_kit`, a common tool at 20 copper,
+`src/sim/content/items.ts`, sold by ordinary general quartermasters and
+gathering/tool vendors) and an explicit Harvest command. The kit's own use,
+the Professions window, and a corpse's Change entrance all open the SAME
+shared harvest-preference picker (`HarvestPreferenceController`,
+`src/ui/hud/professions/harvest_preference_controller.ts`): the draft resets
+to the persisted choice (All by default, or one visible material) on open and
+is written back only on Apply, never on a bare pick or dismiss. Harvest itself
+starts a 1.5-second cast (`HARVEST_CAST_SECONDS`,
+`src/sim/professions/harvest_admission.ts`) admitted by `admitCorpseHarvest`,
+which checks the actor, the corpse, kit ownership, an exclusive single-use
+reservation, kill-credit priority, and the chosen preference's availability
+before any roll runs. A kill snapshots its credit group's priority for
+`HARVEST_PRIORITY_SECONDS` (10 seconds): the player who lands the kill holds
+it solo, and their party if grouped holds it with them. After that window the
+body opens to the first eligible harvester, whose reservation blocks every
+other attempt until it completes, is cancelled, or the corpse expires, and
+one completion consumes the claim. A chosen material
+absent from the corpse refuses the attempt (`material_unavailable`) without
+disturbing the saved preference. Town Focus allocation remains an independent
+bonus the picker never touches. A claimed harvest mirrors online via the
+sparse per-entity `hcb` wire key.
 
 ### Farming, the fifth gathering profession
 Farming shares the gathering proficiency shape and the land cap, and it is

@@ -179,6 +179,11 @@ import {
   refreshCheaterMark,
 } from './cheater_mark_runtime';
 import {
+  cancelCorpseHarvestCastOnDisconnect,
+  harvestCorpseCommandOutcome,
+} from './corpse_harvest_commands';
+import { dispatchCorpseHarvestInspection } from './corpse_harvest_inspection';
+import {
   type CosmeticOpGuardState,
   consumeCosmeticOpToken,
   createCosmeticOpGuard,
@@ -246,6 +251,7 @@ import { assembleEventsFrame, filterRoutableEvents, serializeEventFragments } fr
 import { buildEventPidIndex, forEachSelectedEventIndex } from './event_pid_index';
 import { appendFarmPlotsWire, dispatchFarmingCommand } from './farming_commands';
 import { fishingBandLabel, isKoi, isRodFeeRecipe } from './fishing_telemetry';
+import { appendGatheringSelfWire } from './gathering_self_wire';
 import {
   classifyOnlineGeneralChat,
   GENERAL_CHAT_QUOTA_MAX_IN_FLIGHT,
@@ -947,6 +953,8 @@ export interface ClientSession extends MovementInputSessionState {
   dungeonEntryFacing: entryFacing.DungeonEntryFacingFence;
   // sim time of the last movement input frame, used to clear stale held input
   lastInputAt: number;
+  // Sim time of the next inspectCorpseHarvest throttle this session may pass.
+  nextCorpseHarvestInspectAt?: number;
   // serialized form of each delta self field as last sent to this client;
   // a field is omitted from a snapshot while its serialization is unchanged
   lastSent: Record<string, string>;
@@ -3980,6 +3988,7 @@ export class GameServer {
     if (session.spectating) this.exitSpectate(session, false);
     if (session.jailVisit) this.exitJailVisit(session, false);
     this.cancelAndRecordUnstuck(session);
+    cancelCorpseHarvestCastOnDisconnect(this.sim, session.pid);
     session.linkdead = true;
     session.graceUntil = Date.now() + LINKDEAD_GRACE_MS;
     this.botDetector.setTrackingConnection(session.botTrackingContext, false);
@@ -6588,12 +6597,10 @@ export class GameServer {
         if (typeof msg.id === 'number') sim.autoLoot(msg.id, pid);
         break;
       case 'harvestCorpse':
-        if (typeof msg.id === 'number') {
-          const components = Array.isArray(msg.components)
-            ? msg.components.filter((c): c is string => typeof c === 'string')
-            : undefined;
-          sim.harvestCorpse(msg.id, components, pid);
-        }
+        this.sendCommandOutcome(session, msg, harvestCorpseCommandOutcome(sim, msg, pid));
+        break;
+      case 'inspectCorpseHarvest':
+        dispatchCorpseHarvestInspection(sim, session, msg, pid, (f) => this.send(session, f));
         break;
       case 'set_town_focus':
         if (msg.allocation && typeof msg.allocation === 'object') {
@@ -6612,6 +6619,10 @@ export class GameServer {
               : 'time';
           sim.setTownFocus(allocation, tier, pid);
         }
+        break;
+      // The authenticated player's preference is a setting; the sim validates it.
+      case 'set_harvest_preference':
+        if (typeof msg.raw === 'string') sim.setHarvestPreference(msg.raw, pid);
         break;
       case 'lootRoll':
         if (
@@ -9112,24 +9123,10 @@ export class GameServer {
     maybe('denc', this.sim.lastDisenchantResultFor(anchorSession.pid));
     maybe('ench', this.sim.lastEnchantResultFor(anchorSession.pid));
     maybe('salv', this.sim.lastSalvageResultFor(anchorSession.pid));
-    maybe('tfocus', this.sim.townFocusFor(anchorSession.pid));
-    // Raw gathering-profession proficiency map (IWorld `gatheringProficiency`,
-    // #1119), a second small read alongside `prof` for the ORIGINAL flat-map
-    // shape used by the `/dev gather` chat cheat and existing consumers. Wire
-    // key `gprof`; see TERSE_TO_IWORLD/ALL_DELTA_KEYS in tests/snapshots.test.ts.
-    maybe('gprof', this.sim.gatheringProficiencyFor(anchorSession.pid));
-    // Slotted tool effects (IWorld `toolEffectSlots`). Wire key `tslot`; see
-    // TERSE_TO_IWORLD/ALL_DELTA_KEYS in tests/snapshots.test.ts. Empty for
-    // every player who has never slotted one, so after the first snapshot of a
-    // session (which carries `"tslot":[]`, as every registered key does while
-    // lastSent is empty) the key delta-elides away for almost everyone. The
-    // charge counter moves only on a harvest that actually spends one, so this
-    // is a cheap diff rather than a per-tick churn. The empty arm compares the
-    // constant '[]' directly (byte-identical to maybe(...)): stringifying the
-    // shared frozen empty projection per player per tick bought nothing.
-    const tslotRows = this.sim.toolEffectSlotsFor(anchorSession.pid);
-    if (tslotRows.length === 0) maybeSerialized('tslot', '[]');
-    else maybe('tslot', tslotRows);
+    // Gathering-adjacent self fields (tfocus/gprof/tslot/hpref): extracted to
+    // gathering_self_wire.ts to keep this coordinator under its monolith
+    // ceiling; see that module for the per-field comments this call replaces.
+    appendGatheringSelfWire(this.sim, anchorSession.pid, maybe, maybeSerialized);
     // Riding skill: persisted, so the client knows whether to show the riding
     // trainer UI without waiting on a mount/select command to fail. Wire key
     // `mntRtd`; delta-guarded, only changes once (false to true, never back).

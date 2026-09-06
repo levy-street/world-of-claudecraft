@@ -43,6 +43,9 @@ export const CHROME_GUARDED_PANELS: readonly string[] = [
   // inline loop hud.ts used before the release extracted it.
   '#harvest-journal-window',
   '#plant-sheet-window',
+  // The shared corpse-harvest preference picker (Intentional Gathering PR3):
+  // the same non-modal overlay family as the two farming windows above.
+  '#harvest-preference-window',
   '#side-buttons',
 ];
 

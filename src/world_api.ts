@@ -189,7 +189,12 @@ export type {
 // and an epoch-25 server omits both, stranding Perfecting progress and plots.
 // 27 = Material stacks carry exact per-source counts. Older clients cannot
 // describe a selected source or preserve its identity through item commands.
-export const ONLINE_WORLD_LAYOUT_VERSION = 27 as const;
+// 28 = Corpse harvesting replaced the raw components array with a remembered,
+// id-only per-material harvest preference plus a correlated status query.
+// Epoch 27 clients still send the old components-array harvest command, which
+// the server now rejects outright, and cannot render the new preference or
+// query state, so mixed binaries must fail closed.
+export const ONLINE_WORLD_LAYOUT_VERSION = 28 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI
@@ -309,6 +314,7 @@ export {
 export type {
   CivicServiceKind,
   CivicServicePlacement,
+  CorpseHarvestInfo,
   WorldInteractionOutcome,
 } from './world_api/interaction';
 export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';
@@ -753,6 +759,21 @@ export const COMMAND_NAMES = [
   'perfect_item',
   'material_separate',
   'material_combine',
+  // The corpse-harvest preference (Intentional Gathering PR3): a stored
+  // player setting, never a harvest action (no kit/location/combat/cost
+  // gate). `raw` is a material item id or the 'all' token
+  // (HARVEST_PREFERENCE_ALL_TOKEN), re-validated server-side through the
+  // same parseHarvestPreferenceCommand the sim's own load path uses.
+  // Appended at the END because wire tokens are never reordered. Like
+  // harvest_node/craft_item and the rest of the IWorldProfessions surface,
+  // this is deliberately UNTAGGED in COMMAND_FACETS below (the row-less W6
+  // PARTIAL design; see FACET_PROFESSIONS in tests/world_api_parity.test.ts).
+  'set_harvest_preference',
+  // The selected-corpse status query (corpse-status-contract.md): a
+  // correlated, non-mutating read (`{id, rid}` in, `{t:'corpseHarvestInfo',
+  // id, rid, info}` out), never a harvest action. Appended at the END, like
+  // every wire token above.
+  'inspectCorpseHarvest',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch

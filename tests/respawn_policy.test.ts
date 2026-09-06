@@ -531,7 +531,9 @@ describe('the death site consumes the policy', () => {
     wolf.respawnTimer = 999;
     wolf.harvestClaimedBy = null;
 
-    sim.harvestCorpse(wolf.id, undefined, sim.playerId);
+    // Decayed (corpseTimer 0): admission refuses on corpse_invalid before it
+    // ever reaches the Field Kit check, so no kit is needed for this refusal.
+    sim.harvestCorpse(wolf.id, sim.playerId);
 
     expect(wolf.harvestClaimedBy).toBeNull();
   });

@@ -441,7 +441,7 @@ const MONOLITHS: MonolithRow[] = [
     // src/ui/rest_indicator_painter.ts, which paid for writing the accessible
     // name beside the tooltip AND for the two-line arena-signature note.
     // Exact count, zero slack.
-    ceiling: 18716,
+    ceiling: 18695,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -987,7 +987,7 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered 12028 -> 12006 in PR 3872 cleanup after removing the retired
     // tutorial action and its write-only account fact. Exact count, zero slack.
     // Shared grant options and inventory consumption now live in their sibling modules.
-    ceiling: 12005,
+    ceiling: 11987,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1381,7 +1381,7 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered 10347 -> 10336 in PR 3872 cleanup after removing the unused
     // feast signer wire field plus the retired tutorial dispatch and account-fact
     // plumbing. Measured after formatting; exact count.
-    ceiling: 10336,
+    ceiling: 10333,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1522,7 +1522,7 @@ const MONOLITHS: MonolithRow[] = [
     // formatting; exact count.
     // Copy-safe Perfecting command construction extracted to perfecting_command.ts.
     // Source-aware storage payload construction moved to material_storage_command.ts.
-    ceiling: 5857,
+    ceiling: 5856,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -1960,7 +1960,7 @@ const MONOLITHS: MonolithRow[] = [
     // another method cluster here.
     file: 'src/ui/hud/professions/professions_window.ts',
     // Harvest entry chrome and bindings now live in a sibling controller.
-    ceiling: 838,
+    ceiling: 836,
     seam: 'a pure view-core plus a thin painter sibling (src/ui/hud/CLAUDE.md)',
   },
   {

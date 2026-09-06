@@ -7,6 +7,7 @@ import type {
   ActiveTemporalHourglass,
   BankBonusSource,
   CivicServicePlacement,
+  CorpseHarvestInfo,
   CraftingIdentityView,
   DailyRewardHistory,
   DailyRewardLeaderboardPage,
@@ -457,6 +458,8 @@ import {
   deliverCommissionOrderCommand,
   openCommissionOrderCommand,
 } from './professions/commission_order_commands';
+import { corpseHarvestInfo as corpseHarvestInfoQuery } from './professions/corpse_harvest_inspection';
+import type { CorpseHarvestSession } from './professions/corpse_harvest_session';
 import {
   type AcquireRecipeResult,
   acquireRecipe as acquireRecipeImpl,
@@ -507,6 +510,16 @@ import {
   normalizeGatheringProficiency,
 } from './professions/gathering';
 import { updateGuildTrendLetters } from './professions/guild_letter';
+import {
+  HARVEST_PREFERENCE_ALL,
+  type HarvestPreference,
+  loadHarvestPreference,
+  savedHarvestPreference,
+} from './professions/harvest_preference';
+import {
+  harvestPreferenceFor as harvestPreferenceForImpl,
+  setHarvestPreference as setHarvestPreferenceImpl,
+} from './professions/harvest_preference_commands';
 import {
   applyPairTransitionHobbyMemory,
   normalizeHobbyMemoryOnLoad,
@@ -560,6 +573,7 @@ import {
   type ToolEffectConfirmMode,
   type ToolEffectSlot,
 } from './professions/tools';
+import * as townFocusCommands from './professions/town_focus_commands';
 import {
   grandfatherKnownRecipes,
   resolveTrain,
@@ -784,6 +798,7 @@ import {
   angleTo,
   assertCanonicalEastbrookNoticeboardDef,
   type CampDef,
+  CORPSE_HARVEST_CAST_ID,
   type CrowdControlDrCategory,
   type CrowdControlDrState,
   cloneInvSlot,
@@ -1471,6 +1486,23 @@ export interface PlayerMeta {
   // so a relog can no longer reset the timers: they freeze at the logout
   // frame and resume on load.
   nodeHarvestReadyAt: Record<string, number>;
+  // The remembered corpse-harvest material preference (Intentional Gathering
+  // PR3, professions/harvest_preference.ts): which material a harvest
+  // concentrates on, or the empty-pick All default. `null` is a MALFORMED
+  // persisted preference the load refused: distinct from All (never widened
+  // to it), so nothing may be harvested by preference until the player makes
+  // an explicit new choice (professions/harvest_preference_commands.ts
+  // setHarvestPreference). Persisted sparsely via savedHarvestPreference/
+  // loadHarvestPreference in CharacterState.harvestPreference.
+  harvestPreference: HarvestPreference | null;
+  // The live corpse-harvest CAST session (Intentional Gathering PR3,
+  // professions/corpse_harvest_session.ts): frozen admission inputs for the
+  // one in-flight harvest cast this player is running, or null when none is
+  // active. Transient session-only state (never persisted, never on the
+  // wire), the same shape as the other hidden per-cast fields on `Entity`
+  // (gatherCastNodeId etc); it lives on `PlayerMeta` rather than `Entity`
+  // because it carries a full frozen grant record, not a few primitives.
+  corpseHarvestSession: CorpseHarvestSession | null;
   // Outcome of this player's most recent craftItem command (#1127). Session-only,
   // never persisted: the IWorld craft-result surface for the client to render a
   // toast/log line off, without deciding the outcome itself. Null until the
@@ -2831,6 +2863,8 @@ export class Sim {
       gatheringProficiency: emptyGatheringProficiency(),
       pendingGatherGrants: [],
       nodeHarvestReadyAt: {},
+      harvestPreference: HARVEST_PREFERENCE_ALL,
+      corpseHarvestSession: null,
       lastCraftResult: null,
       lastTrainResult: null,
       lastMasterwork: null,
@@ -3378,6 +3412,15 @@ export class Sim {
       // than riding back out through the panel into a request the command
       // boundary now rejects.
       meta.townFocus = professionsFocus.normalizeTownFocusOnLoad(s.townFocus);
+      // Corpse-harvest preference (Intentional Gathering PR3): absent/explicit
+      // All load to All (the legacy default), a bounded-but-retired material id
+      // is kept verbatim, and a malformed value refuses to null rather than
+      // reviving All (see PlayerMeta.harvestPreference / harvest_preference.ts
+      // loadHarvestPreference for why null must never become an active choice).
+      const loadedHarvestPreference = loadHarvestPreference(s.harvestPreference);
+      meta.harvestPreference = loadedHarvestPreference.ok
+        ? loadedHarvestPreference.preference
+        : null;
       if (s.delveLoreUnlocked) for (const id of s.delveLoreUnlocked) meta.delveLoreUnlocked.add(id);
       // Load hardening (migration review) for the daily/weekly gate state,
       // the delve and heroic daily fragments included since Phase 18 (their
@@ -3871,6 +3914,12 @@ export class Sim {
     if (!meta.leaving) {
       const leavingEntity = this.entities.get(pid);
       if (leavingEntity?.castingAbility === 'rain_of_fire') cancelCastImpl(this.ctx, leavingEntity);
+      // A disconnect mid-harvest must release the corpse reservation before
+      // the leave snapshot/removal, the same idempotent-guard shape as the
+      // rain_of_fire cancel above (see cancelCast's releaseCorpseHarvest hook).
+      if (leavingEntity?.castingAbility === CORPSE_HARVEST_CAST_ID) {
+        cancelCastImpl(this.ctx, leavingEntity);
+      }
     }
     meta.leaving = true;
     cleanupPriestState(this.ctx, pid);
@@ -4228,6 +4277,15 @@ export class Sim {
       })(),
       ...(meta.tutorialGreetingSent ? { tutorialGreetingSent: true } : {}),
       townFocus: { ...meta.townFocus },
+      // Corpse-harvest preference: omit only the sparse-default All case
+      // (undefined); an explicit malformed refusal writes JSON `null`
+      // verbatim, never the omitted key, so it stays refused across a
+      // reload instead of quietly reviving into All (savedHarvestPreference
+      // owns the encoding; see PlayerMeta.harvestPreference).
+      ...(() => {
+        const saved = savedHarvestPreference(meta.harvestPreference);
+        return saved === undefined ? {} : { harvestPreference: saved };
+      })(),
       // World-boss lockouts serialize via raidLockouts (above), not a separate field.
       // Book of Deeds: every field conditional (absent while empty/null/zero)
       // so pre-deed saves stay byte-equal until the system engages. The
@@ -9172,132 +9230,56 @@ export class Sim {
     interaction.autoLootForParty(this.ctx, mobId, pid ?? this.primaryId);
   }
 
-  harvestCorpse(mobId: number, components?: string[], pid?: number): void {
-    interaction.harvestCorpse(this.ctx, mobId, components, pid);
+  harvestCorpse(mobId: number, pid?: number): boolean {
+    return interaction.harvestCorpse(this.ctx, mobId, pid);
+  }
+
+  // The cold selected-corpse status read (corpse-status-contract.md): a thin
+  // delegate onto the shared professions/corpse_harvest_inspection.ts query,
+  // which owns the disclosure-safe gate and the admission-derived denial.
+  corpseHarvestInfo(mobId: number, pid?: number): CorpseHarvestInfo | null {
+    return corpseHarvestInfoQuery(this.ctx, mobId, pid);
   }
 
   pickUpObject(objId: number, pid?: number): boolean {
     return interaction.pickUpObject(this.ctx, objId, pid, this.noticeboardDefinitions);
   }
 
+  // Corpse-harvest preference (Intentional Gathering PR3): a stored PLAYER
+  // SETTING, not a harvest action (no kit/location/combat/cost gate). Body
+  // lives in professions/harvest_preference_commands.ts, behind the same
+  // SimContext seam every other profession command uses; these are thin
+  // delegates so every existing call site resolves unchanged.
+  harvestPreferenceFor(pid: number): HarvestPreference | null {
+    return harvestPreferenceForImpl(this.ctx, pid);
+  }
+
+  get harvestPreference(): HarvestPreference | null {
+    return this.harvestPreferenceFor(this.primaryId);
+  }
+
+  setHarvestPreference(raw: string, pid?: number): void {
+    setHarvestPreferenceImpl(this.ctx, raw, pid);
+  }
+
+  // Town focus (#1143/#1144): the persistent allocation plus its re-spec/
+  // payment-tier machinery live in professions/town_focus_commands.ts (the
+  // monolith ratchet); these stay thin delegates so every existing call site
+  // (server/HUD/tests) resolves unchanged.
   townFocusFor(pid: number): Record<string, number> {
-    return this.players.get(pid)?.townFocus ?? {};
+    return townFocusCommands.townFocusFor(this.ctx, pid);
   }
 
   get townFocus(): Record<string, number> {
     return this.townFocusFor(this.primaryId);
   }
 
-  // #1143: sets the caller's persistent town focus allocation. Gated on the
-  // player standing in their current zone's town hub (professions/focus.ts
-  // isInTownZone); rejected requests (out of town, malformed, over budget)
-  // leave the previous allocation untouched and surface a toast.
-  //
-  // #1144: `tier` picks which of the three RESPEC_TIER_CONFIG rows prices the
-  // reallocation (computeRespecCost). The validity/afford checks happen HERE,
-  // between validating the request and either committing it (instant tier) or
-  // queuing it (time/timeAndPartial): the pure validator runs first and never
-  // mutates state, so an invalid/over-budget/out-of-town request is rejected
-  // before any cost is even computed, and an unaffordable one is rejected
-  // before anything is charged or queued. Priced off `result.allocation` (the
-  // request AFTER the pure validator drops zero-point entries), not the raw
-  // `allocation` argument, so a caller cannot inflate the bill with junk the
-  // commit itself would discard. A no-op reallocation costs nothing at any
-  // tier and can never fail the affordability check.
-  //
-  // A tier with durationMs > 0 (`time`/`timeAndPartial`) does NOT commit or
-  // charge here: it queues `meta.pendingTownFocus`, which the per-player tick
-  // loop resolves via `updateTownFocusRespec` once the duration elapses. That
-  // is what makes the 'free, slow' tier actually slow instead of a same-tick
-  // no-cost commit; only the `instant` tier (durationMs 0) ever runs the
-  // charge-then-commit path below directly. Charging only at resolution, not
-  // at the request, means an abandoned queue (a later request that replaces
-  // it, or a logout, since pendingTownFocus is transient) never spends
-  // anything.
   setTownFocus(allocation: Record<string, number>, tier: RespecPaymentTier, pid?: number): void {
-    const r = this.resolve(pid);
-    if (!r) return;
-    const { meta, e: p } = r;
-    const zone = zoneAt(p.pos.x, p.pos.z);
-    const inTown = professionsFocus.isInTownZone(p.pos, zone);
-    const result = professionsFocus.setTownFocus(meta.townFocus, allocation, inTown);
-    if (!result.ok) {
-      this.error(
-        meta.entityId,
-        result.reason === 'not_in_town'
-          ? 'You must be in town to set your focus.'
-          : result.reason === 'over_budget'
-            ? 'That allocation exceeds your focus point budget.'
-            : 'Invalid focus allocation.',
-      );
-      return;
-    }
-    const resolvedAllocation = result.allocation as Record<string, number>;
-    const cost = professionsFocus.computeRespecCost(meta.townFocus, resolvedAllocation, tier);
-    const canAfford =
-      meta.copper >= cost.coin &&
-      this.countItem(professionsFocus.RESPEC_MATERIAL_ITEM_ID, meta.entityId) >= cost.materials;
-    if (!canAfford) {
-      this.error(meta.entityId, 'You cannot afford that focus re-spec.');
-      return;
-    }
-    if (cost.durationMs <= 0) {
-      this.chargeTownFocusRespec(meta, cost);
-      meta.townFocus = resolvedAllocation;
-      // An instant commit supersedes any earlier queued re-spec: without this,
-      // an older `time`/`timeAndPartial` request would still resolve later via
-      // updateTownFocusRespec, double-charging and overwriting this allocation
-      // with the stale one (see the CHANGES_REQUESTED finding on PR #2909).
-      meta.pendingTownFocus = undefined;
-      deedsMod.markDeedsDirty(this.ctx, meta.entityId); // soc_civic_duty reads the allocation
-      return;
-    }
-    meta.pendingTownFocus = {
-      allocation: resolvedAllocation,
-      readyAtTime: this.time + cost.durationMs / 1000,
-      coin: cost.coin,
-      materials: cost.materials,
-    };
-    this.notice(
-      meta.entityId,
-      `Your focus re-spec will complete in ${Math.ceil(cost.durationMs / 1000)}s.`,
-    );
+    townFocusCommands.setTownFocus(this.ctx, allocation, tier, pid);
   }
 
-  private chargeTownFocusRespec(meta: PlayerMeta, cost: professionsFocus.RespecCost): void {
-    if (cost.coin > 0) meta.copper -= cost.coin;
-    if (cost.materials > 0) {
-      this.removeItem(professionsFocus.RESPEC_MATERIAL_ITEM_ID, cost.materials, meta.entityId);
-    }
-  }
-
-  // #1144: resolves a queued 're-spec' once its duration has elapsed. Called
-  // from the per-player tick loop for a live player. Re-checks affordability
-  // at resolution time (the charge happens here, never at the request), so a
-  // purse spent in the meantime cancels the queued re-spec instead of going
-  // negative or silently discarding materials the player no longer has.
   private updateTownFocusRespec(meta: PlayerMeta): void {
-    const pending = meta.pendingTownFocus;
-    if (!pending || this.time < pending.readyAtTime) return;
-    meta.pendingTownFocus = undefined;
-    const canAfford =
-      meta.copper >= pending.coin &&
-      this.countItem(professionsFocus.RESPEC_MATERIAL_ITEM_ID, meta.entityId) >= pending.materials;
-    if (!canAfford) {
-      this.error(
-        meta.entityId,
-        'You could not afford your pending focus re-spec, so it was cancelled.',
-      );
-      return;
-    }
-    this.chargeTownFocusRespec(meta, {
-      durationMs: 0,
-      coin: pending.coin,
-      materials: pending.materials,
-    });
-    meta.townFocus = pending.allocation;
-    deedsMod.markDeedsDirty(this.ctx, meta.entityId); // soc_civic_duty reads the allocation
-    this.notice(meta.entityId, 'Your focus re-spec is complete.');
+    townFocusCommands.updateTownFocusRespec(this.ctx, meta);
   }
 
   interact(pid?: number): void {

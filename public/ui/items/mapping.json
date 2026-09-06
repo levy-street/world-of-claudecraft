@@ -6564,6 +6564,22 @@
       "itemIds": [
         "reins_mech_bird"
       ]
+    },
+    {
+      "batchId": "intentional-gathering-field-kit-2026-09-06",
+      "source": "OpenAI built-in image generation, one text-prompt call; reviewed and normalized locally",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "Parent reviewed arcanite_mining_pick, linen_pouch, and eastbrook_buckler as style anchors before writing the prompt; no images were passed as image-edit inputs.",
+      "commonPrompt": "Use case: stylized-concept.\nAsset type: one opaque square fantasy MMORPG inventory item icon, World of ClaudeCraft item style contract woc-item-icon-v1.\nPrimary request: paint a new Field Kit (field_kit), a reusable ordinary gathering tool kit. It lets an adventurer deliberately harvest creature materials; it is not a weapon or an extra inventory bag.\nSubject and identity: a compact, partially opened worn brown leather tool roll, with three stout stitched pockets holding a short broad steel skinning knife, a rounded steel scraper, and small blunt brass tongs. A small folded unmarked cream cloth is tucked into the roll. All tools are secured together as ONE cohesive portable kit, no scattered objects. The short blade and broad leather roll should give a clear tool-kit silhouette even at tiny size. Practical low-fantasy materials, no magic, no luxury ornament.\nComposition: readable three-quarter view, complete centered silhouette, compact approximately oval mass, tools angled slightly upward, 68 to 76 percent of the square with safe padding on all sides.\nScene and backdrop: fully opaque deep charcoal and umber painted vignette with subtle atmosphere and contact shadow.\nStyle: premium hand-painted classic fantasy MMO inventory art; tactile leather grain, warm worn edges, simple stitching, controlled broad reflected steel values, crisp focal edges and softer peripheral brushwork. Warm top-left key light and cool deep bottom-right shadow.\nHouse-style references reviewed: arcanite_mining_pick.webp for readable functional tool ends; linen_pouch.webp for compact three-quarter soft-goods volume and tactile materials; eastbrook_buckler.webp for controlled steel highlights and dark painted ground. These are style roles only; do not depict a pickaxe, backpack, shield, star emblem, glowing gem, or potion.\nFraming: square, borderless, centered complete silhouette, readable at 22px, 28px, 40px and inside a 64px circular action-slot crop.\nConstraints: exactly one inventory icon; opaque full-square painted ground; no text, letters, numbers, pseudo-writing, label, UI border, rarity frame, watermark, signature, checkerboard, transparency, split sheet, collage, person, mannequin, hands holding it, cropped tips, flat vector treatment, or raw 3D product render.",
+      "provenance": "docs/achievements/intentional-gathering-field-kit-2026-09-06/accepted-art.json",
+      "itemIds": [
+        "field_kit"
+      ]
     }
   ]
 }

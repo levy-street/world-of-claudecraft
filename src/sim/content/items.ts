@@ -664,6 +664,15 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 4,
     buyValue: 20,
   },
+  field_kit: {
+    id: 'field_kit',
+    name: 'Field Kit',
+    kind: 'tool',
+    quality: 'common',
+    use: { type: 'harvestPreference' },
+    sellValue: 4,
+    buyValue: 20,
+  },
   // Tiered fishing rods (Professions 2.0): gatherTool items like the
   // picks/axes/sickles below, same tier pricing ladder. Their use still routes
   // to startFishing (src/sim/items.ts useItem), so a rod casts exactly like

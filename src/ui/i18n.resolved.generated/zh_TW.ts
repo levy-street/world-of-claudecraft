@@ -2412,6 +2412,35 @@ export const zh_TW: EnTranslations = {
         "tusk": "獠牙",
         "meat": "獸肉",
         "cloth": "布"
+      },
+      "preferenceLabel": "採集偏好：{preference}",
+      "changeButton": "更改",
+      "harvestActionTooltip": "依照你目前的偏好採集，耗時{seconds}秒。需要一個野外工具包。每具屍體只能被採集一次。擊殺者及其隊伍在{prioritySeconds}秒內擁有優先權。掉落的戰利品仍可拾取。",
+      "checkingStatus": "正在檢查採集狀態……",
+      "statusUnavailable": "目前無法取得採集狀態。",
+      "harvestStarting": "正在開始採集……",
+      "allBenefit": "從這具屍體上採集所有可用材料。",
+      "focusBenefit": "將採集集中於{material}。",
+      "tierBonusHint": "將採集集中於{material}：相較於全部材料，品階+{tierBonus}。",
+      "denial": {
+        "actorDead": "你必須存活才能採集。",
+        "actorInCombat": "你在戰鬥中無法採集。",
+        "actorBusy": "你正忙於其他事情。",
+        "corpseInvalid": "這具屍體已無法採集。",
+        "wrongWorld": "這具屍體不在你的世界中。",
+        "outOfRange": "靠近一點才能採集這具屍體。",
+        "noFieldKit": "你需要一個野外工具包才能採集。",
+        "reservedSelf": "你已經在採集這具屍體了。",
+        "reservedOther": "{name}正在採集這具屍體。",
+        "reservedOtherUnknown": "另一名玩家正在採集這具屍體。",
+        "priorityProtected": "目前另一名玩家對這具屍體擁有優先權。",
+        "corpseExpiring": "這具屍體維持的時間不足以完成採集。",
+        "preferenceMalformed": "你的採集偏好無效，請選擇一個以繼續。",
+        "nothingToHarvest": "你的野外工具包無法從這具屍體上採集到任何東西。",
+        "materialUnavailable": "{material}不在這具屍體上。",
+        "materialUnavailableWithList": "{material}不在這具屍體上。可用：{materials}。",
+        "bagsFull": "你的背包太滿，無法採集。",
+        "malformedInput": "出了點問題，請再試一次。"
       }
     },
     "townFocus": {
@@ -2430,6 +2459,16 @@ export const zh_TW: EnTranslations = {
       "respecTierInstantOption": "即時（全額花費）",
       "respecCostFree": "免費",
       "respecCostLine": "花費 {coin} 和 {materials}"
+    },
+    "harvestPreference": {
+      "title": "採集偏好",
+      "allLabel": "全部材料",
+      "applyButton": "套用",
+      "cancelButton": "取消",
+      "pickHint": "套用前請選擇要採集的材料。",
+      "currentUnavailable": "你目前選擇的{material}在此處不可用。",
+      "unknownMaterial": "不可用的材料",
+      "currentChoiceLabel": "目前：{choice}"
     },
     "party": {
       "promoteLeader": "提升為隊長",
@@ -14760,6 +14799,9 @@ export const zh_TW: EnTranslations = {
       },
       "deed_of_making": {
         "name": "造物契據"
+      },
+      "field_kit": {
+        "name": "野外工具包"
       },
       "conjured_water4": {
         "name": "魔法泉水"

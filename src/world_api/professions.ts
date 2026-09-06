@@ -3,6 +3,7 @@ import type {
   CommissionOrderStatus,
 } from '../sim/professions/commission_order';
 import type { MaterialRarity } from '../sim/professions/gathering';
+import type { HarvestPreference } from '../sim/professions/harvest_preference';
 import type { PerfectItemRef, PerfectingInfoView } from '../sim/professions/perfecting';
 import type { PlayerProfessionSkill, ProfessionRecipeRecord } from '../sim/professions/types';
 import type { EquipSlot, StationDef } from '../sim/types';
@@ -299,6 +300,21 @@ export interface IWorldProfessions {
   // (no bonus, no charge; the harvest itself proceeds). The sim re-validates
   // everything server-side; an 'always' slot ignores the flag entirely.
   harvestNode(nodeId: string, confirmEffectUse?: boolean): WorldInteractionOutcome;
+  // The remembered corpse-harvest preference (Intentional Gathering PR3, src/sim/
+  // professions/harvest_preference.ts): which material a corpse harvest
+  // concentrates on, or the `{ kind: 'all' }` spread (the default). `null` is
+  // reserved for a MALFORMED persisted preference the load refused: nothing
+  // may be harvested by preference until the player makes an explicit new
+  // choice (see PlayerMeta.harvestPreference). A settings read, never gated
+  // on kit, location, combat, or cost.
+  readonly harvestPreference: HarvestPreference | null;
+  // Set the viewer's own harvest preference to a material item id, or the
+  // 'all' token (HARVEST_PREFERENCE_ALL_TOKEN) to spread again. Validated
+  // strictly server-side through parseHarvestPreferenceCommand; a malformed
+  // or unsupported `raw` is a silent no-op that leaves the current choice
+  // byte-identical (the deeds.ts setActiveTitle/setActiveBorder precedent).
+  // No kit/location/combat/cost gate: it is a setting, not a harvest action.
+  setHarvestPreference(raw: string): void;
   recipeList: readonly RecipeDef[];
   lastCraftResult: CraftResultView | null;
   lastMasterwork: MasterworkView | null;

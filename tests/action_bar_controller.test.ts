@@ -824,3 +824,51 @@ describe('isHotbarItemId: reins are placeable now that mounts are items', () => 
     expect(controller.isAssignableAction({ type: 'item', id: 'copper_ore' })).toBe(false);
   });
 });
+
+describe('isHotbarItemId: Field Kit (Intentional Gathering, use.type harvestPreference)', () => {
+  // The Field Kit is a reusable settings tool (use.type 'harvestPreference'),
+  // the same placeable shape as a gathering implement or a potion: it must be
+  // admitted here, routable through the drop target's assignable-action gate,
+  // placeable onto a chosen slot, and survive a stored layout reload rather
+  // than being stripped as a known-but-ineligible id (R34).
+  it('admits the field kit item id', () => {
+    const { controller } = makeHarness('warrior', [], []);
+    expect(controller.isHotbarItemId('field_kit')).toBe(true);
+  });
+
+  it('preserves the recipe/consumable-pattern exclusion: a one-shot recipe pattern stays unplaceable', () => {
+    const { controller } = makeHarness('warrior', [], []);
+    // Guard the guard: the exclusion below must fail on a widened
+    // isHotbarItemId, never pass because the content id quietly stopped
+    // existing or stopped being kind:'recipe'.
+    expect(ITEMS.pattern_spiritweld_girdle?.kind).toBe('recipe');
+    expect(controller.isHotbarItemId('pattern_spiritweld_girdle')).toBe(false);
+  });
+
+  it('routes a field kit drag through the assignable-action path like a gathering tool', () => {
+    const { controller } = makeHarness('warrior', [], []);
+    expect(controller.isAssignableAction({ type: 'item', id: 'field_kit' })).toBe(true);
+  });
+
+  it('can be placed onto a chosen slot via replaceActions', () => {
+    const { controller } = makeHarness('warrior', [], bar());
+    const placed = bar();
+    placed[4] = { type: 'item', id: 'field_kit' };
+
+    controller.replaceActions(placed);
+
+    expect(controller.actions[4]).toEqual({ type: 'item', id: 'field_kit' });
+  });
+
+  it('survives a stored layout reload, unlike a known-but-ineligible item id', () => {
+    const storage = new MemoryStorage();
+    const stored = bar();
+    stored[6] = { type: 'item', id: 'field_kit' };
+    storage.setItem('woc_hotbar_warrior_ActionbarTester', JSON.stringify(stored));
+    const { controller } = makeHarness('warrior', [], bar(), storage);
+
+    controller.init();
+
+    expect(controller.actions[6]).toEqual({ type: 'item', id: 'field_kit' });
+  });
+});

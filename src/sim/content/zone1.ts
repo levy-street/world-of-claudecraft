@@ -740,6 +740,7 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
       'gathering_sickle',
       'ironreel_fishing_rod',
       'silverstream_fishing_rod',
+      'field_kit',
       // The one materials-only satchel a vendor stocks, sold beside the two
       // general pouches above so the two-pool trade is legible at the counter.
       'burlap_reagent_pouch',
@@ -811,7 +812,7 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     facing: EASTBROOK_NPC_PLACEMENTS_BY_ID.fisherman_brandt.facing,
     color: 0x2471a3,
     questIds: ['q_murlocs'],
-    vendorItems: ['simple_fishing_pole'],
+    vendorItems: ['simple_fishing_pole', 'field_kit'],
     greeting: 'Blrb-glub... sorry, been listening to those fish-men too long.',
   },
   foreman_odell: {
@@ -877,7 +878,7 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     // NPC stocks a gathered material (professions.md, Locked rulings). The
     // pick is tier 1 alone, the tier Eastbrook's own veins use; the higher
     // rungs moved to the hubs whose ground needs them.
-    vendorItems: ['copper_mining_pick', 'smithing_flux'],
+    vendorItems: ['copper_mining_pick', 'field_kit', 'smithing_flux'],
     greeting: 'The forge answers to me, $C. Bring good ore and it will answer to you too.',
   },
   cook_marlow: {
@@ -926,6 +927,7 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
       'linen_pouch',
       'travelers_knapsack',
       'gathering_sickle',
+      'field_kit',
       'spool_of_thread',
       'burlap_reagent_pouch',
     ],
@@ -955,7 +957,7 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     // The tier-2 and tier-3 axes and sickles moved to the marsh and the peaks;
     // the tier-1 sickle still sits on Ottilie rather than here, the shipped
     // split between the two masters.
-    vendorItems: ['handaxe', 'simple_fishing_pole', 'arcanite_bar'],
+    vendorItems: ['handaxe', 'simple_fishing_pole', 'field_kit', 'arcanite_bar'],
     greeting:
       'Springs, sprockets, and sharp edges, $C: the toolworks has whatever your hands lack.',
   },
@@ -981,7 +983,14 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     facing: -Math.PI / 2,
     color: 0xa8843a,
     questIds: ['q_farm_intro'],
-    vendorItems: ['vale_wheat_seed', 'brook_carrot_seed', 'brook_carrot', 'compost', 'garden_hoe'],
+    vendorItems: [
+      'vale_wheat_seed',
+      'brook_carrot_seed',
+      'brook_carrot',
+      'compost',
+      'garden_hoe',
+      'field_kit',
+    ],
     farmer: true,
     // The two teaching sentences below are pinned VERBATIM (the go-live
     // greeting arm): the anti-chore promise, and the pointer to the Harvest

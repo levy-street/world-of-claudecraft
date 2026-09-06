@@ -12,6 +12,7 @@ import { Input, type InputCallbacks } from '../../src/game/input';
 import { Keybinds } from '../../src/game/keybinds';
 import { tryNearbyInteraction } from '../../src/game/nearby_interaction';
 import { FARM_CROPS } from '../../src/sim/content/farm_crops';
+import type { HarvestPreference } from '../../src/sim/professions/harvest_preference';
 import type { Entity } from '../../src/sim/types';
 import { FocusManager, type FocusTrapHandle } from '../../src/ui/focus_manager';
 import { Hud } from '../../src/ui/hud';
@@ -20,9 +21,10 @@ import {
   type LootWindowControllerDeps,
 } from '../../src/ui/hud/loot/loot_window_controller';
 import { PlantSheetWindow } from '../../src/ui/hud/professions/farming_plant_sheet_window';
+import { HarvestPreferenceController } from '../../src/ui/hud/professions/harvest_preference_controller';
 import { ProfessionsWindow } from '../../src/ui/hud/professions/professions_window';
 import { makeWindowFocus } from '../../src/ui/window_focus';
-import type { IWorld } from '../../src/world_api';
+import type { CorpseHarvestInfo, IWorld } from '../../src/world_api';
 import type { FarmPlotView } from '../../src/world_api/farming';
 import { cleanup, stubDeps } from './_harness';
 
@@ -62,6 +64,7 @@ afterEach(() => {
   current?.loot.close();
   current?.plant.close();
   current?.professions.close();
+  current?.harvestPreference.close();
   current = null;
   clearPadFocus();
   cleanup();
@@ -89,9 +92,11 @@ function mount(mobile: boolean) {
   const lootRoot = root('loot-window', ui);
   const profRoot = root('professions-window', ui);
   const plantRoot = root('plant-sheet-window', ui);
+  const harvestPreferenceRoot = root('harvest-preference-window', ui);
   profRoot.style.zIndex = mobile ? '95' : '51';
   lootRoot.style.zIndex = mobile ? '95' : '52';
   plantRoot.style.zIndex = mobile ? '95' : '53';
+  harvestPreferenceRoot.style.zIndex = mobile ? '95' : '54';
   const fm = new FocusManager();
   const corpse = {
     id: 90,
@@ -131,6 +136,8 @@ function mount(mobile: boolean) {
     professionsState: { skills: [] },
     gatheringProficiency: {},
     toolEffectSlots: [],
+    harvestPreference: { kind: 'all' } as HarvestPreference | null,
+    setHarvestPreference: vi.fn<(raw: string) => void>(),
     craftingIdentity: {
       version: 1,
       synced: true,
@@ -146,10 +153,24 @@ function mount(mobile: boolean) {
     lootCorpse: vi.fn(() => {
       corpse.loot = null;
     }),
-    harvestCorpse: vi.fn(),
+    // A real boolean (cast-started outcome), not a controlled promise: this
+    // fixture always answers synchronously. tests/harvest_preference_*.test.ts
+    // cover the async wire path; this rig only proves the real controllers
+    // wire the outcome through correctly.
+    harvestCorpse: vi.fn(() => true),
     harvestCrop: vi.fn(),
     harvestNode: vi.fn(),
     plantCrop: vi.fn(),
+    corpseHarvestInfo: vi.fn(
+      (id: number): CorpseHarvestInfo => ({
+        corpseId: id,
+        componentTags: ['hide', 'fang'],
+        preference: world.harvestPreference,
+        denial: null,
+        reservation: null,
+        tierBonus: 0,
+      }),
+    ),
   };
   const live = () => world as unknown as IWorld;
   const centerPopup = (el: HTMLElement) => {
@@ -174,6 +195,18 @@ function mount(mobile: boolean) {
       confirmDialog: LootWindowControllerDeps['confirm'];
     }
   ).confirmDialog.bind(modalHost);
+  // The real shared picker (Intentional Gathering PR3), wired the way hud.ts
+  // wires it: closeOthers is a no-op like the real Hud.closeOtherWindows
+  // (siblings are never closed by opening another window), so a corpse Change
+  // press must never close the corpse popup underneath it.
+  const harvestPreference = new HarvestPreferenceController(
+    stubDeps({
+      root: () => harvestPreferenceRoot,
+      world: live,
+      closeOthers: () => {},
+      ...makeWindowFocus(fm, () => harvestPreferenceRoot),
+    }),
+  );
   const loot = new LootWindowController(
     stubDeps({
       element: lootRoot,
@@ -189,6 +222,9 @@ function mount(mobile: boolean) {
       centerPopup,
       placePopup: (el: HTMLElement) => centerPopup(el),
       confirm,
+      openHarvestPreference: (componentTags: readonly string[]) =>
+        harvestPreference.open(componentTags),
+      now: () => Date.now(),
       ...makeWindowFocus(fm, () => lootRoot),
     }),
   );
@@ -201,6 +237,7 @@ function mount(mobile: boolean) {
       moneyHtml: () => '',
       itemTooltip: () => '',
       harvestBody: () => loot.openHarvestBodyChoice(),
+      openHarvestPreference: () => harvestPreference.open(),
       ...makeWindowFocus(fm, () => profRoot),
     }),
   );
@@ -221,9 +258,11 @@ function mount(mobile: boolean) {
     loot,
     plant,
     professions,
+    harvestPreference,
     lootRoot,
     profRoot,
     plantRoot,
+    harvestPreferenceRoot,
     errors,
     closeConfirm: () => modalHost.confirmTrap?.release(false),
     interact: () =>

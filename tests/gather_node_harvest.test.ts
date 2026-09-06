@@ -45,6 +45,7 @@ import { Sim } from '../src/sim/sim';
 import { type Entity, INTERACT_RANGE, type SimEvent, xpForLevel } from '../src/sim/types';
 import { groundHeight, terrainHeight, waterLevelAt } from '../src/sim/world';
 import { bareClient } from './helpers/bare_client';
+import { completeCorpseHarvest } from './helpers/complete_corpse_harvest';
 import { expectDefined } from './helpers/defined';
 import { runRecharge } from './helpers/enchant_family_cast';
 import { placeAtHarvestSpot } from './helpers/harvest_spot';
@@ -750,7 +751,11 @@ describe('gated-path determinism (same seed, same drive)', () => {
       meta.gatheringProficiency.mining = TIER2_TOOL_WIELD_PROFICIENCY;
       sim.harvestNode('ore_mirefen_t2', undefined, pid); // granted: the cast starts
       completeCastNow(sim, pid); // the two draws and the grant land here
-      // A wolf corpse harvest beside the vein (the tier-1 corpse path).
+      // A wolf corpse harvest beside the vein (the tier-1 corpse path). This
+      // now runs a real multi-tick cast (Intentional Gathering PR3), so every
+      // OTHER mob is despawned first for the same reason castAndComplete
+      // does it above: a stray aggro would cancel the cast mid-drive.
+      despawnMobs(sim);
       const template = MOBS.forest_wolf;
       const p = mustEntity(sim, pid);
       const wolf = createMob(987654, template, template.maxLevel, { ...p.pos });
@@ -759,7 +764,13 @@ describe('gated-path determinism (same seed, same drive)', () => {
       wolf.corpseTimer = 9999;
       wolf.respawnTimer = 9999;
       sim.entities.set(wolf.id, wolf);
-      sim.harvestCorpse(wolf.id, ['hide'], pid);
+      sim.addItem('field_kit', 1, pid);
+      // The stored preference concentrates the real cast on hide alone (the
+      // old per-call `['hide']` override no longer exists post-PR3).
+      sim.setHarvestPreference('rough_hide', pid);
+      const corpseResult = completeCorpseHarvest(sim, wolf.id, pid);
+      if (!corpseResult.started) throw new Error('corpse harvest cast refused');
+      events.push(...corpseResult.events);
       // A band-capped catch: band-1 proficiency with no rod resolves band 0.
       // The draw count proves the arm is LIVE (completeFishing has no water
       // gate of its own, but an early-return regression would leave it 0).

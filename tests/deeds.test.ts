@@ -31,6 +31,7 @@ import { turnInQuestCore } from '../src/sim/quests/quest_commands';
 import { type ArenaMatch, type CharacterState, Sim } from '../src/sim/sim';
 import * as duelMod from '../src/sim/social/duel';
 import { type Entity, MAX_LEVEL, MILESTONES, type SimEvent } from '../src/sim/types';
+import { completeCorpseHarvest } from './helpers/complete_corpse_harvest';
 import { runSalvage } from './helpers/enchant_family_cast';
 import { VENDOR_TEST_WORLD } from './sim_shared';
 
@@ -2931,6 +2932,12 @@ describe('profession deed families (threshold-exact, live sites)', () => {
     const sim = makeSim();
     const { meta, e: player } = primary(sim);
     const pid = meta.entityId;
+    // A Field Kit before the bags fill, so the retry loop below tests the
+    // specimen truncation it targets, never a missing-kit refusal.
+    sim.addItem('field_kit', 1, pid);
+    // The stored preference concentrates the real cast on hide alone (the old
+    // per-call `['hide']` override no longer exists post-PR3).
+    sim.setHarvestPreference('rough_hide', pid);
     // Occupy every slot BUT keep stack room in a rough_hide stack: the plain
     // grant then lands by top-up (the harvest pre-gate passes) while the
     // SIGNED specimen needs a fresh slot and cannot (an instance never merges
@@ -2951,14 +2958,17 @@ describe('profession deed families (threshold-exact, live sites)', () => {
     let truncatedFindAt = -1;
     for (let i = 0; i < 400 && truncatedFindAt < 0; i++) {
       mob.harvestClaimedBy = null;
+      // Reset the corpse's window each attempt: only the specimen-roll retry
+      // is under test here, never decay across hundreds of real casts.
+      mob.corpseTimer = 9999;
       // Drain the top-up stack back to a single unit so the pre-gate keeps
       // passing while every slot stays occupied.
       const hideSlot = meta.inventory.find((s: { itemId: string }) => s.itemId === 'rough_hide');
       if (hideSlot) hideSlot.count = 1;
-      sim.harvestCorpse(mob.id, ['hide'], pid);
-      const downgrade = sim
-        .drainEvents()
-        .some((e) => e.type === 'gatherDowngrade' && e.surface === 'corpse' && e.lost === 'find');
+      const result = completeCorpseHarvest(sim, mob.id, pid);
+      const downgrade = result.events.some(
+        (e) => e.type === 'gatherDowngrade' && e.surface === 'corpse' && e.lost === 'find',
+      );
       if (downgrade) truncatedFindAt = i;
     }
     // A specimen ROLLED and was truncated (the hunt found the downgrade), yet

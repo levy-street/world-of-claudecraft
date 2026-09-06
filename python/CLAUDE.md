@@ -31,6 +31,27 @@ first (see `headless/CLAUDE.md`), pinned by `tests/env_protocol.test.ts`; this
 client only mirrors the wire fields, keep it thin. End-to-end smoke after any
 protocol change: `python example_random_agent.py` (random policy + IPC throughput).
 
+## Optional gathering commands (PR3, Intentional Gathering)
+`WoWClassicEnv` also exposes four thin methods mirroring the optional
+`{"cmd":"gathering","verb":...}` family: `inspect_gathering()`,
+`buy_field_kit(npc_id)`, `set_harvest_preference(preference)`,
+`harvest_corpse(corpse_id)`. Each sends the exact camelCase request the TS side
+expects and returns the full parsed reply untouched, refusal reason included;
+none of them advance sim time or the episode step, unlike `step`. They never
+coerce an argument (no `int()`/`str()` cast): the TS validator
+(`gathering_protocol.ts`) is the sole authority on what is a valid id or
+preference token, so an invalid value is forwarded as given and refused over
+the wire, not silently fixed up here. `env.gathering_capability` (from the
+`info` reply, `None` on an older server bundle) is the discovery point for
+whether the connected server build supports the family at all. This covers
+only the explicit corpse-gathering verbs above (harvest inspection/purchase/
+preference/execution); it is not a general professions surface and adds no
+new action index. `tests/headless_gathering_transport.test.ts` (TS side) and
+`test_gathering_protocol.py` (this side, subprocess mocked) pin the wire
+contract; see `headless/CLAUDE.md` for the full protocol. With Gymnasium and NumPy
+installed, run `python3 -m unittest discover -s python -p test_gathering_protocol.py`.
+Missing dependencies or binding import errors fail this check; they never skip it.
+
 ## Gotchas
 - **The Node bundle must be rebuilt** after any change to `src/sim/` or
   `headless/`, this client loads `dist-env/env_server.cjs`, not the TS source.
