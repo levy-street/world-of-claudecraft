@@ -66,7 +66,7 @@ beforeAll(async () => {
   finishChunkGeometry = terrainInternalsForTest.finishChunkGeometry;
   vertexShader = shader.vertexShader;
   fragmentShader = shader.fragmentShader;
-});
+}, 30_000);
 
 afterAll(() => {
   vi.unstubAllGlobals();

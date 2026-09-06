@@ -110,8 +110,8 @@ const PROVEN_SAFE_BASES: ProvenSafeBase[] = [
     file: 'src/render/ability_vfx/rings.ts',
     base: '1.0 - uProgress',
     sites: 1,
-    anchor: /uniforms\.uProgress\.value = easeOutQuart\(/,
-    why: 'uProgress is written from JS as easeOutQuart(min(1, age / dur)), never above 1',
+    anchor: /slot\.progress = easeOutQuart\(t\)/,
+    why: 'uProgress is written from JS from slot.progress, which is easeOutQuart(min(1, age / dur)), never above 1',
   },
 ];
 

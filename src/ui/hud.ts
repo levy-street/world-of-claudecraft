@@ -103,7 +103,6 @@ import { TIER_SKILL_STEP, tierForSkill } from '../sim/professions/wheel';
 import { questObjectivesForMob } from '../sim/quest_targets';
 import type { ResolvedAbility } from '../sim/sim';
 import {
-  type AbilityDef,
   type AuraKind,
   CONSUME_DURATION,
   CRAFT_CAST_ID,
@@ -1235,7 +1234,7 @@ function curatorRankDisplayName(rank: number): string {
 
 // Module-scope (created once, not per frame): freedAttackSlotAbility's abilityDef
 // callback into freedAttackSlotDisplayAbility.
-const abilityDefLookup = (id: string): AbilityDef | undefined => ABILITIES[id];
+const abilityDefLookup = (id: string) => ABILITIES[id];
 
 export class Hud {
   // Ability slots across three rows: 1..11 primary, 12..22 secondary, and
