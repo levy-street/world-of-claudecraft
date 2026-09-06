@@ -590,7 +590,7 @@ import {
   type RenderBudgetState,
   renderBudgetShaderPrewarmLevels,
 } from './render_budget';
-import { gpuPrepMode } from './render_dev_flags';
+import { gpuPrepMode, terrainDetailLevelPin } from './render_dev_flags';
 import {
   emptyRenderDiagnosticsSnapshot,
   type RenderableDiagnosticObject,
@@ -692,6 +692,7 @@ import {
   type TemporalHourglassVisual,
 } from './temporal_hourglass_visual';
 import { buildTerrain, hasTerrainSplatAssets, type TerrainView } from './terrain';
+import { applyTerrainDetailShed } from './terrain_detail_shed_core';
 import { runTexturePrepLane } from './texture_prep_lane';
 import { sweepMaterialTextures, sweepObjectTextures } from './texture_prewarm';
 import { uploadDataTextureInChunks } from './texture_upload';
@@ -2090,6 +2091,8 @@ export class Renderer {
       tier: GFX.tier,
       budget: GFX.budget,
       enabled: GFX.autoGovernor,
+      terrainDetail: GFX,
+      pinnedDetailLevel: terrainDetailLevelPin(),
     });
     this.renderBudgetState = this.renderBudgetGovernor.reset(
       this.effectiveRenderScale,
@@ -4287,7 +4290,8 @@ export class Renderer {
         Math.abs(state.levels.foliage - previousLevels.foliage) >= 0.001 ||
         Math.abs(state.levels.vfx - previousLevels.vfx) >= 0.001 ||
         Math.abs(state.levels.lighting - previousLevels.lighting) >= 0.001 ||
-        Math.abs(state.levels.resolution - previousLevels.resolution) >= 0.001
+        Math.abs(state.levels.resolution - previousLevels.resolution) >= 0.001 ||
+        Math.abs(state.levels.detail - previousLevels.detail) >= 0.001
       : true;
     if (levelsChanged) {
       const nextLevels = { ...state.levels };
@@ -4314,6 +4318,7 @@ export class Renderer {
     this.necromancyArmyPortalFx.setQuality(state.levels.vfx);
     this.abyssalRiftFx.setQuality(state.levels.vfx);
     this.effectivePointLights = Math.max(1, Math.round(GFX.maxPointLights * state.levels.lighting));
+    applyTerrainDetailShed(GFX, state.levels.detail, sharedUniforms);
     if (
       Math.abs(previousScale - this.effectiveRenderScale) >= 0.001 &&
       this.post?.supportsDynamicResolution
@@ -4330,6 +4335,7 @@ export class Renderer {
       foliage: state.levels.foliage,
       vfx: state.levels.vfx,
       lighting: state.levels.lighting,
+      detail: state.levels.detail,
       characters: 1,
       weapons: 1,
       worldStreaming: this.lowGfx ? GFX.bucketBaselines.worldStreaming : 1,
@@ -4373,6 +4379,7 @@ export class Renderer {
       // every-other-frame updates: surfaced so the ?perf overlay and capture
       // artifacts can tell a half-rate sample from a full-rate one.
       shadowCadenceHalfRate: this.shadowCadence.halfRate,
+      terrainDetailLevel: renderBudget.levels.detail,
       pixelRatio: this.webgl.getPixelRatio(),
       width: this.viewport.width,
       height: this.viewport.height,

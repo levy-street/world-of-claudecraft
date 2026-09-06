@@ -69,6 +69,32 @@ COSMETIC (may be tiered down on lower presets):
     that differs between two players looking at the same wearer, and it can only dim.
   What is faded is decoration ON a weapon. The wearer, their nameplate, their cast bar, their
   auras, their position and the weapon model itself are untouched at every scale.
+- Terrain-detail shed under budget pressure (`src/render/terrain_detail_shed_core.ts`,
+  `render_budget.ts`'s `detail` bucket). Ultra/insane's own terrain fragment knobs
+  (`terrainRelief`, `surfaceDetailTaps`, `surfaceDetailClampK`, and worn-stone's matching
+  parallax taps/clamp) are relief parallax steps at grazing angles and micro sun-shadow
+  shading on the ground: depth CUES, never a mechanical read. A GOVERNOR-driven shed, same
+  as the shadow cadence above: reading the LIVE budget governor is correct here because it is
+  a perf-governor output like the grass/vfx levels, not a HUD tier knob, so the static-preset
+  rule for HUD tier knobs does not apply to it. Dwell-hysteresis timed (shadow_cadence_core.ts's
+  shape: sustained pressure before each shed step, sustained calm before each restore step,
+  a dead band that holds the plan), and the applied level slews toward the stepped plan so a
+  step is a short crossfade of the relief, never a one-frame pop at a chunk edge. The live
+  0..1 level only ever pulls a knob DOWN toward high's own static profile (relief 1, taps 0,
+  clamp 0, the floor every tier at or above high already ships), never past a tier's own
+  request in either direction. A high TABLE session is untouched twice over: its `detail`
+  band is not governable and its request equals the floor, where the mapping is a proven
+  no-op (medium and low sit below it and are no-ops the same way). The governor admits the
+  shed from the session's OWN request beside the band, so an Advanced session (tier high
+  with the Terrain or Surface Detail dial raised above the floor) sheds like ultra does.
+  What the level touches, and nothing else: the ground parallax offset, the ground micro
+  sun-shadow shade term, and worn-stone's parallax offset, refinement taps and offset clamp;
+  none of those shader terms carries any information a player acts on. Consumed as live
+  uniform VALUES that weigh the shaders' EXISTING distance fades inside the same compiled
+  branches (never a define, never a program relink, never a `.visible` or `.castShadow`
+  write): the governor can only ever dim a cosmetic depth cue that already varies with
+  viewing angle and distance, not remove terrain, change its collision height, or touch
+  anything a player reacts to.
 - Deed Heraldry's decorative bloom (the Book of Deeds rewards worn in-world and on social
   surfaces). Heraldry is IDENTITY: it encodes no health, range, rank, or threat, so its
   forged seal, motif, material, and structural edge may never be hidden. The world seal and
@@ -352,6 +378,27 @@ measured design decision. Tracked at levy-street/world-of-claudecraft#3525.
   literal-pinned, the shed is strictly every-other-frame (never a removal: the application
   writes only the `shadowMap.autoUpdate`/`needsUpdate` flags), and the wiring scan pins the
   renderer call sites.
+- `tests/terrain_detail_shed_core.test.ts` + `tests/terrain_detail_shed_wiring.test.ts`: the
+  terrain-detail shed. `terrainDetailKnobs` never sheds a knob past its own tier request in
+  either direction, and a tier whose own request already sits at or below the floor (high,
+  medium) is proven untouched at every level; the dwell thresholds and the slew rate are
+  literal-pinned, each step needs SUSTAINED pressure/calm (never a single-frame spike) and
+  the applied level is proven to crossfade at the pinned rate rather than jump. The wiring
+  scan pins that the core imports nothing, that the renderer applies the level through
+  `applyTerrainDetailShed` in the one budget-application path with no `.visible` or
+  `.castShadow` write, that the applied level reaches the telemetry bucket readout, and that
+  the compiled tap count and program cache key still read the STATIC request.
+  `tests/render_budget.test.ts` pins the governor integration: ultra walks the rungs to the
+  floor under sustained pressure and back up under sustained calm, a high TABLE session stays
+  at level 1 under the SAME sustained pressure, an Advanced session on tier high is admitted
+  by its own request, the `?terraindetail=` pin overrides live pressure with the governor on or
+  off, and a
+  disabled governor without a pin holds level 1. `tests/terrain_fragment_shader.test.ts` and
+  `tests/worn_stone_shader.test.ts` prove the live uniforms are shared by reference with
+  `sharedUniforms`, weigh the existing fades inside the existing gates (worn-stone's marginal
+  tap by its fractional weight, the average by the live weight sum), that the program cache
+  key is byte-identical across levels, and that writing the uniforms changes nothing about
+  the compiled source (no relink).
 - `tests/weapon_vfx_shed.test.ts`: the weapon-skin fade. Neither arm reaches zero and the
   lever's floor is proven to stay clear of the multiplier at which a part would stop drawing,
   so the fade can never be mistaken for a cull; the distance arm is anchored to the fixed

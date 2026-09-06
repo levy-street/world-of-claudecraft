@@ -874,6 +874,8 @@ function buildSplatMaterial(
       sh.uniforms.uCarpetRing = sharedUniforms.uCarpetRing;
       sh.uniforms.uPlainLift = { value: plainGrassLift(albedo.grassMean, grassBake.mean) };
     }
+    // The live terrain-detail shed level (terrain_detail_shed_core.ts), by shared reference.
+    if (terrainReliefLevel() >= 2) sh.uniforms.uReliefSteps = sharedUniforms.uReliefSteps;
     sh.vertexShader = sh.vertexShader
       .replace(
         '#include <common>',
@@ -914,6 +916,7 @@ function buildSplatMaterial(
         uniform sampler2DArray uAlb;
         uniform sampler2D uGrassN, uDirtN, uRockN, uSandN, uMacro, uGroundAO;
         ${grassBake ? 'uniform sampler2D uGrassBake;\n        uniform vec3 uCarpetRing;\n        uniform vec3 uPlainLift;' : ''}
+        ${terrainReliefLevel() >= 2 ? 'uniform float uReliefSteps;' : ''}
         ${SPLAT_ALBEDO_GLSL}
         ${GROUND_RELIEF_GLSL}
         ${BRUSH_RING_GLSL}`,
@@ -1013,7 +1016,8 @@ function buildSplatMaterial(
         float pFade = (1.0 - vExtra.y)
           * smoothstep(0.55, 0.85, upW)
           * smoothstep(0.15, 0.38, pNdv)
-          * (1.0 - smoothstep(14.0, 36.0, pDist));
+          * (1.0 - smoothstep(14.0, 36.0, pDist))
+          * clamp(uReliefSteps - 1.0, 0.0, 1.0); // the live terrain-detail shed
         if (pFade > 0.015) {
           // planar-XZ UVs put the tangent frame on world x/z with world y as
           // the surface normal, so the ray projects without a TBN. Offset
@@ -1098,8 +1102,9 @@ function buildSplatMaterial(
         // and occl is zero on its own. The gate only stops the shader paying
         // two to six texture taps to arrive at that zero; the smoothstep is
         // what guarantees no ring at the boundary.
-        float microFade = 1.0
-          - smoothstep(WOC_MICRO_SHADOW_NEAR, WOC_MICRO_SHADOW_FAR, wocCamDist);
+        float microFade = (1.0
+          - smoothstep(WOC_MICRO_SHADOW_NEAR, WOC_MICRO_SHADOW_FAR, wocCamDist))
+          * clamp(uReliefSteps - 2.0, 0.0, 1.0); // the live terrain-detail shed
         if (microFade > 0.0) {
           vec2 sunStep = vec2(${SUN_UV_STEP.x}, ${SUN_UV_STEP.y});
           float occl = max(

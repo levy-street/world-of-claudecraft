@@ -88,6 +88,11 @@ export interface RendererPerfStats {
   effectiveRenderScale: number;
   renderBudget: RenderBudgetState;
   shadowCadenceHalfRate: boolean;
+  /** The live terrain-detail shed level (render_budget.ts `detail`,
+   *  terrain_detail_shed_core.ts): 1 = the tier's own static request, 0 =
+   *  high's profile; the `?terraindetail=` dev pin holds it. Surfaced beside
+   *  the cadence so a capture can tell a shed sample from a full one. */
+  terrainDetailLevel: number;
   pixelRatio: number;
   width: number;
   height: number;
