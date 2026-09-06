@@ -370,8 +370,15 @@ interface AttributionTargetFixture {
 // Re-minted for the PR #3834 merge after PR #3833: runtimeRender.renderer
 // now carries pooled VFX material cleanup beside the coalesced viewport-resize
 // pass, so the composite matches neither parent. No capture was retaken.
+// Re-minted for the Lambert terrain fill fix (the outdoor hemisphere
+// constants moved out to outdoor_light_rig_core.ts and the per-frame
+// uTerrainFillBoost write moved into updateAmbience): the
+// runtimeRender.renderer leaf moved. No capture was retaken.
+// Re-minted for the PR #3841 merge after PR #3839: the candidate's render-stack
+// renderer bytes and #3841's Lambert terrain fill write combine in one tree,
+// so the composite matches neither parent. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '66b3cee9b14ac3e21b02bd451ab925f0baf9596b6ebadbe8169bc2b38982819c';
+  '6b9faccab4159dce23af5bab71c9cfb323b05ebe46841a037621f85968d477ef';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

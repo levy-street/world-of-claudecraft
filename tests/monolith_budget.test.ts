@@ -426,7 +426,13 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned after merging PR #3839 into the v0.42 candidate: the merged
     // renderer lands between the candidate and PR-side pins. Exact count,
     // zero headroom.
-    ceiling: 13213,
+    // The outdoor hemisphere fill constants moved out to
+    // src/render/outdoor_light_rig_core.ts and the per-frame terrain fill
+    // uniform write moved in (a thin consumer of that core). Re-pinned after
+    // merging PR #3841 into the v0.42 candidate after PR #3839: the merged
+    // renderer is the measured tree with Lambert terrain lighting preserved
+    // under the standard-materials rig. Exact count, zero headroom.
+    ceiling: 13216,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

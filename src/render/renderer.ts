@@ -478,6 +478,12 @@ import {
   shouldUseFrontToBackOpaqueSort,
 } from './opaque_draw_order_core';
 import {
+  hemiOutdoorIntensity as hemiOutdoorIntensityFor,
+  LAMBERT_RIG_HEMI_INTENSITY,
+  LAMBERT_RIG_SUN_INTENSITY,
+  terrainFillBoostTarget,
+} from './outdoor_light_rig_core';
+import {
   PALADIN_AEGIS_DOME_RADIUS,
   type PaladinAegisVisual,
   syncPaladinAegisVisual,
@@ -981,19 +987,8 @@ const CAMERA_BASE_FOV = 60;
 // near-black, so non-composer tiers ride a higher floor. The grade-only
 // medium tier sits between: its grade supplies the shadow lift but it has
 // no AO/bloom softening the extremes.
-// Shadow DARKNESS is the other half of felt sunlight: a stronger hemisphere
-// plus IBL fill lifted building and hill shadows until they read as
-// dirt-colour variation, not shade (BSL-class looks run visibly darker,
-// cooler shadow regions). Key up / both fills down buys the contrast.
-const HEMI_INTENSITY_COMPOSER = 0.27;
-const HEMI_INTENSITY_GRADE = 0.32;
-const HEMI_INTENSITY_FLAT = 0.4;
-const hemiOutdoorIntensity = (): number =>
-  GFX.composer
-    ? HEMI_INTENSITY_COMPOSER
-    : GFX.gradePass
-      ? HEMI_INTENSITY_GRADE
-      : HEMI_INTENSITY_FLAT;
+// Hemisphere fill by post chain: outdoor_light_rig_core.ts (the terrain reads it too).
+const hemiOutdoorIntensity = (): number => hemiOutdoorIntensityFor(GFX);
 
 const SUN_INTENSITY = 3.5;
 const ENV_INTENSITY = 0.37;
@@ -2309,7 +2304,7 @@ export class Renderer {
     const hemi = new THREE.HemisphereLight(
       0xdcefff,
       0x465f39,
-      LOW_GFX ? 0.9 : hemiOutdoorIntensity(),
+      LOW_GFX ? LAMBERT_RIG_HEMI_INTENSITY : hemiOutdoorIntensity(),
     );
     this.scene.add(hemi);
     this.hemi = hemi;
@@ -2317,7 +2312,7 @@ export class Renderer {
     // as soft sun, not white glare; the hemisphere stays cool for contrast.
     const sun = new THREE.DirectionalLight(
       LOW_GFX ? 0xffdfaa : 0xffd99a,
-      LOW_GFX ? 2.65 : SUN_INTENSITY,
+      LOW_GFX ? LAMBERT_RIG_SUN_INTENSITY : SUN_INTENSITY,
     );
     sun.position.copy(SUN_ANCHOR);
     sun.castShadow = GFX.dynamicShadows;
@@ -9714,6 +9709,14 @@ export class Renderer {
         fog.near = easedFogNear(fog.near, preset.near, fog.far, dt);
       }
     }
+    // The Lambert terrain's fill lift follows the outdoor rig at the hemi's own
+    // response, so a doorway crossing hands it off with the lights, not a pop.
+    sharedUniforms.uTerrainFillBoost.value = dampedValue(
+      sharedUniforms.uTerrainFillBoost.value,
+      terrainFillBoostTarget(GFX, usesLiveDayNightLighting(desired)),
+      dt,
+      ZONE_ENVIRONMENT_RESPONSE,
+    );
     // Every open-air state follows the live grade. Thornhollow keeps its
     // authored fog range while sharing the overworld's color and light grade.
     if (usesLiveDayNightLighting(desired)) {

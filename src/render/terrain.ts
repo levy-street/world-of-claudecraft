@@ -1636,6 +1636,9 @@ function buildSplatMaterial(
 }
 
 export const terrainInternalsForTest = {
+  createLambertMaterial(): THREE.MeshLambertMaterial {
+    return buildLambertMaterial(makeBrushUniforms());
+  },
   createSplatMaterial(): THREE.MeshStandardMaterial {
     const normal = new THREE.DataTexture(new Uint8Array([128, 128, 255, 255]), 1, 1);
     return buildSplatMaterial(normal, makeBrushUniforms());
@@ -1653,10 +1656,18 @@ function buildLambertMaterial(brush: BrushUniforms): THREE.MeshLambertMaterial {
     emissive: GFX.lowPlus ? 0x182014 : 0x000000,
     emissiveIntensity: GFX.lowPlus ? 0.08 : 1,
   });
+  // Under the standard-materials rig the shadow fill is the IBL environment,
+  // which a Lambert material never samples: lift its hemisphere irradiance by
+  // the rig ratio instead (the shared uTerrainFillBoost the renderer eases
+  // from outdoor_light_rig_core.ts), so the Advanced mix's Terrain Detail Low
+  // no longer renders every sun-averted slope black. The sun term is
+  // untouched, night still darkens the fill through the graded hemisphere it
+  // multiplies, and it sits at 1 under an interior rig or on the Lambert tier.
   // The Lambert tier has no world-position varying of its own, so the brush
   // patch carries one (r165 chunk names; same idiom as the splat patch above).
   mat.onBeforeCompile = (sh) => {
     Object.assign(sh.uniforms, brush);
+    sh.uniforms.uWocFillBoost = sharedUniforms.uTerrainFillBoost;
     sh.vertexShader = sh.vertexShader
       .replace(
         '#include <common>',
@@ -1673,7 +1684,15 @@ function buildLambertMaterial(brush: BrushUniforms): THREE.MeshLambertMaterial {
         '#include <common>',
         `#include <common>
         varying vec3 vWocWPos;
+        uniform float uWocFillBoost;
         ${BRUSH_RING_GLSL}`,
+      )
+      .replace(
+        '#include <lights_fragment_begin>',
+        `#include <lights_fragment_begin>
+        #if defined( RE_IndirectDiffuse )
+        irradiance *= uWocFillBoost;
+        #endif`,
       )
       .replace(
         '#include <emissivemap_fragment>',

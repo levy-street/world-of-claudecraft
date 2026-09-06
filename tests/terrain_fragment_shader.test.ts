@@ -257,3 +257,84 @@ describe('insane terrain fragment shader', () => {
     },
   );
 });
+
+// The Lambert terrain (Terrain Detail Low on the Advanced mix, or any tier
+// above low with the splat assets missing) runs under the standard-materials
+// light rig, whose shadow fill is the IBL environment MeshLambertMaterial
+// never samples. Without the fill boost every slope facing away from a low
+// sun went solid black and the whole ground blacked out at dusk.
+describe('lambert terrain fill under the standard-materials rig', () => {
+  async function compileLambert(overrides: {
+    standardMaterials: boolean;
+    composer: boolean;
+    gradePass: boolean;
+  }): Promise<{
+    shader: FakeShader;
+    boost: number;
+    shared: THREE.IUniform;
+    uniform: THREE.IUniform;
+  }> {
+    vi.resetModules();
+    vi.stubGlobal('location', { search: '?gfx=high' });
+    const { gfxInternalsForTest } = await import('../src/render/gfx');
+    const restore = gfxInternalsForTest.overrideSettings(overrides);
+    try {
+      const { terrainInternalsForTest } = await import('../src/render/terrain');
+      const shader: FakeShader = {
+        uniforms: {},
+        vertexShader: THREE.ShaderLib.lambert.vertexShader,
+        fragmentShader: THREE.ShaderLib.lambert.fragmentShader,
+      };
+      terrainInternalsForTest
+        .createLambertMaterial()
+        .onBeforeCompile(
+          shader as unknown as THREE.WebGLProgramParametersWithUniforms,
+          null as unknown as THREE.WebGLRenderer,
+        );
+      return {
+        shader,
+        boost: shader.uniforms.uWocFillBoost.value as number,
+        shared: gfxInternalsForTest.sharedUniforms().uTerrainFillBoost,
+        uniform: shader.uniforms.uWocFillBoost,
+      };
+    } finally {
+      restore();
+    }
+  }
+
+  it('scales the hemisphere irradiance, not the sun, and only after the lights are summed', async () => {
+    const { shader } = await compileLambert({
+      standardMaterials: true,
+      composer: false,
+      gradePass: true,
+    });
+    const begin = shader.fragmentShader.indexOf('#include <lights_fragment_begin>');
+    const boost = shader.fragmentShader.indexOf('irradiance *= uWocFillBoost;');
+    const end = shader.fragmentShader.indexOf('#include <lights_fragment_end>');
+    expect(begin).toBeGreaterThan(-1);
+    expect(boost).toBeGreaterThan(begin);
+    expect(end).toBeGreaterThan(boost);
+    expect(shader.fragmentShader).toContain('uniform float uWocFillBoost;');
+    // irradiance only exists inside that chunk's RE_IndirectDiffuse block: a
+    // three upgrade that moves the guard must degrade to a no-op, never a
+    // compile failure (blank terrain).
+    expect(shader.fragmentShader).toContain(
+      `#if defined( RE_IndirectDiffuse )
+        irradiance *= uWocFillBoost;
+        #endif`,
+    );
+  });
+
+  it('binds the SHARED renderer-eased uniform, not a build-time constant', async () => {
+    // The renderer eases sharedUniforms.uTerrainFillBoost every frame (1 under
+    // an interior rig, the rig ratio outdoors); the material must alias that
+    // object so the easing reaches the shader without a per-frame lookup.
+    const built = await compileLambert({
+      standardMaterials: true,
+      composer: false,
+      gradePass: true,
+    });
+    expect(built.uniform).toBe(built.shared);
+    expect(built.boost).toBe(1);
+  });
+});

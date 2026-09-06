@@ -571,7 +571,10 @@ GPU work signs. Each rule names its seam and its guard.
 - **Never add, remove, or hide a directional, hemisphere, spot, or rect-area light
   after boot:** those counts are program-cache-key inputs, so one change relinks
   every lit material in view. Re-GRADE the constructor's one sun/hemi pair through
-  `interior_light_rig.ts` instead. Point lights ride the pad budget
+  `interior_light_rig.ts` instead. The outdoor hemisphere fill constants live in
+  `outdoor_light_rig_core.ts`: the Lambert terrain derives its `uTerrainFillBoost`
+  from them (`terrainFillBoostTarget`), so retune them there, never inline.
+  Point lights ride the pad budget
   (`point_light_budget.ts`). Guards: `tests/render_light_census_pin.test.ts` (the
   allowlist of every non-point light constructed under `src/render`) and
   `tests/point_light_budget.test.ts`. The Wildheart caldera rig
