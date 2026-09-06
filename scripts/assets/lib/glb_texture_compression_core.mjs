@@ -25,6 +25,22 @@ export function classifyGlb(json) {
   };
 }
 
+// Tripo stamps every material it generates with this prefix ("tripo_material_
+// <uuid>" for a full PBR generation, "tripo_mat_<uuid>" for a texture-only
+// task); no CC0 kit (KayKit/Quaternius) material name matches it.
+const TRIPO_MATERIAL_NAME = /^tripo_/i;
+
+/** Whether any material in this GLB is Tripo AI-generated: the signal
+ *  compress_glb_textures.mjs uses to route baseColorTexture to UASTC instead of
+ *  ETC1S. Tripo's painterly PBR output is detailed, high-frequency content that
+ *  measurably loses fidelity under ETC1S's low-bitrate block palette (~19 dB
+ *  PSNR gap vs UASTC on shipped Tripo art); the CC0 kits' flat-shaded stylized
+ *  textures compress cleanly under ETC1S and don't need UASTC's larger
+ *  GPU-resident footprint, so they stay on the smaller codec. */
+export function hasTripoGeneratedMaterial(json) {
+  return (json.materials ?? []).some((m) => TRIPO_MATERIAL_NAME.test(m.name ?? ''));
+}
+
 /** Counts that must survive a texture-only conversion byte-for-byte. */
 export function structuralSnapshot(json) {
   return {

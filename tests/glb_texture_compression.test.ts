@@ -17,6 +17,7 @@ import { describe, expect, it } from 'vitest';
 import {
   classifyGlb,
   glbJsonChunk,
+  hasTripoGeneratedMaterial,
   snapshotMismatch,
   structuralSnapshot,
   weaponVfxModelKeys,
@@ -154,5 +155,25 @@ describe('GLB texture KTX2 compression', () => {
     expect(snap.skins).toBeGreaterThan(0);
     expect(snapshotMismatch(snap, snap)).toBeNull();
     expect(snapshotMismatch(snap, { ...snap, skins: snap.skins + 1 })).toEqual(['skins']);
+  });
+
+  it('recognizes Tripo-generated materials so their baseColor favors UASTC over ETC1S', () => {
+    // Tripo's own material naming convention ("tripo_material_<uuid>",
+    // "tripo_mat_<uuid>") on real shipped AI-generated props: detailed painterly
+    // PBR content that measurably loses fidelity under ETC1S's low-bitrate block
+    // palette, unlike the CC0 kits' flat-shaded stylized textures.
+    const brazier = glbJsonChunk(
+      fs.readFileSync(path.join(MODELS, 'props', 'infernal_brazier.glb')),
+    );
+    expect(hasTripoGeneratedMaterial(brazier)).toBe(true);
+    const forge = glbJsonChunk(fs.readFileSync(path.join(MODELS, 'props', 'hell_forge.glb')));
+    expect(hasTripoGeneratedMaterial(forge)).toBe(true);
+    // A CC0 kit asset (Quaternius Modular Dungeons Pack) must NOT match: its
+    // baseColor compresses cleanly under ETC1S and doesn't need UASTC's larger
+    // GPU-resident footprint.
+    const arch = glbJsonChunk(fs.readFileSync(path.join(MODELS, 'dungeon', 'arch.glb')));
+    expect(hasTripoGeneratedMaterial(arch)).toBe(false);
+    expect(hasTripoGeneratedMaterial({ materials: [] })).toBe(false);
+    expect(hasTripoGeneratedMaterial({})).toBe(false);
   });
 });
