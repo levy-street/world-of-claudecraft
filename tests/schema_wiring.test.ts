@@ -407,6 +407,40 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(applied).toContain('CREATE INDEX IF NOT EXISTS content_moderation_actions_resource');
   });
 
+  it('applies the client-perf schema after the accounts and characters tables, before COMMIT', async () => {
+    // The client_perf_reports DDL used to sit textually inside SCHEMA, after
+    // accounts and characters, which made this ordering structurally impossible
+    // to get wrong. It is now its own CLIENT_PERF_SCHEMA statement
+    // (server/client_perf_schema.ts), so the FK targets are a CONVENTION and
+    // need a guard: moved above SCHEMA it would apply cleanly on every existing
+    // database and die only on a FRESH one, with `relation "accounts" does not
+    // exist`. Ordering is pinned by index, not containment, for that reason.
+    await ensureSchema();
+    const accountsIndex = h.calls.findIndex((sql) =>
+      sql.includes('CREATE TABLE IF NOT EXISTS accounts'),
+    );
+    const charactersIndex = h.calls.findIndex((sql) =>
+      sql.includes('CREATE TABLE IF NOT EXISTS characters'),
+    );
+    const perfIndex = h.calls.findIndex((sql) =>
+      sql.includes('CREATE TABLE IF NOT EXISTS client_perf_reports'),
+    );
+    const commitIndex = h.calls.indexOf('COMMIT');
+    expect(accountsIndex).toBeGreaterThanOrEqual(0);
+    expect(charactersIndex).toBeGreaterThanOrEqual(0);
+    // account_id REFERENCES accounts(id), character_id REFERENCES characters(id).
+    expect(perfIndex).toBeGreaterThan(accountsIndex);
+    expect(perfIndex).toBeGreaterThan(charactersIndex);
+    // Inside the boot transaction, so it rides the same advisory lock as the
+    // rest of the DDL rather than racing a sibling realm's boot.
+    expect(commitIndex).toBeGreaterThan(perfIndex);
+    // The additive columns ride the SAME statement as the table, so a partial
+    // apply cannot leave the table without them.
+    expect(h.calls[perfIndex]).toContain(
+      "ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS gl_model TEXT NOT NULL DEFAULT ''",
+    );
+  });
+
   it('applies the economy-oversight schemas (account wealth, suspicion flags) after the accounts table', async () => {
     // ACCOUNT_WEALTH_SCHEMA (server/account_wealth_db.ts) and
     // SUSPICION_FLAGS_SCHEMA (server/suspicion_flags_db.ts) back the admin
@@ -822,6 +856,32 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(applied).toContain(
       "ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS suggestion_ids TEXT[] NOT NULL DEFAULT '{}'",
     );
+    // The GPU model block: additive, idempotent, and default-valued so a boot
+    // against a populated table rewrites no rows and every pre-column row
+    // reads as "no evidence" rather than as a wrong model.
+    expect(applied).toContain(
+      "ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS gl_renderer_raw TEXT NOT NULL DEFAULT ''",
+    );
+    expect(applied).toContain(
+      "ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS gl_model TEXT NOT NULL DEFAULT ''",
+    );
+    // Nullable on purpose: "cannot tell the form factor" is the common answer,
+    // and a NOT NULL default would flatten it into a claim.
+    expect(applied).toContain(
+      'ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS gl_laptop BOOLEAN',
+    );
+    expect(applied).toContain(
+      "ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS gpu_hp_adapter TEXT NOT NULL DEFAULT ''",
+    );
+    // The vendor-level bucket is pinned coarse elsewhere; the model block sits
+    // BESIDE it and must never be spelled as a change to it.
+    expect(applied).not.toContain(
+      'ALTER TABLE client_perf_reports ALTER COLUMN gl_renderer_bucket',
+    );
+    // No new index rides the boot DDL for these columns: the summary reads them
+    // through a created_at-windowed aggregate, and a big live table's indexes go
+    // through the CONCURRENTLY seam.
+    expect(applied).not.toContain('client_perf_reports_os_model_created');
     // The worst-10s index must NEVER appear as transactional boot DDL: the
     // only CREATE for it is the post-commit CONCURRENTLY build (ruling R7).
     const commitIndex = h.calls.indexOf('COMMIT');

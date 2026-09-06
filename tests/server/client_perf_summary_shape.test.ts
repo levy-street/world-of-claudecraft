@@ -7,8 +7,10 @@
 
 import { describe, expect, it } from 'vitest';
 import {
+  type ClientPerfModelRow,
   type ClientPerfSummaryRow,
   cleanHours,
+  mapClientPerfModelRows,
   mapClientPerfSummaryRows,
   mapSuggestionCountRows,
   PERF_SUMMARY_LIMITS,
@@ -268,6 +270,8 @@ describe('mapClientPerfSummaryRows caps', () => {
       byCrowd: 8,
       worstGpu: 20,
       suggestionCounts: 12,
+      byModel: 50,
+      byHpMismatch: 50,
     });
   });
 });
@@ -337,5 +341,97 @@ describe('cleanHours', () => {
     expect(cleanHours(Number.NaN)).toBe(24);
     expect(cleanHours(24)).toBe(24);
     expect(cleanHours(7.9)).toBe(7);
+  });
+});
+
+describe('mapClientPerfModelRows', () => {
+  const base: ClientPerfModelRow = {
+    os_family: 'windows',
+    gl_model: 'nvidia-rtx-4070',
+    gpu_hp_adapter: null,
+    g_hp: 1,
+    vol_rank: 1,
+    sample_count: 10,
+    median_fps: 55,
+    p95_frame_ms: 25,
+    p99_frame_ms: 33,
+    context_loss_count: 2,
+    avg_render_scale: 0.9,
+    avg_effective_render_scale: 0.8,
+  };
+
+  it('classifies on the g_hp bit ALONE, never on the adapter value', () => {
+    // The trap this pins: gpu_hp_adapter is TEXT NOT NULL DEFAULT '', so a
+    // triple-set row can legitimately carry '' as DATA. Routing on "is the
+    // adapter empty" instead of the bit would file that row under byModel and
+    // silently invent a pair aggregate that double-counts its reports.
+    const out = mapClientPerfModelRows([
+      { ...base, g_hp: 0, gpu_hp_adapter: '', vol_rank: 1 },
+      { ...base, g_hp: 1, gpu_hp_adapter: null, vol_rank: 1 },
+    ]);
+    expect(out.byModel).toHaveLength(1);
+    expect(out.byHpMismatch).toHaveLength(1);
+    expect(out.byHpMismatch[0].gpuHpAdapter).toBe('');
+    // The pair row never grows an adapter field it has no value for.
+    expect('gpuHpAdapter' in out.byModel[0]).toBe(false);
+  });
+
+  it('carries both key columns and the full aggregate through', () => {
+    const out = mapClientPerfModelRows([
+      {
+        ...base,
+        g_hp: 0,
+        os_family: 'macos',
+        gl_model: 'apple-m4-pro',
+        gpu_hp_adapter: 'apple-m4-pro',
+      },
+    ]);
+    expect(out.byHpMismatch[0]).toEqual({
+      osFamily: 'macos',
+      glModel: 'apple-m4-pro',
+      gpuHpAdapter: 'apple-m4-pro',
+      sampleCount: 10,
+      medianFps: 55,
+      p95FrameMs: 25,
+      p99FrameMs: 33,
+      contextLossCount: 2,
+      avgRenderScale: 0.9,
+      avgEffectiveRenderScale: 0.8,
+    });
+  });
+
+  it('orders by the statement rank, not by input order or sample count', () => {
+    // Ordering is the database's job (its collation decides the key tie-break);
+    // re-sorting here would disagree with it on non-ASCII keys.
+    const out = mapClientPerfModelRows([
+      { ...base, gl_model: 'third', vol_rank: 3, sample_count: 99 },
+      { ...base, gl_model: 'first', vol_rank: 1, sample_count: 1 },
+      { ...base, gl_model: 'second', vol_rank: 2, sample_count: 50 },
+    ]);
+    expect(out.byModel.map((b) => b.glModel)).toEqual(['first', 'second', 'third']);
+  });
+
+  it('caps each list independently at its own limit', () => {
+    const rows: ClientPerfModelRow[] = [];
+    for (let i = 0; i < PERF_SUMMARY_LIMITS.byModel + 10; i++) {
+      rows.push({ ...base, gl_model: `model-${i}`, vol_rank: i + 1 });
+      rows.push({
+        ...base,
+        g_hp: 0,
+        gl_model: `model-${i}`,
+        gpu_hp_adapter: `hp-${i}`,
+        vol_rank: i + 1,
+      });
+    }
+    const out = mapClientPerfModelRows(rows);
+    expect(out.byModel).toHaveLength(PERF_SUMMARY_LIMITS.byModel);
+    expect(out.byHpMismatch).toHaveLength(PERF_SUMMARY_LIMITS.byHpMismatch);
+  });
+
+  it('folds a NULL key to the empty string and shapes an empty result', () => {
+    const out = mapClientPerfModelRows([{ ...base, os_family: null, gl_model: null }]);
+    expect(out.byModel[0].osFamily).toBe('');
+    expect(out.byModel[0].glModel).toBe('');
+    expect(mapClientPerfModelRows([])).toEqual({ byModel: [], byHpMismatch: [] });
   });
 });

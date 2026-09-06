@@ -758,13 +758,18 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
     // merge: both parents had already ratcheted for their own work, so
     // the composite is the honest size. Exact count, zero slack.
-    // Up 5145 -> 5151 for the Realm Builder of the Month roll (PR #3695, at
-    // its release/v0.42.0 base merge): the table and its SQL live in
-    // server/realm_builder_db.ts; the residue here is the schema import and
-    // the one ensureSchema() apply line with its ordering note, the same
-    // shape every other domain *_SCHEMA takes. Exact merged count, zero
-    // slack; maintainer-review item.
-    ceiling: 5151,
+    // Lowered -42 by the GPU model dimensions: the client_perf_reports DDL
+    // moved whole into server/client_perf_schema.ts (the admin_guilds_schema.ts
+    // pattern, a schema module db.ts imports and that never imports db.ts
+    // back), which more than paid for the four new columns' insert wiring. The
+    // table's accessors stay here beside the pool. Exact count, zero slack.
+    // Re-pinned to the exact merged count of the release/v0.42.0 base merge
+    // (Realm Builder of the Month, PR #3695): that arm added the schema
+    // import and the one ensureSchema() apply line for
+    // server/realm_builder_db.ts (its own table and SQL live there); this
+    // branch's GPU-dimensions reduction still stands beside it. Measured on
+    // the merged tree, not summed by arithmetic. Exact count, zero slack.
+    ceiling: 5109,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {

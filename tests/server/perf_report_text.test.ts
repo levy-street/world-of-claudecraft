@@ -1,0 +1,141 @@
+// server/perf_report_text.ts: the control-character sanitation the client
+// perf-report ingest runs over every stored string. The failure it exists to
+// prevent is not a cosmetic one: Postgres rejects U+0000 in a text parameter
+// and in a jsonb value alike, so one NUL anywhere in a beacon loses the WHOLE
+// report. Both arms are pinned here, the field clamp and the jsonb walk, and
+// the walk is pinned on keys as well as values because a beacon controls both.
+//
+// Every control character below is built with String.fromCharCode, never typed
+// raw. A raw one in the source makes git classify this file as binary, which
+// hides it from `git diff`, from a PR's Files changed view, and from the
+// pre-push copy scan that reads the diff.
+import { describe, expect, it } from 'vitest';
+import { stripControlChars, stripJsonControlChars } from '../../server/perf_report_text';
+
+/** The character at the heart of this module, plus the range's two edges. */
+const NUL = String.fromCharCode(0x00);
+const UNIT_SEP = String.fromCharCode(0x1f);
+const DEL = String.fromCharCode(0x7f);
+
+describe('stripControlChars', () => {
+  it('drops every C0 control and DEL, including the NUL Postgres rejects', () => {
+    expect(stripControlChars(`a${NUL}b${UNIT_SEP}c${DEL}d`)).toBe('abcd');
+    expect(stripControlChars('line\nbreak\ttab\rreturn')).toBe('linebreaktabreturn');
+    expect(stripControlChars(`${NUL}${NUL}${NUL}`)).toBe('');
+  });
+
+  it('returns a clean string unchanged, and keeps everything above DEL', () => {
+    expect(stripControlChars('ANGLE (NVIDIA, GeForce RTX 3060)')).toBe(
+      'ANGLE (NVIDIA, GeForce RTX 3060)',
+    );
+    // U+0080 and up are not C0 controls: a renderer or zone name may legitimately
+    // carry non-ASCII text, and stripping it would corrupt the dimension.
+    expect(stripControlChars('Eastbrook Tavern (é, 中)')).toBe('Eastbrook Tavern (é, 中)');
+    expect(stripControlChars('')).toBe('');
+  });
+});
+
+describe('stripJsonControlChars', () => {
+  it('cleans string values at every depth, in objects and arrays alike', () => {
+    const value = {
+      zone: `east${NUL}brook`,
+      counts: [1, `a${NUL}b`, null],
+      nested: { deep: { deeper: [`c${NUL}d`] } },
+    };
+    expect(stripJsonControlChars(value)).toEqual({
+      zone: 'eastbrook',
+      counts: [1, 'ab', null],
+      nested: { deep: { deeper: ['cd'] } },
+    });
+  });
+
+  it('cleans KEYS too, which a value-only pass would leave to fail the insert', () => {
+    const cleaned = stripJsonControlChars({ [`zone${NUL}name`]: 1, [`${NUL}`]: 2 });
+    expect(Object.keys(cleaned).sort()).toEqual(['', 'zonename']);
+    expect(JSON.stringify(cleaned)).not.toContain('\\u0000');
+  });
+
+  it('never lets a stripped key reach the prototype through an assignment', () => {
+    // The trap the walk uses defineProperty for: a key that strips down to
+    // __proto__ would, assigned, hit Object.prototype's setter and swap the
+    // object's prototype instead of adding a property.
+    const cleaned = stripJsonControlChars({ [`__pro${NUL}to__`]: { polluted: true } });
+    expect(Object.getPrototypeOf(cleaned)).toBe(Object.prototype);
+    expect(({} as Record<string, unknown>).polluted).toBeUndefined();
+    expect(Object.getOwnPropertyDescriptor(cleaned, '__proto__')?.value).toEqual({
+      polluted: true,
+    });
+  });
+
+  it('leaves non-string leaves and a clean object alone', () => {
+    const clean = { a: 1, b: true, c: null, d: 'text', e: [1, 2] };
+    expect(stripJsonControlChars(clean)).toEqual(clean);
+    expect(stripJsonControlChars(42)).toBe(42);
+    expect(stripJsonControlChars(null)).toBe(null);
+    expect(stripJsonControlChars(undefined)).toBe(undefined);
+    expect(stripJsonControlChars(`bare${NUL}string`)).toBe('barestring');
+  });
+
+  it('walks a depth that would overflow a recursive pass', () => {
+    // The input is attacker-shaped: whatever nesting JSON.parse accepts must
+    // reach the walk without blowing its stack, which is why the walk is
+    // iterative. 50k deep is well past any recursive implementation's limit.
+    const depth = 50_000;
+    let deep: Record<string, unknown> = { leaf: `x${NUL}y` };
+    for (let i = 0; i < depth; i++) deep = { next: deep };
+    const cleaned = stripJsonControlChars(deep) as Record<string, unknown>;
+    let node = cleaned;
+    for (let i = 0; i < depth; i++) node = node.next as Record<string, unknown>;
+    expect(node.leaf).toBe('xy');
+  });
+
+  it('enumerates every node EXACTLY once when a stripped key collides with a later sibling', () => {
+    // The adversarial shape, and the reason the walk reads Object.entries
+    // rather than Object.keys plus a live record[key]: every level carries a
+    // dirty `a` key holding the child AND a plain `a` key after it, so the
+    // rename moves the child onto a key the same snapshot has still to visit.
+    // A live read finds the just-moved child there and pushes it a second
+    // time, making level k visited k times: quadratic in nesting depth,
+    // synchronous, on the process that runs the 20 Hz world loop, and
+    // reachable from a public unauthenticated beacon.
+    //
+    // Counted rather than timed, so the pin is decisive instead of
+    // machine-dependent: a `visits` getter the rename never touches fires once
+    // per enumeration of its node. The fixed walk answers one per level; the
+    // quadratic one answered 125250 for 500 levels.
+    const ctrl = String.fromCharCode(0x01);
+    // Past the nesting the 64 KB public body cap admits for this shape, so the
+    // pin covers every depth a beacon can actually reach.
+    const depth = 4000;
+    let visits = 0;
+    let node: Record<string, unknown> = { leaf: `x${NUL}y` };
+    for (let i = 0; i < depth; i++) {
+      const parent: Record<string, unknown> = {};
+      parent[`a${ctrl}`] = node;
+      parent.a = 'plain';
+      Object.defineProperty(parent, 'visits', {
+        get() {
+          visits++;
+          return 'v';
+        },
+        enumerable: true,
+        configurable: true,
+      });
+      node = parent;
+    }
+
+    const cleaned = stripJsonControlChars(node) as Record<string, unknown>;
+    expect(visits).toBe(depth);
+    // The OUTPUT is unchanged by the fix, which is why a correctness-only test
+    // could never have caught this: the collision stays last-writer-wins and
+    // the whole chain is still reached and cleaned.
+    let walk: Record<string, unknown> = cleaned;
+    let levels = 0;
+    while (walk.a && typeof walk.a === 'object') {
+      walk = walk.a as Record<string, unknown>;
+      levels++;
+    }
+    expect(levels).toBe(depth);
+    expect(walk.leaf).toBe('xy');
+  });
+});

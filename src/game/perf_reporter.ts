@@ -1,6 +1,7 @@
 import { graphicsPresetLabel } from '../render/gfx';
 import { isSoftwareRendererName } from '../render/software_renderer';
 import { crowdBucketLabel } from './crowd_bucket';
+import { createGpuAdapterProbe } from './gpu_adapter_probe';
 import { localDevPerfTraceEnabled, type PerfMonitor, type PerfSnapshot } from './perf';
 import { analyzePerfSuggestions } from './perf_doctor';
 import { entryRevealSummary } from './perf_entry_reveal_core';
@@ -526,6 +527,9 @@ function payloadFromSnapshot(
   characterId: number | null,
   worldTelemetry: WorldTelemetry | null = null,
   desktopShell = false,
+  // The WebGPU high-performance adapter description, or null while the probe
+  // is still in flight or on any browser that has no WebGPU to ask.
+  gpuHpAdapter: string | null = null,
 ): Record<string, unknown> | null {
   const renderer = snapshot.renderer;
   if (!renderer) return null;
@@ -590,6 +594,10 @@ function payloadFromSnapshot(
     glVendor: renderer.glVendor,
     glRenderer: renderer.glRenderer,
     glRendererBucket: gpuBucket(renderer.glRenderer),
+    // What the browser hands a page that ASKS for the discrete GPU. Sent raw;
+    // the server buckets it with the same parser it uses on glRenderer, and a
+    // disagreement between the two is a hybrid laptop rendering on its iGPU.
+    gpuHpAdapter,
     source: scenario.source,
     zoneOrScenario,
     simEntities: worldTelemetry?.simEntities ?? null,
@@ -667,6 +675,12 @@ export function startPerfReporter(options: PerfReporterOptions): () => void {
 
   const sessionId = storedSessionId();
   const status = makeStatus(true, devTrace, sessionId);
+  // Started here rather than in main.ts on purpose: startPerfReporter already
+  // runs after world entry, and start() is fire-and-forget, so the probe can
+  // never delay a frame or the entry chain. The first beacon is 75s out; a
+  // report built before it settles just carries null.
+  const gpuAdapterProbe = createGpuAdapterProbe();
+  gpuAdapterProbe.start();
   let stopped = false;
   let timer: number | null = null;
   let lastFinalFlushAt = 0;
@@ -714,6 +728,7 @@ export function startPerfReporter(options: PerfReporterOptions): () => void {
       options.characterIdProvider(),
       options.worldTelemetryProvider?.() ?? null,
       options.desktopShell ?? false,
+      gpuAdapterProbe.value(),
     );
     if (!body) {
       skip('no-renderer', sendOptions.final ? null : cadenceDelay(REPEAT_REPORT_MS));
