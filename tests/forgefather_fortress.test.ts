@@ -6,6 +6,7 @@
 // design.
 import { describe, expect, it } from 'vitest';
 import type { ObbCollider } from '../src/sim/colliders';
+import { SEA_RING_PARAPET_Y } from '../src/sim/content/ember_coast';
 import {
   FORGEFATHER_FORTRESS_PLACEMENTS,
   FORTRESS_CYLINDRICAL_KEYS,
@@ -18,7 +19,7 @@ import {
   IGNIVAR_PROP_COLLIDER_FOOTPRINT,
   IGNIVAR_PROP_NATIVE,
 } from '../src/sim/ignivar_props';
-import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
+import { terrainHeight, terrainHeightSansEdits, WATER_LEVEL } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
 const GROUND_STAND_TOLERANCE = 2.5;
@@ -168,5 +169,52 @@ describe('forgefather fortress bake', () => {
         undefined,
       );
     }
+  });
+  it('terrain edits never bury a ring wall the raw isle leaves standing', () => {
+    // The walled sea pool's ring (the owner's five sea-level fortress_wall
+    // rows) is what the strait sees of the keep's foot. A shore or tier
+    // stamp may run INTO a wall end that the raw isle already swallows
+    // (the west run's south end dies into the flank rim), but no stamp may
+    // lift the ground over a stretch the raw heightfield leaves clear: the
+    // ground plane then cuts through the wall panels and the parapet reads
+    // as a bald hill from the water (the Drakelands terrain-clipping
+    // report). Wherever the raw isle sits a yard under the parapet, the
+    // edited ground stays at least half a yard under it too, sampled on
+    // the spine AND both faces of the wall (the clip lives on a face, not
+    // the centre line) along the wall's interior run: the end caps are
+    // where a ring wall dies into the keep plinth or the postern descent
+    // by design, so they are left out.
+    const RING_BASE_Y = -7.25;
+    const PARAPET_CLEAR = 0.5;
+    const RAW_CLEAR = 1.0;
+    const buried: string[] = [];
+    let ringWalls = 0;
+    for (const placement of FORGEFATHER_FORTRESS_PLACEMENTS) {
+      if (placement.key !== 'fortress_wall' || placement.y !== RING_BASE_Y) continue;
+      ringWalls++;
+      const native = IGNIVAR_PROP_NATIVE[placement.key];
+      const top = placement.y + native.hei * placement.scale;
+      expect(top).toBeCloseTo(SEA_RING_PARAPET_Y, 6);
+      const half = (native.len * placement.scale) / 2;
+      const thick = (native.dep * placement.scale) / 2;
+      const cos = Math.cos(placement.ry);
+      const sin = Math.sin(placement.ry);
+      for (let i = -5; i <= 5; i++) {
+        const along = (half * i) / 6;
+        for (const across of [-thick, 0, thick]) {
+          const x = placement.x + along * cos - across * sin;
+          const z = placement.z + along * sin + across * cos;
+          const raw = terrainHeightSansEdits(x, z, WORLD_SEED);
+          if (raw > top - RAW_CLEAR) continue;
+          const ground = terrainHeight(x, z, WORLD_SEED);
+          if (ground > top - PARAPET_CLEAR)
+            buried.push(
+              `wall (${placement.x}, ${placement.z}) at (${x.toFixed(1)}, ${z.toFixed(1)}): ground ${ground.toFixed(2)} over parapet ${top.toFixed(2)} (raw ${raw.toFixed(2)})`,
+            );
+        }
+      }
+    }
+    expect(ringWalls).toBe(5);
+    expect(buried, buried.slice(0, 6).join('; ')).toEqual([]);
   });
 });
