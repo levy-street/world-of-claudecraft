@@ -1544,6 +1544,88 @@ describe('perf report ingestion', () => {
     expect((stored.rawSummary as Record<string, unknown>).oversized).toBeUndefined();
   });
 
+  it('keeps the drawing buffer block, verbatim and across truncation', async () => {
+    const drawingBuffer = {
+      width: 1728,
+      height: 1080,
+      cssWidth: 1440,
+      cssHeight: 900,
+      dynamicResolution: true,
+    };
+
+    const kept = fakeRes();
+    await handlePerfReport(
+      fakeReq({
+        sessionId: 'drawing-buffer-kept',
+        rawSummary: { seconds: 30, rendererDrawingBuffer: drawingBuffer },
+      }),
+      kept,
+    );
+    expect(kept.statusCode).toBe(200);
+    const stored = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0];
+    expect((stored.rawSummary as Record<string, unknown>).rendererDrawingBuffer).toEqual(
+      drawingBuffer,
+    );
+    expect((stored.rawSummary as Record<string, unknown>).truncated).toBeUndefined();
+
+    // The block is what says at what resolution a fleet actually plays, and an
+    // oversized report is exactly the session whose resolution is worth reading,
+    // so the compact path names it too.
+    const truncated = fakeRes();
+    await handlePerfReport(
+      fakeReq({
+        sessionId: 'drawing-buffer-truncated',
+        rawSummary: {
+          seconds: 30,
+          rendererDrawingBuffer: drawingBuffer,
+          oversized: 'x'.repeat(40_000),
+        },
+      }),
+      truncated,
+    );
+    expect(truncated.statusCode).toBe(200);
+    const compacted = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0].rawSummary as Record<
+      string,
+      unknown
+    >;
+    expect(compacted.truncated).toBe(true);
+    expect(compacted.rendererDrawingBuffer).toEqual(drawingBuffer);
+    expect(compacted.oversized).toBeUndefined();
+  });
+
+  it('field-shapes the drawing buffer rather than storing what was posted', () => {
+    const { rawSummary, DRAWING_BUFFER_RAW_PIXELS_MAX } = perfReportInternalsForTest;
+
+    // Every retained key of the compact path is copied verbatim, so "four
+    // scalars" has to be enforced at the ingest, not trusted. A hostile block
+    // keeps exactly four clamped integers and loses its extra members.
+    const hostile = rawSummary({
+      rendererDrawingBuffer: {
+        width: 1e308,
+        height: -5,
+        cssWidth: '1440.7',
+        cssHeight: { nested: 'x'.repeat(4000) },
+        extra: 'x'.repeat(4000),
+        list: new Array(500).fill('x'),
+      },
+    });
+    expect(hostile.rendererDrawingBuffer).toEqual({
+      width: DRAWING_BUFFER_RAW_PIXELS_MAX,
+      height: 0,
+      cssWidth: 1440,
+      cssHeight: 0,
+      dynamicResolution: false,
+    });
+
+    // A non-record block is dropped, never stored as whatever was sent.
+    expect(rawSummary({ rendererDrawingBuffer: 'x'.repeat(4000) })).not.toHaveProperty(
+      'rendererDrawingBuffer',
+    );
+    expect(rawSummary({ rendererDrawingBuffer: [1, 2, 3] })).not.toHaveProperty(
+      'rendererDrawingBuffer',
+    );
+  });
+
   it('stores the GPU queue block bounded, and keeps it when raw summaries are truncated (#3167)', async () => {
     const {
       GPU_QUEUE_RAW_MS_MAX,
