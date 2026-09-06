@@ -25,8 +25,11 @@
 //   farvista    - the whole coarse far-vista terrain layer (far_terrain); off
 //                 is the A/B that says whether a suspect distant surface is
 //                 this layer or the real splat terrain underneath it
+//   postshed    - the render budget's post shed (post_shed_core.ts): off
+//                 builds no FXAA grade twin and pins the governor's `post`
+//                 level at 1, so a bench reads the tier-static chain
 
-// Beside the ?<name>=off layer switches, one MODE flag with its own accessor:
+// Beside the ?<name>=off layer switches, two flags with their own accessors:
 //   ?prep=legacy - restores the pre-scheduler queue ADMISSION only: every unit
 //                  is admitted as its turn comes and the ledger keeps learning.
 //                  It does NOT revert the reveal-gate policy (piecewise reveal,
@@ -34,6 +37,13 @@
 //                  kill switch for pacing: if the budget regresses on a machine,
 //                  ?prep=legacy is the A/B that says so without a rebuild, and
 //                  the same flag is what a rollback ships as the default.
+//   ?postshed=<0..1> - pins the render budget's `post` level
+//                  (post_shed_core.ts: 1 full chain, 0.75 SMAA to FXAA, 0.5
+//                  bloom tail mips, 0.25 bloom off, 0 AO passthrough) for the
+//                  whole session, governor on or off, so a bench or a
+//                  screenshot reads a known rung instead of racing the
+//                  governor's cooldowns. The same parameter's `off` value is
+//                  the layer kill switch above.
 
 /** Which GPU-preparation behaviour this session runs. */
 export type GpuPrepMode = 'adaptive' | 'legacy';
@@ -61,4 +71,19 @@ const gpuPrep = ((): GpuPrepMode => {
 /** The session's GPU-preparation mode: 'legacy' only under `?prep=legacy`. */
 export function gpuPrepMode(): GpuPrepMode {
   return gpuPrep;
+}
+
+const postShedPin = ((): number | null => {
+  if (typeof location === 'undefined') return null;
+  const raw = new URLSearchParams(location.search).get('postshed');
+  if (raw === null || raw.trim() === '') return null;
+  const parsed = Number(raw);
+  if (!Number.isFinite(parsed)) return null;
+  return Math.min(1, Math.max(0, parsed));
+})();
+
+/** The `?postshed=<0..1>` dev pin, clamped, or null when absent, `off`, or
+ *  otherwise not a number. */
+export function postShedLevelPin(): number | null {
+  return postShedPin;
 }

@@ -11,6 +11,8 @@ import { PostEffectComposer } from './post_composer';
 import { StaticOpaqueN8AOPass } from './post_n8ao';
 import { OutputGradePass } from './post_output_grade';
 import { postPipelinePlan } from './post_plan_core';
+import { PostShed } from './post_shed';
+import type { PostShedChain, PostShedRung } from './post_shed_core';
 import { renderLayerDisabled } from './render_dev_flags';
 
 // Post chain: N8AO (high: half-res Low, ultra+insane: full-res Medium)
@@ -42,6 +44,14 @@ import { renderLayerDisabled } from './render_dev_flags';
 // StaticOpaqueN8AOPass prevents transparency rerender allocations and replaces
 // disabled accumulation's copy with the same binary16 conversion in composite.
 // It retains the beauty clear but suppresses clears before full-coverage writes.
+//
+// The render budget's `post` level (render_budget.ts) sheds this chain under
+// sustained pressure through post_shed.ts, rung by rung (post_shed_core.ts):
+// SMAA gives way to a boot-compiled grade twin carrying the fused FXAA arm,
+// bloom drops its tail mips and then goes dark, and N8AO becomes a white
+// passthrough. Every rung is a pass toggle or a one-time target clear on a
+// pass built here; `prewarmShed` compiles the twin under the presentation
+// prewarm so no rung links a program in a live frame.
 
 // Bloom is a high-pass in linear HDR, so the threshold has to clear the
 // brightest lit diffuse or the whole sunlit world glows. Sunlit high-albedo
@@ -124,6 +134,18 @@ export interface PostPipeline {
   /** Advance ripple ages / flash decay and re-project onto the camera; call
    *  once per frame before render(). Toggles the pass off when idle. */
   updateScreenFx(dt: number): void;
+  /** Apply the render budget's `post` level (post_shed_core.ts): pass
+   *  toggles and one-time clears only, never a compile or a reallocation. */
+  setShedLevel(level: number): void;
+  /** The deepest shed rung in force, `full` for the tier's whole chain. */
+  shedRung(): PostShedRung | 'full';
+  /** Which sheddable passes this chain built: the static input of the
+   *  governor's `post` floor. */
+  readonly shedChain: PostShedChain;
+  /** Link the FXAA grade twin with one draw of that pass alone; run under
+   *  the presentation prewarm, scene hidden. Until it has run, the
+   *  `smaa-to-fxaa` rung keeps the SMAA tail instead of linking live. */
+  prewarmShed(): void;
 }
 
 export function buildComposer(
@@ -151,6 +173,7 @@ export function buildComposer(
     n8aoDisabled: renderLayerDisabled('n8ao'),
     smaaDisabled: renderLayerDisabled('smaa'),
     fxaaDisabled: renderLayerDisabled('fxaa'),
+    postShedDisabled: renderLayerDisabled('postshed'),
     isWebGL2: webgl.capabilities.isWebGL2,
     msaaSamples: GFX.msaaSamples,
   });
@@ -165,7 +188,7 @@ export function buildComposer(
   });
   const composer = new PostEffectComposer(webgl, target, width, height, plan.singleComposerBuffer);
 
-  let ao: N8AOPass | null = null;
+  let ao: StaticOpaqueN8AOPass | null = null;
   if (plan.scene.pass === 'n8ao') {
     // N8AOPass replaces RenderPass. A separate scene pass would be discarded.
     ao = new StaticOpaqueN8AOPass(scene, camera, size.x, size.y);
@@ -222,6 +245,20 @@ export function buildComposer(
     { fxaa: plan.gradeFxaa },
   );
   composer.addPass(grade);
+  // The post shed's `smaa-to-fxaa` rung swaps the grade for this twin, the
+  // same pass with the FXAA arm compiled in. Disabled until that rung, and
+  // compiled by prewarmShed below, never at its first live use.
+  const gradeFxaaTwin = plan.shed.gradeFxaaTwin
+    ? new OutputGradePass(
+        sharedUniforms.uTime,
+        bloom instanceof PreparedBloomPass ? bloom.bloomTexture : null,
+        { fxaa: true },
+      )
+    : null;
+  if (gradeFxaaTwin) {
+    gradeFxaaTwin.enabled = false;
+    composer.addPass(gradeFxaaTwin);
+  }
 
   // Screen-fx pass (display space, straight after the grade and BEFORE the
   // tail SMAA, whose last-pass position is a pinned contract: SMAA then
@@ -257,7 +294,20 @@ export function buildComposer(
   // edge pass.
   // ?smaa=off is the dev-only perf-attribution kill switch. It keeps the
   // post-AA cost attributable while comparing the revised tier policy.
-  if (plan.composerPasses.includes('smaa')) composer.addPass(new SMAAPass());
+  const smaa = plan.composerPasses.includes('smaa') ? new SMAAPass() : null;
+  if (smaa) composer.addPass(smaa);
+
+  const shed = new PostShed(
+    webgl,
+    {
+      smaa,
+      grade,
+      gradeFxaa: gradeFxaaTwin,
+      bloom: bloom instanceof PreparedBloomPass ? bloom : null,
+      ao,
+    },
+    plan.shed.chain,
+  );
 
   return {
     composer,
@@ -265,8 +315,10 @@ export function buildComposer(
     ao,
     grade,
     supportsDynamicResolution: plan.supportsDynamicResolution,
+    shedChain: plan.shed.chain,
     setSize(width: number, height: number, pixelRatio = webgl.getPixelRatio()): void {
       composer.setSizeAndPixelRatio(width, height, pixelRatio);
+      shed.reclear();
       // The ripple projection maps world points to clip space, so it needs the
       // logical aspect, not the drawing-buffer extent.
       aspect = width / Math.max(1, height);
@@ -283,9 +335,22 @@ export function buildComposer(
     render(): void {
       composer.render();
     },
+    setShedLevel(level: number): void {
+      shed.apply(level);
+    },
+    shedRung(): PostShedRung | 'full' {
+      return shed.rung();
+    },
+    prewarmShed(): void {
+      // One draw of the twin alone against the composer's own buffers: the
+      // whole chain has just rendered under the same prewarm, so this adds
+      // one fullscreen quad, not a second composer frame.
+      shed.prewarm(() => gradeFxaaTwin?.render(webgl, composer.writeBuffer, composer.readBuffer));
+    },
     dispose(): void {
       if (disposed) return;
       disposed = true;
+      shed.dispose();
       for (const pass of composer.passes) pass.dispose();
       composer.dispose();
     },

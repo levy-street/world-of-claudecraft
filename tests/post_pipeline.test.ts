@@ -82,12 +82,25 @@ describe('live post pipeline', () => {
       'StaticOpaqueN8AOPass',
       'PreparedBloomPass',
       'OutputGradePass',
+      // The post shed's FXAA grade twin (post_shed.ts): built beside the grade,
+      // disabled until the `smaa-to-fxaa` rung swaps it in for the SMAA tail.
+      'OutputGradePass',
       // The ability-VFX screen-fx pass (ripple / flash) sits between the grade
       // and the tail SMAA, so SMAA keeps anti-aliasing the final image.
       'ShaderPass',
       'SMAAPass',
     ]);
     expect(post.grade.fxaa).toBe(false);
+    expect(post.composer.passes.map((pass) => pass.enabled)).toEqual([
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+    ]);
+    expect(post.shedChain).toEqual({ smaa: true, bloom: true, ao: true });
+    expect(post.shedRung()).toBe('full');
     expect(post.composer.renderTarget1).not.toBe(post.composer.renderTarget2);
     expect(post.composer.renderTarget1.samples).toBe(0);
     expect(post.composer.renderTarget1.depthBuffer).toBe(false);
@@ -317,12 +330,14 @@ describe('live post pipeline', () => {
       720,
     );
 
+    // No SMAA tail to trade for the fused arm, so no grade twin either.
     expect(post.composer.passes.map((pass) => pass.constructor.name)).toEqual([
       'StaticOpaqueN8AOPass',
       'PreparedBloomPass',
       'OutputGradePass',
       'ShaderPass',
     ]);
+    expect(post.shedChain).toEqual({ smaa: false, bloom: true, ao: true });
     expect(post.composer.renderTarget1).not.toBe(post.composer.renderTarget2);
   });
 

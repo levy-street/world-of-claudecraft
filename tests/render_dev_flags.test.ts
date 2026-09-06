@@ -67,3 +67,47 @@ describe('render dev flags: the GPU-preparation mode switch', () => {
     expect(renderLayerDisabled('n8ao')).toBe(true);
   });
 });
+
+describe('render dev flags: the ?postshed= pin and kill switch', () => {
+  it('is absent (null, layer on) by default and in a headless host', async () => {
+    for (const search of ['', null]) {
+      const flags = await loadFlags(search);
+      expect(flags.postShedLevelPin()).toBeNull();
+      expect(flags.renderLayerDisabled('postshed')).toBe(false);
+    }
+  });
+
+  it('pins the parsed 0..1 level, one value per rung', async () => {
+    expect((await loadFlags('?postshed=1')).postShedLevelPin()).toBe(1);
+    expect((await loadFlags('?postshed=0.75')).postShedLevelPin()).toBe(0.75);
+    expect((await loadFlags('?postshed=0.5')).postShedLevelPin()).toBe(0.5);
+    expect((await loadFlags('?postshed=0')).postShedLevelPin()).toBe(0);
+  });
+
+  it('clamps an out-of-range value into 0..1', async () => {
+    expect((await loadFlags('?postshed=7')).postShedLevelPin()).toBe(1);
+    expect((await loadFlags('?postshed=-2')).postShedLevelPin()).toBe(0);
+  });
+
+  it('reads =off as the layer kill switch and never as a pin', async () => {
+    const flags = await loadFlags('?postshed=off');
+    expect(flags.renderLayerDisabled('postshed')).toBe(true);
+    expect(flags.postShedLevelPin()).toBeNull();
+  });
+
+  it('ignores an empty or non-numeric value, so a typo cannot pin the floor', async () => {
+    for (const search of ['?postshed=', '?postshed=low', '?postshed=full']) {
+      const flags = await loadFlags(search);
+      expect(flags.postShedLevelPin(), search).toBeNull();
+      expect(flags.renderLayerDisabled('postshed'), search).toBe(false);
+    }
+  });
+
+  it('is independent of the other =off layer switches and the prep mode', async () => {
+    const flags = await loadFlags('?postshed=0.25&smaa=off&prep=legacy');
+    expect(flags.postShedLevelPin()).toBe(0.25);
+    expect(flags.renderLayerDisabled('postshed')).toBe(false);
+    expect(flags.renderLayerDisabled('smaa')).toBe(true);
+    expect(flags.gpuPrepMode()).toBe('legacy');
+  });
+});
