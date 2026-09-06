@@ -4246,15 +4246,7 @@ export const de_DE: EnTranslations = {
         "soul_rend": "Seelenzerfetzung (markierte Spieler mussen sich verteilen und geheilt werden)",
         "deathless_rage": "Unsterbliche Raserei (an den Schutzsteinen unterbrochen)",
         "wardstones": "Schutzstein-Kanale (Phasenubergang)",
-        "dread_curse": "Schreckensfluch (nur heroisch, stapelnder Schwachungseffekt fur Tankwechsel)",
-        "bloodmane_rend": "Blutmahnen-Zerreißen (Blutung, Zielwechsel beachten)",
-        "tusk_sweep": "Hauerfeger (frontaler Spaltangriff)",
-        "ancestral_sap": "Ahnensaft (heilt seine Verbündeten)",
-        "call_of_the_hunt": "Ruf der Jagd (beschleunigt nahe Verbündete)",
-        "thickhide_ward": "Dickhautwächter (schützt nahe Verbündete mit Schilden)",
-        "beast_pit_quake": "Bestiengrubenbeben (Flächenschaden)",
-        "wildheart_pulse": "Wildherz-Puls (pulsierender Flächenschaden)",
-        "jaguar_roar": "Jaguargebrüll (Rückstoß)"
+        "dread_curse": "Schreckensfluch (nur heroisch, stapelnder Schwachungseffekt fur Tankwechsel)"
       }
     },
     "reliquary": {

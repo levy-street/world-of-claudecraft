@@ -4246,15 +4246,7 @@ export const pl_PL: EnTranslations = {
         "soul_rend": "Rozdarcie Duszy (oznaczeni gracze muszą się rozprószyć i być leczeni)",
         "deathless_rage": "Nieśmiertelna Furia (przerywana przy kamieniach wardowych)",
         "wardstones": "Kanały kamieni wardowych (przejście fazy)",
-        "dread_curse": "Klątwa Grozy (tylko heroiczna, kumulowany efekt do zmiany tanka)",
-        "bloodmane_rend": "Rozdarcie Krwawej Grzywy (krwawienie, uważaj na zmiany celu)",
-        "tusk_sweep": "Zamaszysty cios kłami (atak frontalny)",
-        "ancestral_sap": "Pradawny sok (leczy sojuszników)",
-        "call_of_the_hunt": "Zew łowów (przyspiesza pobliskich sojuszników)",
-        "thickhide_ward": "Osłona Grubej Skóry (osłania pobliskich sojuszników)",
-        "beast_pit_quake": "Wstrząs Jamy Bestii (obrażenia obszarowe)",
-        "wildheart_pulse": "Puls Dzikiego Serca (pulsujące obrażenia obszarowe)",
-        "jaguar_roar": "Ryk jaguara (odrzucenie)"
+        "dread_curse": "Klątwa Grozy (tylko heroiczna, kumulowany efekt do zmiany tanka)"
       }
     },
     "reliquary": {

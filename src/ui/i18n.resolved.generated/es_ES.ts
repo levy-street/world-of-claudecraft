@@ -4246,15 +4246,7 @@ export const es_ES: EnTranslations = {
         "soul_rend": "Desgarro de Alma (los jugadores marcados deben dispersarse y recibir curacion)",
         "deathless_rage": "Furia Inmortal (se interrumpe en las piedras de guardia)",
         "wardstones": "Canalizacion de piedras de guardia (transicion de fase)",
-        "dread_curse": "Maldicion Pavorosa (solo heroico, perjuicio acumulativo para cambio de tanque)",
-        "bloodmane_rend": "Desgarro de Melena Sangrienta (sangrado, atento a los cambios de objetivo)",
-        "tusk_sweep": "Barrido de colmillos (ataque frontal en área)",
-        "ancestral_sap": "Savia ancestral (cura a sus aliados)",
-        "call_of_the_hunt": "Llamada de la caza (acelera a los aliados cercanos)",
-        "thickhide_ward": "Custodia de Piel Gruesa (protege con escudo a aliados cercanos)",
-        "beast_pit_quake": "Terremoto del foso de bestias (daño de área)",
-        "wildheart_pulse": "Pulso de Corazón Salvaje (daño de área periódico)",
-        "jaguar_roar": "Rugido de jaguar (repulsión)"
+        "dread_curse": "Maldicion Pavorosa (solo heroico, perjuicio acumulativo para cambio de tanque)"
       }
     },
     "reliquary": {

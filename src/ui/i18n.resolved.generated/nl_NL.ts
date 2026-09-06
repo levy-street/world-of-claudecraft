@@ -4246,15 +4246,7 @@ export const nl_NL: EnTranslations = {
         "soul_rend": "Zielenscheur (gemarkeerde spelers moeten spreiden en worden genezen)",
         "deathless_rage": "Doodloze Razernij (onderbroken bij de wardstones)",
         "wardstones": "Wardstone-kanalen (faseovergang)",
-        "dread_curse": "Schrikvloek (alleen heroisch, stapelende verzwakking voor tankwissel)",
-        "bloodmane_rend": "Bloedmanenscheur (bloeding, let op doelwissels)",
-        "tusk_sweep": "Slagtandveeg (frontale cleave)",
-        "ancestral_sap": "Voorouderlijk sap (geneest zijn bondgenoten)",
-        "call_of_the_hunt": "Roep van de jacht (versnelt nabije bondgenoten)",
-        "thickhide_ward": "Dikhuidwacht (geeft nabije bondgenoten een schild)",
-        "beast_pit_quake": "Beestkuilbeving (gebiedsschade)",
-        "wildheart_pulse": "Wildhartpuls (pulserende gebiedsschade)",
-        "jaguar_roar": "Jaguarbrul (terugslaan)"
+        "dread_curse": "Schrikvloek (alleen heroisch, stapelende verzwakking voor tankwissel)"
       }
     },
     "reliquary": {

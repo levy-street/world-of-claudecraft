@@ -3843,16 +3843,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.deathless_rage': 'Fureur immortelle (interrompue aux pierres de garde)',
   'hudChrome.finder.mech.dread_curse':
     'Malédiction d’effroi (héroïque seulement, affaiblissement cumulatif pour échange de tank)',
-  'hudChrome.finder.mech.bloodmane_rend':
-    'Déchirure de Crinière-sang (saignement, surveillez les changements de cible)',
-  'hudChrome.finder.mech.tusk_sweep': 'Balayage de défense (clivage frontal)',
-  'hudChrome.finder.mech.ancestral_sap': 'Sève ancestrale (soigne ses alliés)',
-  'hudChrome.finder.mech.call_of_the_hunt': 'Appel de la chasse (accélère les alliés proches)',
-  'hudChrome.finder.mech.thickhide_ward':
-    'Protection de Peau-épaisse (pose un bouclier sur les alliés proches)',
-  'hudChrome.finder.mech.beast_pit_quake': 'Secousse de la fosse aux bêtes (dégâts de zone)',
-  'hudChrome.finder.mech.wildheart_pulse': 'Pulsation de Cœur-sauvage (dégâts de zone périodiques)',
-  'hudChrome.finder.mech.jaguar_roar': 'Rugissement de jaguar (repoussement)',
   'hudChrome.finder.mech.deathstalker_cleave': 'Balayage du traqueur de mort (cleave frontal)',
   'hudChrome.finder.mech.enrage': 'Entre en rage à faible santé',
   'hudChrome.finder.mech.grave_cleaver': 'Faucheur de tombes (cleave frontal)',

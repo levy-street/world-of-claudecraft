@@ -4246,15 +4246,7 @@ export const it_IT: EnTranslations = {
         "soul_rend": "Squarcio dell'Anima (i giocatori segnati devono disperdersi ed essere curati)",
         "deathless_rage": "Furia Immortale (interrotta alle pietre di guardia)",
         "wardstones": "Canalizzazione delle pietre di guardia (transizione di fase)",
-        "dread_curse": "Maledizione del Terrore (solo eroica, penalità cumulativa per cambio tank)",
-        "bloodmane_rend": "Lacerazione Criniera Sanguigna (sanguinamento, attenzione ai cambi di bersaglio)",
-        "tusk_sweep": "Spazzata di Zanne (fendente frontale)",
-        "ancestral_sap": "Linfa Ancestrale (cura i suoi alleati)",
-        "call_of_the_hunt": "Richiamo della Caccia (accelera gli alleati vicini)",
-        "thickhide_ward": "Egida Pelle Spessa (protegge con uno scudo gli alleati vicini)",
-        "beast_pit_quake": "Sisma della Fossa delle Bestie (danni ad area)",
-        "wildheart_pulse": "Impulso Cuore Selvaggio (danni ad area a impulsi)",
-        "jaguar_roar": "Ruggito del Giaguaro (respinta)"
+        "dread_curse": "Maledizione del Terrore (solo eroica, penalità cumulativa per cambio tank)"
       }
     },
     "reliquary": {

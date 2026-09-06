@@ -4246,15 +4246,7 @@ export const pt_BR: EnTranslations = {
         "soul_rend": "Rasgão de Alma (jogadores marcados devem se dispersar e ser curados)",
         "deathless_rage": "Fúria Imortal (interrompida nas pedras de guarda)",
         "wardstones": "Canalizações das pedras de guarda (transição de fase)",
-        "dread_curse": "Maldição do Pavor (somente heroico, penalidade cumulativa para troca de tanque)",
-        "bloodmane_rend": "Dilacerar Juba Sangrenta (sangramento, atenção às trocas de alvo)",
-        "tusk_sweep": "Varredura de Presas (golpe frontal em cone)",
-        "ancestral_sap": "Seiva Ancestral (cura seus aliados)",
-        "call_of_the_hunt": "Chamado da Caçada (acelera aliados próximos)",
-        "thickhide_ward": "Proteção Couro Grosso (concede escudo a aliados próximos)",
-        "beast_pit_quake": "Tremor do Fosso das Feras (dano em área)",
-        "wildheart_pulse": "Pulso Coração Selvagem (dano em área pulsante)",
-        "jaguar_roar": "Rugido da onça-pintada (repulsão)"
+        "dread_curse": "Maldição do Pavor (somente heroico, penalidade cumulativa para troca de tanque)"
       }
     },
     "reliquary": {

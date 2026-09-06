@@ -4246,15 +4246,7 @@ export const da_DK: EnTranslations = {
         "soul_rend": "Sjælerivning (markerede spillere skal sprede sig og heles)",
         "deathless_rage": "Udødelig Raseri (afbrydes ved vardstene)",
         "wardstones": "Vardstenskanaler (faseovergang)",
-        "dread_curse": "Rædselsforbandelse (kun heroisk, stablende svækkelse til tankskifte)",
-        "bloodmane_rend": "Blodmaneriv (blødning, hold øje med målskift)",
-        "tusk_sweep": "Stødtandsfejning (frontal kløvning)",
-        "ancestral_sap": "Forfædres saft (helbreder sine allierede)",
-        "call_of_the_hunt": "Jagtkald (gør nærliggende allierede hurtigere)",
-        "thickhide_ward": "Tykhudsværn (giver nærliggende allierede skjold)",
-        "beast_pit_quake": "Bestgravsskælv (områdeskade)",
-        "wildheart_pulse": "Vildhjertes puls (pulserende områdeskade)",
-        "jaguar_roar": "Jaguarbrøl (tilbageslag)"
+        "dread_curse": "Rædselsforbandelse (kun heroisk, stablende svækkelse til tankskifte)"
       }
     },
     "reliquary": {

@@ -4246,15 +4246,7 @@ export const cs_CZ: EnTranslations = {
         "soul_rend": "Trhání duše (označení hráči se musí rozejít a být vyléčeni)",
         "deathless_rage": "Nesmrtelný hněv (přerušen u ochranných kamenů)",
         "wardstones": "Kanály ochranných kamenů (přechod fáze)",
-        "dread_curse": "Děsivá kletba (pouze heroická, sčítající se oslabení pro střídání tanků)",
-        "bloodmane_rend": "Rozervání Krvavé hřívy (krvácení, pozor na změny cíle)",
-        "tusk_sweep": "Švih kly (čelní plošný zásah)",
-        "ancestral_sap": "Prastará míza (léčí spojence)",
-        "call_of_the_hunt": "Volání lovu (zrychluje spojence poblíž)",
-        "thickhide_ward": "Ochrana Tlusté kůže (štítuje spojence poblíž)",
-        "beast_pit_quake": "Otřes v jámě šelem (plošné poškození)",
-        "wildheart_pulse": "Tep Divokého srdce (pulzující plošné poškození)",
-        "jaguar_roar": "Řev jaguára (odhození)"
+        "dread_curse": "Děsivá kletba (pouze heroická, sčítající se oslabení pro střídání tanků)"
       }
     },
     "reliquary": {

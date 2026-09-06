@@ -3605,16 +3605,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.deathless_rage': 'Ölümsüz Öfke (koruma taşlarında kesilir)',
   'hudChrome.finder.mech.dread_curse':
     'Dehşet Laneti (yalnızca kahramanlık, tank değişimi için biriken zayıflatma)',
-  'hudChrome.finder.mech.bloodmane_rend':
-    'Kanlı Yele Parçalaması (kanama, hedef değişimlerine dikkat et)',
-  'hudChrome.finder.mech.tusk_sweep': 'Diş Süpürüşü (önden yarma)',
-  'hudChrome.finder.mech.ancestral_sap': 'Atasal Özsu (müttefiklerini iyileştirir)',
-  'hudChrome.finder.mech.call_of_the_hunt': 'Avın Çağrısı (yakındaki müttefikleri hızlandırır)',
-  'hudChrome.finder.mech.thickhide_ward':
-    'Kalın Deri Siperliği (yakındaki müttefiklere kalkan verir)',
-  'hudChrome.finder.mech.beast_pit_quake': 'Canavar Çukuru Sarsıntısı (alan hasarı)',
-  'hudChrome.finder.mech.wildheart_pulse': 'Vahşi Yürek Nabzı (atımlı alan hasarı)',
-  'hudChrome.finder.mech.jaguar_roar': 'Jaguar Kükremesi (geri savurma)',
   'hudChrome.finder.mech.deathstalker_cleave': 'Ölüm Avcısının Biçişi (öne doğru yay saldırısı)',
   'hudChrome.finder.mech.enrage': 'Düşük canda çılgına döner',
   'hudChrome.finder.mech.grave_cleaver': 'Mezar Biçici (öne doğru yay saldırısı)',

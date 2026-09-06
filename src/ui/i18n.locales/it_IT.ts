@@ -3803,16 +3803,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.deathless_rage': 'Furia Immortale (interrotta alle pietre di guardia)',
   'hudChrome.finder.mech.dread_curse':
     'Maledizione del Terrore (solo eroica, penalità cumulativa per cambio tank)',
-  'hudChrome.finder.mech.bloodmane_rend':
-    'Lacerazione Criniera Sanguigna (sanguinamento, attenzione ai cambi di bersaglio)',
-  'hudChrome.finder.mech.tusk_sweep': 'Spazzata di Zanne (fendente frontale)',
-  'hudChrome.finder.mech.ancestral_sap': 'Linfa Ancestrale (cura i suoi alleati)',
-  'hudChrome.finder.mech.call_of_the_hunt': 'Richiamo della Caccia (accelera gli alleati vicini)',
-  'hudChrome.finder.mech.thickhide_ward':
-    'Egida Pelle Spessa (protegge con uno scudo gli alleati vicini)',
-  'hudChrome.finder.mech.beast_pit_quake': 'Sisma della Fossa delle Bestie (danni ad area)',
-  'hudChrome.finder.mech.wildheart_pulse': 'Impulso Cuore Selvaggio (danni ad area a impulsi)',
-  'hudChrome.finder.mech.jaguar_roar': 'Ruggito del Giaguaro (respinta)',
   'hudChrome.finder.mech.deathstalker_cleave':
     'Fendente del Cacciatore di Morti (fendente frontale)',
   'hudChrome.finder.mech.enrage': 'Va in furia con poca salute',

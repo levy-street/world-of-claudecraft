@@ -4246,15 +4246,7 @@ export const id_ID: EnTranslations = {
         "soul_rend": "Robek Jiwa (pemain yang ditandai harus menyebar dan disembuhkan)",
         "deathless_rage": "Murka Abadi (diputus di wardstone)",
         "wardstones": "Saluran Wardstone (transisi fase)",
-        "dread_curse": "Kutukan Kengerian (khusus heroik, debuff bertumpuk untuk pergantian tank)",
-        "bloodmane_rend": "Cabikan Bloodmane (pendarahan, awasi pergantian target)",
-        "tusk_sweep": "Sapuan Taring (tebasan frontal)",
-        "ancestral_sap": "Getah Leluhur (menyembuhkan sekutunya)",
-        "call_of_the_hunt": "Panggilan Perburuan (mempercepat sekutu terdekat)",
-        "thickhide_ward": "Perlindungan Kulit Tebal (memberi perisai pada sekutu terdekat)",
-        "beast_pit_quake": "Guncangan Lubang Buas (kerusakan area)",
-        "wildheart_pulse": "Denyut Wildheart (kerusakan area berdenyut)",
-        "jaguar_roar": "Raungan Jaguar (dorongan balik)"
+        "dread_curse": "Kutukan Kengerian (khusus heroik, debuff bertumpuk untuk pergantian tank)"
       }
     },
     "reliquary": {

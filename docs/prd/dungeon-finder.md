@@ -21,7 +21,6 @@ location, difficulty, and lockouts without adding a continuous rendering cost to
 | The Sunken Bastion | Normal | 12 to 13 | 1 tank, 1 healer, 3 DPS |
 | The Drowned Temple | Normal | 16 to 18 | 1 tank, 1 healer, 3 DPS |
 | Gravewyrm Sanctum | Normal | 19 to 20 | 1 tank, 1 healer, 3 DPS |
-| The Wildheart Basin | Normal | 20 | 1 tank, 1 healer, 3 DPS |
 | Abandoned Crypt | Normal | 20 | No automatic queue |
 | Nythraxis Raid Arena | Normal | 20 | 2 tanks, 2 healers, 6 DPS |
 | Every supported heroic dungeon or raid | Heroic | 20 | Same size and role split as normal |

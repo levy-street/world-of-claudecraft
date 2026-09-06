@@ -3762,16 +3762,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.deathless_rage': 'Fúria Imortal (interrompida nas pedras de guarda)',
   'hudChrome.finder.mech.dread_curse':
     'Maldição do Pavor (somente heroico, penalidade cumulativa para troca de tanque)',
-  'hudChrome.finder.mech.bloodmane_rend':
-    'Dilacerar Juba Sangrenta (sangramento, atenção às trocas de alvo)',
-  'hudChrome.finder.mech.tusk_sweep': 'Varredura de Presas (golpe frontal em cone)',
-  'hudChrome.finder.mech.ancestral_sap': 'Seiva Ancestral (cura seus aliados)',
-  'hudChrome.finder.mech.call_of_the_hunt': 'Chamado da Caçada (acelera aliados próximos)',
-  'hudChrome.finder.mech.thickhide_ward':
-    'Proteção Couro Grosso (concede escudo a aliados próximos)',
-  'hudChrome.finder.mech.beast_pit_quake': 'Tremor do Fosso das Feras (dano em área)',
-  'hudChrome.finder.mech.wildheart_pulse': 'Pulso Coração Selvagem (dano em área pulsante)',
-  'hudChrome.finder.mech.jaguar_roar': 'Rugido da onça-pintada (repulsão)',
   'hudChrome.finder.mech.deathstalker_cleave': 'Corte do Caçador da Morte (golpe em cone frontal)',
   'hudChrome.finder.mech.enrage': 'Entra em frenesi com pouca vida',
   'hudChrome.finder.mech.grave_cleaver': 'Ceifador de Tumbas (golpe em cone frontal)',

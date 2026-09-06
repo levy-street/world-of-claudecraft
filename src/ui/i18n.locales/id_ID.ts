@@ -3655,15 +3655,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.deathless_rage': 'Murka Abadi (diputus di wardstone)',
   'hudChrome.finder.mech.dread_curse':
     'Kutukan Kengerian (khusus heroik, debuff bertumpuk untuk pergantian tank)',
-  'hudChrome.finder.mech.bloodmane_rend': 'Cabikan Bloodmane (pendarahan, awasi pergantian target)',
-  'hudChrome.finder.mech.tusk_sweep': 'Sapuan Taring (tebasan frontal)',
-  'hudChrome.finder.mech.ancestral_sap': 'Getah Leluhur (menyembuhkan sekutunya)',
-  'hudChrome.finder.mech.call_of_the_hunt': 'Panggilan Perburuan (mempercepat sekutu terdekat)',
-  'hudChrome.finder.mech.thickhide_ward':
-    'Perlindungan Kulit Tebal (memberi perisai pada sekutu terdekat)',
-  'hudChrome.finder.mech.beast_pit_quake': 'Guncangan Lubang Buas (kerusakan area)',
-  'hudChrome.finder.mech.wildheart_pulse': 'Denyut Wildheart (kerusakan area berdenyut)',
-  'hudChrome.finder.mech.jaguar_roar': 'Raungan Jaguar (dorongan balik)',
   'hudChrome.finder.mech.deathstalker_cleave': 'Tebasan Deathstalker (tebasan ke depan)',
   'hudChrome.finder.mech.enrage': 'Mengamuk saat darah menipis',
   'hudChrome.finder.mech.grave_cleaver': 'Penebas Kubur (tebasan ke depan)',

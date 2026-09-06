@@ -4246,15 +4246,7 @@ export const vi_VN: EnTranslations = {
         "soul_rend": "Xé Hồn (người chơi bị đánh dấu phải tản ra và được hồi máu)",
         "deathless_rage": "Thịnh Nộ Bất Tử (bị gián đoạn tại các đá hộ mệnh)",
         "wardstones": "Kênh đá hộ mệnh (chuyển giai đoạn)",
-        "dread_curse": "Lời Nguyền Kinh Hoàng (chỉ anh hùng, hiệu ứng bất lợi cộng dồn để đổi tank)",
-        "bloodmane_rend": "Xé Bloodmane (chảy máu, chú ý đổi mục tiêu)",
-        "tusk_sweep": "Quét Ngà (chém lan phía trước)",
-        "ancestral_sap": "Nhựa Cây Tổ Tiên (hồi máu cho đồng minh của nó)",
-        "call_of_the_hunt": "Tiếng Gọi Cuộc Săn (tăng tốc đồng minh ở gần)",
-        "thickhide_ward": "Hộ Vệ Da Dày (tạo khiên cho đồng minh ở gần)",
-        "beast_pit_quake": "Chấn Động Hố Quái Thú (sát thương diện rộng)",
-        "wildheart_pulse": "Nhịp Đập Wildheart (sát thương diện rộng theo nhịp)",
-        "jaguar_roar": "Gầm Jaguar (đẩy lùi)"
+        "dread_curse": "Lời Nguyền Kinh Hoàng (chỉ anh hùng, hiệu ứng bất lợi cộng dồn để đổi tank)"
       }
     },
     "reliquary": {

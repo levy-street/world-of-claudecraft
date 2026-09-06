@@ -4246,15 +4246,7 @@ export const tr_TR: EnTranslations = {
         "soul_rend": "Ruh Yırtılması (işaretlenen oyuncular yayılmalı ve iyileştirilmeli)",
         "deathless_rage": "Ölümsüz Öfke (koruma taşlarında kesilir)",
         "wardstones": "Koruma taşı kanalları (faz geçişi)",
-        "dread_curse": "Dehşet Laneti (yalnızca kahramanlık, tank değişimi için biriken zayıflatma)",
-        "bloodmane_rend": "Kanlı Yele Parçalaması (kanama, hedef değişimlerine dikkat et)",
-        "tusk_sweep": "Diş Süpürüşü (önden yarma)",
-        "ancestral_sap": "Atasal Özsu (müttefiklerini iyileştirir)",
-        "call_of_the_hunt": "Avın Çağrısı (yakındaki müttefikleri hızlandırır)",
-        "thickhide_ward": "Kalın Deri Siperliği (yakındaki müttefiklere kalkan verir)",
-        "beast_pit_quake": "Canavar Çukuru Sarsıntısı (alan hasarı)",
-        "wildheart_pulse": "Vahşi Yürek Nabzı (atımlı alan hasarı)",
-        "jaguar_roar": "Jaguar Kükremesi (geri savurma)"
+        "dread_curse": "Dehşet Laneti (yalnızca kahramanlık, tank değişimi için biriken zayıflatma)"
       }
     },
     "reliquary": {

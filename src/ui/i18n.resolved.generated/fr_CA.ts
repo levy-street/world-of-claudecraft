@@ -4246,15 +4246,7 @@ export const fr_CA: EnTranslations = {
         "soul_rend": "Déchirement de l'âme (les joueurs marqués doivent s'écarter et être soignés)",
         "deathless_rage": "Fureur immortelle (interrompue aux pierres de garde)",
         "wardstones": "Canaux des pierres de garde (transition de phase)",
-        "dread_curse": "Malédiction d’effroi (héroïque seulement, affaiblissement cumulatif pour échange de tank)",
-        "bloodmane_rend": "Déchirure de Crinière-sang (saignement, surveillez les changements de cible)",
-        "tusk_sweep": "Balayage de défense (clivage frontal)",
-        "ancestral_sap": "Sève ancestrale (soigne ses alliés)",
-        "call_of_the_hunt": "Appel de la chasse (accélère les alliés proches)",
-        "thickhide_ward": "Protection de Peau-épaisse (pose un bouclier sur les alliés proches)",
-        "beast_pit_quake": "Secousse de la fosse aux bêtes (dégâts de zone)",
-        "wildheart_pulse": "Pulsation de Cœur-sauvage (dégâts de zone périodiques)",
-        "jaguar_roar": "Rugissement de jaguar (repoussement)"
+        "dread_curse": "Malédiction d’effroi (héroïque seulement, affaiblissement cumulatif pour échange de tank)"
       }
     },
     "reliquary": {

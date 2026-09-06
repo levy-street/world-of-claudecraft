@@ -4246,15 +4246,7 @@ export const sv_SE: EnTranslations = {
         "soul_rend": "Själsrift (märkta spelare måste sprida sig och bli helade)",
         "deathless_rage": "Dödsfri vrede (avbryts vid väktarstenarna)",
         "wardstones": "Väktarstenarnas kanaler (fasövergång)",
-        "dread_curse": "Skräckförbannelse (endast heroisk, staplande försvagning för tankbyte)",
-        "bloodmane_rend": "Blodmanes rivsår (blödning, håll koll på målbyten)",
-        "tusk_sweep": "Betesvep (frontal klyvning)",
-        "ancestral_sap": "Förfäderssav (helbreder sina allierade)",
-        "call_of_the_hunt": "Jaktens kall (skyndar på närliggande allierade)",
-        "thickhide_ward": "Tjockhudsvärn (ger sköld åt närliggande allierade)",
-        "beast_pit_quake": "Bestgropens skalv (områdesskada)",
-        "wildheart_pulse": "Vildhjärtats puls (pulserande områdesskada)",
-        "jaguar_roar": "Jaguarvrål (knuffar tillbaka)"
+        "dread_curse": "Skräckförbannelse (endast heroisk, staplande försvagning för tankbyte)"
       }
     },
     "reliquary": {

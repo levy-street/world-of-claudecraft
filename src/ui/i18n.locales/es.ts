@@ -3844,16 +3844,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Furia Inmortal (se interrumpe en las piedras de guardia)',
   'hudChrome.finder.mech.dread_curse':
     'Maldicion Pavorosa (solo heroico, perjuicio acumulativo para cambio de tanque)',
-  'hudChrome.finder.mech.bloodmane_rend':
-    'Desgarro de Melena Sangrienta (sangrado, atento a los cambios de objetivo)',
-  'hudChrome.finder.mech.tusk_sweep': 'Barrido de colmillos (ataque frontal en área)',
-  'hudChrome.finder.mech.ancestral_sap': 'Savia ancestral (cura a sus aliados)',
-  'hudChrome.finder.mech.call_of_the_hunt': 'Llamada de la caza (acelera a los aliados cercanos)',
-  'hudChrome.finder.mech.thickhide_ward':
-    'Custodia de Piel Gruesa (protege con escudo a aliados cercanos)',
-  'hudChrome.finder.mech.beast_pit_quake': 'Terremoto del foso de bestias (daño de área)',
-  'hudChrome.finder.mech.wildheart_pulse': 'Pulso de Corazón Salvaje (daño de área periódico)',
-  'hudChrome.finder.mech.jaguar_roar': 'Rugido de jaguar (repulsión)',
   'hudChrome.finder.mech.deathstalker_cleave': 'Tajo del Acechador de la Muerte (tajo frontal)',
   'hudChrome.finder.mech.enrage': 'Entra en furia al tener poca salud',
   'hudChrome.finder.mech.grave_cleaver': 'Hacha Funebra (tajo frontal)',

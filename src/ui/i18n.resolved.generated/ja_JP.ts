@@ -4246,15 +4246,7 @@ export const ja_JP: EnTranslations = {
         "soul_rend": "ソウルレンド（対象は散開して回復を受ける）",
         "deathless_rage": "不死の憤怒（ウォードストーンで妨害）",
         "wardstones": "ウォードストーンの詠唱（フェーズ移行）",
-        "dread_curse": "ドレッドカース（ヒロイック限定、タンク交代用の累積デバフ）",
-        "bloodmane_rend": "ブラッドメインレンド（出血、対象交代に注意）",
-        "tusk_sweep": "タスクスイープ（前方クリーブ）",
-        "ancestral_sap": "アンセストラルサップ（味方を回復）",
-        "call_of_the_hunt": "コール・オブ・ザ・ハント（周囲の味方を加速）",
-        "thickhide_ward": "シックハイドウォード（周囲の味方を守護）",
-        "beast_pit_quake": "ビーストピットクエイク（範囲ダメージ）",
-        "wildheart_pulse": "ワイルドハートパルス（周期的な範囲ダメージ）",
-        "jaguar_roar": "ジャガーロア（ノックバック）"
+        "dread_curse": "ドレッドカース（ヒロイック限定、タンク交代用の累積デバフ）"
       }
     },
     "reliquary": {

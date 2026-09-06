@@ -3757,15 +3757,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Nieśmiertelna Furia (przerywana przy kamieniach wardowych)',
   'hudChrome.finder.mech.dread_curse':
     'Klątwa Grozy (tylko heroiczna, kumulowany efekt do zmiany tanka)',
-  'hudChrome.finder.mech.bloodmane_rend':
-    'Rozdarcie Krwawej Grzywy (krwawienie, uważaj na zmiany celu)',
-  'hudChrome.finder.mech.tusk_sweep': 'Zamaszysty cios kłami (atak frontalny)',
-  'hudChrome.finder.mech.ancestral_sap': 'Pradawny sok (leczy sojuszników)',
-  'hudChrome.finder.mech.call_of_the_hunt': 'Zew łowów (przyspiesza pobliskich sojuszników)',
-  'hudChrome.finder.mech.thickhide_ward': 'Osłona Grubej Skóry (osłania pobliskich sojuszników)',
-  'hudChrome.finder.mech.beast_pit_quake': 'Wstrząs Jamy Bestii (obrażenia obszarowe)',
-  'hudChrome.finder.mech.wildheart_pulse': 'Puls Dzikiego Serca (pulsujące obrażenia obszarowe)',
-  'hudChrome.finder.mech.jaguar_roar': 'Ryk jaguara (odrzucenie)',
   'hudChrome.finder.mech.deathstalker_cleave': 'Kosiące Cięcie Łowcy Śmierci (frontalne cięcie)',
   'hudChrome.finder.mech.enrage': 'Wpada w szał przy niskim zdrowiu',
   'hudChrome.finder.mech.grave_cleaver': 'Grobowe Cięcie (frontalne cięcie)',

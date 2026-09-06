@@ -172,21 +172,6 @@ const NYTHRAXIS_RAID_ENCOUNTERS_HEROIC: readonly FinderEncounter[] = [
   },
 ];
 
-const WILDHEART_BASIN_ENCOUNTERS: readonly FinderEncounter[] = [
-  { mobId: 'wildheart_stalker', mechanics: [] },
-  { mobId: 'wildheart_ravager', mechanics: ['bloodmane_rend', 'tusk_sweep'] },
-  { mobId: 'wildheart_hexcaller', mechanics: ['ancestral_sap'] },
-  {
-    mobId: 'wildheart_beastmaster',
-    mechanics: ['call_of_the_hunt', 'thickhide_ward', 'beast_pit_quake'],
-  },
-  {
-    mobId: 'wildheart_high_priest',
-    final: true,
-    mechanics: ['wildheart_pulse', 'jaguar_roar', 'enrage'],
-  },
-];
-
 export const FINDER_ACTIVITIES: readonly FinderActivity[] = [
   {
     id: 'hollow_crypt_normal',
@@ -298,34 +283,6 @@ export const FINDER_ACTIVITIES: readonly FinderActivity[] = [
     autoQueue: true,
     entranceDungeonId: 'gravewyrm_sanctum',
     encounters: GRAVEWYRM_SANCTUM_ENCOUNTERS,
-    lockout: 'daily',
-  },
-  {
-    id: 'wildheart_basin_normal',
-    dungeonId: 'wildheart_basin',
-    difficulty: 'normal',
-    kind: 'dungeon',
-    minLevel: 20,
-    maxLevel: 20,
-    size: 5,
-    composition: FIVE_MAN,
-    autoQueue: true,
-    entranceDungeonId: 'wildheart_basin',
-    encounters: WILDHEART_BASIN_ENCOUNTERS,
-    lockout: 'none',
-  },
-  {
-    id: 'wildheart_basin_heroic',
-    dungeonId: 'wildheart_basin',
-    difficulty: 'heroic',
-    kind: 'dungeon',
-    minLevel: 20,
-    maxLevel: 20,
-    size: 5,
-    composition: FIVE_MAN,
-    autoQueue: true,
-    entranceDungeonId: 'wildheart_basin',
-    encounters: WILDHEART_BASIN_ENCOUNTERS,
     lockout: 'daily',
   },
   {
