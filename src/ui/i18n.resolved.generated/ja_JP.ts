@@ -4472,6 +4472,7 @@ export const ja_JP: EnTranslations = {
       "summary": "ワールドマップ。地域を選ぶとその地図が開きます。",
       "toWorld": "ワールドマップ",
       "toZone": "ゾーンマップ",
+      "toInstance": "インスタンスマップ",
       "toggleAria": "ワールドマップとゾーンマップを切り替える",
       "levels": "レベル {min} から {max}"
     },

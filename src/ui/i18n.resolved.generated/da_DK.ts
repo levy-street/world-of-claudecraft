@@ -4472,6 +4472,7 @@ export const da_DK: EnTranslations = {
       "summary": "Verdenskort. Vælg en zone for at åbne dens kort.",
       "toWorld": "Verdenskort",
       "toZone": "Zonekort",
+      "toInstance": "Instance map",
       "toggleAria": "Skift mellem verdenskortet og zonekortet",
       "levels": "Niveauer {min} til {max}"
     },

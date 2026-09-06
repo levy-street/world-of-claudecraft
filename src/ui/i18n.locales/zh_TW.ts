@@ -12182,6 +12182,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.continentMap.toggleAria': '在世界地圖與地區地圖之間切換',
   'hudChrome.continentMap.levels': '等級 {min} 至 {max}',
   'hudChrome.continentMap.toZone': '地區地圖',
+  'hudChrome.continentMap.toInstance': '副本地圖',
   'hudChrome.enchanting.wornTagIndexed': '已裝備（{slot}{index}）',
   'hudChrome.targetAuras.title': '目標光環',
   'hudChrome.targetAuras.keybindLabel': '目標增益與減益效果',

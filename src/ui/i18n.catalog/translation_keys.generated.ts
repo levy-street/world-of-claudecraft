@@ -8746,6 +8746,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.continentMap.levels'
   | 'hudChrome.continentMap.summary'
   | 'hudChrome.continentMap.title'
+  | 'hudChrome.continentMap.toInstance'
   | 'hudChrome.continentMap.toWorld'
   | 'hudChrome.continentMap.toZone'
   | 'hudChrome.continentMap.toggleAria'

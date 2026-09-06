@@ -4472,6 +4472,7 @@ export const pl_PL: EnTranslations = {
       "summary": "Mapa świata. Wybierz strefę, aby otworzyć jej mapę.",
       "toWorld": "Mapa świata",
       "toZone": "Mapa strefy",
+      "toInstance": "Instance map",
       "toggleAria": "Przełącz między mapą świata a mapą strefy",
       "levels": "Poziomy od {min} do {max}"
     },

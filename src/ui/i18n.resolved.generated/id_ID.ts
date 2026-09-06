@@ -4472,6 +4472,7 @@ export const id_ID: EnTranslations = {
       "summary": "Peta dunia. Pilih zona untuk membuka petanya.",
       "toWorld": "Peta dunia",
       "toZone": "Peta zona",
+      "toInstance": "Instance map",
       "toggleAria": "Beralih antara peta dunia dan peta zona",
       "levels": "Level {min} hingga {max}"
     },

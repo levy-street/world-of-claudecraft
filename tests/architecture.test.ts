@@ -443,6 +443,7 @@ const UI_PURE_CORES = [
   'src/ui/map_window_view.ts',
   'src/ui/continent_land_mask_core.ts',
   'src/ui/map_show_on_map_core.ts',
+  'src/ui/map_surface_core.ts',
   'src/ui/continent_map_view.ts',
   'src/ui/map_open_sea_edge_core.ts',
   'src/ui/map_quest_list_view.ts',

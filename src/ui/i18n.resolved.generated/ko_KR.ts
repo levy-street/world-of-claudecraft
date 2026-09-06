@@ -4472,6 +4472,7 @@ export const ko_KR: EnTranslations = {
       "summary": "세계 지도. 지역을 선택하면 해당 지도가 열립니다.",
       "toWorld": "세계 지도",
       "toZone": "지역 지도",
+      "toInstance": "인스턴스 지도",
       "toggleAria": "세계 지도와 지역 지도 전환",
       "levels": "레벨 {min}부터 {max}까지"
     },

@@ -4472,6 +4472,7 @@ export const en_CA: EnTranslations = {
       "summary": "World map. Choose a zone to open its map.",
       "toWorld": "World map",
       "toZone": "Zone map",
+      "toInstance": "Instance map",
       "toggleAria": "Switch between the world map and the zone map",
       "levels": "Levels {min} to {max}"
     },

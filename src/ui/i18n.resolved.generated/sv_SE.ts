@@ -4472,6 +4472,7 @@ export const sv_SE: EnTranslations = {
       "summary": "Världskarta. Välj en zon för att öppna dess karta.",
       "toWorld": "Världskarta",
       "toZone": "Zonkarta",
+      "toInstance": "Instance map",
       "toggleAria": "Växla mellan världskartan och zonkartan",
       "levels": "Nivåer {min} till {max}"
     },

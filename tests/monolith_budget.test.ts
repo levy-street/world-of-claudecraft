@@ -347,7 +347,14 @@ const MONOLITHS: MonolithRow[] = [
     // self in-combat flag wiring lands on the player frame while the zone-entry
     // vista gate drops its recent-personal-event heuristic once p.inCombat is
     // authoritative online. Measured on the merged tree. Exact count, zero slack.
-    ceiling: 18934,
+    // LOWERED by the map-level cycle while merging PR #3883: the surface choice
+    // (instance plan / zone / continent, and the party's dungeon from outside)
+    // moved into src/ui/map_surface_core.ts, and the dungeon + castle world-map
+    // branches collapsed into one InteriorMapController.paintWorldMap call. It
+    // lands after the Loot Explorer, Health Text, account-toggle seam, and
+    // self in-combat history above, so the ceiling pins the exact merged count.
+    // Exact count, zero slack.
+    ceiling: 18926,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

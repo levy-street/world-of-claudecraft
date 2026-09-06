@@ -4472,6 +4472,7 @@ export const tr_TR: EnTranslations = {
       "summary": "Dünya haritası. Haritasını açmak için bir bölge seç.",
       "toWorld": "Dünya haritası",
       "toZone": "Bölge haritası",
+      "toInstance": "Instance map",
       "toggleAria": "Dünya haritası ile bölge haritası arasında geçiş yap",
       "levels": "Seviye {min} ile {max} arası"
     },

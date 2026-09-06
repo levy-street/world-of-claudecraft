@@ -4472,6 +4472,7 @@ export const cs_CZ: EnTranslations = {
       "summary": "Mapa světa. Vyber oblast a otevři její mapu.",
       "toWorld": "Mapa světa",
       "toZone": "Mapa oblasti",
+      "toInstance": "Instance map",
       "toggleAria": "Přepnout mezi mapou světa a mapou oblasti",
       "levels": "Úrovně {min} až {max}"
     },

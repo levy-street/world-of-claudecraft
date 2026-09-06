@@ -4472,6 +4472,7 @@ export const vi_VN: EnTranslations = {
       "summary": "Bản đồ thế giới. Chọn một vùng để mở bản đồ của vùng đó.",
       "toWorld": "Bản Đồ Thế Giới",
       "toZone": "Bản Đồ Vùng",
+      "toInstance": "Instance map",
       "toggleAria": "Chuyển đổi giữa bản đồ thế giới và bản đồ vùng",
       "levels": "Cấp {min} đến {max}"
     },

@@ -4472,6 +4472,7 @@ export const zh_TW: EnTranslations = {
       "summary": "世界地圖。選擇一個地區以開啟其地圖。",
       "toWorld": "世界地圖",
       "toZone": "地區地圖",
+      "toInstance": "副本地圖",
       "toggleAria": "在世界地圖與地區地圖之間切換",
       "levels": "等級 {min} 至 {max}"
     },

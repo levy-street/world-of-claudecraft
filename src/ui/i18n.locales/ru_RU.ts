@@ -13023,6 +13023,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.continentMap.toggleAria': 'Переключение между картой мира и картой региона',
   'hudChrome.continentMap.levels': 'Уровни {min} до {max}',
   'hudChrome.continentMap.toZone': 'Карта региона',
+  'hudChrome.continentMap.toInstance': 'Карта подземелья',
   'hudChrome.enchanting.wornTagIndexed': 'Надето ({slot} {index})',
   'hudChrome.targetAuras.title': 'Ауры цели',
   'hudChrome.targetAuras.keybindLabel': 'Усиления и ослабления цели',

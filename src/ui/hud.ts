@@ -615,6 +615,14 @@ import {
 } from './map_pinch_zoom_core';
 import { shouldResetMapPanOnZoneCross, showOnMapPanState } from './map_show_on_map_core';
 import {
+  defaultMapLevel,
+  type MapLevel,
+  mapLevelToggleKey,
+  nextMapLevel,
+  remoteInstanceAnchor,
+  resolveMapSurface,
+} from './map_surface_core';
+import {
   type MapRegion,
   mapCanvasHeight,
   mapZoneRegion,
@@ -1924,7 +1932,7 @@ export class Hud {
   } | null = null;
   private readonly mapMarkerTooltipContent: MapMarkerTooltipContent;
   private readonly mapMarkerInteraction: MapMarkerInteractionController;
-  private mapLevel: 'zone' | 'continent' = 'zone';
+  private mapLevel: MapLevel = 'zone';
   // The zone id under the cursor on the continent overview (drives the highlight
   // + hover tooltip), and the last paint's clickable zone regions for hit-testing.
   private mapHoverZone: string | null = null;
@@ -10854,22 +10862,22 @@ export class Hud {
     this.mapCenter = null;
     this.mapPing = null;
     this.mapZoneOverride = null;
-    this.mapLevel = 'zone'; // always open on the per-zone detail map
+    this.mapLevel = defaultMapLevel(mapWindowMode(this.sim)); // own instance plan, else zone
     this.mapHoverZone = null;
     el.style.display = 'block';
     this.updateMapWindow();
     this.syncAnyWindowOpenState();
   }
 
-  // Toggle the world map between the per-zone detail level and the continent
-  // overview (WoW-style right-click zoom out / the level-toggle button). Not
-  // available in a delve, whose map is the schematic branch.
+  // Cycle the world map through its levels (map_surface_core.ts owns the order):
+  // inside an instance, plan -> zone -> continent -> plan, so the overworld is
+  // always reachable; outside, zone <-> continent plus the party's dungeon plan.
   private toggleMapLevel(): void {
-    if (mapWindowMode(this.sim) !== 'overworld') return;
-    this.setMapLevel(this.mapLevel === 'continent' ? 'zone' : 'continent');
+    const mode = mapWindowMode(this.sim);
+    this.setMapLevel(nextMapLevel(mode, this.mapLevel, remoteInstanceAnchor(this.sim) !== null));
   }
 
-  private setMapLevel(level: 'zone' | 'continent'): void {
+  private setMapLevel(level: MapLevel): void {
     if (this.mapLevel === level) return;
     this.mapLevel = level;
     this.mapHoverZone = null;
@@ -10913,7 +10921,7 @@ export class Hud {
 
   // scroll-wheel / button zoom for the world map (clamped to [1, MAP_MAX_ZOOM])
   private zoomMap(factor: number): void {
-    if (mapWindowMode(this.sim) !== 'overworld') return;
+    if (this.mapLevel !== 'zone' && this.mapLevel !== 'continent') return;
     // One more zoom-out at the zone map's full extent leaves the zone and opens
     // the continent overview (the level toggle's other half), instead of clamping
     // at the minimum and doing nothing. A delve has no overview to go to.
@@ -10951,14 +10959,18 @@ export class Hud {
   private resetMapModeTransition(mode: MapWindowMode): void {
     const prior = this.lastMapWindowMode;
     this.lastMapWindowMode = mode;
-    if (!prior || prior === mode) return;
+    if (prior === mode) return;
+    if (!prior) {
+      this.mapLevel = defaultMapLevel(mode); // first paint: the band's own level
+      return;
+    }
     this.mapDrag = null;
     this.mapCenter = null;
     this.mapPing = null;
     this.mapZoneOverride = null;
     this.mapHoverZone = null;
     this.mapZoom = MAP_OPEN_ZOOM;
-    this.mapLevel = 'zone';
+    this.mapLevel = defaultMapLevel(mode);
     this.hideTooltip();
   }
 
@@ -10973,14 +10985,13 @@ export class Hud {
 
     const mapMode = mapWindowMode(this.sim);
     this.resetMapModeTransition(mapMode);
-    const inRift = mapMode === 'rift';
-    const inBattleground = mapMode === 'battleground';
-    const inDelve = mapMode === 'delve';
-    const inDungeon = mapMode === 'dungeon';
-    const schematic = inRift || inDelve || inBattleground || inDungeon;
-    this.setDisplay($('#map-level-toggle'), schematic ? 'none' : 'block');
-    this.setDisplay($('#map-zoom'), schematic || this.mapLevel === 'continent' ? 'none' : 'flex');
-    if (inRift) {
+    const remote = remoteInstanceAnchor(this.sim);
+    // Normalise the requested level: a party plan whose member has since left falls to zone.
+    this.mapLevel = resolveMapSurface(mapMode, this.mapLevel, remote !== null);
+    const schematic = this.mapLevel === 'instance';
+    this.setText($('#map-level-toggle'), t(mapLevelToggleKey(mapMode, this.mapLevel, !!remote)));
+    this.setDisplay($('#map-zoom'), this.mapLevel === 'zone' ? 'flex' : 'none');
+    if (schematic && mapMode === 'rift') {
       this.clearMapHitState(canvas);
       const model = this.riftPainter.paintWorldMap(ctx, this.sim, S);
       const area = model?.areaLabel ?? '';
@@ -10988,7 +10999,7 @@ export class Hud {
       this.setText(markerSummaryEl, this.mapMarkerInteraction.semantics.updateRift(model, S));
       return;
     }
-    if (inBattleground) {
+    if (schematic && mapMode === 'battleground') {
       this.clearMapHitState(canvas);
       const model = buildBgMapModel(this.sim);
       const area = t('hudChrome.bg.title');
@@ -11001,7 +11012,7 @@ export class Hud {
       return;
     }
 
-    if (inDelve) {
+    if (schematic && mapMode === 'delve') {
       this.clearMapHitState(canvas);
       const model = this.delvePainter.paintWorldMapDelve(ctx, this.sim, S);
       const area = model?.areaLabel ?? '';
@@ -11010,9 +11021,11 @@ export class Hud {
       return;
     }
 
-    if (inDungeon) {
+    if (schematic) {
+      // Own dungeon / castle plan, or the party member's when viewed from outside.
       this.clearMapHitState(canvas);
-      const result = this.interiorMaps.paintDungeonWorldMap(ctx, this.sim, S);
+      const anchor = mapMode === 'overworld' && remote ? remote : p.pos;
+      const result = this.interiorMaps.paintWorldMap(ctx, this.sim, S, anchor);
       const title = result?.title ?? '';
       this.setText(summaryEl, t('hud.core.mapSummary', { zone: title }));
       this.setText(
@@ -11021,15 +11034,6 @@ export class Hud {
       );
       return;
     }
-
-    this.setText(
-      $('#map-level-toggle'),
-      t(
-        this.mapLevel === 'continent'
-          ? 'hudChrome.continentMap.toZone'
-          : 'hudChrome.continentMap.toWorld',
-      ),
-    );
 
     if (this.mapLevel === 'continent') {
       this.clearMapHitState(canvas); // panning/zoom belong to the per-zone level only
@@ -11048,19 +11052,10 @@ export class Hud {
     }
     this.continentRegions = [];
 
-    const castleTitle = this.interiorMaps.paintCastleWorldMap(ctx, this.sim, S);
-    if (castleTitle !== null) {
-      this.clearMapHitState(canvas);
-      this.setText(summaryEl, t('hud.core.mapSummary', { zone: castleTitle }));
-      this.setText(
-        markerSummaryEl,
-        this.mapMarkerInteraction.semantics.updateSimple(castleTitle, S),
-      );
-      return;
-    }
-
-    // inside an instance, show the zone the dungeon's door is in (dungeonAt owns
-    // the instance x-band layout); outdoors, follow the committed zone so
+    // inside a dungeon, show the zone the dungeon's door is in (dungeonAt owns
+    // the instance x-band layout); in any other instance band lastZoneId is the
+    // zone the player entered from (the zone tracker freezes past
+    // DUNGEON_X_THRESHOLD); outdoors, follow the committed zone so
     // border-straddling can't thrash the cached terrain regen.
     const dungeon = dungeonAt(p.pos.x);
     const zone: ZoneDef = this.mapZoneOverride
@@ -11095,10 +11090,7 @@ export class Hud {
     this.mapView = result.view;
     this.mapMarkerInteraction.setOverworld(result);
     if (!this.mapDrag) canvas.style.cursor = result.cursor;
-    const riftFloor = this.sim.riftFloor;
-    const zoneLabel = riftFloor
-      ? riftFloorLabel(riftFloor.name, riftFloor.tier)
-      : zoneDisplayName(zone.id);
+    const zoneLabel = zoneDisplayName(zone.id);
     this.setText(summaryEl, t('hud.core.mapSummary', { zone: zoneLabel }));
     this.setText(
       markerSummaryEl,
