@@ -170,6 +170,10 @@ export function abilityStartsAutoAttack(effects: AbilityEffect[]): boolean {
   let damaging = false;
   for (const e of effects) {
     if (e.type === 'aoeRoot' && e.breakOnDamage !== undefined) return false;
+    // A groundAoE with allyBuffPct is a FRIENDLY zone (Rune of Power): its min/max
+    // are ignored by the sim (see the AbilityEffect comment), so it deals no damage
+    // and must not be classified as an attack.
+    if (e.type === 'groundAoE' && e.allyBuffPct !== undefined) continue;
     const cls = EFFECT_CLASS[e.type];
     if (cls === 'breakCC') return false;
     if (
