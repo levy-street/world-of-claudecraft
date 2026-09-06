@@ -761,6 +761,7 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
       // place in the world that demands a tool no local counter carries, and
       // the Codfather sends a level-6 angler back to Eastbrook for it.
       'ironreel_fishing_rod',
+      'field_kit',
     ],
     greeting:
       'Dry boots, dry bread, dry powder: at Fenbridge you get two of the three on a good day.',
@@ -844,7 +845,7 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
     facing: FENBRIDGE_NPC_PLACEMENTS_BY_ID.farmer_teasel.facing,
     color: 0x6b7f3a,
     questIds: [],
-    vendorItems: ['marsh_rice_seed', 'bog_beet_seed', 'compost'],
+    vendorItems: ['marsh_rice_seed', 'bog_beet_seed', 'compost', 'field_kit'],
     farmer: true,
     greeting:
       'Marsh rice and bog beet seed, $C, and compost to feed them. The paddies drain slow, so mind where you tread.',

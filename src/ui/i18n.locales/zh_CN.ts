@@ -1112,6 +1112,37 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.horn': '角',
   'hudChrome.corpseHarvest.components.tusk': '獠牙',
   'hudChrome.corpseHarvest.components.cloth': '布',
+  'hudChrome.corpseHarvest.preferenceLabel': '采集偏好：{preference}',
+  'hudChrome.corpseHarvest.changeButton': '更改',
+  'hudChrome.corpseHarvest.harvestActionTooltip':
+    '按照你当前的偏好采集，耗时{seconds}秒。需要一个野外工具包。每具尸体只能被采集一次。击杀者及其队伍在{prioritySeconds}秒内拥有优先权。掉落的战利品仍然可以拾取。',
+  'hudChrome.corpseHarvest.checkingStatus': '正在检查采集状态……',
+  'hudChrome.corpseHarvest.statusUnavailable': '目前无法获取采集状态。',
+  'hudChrome.corpseHarvest.harvestStarting': '正在开始采集……',
+  'hudChrome.corpseHarvest.allBenefit': '从这具尸体上采集所有可用材料。',
+  'hudChrome.corpseHarvest.focusBenefit': '将采集集中于{material}。',
+  'hudChrome.corpseHarvest.tierBonusHint':
+    '将采集集中于{material}：相比全部材料，品阶+{tierBonus}。',
+  'hudChrome.corpseHarvest.denial.actorDead': '你必须存活才能采集。',
+  'hudChrome.corpseHarvest.denial.actorInCombat': '你在战斗中无法采集。',
+  'hudChrome.corpseHarvest.denial.actorBusy': '你正忙于其他事情。',
+  'hudChrome.corpseHarvest.denial.corpseInvalid': '这具尸体已无法采集。',
+  'hudChrome.corpseHarvest.denial.wrongWorld': '这具尸体不在你的世界中。',
+  'hudChrome.corpseHarvest.denial.outOfRange': '靠近一些才能采集这具尸体。',
+  'hudChrome.corpseHarvest.denial.noFieldKit': '你需要一个野外工具包才能采集。',
+  'hudChrome.corpseHarvest.denial.reservedSelf': '你已经在采集这具尸体了。',
+  'hudChrome.corpseHarvest.denial.reservedOther': '{name}正在采集这具尸体。',
+  'hudChrome.corpseHarvest.denial.reservedOtherUnknown': '另一名玩家正在采集这具尸体。',
+  'hudChrome.corpseHarvest.denial.priorityProtected': '目前另一名玩家对这具尸体拥有优先权。',
+  'hudChrome.corpseHarvest.denial.corpseExpiring': '这具尸体维持的时间不足以完成采集。',
+  'hudChrome.corpseHarvest.denial.preferenceMalformed': '你的采集偏好无效，请选择一个以继续。',
+  'hudChrome.corpseHarvest.denial.nothingToHarvest':
+    '你的野外工具包无法从这具尸体上采集到任何东西。',
+  'hudChrome.corpseHarvest.denial.materialUnavailable': '{material}不在这具尸体上。',
+  'hudChrome.corpseHarvest.denial.materialUnavailableWithList':
+    '{material}不在这具尸体上。可用：{materials}。',
+  'hudChrome.corpseHarvest.denial.bagsFull': '你的背包太满，无法采集。',
+  'hudChrome.corpseHarvest.denial.malformedInput': '出了点问题，请重试。',
   'hudChrome.townFocus.title': '城镇专注',
   'hudChrome.townFocus.hint':
     '专注点会在每种材料的基础产出上叠加加成。未专注的材料保持基础产出不变。',
@@ -9484,6 +9515,16 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.harvestJournal.emptyBody': '在任意田畦播下种子，这块田就会带着计时出现在这里。',
   'hudChrome.harvestJournal.noviceTitle': '你还没有打理过田畦',
   'hudChrome.harvestJournal.noviceBody': '每收成一次作物，耕作技能都会提升。在任意田畦播下种子即可开始。',
+  // Intentional Gathering PR3: the shared corpse-harvest preference picker
+  // (Field Kit use, Professions, corpse Change entrances). M16 fills.
+  'hudChrome.harvestPreference.title': '采集偏好',
+  'hudChrome.harvestPreference.allLabel': '全部材料',
+  'hudChrome.harvestPreference.applyButton': '应用',
+  'hudChrome.harvestPreference.cancelButton': '取消',
+  'hudChrome.harvestPreference.pickHint': '应用前请选择要采集的材料。',
+  'hudChrome.harvestPreference.currentUnavailable': '你当前选择的{material}在此处不可用。',
+  'hudChrome.harvestPreference.unknownMaterial': '不可用的材料',
+  'hudChrome.harvestPreference.currentChoiceLabel': '当前：{choice}',
   'gatherEvent.pristineVein': '{finder}挖到了一条纯净的矿脉！',
   'gatherEvent.ancientHeartwood': '{finder}砍倒了一棵远古心木！',
   'gatherEvent.moonlitBloom': '{finder}发现了一朵月光之花！',
@@ -14844,6 +14885,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   // masterwrought Phase 13, the orange promotion (M16 fills). The Deed of
   // Making noun matches the sim_i18n.ts error.legendaryDeed row.
   'entities.items.deed_of_making.name': '造物契据',
+  // Intentional Gathering PR3: the Field Kit's runtime item name. M16 fill.
+  'entities.items.field_kit.name': '野外工具包',
   'hudChrome.materialHint.deedOfMaking':
     '铭文契据。消耗后将一件已臻至完美的大师锻造作品提升为传说，并为其命名。',
   'hudChrome.crafting.legendaryLine': '{item}以{name}之名重生，成为传说！',

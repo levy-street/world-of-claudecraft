@@ -2412,6 +2412,35 @@ export const ko_KR: EnTranslations = {
         "tusk": "엄니",
         "meat": "고기",
         "cloth": "천"
+      },
+      "preferenceLabel": "채집 선호: {preference}",
+      "changeButton": "변경",
+      "harvestActionTooltip": "현재 선호 설정으로 {seconds}초에 걸쳐 채집합니다. 야전 키트가 필요합니다. 각 시체는 한 번만 채집할 수 있습니다. 처치자와 그 파티는 {prioritySeconds}초 동안 우선권을 가집니다. 떨어진 전리품은 계속 획득할 수 있습니다.",
+      "checkingStatus": "채집 상태를 확인하는 중...",
+      "statusUnavailable": "지금은 채집 상태를 확인할 수 없습니다.",
+      "harvestStarting": "채집을 시작하는 중...",
+      "allBenefit": "이 시체에서 얻을 수 있는 모든 재료를 채집합니다.",
+      "focusBenefit": "채집을 {material}에 집중합니다.",
+      "tierBonusHint": "채집을 {material}에 집중합니다: 전체 재료 대비 등급 +{tierBonus}.",
+      "denial": {
+        "actorDead": "채집하려면 살아 있어야 합니다.",
+        "actorInCombat": "전투 중에는 채집할 수 없습니다.",
+        "actorBusy": "이미 다른 일을 하고 있습니다.",
+        "corpseInvalid": "이 시체는 더 이상 채집할 수 없습니다.",
+        "wrongWorld": "이 시체는 당신의 세계에 있지 않습니다.",
+        "outOfRange": "이 시체를 채집하려면 더 가까이 다가가세요.",
+        "noFieldKit": "채집하려면 야전 키트가 필요합니다.",
+        "reservedSelf": "이미 이 시체를 채집하고 있습니다.",
+        "reservedOther": "{name}님이 이 시체를 채집하고 있습니다.",
+        "reservedOtherUnknown": "다른 플레이어가 이 시체를 채집하고 있습니다.",
+        "priorityProtected": "지금은 다른 플레이어가 이 시체에 우선권을 가지고 있습니다.",
+        "corpseExpiring": "이 시체는 채집을 마칠 만큼 오래 유지되지 않습니다.",
+        "preferenceMalformed": "채집 선호 설정이 잘못되었습니다. 계속하려면 하나를 선택하세요.",
+        "nothingToHarvest": "당신의 야전 키트로는 이 시체에서 채집할 것이 없습니다.",
+        "materialUnavailable": "{material}은(는) 이 시체에 없습니다.",
+        "materialUnavailableWithList": "{material}은(는) 이 시체에 없습니다. 사용 가능: {materials}.",
+        "bagsFull": "가방이 가득 차서 채집할 수 없습니다.",
+        "malformedInput": "문제가 발생했습니다. 다시 시도하세요."
       }
     },
     "townFocus": {
@@ -2430,6 +2459,16 @@ export const ko_KR: EnTranslations = {
       "respecTierInstantOption": "즉시 (전액 비용)",
       "respecCostFree": "무료",
       "respecCostLine": "{coin} 및 {materials} 소모"
+    },
+    "harvestPreference": {
+      "title": "채집 설정",
+      "allLabel": "모든 재료",
+      "applyButton": "적용",
+      "cancelButton": "취소",
+      "pickHint": "적용하기 전에 채집할 재료를 선택하세요.",
+      "currentUnavailable": "현재 선택한 {material}은(는) 여기서 제공되지 않습니다.",
+      "unknownMaterial": "이용할 수 없는 재료",
+      "currentChoiceLabel": "현재: {choice}"
     },
     "party": {
       "promoteLeader": "파티장으로 지정",
@@ -14760,6 +14799,9 @@ export const ko_KR: EnTranslations = {
       },
       "deed_of_making": {
         "name": "창조의 증서"
+      },
+      "field_kit": {
+        "name": "야외 도구 키트"
       },
       "conjured_water4": {
         "name": "창조된 샘물"

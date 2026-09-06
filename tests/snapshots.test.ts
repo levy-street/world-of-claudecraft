@@ -5082,6 +5082,7 @@ const ALL_DELTA_KEYS = [
   'hbl',
   'hirat',
   'honor',
+  'hpref',
   'hpw',
   'hrat',
   'inv',
@@ -5197,6 +5198,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   gprof: 'gatheringProficiency',
   guildBank: 'guildBankInfo',
   hirat: 'hitRating',
+  hpref: 'harvestPreference',
   hrat: 'hasteRating',
   inv: 'inventory',
   lhonor: 'lifetimeHonor',
@@ -5359,6 +5361,10 @@ function dirtyEveryDeltaField(): {
   meta.delveClears = { 'collapsed_reliquary:heroic': 1 };
   meta.companionUpgrades = { companion_tessa: 2 };
   meta.gatheringProficiency = { mining: 6, logging: 0, herbalism: 0, fishing: 0, farming: 0 };
+  // hpref: a chosen material, not the default All (which would still pass
+  // the "carries every key" presence loop, since All encodes as the
+  // non-null explicit token, but would not prove a real choice decodes).
+  meta.harvestPreference = { kind: 'material', itemId: 'rough_hide' };
   // tslot: a REAL slotted effect, not the empty default. Without this the key
   // rides the first snapshot as `[]`, which is not null, so it passes the
   // "dirtied to a non-default value" loop below vacuously and nothing anywhere
@@ -5855,6 +5861,11 @@ describe('full self-state snapshot delta fixture', () => {
       fishing: 0,
       farming: 0,
     }); // gprof -> gatheringProficiency
+    // hpref -> harvestPreference: the wire carries a plain material item id
+    // string (never the tag/specimen it resolves against on a body), decoded
+    // through decodeHarvestPreferenceWire into the same shape the offline Sim
+    // exposes via harvestPreferenceFor.
+    expect(client.harvestPreference).toEqual({ kind: 'material', itemId: 'rough_hide' });
     // tslot -> toolEffectSlots: the projected row shape, so a decode onto the
     // wrong field or a renamed wire key reddens here rather than silently
     // leaving the HUD empty. craftedBy is deliberately not projected; what
@@ -6309,8 +6320,11 @@ describe('delta-key contract pins (anti-drift)', () => {
     // a per-tick change; dualWielding rides no key of its own, it is always
     // exactly offhandWeapon !== null, so the client derives it), for 91,
     // counted from the merged registry above rather than from either side.
-    expect(ALL_DELTA_KEYS).toHaveLength(91);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(91);
+    // Intentional Gathering PR3 then adds the corpse-harvest preference key
+    // hpref (a gathering-adjacent self scalar, sibling of gprof/tfocus/tslot),
+    // for 92.
+    expect(ALL_DELTA_KEYS).toHaveLength(92);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(92);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -6466,8 +6480,10 @@ describe('delta-key contract pins (anti-drift)', () => {
     // maybeSerialized arm of the scrape then surfaces the two capability-gated
     // direct emits, auras and de, for 89. Farming's own-plot key fplot (the
     // Masterwrought branch) then makes 90, and the release's off-hand bar key
-    // offhandWeapon makes 91 on the merged tree.
-    expect(scraped.size).toBe(91);
+    // offhandWeapon makes 91 on the merged tree. Intentional Gathering PR3's
+    // hpref (emitted from the new gathering_self_wire.ts sibling, still
+    // inside the recursive server-tree scrape) makes 92.
+    expect(scraped.size).toBe(92);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

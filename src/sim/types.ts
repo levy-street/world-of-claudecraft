@@ -182,6 +182,11 @@ export const TOOL_RECHARGE_CAST_ID = 'tool_recharge';
 // (silence exemption, no spell queue, damage cancels instead of pushing back,
 // item use blocked while it runs).
 export const FARMING_CAST_ID = 'farming';
+// The corpse-harvest cast (Intentional Gathering, PR3): same activity-marker
+// shape as gather/craft/fishing. HARVEST_CAST_SECONDS (professions/
+// harvest_admission.ts) is the frozen duration; professions/
+// corpse_harvest_session.ts owns the whole session.
+export const CORPSE_HARVEST_CAST_ID = 'corpse_harvest';
 // The non-spell casts: castingAbility sentinels that are activities, not
 // abilities. They share one semantics bundle at the casting choke points:
 // exempt from silence and school lockouts, no blink-through, no spell queue,
@@ -199,8 +204,34 @@ export function isNonSpellCast(castId: string | null): boolean {
     castId === SALVAGE_CAST_ID ||
     castId === SUNDER_CAST_ID ||
     castId === TOOL_RECHARGE_CAST_ID ||
-    castId === FARMING_CAST_ID
+    castId === FARMING_CAST_ID ||
+    castId === CORPSE_HARVEST_CAST_ID
   );
+}
+
+// Corpse-harvest per-corpse state (Intentional Gathering, PR3), transient:
+// never persisted, never on the wire. Lives on the mob Entity so the single
+// live reservation and the kill-credit priority snapshot travel with the
+// corpse itself. `token` is a fresh, unexported-shape marker object minted
+// once per `recordCorpseHarvestDeath` (or lazily on first admitted harvest
+// for a corpse that never went through a recorded death, e.g. a bare test
+// fixture): comparing it by REFERENCE is what lets an in-flight session tell
+// its own corpse apart from a same-entity-id corpse that despawned and came
+// back (respawnMob reuses the entity id), since a fresh token never equals an
+// old one even though every primitive field could coincidentally match.
+export interface CorpseHarvestState {
+  readonly token: object;
+  /** ctx.time the kill-credit priority window closes; 0 (or any time already
+   *  passed) means the corpse is public. */
+  priorityEndsAt: number;
+  /** Stable priority keys snapshotted once at death (see
+   *  professions/harvest_admission.ts `harvestPriorityKeyFor`); never
+   *  recomputed from live party state. Empty means nobody is owed the
+   *  window. */
+  readonly priorityMemberKeys: readonly string[];
+  /** entityId of the actor holding the single live reservation/cast against
+   *  this corpse, or null when nobody has one. */
+  reservedBy: number | null;
 }
 // Seconds an empty instance idles before it resets. Shared by the dungeon instance
 // reaper (instances/dungeons.ts) and the delve reaper (sim.ts). NYTHRAXIS_BOSS_ID
@@ -926,6 +957,9 @@ export type ItemUse =
   // type never carries a durability field (this repo has no durability
   // mechanic anywhere), so a base tool can never become unusable.
   | { type: 'gatherTool'; professionId: GatheringProfessionId; tier: number }
+  // A reusable all-class tool that opens the shared harvest-preference picker
+  // (runtime integration lands separately; this item's use arm only marks it).
+  | { type: 'harvestPreference' }
   // A crafted tool-effect charm (the acquisition craft): the item form of one
   // TOOL_EFFECTS entry. Consumed by the slot_tool_effect command through
   // resolveSlotToolEffect (src/sim/professions/tools.ts), never by useItem:
@@ -5268,6 +5302,13 @@ export interface Entity extends ClientMirroredEntityFields {
   // (src/sim/professions/gathering.ts), which the client resolves locally off
   // `tid` (#2513).
   harvestClaimedBy: number | null;
+  // Corpse-harvest CAST state (Intentional Gathering, PR3): the kill-credit
+  // priority window and the single live reservation against a timed harvest
+  // cast, transient (never persisted, never on the wire), owned by
+  // professions/corpse_harvest_session.ts. Absent means no death was ever
+  // recorded for this corpse (a bare fixture, or content lootable outside a
+  // kill): treated as immediately public with no reservation.
+  corpseHarvestState?: CorpseHarvestState;
   despawnTimer?: number;
   // An unconditional lifetime countdown. Unlike despawnTimer, combat, retargeting,
   // and evade transitions never clear this timer.
@@ -6182,6 +6223,13 @@ export type SimEvent = { pid?: number } & (
   // Structured data only (pid supplied by the union intersection); the client
   // builds every visible string, the mailbox precedent.
   | { type: 'bank' }
+  // Asks the client to open the corpse-harvest preference picker (the Field
+  // Kit's 'harvestPreference' use effect, Intentional Gathering PR3). `pid`
+  // is REQUIRED here, unlike `mailbox`/`bank` above: this is minted directly
+  // from an item-use command body rather than routed through the union
+  // intersection's usual pid-supplied-by-caller convention, so a future
+  // caller cannot accidentally emit it world-wide with no owner.
+  | { type: 'harvestPreferenceOpen'; pid: number }
   // Interacting with a town noticeboard. Structured and personal: the client
   // owns localized feedback, and online routing sends it only to the reader.
   // 'listings' carries the board's posted notices verbatim (guild names and

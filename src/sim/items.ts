@@ -879,6 +879,17 @@ export function useItem(
     ctx.openSkinSelect(meta, def.use.catalog ?? 'class', itemId);
     return;
   }
+  // The Field Kit (Intentional Gathering, PR3): a reusable settings tool that
+  // opens the shared harvest-preference picker. Placed beside skinSelect,
+  // ahead of the busy/dead gates below, on purpose: it is a settings action,
+  // not a harvest start, so it is allowed while dead, in combat, or mid
+  // another non-spell cast (the authoritative HARVEST start gates live
+  // separately in professions/harvest_admission.ts). Never consumed, never
+  // picks a preference itself, draws no rng: text-free, pid-scoped event only.
+  if (def.use?.type === 'harvestPreference') {
+    ctx.emit({ type: 'harvestPreferenceOpen', pid: meta.entityId });
+    return;
+  }
   // The Master's Field Forge (Masterwrought phase 09): places a party-shared
   // mobile crafting station at the user's position. Two SEPARATE deliberate
   // choices meet on this arm. First, its placement AHEAD of the busy/dead

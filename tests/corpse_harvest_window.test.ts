@@ -1,524 +1,384 @@
 // @vitest-environment happy-dom
 //
-// Behavioral pin for the per-corpse harvest picker painter (the pure row/button
-// decisions are unit-tested in corpse_harvest_view via the sim suite). Unlike the
-// other batch-5 windows, this is NOT a standalone framed window: the loot window
-// controller composes renderCorpseHarvestPicker into its cursor-anchored popup,
-// which is neither draggable nor resizable, so it
-// stays a picker section rather than adopting the .window-frame chrome. This test
-// locks the load-bearing contract the AAA pass must NOT disturb: the checkbox
-// selection maps straight through to onHarvest (the tags drive the concentrated
-// timed harvest in professions/gathering, so the mapping is the "timing" the brief
-// requires stay untouched), the harvest-disabled state, and the empty short-circuit.
+// Behavioral pin for the corpse popup's harvest STATUS section painter
+// (Intentional Gathering PR3, corpse-status-contract.md). The pure
+// row/status decisions are unit-tested DOM-free in corpse_harvest_view; this
+// locks the render contract renderCorpseHarvestPanel must not disturb: the
+// preference summary + Change control, the one status line (benefit or
+// denial), the Harvest button's disabled/tooltip wiring, and the
+// commandPending override.
 
-import { readdirSync, readFileSync } from 'node:fs';
-import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
-import {
-  type CorpseHarvestViewModel,
-  corpseHarvestView,
-} from '../src/ui/hud/loot/corpse_harvest_view';
-import { renderCorpseHarvestPicker } from '../src/ui/hud/loot/corpse_harvest_window';
-import { expectDefined } from './helpers/defined';
-import { UNMAPPED_FAMILY, UNMAPPED_FAMILY_2 } from './helpers/unmapped_family';
+import type { CorpseHarvestStatusViewModel } from '../src/ui/hud/loot/corpse_harvest_view';
+import { componentLabel, renderCorpseHarvestPanel } from '../src/ui/hud/loot/corpse_harvest_window';
 
-function view(overrides: Partial<CorpseHarvestViewModel> = {}): CorpseHarvestViewModel {
+function view(over: Partial<CorpseHarvestStatusViewModel> = {}): CorpseHarvestStatusViewModel {
   return {
-    rows: [
-      { tag: 'hide', checked: true, yieldsItem: true },
-      { tag: 'fang', checked: false, yieldsItem: true },
-    ],
+    kind: 'ready',
+    preference: { kind: 'all' },
+    denial: null,
+    reservation: null,
+    tierBonus: 0,
+    resolvedComponentTags: [],
+    availableMaterialItemIds: [],
     harvestDisabled: false,
-    concentrated: true,
-    forfeitsEveryYield: false,
-    corpseHarvestable: true,
-    ...overrides,
+    ...over,
   };
 }
 
-describe('renderCorpseHarvestPicker: picker section', () => {
-  it('appends one row per tagged component with the checkbox state from the view', () => {
+describe('renderCorpseHarvestPanel: shape', () => {
+  it('appends one section with a title, a Change control, a status line, and Harvest', () => {
     const container = document.createElement('div');
-    renderCorpseHarvestPicker(container, view(), { onHarvest: () => {}, attachTooltip: () => {} });
-    expect(container.querySelector('.corpse-harvest')).not.toBeNull();
-    const rows = container.querySelectorAll<HTMLElement>('.corpse-harvest-row');
-    expect(rows.length).toBe(2);
-    const boxes = container.querySelectorAll<HTMLInputElement>('.corpse-harvest-check');
-    expect(boxes[0].checked).toBe(true);
-    expect(boxes[1].checked).toBe(false);
-  });
-
-  it('renders nothing when the corpse has no harvestable components', () => {
-    const container = document.createElement('div');
-    renderCorpseHarvestPicker(container, view({ rows: [] }), {
+    renderCorpseHarvestPanel(container, view(), false, {
+      onChange: () => {},
       onHarvest: () => {},
       attachTooltip: () => {},
     });
-    expect(container.querySelector('.corpse-harvest')).toBeNull();
+
+    const section = container.querySelector('.corpse-harvest');
+    expect(section).not.toBeNull();
+    expect(section?.querySelector('.corpse-harvest-title')?.textContent).toBe(
+      'Harvest preference: All materials',
+    );
+    expect(section?.querySelector('.corpse-harvest-change-btn')).not.toBeNull();
+    expect(section?.querySelector('.corpse-harvest-hint')).not.toBeNull();
+    expect(section?.querySelector('.corpse-harvest-btn')).not.toBeNull();
   });
 
-  it('disables the harvest button when the view says so', () => {
+  it('names the current material preference by its real display name, not the raw item id', () => {
     const container = document.createElement('div');
-    renderCorpseHarvestPicker(container, view({ harvestDisabled: true }), {
+    renderCorpseHarvestPanel(
+      container,
+      view({ preference: { kind: 'material', itemId: 'rough_hide' } }),
+      false,
+      { onChange: () => {}, onHarvest: () => {}, attachTooltip: () => {} },
+    );
+    const title = container.querySelector('.corpse-harvest-title')?.textContent ?? '';
+    expect(title).toContain('Harvest preference:');
+    expect(title).not.toContain('rough_hide');
+  });
+
+  it('disables Harvest when the view says so, independent of the Change control', () => {
+    const container = document.createElement('div');
+    renderCorpseHarvestPanel(container, view({ harvestDisabled: true }), false, {
+      onChange: () => {},
       onHarvest: () => {},
       attachTooltip: () => {},
     });
     expect(container.querySelector<HTMLButtonElement>('.corpse-harvest-btn')?.disabled).toBe(true);
-    // The ONE fixture where the two model fields disagree, so it is the only
-    // place that can tell which field each write reads. `harvestDisabled` is
-    // true here and `forfeitsEveryYield` is false, so the reason line must
-    // stay hidden: a painter that keyed the line off `harvestDisabled` would
-    // be invisible to every other case, where the two always coincide.
-    expect(container.querySelector<HTMLElement>('.corpse-harvest-warning')?.hidden).toBe(true);
+    expect(
+      container.querySelector<HTMLButtonElement>('.corpse-harvest-change-btn')?.disabled,
+    ).toBeFalsy();
   });
 
   it('exposes what Harvest does via the shared tooltip idiom, distinct from Take Loot', () => {
     const container = document.createElement('div');
     const attachTooltip = vi.fn();
-    renderCorpseHarvestPicker(container, view(), { onHarvest: () => {}, attachTooltip });
+    renderCorpseHarvestPanel(container, view(), false, {
+      onChange: () => {},
+      onHarvest: () => {},
+      attachTooltip,
+    });
     const btn = container.querySelector<HTMLButtonElement>('.corpse-harvest-btn');
     // No native title: the shared idiom covers hover, mobile long-press, and
     // keyboard focus, where a bare title attribute is hover-only.
     expect(btn?.title).toBe('');
     const call = attachTooltip.mock.calls.find(([target]) => target === btn);
+    // Live placeholders resolved off the real HARVEST_CAST_SECONDS (1.5) and
+    // HARVEST_PRIORITY_SECONDS (10) admission constants, never a hardcoded
+    // duration; states the real rules rather than promising ONE material,
+    // since All is a real preference choice too.
     expect(call?.[1]()).toBe(
-      'Gathers the checked components. Each corpse can be harvested once, first come. Does not take the loot.',
+      'Harvests with your current preference over 1.5 seconds. Requires a Field Kit. Each body can be harvested once. The killer and their party have priority for 10 seconds. Dropped loot stays available.',
     );
   });
 
-  it('reports exactly the currently-checked tags to onHarvest (the concentration/timing contract)', () => {
+  it('registers the tooltip exactly once per render', () => {
     const container = document.createElement('div');
-    const onHarvest = vi.fn();
-    renderCorpseHarvestPicker(container, view(), { onHarvest, attachTooltip: () => {} });
-    // As rendered: only "hide" is checked.
-    container.querySelector<HTMLButtonElement>('.corpse-harvest-btn')?.click();
-    expect(onHarvest).toHaveBeenLastCalledWith(['hide']);
-    // Check "fang" too, then harvest again: both tags now flow through.
-    const boxes = container.querySelectorAll<HTMLInputElement>('.corpse-harvest-check');
-    boxes[1].checked = true;
-    container.querySelector<HTMLButtonElement>('.corpse-harvest-btn')?.click();
-    expect(onHarvest).toHaveBeenLastCalledWith(['hide', 'fang']);
-  });
-
-  it('allows an empty selection (spread across all), which the harvest still accepts', () => {
-    const container = document.createElement('div');
-    const onHarvest = vi.fn();
-    renderCorpseHarvestPicker(
-      container,
-      view({ rows: [{ tag: 'hide', checked: false, yieldsItem: true }], concentrated: false }),
-      { onHarvest, attachTooltip: () => {} },
-    );
-    container.querySelector<HTMLButtonElement>('.corpse-harvest-btn')?.click();
-    expect(onHarvest).toHaveBeenLastCalledWith([]);
+    const attachTooltip = vi.fn();
+    renderCorpseHarvestPanel(container, view(), false, {
+      onChange: () => {},
+      onHarvest: () => {},
+      attachTooltip,
+    });
+    expect(
+      attachTooltip.mock.calls.filter(
+        ([target]) => target === container.querySelector('.corpse-harvest-btn'),
+      ),
+    ).toHaveLength(1);
   });
 });
 
-// #2509: the picker's mirror of the command-boundary refusal. Checking only
-// families with no harvest item behind them is a command the sim refuses
-// pre-claim, so the button goes dead and the section says why IN PLACE: a
-// `disabled` button takes no pointer events and leaves the tab order
-// (src/ui/focus_manager.ts), so a tooltip on it is unreachable. gills and
-// horn were the shipped families in that shape until Masterwrought Phase 11m
-// mapped both, so the fixtures below carry the synthetic never-mapped pair
-// (tests/helpers/unmapped_family.ts) in the slots they used to fill.
-describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#2509)', () => {
-  // The three-tag shape sethrael_palecoil shipped with (hide, claw, horn)
-  // until 11m mapped horn: the synthetic family is the one unmapped row (claw
-  // was mapped at #2905).
-  const PALECOIL = ['hide', 'claw', UNMAPPED_FAMILY];
-
-  function render(tags: string[], checked: string[] = []) {
+describe('renderCorpseHarvestPanel: status line', () => {
+  it('shows the checking sentence while the query has not settled', () => {
     const container = document.createElement('div');
-    const onHarvest = vi.fn();
-    const attachTooltip = vi.fn();
-    // The REAL view core for the initial model, not a hand-rolled guess at it.
-    // The painter re-derives through corpseHarvestView on every `change` event
-    // anyway (corpse_harvest_window.ts), so a second, approximate copy of the
-    // rule here only created a first render that could disagree with every
-    // render after it: the old inline `checked.every(t => t === 'horn' ...)`
-    // answered TRUE for an all-unmapped corpse where the core answers false
-    // (nothing is forfeited there; #2513's separate term is what disables it).
-    renderCorpseHarvestPicker(container, corpseHarvestView(tags, new Set(checked)), {
-      onHarvest,
-      attachTooltip,
+    renderCorpseHarvestPanel(container, view({ kind: 'checking', harvestDisabled: true }), false, {
+      onChange: () => {},
+      onHarvest: () => {},
+      attachTooltip: () => {},
     });
-    const boxes = [...container.querySelectorAll<HTMLInputElement>('.corpse-harvest-check')];
-    return {
-      container,
-      onHarvest,
-      attachTooltip,
-      boxes,
-      btn: expectDefined(container.querySelector<HTMLButtonElement>('.corpse-harvest-btn')),
-      warning: expectDefined(container.querySelector<HTMLElement>('.corpse-harvest-warning')),
-      // The real user gesture. Setting `.checked` fires no `change`, so a test
-      // that mutated the property directly would assert a stale button and
-      // pass whatever the handler did.
-      toggle(tag: string) {
-        const box = expectDefined(boxes.find((b) => b.value === tag));
-        box.checked = !box.checked;
-        box.dispatchEvent(new Event('change', { bubbles: true }));
-      },
-    };
-  }
-
-  it('hides the reason line while the selection can still yield something', () => {
-    const t = render(PALECOIL, ['hide']);
-    expect(t.btn.disabled).toBe(false);
-    expect(t.warning.hidden).toBe(true);
+    expect(container.querySelector('.corpse-harvest-hint')?.textContent).toBe(
+      'Checking harvest status...',
+    );
   });
 
-  it('kills the button and states why when the last mapped box is unchecked', () => {
-    const t = render(PALECOIL, ['hide', UNMAPPED_FAMILY]);
-    expect(t.btn.disabled).toBe(false);
-    t.toggle('hide');
-    expect(t.btn.disabled).toBe(true);
-    expect(t.warning.hidden).toBe(false);
-    expect(t.warning.textContent).toBe('Nothing you selected can be harvested from this corpse.');
-    // The dead button really is dead: a click submits nothing.
-    t.btn.click();
-    expect(t.onHarvest).not.toHaveBeenCalled();
-  });
-
-  it('announces the reason, since the button silently leaves the tab order', () => {
-    // A `disabled` button takes no pointer events and is not focusable, so
-    // neither the shared tooltip nor an aria-label on it is reachable at the
-    // moment the action dies. The live region is what carries the why.
-    const t = render(PALECOIL, ['hide']);
-    expect(t.warning.getAttribute('role')).toBe('status');
-    expect(t.warning.getAttribute('aria-live')).toBe('polite');
-    // Said once, not twice: the sentence lives on the line alone, never also
-    // on the button, so browse mode does not read it back to back.
-    t.toggle('hide');
-    t.toggle(UNMAPPED_FAMILY);
-    expect(t.warning.hidden).toBe(false);
-    expect(t.btn.getAttribute('aria-label')).toBeNull();
-  });
-
-  it('keeps the reason line BELOW the button, so showing it never moves the control', () => {
-    // The line appears and disappears on a checkbox toggle. Above the button
-    // it would shove Harvest down at the exact moment the player is reaching
-    // for it; below, only the popup's bottom edge moves. Pinned because the
-    // whole layout-stability argument is invisible to every other assertion.
-    const t = render(PALECOIL, [UNMAPPED_FAMILY]);
-    expect(t.btn.nextElementSibling).toBe(t.warning);
-  });
-
-  it('styles the reason line as an error, from the shared token', () => {
-    // The class is otherwise pinned only by this file's own querySelector, so
-    // renaming it on one side would leave the line rendering as ordinary body
-    // text with every test still green.
-    const css = readFileSync(
-      path.resolve(process.cwd(), 'src/styles/components.css'),
-      'utf8',
-    ).replace(/\/\*[\s\S]*?\*\//g, '');
-    const rule = /\.corpse-harvest-warning\s*\{([^}]*)\}/.exec(css);
-    expect(rule, '.corpse-harvest-warning has no rule in components.css').not.toBeNull();
-    expect(rule?.[1]).toContain('var(--color-text-error)');
-  });
-
-  it('comes back to life the moment a mapped family is checked again', () => {
-    const t = render(PALECOIL, [UNMAPPED_FAMILY]);
-    expect(t.btn.disabled).toBe(true);
-    expect(t.warning.hidden).toBe(false);
-    t.toggle('claw');
-    expect(t.btn.disabled).toBe(false);
-    expect(t.warning.hidden).toBe(true);
-    t.btn.click();
-    expect(t.onHarvest).toHaveBeenLastCalledWith(['claw', UNMAPPED_FAMILY]);
-  });
-
-  it('never disables on the way back to an empty selection, which spreads', () => {
-    const t = render(PALECOIL, [UNMAPPED_FAMILY]);
-    expect(t.btn.disabled).toBe(true);
-    t.toggle(UNMAPPED_FAMILY);
-    expect(t.btn.disabled).toBe(false);
-    expect(t.warning.hidden).toBe(true);
-    t.btn.click();
-    expect(t.onHarvest).toHaveBeenLastCalledWith([]);
-  });
-
-  it('draws NO section at all for an all-unmapped corpse (#2513)', () => {
-    // The synthetic never-mapped pair, the shared UNMAPPED fixture the sim
-    // suites retag warlock_imp with (gills and horn played that part until
-    // Phase 11m mapped both, as fen_troll's claw and tusk had until #2905
-    // mapped those). The sim refuses the command at its corpse-level gate,
-    // so there is nothing for the picker to submit. Drawing the section with
-    // a dead button would be a NEW state and a bad one: the reason line
-    // reports a FORFEIT, which is a statement about the selection, and nothing
-    // is being forfeited here, so it stays hidden and the player would get a
-    // disabled control with no explanation and two checkboxes that do nothing.
-    // An untagged corpse already shows no section; this matches it.
+  it('shows the unavailable sentence on a settled null answer', () => {
     const container = document.createElement('div');
+    renderCorpseHarvestPanel(
+      container,
+      view({ kind: 'unavailable', harvestDisabled: true }),
+      false,
+      { onChange: () => {}, onHarvest: () => {}, attachTooltip: () => {} },
+    );
+    expect(container.querySelector('.corpse-harvest-hint')?.textContent).toBe(
+      'Harvest status is not available right now.',
+    );
+  });
+
+  it('states the All-materials spread benefit when nothing refuses', () => {
+    const container = document.createElement('div');
+    renderCorpseHarvestPanel(container, view({ preference: { kind: 'all' } }), false, {
+      onChange: () => {},
+      onHarvest: () => {},
+      attachTooltip: () => {},
+    });
+    // Never a quantity/specimen promise: names which materials are targeted,
+    // not how much of any one of them lands.
+    expect(container.querySelector('.corpse-harvest-hint')?.textContent).toBe(
+      'Gathers every available material from this body.',
+    );
+  });
+
+  it('states the focused material, and adds the real tier shift when it is nonzero (never a quantity promise)', () => {
+    const noBonus = document.createElement('div');
+    renderCorpseHarvestPanel(
+      noBonus,
+      view({ preference: { kind: 'material', itemId: 'rough_hide' }, tierBonus: 0 }),
+      false,
+      { onChange: () => {}, onHarvest: () => {}, attachTooltip: () => {} },
+    );
+    const plain = noBonus.querySelector('.corpse-harvest-hint')?.textContent ?? '';
+    expect(plain).toContain('Focuses the harvest on');
+    expect(plain).not.toContain('tier');
+
+    const withBonus = document.createElement('div');
+    renderCorpseHarvestPanel(
+      withBonus,
+      view({ preference: { kind: 'material', itemId: 'rough_hide' }, tierBonus: 2 }),
+      false,
+      { onChange: () => {}, onHarvest: () => {}, attachTooltip: () => {} },
+    );
+    const bonus = withBonus.querySelector('.corpse-harvest-hint')?.textContent ?? '';
+    expect(bonus).toContain('+2 tier over All materials');
+    expect(bonus).not.toMatch(/\bx\d/); // never a quantity/specimen shape
+  });
+
+  it('names the reservation holder, distinguishing self from another player', () => {
+    const other = document.createElement('div');
+    renderCorpseHarvestPanel(
+      other,
+      view({
+        denial: 'reserved',
+        reservation: { name: 'Rival', self: false },
+        harvestDisabled: true,
+      }),
+      false,
+      { onChange: () => {}, onHarvest: () => {}, attachTooltip: () => {} },
+    );
+    expect(other.querySelector('.corpse-harvest-hint')?.textContent).toBe(
+      'Rival is harvesting this body.',
+    );
+
+    const self = document.createElement('div');
+    renderCorpseHarvestPanel(
+      self,
+      view({ denial: 'reserved', reservation: { name: 'Me', self: true }, harvestDisabled: true }),
+      false,
+      { onChange: () => {}, onHarvest: () => {}, attachTooltip: () => {} },
+    );
+    expect(self.querySelector('.corpse-harvest-hint')?.textContent).toBe(
+      'You are already harvesting this body.',
+    );
+  });
+
+  it('falls back to a generic reservation sentence when the holder cannot be named (no blank subject)', () => {
+    const missingReservation = document.createElement('div');
+    renderCorpseHarvestPanel(
+      missingReservation,
+      view({ denial: 'reserved', reservation: null, harvestDisabled: true }),
+      false,
+      { onChange: () => {}, onHarvest: () => {}, attachTooltip: () => {} },
+    );
+    expect(missingReservation.querySelector('.corpse-harvest-hint')?.textContent).toBe(
+      'Another player is harvesting this body.',
+    );
+
+    const blankName = document.createElement('div');
+    renderCorpseHarvestPanel(
+      blankName,
+      view({ denial: 'reserved', reservation: { name: '', self: false }, harvestDisabled: true }),
+      false,
+      { onChange: () => {}, onHarvest: () => {}, attachTooltip: () => {} },
+    );
+    const line = blankName.querySelector('.corpse-harvest-hint')?.textContent ?? '';
+    expect(line).toBe('Another player is harvesting this body.');
+    expect(line.startsWith(' ')).toBe(false);
+  });
+
+  it('names the unavailable material and lists what the body DOES offer, honestly (no retargeting)', () => {
+    const container = document.createElement('div');
+    renderCorpseHarvestPanel(
+      container,
+      view({
+        preference: { kind: 'material', itemId: 'rough_hide' },
+        denial: 'material_unavailable',
+        availableMaterialItemIds: ['linen_cloth'],
+        harvestDisabled: true,
+      }),
+      false,
+      { onChange: () => {}, onHarvest: () => {}, attachTooltip: () => {} },
+    );
+    const line = container.querySelector('.corpse-harvest-hint')?.textContent ?? '';
+    expect(line).toContain('is not on this body');
+    expect(line).toContain('Available:');
+    expect(line).not.toContain('rough_hide');
+  });
+
+  it('joins two or more available materials as a locale-aware conjunction list, not a bare comma join', () => {
+    const container = document.createElement('div');
+    renderCorpseHarvestPanel(
+      container,
+      view({
+        preference: { kind: 'material', itemId: 'rough_hide' },
+        denial: 'material_unavailable',
+        availableMaterialItemIds: ['linen_cloth', 'wolf_fang'],
+        harvestDisabled: true,
+      }),
+      false,
+      { onChange: () => {}, onHarvest: () => {}, attachTooltip: () => {} },
+    );
+    const line = container.querySelector('.corpse-harvest-hint')?.textContent ?? '';
+    // formatList's English conjunction ("A and B"), never a raw comma-joined
+    // fragment (which formatList's per-locale separator/conjunction data
+    // would otherwise diverge from silently).
+    expect(line).toMatch(/ and /);
+  });
+
+  it('drops the "Available" clause when this body offers nothing at all', () => {
+    const container = document.createElement('div');
+    renderCorpseHarvestPanel(
+      container,
+      view({
+        preference: { kind: 'material', itemId: 'rough_hide' },
+        denial: 'material_unavailable',
+        availableMaterialItemIds: [],
+        harvestDisabled: true,
+      }),
+      false,
+      { onChange: () => {}, onHarvest: () => {}, attachTooltip: () => {} },
+    );
+    const line = container.querySelector('.corpse-harvest-hint')?.textContent ?? '';
+    expect(line).toContain('is not on this body');
+    expect(line).not.toContain('Available:');
+  });
+
+  it('reads every other denial through a stable, non-empty status line', () => {
+    const reasons = [
+      'malformed_input',
+      'actor_dead',
+      'actor_in_combat',
+      'actor_busy',
+      'corpse_invalid',
+      'wrong_world',
+      'out_of_range',
+      'no_field_kit',
+      'already_harvested',
+      'priority_protected',
+      'corpse_expiring',
+      'preference_malformed',
+      'nothing_to_harvest',
+      'bags_full',
+    ] as const;
+    for (const denial of reasons) {
+      const container = document.createElement('div');
+      renderCorpseHarvestPanel(container, view({ denial, harvestDisabled: true }), false, {
+        onChange: () => {},
+        onHarvest: () => {},
+        attachTooltip: () => {},
+      });
+      const line = container.querySelector('.corpse-harvest-hint')?.textContent ?? '';
+      expect(line.length, denial).toBeGreaterThan(0);
+    }
+  });
+});
+
+describe('renderCorpseHarvestPanel: commandPending', () => {
+  it('overrides the status line and disables Harvest independent of the view, while Change stays live', () => {
+    const container = document.createElement('div');
+    renderCorpseHarvestPanel(container, view({ harvestDisabled: false }), true, {
+      onChange: () => {},
+      onHarvest: () => {},
+      attachTooltip: () => {},
+    });
+    expect(container.querySelector('.corpse-harvest-hint')?.textContent).toBe(
+      'Starting harvest...',
+    );
+    expect(container.querySelector<HTMLButtonElement>('.corpse-harvest-btn')?.disabled).toBe(true);
+    expect(
+      container.querySelector<HTMLButtonElement>('.corpse-harvest-change-btn')?.disabled,
+    ).toBeFalsy();
+  });
+});
+
+describe('renderCorpseHarvestPanel: dispatch', () => {
+  it('Change fires with no arguments and never touches Harvest', () => {
+    const container = document.createElement('div');
+    const onChange = vi.fn();
     const onHarvest = vi.fn();
-    renderCorpseHarvestPicker(
-      container,
-      corpseHarvestView([UNMAPPED_FAMILY_2, UNMAPPED_FAMILY], new Set()),
-      {
-        onHarvest,
-        attachTooltip: () => {},
-      },
-    );
-    expect(container.querySelector('.corpse-harvest')).toBeNull();
-    expect(container.querySelector('.corpse-harvest-btn')).toBeNull();
-    expect(container.querySelector('.corpse-harvest-check')).toBeNull();
-    expect(container.children).toHaveLength(0);
-    // The discriminator on the identical call: a MIXED corpse carrying the same
-    // unmapped family still draws its section, so this is the predicate and
-    // not the painter refusing everything.
-    const mixed = document.createElement('div');
-    renderCorpseHarvestPicker(
-      mixed,
-      corpseHarvestView(['hide', UNMAPPED_FAMILY, 'meat'], new Set()),
-      {
-        onHarvest,
-        attachTooltip: () => {},
-      },
-    );
-    expect(mixed.querySelector('.corpse-harvest')).not.toBeNull();
-    expect(mixed.querySelectorAll('.corpse-harvest-check')).toHaveLength(3);
+    renderCorpseHarvestPanel(container, view(), false, {
+      onChange,
+      onHarvest,
+      attachTooltip: () => {},
+    });
+    container.querySelector<HTMLButtonElement>('.corpse-harvest-change-btn')?.click();
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onHarvest).not.toHaveBeenCalled();
   });
 
-  it('refuses the section on the view model FIELD, not on the tag list it came from', () => {
-    // The painter reads `corpseHarvestable`, so a caller that hands it a model
-    // built some other way still gets the refusal. Rows are non-empty here, so
-    // the pre-existing `rows.length === 0` early return cannot be what fires:
-    // the two arms are pinned apart.
-    const container = document.createElement('div');
-    renderCorpseHarvestPicker(
-      container,
-      view({ rows: [{ tag: 'hide', checked: false, yieldsItem: true }], corpseHarvestable: false }),
-      { onHarvest: () => {}, attachTooltip: () => {} },
-    );
-    expect(container.querySelector('.corpse-harvest')).toBeNull();
-    // Same rows, field flipped: the section appears. Without this the assertion
-    // above would pass against a painter that never drew anything.
-    const on = document.createElement('div');
-    renderCorpseHarvestPicker(
-      on,
-      view({ rows: [{ tag: 'hide', checked: false, yieldsItem: true }], corpseHarvestable: true }),
-      { onHarvest: () => {}, attachTooltip: () => {} },
-    );
-    expect(on.querySelector('.corpse-harvest')).not.toBeNull();
+  it('Harvest fires on click only when enabled; a disabled button dispatches nothing', () => {
+    const enabled = document.createElement('div');
+    const onHarvest = vi.fn();
+    renderCorpseHarvestPanel(enabled, view({ harvestDisabled: false }), false, {
+      onChange: () => {},
+      onHarvest,
+      attachTooltip: () => {},
+    });
+    enabled.querySelector<HTMLButtonElement>('.corpse-harvest-btn')?.click();
+    expect(onHarvest).toHaveBeenCalledTimes(1);
+
+    const disabled = document.createElement('div');
+    const onHarvestDisabled = vi.fn();
+    renderCorpseHarvestPanel(disabled, view({ harvestDisabled: true }), false, {
+      onChange: () => {},
+      onHarvest: onHarvestDisabled,
+      attachTooltip: () => {},
+    });
+    disabled.querySelector<HTMLButtonElement>('.corpse-harvest-btn')?.click();
+    expect(onHarvestDisabled).not.toHaveBeenCalled();
+  });
+});
+
+// Preserved unchanged by the Intentional Gathering PR3 harvest-status rework:
+// Town Focus (src/ui/town_focus_window.ts) still reads the sibling
+// `hudChrome.corpseHarvest.components.*` keys directly via componentLabel's
+// own key map, pinned by tests/town_focus_i18n.test.ts against the real set
+// of componentTags used across mob content.
+describe('componentLabel: preserved for Town Focus and its i18n pin', () => {
+  it('resolves a real label for a known component tag', () => {
+    expect(componentLabel('hide')).toBe('Hide');
   });
 
-  it('still submits on a MIXED corpse carrying the same unmapped family', () => {
-    // The discriminator for the case above: a corpse carrying the unmapped
-    // family beside hide and meat (the shape a horn-tagged beast shipped in
-    // before 11m), so the button lives and the pick goes through.
-    const t = render(['hide', UNMAPPED_FAMILY, 'meat'], []);
-    expect(t.btn.disabled).toBe(false);
-    t.toggle(UNMAPPED_FAMILY);
-    // The unmapped family alone forfeits every yield: that is the #2509 arm,
-    // with its line.
-    expect(t.btn.disabled).toBe(true);
-    expect(t.warning.hidden).toBe(false);
-    t.toggle('hide');
-    expect(t.btn.disabled).toBe(false);
-    expect(t.warning.hidden).toBe(true);
-    t.btn.click();
-    expect(t.onHarvest).toHaveBeenLastCalledWith(['hide', UNMAPPED_FAMILY]);
-  });
-
-  it('registers the tooltip exactly once, however many times the selection changes', () => {
-    // Hud.attachTooltip binds a fresh listener set per call, so re-attaching
-    // per toggle would stack them silently.
-    const t = render(PALECOIL, ['hide']);
-    t.toggle('hide');
-    t.toggle(UNMAPPED_FAMILY);
-    t.toggle(UNMAPPED_FAMILY);
-    expect(t.attachTooltip.mock.calls.filter(([target]) => target === t.btn)).toHaveLength(1);
-  });
-
-  // #2514: after the sim stopped charging for an unmapped box, the box became a
-  // control with no effect at all. That is better than a tax, but it must not
-  // be silent: a checked box that changes nothing reads as a bug. The row is
-  // marked instead of hidden or disabled, so the corpse still says what it
-  // carries and the #2509 refusal above stays reachable from the shipped
-  // picker.
-  it('marks the rows with no item behind them, and leaves them checkable', () => {
-    const t = render(PALECOIL, []);
-    const rows = [...t.container.querySelectorAll<HTMLElement>('.corpse-harvest-row')];
-    expect(rows).toHaveLength(3);
-    // Only the unmapped row is marked, and it is marked in TEXT, not colour
-    // alone.
-    expect(rows.map((r) => r.classList.contains('corpse-harvest-row-no-yield'))).toEqual([
-      false,
-      false,
-      true,
-    ]);
-    const notes = [...t.container.querySelectorAll<HTMLElement>('.corpse-harvest-note')];
-    expect(notes).toHaveLength(1);
-    expect(notes[0].textContent).toBe('nothing yet');
-    expect(rows[2].contains(notes[0])).toBe(true);
-    // Still a live control: the sim ignores it either way, so the picker must
-    // not pretend it cannot be pressed, and the pick still goes over the wire
-    // verbatim (the sim boundary is what interprets it, never the client).
-    const unmapped = expectDefined(t.boxes.find((b) => b.value === UNMAPPED_FAMILY));
-    expect(unmapped.disabled).toBe(false);
-    t.toggle('hide');
-    t.toggle(UNMAPPED_FAMILY);
-    expect(t.btn.disabled).toBe(false);
-    t.btn.click();
-    expect(t.onHarvest).toHaveBeenLastCalledWith(['hide', UNMAPPED_FAMILY]);
-    // ...and checking it ALONE is still the #2509 refusal, which is the state a
-    // filtered row list would have made unreachable from this picker.
-    t.toggle('hide');
-    expect(t.btn.disabled).toBe(true);
-    expect(t.warning.hidden).toBe(false);
-  });
-
-  it('folds the mark into the checkbox label rather than announcing it twice', () => {
-    // A screen reader would otherwise read the component name, then the note,
-    // as two separate labelled nodes. The visible note is aria-hidden and the
-    // whole sentence lives in the checkbox's own label, which is also why it is
-    // a separate key and not the base label with a clause appended.
-    const t = render(PALECOIL, []);
-    const label = (tag: string) => t.boxes.find((b) => b.value === tag)?.getAttribute('aria-label');
-    expect(label('hide')).toBe('Harvest Hide');
-    // A synthetic family has no label key (the label map is pinned against
-    // the tags shipped content really carries, tests/town_focus_i18n.test.ts),
-    // so componentLabel falls back to the raw tag: what is under test here is
-    // the fold, not the component's display name, and horn's own label
-    // (`Harvest Horn`) is a mapped, unmarked row since Phase 11m.
-    expect(label(UNMAPPED_FAMILY)).toBe(`Harvest ${UNMAPPED_FAMILY}: nothing yet`);
-    const note = expectDefined(t.container.querySelector<HTMLElement>('.corpse-harvest-note'));
-    expect(note.getAttribute('aria-hidden')).toBe('true');
-    // WCAG 2.2 SC 2.5.3, Label in Name: the accessible name must CONTAIN the
-    // text the row presents visually, or a speech-input user reading the row
-    // aloud misses. Asserted as containment of the visible node's own text, not
-    // as a second literal, so it holds in every locale: the aria key takes the
-    // mark as a {note} placeholder rather than restating it, which is what
-    // makes that structural instead of a translator convention.
-    expect(label(UNMAPPED_FAMILY)).toContain(note.textContent);
-    // ...and the row's visible name is still in there too, so the containment
-    // above cannot be satisfied by a label that dropped the component.
-    expect(label(UNMAPPED_FAMILY)).toContain(UNMAPPED_FAMILY);
-  });
-
-  it('marks nothing on an all-mapped corpse', () => {
-    // The negative arm, so the case above is not passing against a painter that
-    // marks every row.
-    const t = render(['hide', 'fang'], []);
-    expect(t.container.querySelectorAll('.corpse-harvest-note')).toHaveLength(0);
-    expect(t.container.querySelectorAll('.corpse-harvest-row-no-yield')).toHaveLength(0);
-  });
-
-  it('states the tier rule in terms of what a harvest TAKES (#2514)', () => {
-    // The retired concentrateHint said "fewer CHOSEN components", which the new
-    // rule makes false in both directions on a mixed corpse: checking one more
-    // unmapped row lowers nothing and unchecking one raises nothing.
-    const t = render(PALECOIL, []);
-    expect(t.container.querySelector('.corpse-harvest-hint')?.textContent).toBe(
-      'The fewer components a harvest takes, the higher the tier of each.',
-    );
-  });
-
-  it('emphasizes that hint exactly while the pick concentrates (#2514)', () => {
-    // The render sink for the view model's `concentrated`, which the picker
-    // computed and no painter read before this. It must follow the SIM's bonus,
-    // not a box count: on this corpse the widest pick already carries a bonus,
-    // so naming both mapped families is not a concentrate and naming one is.
-    const t = render(PALECOIL, []);
-    const section = expectDefined(t.container.querySelector<HTMLElement>('.corpse-harvest'));
-    expect(section.classList.contains('is-concentrated')).toBe(false);
-    t.toggle('hide');
-    expect(section.classList.contains('is-concentrated')).toBe(true);
-    // Ticking the unmapped box changes nothing, which is the whole ruling seen
-    // from the client: the sim scores this pick exactly as it scores ['hide'].
-    t.toggle(UNMAPPED_FAMILY);
-    expect(section.classList.contains('is-concentrated')).toBe(true);
-    // The discriminating state, and the reason this case exists: naming both
-    // MAPPED families is the widest pick this corpse offers, so it is not a
-    // concentrate even though only two of the three boxes are checked. The
-    // retired box-count definition called exactly this a concentrate, so a
-    // painter still keyed off a count reds right here.
-    t.toggle(UNMAPPED_FAMILY);
-    t.toggle('claw');
-    expect(t.boxes.filter((b) => b.checked).map((b) => b.value)).toEqual(['hide', 'claw']);
-    expect(section.classList.contains('is-concentrated')).toBe(false);
-    // Checking every box is the same world again, by the same rule.
-    t.toggle(UNMAPPED_FAMILY);
-    expect(section.classList.contains('is-concentrated')).toBe(false);
-    // ...and a dead pick is never "concentrated", though its raw bonus is the
-    // whole tag count.
-    t.toggle('hide');
-    t.toggle('claw');
-    expect(t.btn.disabled).toBe(true);
-    expect(section.classList.contains('is-concentrated')).toBe(false);
-  });
-
-  it('carries a stylesheet rule for every class the mark relies on', () => {
-    // Same argument as the reason-line rule below: these classes are otherwise
-    // pinned only by this file's own querySelector, so renaming one side would
-    // leave the mark rendering as ordinary body text with every test green.
-    // The muted TOKEN is asserted rather than an opacity: a stacked opacity
-    // composited the note to 2.97:1 on the parchment preset, and
-    // tests/theme.test.ts structurally cannot see a loss that happens in a
-    // stylesheet rather than in a token. The token is not a 4.5:1 guarantee
-    // either (theme.ts repairs it to the 3:1 tier); what it buys is a floor the
-    // composite did not have, and the mark's meaning rides on the note TEXT.
-    //
-    // Read over the WHOLE styles directory, not one file: every negative below
-    // is a statement about the shipped stylesheet, and a rule re-added in
-    // hud.css, shell.css or hud.mobile.css would satisfy a single-file scan
-    // while re-breaking exactly what these pins protect.
-    const stripComments = (text: string) => text.replace(/\/\*[\s\S]*?\*\//g, '');
-    const stylesDir = path.resolve(process.cwd(), 'src/styles');
-    const allCss = readdirSync(stylesDir)
-      .filter((f) => f.endsWith('.css'))
-      .map((f) => stripComments(readFileSync(path.join(stylesDir, f), 'utf8')))
-      .join('\n');
-    expect(allCss.length).toBeGreaterThan(10000);
-    const css = stripComments(
-      readFileSync(path.resolve(process.cwd(), 'src/styles/components.css'), 'utf8'),
-    );
-    const noteRule = /\.corpse-harvest-note\s*\{([^}]*)\}/.exec(css);
-    expect(noteRule, '.corpse-harvest-note has no rule in components.css').not.toBeNull();
-    expect(noteRule?.[1]).toContain('var(--color-text-muted)');
-    expect(noteRule?.[1]).not.toContain('opacity');
-    const rowRule = /\.corpse-harvest-row-no-yield\s*>\s*span\s*\{([^}]*)\}/.exec(css);
-    expect(rowRule, '.corpse-harvest-row-no-yield > span has no rule').not.toBeNull();
-    expect(rowRule?.[1]).toContain('var(--color-text-muted)');
-    // Scoped to the row's TEXT: dimming the whole label would dim the checkbox,
-    // and a greyed checkbox is this HUD's disabled idiom, so a deliberately
-    // live control would read as a dead one. Every selector mentioning the
-    // class must therefore end in `> span`, anywhere in the styles directory,
-    // which also rejects `.corpse-harvest-row-no-yield input` and a
-    // `body.mobile-touch` re-dim.
-    for (const [, selector] of allCss.matchAll(
-      /([^{};]*\.corpse-harvest-row-no-yield[^{};]*)\{/g,
-    )) {
-      expect(selector.trim(), 'dim must stay scoped to the row text').toMatch(/>\s*span$/);
-    }
-    const hintRule = /\.corpse-harvest\.is-concentrated\s+\.corpse-harvest-hint\s*\{([^}]*)\}/.exec(
-      css,
-    );
-    expect(hintRule, '.corpse-harvest.is-concentrated has no rule').not.toBeNull();
-    // The whole cue is the opacity lift out of the .corpse-harvest-hint default,
-    // and it must stay metric-free: this block sits ABOVE the checkboxes and
-    // re-renders on every toggle, so a weight, a border or a padding could
-    // rewrap a long locale and shove the Harvest button under the player's
-    // finger mid-press.
-    expect(hintRule?.[1]).toContain('opacity: 1');
-    expect(hintRule?.[1]).not.toMatch(/font-weight|font-size|padding|margin|border/);
-    // The picker rows are deliberately NOT in the mobile 40px touch-floor list,
-    // and that is a decision worth pinning rather than leaving as an absence:
-    // raising them pushes the Harvest button below the fold at the in-game
-    // landscape metrics, where the popup is already pinned at its 350px cap on
-    // a 390px viewport. The reasoning lives beside the rule in hud.mobile.css;
-    // this asserts the state it argues for, so re-adding a floor without
-    // redoing the layout reds. Any height-shaped property, not just
-    // min-height, and across every stylesheet.
-    for (const [, selector, body] of allCss.matchAll(
-      /([^{};]*\.corpse-harvest-(?:row|check)[^{};]*)\{([^}]*)\}/g,
-    )) {
-      expect(
-        body,
-        `no height floor on ${selector.trim()} until the popup layout is redone`,
-      ).not.toMatch(/min-height|min-block-size|(^|;)\s*height\s*:|padding-block|padding-top/);
-    }
-    // ...and the rule the floor DOES cover on this window is still there, so
-    // the sweep above is about the rows and not about an empty stylesheet.
-    expect(allCss).toContain('body.mobile-touch #loot-window .btn');
+  it('falls back to the raw tag for an unmapped one, never throwing', () => {
+    expect(componentLabel('not_a_real_tag')).toBe('not_a_real_tag');
   });
 });

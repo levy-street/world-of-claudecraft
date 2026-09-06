@@ -1153,6 +1153,40 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.horn': 'Рог',
   'hudChrome.corpseHarvest.components.tusk': 'Бивень',
   'hudChrome.corpseHarvest.components.cloth': 'Ткань',
+  'hudChrome.corpseHarvest.preferenceLabel': 'Предпочтение сбора: {preference}',
+  'hudChrome.corpseHarvest.changeButton': 'Изменить',
+  'hudChrome.corpseHarvest.harvestActionTooltip':
+    'Собирает согласно вашему текущему предпочтению за {seconds} секунд. Требуется полевой набор. Каждое тело можно обработать только один раз. Убийца и его группа имеют приоритет в течение {prioritySeconds} секунд. Выпавшая добыча остаётся доступной.',
+  'hudChrome.corpseHarvest.checkingStatus': 'Проверка состояния сбора...',
+  'hudChrome.corpseHarvest.statusUnavailable': 'Состояние сбора сейчас недоступно.',
+  'hudChrome.corpseHarvest.harvestStarting': 'Начинается сбор...',
+  'hudChrome.corpseHarvest.allBenefit': 'Собирает все доступные материалы с этого тела.',
+  'hudChrome.corpseHarvest.focusBenefit': 'Сосредоточивает сбор на {material}.',
+  'hudChrome.corpseHarvest.tierBonusHint':
+    'Сосредоточивает сбор на {material}: +{tierBonus} к уровню по сравнению со сбором всех материалов.',
+  'hudChrome.corpseHarvest.denial.actorDead': 'Чтобы собирать, нужно быть живым.',
+  'hudChrome.corpseHarvest.denial.actorInCombat': 'Нельзя собирать в бою.',
+  'hudChrome.corpseHarvest.denial.actorBusy': 'Вы уже заняты.',
+  'hudChrome.corpseHarvest.denial.corpseInvalid': 'Это тело больше нельзя обработать.',
+  'hudChrome.corpseHarvest.denial.wrongWorld': 'Это тело не в вашем мире.',
+  'hudChrome.corpseHarvest.denial.outOfRange': 'Подойдите ближе, чтобы собрать с этого тела.',
+  'hudChrome.corpseHarvest.denial.noFieldKit': 'Для сбора нужен полевой набор.',
+  'hudChrome.corpseHarvest.denial.reservedSelf': 'Вы уже собираете с этого тела.',
+  'hudChrome.corpseHarvest.denial.reservedOther': '{name} собирает с этого тела.',
+  'hudChrome.corpseHarvest.denial.reservedOtherUnknown': 'Другой игрок собирает с этого тела.',
+  'hudChrome.corpseHarvest.denial.priorityProtected':
+    'Сейчас у другого игрока приоритет на это тело.',
+  'hudChrome.corpseHarvest.denial.corpseExpiring':
+    'Это тело не продержится достаточно долго для сбора.',
+  'hudChrome.corpseHarvest.denial.preferenceMalformed':
+    'Ваше предпочтение сбора недействительно. Выберите его, чтобы продолжить.',
+  'hudChrome.corpseHarvest.denial.nothingToHarvest':
+    'Ваш полевой набор не может ничего собрать с этого тела.',
+  'hudChrome.corpseHarvest.denial.materialUnavailable': '{material} отсутствует на этом теле.',
+  'hudChrome.corpseHarvest.denial.materialUnavailableWithList':
+    '{material} отсутствует на этом теле. Доступно: {materials}.',
+  'hudChrome.corpseHarvest.denial.bagsFull': 'Ваши сумки слишком полны, чтобы собирать.',
+  'hudChrome.corpseHarvest.denial.malformedInput': 'Что-то пошло не так. Попробуйте ещё раз.',
   'hudChrome.townFocus.title': 'Фокус города',
   'hudChrome.townFocus.hint':
     'Очки фокуса добавляют бонус поверх базового выхода каждого компонента. Компоненты без фокуса остаются на базовом уровне.',
@@ -10181,6 +10215,17 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.harvestJournal.noviceTitle': 'Вы еще не работали на грядке',
   'hudChrome.harvestJournal.noviceBody':
     'Навык земледелия растет с каждым собранным урожаем. Посейте семя на любой грядке, чтобы начать.',
+  // Intentional Gathering PR3: the shared corpse-harvest preference picker
+  // (Field Kit use, Professions, corpse Change entrances). M16 fills.
+  'hudChrome.harvestPreference.title': 'Настройка сбора',
+  'hudChrome.harvestPreference.allLabel': 'Все материалы',
+  'hudChrome.harvestPreference.applyButton': 'Применить',
+  'hudChrome.harvestPreference.cancelButton': 'Отмена',
+  'hudChrome.harvestPreference.pickHint': 'Перед применением выберите, что собирать.',
+  'hudChrome.harvestPreference.currentUnavailable':
+    'Ваш текущий выбор, {material}, здесь недоступен.',
+  'hudChrome.harvestPreference.unknownMaterial': 'Недоступный материал',
+  'hudChrome.harvestPreference.currentChoiceLabel': 'Текущий выбор: {choice}',
   'gatherEvent.pristineVein': '{finder} находит нетронутую жилу!',
   'gatherEvent.ancientHeartwood': '{finder} добывает древнюю сердцевину!',
   'gatherEvent.moonlitBloom': '{finder} находит лунный цветок!',
@@ -15389,6 +15434,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   // masterwrought Phase 13, the orange promotion (M16 fills). The Deed of
   // Making noun matches the sim_i18n.ts error.legendaryDeed row.
   'entities.items.deed_of_making.name': 'Грамота созидания',
+  // Intentional Gathering PR3: the Field Kit's runtime item name. M16 fill.
+  'entities.items.field_kit.name': 'Полевой набор',
   'hudChrome.materialHint.deedOfMaking':
     'Каллиграфическая грамота. Расходуется, чтобы возвысить доведённое до совершенства творение Ковки мастера до легендарного и дать ему имя.',
   'hudChrome.crafting.legendaryLine': '{item} перерождается как {name} и становится легендой!',

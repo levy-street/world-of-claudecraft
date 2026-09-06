@@ -1273,6 +1273,7 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
       // its own. Trader Wilkes keeps the whole rod ladder as the one place you
       // can buy ahead; this row is so you never have to.
       'silverstream_fishing_rod',
+      'field_kit',
       // Tier 4/5 station-recipe reagents (items.ts): Bree is the Highwatch
       // trade-goods vendor, but she carries only arcanite_bar, the one premium
       // reagent that is refined rather than gathered (no node anywhere yields
@@ -1488,6 +1489,7 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
       'frost_gourd_seed',
       'thornpeak_cabbage_seed',
       'frost_lentils_seed',
+      'field_kit',
     ],
     farmer: true,
     greeting:

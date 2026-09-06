@@ -1,7 +1,6 @@
 // Source-guard for the gatherResult/craftResult/masterwork audio wiring
-// (the player_death_audio.test.ts pattern): pins that gathering plays a
-// dedicated node-type cue (audio.gather), that a successful craft resolves
-// the recipe's professionId to its own ui_craft_<family> cue via
+// (the player_death_audio.test.ts pattern): pins that a successful craft
+// resolves the recipe's professionId to its own ui_craft_<family> cue via
 // audio.craftSuccess(), and that a masterwork proc LAYERS audio.masterwork()
 // alongside that cue rather than replacing it. Every professions grant also
 // suppresses BOTH generic hub feedbacks at the source (Sim.addItem/
@@ -9,7 +8,10 @@
 // tests/professions_silent_loot.test.ts) so neither the generic ding nor the
 // generic "You receive:" line stacks on top of the profession's own cue and
 // line; the corresponding hud.ts case 'loot' halves of that contract are
-// pinned below.
+// pinned below. gatherResult/harvestResult's OWN cue+line behavior now lives
+// behind the extracted gathering_result_feedback.ts executor and is pinned
+// there (tests/gathering_result_feedback.test.ts); this file keeps only the
+// hud.ts dispatch weld to it (see below).
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -24,46 +26,42 @@ const hud = readFileSync(join(__dirname, '../src/ui/hud.ts'), 'utf8')
   .replace(/\/\*[\s\S]*?\*\//g, '')
   .replace(/(^|[^:])\/\/.*$/gm, '$1');
 
-describe('gatherResult audio wiring', () => {
-  it('plays a gather cue keyed off the node type, not silence', () => {
+// gatherResult and harvestResult used to be inline hud.ts arms (a
+// audio.gather(ev.nodeType) call and a for-loop over ev.yields plus one
+// audio.lootItem() ding); the monolith-ratchet heal moved both bodies whole
+// into src/ui/hud/professions/gathering_result_feedback.ts
+// (handleGatherResult / handleHarvestResult), leaving hud.ts a one-line
+// dispatch per case. The BEHAVIOR these two blocks used to pin (the node-type
+// cue, the rare-tier stinger layering, the one-log-line-per-yield loop, the
+// single post-loop ding, the QUALITY_COLOR rarity coloring, the self-note on
+// a depleted charge) is now pinned directly against the extracted executor in
+// tests/gathering_result_feedback.test.ts, through a recording host: that
+// file can see everything a hud.ts source-text scan could and drives real
+// function calls instead of matching strings, so the behavior pins moved
+// there rather than being restated here. What a body-side scan of the
+// executor's OWN file cannot see is whether hud.ts's case bodies still wire
+// to it, so that is all this guard checks: the two cases call the real
+// handlers, imported from the real module, with `this` (the Hud host) as the
+// second argument.
+describe('gatherResult / harvestResult dispatch weld (#2457, extracted to gathering_result_feedback.ts)', () => {
+  it('imports both handlers from the extracted module', () => {
+    expect(hud).toContain("from './hud/professions/gathering_result_feedback'");
+    expect(hud).toContain('handleGatherResult');
+    expect(hud).toContain('handleHarvestResult');
+  });
+
+  it("case 'gatherResult' delegates to handleGatherResult(ev, this)", () => {
     const start = hud.indexOf("case 'gatherResult':");
     expect(start).toBeGreaterThan(-1);
-    const end = hud.indexOf('break;', start);
-    const body = hud.slice(start, end);
-    expect(body).toContain('audio.gather(ev.nodeType)');
+    const body = hud.slice(start, hud.indexOf('break;', start));
+    expect(body).toContain('handleGatherResult(ev, this)');
   });
-});
 
-describe('harvestResult audio wiring (#2457)', () => {
-  const harvestArm = () => {
+  it("case 'harvestResult' delegates to handleHarvestResult(ev, this)", () => {
     const start = hud.indexOf("case 'harvestResult':");
     expect(start).toBeGreaterThan(-1);
-    return hud.slice(start, hud.indexOf('break;', start));
-  };
-
-  it('plays exactly ONE cue for the command, outside the per-yield loop', () => {
-    // The whole audio half of the bug: the hub used to ding once per grant, so
-    // a two-component harvest double-dinged and a specimen proc on a
-    // two-specimen corpse quadruple-dinged. The single call is what fixes it,
-    // and it must sit AFTER the loop that walks ev.yields, never inside it.
-    const body = harvestArm();
-    expect(body.match(/audio\.\w+\(/g)).toEqual(['audio.lootItem(']);
-    const loopEnd = body.lastIndexOf('}');
-    expect(body.indexOf('audio.lootItem();')).toBeGreaterThan(loopEnd);
-  });
-
-  it('logs one line per yield, from the shared grant-line helpers', () => {
-    // One log call, inside the loop: a line hoisted out would collapse a
-    // multi-item harvest to a single item's line, and the helpers are what
-    // carry the clickable link and the quantity the hub line used to own.
-    const body = harvestArm();
-    expect(body).toContain('for (const y of ev.yields)');
-    expect(body.match(/this\.log\(/g)).toHaveLength(1);
-    expect(body).toContain('t(harvestLineKey(y)');
-    expect(body).toContain('grantItemToken(y.itemId)');
-    expect(body).toContain('grantQtyText(y.qty)');
-    // The rolled material rarity colors the line (the gatherResult rule).
-    expect(body).toContain('QUALITY_COLOR[y.rarity]');
+    const body = hud.slice(start, hud.indexOf('break;', start));
+    expect(body).toContain('handleHarvestResult(ev, this)');
   });
 });
 

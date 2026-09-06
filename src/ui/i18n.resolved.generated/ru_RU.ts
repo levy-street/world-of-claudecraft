@@ -2412,6 +2412,35 @@ export const ru_RU: EnTranslations = {
         "tusk": "Бивень",
         "meat": "Мясо",
         "cloth": "Ткань"
+      },
+      "preferenceLabel": "Предпочтение сбора: {preference}",
+      "changeButton": "Изменить",
+      "harvestActionTooltip": "Собирает согласно вашему текущему предпочтению за {seconds} секунд. Требуется полевой набор. Каждое тело можно обработать только один раз. Убийца и его группа имеют приоритет в течение {prioritySeconds} секунд. Выпавшая добыча остаётся доступной.",
+      "checkingStatus": "Проверка состояния сбора...",
+      "statusUnavailable": "Состояние сбора сейчас недоступно.",
+      "harvestStarting": "Начинается сбор...",
+      "allBenefit": "Собирает все доступные материалы с этого тела.",
+      "focusBenefit": "Сосредоточивает сбор на {material}.",
+      "tierBonusHint": "Сосредоточивает сбор на {material}: +{tierBonus} к уровню по сравнению со сбором всех материалов.",
+      "denial": {
+        "actorDead": "Чтобы собирать, нужно быть живым.",
+        "actorInCombat": "Нельзя собирать в бою.",
+        "actorBusy": "Вы уже заняты.",
+        "corpseInvalid": "Это тело больше нельзя обработать.",
+        "wrongWorld": "Это тело не в вашем мире.",
+        "outOfRange": "Подойдите ближе, чтобы собрать с этого тела.",
+        "noFieldKit": "Для сбора нужен полевой набор.",
+        "reservedSelf": "Вы уже собираете с этого тела.",
+        "reservedOther": "{name} собирает с этого тела.",
+        "reservedOtherUnknown": "Другой игрок собирает с этого тела.",
+        "priorityProtected": "Сейчас у другого игрока приоритет на это тело.",
+        "corpseExpiring": "Это тело не продержится достаточно долго для сбора.",
+        "preferenceMalformed": "Ваше предпочтение сбора недействительно. Выберите его, чтобы продолжить.",
+        "nothingToHarvest": "Ваш полевой набор не может ничего собрать с этого тела.",
+        "materialUnavailable": "{material} отсутствует на этом теле.",
+        "materialUnavailableWithList": "{material} отсутствует на этом теле. Доступно: {materials}.",
+        "bagsFull": "Ваши сумки слишком полны, чтобы собирать.",
+        "malformedInput": "Что-то пошло не так. Попробуйте ещё раз."
       }
     },
     "townFocus": {
@@ -2430,6 +2459,16 @@ export const ru_RU: EnTranslations = {
       "respecTierInstantOption": "Мгновенно (полная плата)",
       "respecCostFree": "Бесплатно",
       "respecCostLine": "Стоит {coin} и {materials}"
+    },
+    "harvestPreference": {
+      "title": "Настройка сбора",
+      "allLabel": "Все материалы",
+      "applyButton": "Применить",
+      "cancelButton": "Отмена",
+      "pickHint": "Перед применением выберите, что собирать.",
+      "currentUnavailable": "Ваш текущий выбор, {material}, здесь недоступен.",
+      "unknownMaterial": "Недоступный материал",
+      "currentChoiceLabel": "Текущий выбор: {choice}"
     },
     "party": {
       "promoteLeader": "Назначить лидером",
@@ -14760,6 +14799,9 @@ export const ru_RU: EnTranslations = {
       },
       "deed_of_making": {
         "name": "Грамота созидания"
+      },
+      "field_kit": {
+        "name": "Полевой набор"
       },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"

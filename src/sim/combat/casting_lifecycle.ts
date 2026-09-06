@@ -40,6 +40,11 @@ import {
   paladinExecuteWindowActive,
   spendDevotion,
 } from '../paladin_devotion';
+import {
+  completeCorpseHarvestCast,
+  releaseCorpseHarvest,
+  validateCorpseHarvestCast,
+} from '../professions/corpse_harvest_session';
 import { effectiveFishingBand, fishReelWindowSecFor } from '../professions/fishing';
 import { bestOwnedGatherToolFor } from '../professions/tools';
 import { scheduleProjectile } from '../projectile_travel';
@@ -56,6 +61,7 @@ import {
   CAST_PUSHBACK_SEC,
   CAST_QUEUE_WINDOW_SEC,
   CHANNEL_PUSHBACK_FRACTION,
+  CORPSE_HARVEST_CAST_ID,
   CRAFT_CAST_ID,
   DEMON_HEAL_CAST_ID,
   DISENCHANT_CAST_ID,
@@ -529,6 +535,15 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
       return;
     }
   }
+  // Corpse-harvest cast (Intentional Gathering, PR3): a full per-tick recheck
+  // BEFORE the decrement, the same shape as the mass-rez/single-target
+  // rechecks above, because this session is deliberately stricter than the
+  // generic non-spell cancel plumbing (any movement at all invalidates it,
+  // not just leaving interact range; see corpse_harvest_session.ts).
+  if (p.castingAbility === CORPSE_HARVEST_CAST_ID && !validateCorpseHarvestCast(ctx, p, meta)) {
+    cancelCast(ctx, p);
+    return;
+  }
   if (activeCast && p.channeling) syncPaladinAegisProtection(ctx, p, activeCast);
   p.castRemaining -= DT;
 
@@ -625,6 +640,14 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
     // stopped successfully; the denial renders through its own error line.
     if (castId === GATHER_CAST_ID) {
       ctx.completeGatherCast(p, meta);
+      return;
+    }
+    // Corpse-harvest cast completion (Intentional Gathering, PR3): same
+    // route-then-return shape, castId dispatched directly to the domain
+    // module (no new SimContext callback, matching the existing sibling
+    // arms' own comment on the pattern).
+    if (castId === CORPSE_HARVEST_CAST_ID) {
+      completeCorpseHarvestCast(ctx, p, meta);
       return;
     }
     // Craft cast completion: same non-spell route as gather. castStop success
@@ -756,6 +779,7 @@ function fireQueuedCast(ctx: SimContext, p: Entity): void {
 
 export function cancelCast(ctx: SimContext, p: Entity): void {
   if (p.castingAbility) cleanupPaladinAegis(ctx, p.id);
+  if (p.castingAbility === CORPSE_HARVEST_CAST_ID) releaseCorpseHarvest(ctx, p.id);
   stopChannelVisual(ctx, p);
   clearAfflictionConsumeThreads(ctx, p);
   emitRainOfFireStop(ctx, p);

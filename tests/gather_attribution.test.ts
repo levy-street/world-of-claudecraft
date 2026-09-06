@@ -16,7 +16,9 @@ import { isPremiumMaterialSource, type MaterialSource } from '../src/sim/materia
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { Entity, InvSlot } from '../src/sim/types';
+import { completeCorpseHarvest } from './helpers/complete_corpse_harvest';
 import { expectDefined } from './helpers/defined';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 type SimInternals = { entities: Map<number, Entity>; players: Map<number, PlayerMeta> };
 
@@ -152,20 +154,32 @@ describe('the persisted local identity round trip', () => {
   });
 });
 
-// A dead wolf carries hide and fang tags, so one harvestCorpse command lands
-// real material through the real grant hub.
+// A dead wolf carries hide and fang tags, so one real harvestCorpse cast
+// (Intentional Gathering PR3: a timed HARVEST_CAST_SECONDS cast, not an
+// instant grant) lands real material through the real grant hub.
 function corpseRig(seed: number, opts: { identity?: typeof OFFLINE_A; name?: string } = {}) {
-  const sim = bareSim(seed);
+  // A world with no camps/npcs/ground objects: a real multi-tick cast must
+  // not risk a stray mob aggroing the stationary player and cancelling it
+  // (the corpse_harvest_cast.test.ts / corpse_harvest_command.test.ts rigs
+  // use the same EMPTY_TEST_WORLD for the same reason).
+  const sim = new Sim({ seed, playerClass: 'warrior', noPlayer: true, world: EMPTY_TEST_WORLD });
   const pid = sim.addPlayer('warrior', opts.name ?? 'Ana', {
     ...(opts.identity === undefined ? {} : { localGathererIdentity: opts.identity }),
   });
   sim.tick();
   const player = expectDefined(internalsOf(sim).entities.get(pid));
-  player.pos = { x: 0, y: 0, z: 0 };
-  player.prevPos = { x: 0, y: 0, z: 0 };
+  // Coherent rest state (matching prevPos, zero velocity, grounded) so a real
+  // multi-tick cast never reads a gravity settle as a cancelling displacement.
+  player.pos = sim.groundPos(0, 0);
+  player.prevPos = { ...player.pos };
+  player.vx = 0;
+  player.vy = 0;
+  player.vz = 0;
+  player.onGround = true;
+  sim.addItem('field_kit', 1, pid);
 
   const template = MOBS.forest_wolf;
-  const corpse = createMob(9000 + seed, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+  const corpse = createMob(9000 + seed, template, template.maxLevel, sim.groundPos(0, 0));
   corpse.dead = true;
   corpse.aiState = 'dead';
   corpse.corpseTimer = 9999;
@@ -175,7 +189,7 @@ function corpseRig(seed: number, opts: { identity?: typeof OFFLINE_A; name?: str
   return { sim, pid, corpse };
 }
 
-/** Drive one harvest and report the rng draws it spent. */
+/** Drive one real harvest cast to completion and report the rng draws it spent. */
 function harvest(rig: ReturnType<typeof corpseRig>): { draws: number; events: unknown[] } {
   let draws = 0;
   const rng = (rig.sim as unknown as { rng: { setObserver: (o: (() => void) | null) => void } })
@@ -183,9 +197,9 @@ function harvest(rig: ReturnType<typeof corpseRig>): { draws: number; events: un
   rng.setObserver(() => {
     draws++;
   });
-  rig.sim.harvestCorpse(rig.corpse.id, undefined, rig.pid);
+  const result = completeCorpseHarvest(rig.sim, rig.corpse.id, rig.pid);
   rng.setObserver(null);
-  return { draws, events: rig.sim.drainEvents() };
+  return { draws, events: result.events };
 }
 
 describe('a real corpse harvest lands attributed units', () => {

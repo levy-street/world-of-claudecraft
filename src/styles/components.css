@@ -923,91 +923,41 @@
     font-size: 12px;
     margin-bottom: 2px;
   }
+  /* Dynamic content (the resolved material/reservation name, or the
+     denial/benefit sentence) is interpolated player-facing text, so a single
+     long localized token wraps inside the fixed-width popup instead of
+     forcing a horizontal scrollbar (the .window shell clamps width, not
+     unbroken text runs). */
+  .corpse-harvest-title,
+  .corpse-harvest-hint {
+    overflow-wrap: anywhere;
+  }
   .corpse-harvest-hint {
     font-size: 11px;
     opacity: 0.75;
     margin-bottom: 6px;
   }
-  /* #2514: the current selection earns a tier the widest pick on this corpse
-     would not, so the rule the hint states is live right now. Lifting it out of
-     the muted default is the whole cue: it adds information the player can act
-     on (keep the boxes as they are) and takes none away, and it is what makes
-     the view model's `concentrated` a rendered decision rather than a field
-     nothing reads.
-     Opacity ONLY, and that is load-bearing rather than timid. This hint sits
-     ABOVE the checkbox list and the Harvest button, and it re-renders on every
-     toggle, so any metric-changing emphasis (a heavier weight, a border, a
-     padding) can flip a long locale from two wrapped lines to three and shove
-     the controls down at the exact moment the player is reaching for them. That
-     is the hazard corpse_harvest_window.ts already argues for the reason line,
-     and it is worse here because this block precedes the controls. Opacity
-     changes no box. The cue is supplementary in any case: the rule it
-     emphasizes is the sentence itself, which is always present and always
-     legible. */
-  .corpse-harvest.is-concentrated .corpse-harvest-hint {
-    opacity: 1;
-  }
-  .corpse-harvest-list {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+  /* Change sits between the preference title and the live status line: a
+     block of its own row (like Harvest below) rather than the default
+     inline-block .btn sizing, so its >=40px touch target is never squeezed
+     by neighboring inline content and the status line beneath it never
+     visually crowds it. */
+  .corpse-harvest-change-btn {
+    display: block;
     margin-bottom: 6px;
-  }
-  .corpse-harvest-row {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 6px;
-    font-size: 12px;
-    cursor: pointer;
-  }
-  /* The name and the mark wrap instead of widening the fixed-width popup: the
-     longest localized pair ("Venom Sac" beside id_ID "belum ada hasil") would
-     otherwise push the row past the 230px window and turn .window's
-     overflow-y:auto into a horizontal scrollbar. */
-  .corpse-harvest-row > span {
-    min-width: 0;
-  }
-  /* #2514: a component family with no harvest item behind it yet. The row is
-     still offered and still CHECKABLE (the sim ignores it either way), so the
-     mark is the muted name plus the .corpse-harvest-note text beside it, never
-     colour alone.
-     Scoped to the row's text, deliberately: dimming the whole label would dim
-     the checkbox too, and a greyed checkbox is this HUD's disabled idiom
-     (.btn:disabled above), so a live control would read as a dead one in the
-     one place this change exists to make honest.
-     A themed token rather than an opacity, and the reason is measurement, not
-     taste: a stacked opacity composited the mark to 2.97:1 on the parchment
-     preset, and tests/theme.test.ts structurally cannot see a loss that happens
-     in a stylesheet rather than in a token. --color-text-muted is the house
-     treatment for muted 10-11px chrome (78 sibling rules across this file,
-     hud.css and shell.css) and theme.ts repairs it to the 3:1 large-text tier
-     against the panel base, which is a floor the composite did not have; it is
-     an improvement on every preset and it moves with the theme. It is NOT a
-     4.5:1 guarantee, and on parchment it measures 4.92:1 at the panel top and
-     3.60:1 in the gradient's edge band. That gap is systemic to the token
-     rather than introduced here, and it is not what carries the row's meaning:
-     the mark is the .corpse-harvest-note TEXT, whose sentence is also in the
-     checkbox's accessible name, so nothing is conveyed by contrast alone. */
-  .corpse-harvest-row-no-yield > span {
-    color: var(--color-text-muted);
-  }
-  .corpse-harvest-note {
-    font-size: 10px;
-    font-style: italic;
-    color: var(--color-text-muted);
   }
   .corpse-harvest-btn {
     width: 100%;
   }
-  /* #2509: why Harvest is refused, stated in place. A disabled button takes no
-     pointer events and leaves the tab order, so its tooltip is unreachable.
-     Sits BELOW the button (see corpse_harvest_window.ts) so showing it never
-     moves the control the player is reaching for. */
-  .corpse-harvest-warning {
-    font-size: 11px;
-    color: var(--color-text-error);
-    margin-top: 6px;
+  /* A background status refresh over a prior admitted answer disables via
+     aria-disabled rather than native `disabled` (loot_window_controller.ts
+     applyHarvestButtonState), so it must still READ as disabled: the same
+     treatment as the shared .btn:disabled family above, scoped to this one
+     control rather than a global aria-disabled rule. */
+  .corpse-harvest-btn[aria-disabled="true"] {
+    filter: grayscale(1) brightness(0.7);
+    cursor: default;
+    box-shadow: none;
   }
 
   /* ---------- town-focus ---------- */
@@ -1105,6 +1055,88 @@
     opacity: 0.4;
     cursor: default;
   }
+
+  /* ---------- harvest-preference ---------- */
+  /* The shared corpse-harvest preference picker (Intentional Gathering PR3):
+     the same small cold-settings shape as town-focus above, reused by the
+     Field Kit use, Professions, and corpse Change entrances. Apply/Cancel
+     reuse the existing .btn/.btn-secondary family; only this content's own
+     rows need rules. */
+  #harvest-preference-window {
+    width: 340px;
+  }
+  /* Dynamic content (the resolved material name in the title, the retired
+     stored-material notice, the pick hint) is interpolated player-facing
+     text; wrap it rather than forcing the fixed-width popup to scroll
+     horizontally. */
+  .harvest-preference-title,
+  .harvest-preference-current-unavailable,
+  .harvest-preference-hint {
+    overflow-wrap: anywhere;
+  }
+  .harvest-preference-title {
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .harvest-preference-current-unavailable {
+    font-size: 12px;
+    color: var(--color-text-error);
+    margin-bottom: 6px;
+  }
+  .harvest-preference-hint {
+    font-size: 11px;
+    opacity: 0.75;
+    margin-bottom: 6px;
+  }
+  .harvest-preference-rows {
+    list-style: none;
+    margin: 0 0 8px;
+    padding: 0;
+  }
+  /* Each row IS the radio button (role="radio"), full-width and left-aligned
+     so the whole row is the >=40px touch target, not just its text. */
+  .harvest-preference-row {
+    display: block;
+    width: 100%;
+    min-height: 40px;
+    padding: 8px 10px;
+    border: 1px solid transparent;
+    border-left: 3px solid transparent;
+    border-radius: 4px;
+    background: transparent;
+    color: inherit;
+    font-family: var(--ui-font);
+    font-size: 12px;
+    text-align: left;
+    cursor: var(--cursor-point);
+  }
+  /* Each row is the SOLE child of its own `<li>` (role="none"), so
+     `.harvest-preference-row:not(:last-child)` never matched; the list items,
+     not the buttons, are the siblings. */
+  .harvest-preference-rows li:not(:last-child) {
+    margin-bottom: 2px;
+  }
+  /* A custom control (role=radio on a plain button, not .btn), so it needs its
+     own steady, tokenized ring rather than relying on the UA default (the
+     .tal-row-opt idiom for a house radio/option-row family). */
+  .harvest-preference-row:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  /* The non-colour selected indicator: a left accent bar plus bold weight, so
+     the checked row reads without relying on colour alone. */
+  .harvest-preference-row[aria-checked="true"] {
+    border-left-color: var(--color-accent);
+    font-weight: 600;
+  }
+  .harvest-preference-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .harvest-preference-actions .btn {
+    flex: 1;
+  }
+
   #loot-rolls {
     position: fixed;
     right: max(14px, env(safe-area-inset-right));
@@ -10886,6 +10918,14 @@
     margin-right: 0;
     padding: 2px 10px;
     font-size: 11px;
+  }
+  /* The Harvest Preference entry's remembered-choice subtitle: opacity, not
+     colour, distinguishes it from the button's own label text. */
+  .prof-harvest-preference-current {
+    display: block;
+    margin-top: 2px;
+    font-size: 11px;
+    opacity: 0.75;
   }
   /* The R40 prompt-mode chip on a live slot line: words, not hue, per the
      color-independence rule (the chip IS the second signal). */

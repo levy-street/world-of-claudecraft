@@ -1,15 +1,27 @@
 // The corpse-harvest result event (#2457): one `harvestResult` per harvest
-// command that landed something, carrying ONE entry per distinct granted item.
+// GRANT that landed something, carrying ONE entry per distinct granted item.
 //
 // The bug it closes: corpse harvest was the last profession flow still logging
-// through the grant hub. It reaches the hub from six call sites inside
-// harvestCorpse, so a two-component corpse printed two "You receive:" lines and
-// two generic dings for one keypress, and a specimen proc on a two-specimen
-// corpse (Mire Prowler) printed four of each. #2430 gave the other six flows a
-// `callerLogs` flag that stands the hub line down, and deliberately skipped
-// this one: with no result event of its own, flagging the grants would have
-// made the whole harvest invisible. This suite pins the missing event, the
-// flags it unlocks, and the arms of the harvest that feed it.
+// through the grant hub. It reaches the hub from six call sites inside the
+// grant completion body, so a two-component corpse printed two "You receive:"
+// lines and two generic dings for one keypress, and a specimen proc on a
+// two-specimen corpse (Mire Prowler) printed four of each. #2430 gave the
+// other six flows a `callerLogs` flag that stands the hub line down, and
+// deliberately skipped this one: with no result event of its own, flagging the
+// grants would have made the whole harvest invisible. This suite pins the
+// missing event, the flags it unlocks, and the arms of the harvest that feed
+// it.
+//
+// Intentional Gathering PR3: this suite targets the GRANT-COMPLETION domain
+// directly (`grantCorpseHarvest`/`snapshotCorpseHarvestGrantInputs` via
+// `tests/helpers/corpse_harvest_grant.ts`'s `grantCorpseHarvestOnMob`), not the
+// public `Sim.harvestCorpse` command: that command now starts a timed cast and
+// no longer accepts a per-call components override
+// (tests/corpse_harvest_command.test.ts owns that public contract; this suite
+// is about the yield/rarity/premium/specimen/ledger math the completion body
+// produces once a cast finishes, independent of cast timing). Every seed,
+// quantity, rarity, kind and event-sequence literal below is unchanged from
+// the pre-PR3 version of this file: only the driving call changed.
 //
 // Rig note: the two-player `setup()` construction order below matches
 // tests/corpse_harvest_sim.test.ts exactly, because the seeds are hunted
@@ -41,6 +53,7 @@ import { createMob } from '../src/sim/entity';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
+import { grantCorpseHarvestOnMob } from './helpers/corpse_harvest_grant';
 import {
   UNMAPPED_FAMILY,
   UNMAPPED_FAMILY_2,
@@ -103,15 +116,17 @@ function fillBags(sim: Sim, internals: SimInternals, pid: number): void {
 type HarvestResultEvent = Extract<SimEvent, { type: 'harvestResult' }>;
 type LootEvent = Extract<SimEvent, { type: 'loot' }>;
 
-/** Run one harvest against a drained event stream and split the result. */
+/** Run one grant completion against a drained event stream and split the
+ *  result. Domain-level (`grantCorpseHarvestOnMob`), not the public timed-cast
+ *  command: see the file banner. */
 function harvest(
   sim: Sim,
-  mobId: number,
+  mob: Entity,
+  meta: PlayerMeta,
   components: string[] | undefined,
-  pid: number,
 ): { results: HarvestResultEvent[]; loots: LootEvent[]; events: SimEvent[] } {
   sim.drainEvents();
-  sim.harvestCorpse(mobId, components, pid);
+  grantCorpseHarvestOnMob(sim, mob, meta, components);
   const events = sim.drainEvents();
   return {
     results: events.filter((e): e is HarvestResultEvent => e.type === 'harvestResult'),
@@ -120,12 +135,12 @@ function harvest(
   };
 }
 
-describe('one harvestResult per harvest command (#2457)', () => {
+describe('one harvestResult per harvest grant (#2457)', () => {
   it('a two-component harvest emits exactly ONE event, with one entry per distinct item', () => {
     // The everyday case the issue measures: two item-mapped tags is the most
     // any shipped mob carries, and it used to print two hub lines.
-    const { sim, a, mob } = setup(1);
-    const { results } = harvest(sim, mob.id, undefined, a);
+    const { sim, internals, a, mob } = setup(1);
+    const { results } = harvest(sim, mob, metaOf(internals, a), undefined);
     expect(results).toHaveLength(1);
     expect(results[0]).toEqual({
       type: 'harvestResult',
@@ -141,13 +156,13 @@ describe('one harvestResult per harvest command (#2457)', () => {
     // Personal delivery is what the server router (ev.pid === anchorPid) and
     // the HUD's own pid gate both key off. A wrong pid would silently drop the
     // whole harvest's feedback online.
-    const { sim, a, b, mob } = setup(1);
-    const { results } = harvest(sim, mob.id, undefined, a);
+    const { sim, internals, a, b, mob } = setup(1);
+    const { results } = harvest(sim, mob, metaOf(internals, a), undefined);
     expect(results[0].pid).toBe(a);
     expect(results[0].pid).not.toBe(b);
     // The corpse is single-use, so Bravo's later attempt is denied and emits
     // nothing at all.
-    expect(harvest(sim, mob.id, undefined, b).results).toHaveLength(0);
+    expect(harvest(sim, mob, metaOf(internals, b), undefined).results).toHaveLength(0);
   });
 
   it('every grant behind the event stands BOTH hub halves down, on every arm', () => {
@@ -156,10 +171,10 @@ describe('one harvestResult per harvest command (#2457)', () => {
     // them), but each one carries silent + callerLogs so neither the generic
     // ding nor the "You receive:" line stacks on top of the event's own line.
     //
-    // Driven across the ARMS, not just the ordinary roll. harvestCorpse reaches
-    // the hub from six call sites and a single-seed case only ever touches the
-    // plain one, so `silent` would sit unpinned on the premium arms and a
-    // specimen proc could quietly ship two cues for one command. Each row below
+    // Driven across the ARMS, not just the ordinary roll. The grant completion
+    // reaches the hub from six call sites and a single-seed case only ever
+    // touches the plain one, so `silent` would sit unpinned on the premium arms
+    // and a specimen proc could quietly ship two cues for one grant. Each row below
     // is a distinct grant site: the seeds are the same ones the per-arm cases
     // above and below use, and the bag-full rows drive the downgrade
     // fallbacks. The tool-gate deny arm cannot be reached from content (every
@@ -170,31 +185,34 @@ describe('one harvestResult per harvest command (#2457)', () => {
     const plain = setup(1);
     arms.push({
       name: 'ordinary roll',
-      loots: harvest(plain.sim, plain.mob.id, undefined, plain.a).loots,
+      loots: harvest(plain.sim, plain.mob, metaOf(plain.internals, plain.a), undefined).loots,
     });
     const signed = setup(6);
     arms.push({
       name: 'signed non-specimen',
-      loots: harvest(signed.sim, signed.mob.id, undefined, signed.a).loots,
+      loots: harvest(signed.sim, signed.mob, metaOf(signed.internals, signed.a), undefined).loots,
     });
     const jackpot = setup(2);
     arms.push({
       name: 'specimen jackpot',
-      loots: harvest(jackpot.sim, jackpot.mob.id, undefined, jackpot.a).loots,
+      loots: harvest(jackpot.sim, jackpot.mob, metaOf(jackpot.internals, jackpot.a), undefined)
+        .loots,
     });
     const markLost = setup(5);
     fillBags(markLost.sim, markLost.internals, markLost.a);
     metaOf(markLost.internals, markLost.a).inventory[0] = { itemId: 'wolf_fang', count: 1 };
     arms.push({
       name: 'full-bag mark loss',
-      loots: harvest(markLost.sim, markLost.mob.id, ['fang'], markLost.a).loots,
+      loots: harvest(markLost.sim, markLost.mob, metaOf(markLost.internals, markLost.a), ['fang'])
+        .loots,
     });
     const findLost = setup(5);
     fillBags(findLost.sim, findLost.internals, findLost.a);
     metaOf(findLost.internals, findLost.a).inventory[0] = { itemId: 'rough_hide', count: 1 };
     arms.push({
       name: 'full-bag specimen truncation',
-      loots: harvest(findLost.sim, findLost.mob.id, ['hide'], findLost.a).loots,
+      loots: harvest(findLost.sim, findLost.mob, metaOf(findLost.internals, findLost.a), ['hide'])
+        .loots,
     });
 
     for (const arm of arms) {
@@ -226,8 +244,8 @@ describe('one harvestResult per harvest command (#2457)', () => {
     // that disagreed with the recorded one would otherwise go unseen.
     const seen: HarvestResultEvent['yields'] = [];
     for (const seed of [1, 6]) {
-      const { sim, a, mob } = setup(seed);
-      const { results } = harvest(sim, mob.id, undefined, a);
+      const { sim, internals, a, mob } = setup(seed);
+      const { results } = harvest(sim, mob, metaOf(internals, a), undefined);
       expect(results[0].yields.length, `seed ${seed}`).toBeGreaterThan(0);
       for (const y of results[0].yields) {
         expect(sim.countItem(y.itemId, a), `seed ${seed} ${y.itemId}`).toBe(y.qty);
@@ -240,14 +258,15 @@ describe('one harvestResult per harvest command (#2457)', () => {
   });
 
   it('adds no rng draw: the event is composed from grants that already happened', () => {
-    // The draw sequence through harvestCorpse is load-bearing (one tier roll
-    // plus one rarity roll per yielded component, in yield order), and the
-    // emit must be purely additive to it.
-    const { sim, a, mob } = setup(1);
+    // The draw sequence through the grant completion is load-bearing (one
+    // tier roll plus one rarity roll per yielded component, in yield order),
+    // and the emit must be purely additive to it.
+    const { sim, internals, a, mob } = setup(1);
+    const meta = metaOf(internals, a);
     let draws = 0;
     sim.rng.setObserver(() => draws++);
     try {
-      sim.harvestCorpse(mob.id, ['hide'], a);
+      grantCorpseHarvestOnMob(sim, mob, meta, ['hide']);
     } finally {
       sim.rng.setObserver(null);
     }
@@ -257,8 +276,8 @@ describe('one harvestResult per harvest command (#2457)', () => {
 
 describe('the four grant arms each report themselves (#2457)', () => {
   it('ordinary roll: every entry is plain, and a multi-unit yield carries its count', () => {
-    const { sim, a, mob } = setup(1);
-    const { results } = harvest(sim, mob.id, undefined, a);
+    const { sim, internals, a, mob } = setup(1);
+    const { results } = harvest(sim, mob, metaOf(internals, a), undefined);
     expect(results[0].yields.map((y) => y.kind)).toEqual(['plain', 'plain']);
     // Both quantity variants in one harvest, which is what makes the client's
     // singular/quantity key choice reachable from a single case.
@@ -271,7 +290,7 @@ describe('the four grant arms each report themselves (#2457)', () => {
     // multi-unit roll lands all units that fit, and the ledger reports that
     // count rather than the one-slot gate probe.
     const { sim, internals, a, mob } = setup(6);
-    const { results } = harvest(sim, mob.id, undefined, a);
+    const { results } = harvest(sim, mob, metaOf(internals, a), undefined);
     expect(results[0].yields).toEqual([
       { itemId: 'rough_hide', qty: 1, rarity: 'common', kind: 'plain' },
       // The signed entry carries the roll's own quantity (#2473), which is what
@@ -292,7 +311,7 @@ describe('the four grant arms each report themselves (#2457)', () => {
     // The acceptance contract: a proc adds a line, it never replaces the
     // component's own yield line.
     const { sim, internals, a, mob } = setup(2);
-    const { results } = harvest(sim, mob.id, undefined, a);
+    const { results } = harvest(sim, mob, metaOf(internals, a), undefined);
     expect(results[0].yields).toEqual([
       { itemId: 'rough_hide', qty: 1, rarity: 'rare', kind: 'plain' },
       { itemId: 'wolf_fang', qty: 2, rarity: 'uncommon', kind: 'plain' },
@@ -306,11 +325,11 @@ describe('the four grant arms each report themselves (#2457)', () => {
     expect(specimenStack?.materialSources).toEqual([{ source: { signer: 'Alpha' }, count: 1 }]);
   });
 
-  it('all three kinds can ride one command', () => {
+  it('all three kinds can ride one grant', () => {
     // Seed 23 signs both wolf families: hide procs its specimen, fang signs
     // itself. Proof the three arms compose rather than shadowing each other.
-    const { sim, a, mob } = setup(23);
-    const { results } = harvest(sim, mob.id, undefined, a);
+    const { sim, internals, a, mob } = setup(23);
+    const { results } = harvest(sim, mob, metaOf(internals, a), undefined);
     expect(results[0].yields).toEqual([
       { itemId: 'rough_hide', qty: 2, rarity: 'rare', kind: 'plain' },
       { itemId: 'wolf_fang', qty: 1, rarity: 'legendary', kind: 'signed' },
@@ -330,7 +349,7 @@ describe('the four grant arms each report themselves (#2457)', () => {
     const m = metaOf(internals, a);
     m.inventory[0] = { itemId: 'wolf_fang', count: 1 };
     expect(m.inventory.length).toBe(bagCapacity(m.bags));
-    const { results, events } = harvest(sim, mob.id, ['fang'], a);
+    const { results, events } = harvest(sim, mob, m, ['fang']);
     expect(results[0].yields).toEqual([
       { itemId: 'wolf_fang', qty: 6, rarity: 'rare', kind: 'signed' },
     ]);
@@ -356,7 +375,7 @@ describe('the four grant arms each report themselves (#2457)', () => {
     const m = metaOf(internals, a);
     m.inventory[0] = { itemId: 'rough_hide', count: 1 };
     expect(m.inventory.length).toBe(bagCapacity(m.bags));
-    const { results, events } = harvest(sim, mob.id, ['hide'], a);
+    const { results, events } = harvest(sim, mob, m, ['hide']);
     expect(results[0].yields).toEqual([
       { itemId: 'rough_hide', qty: 6, rarity: 'rare', kind: 'plain' },
     ]);
@@ -374,11 +393,12 @@ describe('the four grant arms each report themselves (#2457)', () => {
     // seam tests/corpse_harvest_sim.test.ts uses to drive the real arm.
     const tiers = MONSTER_MATERIAL_TIERS as Record<string, number>;
     const prior = tiers.hide;
-    const { sim, a, mob } = setup(15);
+    const { sim, internals, a, mob } = setup(15);
+    const meta = metaOf(internals, a);
     sim.drainEvents();
     tiers.hide = 2;
     try {
-      sim.harvestCorpse(mob.id, ['hide'], a);
+      grantCorpseHarvestOnMob(sim, mob, meta, ['hide']);
     } finally {
       tiers.hide = prior;
     }
@@ -415,12 +435,12 @@ describe('the worst case in shipped content (#2457)', () => {
     // costs a tier roll, so every draw after the first shifts whenever either
     // branch touches the harvest sequence, and the old seed stops rolling the
     // double proc entirely. This is the only fixture in shipped content that
-    // reaches the four-entry ledger through the real command, so the seed is
+    // reaches the four-entry ledger through the real grant, so the seed is
     // re-HUNTED to keep the double proc, never re-recorded to whatever the new
     // seed happens to yield: a seed that does not proc leaves the merge/append
     // path untested rather than merely re-numbered.
-    const { sim, a, mob } = setup(22, 'mire_prowler');
-    const { results, loots } = harvest(sim, mob.id, undefined, a);
+    const { sim, internals, a, mob } = setup(22, 'mire_prowler');
+    const { results, loots } = harvest(sim, mob, metaOf(internals, a), undefined);
     expect(results).toHaveLength(1);
     expect(results[0].yields).toEqual([
       { itemId: 'rough_hide', qty: 2, rarity: 'common', kind: 'plain' },
@@ -449,13 +469,13 @@ describe('a harvest that lands nothing never gets that far (#2457, #2513)', () =
     // case, restored in a finally. The "no result event, no loot line" half of this
     // pin is the #2457 contract and still holds; what changed is WHY. Pre-#2513
     // the claim was spent and the ledger was skipped, so the client got a
-    // no-op it could not distinguish from a lost keypress. Now the command is
+    // no-op it could not distinguish from a lost keypress. Now the grant is
     // refused at the corpse-level gate before the claim, and the one thing the
     // player gets is the refusal.
     withRetaggedTemplates({ warlock_imp: [UNMAPPED_FAMILY, UNMAPPED_FAMILY_2] }, () => {
       expect(MOBS.warlock_imp.componentTags).toEqual([UNMAPPED_FAMILY, UNMAPPED_FAMILY_2]);
-      const { sim, a, mob } = setup(60, 'warlock_imp');
-      const { results, loots, events } = harvest(sim, mob.id, undefined, a);
+      const { sim, internals, a, mob } = setup(60, 'warlock_imp');
+      const { results, loots, events } = harvest(sim, mob, metaOf(internals, a), undefined);
       expect(mob.harvestClaimedBy).toBeNull();
       expect(results).toHaveLength(0);
       expect(loots).toHaveLength(0);
@@ -470,8 +490,8 @@ describe('a harvest that lands nothing never gets that far (#2457, #2513)', () =
     // The discriminator on the same rig: mire_prowler carries hide, claw and
     // meat, all mapped, so it harvests and reports.
     expect(MOBS.mire_prowler.componentTags).toEqual(['hide', 'claw', 'meat']);
-    const { sim, a, mob } = setup(24, 'mire_prowler');
-    const { results, loots } = harvest(sim, mob.id, undefined, a);
+    const { sim, internals, a, mob } = setup(24, 'mire_prowler');
+    const { results, loots } = harvest(sim, mob, metaOf(internals, a), undefined);
     expect(mob.harvestClaimedBy).toBe(a);
     expect(results).toHaveLength(1);
     expect(loots.length).toBeGreaterThan(0);

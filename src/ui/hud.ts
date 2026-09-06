@@ -106,6 +106,7 @@ import {
   type AuraKind,
   type CalendarResultCode,
   CONSUME_DURATION,
+  CORPSE_HARVEST_CAST_ID,
   CRAFT_CAST_ID,
   canPrestige,
   DISENCHANT_CAST_ID,
@@ -323,13 +324,7 @@ import {
 import { gatherRareEventFeedback } from './gather_rare_event_feedback';
 import { gatherToolTooltipLines } from './gather_tool_tooltip';
 import { generalChatQuotaView } from './general_chat_quota_view';
-import {
-  craftedLineKey,
-  gatherLineKey,
-  grantItemToken,
-  grantQtyText,
-  harvestLineKey,
-} from './grant_line_view';
+import { craftedLineKey, grantItemToken, grantQtyText } from './grant_line_view';
 import { decideGuildMotdLine } from './guild_motd_login';
 import {
   healLandingFloatTextKey,
@@ -525,13 +520,17 @@ import { PlantSheetWindow } from './hud/professions/farming_plant_sheet_window';
 import { feastTooltipLines } from './hud/professions/feast_tooltip_view';
 import { gatheringProfessionNameKey } from './hud/professions/gathering_profession_name';
 import {
+  handleGatherResult,
+  handleHarvestResult,
+} from './hud/professions/gathering_result_feedback';
+import {
   buildGatheringProficiencyRows,
   gatherDeniedLineKey,
   gatherDowngradeLineKey,
-  gatherRareTierFor,
   gatherToolNoNodeKey,
 } from './hud/professions/gathering_view';
 import { HarvestJournalWindow } from './hud/professions/harvest_journal_window';
+import { HarvestPreferenceController } from './hud/professions/harvest_preference_controller';
 import { materialHintLine } from './hud/professions/material_hint_view';
 import { materialProfessionHintText } from './hud/professions/material_profession_hint_view';
 import { mobileStationTooltipLines } from './hud/professions/mobile_station_tooltip';
@@ -2394,6 +2393,13 @@ export class Hud {
         this.placePopupAt(element, x, y, reserveRight, reserveBottom, minLeft, minTop),
       ...this.windowFocus('#loot-window'),
       onVisibilityChange: () => this.syncAnyWindowOpenState(),
+      // The corpse popup's Change control (Intentional Gathering PR3): opens
+      // the SAME shared picker the Field Kit's use and the Professions entry
+      // button open, scoped to this body's own materials. Never sends a
+      // preference itself.
+      openHarvestPreference: (componentTags) =>
+        this.harvestPreferenceController.open(componentTags),
+      now: () => performance.now(),
     });
     this.lootRolls = new LootRollController({
       document,
@@ -3583,6 +3589,11 @@ export class Hud {
       case 'professions-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.professionsWindow.close();
+        break;
+      case 'harvest-preference-window':
+        // Route through the controller so focus returns to the opener
+        // (WCAG 2.2 AA) and the visit is invalidated (Intentional Gathering PR3).
+        this.harvestPreferenceController.close();
         break;
       case 'harvest-journal-window':
         // Route through the painter: focus returns (WCAG 2.2 AA), clock disposed.
@@ -5307,6 +5318,18 @@ export class Hud {
     ...this.windowFocus('#professions-window'),
     openHarvestJournal: () => this.harvestJournalWindow.open(),
     harvestBody: () => this.lootWindow.openHarvestBodyChoice(),
+    openHarvestPreference: () => this.harvestPreferenceController.open(),
+  });
+  // The shared corpse-harvest preference picker (Intentional Gathering PR3):
+  // the SAME controller the Field Kit's use and this window's own entry
+  // button both open, always general (no body context; the corpse Change
+  // entrance is the popup's own future caller, out of scope here).
+  private readonly harvestPreferenceController = new HarvestPreferenceController({
+    root: () => $('#harvest-preference-window'),
+    world: () => this.sim,
+    closeOthers: () => this.closeOtherWindows('#harvest-preference-window'),
+    ...this.windowFocus('#harvest-preference-window'),
+    onVisibilityChange: () => this.syncAnyWindowOpenState(),
   });
   // The Harvest Journal painter (harvest_journal_view.ts core +
   // harvest_journal_window.ts painter): the read-only plot list over
@@ -6965,6 +6988,10 @@ export class Hud {
     this.relocalizeCoordinatorMemos();
     this.syncDailyRewardsSurfaceLabels();
     this.wocMarketWindow.relocalize();
+    // Self-gated on its own open check (root src/ui/CLAUDE.md); refreshes the
+    // root accessible name and row labels, preserving the uncommitted draft
+    // and exact focus (Intentional Gathering PR3).
+    this.harvestPreferenceController.relocalize();
     this.storePromoCard?.relocalize({
       open: t('hudChrome.wocStore.title'),
       close: t('hudChrome.wocStore.close'),
@@ -12224,77 +12251,24 @@ export class Hud {
           // executes it.
           this.handleProfessionEvent(ev);
           break;
-        case 'gatherResult': {
-          // Harvest feedback line (Professions 2.0), colored by rolled
-          // material rarity. Identical on every graphics tier (player feedback
-          // is never profile-gated). This is the ONLY line for the harvest
-          // grant: the grant hub's own 'loot' event is emitted both silent and
-          // callerLogs for a gather grant (see gathering.ts harvestNode), so
-          // neither the generic ding nor the "You receive:" line stacks on top
-          // of this line and its dedicated node-type cue (#2430). The
-          // node-type impact always plays; a rare-or-better material roll (or
-          // any rare-event roll) layers one additional tiered stinger on top,
-          // never a replacement for the impact.
-          // The LINE color is the rolled rarity (the yield roll), while the
-          // item link inside it paints from the item's own def quality: the
-          // same Copper Ore is granted at every roll, only the qty scales, so
-          // the link must not claim the ore itself got rarer.
-          this.log(
-            t(gatherLineKey(ev.qty), {
-              name: grantItemToken(ev.itemId),
-              qty: grantQtyText(ev.qty),
-            }),
-            QUALITY_COLOR[ev.rarity],
-          );
-          audio.gather(ev.nodeType);
-          const gatherRareTier = gatherRareTierFor(ev.rarity, ev.rareEvent);
-          if (gatherRareTier) audio.gatherRareTier(gatherRareTier);
-          // The last-charge signal (the UX pass): the harvest that spent the
-          // slotted effect's final charge announces it as an FCT self-note
-          // (which also feeds the polite live region). ONE surface on
-          // purpose: the professions window's charge row is the durable
-          // record, so a log line here would be the double-feedback trap the
-          // arms above already avoid.
-          if (ev.effectDepleted) {
-            this.showSelfNote(t('hudChrome.professions.toolEffectDepleted'));
-          }
+        case 'gatherResult':
+          // Node-harvest feedback: line, cue, and rare-tier stinger (extracted
+          // to gathering_result_feedback.ts; Hud is the host seam).
+          handleGatherResult(ev, this);
           break;
-        }
-        case 'harvestResult': {
-          // Corpse-harvest feedback (#2457): ONE line per distinct granted
-          // item and exactly ONE cue for the whole command. Corpse harvest is
-          // the only profession flow whose single command grants several
-          // distinct items, so the sim sends a LIST and this arm walks it;
-          // before the event existed each of the six internal grants printed
-          // its own hub "You receive:" line and its own generic ding, so a
-          // two-component harvest burst two of each and a specimen proc four.
-          // Every grant behind this event is emitted silent + callerLogs
-          // (src/sim/interaction.ts harvestCorpse), so these lines and the one
-          // cue below are the whole of the harvest's feedback. The list is
-          // never empty (the sim skips the emit on a harvest that landed
-          // nothing), so the cue never fires for a no-op.
-          //
-          // Line color is the ROLLED material rarity, the gatherResult rule:
-          // the item link inside paints from the item's own def quality,
-          // because the same Rough Hide is granted at every roll and the link
-          // must not claim the hide itself got rarer.
-          for (const y of ev.yields) {
-            this.log(
-              t(harvestLineKey(y), {
-                name: grantItemToken(y.itemId),
-                qty: grantQtyText(y.qty),
-              }),
-              QUALITY_COLOR[y.rarity],
-            );
-          }
-          // The generic pickup ding, played ONCE for the command rather than
-          // once per component. A node harvest has a dedicated per-node-type
-          // recording (audio.gather above); a corpse harvest has never had one
-          // of its own, so it keeps the sound it has always made and the fix
-          // here is purely that it stops stacking.
-          audio.lootItem();
+        case 'harvestPreferenceOpen':
+          // A settings action, never a harvest. `!sim.spectating` because the
+          // server routes the SPECTATED anchor's own personal events to a
+          // moderator's session (and playerId mirrors the anchor's pid while
+          // spectating), so the generic pid gate alone would open this for a
+          // spectator who never asked for it.
+          if (!sim.spectating) this.harvestPreferenceController.open();
           break;
-        }
+        case 'harvestResult':
+          // Corpse-harvest feedback: one line per distinct yield, one cue for
+          // the whole command (extracted beside gatherResult above).
+          handleHarvestResult(ev, this);
+          break;
         case 'gatherDenied': {
           // Tool-tier denial (Professions 2.0): an error toast ONLY.
           // No loot line, no cue, no other state (the grant-hub double-log
@@ -13734,6 +13708,11 @@ export class Hud {
           // uses craftSuccess / disenchant / enchant / salvage.
           if (ev.entityId === sim.playerId) {
             if (ev.ability === GATHER_CAST_ID) audio.gatherCast(ev.gatherNodeType);
+            // Corpse harvest (Intentional Gathering PR3) deliberately reuses
+            // the flat gathering wind-up: it is a land-gather cast in
+            // everything but source (a body instead of a node), and no new
+            // cue was authored for it.
+            else if (ev.ability === CORPSE_HARVEST_CAST_ID) audio.gatherCast();
             else if (ev.ability === FISHING_CAST_ID) audio.fishCast();
             else if (
               ev.ability === CRAFT_CAST_ID ||

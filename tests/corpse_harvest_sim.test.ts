@@ -1,3 +1,25 @@
+// Intentional Gathering PR3 migration of the legacy corpse-harvest regression
+// suite. Sim.harvestCorpse(id, pid?) now only STARTS a timed
+// HARVEST_CAST_SECONDS cast; the old per-call `components` override is gone
+// (Field Kit carried, remembered HarvestPreference decides selection; see
+// src/sim/professions/corpse_harvest_session.ts and harvest_preference.ts).
+// The public admission/lifecycle/wire contracts already have dedicated PR3
+// suites (tests/corpse_harvest_cast.test.ts, tests/corpse_harvest_command.test.ts,
+// tests/corpse_harvest_rights.test.ts, tests/harvest_admission.test.ts,
+// tests/harvest_preference*.test.ts, tests/corpse_harvest_inspection.test.ts,
+// tests/corpse_harvest_view.test.ts, tests/corpse_harvest_window.test.ts); this
+// file's remaining job is:
+//   - the DETERMINISTIC grant-completion arithmetic (quantity/rarity/specimen/
+//     premium/tool/capacity math), driven directly against the unchanged
+//     grantCorpseHarvest(ctx, mob, meta, snapshotCorpseHarvestGrantInputs(...))
+//     domain via the tests/helpers/corpse_harvest_grant.ts fixture, and
+//   - the wire/broadcast surfaces this file originated (hcb/ffa mirroring,
+//     delta + interest-scope claim truth) adapted to the real timed cast, plus
+//     a narrowed proof that the retired per-call `components` override is
+//     refused outright over the wire.
+// Every literal seed/quantity/rarity/draw-count pinned below is UNCHANGED from
+// the pre-migration suite: grantCorpseHarvest's own gates, rolls and grants
+// never moved, only the harness calling it did.
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { expectDefined } from './helpers/defined';
 
@@ -7,6 +29,7 @@ import { expectDefined } from './helpers/defined';
 vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
+  saveCharacterAndMarketState: vi.fn(async () => {}),
   openPlaySession: vi.fn(async () => 1),
   touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
@@ -21,6 +44,10 @@ vi.mock('../server/db', () => ({
     weaponSkinIds: [],
     weaponSkinLoadout: {},
   })),
+  acquireCharacterLease: vi.fn(async () => true),
+  releaseCharacterLease: vi.fn(async () => {}),
+  heartbeatCharacterLeases: vi.fn(async () => {}),
+  releaseAllCharacterLeases: vi.fn(async () => {}),
 }));
 
 import { type ClientSession, GameServer, wireEntity } from '../server/game';
@@ -42,6 +69,7 @@ import {
   isHarvestableCorpse,
   yieldingFocusComponents,
 } from '../src/sim/professions/gathering';
+import { HARVEST_CAST_SECONDS } from '../src/sim/professions/harvest_admission';
 import {
   bestOwnedAnyGatherToolTier,
   canHarvestMonsterMaterial,
@@ -49,22 +77,20 @@ import {
 import { TIER3_TOOL_WIELD_PROFICIENCY } from '../src/sim/professions/wield_gate';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
-import type { Entity, SimEvent, WorldContent } from '../src/sim/types';
-import { corpseHarvestView } from '../src/ui/hud/loot/corpse_harvest_view';
+import { DT, type Entity, type WorldContent } from '../src/sim/types';
 import { bareClient, broadcast, fakeWs, joinServer, lastSnap } from './helpers/bare_client';
+import { grantCorpseHarvestOnMob } from './helpers/corpse_harvest_grant';
 import {
   UNMAPPED_FAMILY,
   UNMAPPED_FAMILY_2,
   withRetaggedTemplates,
 } from './helpers/unmapped_family';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // End-to-end: a slain mob's corpse can be harvested for profession components
 // exactly once, first-come. This is the deliberate OPPOSITE of a world gathering
 // node (per-player, everyone gets their own harvest); here two players racing the
-// same corpse must resolve to exactly one success, deterministically, even when
-// both commands land in the SAME 20 Hz tick (server.game.ts processes a tick's
-// command batch synchronously, one command at a time, so there is no interleaving
-// to race).
+// same corpse must resolve to exactly one success, deterministically.
 
 type SimInternals = {
   entities: Map<number, Entity>;
@@ -73,15 +99,6 @@ type SimInternals = {
 
 type SnapshotClient = {
   applySnapshot(snap: unknown): void;
-};
-
-type WireClient = {
-  ws: { readyState: number; send(payload: string): void };
-};
-
-type ServerHarness = {
-  dispatchMessage(session: ClientSession, msg: unknown, raw: string, receivedAtMs: number): void;
-  routeEvents(events: SimEvent[]): void;
 };
 
 type WireEntityRecord = {
@@ -95,34 +112,12 @@ type SnapFrame = {
   ents: WireEntityRecord[];
 };
 
-type EventsFrame = {
-  t: 'events';
-  list: SimEvent[];
-};
-
 function clientMirror(client: ReturnType<typeof bareClient>): SnapshotClient {
   return client as unknown as SnapshotClient;
 }
 
-function wireClient(client: ReturnType<typeof bareClient>): WireClient {
-  return client as unknown as WireClient;
-}
-
-function serverHarness(server: GameServer): ServerHarness {
-  return server as unknown as ServerHarness;
-}
-
 function asSnapFrame(snap: unknown): SnapFrame {
   return snap as SnapFrame;
-}
-
-function isEventsFrame(frame: unknown): frame is EventsFrame {
-  return (
-    typeof frame === 'object' &&
-    frame !== null &&
-    (frame as { t?: unknown }).t === 'events' &&
-    Array.isArray((frame as { list?: unknown }).list)
-  );
 }
 
 // Harvest tests preserve the built-in spawn tables because their seed pins
@@ -130,8 +125,21 @@ function isEventsFrame(frame: unknown): frame is EventsFrame {
 // full solid streetlamp network for every fresh-seed probe.
 const CORPSE_TEST_WORLD: WorldContent = { ...BUILTIN_WORLD, roads: [] };
 
+// PUBLIC/timed-cast fixtures need a genuinely controlled world, never
+// BUILTIN_WORLD: `getActiveWorldContent()` (src/sim/data.ts) is a process
+// GLOBAL the terrain function reads regardless of what `world:` a particular
+// `Sim`/`GameServer` was constructed with, so BUILTIN_WORLD's real camps,
+// props, blockers (the jail/castle cage) and terrain edits near the origin
+// can drift or block a multi-tick cast's grounded position, which reads as
+// movement and cancels the cast. tests/corpse_harvest_cast.test.ts and
+// tests/corpse_harvest_command.test.ts (the already-passing PR3 fixtures)
+// both drive EVERY Sim/GameServer in their files off this exact shape.
+const PUBLIC_TEST_WORLD: WorldContent = { ...EMPTY_TEST_WORLD, roads: [] };
+
 beforeAll(() => setActiveWorldContent(CORPSE_TEST_WORLD));
 afterAll(() => setActiveWorldContent(null));
+
+const TICKS_PER_CAST = Math.round(HARVEST_CAST_SECONDS / DT);
 
 function mustPlayer(internals: SimInternals, pid: number): PlayerMeta {
   const meta = internals.players.get(pid);
@@ -169,6 +177,10 @@ function premiumMaterialUnits(meta: PlayerMeta, itemId?: string, signer?: string
   return total;
 }
 
+/** The DOMAIN fixture: no admission, no cast, no field kit, no preference.
+ *  Builds a fresh two-player world on the pinned seed for grant-arithmetic
+ *  tests. Unchanged from the pre-migration suite: every literal seed here
+ *  keeps drawing exactly the same world-gen rng stream it always has. */
 function setup(seed = 11) {
   const sim = new Sim({ seed, playerClass: 'warrior', noPlayer: true, world: CORPSE_TEST_WORLD });
   const internals = sim as unknown as SimInternals;
@@ -194,6 +206,44 @@ function setup(seed = 11) {
   return { sim, internals, a, b, mob };
 }
 
+/** Places `e` at `(x, z)` with a coherent rest state: matching `prevPos`, zero
+ *  velocity, grounded. Needed only by the PUBLIC/timed-cast fixture below,
+ *  since a multi-tick cast would otherwise read a hand-set `y:0` as movement
+ *  the moment gravity settles it onto the real heightfield. */
+function placeCoherently(sim: Sim, e: Entity, x: number, z: number): void {
+  e.pos = sim.groundPos(x, z);
+  e.prevPos = { ...e.pos };
+  e.vx = 0;
+  e.vy = 0;
+  e.vz = 0;
+  e.onGround = true;
+}
+
+/** The PUBLIC fixture: two players on the controlled PUBLIC_TEST_WORLD, each
+ *  carrying a Field Kit, at DISTINCT grounded spots (never the exact same x,z
+ *  as each other, the corpse_harvest_command.test.ts idiom) so nothing here
+ *  relies on same-tile behavior being harmless, but both still within
+ *  INTERACT_RANGE (5) of the corpse: several cases here have Bravo win the
+ *  corpse in a later, independent attempt after Alpha's is refused or spent,
+ *  which needs Bravo actually reachable. Corpse grounded at Alpha's own spot. */
+function publicSetup(seed = 11) {
+  const sim = new Sim({ seed, playerClass: 'warrior', noPlayer: true, world: PUBLIC_TEST_WORLD });
+  const a = sim.addPlayer('warrior', 'Alpha');
+  const b = sim.addPlayer('warrior', 'Bravo');
+  sim.tick();
+  placeCoherently(sim, expectDefined(sim.entities.get(a)), 0, 0);
+  placeCoherently(sim, expectDefined(sim.entities.get(b)), 2, 0);
+  for (const pid of [a, b]) sim.addItem('field_kit', 1, pid);
+  const template = MOBS.forest_wolf;
+  const mob = createMob(9999, template, template.maxLevel, sim.groundPos(0, 0));
+  mob.dead = true;
+  mob.aiState = 'dead';
+  mob.corpseTimer = 9999;
+  mob.respawnTimer = 9999;
+  sim.entities.set(mob.id, mob);
+  return { sim, a, b, mob };
+}
+
 // Fill every free slot with distinct 1-per-slot gear so the next add has
 // nowhere to go (same idiom as tests/bags.test.ts fillBags, per-player).
 function fillBags(sim: Sim, internals: SimInternals, pid: number): void {
@@ -210,28 +260,31 @@ function fillBags(sim: Sim, internals: SimInternals, pid: number): void {
 }
 
 /**
- * One rig for "issue a harvest command against a corpse of `templateId` and
- * report every observable it could have moved". Module-scope and shared by the
- * #2509 and #2513 describes below, which used to hold two near-identical copies:
- * one rig means a future observable is added in one place, and the two suites
- * cannot drift into measuring different things.
+ * The GRANT-DOMAIN rig: issues a completion directly against
+ * grantCorpseHarvestOnMob (which resolves the real mob's componentTags and
+ * calls the actual snapshotCorpseHarvestGrantInputs + grantCorpseHarvest
+ * pair), reporting every observable a completion could have moved. Replaces
+ * the pre-migration harvestCommand rig, which called the retired
+ * `sim.harvestCorpse(id, components, pid)` three-argument form; the grant
+ * function itself, its gates, its rolls and its grants are byte-identical to
+ * before, so every literal below is unchanged.
  *
- * `arrange` runs after the corpse is in the world and before the command, so a
- * case can move the player, pre-claim the corpse, or poison the town focus and
+ * `arrange` runs after the corpse is in the world and before the completion,
+ * so a case can move the player, pre-claim the corpse, or fill their bags and
  * still get the same measurement set.
  */
-function harvestCommand(
+function grantCommand(
   templateId: string,
   components: string[] | undefined,
   opts: {
     seed?: number;
-    townFocus?: Record<string, number>;
     corpseId?: number;
     arrange?: (rig: ReturnType<typeof setup>, corpse: Entity) => void;
   } = {},
 ) {
   const rig = setup(opts.seed ?? 5);
   const { sim, internals, a } = rig;
+  const meta = mustPlayer(internals, a);
   const template = MOBS[templateId];
   const corpse = createMob(opts.corpseId ?? 7513, template, template.maxLevel, {
     x: 0,
@@ -243,17 +296,15 @@ function harvestCommand(
   corpse.corpseTimer = 9999;
   corpse.respawnTimer = 9999;
   internals.entities.set(corpse.id, corpse);
-  if (opts.townFocus) expectDefined(internals.players.get(a)).townFocus = { ...opts.townFocus };
   opts.arrange?.(rig, corpse);
   sim.drainEvents();
-  const before = structuredClone(mustPlayer(internals, a).inventory);
+  const before = structuredClone(meta.inventory);
   let draws = 0;
-  const rng = (sim as unknown as { rng: { setObserver: (o: (() => void) | null) => void } }).rng;
-  rng.setObserver(() => {
+  sim.rng.setObserver(() => {
     draws++;
   });
-  sim.harvestCorpse(corpse.id, components, a);
-  rng.setObserver(null);
+  const granted = grantCorpseHarvestOnMob(sim, corpse, meta, components);
+  sim.rng.setObserver(null);
   const events = sim.drainEvents();
   return {
     sim,
@@ -261,14 +312,15 @@ function harvestCommand(
     a,
     b: rig.b,
     corpse,
+    granted,
     draws,
     events,
     before,
     errors: events
       .filter((e): e is Extract<typeof e, { type: 'error' }> => e.type === 'error')
       .map((e) => e.text),
-    inventory: structuredClone(mustPlayer(internals, a).inventory),
-    items: mustPlayer(internals, a).inventory.length,
+    inventory: structuredClone(meta.inventory),
+    items: meta.inventory.length,
     claimedBy: corpse.harvestClaimedBy,
     corpseTimer: corpse.corpseTimer,
   };
@@ -323,248 +375,174 @@ function withFixtureTemplates<T>(body: () => T): T {
   return withUnmappedTemplate(() => withMixedTemplates(body));
 }
 
+// PUBLIC/lifecycle: driven through the real id-only admission and the real
+// timed cast (tests/corpse_harvest_cast.test.ts owns the exhaustive per-gate
+// coverage of admission and cancellation; this block keeps only the
+// single-use, first-come CLAIM identity guarantees #1141 is actually about,
+// plus two admission refusals (an owned corpse, a live mob) that suite does
+// not carry).
 describe('corpse harvest: single-use, first-come (#1141)', () => {
+  // Scoped world switch: PUBLIC_TEST_WORLD for this describe's timed-cast
+  // fixtures, restored to the domain's CORPSE_TEST_WORLD for every describe
+  // after it (getActiveWorldContent() is a process global; see PUBLIC_TEST_WORLD).
+  beforeAll(() => setActiveWorldContent(PUBLIC_TEST_WORLD));
+  afterAll(() => setActiveWorldContent(CORPSE_TEST_WORLD));
+
   it('is unclaimed on a fresh corpse', () => {
-    const { mob } = setup();
+    const { mob } = publicSetup();
     expect(mob.harvestClaimedBy).toBeNull();
   });
 
-  it('the first attempt succeeds and claims the corpse', () => {
-    const { sim, mob, a } = setup();
-    sim.harvestCorpse(mob.id, undefined, a);
+  it('the first attempt starts a cast and completing it claims the corpse', () => {
+    const { sim, mob, a } = publicSetup();
+    expect(sim.harvestCorpse(mob.id, a)).toBe(true);
+    expect(mob.harvestClaimedBy).toBeNull(); // not yet: the cast has not ticked
+    for (let i = 0; i < TICKS_PER_CAST; i++) sim.tick();
     expect(mob.harvestClaimedBy).toBe(a);
   });
 
   it('a later solo attempt against an already-claimed corpse is denied', () => {
-    const { sim, mob, a, b } = setup();
-    sim.harvestCorpse(mob.id, undefined, a);
+    const { sim, mob, a, b } = publicSetup();
+    expect(sim.harvestCorpse(mob.id, a)).toBe(true);
+    for (let i = 0; i < TICKS_PER_CAST; i++) sim.tick();
     expect(mob.harvestClaimedBy).toBe(a);
     // Bravo tries a full second later; still denied, still claimed by Alpha.
     for (let i = 0; i < 20; i++) sim.tick();
-    sim.harvestCorpse(mob.id, undefined, b);
+    expect(sim.harvestCorpse(mob.id, b)).toBe(false);
     expect(mob.harvestClaimedBy).toBe(a);
   });
 
-  it('exactly one of two attempts in the SAME tick succeeds, deterministically', () => {
-    // Simulate both players' commands landing in the same 20 Hz tick: the
-    // server dispatches a tick's command batch synchronously, one at a time, so
-    // this back-to-back call pair on one tick is the faithful reproduction.
-    const { sim, mob, a, b } = setup();
-    sim.harvestCorpse(mob.id, undefined, a);
-    sim.harvestCorpse(mob.id, undefined, b);
+  it('reservation is exclusive within the same tick: the rival is refused before any grant, no early claim', () => {
+    // Both commands land in the SAME 20 Hz tick (the server dispatches a
+    // tick's command batch synchronously, one command at a time), so this
+    // back-to-back start pair with no tick() between them is the faithful
+    // reproduction. The first start reserves; the claim itself is not written
+    // until completion, so this also proves there is no early claim/reward.
+    const { sim, mob, a, b } = publicSetup();
+    expect(sim.harvestCorpse(mob.id, a)).toBe(true);
+    const draws: number[] = [];
+    sim.rng.setObserver((v) => draws.push(v));
+    expect(sim.harvestCorpse(mob.id, b)).toBe(false);
+    sim.rng.setObserver(null);
+    expect(draws).toEqual([]);
+    expect(mob.harvestClaimedBy).toBeNull();
+    expect(mob.corpseHarvestState?.reservedBy).toBe(a);
+    for (let i = 0; i < TICKS_PER_CAST; i++) sim.tick();
+    // One eventual completion, and the loser never started a cast at all.
     expect(mob.harvestClaimedBy).toBe(a);
+    expect(sim.entities.get(b)?.castingAbility).toBeNull();
   });
 
-  it('is order-independent: whichever command is processed first wins, never both', () => {
-    const run1 = setup();
-    run1.sim.harvestCorpse(run1.mob.id, undefined, run1.a);
-    run1.sim.harvestCorpse(run1.mob.id, undefined, run1.b);
+  it('is order-independent: whichever start is processed first reserves, never both', () => {
+    const run1 = publicSetup();
+    expect(run1.sim.harvestCorpse(run1.mob.id, run1.a)).toBe(true);
+    expect(run1.sim.harvestCorpse(run1.mob.id, run1.b)).toBe(false);
+    for (let i = 0; i < TICKS_PER_CAST; i++) run1.sim.tick();
 
-    const run2 = setup();
-    run2.sim.harvestCorpse(run2.mob.id, undefined, run2.b);
-    run2.sim.harvestCorpse(run2.mob.id, undefined, run2.a);
+    const run2 = publicSetup();
+    expect(run2.sim.harvestCorpse(run2.mob.id, run2.b)).toBe(true);
+    expect(run2.sim.harvestCorpse(run2.mob.id, run2.a)).toBe(false);
+    for (let i = 0; i < TICKS_PER_CAST; i++) run2.sim.tick();
 
-    // Whichever pid is processed first claims the corpse; the second is always denied.
+    // Whichever pid started first claims the corpse; the second never does.
     expect(run1.mob.harvestClaimedBy).toBe(run1.a);
     expect(run2.mob.harvestClaimedBy).toBe(run2.b);
   });
 
-  it('grants the mapped component item only to the winner', () => {
-    const { sim, mob, a, b } = setup();
-    sim.harvestCorpse(mob.id, undefined, a);
-    sim.harvestCorpse(mob.id, undefined, b);
+  it('grants the mapped component item only to the eventual winner', () => {
+    const { sim, mob, a, b } = publicSetup();
+    expect(sim.harvestCorpse(mob.id, a)).toBe(true);
+    expect(sim.harvestCorpse(mob.id, b)).toBe(false);
+    for (let i = 0; i < TICKS_PER_CAST; i++) sim.tick();
     // forest_wolf's componentTags (#1140) include 'hide', mapped to the
-    // dedicated rough_hide material. #1142's focus-harvest tier
-    // roll can grant more than one per tier, so the winner gets AT LEAST one,
-    // never the loser.
+    // dedicated rough_hide material. #1142's focus-harvest tier roll can grant
+    // more than one per tier, so the winner gets AT LEAST one, never the loser.
     expect(sim.countItem('rough_hide', a)).toBeGreaterThanOrEqual(1);
     expect(sim.countItem('rough_hide', b)).toBe(0);
   });
 
   it('denies harvest against a mob with no profession component tags', () => {
-    const { sim, internals, a } = setup();
+    const { sim, a } = publicSetup();
     // warlock_imp carries no componentTags (#1140 only tagged a subset of mobs).
     expect(MOBS.warlock_imp.componentTags).toBeUndefined();
     const noTagTemplate = MOBS.warlock_imp;
-    const noTagMob = createMob(8888, noTagTemplate, noTagTemplate.maxLevel, {
-      x: 0,
-      y: 0,
-      z: 0,
-    });
+    const noTagMob = createMob(8888, noTagTemplate, noTagTemplate.maxLevel, sim.groundPos(0, 0));
     noTagMob.dead = true;
     noTagMob.corpseTimer = 9999;
     noTagMob.respawnTimer = 9999;
-    internals.entities.set(noTagMob.id, noTagMob);
-    sim.harvestCorpse(noTagMob.id, undefined, a);
+    sim.entities.set(noTagMob.id, noTagMob);
+    expect(sim.harvestCorpse(noTagMob.id, a)).toBe(false);
     expect(noTagMob.harvestClaimedBy).toBeNull();
   });
 
   it('denies harvest on a live (non-dead) mob', () => {
-    const { sim, mob, a } = setup();
+    const { sim, mob, a } = publicSetup();
     mob.dead = false;
-    sim.harvestCorpse(mob.id, undefined, a);
+    expect(sim.harvestCorpse(mob.id, a)).toBe(false);
     expect(mob.harvestClaimedBy).toBeNull();
   });
 
   it('a dead player cannot harvest and does not consume the claim', () => {
-    const { sim, internals, mob, a, b } = setup();
-    const alpha = expectDefined(internals.entities.get(a));
+    const { sim, mob, a, b } = publicSetup();
+    const alpha = expectDefined(sim.entities.get(a));
     alpha.dead = true;
     sim.drainEvents();
-    sim.harvestCorpse(mob.id, undefined, a);
-    const ev = sim.drainEvents();
-    expect(ev.some((e) => e.type === 'error' && e.text === "You can't do that while dead.")).toBe(
-      true,
-    );
+    expect(sim.harvestCorpse(mob.id, a)).toBe(false);
     expect(mob.harvestClaimedBy).toBeNull();
     expect(sim.countItem('rough_hide', a)).toBe(0);
     // The corpse stays unclaimed: a living player can still win it.
-    sim.harvestCorpse(mob.id, undefined, b);
+    expect(sim.harvestCorpse(mob.id, b)).toBe(true);
+    for (let i = 0; i < TICKS_PER_CAST; i++) sim.tick();
     expect(mob.harvestClaimedBy).toBe(b);
   });
 
   it('direct harvest refuses an owned tagged corpse without consuming or minting materials', () => {
-    const { sim, mob, a, b } = setup();
-    mob.ownerId = a;
+    const { sim, mob, b } = publicSetup();
+    mob.ownerId = 999999;
     mob.lootable = false;
     sim.drainEvents();
-    let draws = 0;
-    const rng = (sim as unknown as { rng: { setObserver: (o: (() => void) | null) => void } }).rng;
-    rng.setObserver(() => {
-      draws++;
-    });
-    sim.harvestCorpse(mob.id, undefined, b);
-    rng.setObserver(null);
+    const draws: number[] = [];
+    sim.rng.setObserver((v) => draws.push(v));
+    expect(sim.harvestCorpse(mob.id, b)).toBe(false);
+    sim.rng.setObserver(null);
 
     expect(mob.harvestClaimedBy).toBeNull();
-    expect(draws).toBe(0);
+    expect(draws).toEqual([]);
     expect(sim.countItem('rough_hide', b)).toBe(0);
     expect(sim.countItem('wolf_fang', b)).toBe(0);
-    expect(sim.drainEvents()).toEqual([]);
   });
 
-  it('a full-bags harvest is refused and does not consume the claim', () => {
-    const { sim, internals, mob, a, b } = setup();
-    fillBags(sim, internals, a);
+  it('a full-bags harvest is refused at the start and does not consume the claim', () => {
+    const { sim, mob, a, b } = publicSetup();
+    fillBags(sim, sim as unknown as SimInternals, a);
     sim.drainEvents();
-    sim.harvestCorpse(mob.id, undefined, a);
-    const ev = sim.drainEvents();
-    expect(ev.some((e) => e.type === 'error' && e.text === 'Your bags are full.')).toBe(true);
+    expect(sim.harvestCorpse(mob.id, a)).toBe(false);
     expect(mob.harvestClaimedBy).toBeNull();
     expect(sim.countItem('rough_hide', a)).toBe(0);
     // The unconsumed claim is still winnable by a player with bag room.
-    sim.harvestCorpse(mob.id, undefined, b);
-    expect(mob.harvestClaimedBy).toBe(b);
-    // #1142's focus-harvest tier roll can grant more than one per component.
-    expect(sim.countItem('rough_hide', b)).toBeGreaterThanOrEqual(1);
-  });
-
-  it('a slot-full inventory with a nearly-full yield stack is refused, never taken over capacity', () => {
-    // The tier roll can add up to harvestTierQuantity('legendary') = 6 of a
-    // component's item, and addItem is never capacity-capped. A gate that only
-    // reserves 1 would pass here (the partial stack absorbs 1) and the roll
-    // could spill past capacity into a new slot; the gate must reserve the
-    // roll's MAXIMUM. Focused single-component pick so the partial-stack path
-    // is what decides, not a second component needing a free slot.
-    const { sim, internals, mob, a, b } = setup();
-    fillBags(sim, internals, a);
-    const m = expectDefined(internals.players.get(a));
-    const cap = bagCapacity(m.bags);
-    // Convert one gear slot into a rough_hide stack with room for exactly 1.
-    m.inventory[0] = { itemId: 'rough_hide', count: stackSizeOf(ITEMS.rough_hide) - 1 };
-    expect(m.inventory.length).toBe(cap);
-    sim.drainEvents();
-    sim.harvestCorpse(mob.id, ['hide'], a);
-    const ev = sim.drainEvents();
-    expect(ev.some((e) => e.type === 'error' && e.text === 'Your bags are full.')).toBe(true);
-    expect(mob.harvestClaimedBy).toBeNull();
-    expect(m.inventory.length).toBeLessThanOrEqual(cap);
-    expect(sim.countItem('rough_hide', a)).toBe(stackSizeOf(ITEMS.rough_hide) - 1);
-    // The unconsumed claim is still winnable by a player with room.
-    sim.harvestCorpse(mob.id, ['hide'], b);
+    expect(sim.harvestCorpse(mob.id, b)).toBe(true);
+    for (let i = 0; i < TICKS_PER_CAST; i++) sim.tick();
     expect(mob.harvestClaimedBy).toBe(b);
     expect(sim.countItem('rough_hide', b)).toBeGreaterThanOrEqual(1);
-  });
-
-  it('a tagged corpse with no mapped item is refused, not silently claimed (#2513)', () => {
-    // A template carrying only unmapped component families maps to no harvest
-    // item at all. This pin used to lock the opposite behavior, flagged in its
-    // own comment as an open design call: the claim was spent, two tier rolls
-    // were drawn, nothing was granted and NOTHING was emitted, so a player
-    // could not tell anything had happened. #2513 settled that call by making
-    // isHarvestableCorpse answer on mapped families, which routes this corpse
-    // to the pre-existing pre-claim, rng-free refusal every untagged template
-    // already takes. fen_troll (claw, tusk) was the shipped fixture for this
-    // shape; claw and tusk are both mapped now, so this drives the gate
-    // through the synthetic all-unmapped template instead (see
-    // withUnmappedTemplate above).
-    withUnmappedTemplate(() => {
-      const { sim, internals, mob, a, b } = setup();
-      const template = MOBS[UNMAPPED_TEMPLATE_ID];
-      expect(template.componentTags).toEqual(UNMAPPED_TEMPLATE_TAGS);
-      for (const tag of expectDefined(template.componentTags)) {
-        expect(HARVEST_COMPONENT_ITEMS[tag]).toBeUndefined();
-      }
-      const noYieldMob = createMob(7777, template, template.maxLevel, { x: 0, y: 0, z: 0 });
-      noYieldMob.dead = true;
-      noYieldMob.corpseTimer = 9999;
-      noYieldMob.respawnTimer = 9999;
-      internals.entities.set(noYieldMob.id, noYieldMob);
-      const before = mustPlayer(internals, a).inventory.length;
-      sim.drainEvents();
-      let draws = 0;
-      const rng = (sim as unknown as { rng: { setObserver: (o: (() => void) | null) => void } })
-        .rng;
-      rng.setObserver(() => {
-        draws++;
-      });
-      sim.harvestCorpse(noYieldMob.id, undefined, a);
-      rng.setObserver(null);
-      // The command says something, exactly once, and it is the localized
-      // corpse-level refusal rather than a new string.
-      expect(sim.drainEvents()).toEqual([
-        { type: 'error', pid: a, text: 'That corpse has nothing to harvest.' },
-      ]);
-      // ...and nothing moved: no claim, no draw, no item, and the post-harvest
-      // corpse-timer clamp never ran. Zero draws alone would not establish the
-      // refusal (a spent claim used to draw two here), so the claim and the
-      // timer are what say "refused".
-      expect(noYieldMob.harvestClaimedBy).toBeNull();
-      expect(draws).toBe(0);
-      expect(noYieldMob.corpseTimer).toBe(9999);
-      expect(mustPlayer(internals, a).inventory.length).toBe(before);
-      // A second player gets the same answer, not a "already harvested" one:
-      // the corpse was never claimed, so there is no claim to lose the race
-      // for.
-      sim.harvestCorpse(noYieldMob.id, undefined, b);
-      expect(noYieldMob.harvestClaimedBy).toBeNull();
-      expect(sim.drainEvents()).toEqual([
-        { type: 'error', pid: b, text: 'That corpse has nothing to harvest.' },
-      ]);
-      // The rig is not simply refusing every corpse: the suite's own
-      // forest_wolf corpse (hide, fang) still harvests on the same Sim, same
-      // tick.
-      sim.harvestCorpse(mob.id, ['hide'], a);
-      expect(mob.harvestClaimedBy).toBe(a);
-      expect(sim.countItem('rough_hide', a)).toBeGreaterThan(0);
-    });
   });
 
   it('clears the claim on respawn, so the next corpse is harvestable again', () => {
-    const { sim, internals, mob, a, b } = setup();
-    sim.harvestCorpse(mob.id, undefined, a);
+    const { sim, mob, a, b } = publicSetup();
+    expect(sim.harvestCorpse(mob.id, a)).toBe(true);
+    for (let i = 0; i < TICKS_PER_CAST; i++) sim.tick();
     expect(mob.harvestClaimedBy).toBe(a);
 
-    (sim as unknown as { ctx: { respawnMob(m: Entity): void } }).ctx.respawnMob(mob);
+    sim.ctx.respawnMob(mob);
     expect(mob.harvestClaimedBy).toBeNull();
 
     mob.dead = true;
     mob.aiState = 'dead';
     mob.corpseTimer = 9999;
     mob.respawnTimer = 9999;
-    internals.entities.set(mob.id, mob);
+    sim.entities.set(mob.id, mob);
 
-    sim.harvestCorpse(mob.id, undefined, b);
+    expect(sim.harvestCorpse(mob.id, b)).toBe(true);
+    for (let i = 0; i < TICKS_PER_CAST; i++) sim.tick();
     expect(mob.harvestClaimedBy).toBe(b);
   });
 });
@@ -576,28 +554,18 @@ describe('corpse harvest: single-use, first-come (#1141)', () => {
 // A family WITHOUT a specimen (fang) keeps the original behavior: the
 // component itself grants signed at rare-or-better. Each case focuses on a
 // single component so the harvest draws exactly one tier roll and one rarity
-// roll, keeping the seed choice legible. Seeds below are pre-verified against
-// this exact setup() shape (two players, seeded before the harvest's rolls)
-// to land on each side of the rarity floor; the rare-or-better seed was
-// re-recorded from 10 to 2 after the Eastbrook camp respacing thinned the
-// zone-1 camp counts, then from 2 to 30 after the zones 1-3 quest-dedupe
-// content pass shifted the camp-driven world-gen draw sequence again, then
-// from 30 to 9 after the Galecrest quest-camp pass (#2887) added four camps
-// and shifted it once more (4c2b43f8f7), then back to 30 when the v0.35.0
-// base sync re-recorded this file's pins against the synced base content
-// (d4deed629a). The below-rare seed has never had to move: its
-// roll stayed under the floor through every re-record, only its quantity
-// changed. Every re-hunt reproduces the same rig profile (a one-unit base
-// tier roll that reads 2 on the wolf's fang at bonus 1 and 1 on the bandit's
-// cloth at bonus 0), so every literal in this block is unchanged.
+// roll, keeping the seed choice legible. Every seed below, and every literal
+// it grants, is unchanged from the pre-PR3 suite: only the call mechanism
+// (grantCorpseHarvestOnMob against the unchanged grant domain, instead of the
+// retired `sim.harvestCorpse(id, components, pid)`) moved.
 describe('signed Pristine specimens (#1145)', () => {
   it('a rare-or-better harvest grants the signed specimen PLUS the plain component (seed 30)', () => {
     const { sim, internals, a, mob } = setup(30);
+    const meta = mustPlayer(internals, a);
     sim.drainEvents();
-    sim.harvestCorpse(mob.id, ['hide'], a);
+    grantCorpseHarvestOnMob(sim, mob, meta, ['hide']);
     // The signed jackpot landed signed: no downgrade notice fires.
     expect(sim.drainEvents().filter((e) => e.type === 'gatherDowngrade')).toHaveLength(0);
-    const meta = expectDefined(internals.players.get(a));
     // The regular component grants plain (fungible, unsigned), at its rolled
     // tier quantity: the specimen is now the signed jackpot, not the hide.
     const plain = meta.inventory.find((s) => s.itemId === 'rough_hide');
@@ -615,26 +583,20 @@ describe('signed Pristine specimens (#1145)', () => {
 
   it('a below-rare harvest grants a plain stack at its tier quantity and NO specimen (seed 3)', () => {
     const { sim, internals, a, mob } = setup(3);
-    sim.harvestCorpse(mob.id, ['hide'], a);
+    grantCorpseHarvestOnMob(sim, mob, mustPlayer(internals, a), ['hide']);
     const meta = expectDefined(internals.players.get(a));
     const slot = meta.inventory.find((s) => s.itemId === 'rough_hide');
     expect(slot).toBeDefined();
     expect(slot?.instance).toBeUndefined();
     // This seed's focus-tier roll lands above the poor floor, so the fungible
     // grant is more than a single unit (harvestTierQuantity(tier), #1142).
-    // Quantity re-recorded after the Eastbrook camp respacing (2 to 3), then
-    // again after the zones 1-3 quest-dedupe content pass shifted the shared
-    // stream (back to 2), then to 4 after the Galecrest quest-camp pass
-    // (#2887, 4c2b43f8f7), then back to 2 when the v0.35.0 base sync
-    // re-recorded this file's pins (d4deed629a); the below-rare property held
-    // every time, so the seed itself never had to move.
     expect(sim.countItem('rough_hide', a)).toBe(2);
     expect(sim.countItem('pristine_hide', a)).toBe(0);
   });
 
   it('a specimen-less family (fang) keeps the signed-component behavior at rare-or-better (seed 30)', () => {
     const { sim, internals, a, mob } = setup(30);
-    sim.harvestCorpse(mob.id, ['fang'], a);
+    grantCorpseHarvestOnMob(sim, mob, mustPlayer(internals, a), ['fang']);
     const meta = expectDefined(internals.players.get(a));
     const slot = meta.inventory.find((s) => s.itemId === 'wolf_fang');
     expect(slot).toBeDefined();
@@ -658,7 +620,7 @@ describe('signed Pristine specimens (#1145)', () => {
     // A fresh character's starting kit leaves the bags nearly empty (roomy,
     // not necessarily zero items): plenty of free slots for a 3-unit roll.
     expect(bagCapacity(meta.bags) - meta.inventory.length).toBeGreaterThan(3);
-    sim.harvestCorpse(mob.id, ['fang'], a);
+    grantCorpseHarvestOnMob(sim, mob, meta, ['fang']);
     const signedSlots = meta.inventory.filter((s) => s.itemId === 'wolf_fang');
     // Exactly one signed stack, not several single-unit slots.
     expect(signedSlots).toHaveLength(1);
@@ -699,8 +661,8 @@ describe('signed Pristine specimens (#1145)', () => {
       corpse.corpseTimer = 9999;
       corpse.respawnTimer = 9999;
       internals.entities.set(corpse.id, corpse);
-      sim.harvestCorpse(corpse.id, [f.focus], a);
       const meta = expectDefined(internals.players.get(a));
+      grantCorpseHarvestOnMob(sim, corpse, meta, [f.focus]);
       const plain = meta.inventory.find((s) => s.itemId === f.plain);
       expect(plain, `${f.focus} plain`).toBeDefined();
       expect(plain?.instance, `${f.focus} plain stays unsigned`).toBeUndefined();
@@ -722,8 +684,8 @@ describe('signed Pristine specimens (#1145)', () => {
     corpse.corpseTimer = 9999;
     corpse.respawnTimer = 9999;
     internals.entities.set(corpse.id, corpse);
-    sim.harvestCorpse(corpse.id, ['cloth'], a);
     const meta = expectDefined(internals.players.get(a));
+    grantCorpseHarvestOnMob(sim, corpse, meta, ['cloth']);
     const slot = meta.inventory.find((s) => s.itemId === 'homespun_cloth');
     expect(slot).toBeDefined();
     expect(slot?.instance).toBeUndefined();
@@ -758,14 +720,14 @@ describe('signed Pristine specimens (#1145)', () => {
     corpse.respawnTimer = 9999;
     internals.entities.set(corpse.id, corpse);
     sim.drainEvents();
-    sim.harvestCorpse(corpse.id, ['gills'], a);
+    const meta = expectDefined(internals.players.get(a));
+    grantCorpseHarvestOnMob(sim, corpse, meta, ['gills']);
     const result = sim
       .drainEvents()
       .find((e): e is Extract<typeof e, { type: 'harvestResult' }> => e.type === 'harvestResult');
     expect(result?.yields).toEqual([
       { itemId: 'mudfin_scale', qty: 3, rarity: 'rare', kind: 'signed' },
     ]);
-    const meta = expectDefined(internals.players.get(a));
     const scales = meta.inventory.filter((s) => s.itemId === 'mudfin_scale');
     expect(scales).toHaveLength(1);
     expect(scales[0].count).toBe(3);
@@ -796,7 +758,7 @@ describe('signed Pristine specimens (#1145)', () => {
     m.inventory[0] = { itemId: 'wolf_fang', count: 1 };
     expect(m.inventory.length).toBe(cap);
     sim.drainEvents();
-    sim.harvestCorpse(mob.id, ['fang'], a);
+    grantCorpseHarvestOnMob(sim, mob, m, ['fang']);
     expect(mob.harvestClaimedBy).toBe(a);
     expect(m.inventory.length).toBeLessThanOrEqual(cap);
     const fang = m.inventory.find((s) => s.itemId === 'wolf_fang');
@@ -822,7 +784,7 @@ describe('signed Pristine specimens (#1145)', () => {
     m.inventory[0] = { itemId: 'rough_hide', count: 1 };
     expect(m.inventory.length).toBe(cap);
     sim.drainEvents();
-    sim.harvestCorpse(mob.id, ['hide'], a);
+    grantCorpseHarvestOnMob(sim, mob, m, ['hide']);
     expect(mob.harvestClaimedBy).toBe(a);
     expect(m.inventory.length).toBeLessThanOrEqual(cap);
     expect(m.inventory.some((s) => s.itemId === 'pristine_hide')).toBe(false);
@@ -840,7 +802,7 @@ describe('signed Pristine specimens (#1145)', () => {
     // emits the one specimen-loss event.
     const seed = 23;
     const probe = setup(seed);
-    probe.sim.harvestCorpse(probe.mob.id, undefined, probe.a);
+    grantCorpseHarvestOnMob(probe.sim, probe.mob, mustPlayer(probe.internals, probe.a), undefined);
     const pm = expectDefined(probe.internals.players.get(probe.a));
     expect(premiumMaterialUnits(pm, 'wolf_fang', 'Alpha')).toBe(1);
     expect(pm.inventory.some((s) => s.itemId === 'pristine_hide')).toBe(true);
@@ -853,7 +815,7 @@ describe('signed Pristine specimens (#1145)', () => {
     m.inventory[1] = { itemId: 'rough_hide', count: 1 };
     expect(m.inventory.length).toBe(cap);
     sim.drainEvents();
-    sim.harvestCorpse(mob.id, undefined, a);
+    grantCorpseHarvestOnMob(sim, mob, m, undefined);
     expect(mob.harvestClaimedBy).toBe(a);
     expect(m.inventory.length).toBeLessThanOrEqual(cap);
     // The signed fang merged, while the distinct jackpot had no slot.
@@ -890,30 +852,13 @@ describe('two-specimen-family harvest capacity contract', () => {
   }
 
   it('with a genuinely spare slot the jackpot still lands beside both plain yields (seed 6)', () => {
-    // Seed 6 pre-verified: the hide rarity roll clears the signable floor with
-    // this exact draw sequence (the rolls are inventory-independent, so this
-    // arm also proves the exactly-reserved arm below EARNED its jackpot).
-    //
-    // Re-seeded as content moved under the draw order (1, 11 at #2514, 15 at
-    // the v0.32.0 base merge, 16 at the zones 1-3 quest-dedupe pass
-    // (a5d51c7500), then 4 at the #2905 claw and tusk wiring,
-    // c53520b499); the v0.35.0 base-sync fixture refresh (d4deed629a)
-    // re-hunted it to the CURRENT 6, where this chain ends (11m QA: the old
-    // text opened "Seed 11" and narrated the abandoned 4 as terminal over a
-    // setup(6) body). wild_boar is now a corpse with THREE mapped families (hide,
-    // tusk, meat), so the default harvest extracts all three and the pre-gate
-    // reserves a plain-stack slot for each: three reserved slots, not two, so
-    // "genuinely spare" is four free slots, not three. Every re-seed for the
-    // same reason as the ones before it: any content or draw-order change
-    // shifts every draw after it, so whichever seed used to land the jackpot
-    // here stops.
     const { sim, internals, a } = setup(6);
     const boar = addBoarCorpse(internals);
     fillBags(sim, internals, a);
     const m = expectDefined(internals.players.get(a));
     const cap = bagCapacity(m.bags);
     m.inventory.length = cap - 4; // four free slots, no hide/tusk/meat stacks
-    sim.harvestCorpse(boar.id, undefined, a);
+    grantCorpseHarvestOnMob(sim, boar, m, undefined);
     expect(boar.harvestClaimedBy).toBe(a);
     expect(m.inventory.length).toBeLessThanOrEqual(cap);
     expect(sim.countItem('rough_hide', a)).toBeGreaterThanOrEqual(1);
@@ -925,21 +870,13 @@ describe('two-specimen-family harvest capacity contract', () => {
   });
 
   it('with exactly the reserved free slots the jackpot truncates, never the plain yield (seed 6)', () => {
-    // Three free slots = exactly the pre-gate's reservation for the three
-    // plain stacks (hide, tusk, meat) now that tusk is mapped too. The
-    // unfixed code granted pristine_hide into a slot a later family's plain
-    // stack needed and spilled that stack past capacity. Same seed as the arm
-    // above, which is what makes "truncates" mean anything: that arm shows
-    // this exact draw sequence DOES mint the jackpot when a fourth slot
-    // exists. 6 was re-HUNTED against BOTH arms together for exactly that
-    // reason, never re-recorded from whichever seed happened to pass one.
     const { sim, internals, a } = setup(6);
     const boar = addBoarCorpse(internals);
     fillBags(sim, internals, a);
     const m = expectDefined(internals.players.get(a));
     const cap = bagCapacity(m.bags);
     m.inventory.length = cap - 3; // exactly the three reserved plain-stack slots
-    sim.harvestCorpse(boar.id, undefined, a);
+    grantCorpseHarvestOnMob(sim, boar, m, undefined);
     expect(boar.harvestClaimedBy).toBe(a);
     expect(m.inventory.length).toBeLessThanOrEqual(cap);
     expect(sim.countItem('rough_hide', a)).toBeGreaterThanOrEqual(1);
@@ -1035,7 +972,7 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
     // inventory-independent draws against the issue's exact inventory shape.
     const seed = 31;
     const probe = setup(seed);
-    probe.sim.harvestCorpse(probe.mob.id, ['fang'], probe.a);
+    grantCorpseHarvestOnMob(probe.sim, probe.mob, mustPlayer(probe.internals, probe.a), ['fang']);
     const pm = expectDefined(probe.internals.players.get(probe.a));
     expect(premiumMaterialUnits(pm, 'wolf_fang', 'Alpha')).toBe(3);
 
@@ -1046,7 +983,7 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
     m.inventory[0] = { itemId: 'wolf_fang', count: 1 };
     expect(m.inventory.length).toBe(cap);
     sim.drainEvents();
-    sim.harvestCorpse(mob.id, ['fang'], a);
+    grantCorpseHarvestOnMob(sim, mob, m, ['fang']);
     expect(mob.harvestClaimedBy).toBe(a);
     // The issue's acceptance: never past capacity, and the whole signed yield
     // arrived in the compatible top-up without losing its source mark.
@@ -1077,7 +1014,7 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
     m.inventory[1] = { itemId: 'wolf_fang', count: 3, instance: { signer: 'Alpha' } };
     expect(m.inventory.length).toBe(cap);
     sim.drainEvents();
-    sim.harvestCorpse(mob.id, ['fang'], a);
+    grantCorpseHarvestOnMob(sim, mob, m, ['fang']);
     expect(mob.harvestClaimedBy).toBe(a);
     // The earlier stack carries both exact source buckets without a new slot.
     expect(m.inventory.length).toBe(cap);
@@ -1121,7 +1058,7 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
     let draws = 0;
     sim.rng.setObserver(() => draws++);
     try {
-      sim.harvestCorpse(mob.id, ['fang'], a);
+      grantCorpseHarvestOnMob(sim, mob, m, ['fang']);
     } finally {
       sim.rng.setObserver(null);
     }
@@ -1142,7 +1079,7 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
     m.inventory[1] = { itemId: 'pristine_hide', count: 2, instance: { signer: 'Bravo' } };
     expect(m.inventory.length).toBe(cap);
     sim.drainEvents();
-    sim.harvestCorpse(mob.id, ['hide'], a);
+    grantCorpseHarvestOnMob(sim, mob, m, ['hide']);
     expect(mob.harvestClaimedBy).toBe(a);
     expect(m.inventory.length).toBe(cap);
     const specimen = m.inventory.find((s) => s.itemId === 'pristine_hide');
@@ -1162,29 +1099,13 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
 // so the signature and the yield ride one call. That call used to pass a
 // hardcoded count of 1 while the ordinary arm granted the whole rolled
 // quantity. The premium arm must carry every rolled unit in its source bucket.
-//
-// The two rig seeds here were re-hunted (45 to 153, 63 to 104) after the
-// Eastbrook camp respacing merged into this branch, then again (153 to 115,
-// 104 to 211) after the zones 1-3 quest-dedupe content pass, again (115 to
-// 114, 211 to 50) after the Galecrest quest-camp pass (#2887), and the fang
-// rig once more by the v0.35.0 base-sync fixture refresh (d4deed629a), 114 to
-// the CURRENT 31 with the spill rig's 50 standing (11m QA: the chain used to
-// end at 114 over setup(31) bodies). Any content add shifts the shared
-// world-gen draw sequence, and each time the old seed's fang
-// roll stopped clearing the signable floor. Every replacement reproduces the
-// ORIGINAL multi-unit fang and cloth profiles exactly. Seed 23 below is the
-// independently pinned three-kind wolf fixture.
 describe('a signed specimen-less grant carries its rolled quantity (#2473)', () => {
   it('draws no rng of its own: the count comes from the tier roll already taken', () => {
-    // The draw pin ON the arm the change touched. The sibling cases in
-    // tests/corpse_harvest_result_event.test.ts cover the plain and specimen
-    // paths; a counted grant that re-rolled anything per unit would show up
-    // here as more than the one tier roll plus one rarity roll.
-    const { sim, a, mob } = setup(31);
+    const { sim, internals, a, mob } = setup(31);
     let draws = 0;
     sim.rng.setObserver(() => draws++);
     try {
-      sim.harvestCorpse(mob.id, ['fang'], a);
+      grantCorpseHarvestOnMob(sim, mob, mustPlayer(internals, a), ['fang']);
     } finally {
       sim.rng.setObserver(null);
     }
@@ -1194,15 +1115,11 @@ describe('a signed specimen-less grant carries its rolled quantity (#2473)', () 
   });
 
   it('grants the same premium quantity in roomy and slot-full compatible bags (seed 31)', () => {
-    // Same seed, same corpse, same roll: the ONLY difference between the two
-    // runs is whether the bags can hold the instance. Rolling rare must not
-    // cost the player units, so the two counts have to agree.
     const roomy = setup(31);
-    roomy.sim.harvestCorpse(roomy.mob.id, ['fang'], roomy.a);
+    grantCorpseHarvestOnMob(roomy.sim, roomy.mob, mustPlayer(roomy.internals, roomy.a), ['fang']);
     const signedSlot = roomy.internals.players
       .get(roomy.a)
       ?.inventory.find((s) => s.itemId === 'wolf_fang');
-    // The premium arm really is the one under test: the units landed stamped.
     expect(signedSlot?.instance).toBeUndefined();
     expect(signedSlot?.materialSources).toEqual([{ source: { signer: 'Alpha' }, count: 3 }]);
     const signedQty = roomy.sim.countItem('wolf_fang', roomy.a);
@@ -1212,34 +1129,27 @@ describe('a signed specimen-less grant carries its rolled quantity (#2473)', () 
     const m = expectDefined(full.internals.players.get(full.a));
     m.inventory[0] = { itemId: 'wolf_fang', count: 1 };
     expect(m.inventory.length).toBe(bagCapacity(m.bags));
-    full.sim.harvestCorpse(full.mob.id, ['fang'], full.a);
+    grantCorpseHarvestOnMob(full.sim, full.mob, m, ['fang']);
     expect(premiumMaterialUnits(m, 'wolf_fang', 'Alpha')).toBe(3);
     // Minus the unit seeded into the compatible stack.
     const fullQty = full.sim.countItem('wolf_fang', full.a) - 1;
 
     expect(signedQty).toBe(fullQty);
-    // Bound to the roll's own tier quantity too, so a future change that made
-    // BOTH arms grant one unit could not pass the equality above alone.
     expect(fullQty).toBe(3);
   });
 
   it('grants the whole rolled quantity into ONE signed slot, never a unit per slot (seed 31)', () => {
-    // Three units with one source composition form one ordinary material
-    // stack, so the counted grant does not cost one bag slot per unit.
     const { sim, internals, a, mob } = setup(31);
     const m = expectDefined(internals.players.get(a));
     const before = m.inventory.length;
     sim.drainEvents();
-    sim.harvestCorpse(mob.id, ['fang'], a);
+    grantCorpseHarvestOnMob(sim, mob, m, ['fang']);
     const signed = m.inventory.filter((s) => s.itemId === 'wolf_fang');
     expect(signed).toHaveLength(1);
     expect(signed[0].count).toBe(3);
     expect(signed[0].instance).toBeUndefined();
     expect(signed[0].materialSources).toEqual([{ source: { signer: 'Alpha' }, count: 3 }]);
     expect(m.inventory.length).toBe(before + 1);
-    // The slot's count is the ledger's count is the roll: bound to the event
-    // rather than to the literal alone, so a change that moved the grant and
-    // the report together could not pass by agreeing with itself.
     const result = sim
       .drainEvents()
       .find((e): e is Extract<typeof e, { type: 'harvestResult' }> => e.type === 'harvestResult');
@@ -1249,9 +1159,6 @@ describe('a signed specimen-less grant carries its rolled quantity (#2473)', () 
   });
 
   it('the cloth family carries its rolled quantity the same way (seed 31)', () => {
-    // The second specimen-less family, so the fix is the ARM's behavior and not
-    // a fang-shaped special case. Its roll is TWO where the fang above is
-    // three, which is what proves the count is read off the roll.
     const { sim, internals, a } = setup(31);
     const template = MOBS.vale_bandit;
     const corpse = createMob(7775, template, template.maxLevel, { x: 0, y: 0, z: 0 });
@@ -1260,7 +1167,7 @@ describe('a signed specimen-less grant carries its rolled quantity (#2473)', () 
     corpse.corpseTimer = 9999;
     corpse.respawnTimer = 9999;
     internals.entities.set(corpse.id, corpse);
-    sim.harvestCorpse(corpse.id, ['cloth'], a);
+    grantCorpseHarvestOnMob(sim, corpse, mustPlayer(internals, a), ['cloth']);
     const slot = mustPlayer(internals, a).inventory.find((s) => s.itemId === 'homespun_cloth');
     expect(slot?.instance).toBeUndefined();
     expect(slot?.materialSources).toEqual([{ source: { signer: 'Alpha' }, count: 2 }]);
@@ -1268,14 +1175,11 @@ describe('a signed specimen-less grant carries its rolled quantity (#2473)', () 
     // The two families really do land on different counts, so neither literal
     // can be a constant the arm hardcoded.
     const fang = setup(31);
-    fang.sim.harvestCorpse(fang.mob.id, ['fang'], fang.a);
+    grantCorpseHarvestOnMob(fang.sim, fang.mob, mustPlayer(fang.internals, fang.a), ['fang']);
     expect(fang.sim.countItem('wolf_fang', fang.a)).not.toBe(slot?.count);
   });
 
   it('source-compatible room takes the whole mark before a legacy partial target', () => {
-    // The earlier unrecorded stack has room for all three units. It wins by
-    // inventory order even though the later legacy Alpha stack also has room,
-    // proving source provenance does not fragment capacity.
     const { sim, internals, a, mob } = setup(31);
     fillBags(sim, internals, a);
     const m = expectDefined(internals.players.get(a));
@@ -1285,7 +1189,7 @@ describe('a signed specimen-less grant carries its rolled quantity (#2473)', () 
     m.inventory[1] = { itemId: 'wolf_fang', count: stack - 2, instance: { signer: 'Alpha' } };
     expect(m.inventory.length).toBe(cap);
     sim.drainEvents();
-    sim.harvestCorpse(mob.id, ['fang'], a);
+    grantCorpseHarvestOnMob(sim, mob, m, ['fang']);
     expect(mob.harvestClaimedBy).toBe(a);
     expect(m.inventory.length).toBe(cap);
     // The later legacy target remains untouched.
@@ -1304,8 +1208,6 @@ describe('a signed specimen-less grant carries its rolled quantity (#2473)', () 
   });
 
   it('keeps a separated stack excluded while a legacy target receives the roll (seed 31)', () => {
-    // Explicit separation removes the earlier stack from automatic packing,
-    // leaving the six-unit pre-gate maximum in the legacy Alpha target.
     const { sim, internals, a, mob } = setup(31);
     fillBags(sim, internals, a);
     const m = expectDefined(internals.players.get(a));
@@ -1315,7 +1217,7 @@ describe('a signed specimen-less grant carries its rolled quantity (#2473)', () 
     m.inventory[1] = { itemId: 'wolf_fang', count: stack - 6, instance: { signer: 'Alpha' } };
     expect(m.inventory.length).toBe(cap);
     sim.drainEvents();
-    sim.harvestCorpse(mob.id, ['fang'], a);
+    grantCorpseHarvestOnMob(sim, mob, m, ['fang']);
     expect(m.inventory.length).toBe(cap);
     // The touched legacy stack normalizes and receives the exact three-unit roll.
     expect(m.inventory[1].count).toBe(stack - 3);
@@ -1343,14 +1245,14 @@ describe('a signed specimen-less grant carries its rolled quantity (#2473)', () 
     m.inventory.pop();
     expect(m.inventory.length).toBe(cap - 1);
     sim.drainEvents();
-    sim.harvestCorpse(mob.id, undefined, a);
+    grantCorpseHarvestOnMob(sim, mob, m, undefined);
     const events = sim.drainEvents();
     // Seed 23 is pinned to rough_hide 2, signed wolf_fang 1 and one specimen.
     expect(m.inventory.length).toBe(cap);
     expect(sim.countItem('rough_hide', a)).toBe(3);
     expect(sim.countItem('wolf_fang', a)).toBe(1);
     expect(premiumMaterialUnits(m, 'wolf_fang', 'Alpha')).toBe(1);
-    // ... and the jackpot had nowhere left to go, so it truncated and said so.
+    // ...and the jackpot had nowhere left to go, so it truncated and said so.
     expect(m.inventory.some((s) => s.itemId === 'pristine_hide')).toBe(false);
     expect(events.filter((e) => e.type === 'gatherDowngrade')).toEqual([
       { type: 'gatherDowngrade', pid: a, surface: 'corpse', lost: 'find' },
@@ -1358,8 +1260,6 @@ describe('a signed specimen-less grant carries its rolled quantity (#2473)', () 
   });
 
   it('a compatible different-signer stack leaves the last slot for the specimen (seed 23)', () => {
-    // The same pinned roll with one compatible Bravo fang stack: Alpha merges
-    // into it, so the distinct specimen receives the remaining slot.
     const { sim, internals, a, mob } = setup(23);
     const m = expectDefined(internals.players.get(a));
     const cap = bagCapacity(m.bags);
@@ -1373,7 +1273,7 @@ describe('a signed specimen-less grant carries its rolled quantity (#2473)', () 
     m.inventory.pop();
     expect(m.inventory.length).toBe(cap - 1);
     sim.drainEvents();
-    sim.harvestCorpse(mob.id, undefined, a);
+    grantCorpseHarvestOnMob(sim, mob, m, undefined);
     const events = sim.drainEvents();
     expect(m.inventory.length).toBe(cap);
     expect(m.inventory[1].count).toBe(2);
@@ -1388,15 +1288,16 @@ describe('a signed specimen-less grant carries its rolled quantity (#2473)', () 
 });
 
 // #2474: a corpse is single-use, so the family a repeated tag names must be
-// harvested ONCE however many times the frame repeats it. The pick reaches the
-// sim straight off the wire (server/game.ts type-filters `components` and
-// forwards it), and before the dedupe a hand-crafted ['hide','hide'] rolled,
-// granted and logged the hide family twice off one claim, signed Pristine Hides
-// included. Driven end to end here (rolls, grants, ledger, claim, lifecycle),
-// not just at the pure boundary in tests/gathering.test.ts.
+// harvested ONCE however many times the pick repeats it. Pre-fix, a
+// hand-crafted ['hide','hide'] rolled, granted and logged the hide family
+// twice off one claim, signed Pristine Hides included. The dedupe itself
+// (effectiveFocusComponents) is unchanged domain logic, still reachable
+// through the `chosen` argument grantCorpseHarvestOnMob passes straight
+// through to it; only the retired per-call wire override that used to CARRY a
+// repeated tag is gone (see the wire refusal describe below).
 describe('a repeated component tag harvests the family once (#2474)', () => {
-  // Same seed, same corpse template, one command each: the duplicated pick must
-  // land the deduped pick's world, exactly.
+  // Same seed, same corpse template, one completion each: the duplicated pick
+  // must land the deduped pick's world, exactly.
   function harvestWith(
     templateId: string,
     components: string[],
@@ -1410,16 +1311,16 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
     corpse.corpseTimer = 9999;
     corpse.respawnTimer = 9999;
     internals.entities.set(corpse.id, corpse);
+    const meta = mustPlayer(internals, a);
     sim.drainEvents();
     let draws = 0;
-    const rng = (sim as unknown as { rng: { setObserver: (o: (() => void) | null) => void } }).rng;
-    rng.setObserver(() => {
+    sim.rng.setObserver(() => {
       draws++;
     });
-    sim.harvestCorpse(corpse.id, components, a);
-    rng.setObserver(null);
+    grantCorpseHarvestOnMob(sim, corpse, meta, components);
+    sim.rng.setObserver(null);
     return {
-      inventory: structuredClone(mustPlayer(internals, a).inventory),
+      inventory: structuredClone(meta.inventory),
       events: sim.drainEvents(),
       draws,
       claimedBy: corpse.harvestClaimedBy,
@@ -1431,10 +1332,6 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
   // straight through. old_greyjaw (hide/fang/claw) is the same arm one tag map
   // over. forest_wolf tags hide/fang: two tags, so ['hide','hide'] used to
   // clear `>= tagged.length` and spread onto fang instead.
-  // `tags` is pinned per row, not just described: the arm a row exercises is
-  // decided by the corpse's tag COUNT against the two-entry pick, so a content
-  // retag would slide a row onto the other arm while the table still claimed to
-  // cover both. Pinning the tags here is what keeps the matrix honest.
   const CASES: { templateId: string; tag: string; arm: string; tags: string[] }[] = [
     { templateId: 'wild_boar', tag: 'hide', arm: 'concentrate', tags: ['hide', 'tusk', 'meat'] },
     { templateId: 'wild_boar', tag: 'meat', arm: 'concentrate', tags: ['hide', 'tusk', 'meat'] },
@@ -1447,8 +1344,6 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
     for (const c of CASES) {
       expect(MOBS[c.templateId].componentTags, `${c.templateId} tags`).toEqual(c.tags);
       expect(c.tags, `${c.templateId} ${c.tag} is on the corpse`).toContain(c.tag);
-      // A two-entry pick is under the spread threshold only while the corpse
-      // carries MORE than two tags; at exactly two it clears `>= tagged.length`.
       const arm = c.tags.length > 2 ? 'concentrate' : 'spread threshold';
       expect(arm, `${c.templateId} ${c.tag} arm`).toBe(c.arm);
     }
@@ -1462,17 +1357,10 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
         const label = `${c.templateId} ${c.tag} (${c.arm}) @${seed}`;
         const dup = harvestWith(c.templateId, [c.tag, c.tag], seed);
         const once = harvestWith(c.templateId, [c.tag], seed);
-        // The whole observable result of the command: what landed in the bags,
-        // every event it emitted (the harvestResult ledger included), and how
-        // much rng it spent doing it.
         expect(dup.inventory, `${label} inventory`).toEqual(once.inventory);
         expect(dup.events, `${label} events`).toEqual(once.events);
         expect(dup.draws, `${label} draws`).toEqual(once.draws);
-        // An absolute floor under that equality, so a mis-wired observer
-        // reading 0 on both sides cannot pass: one mapped family costs exactly
-        // one tier roll plus one rarity roll, on every row.
         expect(once.draws, `${label} single-pick draws`).toBe(2);
-        // ... and the claim is still spent exactly once, by the harvester.
         expect(dup.claimedBy, `${label} claim`).toBe(once.claimedBy);
         expect(dup.claimedBy, `${label} claim is the harvester`).not.toBeNull();
       }
@@ -1480,26 +1368,6 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
   });
 
   it('never mints a second signed Pristine Hide off one claim (seed 277, the issue case)', () => {
-    // The headline harm the issue reports, at the one state that actually
-    // reaches it. Pre-fix, this seed rolls rare-or-better on BOTH of the
-    // duplicate's rarity rolls and hands out two Pristine Hides off a
-    // single-use corpse; nothing else in this suite exercises the doubled
-    // SIGNED arm, which is the valuable half of the exploit (a non-fungible,
-    // signer-stamped item, minted twice from one claim). Post-fix the repeat
-    // lands the single tag's world exactly: no specimen, 4 hides, one claim.
-    // Re-hunted from seed 11 after the Eastbrook camp respacing (to 128), then
-    // again after the zones 1-3 quest-dedupe content pass (to 23), then again
-    // after the Galecrest quest-camp pass (#2887) shifted the camp-driven
-    // world-gen draw sequence: each time the old seed stopped clearing the
-    // signable floor on both duplicate rolls, or started clearing it on the
-    // deduped single roll, so it no longer reached the doubled arm at all.
-    // Seed 277 does, and lands the same
-    // post-fix world, so every literal below is unchanged. The doubled arm is
-    // verified through ['hide','meat'] on this same corpse, which spends the
-    // duplicate's exact draw positions at its exact concentration bonus (2
-    // chosen of 3 tags) and comes back with BOTH specimens;
-    // rollCorpseMaterialRarity is family-independent (a fixed baseline, one
-    // draw), so the two rarity rolls are the duplicate's own.
     const { sim, internals, a } = setup(277);
     const template = MOBS.wild_boar;
     const corpse = createMob(7769, template, template.maxLevel, { x: 0, y: 0, z: 0 });
@@ -1508,23 +1376,13 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
     corpse.corpseTimer = 9999;
     corpse.respawnTimer = 9999;
     internals.entities.set(corpse.id, corpse);
-    sim.harvestCorpse(corpse.id, ['hide', 'hide'], a);
+    grantCorpseHarvestOnMob(sim, corpse, mustPlayer(internals, a), ['hide', 'hide']);
     expect(sim.countItem('pristine_hide', a)).toBe(0);
     expect(sim.countItem('rough_hide', a)).toBe(6);
-    // No premium source landed anywhere, so a duplicated signed jackpot cannot
-    // hide inside an otherwise compatible material stack.
     expect(premiumMaterialUnits(mustPlayer(internals, a), undefined, 'Alpha')).toBe(0);
   });
 
   it('rolls and grants the family ONE time, not once per repeat (seed 31, absolute counts)', () => {
-    // The equality above would also pass if both sides were wrong together, so
-    // the quantities are pinned to literals here. At this seed the deduped
-    // single roll clears the signable floor, so the specimen below is the
-    // ORDINARY one-family jackpot, not a doubled one: pre-fix the same command
-    // rolled twice at a lower concentration bonus and came back with 8 plain
-    // hides and no specimen at all. Both numbers move under a revert, which is
-    // what makes them decisive. The doubled-specimen state has its own case
-    // above, at the seed that actually reaches it.
     const { sim, internals, a } = setup(31);
     const template = MOBS.wild_boar;
     const corpse = createMob(7773, template, template.maxLevel, { x: 0, y: 0, z: 0 });
@@ -1535,45 +1393,29 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
     internals.entities.set(corpse.id, corpse);
     expect(template.componentTags).toEqual(['hide', 'tusk', 'meat']);
     sim.drainEvents();
-    sim.harvestCorpse(corpse.id, ['hide', 'hide'], a);
-    // Two draws is one family's worth (tier roll + rarity roll); four was the
-    // bug. Read off the ledger the client actually prints, which carries one
-    // entry per distinct granted item.
+    grantCorpseHarvestOnMob(sim, corpse, mustPlayer(internals, a), ['hide', 'hide']);
     const result = sim
       .drainEvents()
       .filter((e): e is Extract<typeof e, { type: 'harvestResult' }> => e.type === 'harvestResult');
     expect(result).toHaveLength(1);
     expect(result[0].yields.map((y) => y.itemId).sort()).toEqual(['pristine_hide', 'rough_hide']);
-    // The QUANTITY on that entry, not its count: recordHarvestYield merges
-    // same-item grants, so the doubled harvest also produced exactly one
-    // rough_hide row, just carrying 8 instead of 4. Only the number can tell
-    // the two apart.
     expect(result[0].yields.find((y) => y.itemId === 'rough_hide')?.qty).toBe(4);
     expect(sim.countItem('rough_hide', a)).toBe(4);
     expect(sim.countItem('pristine_hide', a)).toBe(1);
-    const meta = expectDefined(internals.players.get(a));
+    const meta = mustPlayer(internals, a);
     expect(meta.inventory.filter((s) => s.itemId === 'pristine_hide')).toHaveLength(1);
-    // Nothing from the tags the caller never named.
     expect(sim.countItem('game_meat', a)).toBe(0);
   });
 
   it('a repeat cannot pull in a tag the caller never asked for (spread threshold, seed 31)', () => {
-    // forest_wolf tags hide and fang, so ['hide','hide'] used to clear
-    // `chosen.length >= tagged.length` and spread across BOTH families at the
-    // zero concentration bonus a real two-tag pick earns. The fang line is the
-    // decisive one: a dedupe that ran after the length test would still grant it.
-    const { sim, mob, a } = setup(31);
+    const { sim, internals, mob, a } = setup(31);
     expect(MOBS.forest_wolf.componentTags).toEqual(['hide', 'fang']);
-    sim.harvestCorpse(mob.id, ['hide', 'hide'], a);
+    grantCorpseHarvestOnMob(sim, mob, mustPlayer(internals, a), ['hide', 'hide']);
     expect(sim.countItem('rough_hide', a)).toBeGreaterThan(0);
     expect(sim.countItem('wolf_fang', a)).toBe(0);
   });
 
   it('a repeat inside a MULTI-family pick collapses only its own family', () => {
-    // The mixed case: the other tags in the same frame must still be harvested,
-    // in the order they were named. The pick names meat and hide out of
-    // wild_boar's three families (tusk, mapped since #2905, is simply not
-    // named), so those two are the ones that land.
     const { sim, internals, a } = setup(31);
     const template = MOBS.wild_boar;
     const corpse = createMob(7772, template, template.maxLevel, { x: 0, y: 0, z: 0 });
@@ -1583,7 +1425,7 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
     corpse.respawnTimer = 9999;
     internals.entities.set(corpse.id, corpse);
     sim.drainEvents();
-    sim.harvestCorpse(corpse.id, ['meat', 'hide', 'meat'], a);
+    grantCorpseHarvestOnMob(sim, corpse, mustPlayer(internals, a), ['meat', 'hide', 'meat']);
     const result = sim
       .drainEvents()
       .filter((e): e is Extract<typeof e, { type: 'harvestResult' }> => e.type === 'harvestResult');
@@ -1597,40 +1439,28 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
   });
 
   it('leaves the corpse lifecycle exactly where a single-tag harvest leaves it', () => {
-    // The claim is single-use whatever the frame said: the repeat spends it
-    // once, the corpse is denied to everyone after, and the harvested-corpse
-    // timer clamp is the same one the deduped pick produces.
-    const { sim, mob, a, b } = setup(11);
+    const { sim, internals, mob, a, b } = setup(11);
     const once = setup(11);
     expect(mob.corpseTimer).toBe(9999);
-    sim.harvestCorpse(mob.id, ['hide', 'hide'], a);
-    once.sim.harvestCorpse(once.mob.id, ['hide'], once.a);
+    grantCorpseHarvestOnMob(sim, mob, mustPlayer(internals, a), ['hide', 'hide']);
+    grantCorpseHarvestOnMob(once.sim, once.mob, mustPlayer(once.internals, once.a), ['hide']);
     expect(mob.harvestClaimedBy).toBe(a);
-    // Literals, not only the twin comparison: two runs of the same post-fix
-    // path move together, so an equality alone cannot fail. This corpse carries
-    // no loot, so the harvest takes the collapse arm and clamps the timer to 4.
+    // This corpse carries no loot, so the harvest takes the collapse arm and
+    // clamps the timer to 4.
     expect(mob.corpseTimer).toBe(4);
     expect(mob.corpseTimer).toBe(once.mob.corpseTimer);
-    // `lootable` is pinned against the arm that decides it rather than against
-    // the twin: this corpse has no loot, so it takes the collapse arm and ends
-    // false. Compared to the twin alone the line would hold even if the command
-    // never ran, since a createMob corpse starts out unlootable.
     expect(mob.loot).toBeNull();
     expect(mob.lootable).toBe(false);
     expect(mob.lootable).toBe(once.mob.lootable);
-    // A second command, repeated tag or not, is denied against the same corpse.
-    sim.harvestCorpse(mob.id, ['hide', 'hide'], b);
+    // A second completion, repeated tag or not, is denied against the same
+    // corpse (the claim is already spent).
+    expect(grantCorpseHarvestOnMob(sim, mob, mustPlayer(internals, b), ['hide', 'hide'])).toBe(
+      false,
+    );
     expect(mob.harvestClaimedBy).toBe(a);
   });
 
   it('reserves ONE family of stack room, so a repeat no longer over-reserves the gate', () => {
-    // The boundary this fix actually MOVES, and the reason the pre-claim gate
-    // and the roll have to agree: the gate reserves the most a component can
-    // roll, so the duplicated pick used to ask for two families' worth (12
-    // rough_hide, 2 x the legendary tier quantity) where one was ever granted.
-    // A bag holding room for exactly one family therefore refused the repeat
-    // outright while accepting the identical single-tag pick. Both now behave
-    // the same, which is the whole contract.
     const stack = stackSizeOf(ITEMS.rough_hide);
     const rig = (components: string[]) => {
       const { sim, internals, a } = setup(31);
@@ -1646,13 +1476,11 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
       // Zero free slots, and stack room for exactly one family's top roll.
       m.inventory[0] = { itemId: 'rough_hide', count: stack - 6 };
       let draws = 0;
-      const rng = (sim as unknown as { rng: { setObserver: (o: (() => void) | null) => void } })
-        .rng;
-      rng.setObserver(() => {
+      sim.rng.setObserver(() => {
         draws++;
       });
-      sim.harvestCorpse(corpse.id, components, a);
-      rng.setObserver(null);
+      grantCorpseHarvestOnMob(sim, corpse, m, components);
+      sim.rng.setObserver(null);
       return {
         claimedBy: corpse.harvestClaimedBy,
         hides: sim.countItem('rough_hide', a),
@@ -1661,9 +1489,6 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
     };
     const dup = rig(['hide', 'hide']);
     const once = rig(['hide']);
-    // The single pick has always fit here, so this is the decisive half: the
-    // repeat has to reach the same harvested state, not the refusal it used to
-    // get. Absolute values, not just equality, so both sides cannot be wrong.
     expect(once.claimedBy).not.toBeNull();
     expect(once.draws).toBe(2);
     expect(dup.claimedBy).toBe(once.claimedBy);
@@ -1672,120 +1497,52 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
     expect(dup.hides).toBe(stack - 6 + 4);
   });
 
-  it('draws NO rng when refused, on every refusal arm, repeat or not', () => {
-    // A refused command must not shift the world's draw order for everyone
-    // else. Both source comments state that as a hard determinism contract and
-    // nothing pinned it, and this change is what moved the gate that decides
-    // one of these arms, so it is pinned here across all five.
-    const refusals: {
-      label: string;
-      arrange: (rig: ReturnType<typeof setup>) => number;
-      // Templates retagged for the duration of THIS arm alone (the shared
-      // withRetaggedTemplates idiom), so an earlier arm sees them as shipped.
-      retags?: Record<string, readonly string[]>;
-    }[] = [
-      {
-        label: 'full bags (the pre-claim capacity gate)',
-        arrange: ({ sim, internals, a, mob }) => {
-          fillBags(sim, internals, a);
-          return mob.id;
-        },
-      },
-      {
-        label: 'too far away',
-        arrange: ({ internals, a, mob }) => {
-          expectDefined(internals.entities.get(a)).pos = { x: 500, y: 0, z: 0 };
-          return mob.id;
-        },
-      },
-      {
-        label: 'the corpse is already claimed',
-        arrange: ({ mob, b }) => {
-          mob.harvestClaimedBy = b;
-          return mob.id;
-        },
-      },
-      {
-        label: 'the harvester is dead',
-        arrange: ({ internals, a, mob }) => {
-          expectDefined(internals.entities.get(a)).dead = true;
-          return mob.id;
-        },
-      },
-      {
-        label: 'the corpse carries no component tags',
-        arrange: ({ internals }) => {
-          // The retags scoping claim below, asserted: this arm runs against
-          // warlock_imp as shipped (untagged), never under another arm's retag.
-          expect(MOBS.warlock_imp.componentTags).toBeUndefined();
-          const template = MOBS.warlock_imp;
-          const corpse = createMob(7770, template, template.maxLevel, { x: 0, y: 0, z: 0 });
-          corpse.dead = true;
-          corpse.aiState = 'dead';
-          corpse.corpseTimer = 9999;
-          corpse.respawnTimer = 9999;
-          internals.entities.set(corpse.id, corpse);
-          return corpse.id;
-        },
-      },
-      {
-        // The same early return reached the other way (#2513): the corpse
-        // carries tags, but every one of them is unmapped, so
-        // isHarvestableCorpse answers false and the command is refused before
-        // the claim. Pre-#2513 this arm did not exist: it drew a tier roll per
-        // effective family and spent the claim. fen_troll (claw, tusk) was the
-        // shipped fixture; claw and tusk are both mapped now, so this retags
-        // UNMAPPED_TEMPLATE_ID for the duration of the arm (scoped to it, so
-        // the "no component tags" arm above runs against it untagged).
-        label: 'the corpse carries only unmapped component families',
-        retags: { [UNMAPPED_TEMPLATE_ID]: UNMAPPED_TEMPLATE_TAGS },
-        arrange: ({ internals }) => {
-          const template = MOBS[UNMAPPED_TEMPLATE_ID];
-          const corpse = createMob(7771, template, template.maxLevel, { x: 0, y: 0, z: 0 });
-          corpse.dead = true;
-          corpse.aiState = 'dead';
-          corpse.corpseTimer = 9999;
-          corpse.respawnTimer = 9999;
-          internals.entities.set(corpse.id, corpse);
-          return corpse.id;
-        },
-      },
-      {
-        // The seventh early return, and the only one that refuses SILENTLY (no
-        // error text): the target is not a dead mob. "Every arm" has to mean
-        // every arm, so the live mob and the unknown id are both here.
-        label: 'the target mob is still alive',
-        arrange: ({ mob }) => {
-          mob.dead = false;
-          mob.aiState = 'idle';
-          return mob.id;
-        },
-      },
-      {
-        label: 'the target id is not an entity at all',
-        arrange: () => 4242,
-      },
-    ];
-    for (const arm of refusals) {
-      withRetaggedTemplates(arm.retags ?? {}, () => {
-        for (const components of [['hide', 'hide'], ['hide']]) {
-          const rig = setup(153);
-          const mobId = arm.arrange(rig);
-          let draws = 0;
-          const rng = (
-            rig.sim as unknown as { rng: { setObserver: (o: (() => void) | null) => void } }
-          ).rng;
-          rng.setObserver(() => {
-            draws++;
-          });
-          rig.sim.harvestCorpse(mobId, components, rig.a);
-          rng.setObserver(null);
-          const label = `${arm.label} ${JSON.stringify(components)}`;
-          expect(draws, `${label} draws`).toBe(0);
-          expect(rig.sim.countItem('rough_hide', rig.a), `${label} yield`).toBe(0);
-        }
-      });
+  it('draws NO rng when refused, on every GRANT-level refusal arm, repeat or not', () => {
+    // Admission-level refusals (dead actor, too far, live mob, unknown
+    // target) are the timed session's own gates, exhaustively pinned in
+    // tests/corpse_harvest_cast.test.ts; grantCorpseHarvestOnMob's signature
+    // (a real Entity, not an id, no pid resolution) does not reach them at
+    // all. What stays in scope here is the GRANT function's own pre-roll
+    // gates, which a refused command must not shift rng past.
+    function runArm(
+      label: string,
+      templateId: string,
+      arrange: (rig: ReturnType<typeof setup>, corpse: Entity) => void,
+    ): void {
+      for (const components of [['hide', 'hide'], ['hide']]) {
+        const rig = setup(153);
+        const template = MOBS[templateId];
+        const corpse = createMob(7770, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+        corpse.dead = true;
+        corpse.aiState = 'dead';
+        corpse.corpseTimer = 9999;
+        corpse.respawnTimer = 9999;
+        rig.internals.entities.set(corpse.id, corpse);
+        arrange(rig, corpse);
+        let draws = 0;
+        rig.sim.rng.setObserver(() => {
+          draws++;
+        });
+        grantCorpseHarvestOnMob(rig.sim, corpse, mustPlayer(rig.internals, rig.a), components);
+        rig.sim.rng.setObserver(null);
+        const rowLabel = `${label} ${JSON.stringify(components)}`;
+        expect(draws, `${rowLabel} draws`).toBe(0);
+        expect(rig.sim.countItem('rough_hide', rig.a), `${rowLabel} yield`).toBe(0);
+      }
     }
+
+    runArm('full bags (the pre-claim capacity gate)', 'forest_wolf', ({ sim, internals, a }) => {
+      fillBags(sim, internals, a);
+    });
+    runArm('the corpse is already claimed', 'forest_wolf', ({ b }, corpse) => {
+      corpse.harvestClaimedBy = b;
+    });
+    // warlock_imp as SHIPPED (untagged; #1140 only tagged a subset of mobs).
+    expect(MOBS.warlock_imp.componentTags).toBeUndefined();
+    runArm('the corpse carries no component tags', 'warlock_imp', () => {});
+    withUnmappedTemplate(() => {
+      runArm('the corpse carries only unmapped component families', UNMAPPED_TEMPLATE_ID, () => {});
+    });
   });
 });
 
@@ -1793,10 +1550,9 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
 // test, so it can no longer pad the pick past the `>= taggedComponents.length`
 // spread threshold. Pre-fix, ['hide','junk'] on a two-tag corpse harvested BOTH
 // families at bonus 0 (a family the caller never named), byte-identical to the
-// empty pick; ['hide'] concentrated on hide. Same class as #2474 one step over.
+// empty pick; ['hide'] concentrated on hide. Same class as #2474 one step over,
+// and the same unchanged effectiveFocusComponents domain logic.
 describe('an invalid component tag is ignored entirely (#2504)', () => {
-  // Same seed, same corpse template, one command each: the padded pick must
-  // land the stripped pick's world, exactly.
   function harvestWith(
     templateId: string,
     components: string[],
@@ -1810,50 +1566,22 @@ describe('an invalid component tag is ignored entirely (#2504)', () => {
     corpse.corpseTimer = 9999;
     corpse.respawnTimer = 9999;
     internals.entities.set(corpse.id, corpse);
+    const meta = mustPlayer(internals, a);
     sim.drainEvents();
     let draws = 0;
-    const rng = (sim as unknown as { rng: { setObserver: (o: (() => void) | null) => void } }).rng;
-    rng.setObserver(() => {
+    sim.rng.setObserver(() => {
       draws++;
     });
-    sim.harvestCorpse(corpse.id, components, a);
-    rng.setObserver(null);
+    grantCorpseHarvestOnMob(sim, corpse, meta, components);
+    sim.rng.setObserver(null);
     return {
-      inventory: structuredClone(mustPlayer(internals, a).inventory),
+      inventory: structuredClone(meta.inventory),
       events: sim.drainEvents(),
       draws,
       claimedBy: corpse.harvestClaimedBy,
     };
   }
 
-  // Which ARM a row exercises is decided by the deduped pick's raw length
-  // against the corpse's tag COUNT, not by the template: at or above the count
-  // the junk used to flip the whole command to spread, below it the junk was
-  // already dropped by the old filter. Both are here, at two different widths,
-  // and `tags` is pinned per row so a content retag cannot slide a row onto the
-  // other arm while the table still claims to cover both.
-  // `absent` is the item id of every family the pick did NOT name, so a row can
-  // assert the harm directly (a spread grants them).
-  //
-  // #2514 re-picked the two mixed-corpse rows, and the reason is the point of
-  // the row: they used to leave out only claw / tusk, which mapped to no item
-  // at the time, so their `absent` list was empty and only `spreadDraws`
-  // separated the arms. Once an unmapped family stopped being extracted, the
-  // spread on those corpses became the SAME world as the pick that named
-  // every mapped family, and the separator collapsed (4 draws against 4).
-  // Both rows were re-picked to leave out a MAPPED family instead
-  // (old_greyjaw's fang, wild_boar's hide), which restored a non-empty
-  // `absent` and made the separator hold on its own terms.
-  //
-  // claw and tusk have since joined the yield table too, which raises both
-  // rows' `draws` and `spreadDraws` again: old_greyjaw's stripped pick
-  // (hide, claw) now extracts two mapped families, not one, and wild_boar's
-  // (meat, tusk) does the same; the corpus-wide "no shipped template carries
-  // more than two mapped families" bound that used to make every mixed row a
-  // one-family extraction no longer holds for these two, so their `draws`
-  // literal is 4, not 2. forest_wolf's row (hide, fang, two mapped families
-  // total) and wild_boar's other row (a single-tag stripped pick) are
-  // unaffected: they never named claw or tusk.
   const CASES: {
     templateId: string;
     padded: string[];
@@ -1880,9 +1608,6 @@ describe('an invalid component tag is ignored entirely (#2504)', () => {
       stripped: ['hide', 'claw'],
       tags: ['hide', 'fang', 'claw'],
       arm: 'padded past the threshold',
-      // claw joined the yield table, so the stripped pick now extracts TWO
-      // mapped families (hide, claw), not one: 4 draws, not 2. The spread
-      // extracts all three (hide, fang, claw are all mapped now): 6, not 4.
       draws: 4,
       spreadDraws: 6,
       absent: ['wolf_fang'],
@@ -1893,9 +1618,6 @@ describe('an invalid component tag is ignored entirely (#2504)', () => {
       stripped: ['meat', 'tusk'],
       tags: ['hide', 'tusk', 'meat'],
       arm: 'padded past the threshold',
-      // tusk joined the yield table, so the stripped pick now extracts TWO
-      // mapped families (meat, tusk), not one: 4 draws, not 2. The spread
-      // extracts all three (hide, tusk, meat are all mapped now): 6, not 4.
       draws: 4,
       spreadDraws: 6,
       absent: ['rough_hide'],
@@ -1907,8 +1629,6 @@ describe('an invalid component tag is ignored entirely (#2504)', () => {
       tags: ['hide', 'tusk', 'meat'],
       arm: 'under the threshold',
       draws: 2,
-      // Same corpse as the row above: the spread now extracts all three
-      // mapped families, 6 draws not 4.
       spreadDraws: 6,
       absent: ['game_meat'],
     },
@@ -1923,16 +1643,11 @@ describe('an invalid component tag is ignored entirely (#2504)', () => {
       for (const tag of c.padded.filter((t) => !c.stripped.includes(t))) {
         expect(c.tags, `${c.templateId} ${tag} is NOT on the corpse`).not.toContain(tag);
       }
-      // The pre-#2504 test: the RAW deduped count, junk included, against the
-      // corpse's tag count.
       const arm =
         new Set(c.padded).size >= c.tags.length
           ? 'padded past the threshold'
           : 'under the threshold';
       expect(arm, `${c.templateId} ${JSON.stringify(c.padded)} arm`).toBe(c.arm);
-      // Every `absent` id really is a family the pick leaves out, and really is
-      // mapped to an item (an unmapped one could never show up in a count, so
-      // asserting its absence would prove nothing).
       for (const itemId of c.absent) {
         const family = Object.keys(HARVEST_COMPONENT_ITEMS).find(
           (k) => HARVEST_COMPONENT_ITEMS[k] === itemId,
@@ -1941,10 +1656,6 @@ describe('an invalid component tag is ignored entirely (#2504)', () => {
         expect(c.tags, `${c.templateId} ${family} is on the corpse`).toContain(family);
         expect(c.stripped, `${c.templateId} ${family} is not named`).not.toContain(family);
       }
-      // And the spread really does cost a different number of draws than the
-      // junk-free pick, live off the same corpse, so the per-row `draws` literal
-      // in the next test is a decisive arm separator and not a coincidence.
-      // This is what carries the two rows whose left-out family maps to no item.
       expect(harvestWith(c.templateId, [], 5).draws, `${c.templateId} spread draws`).toBe(
         c.spreadDraws,
       );
@@ -1960,22 +1671,12 @@ describe('an invalid component tag is ignored entirely (#2504)', () => {
         const label = `${c.templateId} ${JSON.stringify(c.padded)} (${c.arm}) @${seed}`;
         const padded = harvestWith(c.templateId, c.padded, seed);
         const stripped = harvestWith(c.templateId, c.stripped, seed);
-        // The whole observable result of the command: what landed in the bags,
-        // every event it emitted (the harvestResult ledger included), and how
-        // much rng it spent doing it.
         expect(padded.inventory, `${label} inventory`).toEqual(stripped.inventory);
         expect(padded.events, `${label} events`).toEqual(stripped.events);
         expect(padded.draws, `${label} draws`).toEqual(stripped.draws);
-        // An absolute floor under that equality, per row, so a mis-wired
-        // observer reading 0 on both sides cannot pass: one mapped family costs
-        // one tier roll plus one rarity roll.
         expect(stripped.draws, `${label} junk-free draws`).toBe(c.draws);
-        // ... and the claim is still spent exactly once, by the harvester.
         expect(padded.claimedBy, `${label} claim`).toBe(stripped.claimedBy);
         expect(padded.claimedBy, `${label} claim is the harvester`).not.toBeNull();
-        // The harm, stated absolutely per row rather than only as an equality:
-        // a family the caller never named is not in the bags at all. A spread
-        // would put it there, which is precisely what the junk used to buy.
         const inv = padded.inventory as { itemId: string; count: number }[];
         for (const itemId of c.absent) {
           expect(
@@ -1988,11 +1689,6 @@ describe('an invalid component tag is ignored entirely (#2504)', () => {
   });
 
   it('the issue case in absolute counts: junk no longer buys a family never named', () => {
-    // The reproduction the issue files, on the corpse it files it against.
-    // Pre-fix this command came back with 2 rough_hide and 4 wolf_fang off 4
-    // draws, byte-identical to the empty pick; the fang line is the harm (a
-    // family the caller never named) and the specimen line is the cost (the
-    // concentration bonus a one-family pick earns, spent on spreading instead).
     const { sim, internals, a } = setup(31);
     expect(MOBS.forest_wolf.componentTags).toEqual(['hide', 'fang']);
     const corpse = createMob(7753, MOBS.forest_wolf, MOBS.forest_wolf.maxLevel, {
@@ -2005,20 +1701,18 @@ describe('an invalid component tag is ignored entirely (#2504)', () => {
     corpse.corpseTimer = 9999;
     corpse.respawnTimer = 9999;
     internals.entities.set(corpse.id, corpse);
+    const meta = mustPlayer(internals, a);
     sim.drainEvents();
     let draws = 0;
-    const rng = (sim as unknown as { rng: { setObserver: (o: (() => void) | null) => void } }).rng;
-    rng.setObserver(() => {
+    sim.rng.setObserver(() => {
       draws++;
     });
-    sim.harvestCorpse(corpse.id, ['hide', 'junk'], a);
-    rng.setObserver(null);
+    grantCorpseHarvestOnMob(sim, corpse, meta, ['hide', 'junk']);
+    sim.rng.setObserver(null);
     expect(sim.countItem('rough_hide', a)).toBe(3);
     expect(sim.countItem('wolf_fang', a)).toBe(0);
     expect(sim.countItem('pristine_hide', a)).toBe(1);
     expect(draws).toBe(2);
-    // Read off the ledger the client actually prints, too: the junk string
-    // reaches no grant of its own and leaves no entry behind.
     const result = sim
       .drainEvents()
       .filter((e): e is Extract<typeof e, { type: 'harvestResult' }> => e.type === 'harvestResult');
@@ -2028,10 +1722,6 @@ describe('an invalid component tag is ignored entirely (#2504)', () => {
   });
 
   it('an ALL-junk pick spreads, exactly as the empty pick does (the settled ruling)', () => {
-    // The ordering consequence the issue asked to settle: with the filter ahead
-    // of the length tests, a pick naming nothing on the corpse reaches the
-    // `length === 0` arm. Ruled for spreading. Pre-fix this command spent the
-    // claim and granted NOTHING, which is the outcome being retired.
     for (const templateId of ['forest_wolf', 'wild_boar']) {
       for (const seed of [2, 5, 11]) {
         for (const pick of [['junk'], ['junk', 'zzz'], ['junk', 'zzz', 'qqq']]) {
@@ -2045,13 +1735,6 @@ describe('an invalid component tag is ignored entirely (#2504)', () => {
         }
       }
     }
-    // Absolutes under the equality, so two identically-empty harvests cannot
-    // pass it: the wolf spread costs 4 draws (two mapped families, a tier roll
-    // and a rarity roll each) and really lands both families. Pre-fix the same
-    // command drew 0 and granted 0. Both quantities re-recorded (3 to 1) after
-    // the zones 1-3 quest-dedupe content pass shifted the shared stream, then
-    // (1 to 2) after the Galecrest quest-camp pass (#2887) shifted it again;
-    // the spread property the row is about is what stayed put.
     const junk = harvestWith('forest_wolf', ['junk'], 5);
     expect(junk.draws).toBe(4);
     expect(junk.claimedBy).not.toBeNull();
@@ -2061,29 +1744,20 @@ describe('an invalid component tag is ignored entirely (#2504)', () => {
   });
 
   const HIDE_STACK = stackSizeOf(ITEMS.rough_hide);
-  // What the pre-claim gate reserves per component: the most one can roll,
-  // harvestTierQuantity('legendary'). A literal, because WHERE that boundary
-  // sits is the whole subject of the two tests below; a rig that only ever
-  // proves "something fit" would pass on a gate reserving 3, or 1, or nothing.
   const RESERVED_PER_FAMILY = 6;
 
-  // One rig for both capacity tests: zero free SLOTS, and a rough_hide stack
-  // with exactly `room` units of headroom. That is the only bag shape where
-  // "reserves one family" and "reserves the whole spread" can be told apart,
-  // since a second family (wolf_fang) needs a free slot and there is none.
   const gateRig = (components: string[], room: number) => {
     const { sim, internals, a, mob } = setup(31);
-    const m = expectDefined(internals.players.get(a));
+    const meta = mustPlayer(internals, a);
     fillBags(sim, internals, a);
-    m.inventory[0] = { itemId: 'rough_hide', count: HIDE_STACK - room };
+    meta.inventory[0] = { itemId: 'rough_hide', count: HIDE_STACK - room };
     sim.drainEvents();
     let draws = 0;
-    const rng = (sim as unknown as { rng: { setObserver: (o: (() => void) | null) => void } }).rng;
-    rng.setObserver(() => {
+    sim.rng.setObserver(() => {
       draws++;
     });
-    sim.harvestCorpse(mob.id, components, a);
-    rng.setObserver(null);
+    grantCorpseHarvestOnMob(sim, mob, meta, components);
+    sim.rng.setObserver(null);
     return {
       claimedBy: mob.harvestClaimedBy,
       hides: sim.countItem('rough_hide', a),
@@ -2097,17 +1771,8 @@ describe('an invalid component tag is ignored entirely (#2504)', () => {
   };
 
   it('the pre-claim capacity gate reserves the junk-free pick, not the padded one', () => {
-    // The gate and the roll read the same helper, so they move together for
-    // free, but the boundary they share MOVES here and only a bag sized between
-    // the old and new reservations can see it. Pre-fix ['hide','junk'] asked
-    // for two families' worth on a two-tag corpse, so a bag with room for
-    // exactly one REFUSED it while accepting the identical ['hide'].
     const padded = gateRig(['hide', 'junk'], RESERVED_PER_FAMILY);
     const stripped = gateRig(['hide'], RESERVED_PER_FAMILY);
-    // The single pick has always fit here, so this is the decisive half: the
-    // padded pick has to reach the same harvested state, not the refusal it
-    // used to get. Absolute values, not just equality, so both sides cannot be
-    // wrong together.
     expect(stripped.claimedBy).not.toBeNull();
     expect(stripped.draws).toBe(2);
     expect(stripped.errors).toEqual([]);
@@ -2116,10 +1781,6 @@ describe('an invalid component tag is ignored entirely (#2504)', () => {
     expect(padded.hides).toBe(stripped.hides);
     expect(padded.hides).toBe(HIDE_STACK - RESERVED_PER_FAMILY + 3);
     expect(padded.errors).toEqual([]);
-    // ONE unit less of room refuses both, which is what pins the reservation to
-    // 6 rather than merely "an amount that happened to fit". Without this half
-    // the accept side above would also pass a sanitize that dropped the VALID
-    // tag along with the junk and so reserved nothing at all.
     const tightPadded = gateRig(['hide', 'junk'], RESERVED_PER_FAMILY - 1);
     const tightStripped = gateRig(['hide'], RESERVED_PER_FAMILY - 1);
     expect(tightStripped.claimedBy).toBeNull();
@@ -2132,14 +1793,6 @@ describe('an invalid component tag is ignored entirely (#2504)', () => {
   });
 
   it('...and an all-junk pick reserves the whole SPREAD, not one family', () => {
-    // The other side of the same moved boundary, and the one that changes a
-    // REFUSAL rather than a grant. Run at the bag shape that can actually tell
-    // the two reservations apart: room for exactly ONE family. A gate that
-    // reserved one family for an all-junk pick would ACCEPT here, because
-    // ['hide'] does on the identical rig (the discriminator line below); the
-    // spread additionally needs a free slot for wolf_fang and there is none.
-    // A totally full bag would refuse under either reservation and prove
-    // nothing.
     const junk = gateRig(['junk'], RESERVED_PER_FAMILY);
     const oneFamily = gateRig(['hide'], RESERVED_PER_FAMILY);
     expect(oneFamily.claimedBy).not.toBeNull();
@@ -2149,207 +1802,54 @@ describe('an invalid component tag is ignored entirely (#2504)', () => {
     expect(junk.hides).toBe(HIDE_STACK - RESERVED_PER_FAMILY);
     expect(junk.fangs).toBe(0);
     expect(junk.errors).toEqual(['Your bags are full.']);
-    // Same world as the empty pick, refusal included: an all-junk pick IS the
-    // empty pick. Pre-fix it reserved nothing, sailed through the gate, and
-    // spent the single-use claim for zero yield.
     const empty = gateRig([], RESERVED_PER_FAMILY);
     expect(junk.claimedBy).toBe(empty.claimedBy);
     expect(junk.errors).toEqual(empty.errors);
     expect(junk.draws).toBe(empty.draws);
   });
 
-  it('draws NO rng when refused, on every refusal arm, junk in the pick or not', () => {
-    // The determinism contract the issue names last: a refused command must not
-    // shift the world's draw order for everyone else. This change moved what
-    // the capacity gate reserves, which is one of these arms, so every arm is
-    // re-run with a junk-bearing pick and with an all-junk pick.
-    // Zero draws alone does NOT establish a refusal, which is exactly the trap
-    // this fix closes: pre-fix, the full-bags arm with an all-junk pick was not
-    // refused at all. It reserved nothing, passed the gate, SPENT the single-use
-    // claim, granted nothing, emitted no harvestResult (that event is gated on
-    // `granted.length > 0`) and clamped corpseTimer to 4, all while drawing zero
-    // rng and yielding zero items. So every arm also pins the claim and the
-    // corpse timer: an unspent claim on an untouched corpse is what "refused"
-    // actually means here.
-    const refusals: {
-      label: string;
-      arrange: (rig: ReturnType<typeof setup>) => number;
-      // The pid that issues the command; defaults to the rig's player A.
-      pid?: (rig: ReturnType<typeof setup>) => number;
-      // Who owns the claim afterwards. Null everywhere except the arm that is
-      // refused BECAUSE someone else already holds it.
-      claimAfter?: (rig: ReturnType<typeof setup>) => number | null;
-      // Overrides the shared junk picks for an arm the junk picks cannot reach.
-      picks?: string[][];
-      // Templates retagged for the duration of THIS arm alone (the shared
-      // withRetaggedTemplates idiom), so an earlier arm sees them as shipped.
-      retags?: Record<string, readonly string[]>;
-    }[] = [
-      {
-        label: 'full bags (the pre-claim capacity gate)',
-        arrange: ({ sim, internals, a, mob }) => {
-          fillBags(sim, internals, a);
-          return mob.id;
-        },
-      },
-      {
-        label: 'too far away',
-        arrange: ({ internals, a, mob }) => {
-          expectDefined(internals.entities.get(a)).pos = { x: 500, y: 0, z: 0 };
-          return mob.id;
-        },
-      },
-      {
-        label: 'the corpse is already claimed',
-        arrange: ({ mob, b }) => {
-          mob.harvestClaimedBy = b;
-          return mob.id;
-        },
-        claimAfter: ({ b }) => b,
-      },
-      {
-        label: 'the harvester is dead',
-        arrange: ({ internals, a, mob }) => {
-          expectDefined(internals.entities.get(a)).dead = true;
-          return mob.id;
-        },
-      },
-      {
-        label: 'the corpse carries no component tags',
-        arrange: ({ internals }) => {
-          // The retags scoping claim below, asserted: this arm runs against
-          // warlock_imp as shipped (untagged), never under another arm's retag.
-          expect(MOBS.warlock_imp.componentTags).toBeUndefined();
-          const template = MOBS.warlock_imp;
-          const corpse = createMob(7752, template, template.maxLevel, { x: 0, y: 0, z: 0 });
-          corpse.dead = true;
-          corpse.aiState = 'dead';
-          corpse.corpseTimer = 9999;
-          corpse.respawnTimer = 9999;
-          internals.entities.set(corpse.id, corpse);
-          return corpse.id;
-        },
-      },
-      {
-        label: 'the target mob is still alive',
-        arrange: ({ mob }) => {
-          mob.dead = false;
-          mob.aiState = 'idle';
-          return mob.id;
-        },
-      },
-      {
-        label: 'the target id is not an entity at all',
-        arrange: () => 4242,
-      },
-      {
-        // The two early returns the #2474 sweep this is modelled on left out.
-        // "Every arm" has to mean every arm, so the non-mob entity and the
-        // unresolvable caller are both here.
-        label: 'the target id is an entity but not a mob',
-        arrange: ({ a }) => a,
-      },
-      {
-        label: 'the acting pid resolves to no player',
-        arrange: ({ mob }) => mob.id,
-        pid: () => 987654,
-      },
-      {
-        // #2509's arm, added here so "every arm" keeps meaning every arm. It
-        // needs its own picks and its own corpse: forest_wolf carries no
-        // unmapped family, so the shared junk picks below cannot reach it.
-        // old_greyjaw (hide, fang, claw) was the shipped fixture until #2905
-        // mapped claw, then sethrael_palecoil (hide, claw, horn) until Phase
-        // 11m mapped horn; the same three-tag shape is retagged onto
-        // MIXED_TEMPLATE_ID for the duration of the arm.
-        label: 'the pick names only families with no item behind them (#2509)',
-        retags: { [MIXED_TEMPLATE_ID]: MIXED_TEMPLATE_TAGS },
-        arrange: ({ internals }) => {
-          const template = MOBS[MIXED_TEMPLATE_ID];
-          const corpse = createMob(7753, template, template.maxLevel, { x: 0, y: 0, z: 0 });
-          corpse.dead = true;
-          corpse.aiState = 'dead';
-          corpse.corpseTimer = 9999;
-          corpse.respawnTimer = 9999;
-          internals.entities.set(corpse.id, corpse);
-          return corpse.id;
-        },
-        picks: [[UNMAPPED_FAMILY], [UNMAPPED_FAMILY, 'junk']],
-      },
-      {
-        // #2513's arm, the corpse-level twin of the one above. The picks are
-        // deliberately the ones that used to SUCCEED here: an omitted-equivalent
-        // full cover, a single unmapped family, and junk beside it. Every one of
-        // them spent the claim pre-fix. fen_troll (claw, tusk) was the shipped
-        // fixture; claw and tusk are both mapped now, so this retags
-        // UNMAPPED_TEMPLATE_ID for the duration of the arm (scoped to it, so
-        // the "no component tags" arm above runs against it untagged).
-        label: 'the corpse carries only unmapped component families (#2513)',
-        retags: { [UNMAPPED_TEMPLATE_ID]: UNMAPPED_TEMPLATE_TAGS },
-        arrange: ({ internals }) => {
-          const template = MOBS[UNMAPPED_TEMPLATE_ID];
-          const corpse = createMob(7755, template, template.maxLevel, { x: 0, y: 0, z: 0 });
-          corpse.dead = true;
-          corpse.aiState = 'dead';
-          corpse.corpseTimer = 9999;
-          corpse.respawnTimer = 9999;
-          internals.entities.set(corpse.id, corpse);
-          return corpse.id;
-        },
-        picks: [
-          [UNMAPPED_FAMILY_2, UNMAPPED_FAMILY],
-          [UNMAPPED_FAMILY],
-          [UNMAPPED_FAMILY, 'junk'],
-          ['junk'],
-          [],
-        ],
-      },
-    ];
-    for (const arm of refusals) {
-      withRetaggedTemplates(arm.retags ?? {}, () => {
-        for (const components of arm.picks ?? [['hide', 'junk'], ['junk'], ['junk', 'zzz']]) {
-          const rig = setup(153);
-          const mobId = arm.arrange(rig);
-          let draws = 0;
-          const rng = (
-            rig.sim as unknown as { rng: { setObserver: (o: (() => void) | null) => void } }
-          ).rng;
-          rng.setObserver(() => {
-            draws++;
-          });
-          rig.sim.harvestCorpse(mobId, components, arm.pid ? arm.pid(rig) : rig.a);
-          rng.setObserver(null);
-          const label = `${arm.label} ${JSON.stringify(components)}`;
-          expect(draws, `${label} draws`).toBe(0);
-          expect(rig.sim.countItem('rough_hide', rig.a), `${label} yield`).toBe(0);
-          expect(rig.sim.countItem('wolf_fang', rig.a), `${label} fang yield`).toBe(0);
-          // The lines that make "refused" mean something: the claim is not spent
-          // and the corpse is left exactly as it was found, so the next harvester
-          // can still take it. Skipped only where the target is not a corpse at
-          // all (no entity, or a player entity), which have nothing to assert.
-          const target = rig.internals.entities.get(mobId);
-          if (target?.kind === 'mob') {
-            expect(target.harvestClaimedBy, `${label} claim`).toBe(
-              arm.claimAfter ? arm.claimAfter(rig) : null,
-            );
-            expect(target.corpseTimer, `${label} corpse timer`).toBe(9999);
-          }
-        }
-      });
+  it('draws NO rng when refused, on every GRANT-level refusal arm, junk in the pick or not', () => {
+    // Narrowed the same way as #2474's sweep above: admission-only arms (too
+    // far, dead actor, live mob, an id resolving to no entity or no player)
+    // are tests/corpse_harvest_cast.test.ts's, unreachable through this
+    // function's signature. #2509's and #2513's own arms get their own
+    // describes below; this sweep keeps the two arms genuinely driven by the
+    // JUNK-bearing pick itself: full bags, and an already-spent claim.
+    function runArm(label: string, arrange: (rig: ReturnType<typeof setup>) => void): void {
+      for (const components of [['hide', 'junk'], ['junk'], ['junk', 'zzz']]) {
+        const rig = setup(153);
+        arrange(rig);
+        let draws = 0;
+        rig.sim.rng.setObserver(() => {
+          draws++;
+        });
+        grantCorpseHarvestOnMob(rig.sim, rig.mob, mustPlayer(rig.internals, rig.a), components);
+        rig.sim.rng.setObserver(null);
+        const label2 = `${label} ${JSON.stringify(components)}`;
+        expect(draws, `${label2} draws`).toBe(0);
+        expect(rig.sim.countItem('rough_hide', rig.a), `${label2} yield`).toBe(0);
+        expect(rig.sim.countItem('wolf_fang', rig.a), `${label2} fang yield`).toBe(0);
+        expect(rig.mob.harvestClaimedBy, `${label2} claim`).toBe(
+          label === 'the corpse is already claimed' ? rig.b : null,
+        );
+        expect(rig.mob.corpseTimer, `${label2} corpse timer`).toBe(9999);
+      }
     }
-    // Positive control for the observer itself: every expectation above is
-    // zero, so a mis-wired setObserver would make the whole sweep vacuous. The
-    // SAME wiring on an accepted command has to read a nonzero count, and the
-    // accepted command has to actually land (claim spent, corpse consumed).
+    runArm('full bags (the pre-claim capacity gate)', ({ sim, internals, a }) => {
+      fillBags(sim, internals, a);
+    });
+    runArm('the corpse is already claimed', ({ mob, b }) => {
+      mob.harvestClaimedBy = b;
+    });
+
+    // Positive control for the observer itself.
     const ok = setup(31);
     let okDraws = 0;
-    const okRng = (ok.sim as unknown as { rng: { setObserver: (o: (() => void) | null) => void } })
-      .rng;
-    okRng.setObserver(() => {
+    ok.sim.rng.setObserver(() => {
       okDraws++;
     });
-    ok.sim.harvestCorpse(ok.mob.id, ['hide', 'junk'], ok.a);
-    okRng.setObserver(null);
+    grantCorpseHarvestOnMob(ok.sim, ok.mob, mustPlayer(ok.internals, ok.a), ['hide', 'junk']);
+    ok.sim.rng.setObserver(null);
     expect(okDraws).toBe(2);
     expect(ok.mob.harvestClaimedBy).toBe(ok.a);
     expect(ok.mob.corpseTimer).not.toBe(9999);
@@ -2385,7 +1885,7 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
   }
 
   // MONSTER_MATERIAL_TIERS is typed Readonly but is a plain runtime object,
-  // and interaction.ts resolves monsterMaterialTierFor inline (no injectable
+  // and the grant domain resolves monsterMaterialTierFor inline (no injectable
   // seam), so raising one family's tier here, restored in finally, is the
   // narrowest honest way to drive the REAL deny arm rather than pin a
   // re-implementation. Restored before any assertion runs.
@@ -2396,21 +1896,12 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
     try {
       body();
     } finally {
-      // A future component absent from the table must restore to ABSENT, not
-      // to a present-but-undefined key (which would surprise the literal set
-      // pin below and any Object.keys comparison).
       if (prior === undefined) delete tiers[component];
       else tiers[component] = prior;
     }
   }
 
   it('lists every harvest component family literally, all at tier 1 (the wave-one prime directive)', () => {
-    // LITERAL set equality, never derived from HARVEST_COMPONENT_ITEMS alone:
-    // a future higher-tier corpse family must consciously re-pin this.
-    // horn and gills (Masterwrought Phase 11m) join at 1 for the prime
-    // directive's own reason: both were tagged on bare-hands corpses long
-    // before they yielded anything, so a higher tier would gate a corpse a
-    // player has been harvesting all along.
     expect(MONSTER_MATERIAL_TIERS).toEqual({
       hide: 1,
       fang: 1,
@@ -2427,7 +1918,6 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
       Object.keys(HARVEST_COMPONENT_ITEMS).sort(),
     );
     expect(monsterMaterialTierFor('hide')).toBe(1);
-    // An unlisted (future) component defaults to the bare-hands floor: never gated.
     expect(monsterMaterialTierFor('no_such_component')).toBe(1);
   });
 
@@ -2439,10 +1929,9 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
   it('bare hands still earn the signed specimen on real content: tier-1 families never gate (seed 30)', () => {
     const { sim, internals, a, mob } = setup(30);
     const meta = expectDefined(internals.players.get(a));
-    // Genuinely bare-handed: the starting kit resolves to the tier-1 floor.
     expect(bestOwnedAnyGatherToolTier(meta.inventory, ITEMS)).toBe(1);
     sim.drainEvents();
-    sim.harvestCorpse(mob.id, ['hide'], a);
+    grantCorpseHarvestOnMob(sim, mob, meta, ['hide']);
     expect(sim.drainEvents().some((e) => e.type === 'gatherDenied')).toBe(false);
     const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
     expect(specimen?.instance).toBeUndefined();
@@ -2451,20 +1940,12 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
   });
 
   it('a denied premium pull downgrades to the plain grant: same qty, same claim, same draws (seed 15)', () => {
-    // Baseline arm, unmutated: seed 15's rarity roll clears the signable floor,
-    // so the specimen jackpot lands beside the plain component. Re-recorded
-    // from seed 45 after the Eastbrook camp respacing (to 4), then from 4 to
-    // 31 after the zones 1-3 quest-dedupe content pass shifted the camp-driven
-    // world-gen draw sequence again, then from 31 to 21 after the Galecrest
-    // quest-camp pass (#2887), and finally from 21 to the CURRENT 15 by the
-    // v0.35.0 base-sync fixture refresh (d4deed629a; 11m QA: the chain used
-    // to end at 21 over soloRig(15) bodies). Every re-hunt reproduces
-    // the same 3-unit signable hide roll, so the literals below are unchanged.
     const base = soloRig(15);
+    const baseMeta = mustPlayer(base.internals, base.a);
     let baseDraws = 0;
     base.sim.rng.setObserver(() => baseDraws++);
     try {
-      base.sim.harvestCorpse(base.mob.id, ['hide'], base.a);
+      grantCorpseHarvestOnMob(base.sim, base.mob, baseMeta, ['hide']);
     } finally {
       base.sim.rng.setObserver(null);
     }
@@ -2472,62 +1953,47 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
     expect(basePlain).toBe(6);
     expect(base.sim.countItem('pristine_hide', base.a)).toBe(1);
 
-    // Denied arm: hide raised to tier 2, same seed, same rig, same draws.
     const { sim, internals, a, mob } = soloRig(15);
+    const meta = mustPlayer(internals, a);
     sim.drainEvents();
     let draws = 0;
     withTier('hide', 2, () => {
       sim.rng.setObserver(() => draws++);
       try {
-        sim.harvestCorpse(mob.id, ['hide'], a);
+        grantCorpseHarvestOnMob(sim, mob, meta, ['hide']);
       } finally {
         sim.rng.setObserver(null);
       }
     });
-    // Draw-order invariant: the rarity roll is STILL consumed on a denied
-    // pull (the denial sits strictly after the roll and draws nothing).
     expect(baseDraws).toBe(2);
     expect(draws).toBe(2);
-    // Claim outcome identical: the corpse is spent either way.
     expect(mob.harvestClaimedBy).toBe(a);
-    // The yield downgrades to the plain fungible grant: same quantity, no
-    // jackpot, and no premium source anywhere.
     expect(sim.countItem('rough_hide', a)).toBe(basePlain);
     expect(sim.countItem('pristine_hide', a)).toBe(0);
-    const meta = expectDefined(internals.players.get(a));
     expect(meta.inventory.some((s) => s.itemId === 'rough_hide' && s.instance)).toBe(false);
     expect(premiumMaterialUnits(meta)).toBe(0);
-    // Event shape pin: surface corpse carries NO professionId (the contract:
-    // professionId is present exactly when surface === 'node').
     expect(sim.drainEvents().filter((e) => e.type === 'gatherDenied')).toEqual([
       { type: 'gatherDenied', pid: a, surface: 'corpse', requiredTier: 2 },
     ]);
   });
 
   it('an owned tier-2 tool restores the premium pull at a raised family tier (seed 15)', () => {
-    // The canHarvestMonsterMaterial SUCCESS branch with a real tool: the
-    // deny/downgrade arms above never prove a tool actually re-opens the
-    // premium pull once a family tier rises.
     const { sim, internals, a, mob } = soloRig(15);
+    const meta = mustPlayer(internals, a);
     sim.addItem('mithril_mining_pick', 1, a); // any-profession owned-best covers tier 2
-    // The tier-3 pick must wield (R22): the corpse arm scans the wield-aware
-    // any-profession best, so an unearned pick would contribute nothing.
-    expectDefined(internals.players.get(a)).gatheringProficiency.mining =
-      TIER3_TOOL_WIELD_PROFICIENCY;
+    meta.gatheringProficiency.mining = TIER3_TOOL_WIELD_PROFICIENCY;
     sim.drainEvents();
     let draws = 0;
     withTier('hide', 2, () => {
       sim.rng.setObserver(() => draws++);
       try {
-        sim.harvestCorpse(mob.id, ['hide'], a);
+        grantCorpseHarvestOnMob(sim, mob, meta, ['hide']);
       } finally {
         sim.rng.setObserver(null);
       }
     });
-    // Same two draws as the bare-handed arms: the success branch adds none.
     expect(draws).toBe(2);
     expect(sim.drainEvents().some((e) => e.type === 'gatherDenied')).toBe(false);
-    const meta = expectDefined(internals.players.get(a));
     const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
     expect(specimen?.instance).toBeUndefined();
     expect(specimen?.materialSources).toEqual([{ source: { signer: 'Alpha' }, count: 1 }]);
@@ -2536,39 +2002,25 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
   });
 
   it('R50: the same tool BELOW its wield requirement restores nothing, and names the rung (seed 15)', () => {
-    // The R22 negative of the arm above, and the reason the corpse scan reads
-    // WIELDABLE rather than owned: ownership alone must not re-open the premium
-    // pull. One point short of the pick's requirement the scan floats back at
-    // bare hands, the pull downgrades exactly as the toolless arm does, and the
-    // denial NAMES the smallest proficiency at which something already carried
-    // would work the family.
     const { sim, internals, a, mob } = soloRig(15);
+    const meta = mustPlayer(internals, a);
     sim.addItem('mithril_mining_pick', 1, a);
-    expectDefined(internals.players.get(a)).gatheringProficiency.mining =
-      TIER3_TOOL_WIELD_PROFICIENCY - 1;
+    meta.gatheringProficiency.mining = TIER3_TOOL_WIELD_PROFICIENCY - 1;
     sim.drainEvents();
     let draws = 0;
     withTier('hide', 2, () => {
       sim.rng.setObserver(() => draws++);
       try {
-        sim.harvestCorpse(mob.id, ['hide'], a);
+        grantCorpseHarvestOnMob(sim, mob, meta, ['hide']);
       } finally {
         sim.rng.setObserver(null);
       }
     });
-    // Same two draws as every other arm: the wield denial sits strictly after
-    // the rarity roll and draws nothing of its own.
     expect(draws).toBe(2);
-    // Byte-for-byte the bare-handed denied arm's outcome, with an inert pick in
-    // the bags: plain quantity, no jackpot, no signature, corpse still spent.
     expect(sim.countItem('pristine_hide', a)).toBe(0);
     expect(sim.countItem('rough_hide', a)).toBe(6);
-    const meta = expectDefined(internals.players.get(a));
     expect(premiumMaterialUnits(meta)).toBe(0);
     expect(mob.harvestClaimedBy).toBe(a);
-    // The R22 wield split: one event, carrying the pick's OWN requirement
-    // rather than the family tier, so the toast names a rung that really
-    // unlocks something the player is holding.
     expect(sim.drainEvents().filter((e) => e.type === 'gatherDenied')).toEqual([
       {
         type: 'gatherDenied',
@@ -2581,32 +2033,22 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
   });
 
   it('at most ONE gatherDenied per harvest command, even with several denied families (seed 23)', () => {
-    // Seed 23 pre-verified against soloRig: BOTH wolf families (hide and
-    // fang) roll signable on an untagged harvest, so raising both tiers
-    // denies two yields in one command; the dedupe flag must emit exactly one
-    // event, tiered off the FIRST failing family. Re-recorded from seed 23
-    // after the Eastbrook camp respacing (to 31), then from 31 to 26 after
-    // the zones 1-3 quest-dedupe content pass shifted the camp-driven
-    // world-gen draw sequence again, then from 26 to 138 after the Galecrest
-    // quest-camp pass (#2887, 4c2b43f8f7), then back to 23 when the v0.35.0
-    // base sync re-recorded this file's pins (d4deed629a).
     const base = soloRig(23);
-    base.sim.harvestCorpse(base.mob.id, undefined, base.a);
+    grantCorpseHarvestOnMob(base.sim, base.mob, mustPlayer(base.internals, base.a), undefined);
     const baseMeta = expectDefined(base.internals.players.get(base.a));
     expect(base.sim.countItem('pristine_hide', base.a)).toBe(1);
     expect(premiumMaterialUnits(baseMeta, 'wolf_fang', 'Alpha')).toBe(1);
 
     const { sim, internals, a, mob } = soloRig(23);
+    const meta = mustPlayer(internals, a);
     sim.drainEvents();
     withTier('hide', 2, () => {
       withTier('fang', 2, () => {
-        sim.harvestCorpse(mob.id, undefined, a);
+        grantCorpseHarvestOnMob(sim, mob, meta, undefined);
       });
     });
     const denied = sim.drainEvents().filter((e) => e.type === 'gatherDenied');
     expect(denied).toEqual([{ type: 'gatherDenied', pid: a, surface: 'corpse', requiredTier: 2 }]);
-    // Both families downgraded: plain yields land, nothing is signed.
-    const meta = expectDefined(internals.players.get(a));
     expect(sim.countItem('rough_hide', a)).toBeGreaterThanOrEqual(1);
     expect(sim.countItem('wolf_fang', a)).toBeGreaterThanOrEqual(1);
     expect(sim.countItem('pristine_hide', a)).toBe(0);
@@ -2615,21 +2057,16 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
   });
 
   it('the single event is tiered off the FIRST failing family in yield order (seed 2)', () => {
-    // hide precedes fang in the wolf's yield order, so asymmetric raised
-    // tiers discriminate FIRST from min/max/last: (hide 2, fang 3) emits 2
-    // (ruling out max and last), the mirror (hide 3, fang 2) emits 3 (ruling
-    // out min). Same pre-hunted both-families-signable soloRig shape as the
-    // dedupe arm above. Re-recorded from seed 63 after the Eastbrook camp
-    // respacing (to 42), then from 42 to 62 after the zones 1-3 quest-dedupe
-    // content pass shifted the camp-driven world-gen draw sequence again, then
-    // from 62 to 280 after the Galecrest quest-camp pass (#2887, 4c2b43f8f7),
-    // then to 2 when the v0.35.0 base sync re-recorded this file's pins
-    // (d4deed629a).
     const first = soloRig(2);
     first.sim.drainEvents();
     withTier('hide', 2, () => {
       withTier('fang', 3, () => {
-        first.sim.harvestCorpse(first.mob.id, undefined, first.a);
+        grantCorpseHarvestOnMob(
+          first.sim,
+          first.mob,
+          mustPlayer(first.internals, first.a),
+          undefined,
+        );
       });
     });
     expect(first.sim.drainEvents().filter((e) => e.type === 'gatherDenied')).toEqual([
@@ -2639,7 +2076,12 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
     mirror.sim.drainEvents();
     withTier('hide', 3, () => {
       withTier('fang', 2, () => {
-        mirror.sim.harvestCorpse(mirror.mob.id, undefined, mirror.a);
+        grantCorpseHarvestOnMob(
+          mirror.sim,
+          mirror.mob,
+          mustPlayer(mirror.internals, mirror.a),
+          undefined,
+        );
       });
     });
     expect(mirror.sim.drainEvents().filter((e) => e.type === 'gatherDenied')).toEqual([
@@ -2651,11 +2093,16 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
 // The online half of the claim: the server encodes harvestClaimedBy as the
 // sparse terse key `hcb` (server/game.ts wireEntity), ClientWorld mirrors it,
 // and the corpse picker's availability core (corpseLootAvailability) therefore
-// stops offering an already-claimed corpse online, exactly as offline.
+// stops offering an already-claimed corpse online, exactly as offline. Driven
+// through the real timed cast now that a claim is no longer instant.
 describe('corpse harvest claim over the wire (online picker parity)', () => {
+  beforeAll(() => setActiveWorldContent(PUBLIC_TEST_WORLD));
+  afterAll(() => setActiveWorldContent(CORPSE_TEST_WORLD));
+
   it('a real claim rides hcb, mirrors into ClientWorld, and gates the picker', () => {
-    const { sim, mob, a, b } = setup();
-    sim.harvestCorpse(mob.id, undefined, a);
+    const { sim, mob, a, b } = publicSetup();
+    expect(sim.harvestCorpse(mob.id, a)).toBe(true);
+    for (let i = 0; i < TICKS_PER_CAST; i++) sim.tick();
     expect(mob.harvestClaimedBy).toBe(a);
 
     const w = wireEntity(mob);
@@ -2688,8 +2135,13 @@ describe('corpse harvest claim over the wire (online picker parity)', () => {
 // sight, so a claim landing AFTER a viewer has seen the corpse rides a lite
 // (dyn-only) record, and leaving interest scope evicts the corpse from the
 // session's sent set so re-entry gets a fresh full record. Both arms must
-// deliver claim truth to the mirror.
+// deliver claim truth to the mirror. Driven through the real timed cast: the
+// harvester is grounded via server.sim.groundPos so the multi-tick completion
+// never reads gravity settle as movement.
 describe('corpse harvest claim over the live broadcast (delta + interest scope)', () => {
+  beforeAll(() => setActiveWorldContent(PUBLIC_TEST_WORLD));
+  afterAll(() => setActiveWorldContent(CORPSE_TEST_WORLD));
+
   function liveSetup() {
     const server = new GameServer();
     const fcA = fakeWs();
@@ -2697,16 +2149,27 @@ describe('corpse harvest claim over the live broadcast (delta + interest scope)'
     const sa = joinServer(server, fcA, 81, 'Alpha');
     const sb = joinServer(server, fcB, 82, 'Bravo');
     const internals = server.sim as unknown as SimInternals;
-    for (const pid of [sa.pid, sb.pid]) {
+    // Distinct spots (never the exact same x,z as each other or the corpse
+    // below), the corpse_harvest_command.test.ts idiom: nothing here should
+    // ever rely on same-tile behavior being harmless. Bravo stays well within
+    // the ~120 yd interest radius so the "first sight" arm still applies.
+    const place = (pid: number, x: number, z: number) => {
       const e = expectDefined(internals.entities.get(pid));
-      e.pos = { x: 0, y: 0, z: 0 };
-      e.prevPos = { x: 0, y: 0, z: 0 };
-    }
-    // A dead wolf corpse beside both players, with a world-unique entity id
+      e.pos = server.sim.groundPos(x, z);
+      e.prevPos = { ...e.pos };
+      e.vx = 0;
+      e.vy = 0;
+      e.vz = 0;
+      e.onGround = true;
+    };
+    place(sa.pid, 0, 0);
+    place(sb.pid, 20, 0);
+    server.sim.addItem('field_kit', 1, sa.pid);
+    // A dead wolf corpse at Alpha's own spot, with a world-unique entity id
     // (the server sim is a full generated world, so 9999 could collide).
     const template = MOBS.forest_wolf;
     const mobId = Math.max(...internals.entities.keys()) + 1;
-    const mob = createMob(mobId, template, template.maxLevel, { x: 2, y: 0, z: 0 });
+    const mob = createMob(mobId, template, template.maxLevel, server.sim.groundPos(0, 0));
     mob.dead = true;
     mob.aiState = 'dead';
     mob.corpseTimer = 9999;
@@ -2717,6 +2180,11 @@ describe('corpse harvest claim over the live broadcast (delta + interest scope)'
     // their cells before the first broadcast.
     server.sim.tick();
     return { server, internals, fcB, sa, sb, mob };
+  }
+
+  function completeHarvest(server: GameServer, mobId: number, pid: number): void {
+    expect(server.sim.harvestCorpse(mobId, pid)).toBe(true);
+    for (let i = 0; i < TICKS_PER_CAST; i++) server.sim.tick();
   }
 
   it('a claim landing after first sight arrives as a lite delta record and gates the picker', () => {
@@ -2730,12 +2198,11 @@ describe('corpse harvest claim over the live broadcast (delta + interest scope)'
     expect(first.harvestClaimedBy).toBeNull();
     expect(corpseLootAvailability(first, sb.pid).harvestable).toBe(true);
 
-    // Alpha claims AFTER Bravo has seen the corpse: the next broadcast carries
-    // the claim as a dyn-only lite record (identity already sent), the exact
-    // production sequence the hcb mirror exists for.
-    server.sim.harvestCorpse(mob.id, undefined, sa.pid);
+    // Alpha's cast completes AFTER Bravo has seen the corpse: the next
+    // broadcast carries the claim as a dyn-only lite record (identity already
+    // sent), the exact production sequence the hcb mirror exists for.
+    completeHarvest(server, mob.id, sa.pid);
     expect(mob.harvestClaimedBy).toBe(sa.pid);
-    server.sim.tick(); // advance past the first broadcast's tick so the update is due
     broadcast(server);
     const snap = asSnapFrame(lastSnap(fcB.sent));
     const rec = expectDefined(snap.ents.find((e) => e.id === mob.id));
@@ -2767,7 +2234,7 @@ describe('corpse harvest claim over the live broadcast (delta + interest scope)'
       clientMirror(client).applySnapshot(lastSnap(fcB.sent));
     };
     walkTo(5000);
-    server.sim.harvestCorpse(mob.id, undefined, sa.pid);
+    completeHarvest(server, mob.id, sa.pid);
     broadcast(server);
     clientMirror(client).applySnapshot(lastSnap(fcB.sent));
 
@@ -2791,7 +2258,9 @@ describe('corpse harvest claim over the live broadcast (delta + interest scope)'
   it('an owner-lock lapse after first sight rides a lite delta record and reopens the picker', () => {
     // The `ffa` key flips once per corpse INSIDE dynamicFields, the same
     // cached-record path as hcb, so the flip must invalidate the per-entity
-    // dyn cache and reach a viewer who already saw the locked corpse.
+    // dyn cache and reach a viewer who already saw the locked corpse. Driven
+    // directly off the fixture (no harvest cast involved): this is the
+    // ordinary loot-lock lapse, orthogonal to the timed harvest cast above.
     const { server, fcB, sa, sb, mob } = liveSetup();
     mob.lootable = true;
     mob.tappedById = sa.pid;
@@ -2823,252 +2292,78 @@ describe('corpse harvest claim over the live broadcast (delta + interest scope)'
   });
 });
 
-// The omitted-components town-focus default depends on an ABSENT
-// wire field surviving the whole trip: ClientWorld.harvestCorpse(id) serializes
-// NO components key (JSON.stringify drops undefined), and the server dispatch
-// normalizes a missing or malformed field to undefined, never [], so
-// sim.harvestCorpse sees the omission and derives the town-focus pick.
-describe('harvestCorpse omitted components over the wire', () => {
-  function wireSetup() {
-    const server = new GameServer();
-    const fc = fakeWs();
-    const session = joinServer(server, fc, 91, 'Alpha');
-    return { server, session };
-  }
-
-  // The REAL client serializer, not a hand-built envelope: a bare ClientWorld
-  // with a capturing ws socket.
-  function clientRaw(id: number, components?: string[]): string {
-    const sent: string[] = [];
-    const client = bareClient(1);
-    wireClient(client).ws = { readyState: 1, send: (payload: string) => sent.push(payload) };
-    client.harvestCorpse(id, components);
-    expect(sent).toHaveLength(1);
-    return sent[0];
-  }
-
-  it('an omitted pick rides with NO components key and reaches harvestCorpse as undefined', () => {
-    const { server, session } = wireSetup();
-    const raw = clientRaw(4242);
-    expect(raw).not.toContain('components');
-    const spy = vi.spyOn(server.sim, 'harvestCorpse').mockImplementation(() => {});
-    serverHarness(server).dispatchMessage(session, JSON.parse(raw), raw, 0);
-    expect(spy).toHaveBeenCalledWith(4242, undefined, session.pid);
-  });
-
-  it('an explicit pick passes through intact', () => {
-    const { server, session } = wireSetup();
-    const raw = clientRaw(4242, ['hide']);
-    const spy = vi.spyOn(server.sim, 'harvestCorpse').mockImplementation(() => {});
-    serverHarness(server).dispatchMessage(session, JSON.parse(raw), raw, 0);
-    expect(spy).toHaveBeenCalledWith(4242, ['hide'], session.pid);
-  });
-});
-
-// #2474 over the wire. The `components` array is a client-supplied value the
-// authoritative server acts on, and no shipped client sends a repeat (the loot
-// window's picker and the interact key both build unique tags), so the only way
-// in is a hand-crafted frame. This drives exactly that frame through a REAL
-// GameServer into the REAL sim, because the wire is where the untrusted value
-// enters and a fix that only held for a direct sim call would not close it.
-// Two servers, one command each: GameServer pins a constant WORLD_SEED and
-// neither run ticks, so the two worlds are byte-identical at harvest time and
-// any difference in the result is the pick.
-describe('a repeated component tag over the wire, through a real GameServer (#2474)', () => {
-  function serverHarvest(components: string[]): {
-    raw: string;
-    inventory: { itemId: string; count: number; instance?: unknown }[];
-    hides: number;
-    draws: number;
-    claimedBy: number | null;
+// #2474/#2504/#2509 over the wire: these three issues each drove a
+// hand-crafted `components` frame (repeated tag, junk tag, unmapped-family-
+// only) through the legacy per-call selection protocol. That protocol is
+// retired: Sim.harvestCorpse now takes id and an optional pid only, and ANY
+// components key on the wire command, whatever it contains, is refused
+// outright before admission, with a false commandOutcome and no reservation,
+// grant, or rng (see tests/corpse_harvest_command.test.ts's
+// legacyComponentPayloads sweep for the general `[]`/null/single/multi-tag
+// shape). This keeps the three ADVERSARIAL variants those issues cared about
+// on the record as refused, rather than silently dropping the coverage.
+describe('legacy per-call components shapes are refused before admission (#2474, #2504, #2509)', () => {
+  function joinedServer(characterId: number): {
+    server: GameServer;
+    session: ClientSession;
+    fc: ReturnType<typeof fakeWs>;
   } {
     const server = new GameServer();
     const fc = fakeWs();
-    const session = joinServer(server, fc, 93, 'Alpha');
-    const internals = server.sim as unknown as SimInternals;
-    const self = expectDefined(internals.entities.get(session.pid));
-    self.pos = { x: 0, y: 0, z: 0 };
-    self.prevPos = { x: 0, y: 0, z: 0 };
-    // wild_boar tags hide/tusk/meat: three tags, so a two-entry pick stays
-    // under the spread threshold and lands on the arm that used to hand the
-    // repeat through to the roll loop.
-    const template = MOBS.wild_boar;
-    const mobId = Math.max(...internals.entities.keys()) + 1;
-    const mob = createMob(mobId, template, template.maxLevel, { x: 2, y: 0, z: 0 });
+    const session = joinServer(server, fc, characterId, 'Legacy');
+    return { server, session, fc };
+  }
+
+  function spawnCorpseAtSession(server: GameServer, session: ClientSession, id: number): Entity {
+    const player = expectDefined(server.sim.entities.get(session.pid), 'player entity');
+    const mob = createMob(id, MOBS.forest_wolf, MOBS.forest_wolf.maxLevel, { ...player.pos });
     mob.dead = true;
     mob.aiState = 'dead';
     mob.corpseTimer = 9999;
     mob.respawnTimer = 9999;
-    internals.entities.set(mob.id, mob);
-    // A hand-built frame, the untrusted shape the issue reproduces with, parsed
-    // and dispatched exactly as a socket message is. `t: 'cmd'` is the real
-    // envelope (ClientWorld.rawCmd); without it the dispatcher drops the frame
-    // as a protocol anomaly and the test would pass on an unharvested corpse.
-    const raw = JSON.stringify({ t: 'cmd', cmd: 'harvestCorpse', id: mobId, components });
-    let draws = 0;
-    const rng = (
-      server.sim as unknown as { rng: { setObserver: (o: (() => void) | null) => void } }
-    ).rng;
-    rng.setObserver(() => {
-      draws++;
-    });
-    serverHarness(server).dispatchMessage(session, JSON.parse(raw), raw, 0);
-    rng.setObserver(null);
-    return {
-      raw,
-      inventory: structuredClone(mustPlayer(internals, session.pid).inventory),
-      hides: server.sim.countItem('rough_hide', session.pid),
-      draws,
-      claimedBy: mob.harvestClaimedBy,
-    };
+    server.sim.entities.set(mob.id, mob);
+    return mob;
   }
 
-  it('lands the same bags a single tag lands, and spends the claim once', () => {
-    const dup = serverHarvest(['hide', 'hide']);
-    const once = serverHarvest(['hide']);
-    // The frame really carried the repeat: the assertion below is about the
-    // sim collapsing it, not about the payload never arriving.
-    expect(dup.raw).toContain('["hide","hide"]');
-    // Not a vacuous comparison of two empty bags: the harvest actually yielded.
-    expect(once.hides).toBeGreaterThan(0);
-    expect(dup.hides).toBe(once.hides);
-    expect(dup.inventory).toEqual(once.inventory);
-    expect(dup.claimedBy).not.toBeNull();
-    expect(dup.claimedBy).toBe(once.claimedBy);
-    // The most decisive pin available over the wire, and the one the bags
-    // alone cannot make: rolls are what a doubled harvest actually spent. One
-    // family costs two draws (tier roll plus rarity roll); the repeat used to
-    // cost four, so this is a literal, not an equality that could hold at any
-    // value.
-    expect(dup.draws).toBe(2);
-    expect(once.draws).toBe(2);
-  });
-
-  it('forwards the repeat verbatim: the SIM boundary is what closes it, not the server', () => {
-    // Deliberate, and the reason the fix lives in effectiveFocusComponents: the
-    // offline Sim and the headless env call the same command without ever
-    // passing through server/game.ts, so sanitizing here would have left both
-    // hosts open. If a future change starts deduping on the server too, this
-    // test is the one that should be re-argued, not quietly deleted.
-    const server = new GameServer();
-    const session = joinServer(server, fakeWs(), 94, 'Alpha');
-    const raw = JSON.stringify({
-      t: 'cmd',
-      cmd: 'harvestCorpse',
-      id: 4242,
-      components: ['hide', 'hide'],
-    });
-    const spy = vi.spyOn(server.sim, 'harvestCorpse').mockImplementation(() => {});
-    serverHarness(server).dispatchMessage(session, JSON.parse(raw), raw, 0);
-    expect(spy).toHaveBeenCalledWith(4242, ['hide', 'hide'], session.pid);
-  });
-});
-
-// Two servers, one command each: GameServer pins a constant WORLD_SEED and
-// neither run ticks, so the two worlds are byte-identical at harvest time and
-// any difference in the result is the pick.
-describe('an invalid component tag over the wire, through a real GameServer (#2504)', () => {
-  function serverHarvest(components: string[]): {
-    raw: string;
-    inventory: { itemId: string; count: number; instance?: unknown }[];
-    hides: number;
-    fangs: number;
-    draws: number;
-    claimedBy: number | null;
-  } {
-    const server = new GameServer();
-    const fc = fakeWs();
-    const session = joinServer(server, fc, 95, 'Alpha');
-    const internals = server.sim as unknown as SimInternals;
-    const self = expectDefined(internals.entities.get(session.pid));
-    self.pos = { x: 0, y: 0, z: 0 };
-    self.prevPos = { x: 0, y: 0, z: 0 };
-    // forest_wolf tags hide/fang: two tags, so a two-entry pick CLEARS
-    // `>= tagged.length` and lands on the arm the junk string used to flip to
-    // spread. A three-tag corpse would never reach it, and this test would pass
-    // on either body.
-    const template = MOBS.forest_wolf;
-    const mobId = Math.max(...internals.entities.keys()) + 1;
-    const mob = createMob(mobId, template, template.maxLevel, { x: 2, y: 0, z: 0 });
-    mob.dead = true;
-    mob.aiState = 'dead';
-    mob.corpseTimer = 9999;
-    mob.respawnTimer = 9999;
-    internals.entities.set(mob.id, mob);
-    // A hand-built frame, the untrusted shape the issue reproduces with, parsed
-    // and dispatched exactly as a socket message is. `t: 'cmd'` is the real
-    // envelope (ClientWorld.rawCmd); without it the dispatcher drops the frame
-    // as a protocol anomaly and the test would pass on an unharvested corpse.
-    const raw = JSON.stringify({ t: 'cmd', cmd: 'harvestCorpse', id: mobId, components });
-    let draws = 0;
-    const rng = (
-      server.sim as unknown as { rng: { setObserver: (o: (() => void) | null) => void } }
-    ).rng;
-    rng.setObserver(() => {
-      draws++;
-    });
-    serverHarness(server).dispatchMessage(session, JSON.parse(raw), raw, 0);
-    rng.setObserver(null);
-    return {
-      raw,
-      inventory: structuredClone(mustPlayer(internals, session.pid).inventory),
-      hides: server.sim.countItem('rough_hide', session.pid),
-      fangs: server.sim.countItem('wolf_fang', session.pid),
-      draws,
-      claimedBy: mob.harvestClaimedBy,
-    };
-  }
-
-  it('lands the same bags the junk-free tag lands, and spends the claim once', () => {
-    const padded = serverHarvest(['hide', 'not_a_real_tag']);
-    const once = serverHarvest(['hide']);
-    // The frame really carried the junk: the assertion below is about the sim
-    // dropping it, not about the payload never arriving.
-    expect(padded.raw).toContain('["hide","not_a_real_tag"]');
-    // Not a vacuous comparison of two empty bags: the harvest actually yielded,
-    // and it yielded only the family the frame named.
-    // A literal, not just "more than zero": GameServer pins a constant
-    // WORLD_SEED and neither run ticks, so this value is knowable and a
-    // regression that changed the yield would still clear a > 0 floor.
-    // Re-recorded 4 to 2 after the Eastbrook camp respacing merged into this
-    // branch, then 2 to 3 after the Galecrest quest-camp pass (#2887):
-    // WORLD_SEED is fixed, so the only way to re-record this row is the
-    // literal. The fang line below is what makes the pair decisive (a spread
-    // would put wolf_fang in the bags), not the size of the hide yield.
-    expect(once.hides).toBe(2);
-    expect(once.fangs).toBe(0);
-    expect(padded.hides).toBe(once.hides);
-    expect(padded.fangs).toBe(0);
-    expect(padded.inventory).toEqual(once.inventory);
-    expect(padded.claimedBy).not.toBeNull();
-    expect(padded.claimedBy).toBe(once.claimedBy);
-    // The most decisive pin available over the wire, and the one the bags alone
-    // cannot make: rolls are what the padded pick actually spent. One family
-    // costs two draws (tier roll plus rarity roll); the padded pick used to
-    // spread and cost four, so this is a literal, not an equality that could
-    // hold at any value.
-    expect(padded.draws).toBe(2);
-    expect(once.draws).toBe(2);
-  });
-
-  it('forwards the junk verbatim: the SIM boundary is what closes it, not the server', () => {
-    // Deliberate, and the reason the fix lives in effectiveFocusComponents: the
-    // offline Sim and the headless env call the same command without ever
-    // passing through server/game.ts, so validating tags here would have left
-    // both hosts open. If a future change starts filtering on the server too,
-    // this test is the one that should be re-argued, not quietly deleted.
-    const server = new GameServer();
-    const session = joinServer(server, fakeWs(), 96, 'Alpha');
-    const raw = JSON.stringify({
-      t: 'cmd',
-      cmd: 'harvestCorpse',
-      id: 4242,
+  const shapes: { label: string; components: unknown }[] = [
+    { label: 'a repeated component tag (#2474)', components: ['hide', 'hide'] },
+    {
+      label: 'a junk component tag beside a real one (#2504)',
       components: ['hide', 'not_a_real_tag'],
+    },
+    { label: 'a pick naming only an unmapped family (#2509)', components: ['claw'] },
+  ];
+
+  for (const [i, shape] of shapes.entries()) {
+    it(`refuses ${shape.label}: no admission, reservation, grant, or rng`, () => {
+      const { server, session, fc } = joinedServer(200 + i);
+      server.sim.addItem('field_kit', 1, session.pid);
+      const mob = spawnCorpseAtSession(server, session, 9301 + i);
+      fc.sent.length = 0;
+      const draws: number[] = [];
+      server.sim.rng.setObserver((v) => draws.push(v));
+
+      server.handleMessage(
+        session,
+        JSON.stringify({
+          t: 'cmd',
+          cmd: 'harvestCorpse',
+          id: mob.id,
+          components: shape.components,
+          rid: 1,
+        }),
+      );
+
+      server.sim.rng.setObserver(null);
+      expect(draws).toEqual([]);
+      expect(mob.corpseHarvestState?.reservedBy ?? null).toBeNull();
+      expect(mob.harvestClaimedBy).toBeNull();
+      const actor = expectDefined(server.sim.entities.get(session.pid));
+      expect(actor.castingAbility).toBeNull();
+      const outcome = fc.sent.find((f) => f.t === 'commandOutcome');
+      expect(outcome).toEqual({ t: 'commandOutcome', rid: 1, ok: false });
     });
-    const spy = vi.spyOn(server.sim, 'harvestCorpse').mockImplementation(() => {});
-    serverHarness(server).dispatchMessage(session, JSON.parse(raw), raw, 0);
-    expect(spy).toHaveBeenCalledWith(4242, ['hide', 'not_a_real_tag'], session.pid);
-  });
+  }
 });
 
 // #2509: a pick can name a family the corpse really CARRIES that no harvest
@@ -3077,43 +2372,32 @@ describe('an invalid component tag over the wire, through a real GameServer (#25
 // survives sanitization for that reason, so pre-fix it spent the single-use
 // claim, drew one tier roll per named family, granted nothing, and emitted
 // NOTHING AT ALL (the harvestResult ledger is gated on `granted.length > 0`).
-// Measured on old_greyjaw with ['claw']: claim spent, 1 draw, 0 items, 0
-// events. Reachable from the shipped picker, which renders a row per tag with
-// no mapping filter, and on the then three `gills, hide` murlocs a single
-// checkbox was enough.
 //
-// The fix is a pre-claim, rng-free refusal at the command boundary, NOT a
-// narrowing inside effectiveFocusComponents: narrowing would move the
-// concentration bonus (`taggedComponents.length - effectiveChosen.length`) on
-// every mixed pick. The "yields are untouched" describe below is what holds
-// that line. No shipped family is unmapped since 11m, so the mixed shapes
-// here are the retagged fixtures (MIXED_TEMPLATE_ID, MIXED2_TEMPLATE_ID) and
-// the shipped exemplars are pinned as the all-mapped corpses they are now.
+// The fix is a pre-claim, rng-free refusal inside grantCorpseHarvest
+// (forfeitsEveryMappedYield), NOT a narrowing inside effectiveFocusComponents:
+// narrowing would move the concentration bonus on every mixed pick. No
+// shipped family is unmapped since 11m, so the mixed shapes here are the
+// retagged fixtures (MIXED_TEMPLATE_ID, MIXED2_TEMPLATE_ID) and the shipped
+// exemplars are pinned as the all-mapped corpses they are now. The old
+// per-corpse checkbox picker's "offers exactly what the command accepts"
+// sweep (corpseHarvestView) is retired along with that picker: the current
+// preference model (All, or one remembered material) is proven against
+// corpseHarvestStatusView/corpseHarvestPreferenceOptions in
+// tests/corpse_harvest_view.test.ts and tests/harvest_preference*.test.ts.
+// The old "an omitted pick derives from town focus" tests are retired the
+// same way (town focus is bonus math only now, never selection); what
+// remains genuinely domain is that this gate refuses on `chosen` content
+// alone, which the last case below states directly.
 describe('a pick of nothing but unmapped families is refused, claim intact (#2509)', () => {
   // The shared module-scope rig, with this suite's own corpse id so its cases
   // and the #2513 suite's cannot collide on one entity.
-  const harvest2509 = (
-    templateId: string,
-    components: string[] | undefined,
-    seed = 5,
-    townFocus?: Record<string, number>,
-  ) => harvestCommand(templateId, components, { seed, townFocus, corpseId: 7509 });
+  const harvest2509 = (templateId: string, components: string[] | undefined, seed = 5) =>
+    grantCommand(templateId, components, { seed, corpseId: 7509 });
 
   const REFUSAL = 'Nothing you selected can be harvested from that corpse.';
-  // The corpse-level refusal #2513 routes an all-unmapped template to, distinct
-  // from the pick-level REFUSAL above and deliberately the pre-existing string
-  // every untagged corpse already answers with.
   const NOT_HARVESTABLE = 'That corpse has nothing to harvest.';
 
   it('is about families no row maps: the shipped set is empty since 11m, so the synthetic pair carries the case', () => {
-    // Read off the real table rather than restated, so a family gaining an item
-    // retires these cases instead of silently inverting what they claim. A
-    // LITERAL set on both sides: deriving the unmapped list from
-    // HARVEST_COMPONENT_ITEMS alone would make this pass against any table.
-    // claw and tusk joined the yield table at #2905 and gills and horn later:
-    // the tagged-but-unmapped set is
-    // EMPTY, which is the shipped reality this row pins, beside the ten
-    // mapped families.
     const tagged = new Set(Object.values(MOBS).flatMap((m) => m.componentTags ?? []));
     expect([...tagged].filter((t) => !HARVEST_COMPONENT_ITEMS[t]).sort()).toEqual([]);
     expect(Object.keys(HARVEST_COMPONENT_ITEMS).sort()).toEqual([
@@ -3128,40 +2412,23 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
       'tusk',
       'venomSac',
     ]);
-    // The synthetic pair the cases below run on is unmapped by construction:
-    // no row and no shipped carrier, both literal, so the fixtures are not
-    // measuring the table against itself either.
     for (const family of [UNMAPPED_FAMILY, UNMAPPED_FAMILY_2]) {
       expect(HARVEST_COMPONENT_ITEMS[family], family).toBeUndefined();
       expect(tagged.has(family), family).toBe(false);
     }
-    // ...and the sweep is a measurement: the two families 11m mapped are
-    // still carried.
     expect(tagged.has('gills')).toBe(true);
     expect(tagged.has('horn')).toBe(true);
   });
 
   it('refuses the pick the issue reproduces, and leaves the corpse exactly as it found it', () => {
-    // old_greyjaw (hide, fang, claw) was the shipped fixture the issue names;
-    // claw was mapped at #2905, so sethrael_palecoil (hide, claw, horn) took
-    // its place until Phase 11m mapped horn too. The same three-tag shape,
-    // with the synthetic family in horn's slot, is retagged onto
-    // MIXED_TEMPLATE_ID for the case.
     withMixedTemplates(() => {
       expect(MOBS[MIXED_TEMPLATE_ID].componentTags).toEqual(['hide', 'claw', UNMAPPED_FAMILY]);
       const refused = harvest2509(MIXED_TEMPLATE_ID, [UNMAPPED_FAMILY]);
-      // Every observable the pre-fix command moved, pinned as UNMOVED. Zero
-      // draws alone would not establish a refusal (pre-fix this arm drew one
-      // and still spent the claim), so the claim and the corpse timer are
-      // what say "refused": the clamp at the end of harvestCorpse never ran.
       expect(refused.claimedBy).toBeNull();
       expect(refused.draws).toBe(0);
       expect(refused.corpseTimer).toBe(9999);
       expect(refused.errors).toEqual([REFUSAL]);
-      // ...and the ONLY event is that refusal: no harvestResult, no loot line.
       expect(refused.events.map((e) => e.type)).toEqual(['error']);
-      // The discriminator, on the identical rig: a mapped pick on this same
-      // corpse still harvests, so the rig is not simply refusing everything.
       const ok = harvest2509(MIXED_TEMPLATE_ID, ['hide']);
       expect(ok.claimedBy).not.toBeNull();
       expect(ok.draws).toBe(2);
@@ -3170,46 +2437,25 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
   });
 
   it('no longer fires on sethrael_palecoil, the old exemplar: horn pays since Phase 11m', () => {
-    // The shipped serpent as it is today, every family mapped (the 11m
-    // spread also gave it venomSac). The exact pick that used to be refused
-    // is a plain concentrate now: claim spent, two draws (one tier roll, one
-    // rarity roll, for horn alone) and curved_tusk in the bag, since horn
-    // feeds the same hard keratin as tusk. This is
-    // the behavioural pin that horn GRANTS: drop the horn row and this corpse
-    // is mixed again, the pick is refused, and the tusk count is zero.
     expect(MOBS.sethrael_palecoil.componentTags).toEqual(['hide', 'claw', 'horn', 'venomSac']);
     expect(HARVEST_COMPONENT_ITEMS.horn).toBe('curved_tusk');
     const hornOnly = harvest2509('sethrael_palecoil', ['horn']);
     expect(hornOnly.errors).toEqual([]);
     expect(hornOnly.claimedBy).not.toBeNull();
     expect(hornOnly.draws).toBe(2);
-    // The EXACT count, predicted from the roll model before it was measured:
-    // harvestTierQuantity over rollFocusTier is min(5, rolledIndex + bonus)
-    // plus one, the first draw on this rig (seed 5) is the tier roll, and
-    // horn alone on the four-tag serpent is bonus 3. The seed-5 index has no
-    // earlier literal in this file, so the prediction was parametric
-    // (index + 4, capped at 6) with index 0 as the point guess: predicted 4,
-    // measured 4.
     expect(hornOnly.sim.countItem('curved_tusk', hornOnly.a)).toBe(4);
     expect(hornOnly.sim.countItem('rough_hide', hornOnly.a)).toBe(0);
-    // ...and the same on the murloc, for gills: the single checkbox that was
-    // the whole refusal on the `gills, hide` shape pays mudfin_scale now.
     expect(MOBS.mudfin_murloc.componentTags).toEqual(['gills', 'hide']);
     expect(HARVEST_COMPONENT_ITEMS.gills).toBe('mudfin_scale');
     const gillsOnly = harvest2509('mudfin_murloc', ['gills']);
     expect(gillsOnly.errors).toEqual([]);
     expect(gillsOnly.claimedBy).not.toBeNull();
     expect(gillsOnly.draws).toBe(2);
-    // Same seed, same first draw, bonus 1 on the two-tag murloc: the same
-    // index 0 predicts index + 2, so 2; measured 2. The two counts differing
-    // by exactly the bonus gap (3 versus 1) is the roll model showing.
     expect(gillsOnly.sim.countItem('mudfin_scale', gillsOnly.a)).toBe(2);
     expect(gillsOnly.sim.countItem('rough_hide', gillsOnly.a)).toBe(0);
   });
 
   it('leaves the corpse harvestable, so the player recovers the yield they nearly threw away', () => {
-    // The whole point of refusing rather than reporting: the single-use claim
-    // survives the mistake. Same corpse, second command, full yield.
     withMixedTemplates(() => {
       const { sim, internals, a } = setup(153);
       const template = MOBS[MIXED_TEMPLATE_ID];
@@ -3219,17 +2465,16 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
       corpse.corpseTimer = 9999;
       corpse.respawnTimer = 9999;
       internals.entities.set(corpse.id, corpse);
-      sim.harvestCorpse(corpse.id, [UNMAPPED_FAMILY], a);
+      const meta = mustPlayer(internals, a);
+      expect(grantCorpseHarvestOnMob(sim, corpse, meta, [UNMAPPED_FAMILY])).toBe(false);
       expect(corpse.harvestClaimedBy).toBeNull();
-      sim.harvestCorpse(corpse.id, ['hide'], a);
+      expect(grantCorpseHarvestOnMob(sim, corpse, meta, ['hide'])).toBe(true);
       expect(corpse.harvestClaimedBy).toBe(a);
       expect(sim.countItem('rough_hide', a)).toBeGreaterThan(0);
     });
   });
 
   it('covers every template that mixes mapped and unmapped families: none ships since 11m, so the two retagged widths carry the sweep', () => {
-    // Derived from content, not listed by hand: a retag that adds a mixed
-    // template moves this sweep instead of leaving the new one untested.
     const mixedTemplates = () =>
       Object.entries(MOBS).filter(([, m]) => {
         const tags = m.componentTags ?? [];
@@ -3238,13 +2483,6 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
           tags.some((t) => !HARVEST_COMPONENT_ITEMS[t])
         );
       });
-    // The shipped reality, pinned with its reason: claw and tusk joining the
-    // yield table (#2905) folded old_greyjaw, wild_boar, mire_prowler,
-    // old_cragmaw and ridge_stalker into fully-mapped, and gills and horn
-    // joining it (Phase 11m) folded the last six, which are named so the
-    // empty sweep reads as a measurement and not a vacuous pass: each of
-    // them still carries the family that made it mixed, and every family it
-    // carries maps.
     expect(mixedTemplates()).toEqual([]);
     const formerlyMixed: Record<string, string> = {
       bogtoad: 'gills',
@@ -3262,21 +2500,9 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
         id,
       ).toEqual([]);
     }
-    // The census the sweep sits in: 54 tagged templates, 188 untagged, 0
-    // mixed after the 11m spread (six templates tagged for the first time)
-    // and mapping. Re-derived 181 -> 188 at the eighth v0.41.0 sync
-    // (2026-08-30): the Ignivar raid span adds seven untagged templates
-    // (derelict_mech, ignivar_cinder_artificer, ignivar_crucible_warden,
-    // ignivar_ember_sentinel, ignivar_heart_of_the_end,
-    // ignivar_herald_of_the_last_flame,
-    // varkhul_forgefather_of_the_last_flame), measured by a MOBS-key diff of
-    // the two merge parents; no tagged template moved.
     const tagged = Object.values(MOBS).filter((m) => (m.componentTags?.length ?? 0) > 0);
     expect(tagged).toHaveLength(54);
     expect(Object.keys(MOBS).length - tagged.length).toBe(188);
-    // The sweep itself, over the two mixed widths retagged onto real
-    // templates: the three-tag sethrael shape (one trap among three boxes)
-    // and the two-tag murloc shape (one box is the whole refusal).
     withMixedTemplates(() => {
       const mixed = mixedTemplates();
       expect(mixed.map(([id]) => id).sort()).toEqual(
@@ -3286,7 +2512,6 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
         const tags = expectDefined(m.componentTags);
         const unmapped = tags.filter((t) => !HARVEST_COMPONENT_ITEMS[t]);
         const mapped = tags.filter((t) => HARVEST_COMPONENT_ITEMS[t]);
-        // Each unmapped family alone, then all of them together.
         for (const pick of [...unmapped.map((t) => [t]), unmapped]) {
           const r = harvest2509(id, pick);
           const label = `${id} ${JSON.stringify(pick)}`;
@@ -3295,8 +2520,6 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
           expect(r.corpseTimer, `${label} timer`).toBe(9999);
           expect(r.errors, `${label} errors`).toEqual([REFUSAL]);
         }
-        // ...and the mapped families on the same template still harvest, so
-        // no row of this sweep is passing because the template is broken.
         const ok = harvest2509(id, mapped);
         expect(ok.claimedBy, `${id} mapped pick`).not.toBeNull();
         expect(ok.errors, `${id} mapped pick errors`).toEqual([]);
@@ -3305,17 +2528,6 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
   });
 
   it('does NOT fire on a corpse whose every family is unmapped: the other gate does (#2513)', () => {
-    // The second condition of THIS gate, still false on an all-unmapped
-    // corpse and still meaning what it always meant: no pick forfeits
-    // anything there, because no pick could have paid out. What refuses that
-    // corpse is the corpse-level isHarvestableCorpse gate #2513 added
-    // upstream, with its own message. The two are pinned apart on purpose: a
-    // fixture where both fired would let either one rot, and collapsing them
-    // would move the concentration bonus. fen_troll (claw, tusk) was the
-    // shipped fixture; claw and tusk are both mapped now, so this drives the
-    // corpse-level gate through the synthetic all-unmapped template instead
-    // (see withUnmappedTemplate), and the mixed contrast through the
-    // retagged three-tag shape.
     withFixtureTemplates(() => {
       expect(MOBS[UNMAPPED_TEMPLATE_ID].componentTags).toEqual(UNMAPPED_TEMPLATE_TAGS);
       const picks: (string[] | undefined)[] = [
@@ -3327,9 +2539,6 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
       ];
       for (const pick of picks) {
         const label = `${UNMAPPED_TEMPLATE_ID} ${JSON.stringify(pick)}`;
-        // This predicate, called directly: it is the #2509 rule that must stay
-        // quiet here, independently of which gate ends up refusing the
-        // command.
         expect(
           forfeitsEveryMappedYield(UNMAPPED_TEMPLATE_TAGS, pick ?? []),
           `${label} predicate`,
@@ -3340,10 +2549,6 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
         expect(r.draws, `${label} draws`).toBe(0);
         expect(r.corpseTimer, `${label} timer`).toBe(9999);
       }
-      // Decisive contrast, same pick shape, same seed: a lone unmapped family
-      // is refused on BOTH corpses, but by different gates carrying different
-      // text. A single merged gate, or a gate keyed on the pick alone, would
-      // fail exactly this pair by making the two messages the same one.
       expect(harvest2509(UNMAPPED_TEMPLATE_ID, [UNMAPPED_FAMILY]).errors).toEqual([
         NOT_HARVESTABLE,
       ]);
@@ -3352,111 +2557,37 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
     });
   });
 
-  it('refuses the DERIVED pick too, when a persisted town focus names only unmapped families', () => {
-    // An omitted `components` resolves to the persisted town focus, so it can
-    // be an all-unmapped pick with no client involved. #2511 has since closed
-    // the write route (set_town_focus rejects an unmapped key and the load arm
-    // drops one an older save carries), so the direct meta poke below stands
-    // in for exactly that: a save written before the key check existed.
-    // Pre-fix that burned the corpse on a plain interact press, with no picker
-    // open and no line printed. The refusal covers this path for the same
-    // reason it covers the explicit one: the yield is still being forfeited.
-    // old_greyjaw's focus family was claw, then sethrael_palecoil's horn; the
-    // synthetic family takes their place on the retagged three-tag shape.
+  it('refuses driven by `chosen` content alone, not by any town-focus derivation (retires the pre-PR3 default)', () => {
+    // Retires the pre-PR3 "an omitted pick derives from meta.townFocus" case:
+    // grantCorpseHarvestOnMob takes `chosen` directly and never reads
+    // townFocus at all, so there is no live path left that could derive a
+    // pick from it. On MIXED_TEMPLATE_ID (hide, claw mapped; UNMAPPED_FAMILY
+    // not) an explicit UNMAPPED-ONLY pick still refuses at the pick-level
+    // #2509 gate with the claim intact, while an unspecified/empty pick
+    // SPREADS across every tag (the mapped ones included) and grants: an
+    // all-unmapped corpse refusing on every pick shape, including the
+    // derived default, is #2513's own gate and is already fully covered on
+    // its dedicated all-unmapped template in that describe below, not
+    // repeated here.
     withMixedTemplates(() => {
-      const poisoned = harvest2509(MIXED_TEMPLATE_ID, undefined, 5, { [UNMAPPED_FAMILY]: 5 });
-      expect(poisoned.claimedBy).toBeNull();
-      expect(poisoned.draws).toBe(0);
-      expect(poisoned.errors).toEqual([REFUSAL]);
-      // The ordinary focus path is untouched: a focus on a mapped family still
-      // derives that pick and harvests it.
-      const healthy = harvest2509(MIXED_TEMPLATE_ID, undefined, 5, { hide: 5 });
+      const unmappedOnly = harvest2509(MIXED_TEMPLATE_ID, [UNMAPPED_FAMILY], 5);
+      expect(unmappedOnly.claimedBy).toBeNull();
+      expect(unmappedOnly.draws).toBe(0);
+      expect(unmappedOnly.errors).toEqual([REFUSAL]);
+
+      const spread = harvest2509(MIXED_TEMPLATE_ID, undefined, 5);
+      expect(spread.claimedBy).not.toBeNull();
+      expect(spread.errors).toEqual([]);
+      expect(spread.sim.countItem('rough_hide', spread.a)).toBeGreaterThan(0);
+
+      const healthy = harvest2509(MIXED_TEMPLATE_ID, ['hide'], 5);
       expect(healthy.claimedBy).not.toBeNull();
       expect(healthy.errors).toEqual([]);
       expect(healthy.sim.countItem('rough_hide', healthy.a)).toBeGreaterThan(0);
     });
-    // ...and a persisted `{ horn: 5 }` on the shipped serpent is a healthy
-    // focus now, not a poisoned one: the derived pick is horn and horn pays.
-    const hornFocus = harvest2509('sethrael_palecoil', undefined, 5, { horn: 5 });
-    expect(hornFocus.claimedBy).not.toBeNull();
-    expect(hornFocus.errors).toEqual([]);
-    expect(hornFocus.sim.countItem('curved_tusk', hornFocus.a)).toBeGreaterThan(0);
   });
 
-  it('the picker offers exactly what the command accepts, driven against a real Sim', () => {
-    // The mirror, pinned end to end rather than as two restatements of one
-    // rule: for every shipped mixed template and every subset of its tags, the
-    // picker's harvestDisabled must equal what the real harvestCorpse actually
-    // does with that pick. Nothing here re-derives the gate, so a change made
-    // on EITHER side reds this, which is the whole point (a divergence is
-    // invisible to the sim suite and to the view suite separately).
-    // "Refused" spans BOTH gates after #2513: the pick-level REFUSAL and the
-    // corpse-level NOT_HARVESTABLE. Scoping this to REFUSAL alone would let the
-    // picker disable an all-unmapped corpse while this sweep called it accepted,
-    // which is the exact divergence the sweep exists to catch.
-    //
-    // No shipped template is fully unmapped any more (fen_troll no longer
-    // is) and none is mixed any more (Phase 11m), so both gates are driven
-    // through the retagged fixtures for the duration of the sweep, exactly
-    // like the "does NOT fire" case above; without them byCorpse and byPick
-    // would be vacuously zero and the split-by-gate assertion below would
-    // prove nothing about either gate.
-    const sweep = () => {
-      let disabledSeen = 0;
-      let byPick = 0;
-      let byCorpse = 0;
-      for (const [id, m] of Object.entries(MOBS)) {
-        const tags = m.componentTags;
-        if (!tags?.length) continue;
-        for (let mask = 0; mask < 1 << tags.length; mask++) {
-          const selected = tags.filter((_, i) => mask & (1 << i));
-          const label = `${id} ${JSON.stringify(selected)}`;
-          const disabled = corpseHarvestView(tags, new Set(selected)).harvestDisabled;
-          const r = harvest2509(id, selected);
-          const refused = r.errors.includes(REFUSAL) || r.errors.includes(NOT_HARVESTABLE);
-          expect(disabled, `${label} picker vs command`).toBe(refused);
-          // ...and "refused" is read off the world, not just off the text.
-          expect(r.claimedBy === null, `${label} claim vs refusal`).toBe(refused);
-          if (refused) disabledSeen++;
-          if (r.errors.includes(REFUSAL)) byPick++;
-          if (r.errors.includes(NOT_HARVESTABLE)) byCorpse++;
-        }
-      }
-      return { disabledSeen, byPick, byCorpse };
-    };
-    // The shipped reality first, pinned as the zeros it is: every one of the
-    // 266 subsets over the 54 tagged templates is accepted by the command and
-    // offered by the picker, because every shipped family maps.
-    expect(sweep()).toEqual({ disabledSeen: 0, byPick: 0, byCorpse: 0 });
-    // The sweep has to visit the disabled arm at all: an all-false pass
-    // would agree trivially. Split by gate so a change that moved every
-    // refusal onto ONE of them could not pass the total: one pick-level row
-    // per mixed width (the unmapped family alone; every other subset names a
-    // mapped family or spreads), so 2 across the two fixtures where the six
-    // shipped mixed templates gave 6 before 11m, and the synthetic
-    // all-unmapped template's four subsets at the corpse level.
-    const retagged = withFixtureTemplates(sweep);
-    expect(retagged).toEqual({ disabledSeen: 6, byPick: 2, byCorpse: 4 });
-    // The two gates partition the refusals: no row is refused by both, so
-    // the two messages can never be reported together. (Arithmetically
-    // implied by the three literals above, kept as the statement of
-    // intent.)
-    expect(retagged.byPick + retagged.byCorpse).toBe(retagged.disabledSeen);
-    // Measured 16.1 s alone on a warm developer machine, which sits close enough to
-    // vitest's 20 s default that a shared CI runner under an eight-way shard split times
-    // it out: the sweep drives a real Sim once per template per tag subset. The allowance
-    // is roughly four times the measurement, the same contention headroom the duration
-    // ledger's other rows carry, and the file's declared sum stays under the per-file
-    // default so no ledger row is owed.
-  }, 60_000);
-
   it('keeps the settled #2504 ruling: an ALL-junk pick still spreads, junk beside an unmapped family still refuses', () => {
-    // The two rules meet here. A tag the corpse does not CARRY sanitizes away,
-    // so a pick of nothing but junk is the empty pick and spreads (#2504). A
-    // tag it DOES carry survives, so [unmapped, 'junk'] is exactly [unmapped]
-    // and is refused. Neither rule may swallow the other. old_greyjaw's claw
-    // was mapped at #2905 and sethrael_palecoil's horn at Phase 11m; the
-    // synthetic family on the retagged three-tag shape takes their place.
     withMixedTemplates(() => {
       const junk = harvest2509(MIXED_TEMPLATE_ID, ['junk']);
       const empty = harvest2509(MIXED_TEMPLATE_ID, []);
@@ -3472,14 +2603,6 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
   });
 
   it('draws NO rng and moves nothing on the new refusal arm, across every mixed width', () => {
-    // The determinism contract every refusal arm in this file carries: a
-    // refused command must not shift the world's draw order for everyone else.
-    // Widths matter because the pick's length against the tag count is what
-    // picks the concentrate-vs-spread arm; both a 2-tag and a 3-tag corpse are
-    // here, and on the 2-tag murloc shape a single box is the whole refusal.
-    // old_greyjaw (claw) and wild_boar (tusk) went fully mapped at #2905 and
-    // the gills/horn carriers at Phase 11m; the two retagged widths take
-    // their place.
     withMixedTemplates(() => {
       for (const [templateId, pick] of [
         [MIXED2_TEMPLATE_ID, [UNMAPPED_FAMILY_2]],
@@ -3488,17 +2611,12 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
         for (const seed of [2, 5, 11]) {
           const label = `${templateId} ${JSON.stringify(pick)} @${seed}`;
           const r = harvest2509(templateId, pick, seed);
-          // The world as it stands with the command never issued at all: the
-          // refusal has to land exactly here, not merely "somewhere quiet".
           const never = harvest2509(templateId, ['not_a_tag_at_all'], seed);
           const untouched = harvest2509(templateId, undefined, seed);
           expect(r.draws, `${label} draws`).toBe(0);
           expect(r.claimedBy, `${label} claim`).toBeNull();
           expect(r.corpseTimer, `${label} timer`).toBe(9999);
           expect(r.inventory, `${label} inventory`).toEqual(r.before);
-          // The two controls on the same seed, which is what makes the zeros
-          // above mean "refused" rather than "inert rig": a junk-only pick
-          // spreads (#2504) and an omitted pick harvests, both on this corpse.
           expect(never.claimedBy, `${label} junk control claim`).not.toBeNull();
           expect(never.draws, `${label} junk control draws`).toBeGreaterThan(0);
           expect(untouched.claimedBy, `${label} omitted control claim`).not.toBeNull();
@@ -3513,90 +2631,58 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
 // at the time, so it was the one shipped template on which no pick could
 // ever have paid out. #2509's pick-level refusal deliberately left it alone
 // (nothing is forfeited when nothing was on offer), which left the original
-// harm standing on the one corpse where the player had no better option: it
-// advertised itself as harvestable, took the command, spent the single-use
-// claim, drew one tier roll per effective family, granted nothing and
-// emitted NOTHING AT ALL. Measured pre-fix at seed 5: an omitted pick, `[]`
-// and `['claw','tusk']` each drew 2, `['claw']` and `['tusk']` each drew 1,
-// every one of them silent with the claim spent and the corpse timer
-// clamped from 9999 to 4.
+// harm standing: it advertised itself as harvestable, took the command,
+// spent the single-use claim, drew one tier roll per effective family,
+// granted nothing and emitted NOTHING AT ALL.
 //
 // The fix answers the corpse-level question honestly instead of reporting the
 // dead end: isHarvestableCorpse reads the MAPPED families a template carries,
 // so this corpse takes the same path as the 101 templates that carry no
-// component tags at all. No new string (the pre-existing localized
-// error.corpseNothingToHarvest), no new event, no wire or IWorld change, and
-// nothing moves on a MIXED corpse. That last clause used to say the describe
-// below still held every one of its pre-#2509 literals; #2514 has since moved
-// those literals on purpose, so what is unchanged on a mixed corpse is the
-// #2509 refusal itself and this corpse-level gate, not the yields.
-//
-// claw and tusk have since joined HARVEST_COMPONENT_ITEMS themselves
-// (fen_troll's own family closing the gap this describe documents, #2905),
-// and gills and horn after them (Masterwrought Phase 11m), so fen_troll is
-// fully mapped and no shipped template carries an unmapped family at all any
-// more. The corpse-level gate below is still real code, so this whole
-// describe drives it through the synthetic UNMAPPED_TEMPLATE_ID (see
+// component tags at all. claw and tusk have since joined
+// HARVEST_COMPONENT_ITEMS themselves (#2905), and gills and horn after them
+// (Masterwrought Phase 11m), so fen_troll is fully mapped and no shipped
+// template carries an unmapped family at all any more: this whole describe
+// drives the gate through the synthetic UNMAPPED_TEMPLATE_ID (see
 // withUnmappedTemplate above the #1141 describe) instead of fen_troll, and
-// its mixed contrasts through the retagged MIXED_TEMPLATE_ID.
+// its mixed contrasts through the retagged MIXED_TEMPLATE_ID. The old
+// "an omitted pick derives from town focus" case is retired the same way as
+// #2509's: this gate refuses on the corpse alone, before any pick (derived
+// or explicit) is even consulted, which the "preempts" case below still
+// states, narrowed to the claim-order half that survives (grantCorpseHarvest
+// has no range concept at all; that admission gate is
+// tests/corpse_harvest_cast.test.ts's).
 describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2513)', () => {
   const harvestAt = (
     templateId: string,
     components: string[] | undefined,
     seed = 5,
-    townFocus?: Record<string, number>,
-    arrange?: (rig: { internals: SimInternals; a: number; b: number }, corpse: Entity) => void,
-  ) =>
-    harvestCommand(templateId, components, {
-      seed,
-      townFocus,
-      corpseId: 7513,
-      arrange: arrange as never,
-    });
+    arrange?: (rig: ReturnType<typeof setup>, corpse: Entity) => void,
+  ) => grantCommand(templateId, components, { seed, corpseId: 7513, arrange });
 
   const harvest2513 = (
     components: string[] | undefined,
     seed = 5,
-    townFocus?: Record<string, number>,
-    arrange?: (rig: { internals: SimInternals; a: number; b: number }, corpse: Entity) => void,
-  ) =>
-    withUnmappedTemplate(() =>
-      harvestAt(UNMAPPED_TEMPLATE_ID, components, seed, townFocus, arrange),
-    );
+    arrange?: (rig: ReturnType<typeof setup>, corpse: Entity) => void,
+  ) => withUnmappedTemplate(() => harvestAt(UNMAPPED_TEMPLATE_ID, components, seed, arrange));
 
   const NOT_HARVESTABLE = 'That corpse has nothing to harvest.';
   const PICK_REFUSAL = 'Nothing you selected can be harvested from that corpse.';
 
   it('is about a template the content really leaves fully unmapped, derived not listed', () => {
-    // A retag that leaves a shipped template fully unmapped moves this row
-    // instead of leaving the new case untested. claw and tusk joining the
-    // yield table (#2905) retired fen_troll, the one shipped template that
-    // used to be here, so the sweep is legitimately empty today (and Phase
-    // 11m's mapping of gills and horn means no shipped tag could put a
-    // template here without a brand-new family).
     const allUnmapped = Object.entries(MOBS)
       .filter(([, m]) => (m.componentTags?.length ?? 0) > 0)
       .filter(([, m]) => !m.componentTags?.some((t) => HARVEST_COMPONENT_ITEMS[t]))
       .map(([id]) => id);
     expect(allUnmapped).toEqual([]);
-    // The gate itself is still real code, driven here through the synthetic
-    // template instead of a shipped fixture.
     withUnmappedTemplate(() => {
       expect(MOBS[UNMAPPED_TEMPLATE_ID].componentTags).toEqual(UNMAPPED_TEMPLATE_TAGS);
       expect(isHarvestableCorpse(MOBS[UNMAPPED_TEMPLATE_ID].componentTags)).toBe(false);
     });
-    // The contrast that makes the predicate mean "mapped families" rather than
-    // "these two tags": wild_boar also carries tusk (now mapped) and stays
-    // harvestable.
     expect(MOBS.wild_boar.componentTags).toEqual(['hide', 'tusk', 'meat']);
     expect(isHarvestableCorpse(MOBS.wild_boar.componentTags)).toBe(true);
   });
 
   it('refuses every pick shape, pre-claim and rng-free, and says so exactly once', () => {
-    // Every shape that reaches the command: omitted (the town-focus default),
-    // an explicit empty pick, each single family, and the full cover. Pre-fix
-    // each of these spent the claim and emitted nothing; the draw counts they
-    // used to spend are in the describe comment above.
     const picks: (string[] | undefined)[] = [
       undefined,
       [],
@@ -3608,54 +2694,18 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
       const label = `${UNMAPPED_TEMPLATE_ID} ${JSON.stringify(pick)}`;
       const r = harvest2513(pick);
       expect(r.errors, `${label} errors`).toEqual([NOT_HARVESTABLE]);
-      // The refusal is the ONLY event: no harvestResult, no loot line, no cue.
       expect(
         r.events.map((e) => e.type),
         `${label} events`,
       ).toEqual(['error']);
       expect(r.claimedBy, `${label} claim`).toBeNull();
       expect(r.draws, `${label} draws`).toBe(0);
-      // The post-harvest clamp never ran, so the corpse keeps its own decay.
       expect(r.corpseTimer, `${label} timer`).toBe(9999);
       expect(r.inventory, `${label} inventory`).toEqual(r.before);
     }
   });
 
-  it('refuses the DERIVED pick too, whatever a persisted town focus names', () => {
-    // An omitted `components` resolves through meta.townFocus, so a persisted
-    // allocation is the pick. #2511 has since closed the route that could WRITE
-    // an unmapped key (set_town_focus rejects one and the load arm drops one an
-    // older save carries), so the direct meta poke in the rig stands in for
-    // exactly that: a save written before the key check existed. Pre-fix an
-    // allocation naming the then-unmapped gills burned this corpse on a plain
-    // interact press with no picker open and no line printed. The corpse-level
-    // gate fires before the pick is even derived, which is why every focus
-    // shape lands the same refusal here: a mapped focus, an unmapped one,
-    // junk, and none at all. That insensitivity to the focus is the point,
-    // and it is what makes this gate independent of #2511 rather than
-    // relying on it.
-    const focuses: (Record<string, number> | undefined)[] = [
-      undefined,
-      { [UNMAPPED_FAMILY]: 5 },
-      { [UNMAPPED_FAMILY_2]: 5 },
-      { hide: 5 },
-      { junk: 5 },
-    ];
-    for (const focus of focuses) {
-      const r = harvest2513(undefined, 5, focus);
-      const label = JSON.stringify(focus ?? 'no focus');
-      expect(r.errors, `${label} errors`).toEqual([NOT_HARVESTABLE]);
-      expect(r.claimedBy, `${label} claim`).toBeNull();
-      expect(r.draws, `${label} draws`).toBe(0);
-    }
-  });
-
   it('holds across seeds, which is a statement about the gate reading no rng state', () => {
-    // Deliberately NOT claimed as "not one lucky draw stream": the gate is
-    // rng-free and pre-claim, so all three rows run byte-identical code today and
-    // no seed can pass while another fails. What the row buys is the future: a
-    // change that made the gate read anything seed-derived (a roll, a shuffled
-    // tag order) would break exactly here and nowhere else in this file.
     for (const seed of [2, 5, 11]) {
       const r = harvest2513(undefined, seed);
       expect(r.draws, `@${seed} draws`).toBe(0);
@@ -3665,43 +2715,27 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
     }
   });
 
-  it('preempts the range and already-claimed refusals, which is a message change', () => {
-    // Gate ORDER, pinned because the diff changed which message a player gets
-    // and no other case asserts precedence. The corpse-level gate sits above the
-    // range check and the claim resolve, so on an all-unmapped corpse it answers
-    // first: an out-of-range press used to say "Too far away." and a
-    // second-comer used to say "This corpse has already been harvested." Both
-    // now say the corpse has nothing to harvest, which is the more useful of the
-    // two answers (the range and the claim are not the reason it will never
-    // work) and is what an untagged corpse has always said.
-    const far = harvest2513(undefined, 5, undefined, (rig) => {
-      expectDefined(rig.internals.entities.get(rig.a)).pos = { x: 500, y: 0, z: 0 };
-    });
-    expect(far.errors).toEqual([NOT_HARVESTABLE]);
-    expect(far.draws).toBe(0);
-    const claimed = harvest2513(undefined, 5, undefined, (rig, corpse) => {
+  it('preempts the already-claimed refusal, which is a message change', () => {
+    // Gate ORDER, pinned because the diff changed which message a player
+    // gets: the corpse-level gate sits above the claim resolve, so on an
+    // all-unmapped corpse a second-comer used to say "This corpse has
+    // already been harvested." and now says the corpse has nothing to
+    // harvest, the more useful of the two (the claim is not the reason it
+    // will never work). The discriminator: on a HARVESTABLE corpse the claim
+    // gate still owns its own message, so this is precedence on one
+    // template and not the corpse gate swallowing the other.
+    const claimed = harvest2513(undefined, 5, (rig, corpse) => {
       corpse.harvestClaimedBy = rig.b;
     });
     expect(claimed.errors).toEqual([NOT_HARVESTABLE]);
     expect(claimed.draws).toBe(0);
-    // The discriminator: on a HARVESTABLE corpse both of those gates still own
-    // their own message, so this is precedence on one template and not the
-    // corpse gate swallowing the others.
-    const farWolf = harvestAt('forest_wolf', undefined, 5, undefined, (rig) => {
-      expectDefined(rig.internals.entities.get(rig.a)).pos = { x: 500, y: 0, z: 0 };
-    });
-    expect(farWolf.errors).toEqual(['Too far away.']);
-    const claimedWolf = harvestAt('forest_wolf', undefined, 5, undefined, (rig, corpse) => {
+    const claimedWolf = harvestAt('forest_wolf', undefined, 5, (rig, corpse) => {
       corpse.harvestClaimedBy = rig.b;
     });
     expect(claimedWolf.errors).toEqual(['This corpse has already been harvested.']);
   });
 
   it('leaves the sim IDENTICAL to the command never being issued', () => {
-    // The determinism contract: a refused command must not shift the world's
-    // draw order or move any state for anyone else. Stated as an equality
-    // against a run of the same seed that never calls harvestCorpse at all, so
-    // it cannot pass by comparing the refusal with itself.
     withUnmappedTemplate(() => {
       const issued = harvestAt(UNMAPPED_TEMPLATE_ID, [UNMAPPED_FAMILY], 5);
       const { sim: quiet, internals: quietInternals, a: quietA } = setup(5);
@@ -3718,16 +2752,11 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
       expect(issued.corpse.corpseTimer).toBe(corpse.corpseTimer);
       // Same rng stream position: the next draw either world takes is the same
       // one. A refusal that drew anything would desync exactly here.
-      const nextOf = (s: typeof quiet) => (s as unknown as { rng: { next(): number } }).rng.next();
-      expect(nextOf(issued.sim)).toBe(nextOf(quiet));
+      expect(issued.sim.rng.next()).toBe(quiet.rng.next());
     });
   });
 
   it('is a corpse-level gate, so the pick-level #2509 rule is untouched', () => {
-    // The two predicates answer independently. On the all-unmapped corpse the
-    // #2509 rule is false for every pick (nothing is forfeited), and the
-    // command is refused anyway. On a mixed corpse the #2509 rule still fires
-    // and its message is still the one reported.
     for (const pick of [
       [],
       [UNMAPPED_FAMILY],
@@ -3739,11 +2768,6 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
       );
     }
     expect(forfeitsEveryMappedYield(MIXED_TEMPLATE_TAGS, [UNMAPPED_FAMILY])).toBe(true);
-    // Same rig, same seed, same pick shape: the mixed corpse still answers
-    // with the PICK-level message, so the corpse-level gate has not
-    // swallowed it. old_greyjaw's claw was mapped at #2905 and
-    // sethrael_palecoil's horn at Phase 11m; the retagged three-tag shape
-    // takes their place.
     withMixedTemplates(() => {
       expect(harvestAt(MIXED_TEMPLATE_ID, [UNMAPPED_FAMILY]).errors).toEqual([PICK_REFUSAL]);
     });
@@ -3752,12 +2776,10 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
 
   it('every command that spends the claim reports at least one yield', () => {
     // The #2457 "granted path only" contract in src/sim/types.ts used to be
-    // pinned by fen_troll alone: it was the only production fixture that took
-    // the `granted.length > 0` guard's FALSE arm, and #2513 makes that arm
-    // unreachable. Rather than leave the contract asserted by nothing, state it
-    // as the property it now is, swept over every shipped template and every
-    // subset of its tags: if the claim was spent, the ledger is non-empty and
-    // one event carries it. The two gates together are what make this true.
+    // pinned by fen_troll alone; #2513 makes its FALSE arm unreachable.
+    // Rather than leave the contract asserted by nothing, state it as the
+    // property it now is, swept over every shipped template and every
+    // subset of its tags.
     const sweep = (ids: readonly string[]) => {
       let spent = 0;
       let refused = 0;
@@ -3779,8 +2801,6 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
           spent++;
           expect(results, `${label} one ledger event`).toHaveLength(1);
           expect(results[0].yields.length, `${label} non-empty ledger`).toBeGreaterThan(0);
-          // ...and every entry really landed a positive quantity, so a phantom
-          // zero-count row could not satisfy the length above.
           for (const y of results[0].yields) {
             expect(y.qty, `${label} ${y.itemId} qty`).toBeGreaterThan(0);
           }
@@ -3788,51 +2808,12 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
       }
       return { spent, refused };
     };
-    // The shipped corpus. The total is every subset of every tagged template
-    // (it grew with the templates #1584 added), stated so a shrunk sweep reads
-    // as wrong rather than merely smaller. Exact totals are pinned against the
-    // shipped catalog, not derived, so a template that gains or loses a
-    // mapped tag moves one of them.
-    // Spent rose 86 to 152 with the farm-economy pass, which gave 15 coinless
-    // trash templates their mapped harvest tags; refused is untouched because
-    // that arm counts all-unmapped corpses, which neither pass added to.
-    // Then 152 to 164 for the Drakelands brood: whelp, broodguard and
-    // broodlord each carry hide+fang, so each contributes all 4 of its masks
-    // (2 mapped families means no selection can forfeit every yield) and none
-    // to refused, exactly +12/+0. Then 164 to 166 with the zones 1-3
-    // quest-dedupe pass, whose tagged threnos_first_voice adds its two subsets.
-    // Then 166 to 168 with the Galecrest quest-camp pass (#2887), which gave
-    // the newly reachable shoal_scuttler the meat tag its tide_scuttler twin
-    // already carried: one mapped family, so both of its subsets spend and
-    // neither can forfeit every yield, exactly +2/+0.
-    // claw and tusk joining the yield table (#2905) then raised `spent`
-    // further and collapsed `refused` to only the pick-level-only rows the
-    // then gills/horn-mixed templates still refused: fen_troll's four
-    // all-unmapped subsets fell out of refused and landed in spent instead.
-    // 188 to 196 when frostmane_yeti left the ogre family for beast: the
-    // every-beast-pays-in-components rule then owes it hide/fang/meat, and three
-    // mapped families contribute all 8 of its masks to spent and none to
-    // refused (all three are mapped), exactly +8/+0.
-    // 196 to 200 for the Proving Shore: shore_scuttler AND its tide-pool king
-    // mister_crabs each carry the meat tag the tide_scuttler twin already has,
-    // so all four of their subsets spend and none refuse, exactly +2/+0 per
-    // template (training_effigy has no tags and never enters the sweep, and
-    // neither do the Highwatch practice dummies).
-    // 200/6 to 266/0 at Masterwrought Phase 11m, in two moves. The tag spread
-    // (bf4f36405d) added 60 subsets: nine templates went from two tags to
-    // three (+4 each, 36), two from one to two (+2 each, 4), sethrael_palecoil
-    // from three to four (+8), and six untagged templates gained a single
-    // family (+2 each, 12). Mapping gills and horn then folded the six
-    // pick-level refusals (one per formerly mixed template: the unmapped
-    // family alone) into spent, so refused is ZERO on shipped content: no
-    // template is all-unmapped and none is mixed. 206 + 60 = 266, all spent.
+    // The shipped corpus: every subset of every tagged template. Exact totals
+    // are pinned against the shipped catalog, not derived, so a template that
+    // gains or loses a mapped tag moves one of them.
     expect(sweep(Object.keys(MOBS))).toEqual({ spent: 266, refused: 0 });
     // Both arms still have to be visited, so neither half of the property is
     // vacuous: the refused arm is driven through the three retagged fixtures.
-    // The all-unmapped template refuses all four of its subsets; each mixed
-    // width refuses exactly one (the unmapped family alone) and spends the
-    // rest (seven of eight on the three-tag shape, three of four on the
-    // two-tag one).
     const fixtures = withFixtureTemplates(() =>
       sweep([UNMAPPED_TEMPLATE_ID, MIXED_TEMPLATE_ID, MIXED2_TEMPLATE_ID]),
     );
@@ -3841,9 +2822,7 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
 
   // The ten mapped families and their item ids, spelled out. Deriving them
   // from HARVEST_COMPONENT_ITEMS would compare the table with itself and pass
-  // against an empty one; this is the tests/gathering.test.ts idiom. horn and
-  // gills (Phase 11m) reuse shipped ids: horn is the same hard keratin as
-  // tusk, gills feeds the trophy scale 11l promoted out of quality 'poor'.
+  // against an empty one; this is the tests/gathering.test.ts idiom.
   const EXPECTED_FAMILY_ITEMS: Record<string, string> = {
     hide: 'rough_hide',
     fang: 'wolf_fang',
@@ -3858,16 +2837,6 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
   };
 
   it('every family a harvest extracts has an item behind it (#2514)', () => {
-    // Both `if (!itemId) continue` arms in harvestCorpse (the pre-claim
-    // capacity gate and the grant loop) are unreachable by construction as of
-    // #2514: resolveCorpseFocusHarvest only yields what yieldingFocusComponents
-    // kept, and that filter and those two lookups are the SAME accessor. No
-    // fixture can reach a dead arm, so what is pinned is the property that
-    // makes them dead, over the same subsets the sweep above uses.
-    //
-    // Read off the ledger rather than the roll, so it is a statement about the
-    // command and not about the pure function: a family that slipped through
-    // would grant nothing and leave the ledger short.
     const sweep = (ids: readonly string[]) => {
       let extracted = 0;
       let unmappedOffered = 0;
@@ -3880,11 +2849,6 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
           const label = `${id} ${JSON.stringify(selected)}`;
           if (selected.some((t) => !harvestFamilyYieldsItem(t))) unmappedOffered++;
           const expectedSet = yieldingFocusComponents(tags, selected);
-          // The item ids the extracted set resolves to, against a LITERAL map.
-          // Comparing the accessor to the table it reads would be a tautology
-          // (the accessor returns that table's value verbatim once hasOwn
-          // passes), and it would stay green against an empty table, which is
-          // the exact failure mode this row exists to rule out.
           for (const family of expectedSet) {
             expect(harvestItemForFamily(family), `${label} ${family}`).toBe(
               EXPECTED_FAMILY_ITEMS[family],
@@ -3893,23 +2857,10 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
           const r = harvestAt(id, selected);
           if (r.claimedBy === null) continue;
           extracted += expectedSet.length;
-          // One tier roll per extracted family and one rarity roll per grant,
-          // so an unmapped family costs NOTHING. Swept here rather than left
-          // to the seed-5 literal cases, since "no draw for a family that
-          // cannot pay" is the property that makes the two arms dead at the
-          // roll rather than merely at the lookup.
           expect(r.draws, `${label} draws`).toBe(2 * expectedSet.length);
-          // The ledger's distinct item ids are exactly the extracted families'
-          // items, plus whatever specimens rode along. Never an id from a
-          // family outside the extracted set, and never one short of it.
           const results = r.events.filter(
             (e): e is Extract<typeof e, { type: 'harvestResult' }> => e.type === 'harvestResult',
           );
-          // Every kind EXCEPT 'specimen': a specimen is a separate jackpot
-          // item that rides along with its family, while 'plain' and 'signed'
-          // are the two shapes the family's own component lands in (signed
-          // when its rarity roll cleared the floor and it has no specimen of
-          // its own).
           const component = results[0].yields
             .filter((y) => y.kind !== 'specimen')
             .map((y) => y.itemId);
@@ -3923,34 +2874,7 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
       }
       return { extracted, unmappedOffered };
     };
-    // The shipped corpus, a CORPUS CENSUS and not a behaviour claim: the
-    // v0.32.0 base merge brought the release's 35/92 together with the rift
-    // bestiary and Drakelands brood, then the zones 1-3 quest-dedupe pass
-    // added threnos_first_voice and the Galecrest quest-camp pass (#2887)
-    // added shoal_scuttler (37/239). claw and tusk joining the yield table
-    // (#2905) then folded the claw/tusk-only mixed templates into
-    // fully-mapped, shrinking `unmappedOffered` to only the subsets naming
-    // gills or horn (14), while `extracted` rose with the extra families each
-    // affected subset extracts; frostmane_yeti's move from the ogre family to
-    // beast added its hide/fang/meat subsets (286 to 301), and the Proving
-    // Shore's two meat-tagged templates (shore_scuttler and mister_crabs)
-    // took it to 305. Masterwrought Phase 11m then moved both at once: the
-    // tag spread added 60 subsets (accounted in the sweep above) and mapping
-    // gills and horn made every family on every template extractable, so
-    // `unmappedOffered` is ZERO (no shipped subset names an unmapped family)
-    // and `extracted` is the sum over all 266 subsets of the effective
-    // pick's width, 447: measured against the tree, predicted beforehand
-    // from that sum (the empty pick and the full cover each extract the whole
-    // tag list, every strict subset extracts itself).
     expect(sweep(Object.keys(MOBS))).toEqual({ extracted: 447, unmappedOffered: 0 });
-    // The property is not vacuously true of a corpus that never names an
-    // unmapped family: the retagged fixtures name one in six subsets (four on
-    // the three-tag shape, two on the two-tag one) and extract 13 families
-    // across the ten subsets that spend (2+1+1+2+1+1+2 on the three-tag
-    // shape, 1+1+1 on the two-tag one), with the all-unmapped template
-    // contributing its three non-empty subsets to the offered count and
-    // nothing extracted (the empty pick names no family, so it is not
-    // "offered" an unmapped one).
     const fixtures = withFixtureTemplates(() =>
       sweep([UNMAPPED_TEMPLATE_ID, MIXED_TEMPLATE_ID, MIXED2_TEMPLATE_ID]),
     );
@@ -3958,13 +2882,6 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
   });
 
   it('keeps every mixed template harvestable, so the gate is not a blanket refusal', () => {
-    // A template that mixes mapped and unmapped families still claims, still
-    // draws and still grants on its mapped pick. Derived from content so a
-    // retag cannot quietly grow the set unnoticed: claw and tusk joining the
-    // yield table (#2905) folded five of the ten mixed templates (old_greyjaw,
-    // wild_boar, mire_prowler, old_cragmaw, ridge_stalker) into fully-mapped,
-    // and gills and horn joining it (Phase 11m) folded the other six, so the
-    // shipped set is EMPTY and the sweep runs on the two retagged widths.
     const mixedTemplates = () =>
       Object.entries(MOBS).filter(([, m]) => {
         const tags = m.componentTags ?? [];
@@ -3986,46 +2903,19 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
         expect(r.inventory.length, `${id} inventory`).toBeGreaterThan(r.before.length);
       }
     });
-    // ...and a template with no tags at all still answers the SAME corpse-level
-    // refusal the synthetic all-unmapped template above takes, which is the
-    // point of routing it there.
     expect(MOBS.warlock_imp.componentTags).toBeUndefined();
     expect(harvestAt('warlock_imp', undefined).errors).toEqual([NOT_HARVESTABLE]);
   });
 });
 
 // The concentration bonus on a mixed corpse, before and after #2514 moved it,
-// as literals measured against a real Sim at seed 31.
-//
-// This block used to be titled "untouched (#2509)" and existed to prove the
-// opposite of what it now pins, so it is re-argued rather than renumbered. Its
-// premise was that #2509's silent-claim bug could be closed without re-tuning
-// anything, which was true and was the right call for THAT issue: the fix was a
-// pre-claim refusal, and every pick that yielded something kept yielding
-// exactly what it had. It left the partial case standing, filed as #2514,
-// because closing that one means moving the bonus, which is a balance decision
-// and had to be made on purpose rather than as a side effect. #2514 is that
-// decision: an unmapped family is never extracted, so it is always forfeited
-// breadth and never dilutes the bonus.
-//
-// What that superseded, sentence by sentence, since the old block asserted each
-// one: `['hide','claw']` was byte-identical to `['hide']` (it was the suite's
-// explicit polarity discriminator that they must NOT be); the empty pick, an
-// explicit full cover and a cover of just the mapped families are all one
-// world at bonus 1; and bonus 0 is no longer reachable on this corpse at
-// all. What #2514 did NOT touch, and what is still pinned here: #2509's own
-// refusal, which fires on exactly the same picks as before, and the equality
-// between an explicit full cover and an empty pick.
-//
-// old_greyjaw (hide, fang, claw) was this block's fixture; claw was mapped at
-// #2905, which made old_greyjaw fully mapped and retired it from a describe
-// about a family that stays unmapped beside mapped ones. sethrael_palecoil
-// (hide, claw, horn) took its place until Masterwrought Phase 11m mapped horn
-// (and gave the serpent venomSac), which retired it the same way. The same
-// three-tag shape is now retagged onto MIXED_TEMPLATE_ID with the synthetic
-// family in horn's slot: claw plays the second-mapped-family role fang used
-// to (claw's own Pristine Claw specimen is not what this block is about, so
-// the rows below only ever concentrate on hide, the same as before). The
+// as literals measured against a real Sim at seed 31. old_greyjaw (hide,
+// fang, claw) was this block's fixture; claw was mapped at #2905, which made
+// old_greyjaw fully mapped and retired it. sethrael_palecoil (hide, claw,
+// horn) took its place until Masterwrought Phase 11m mapped horn (and gave
+// the serpent venomSac), which retired it the same way. The same three-tag
+// shape is now retagged onto MIXED_TEMPLATE_ID with the synthetic family in
+// horn's slot: claw plays the second-mapped-family role fang used to. The
 // serpent itself is pinned at the end of the block as the all-mapped corpse
 // it is today, on the same seed, which is where "self-healing" is measured.
 describe('the concentration bonus on a mixed corpse, moved on purpose (#2514)', () => {
@@ -4038,14 +2928,14 @@ describe('the concentration bonus on a mixed corpse, moved on purpose (#2514)', 
     corpse.corpseTimer = 9999;
     corpse.respawnTimer = 9999;
     internals.entities.set(corpse.id, corpse);
+    const meta = mustPlayer(internals, a);
     sim.drainEvents();
     let draws = 0;
-    const rng = (sim as unknown as { rng: { setObserver: (o: (() => void) | null) => void } }).rng;
-    rng.setObserver(() => {
+    sim.rng.setObserver(() => {
       draws++;
     });
-    sim.harvestCorpse(corpse.id, components, a);
-    rng.setObserver(null);
+    grantCorpseHarvestOnMob(sim, corpse, meta, components);
+    sim.rng.setObserver(null);
     sim.drainEvents();
     return {
       draws,
@@ -4058,18 +2948,6 @@ describe('the concentration bonus on a mixed corpse, moved on purpose (#2514)', 
   const yieldOf = (components: string[] | undefined) =>
     withMixedTemplates(() => yieldAt(MIXED_TEMPLATE_ID, components));
 
-  // The three-tag mixed shape (hide, claw, unmapped) at seed 30 (re-hunted
-  // for the final rebase onto release/v0.35.0, which shifted the shared
-  // content catalog and with it the world-gen draw sequence once more). Every
-  // pick shape that yields something, so the size and direction of the
-  // concentration bonus is on the record rather than only its endpoint.
-  // `bonus` is not asserted directly (the roll is internal); the tier-driven
-  // quantities and the draw counts are what a moved bonus changes, and they
-  // are pinned. Moving the shape from sethrael_palecoil onto the retagged
-  // fixture at Phase 11m was predicted to move NO literal: the extracted set,
-  // the bonus and the rng position are the same, and the template only names
-  // the corpse (createMob draws nothing, and the roll never reads its level).
-  // Measured so.
   const CASES: {
     pick: string[] | undefined;
     draws: number;
@@ -4081,21 +2959,12 @@ describe('the concentration bonus on a mixed corpse, moved on purpose (#2514)', 
     // the widest pick this corpse offers is 2 of 3 at bonus 1.
     { pick: undefined, draws: 4, hide: 2, claw: 5, pristine: 0 },
     { pick: [], draws: 4, hide: 2, claw: 5, pristine: 0 },
-    // An explicit FULL cover lands the identical world to the empty pick:
-    // both collapse to the corpse's tags inside effectiveFocusComponents
-    // before anything else looks at them.
     { pick: ['hide', 'claw', UNMAPPED_FAMILY], draws: 4, hide: 2, claw: 5, pristine: 0 },
-    // ...and so does the cover of just the MAPPED families: the unmapped
-    // family is never extracted whether or not it is named, so naming it
-    // changes nothing.
     { pick: ['hide', 'claw'], draws: 4, hide: 2, claw: 5, pristine: 0 },
     // Concentrate on one mapped family: bonus 2, and the extra tier shift is
-    // what lands the signed pristine_hide. The row that pins the denominator:
-    // it would be bonus 1 here if the denominator had moved to the
-    // mapped-family count along with the numerator.
+    // what lands the signed pristine_hide.
     { pick: ['hide'], draws: 2, hide: 3, claw: 0, pristine: 1 },
-    // The #2514 story itself: ticking the unmapped box beside Hide costs
-    // nothing at all, byte-identical to concentrating on hide alone.
+    // Ticking the unmapped box beside Hide costs nothing at all.
     { pick: ['hide', UNMAPPED_FAMILY], draws: 2, hide: 3, claw: 0, pristine: 1 },
   ];
 
@@ -4111,32 +2980,13 @@ describe('the concentration bonus on a mixed corpse, moved on purpose (#2514)', 
   }
 
   it('the full cover, the empty pick and the mapped-only cover land one identical world', () => {
-    // Stated as equalities too, so the rows above cannot drift together.
     expect(yieldOf(['hide', 'claw', UNMAPPED_FAMILY])).toEqual(yieldOf([]));
     expect(yieldOf(['hide', 'claw'])).toEqual(yieldOf([]));
-    // ...and ticking the unmapped family beside a concentrated pick is the
-    // identical world to the concentrated pick alone: the #2514 ruling stated
-    // directly.
     expect(yieldOf(['hide', UNMAPPED_FAMILY])).toEqual(yieldOf(['hide']));
-    // The class has not swallowed everything, though: concentrating still buys
-    // something on this corpse, so the picker is still a choice here.
     expect(yieldOf(['hide'])).not.toEqual(yieldOf([]));
   });
 
   it('is self-healing on the shipped serpent: horn mapped, the same seed rolls the bonus-0 spread', () => {
-    // The "self-healing" bullet of the ruling on harvestConcentrationBonus,
-    // measured rather than asserted in prose. sethrael_palecoil at the same
-    // seed and corpse id as the rows above, four tags all mapped since Phase
-    // 11m: the default pick extracts all four at bonus 0, so it draws 8 (a
-    // tier roll per family, then a rarity roll per grant). Predicted before
-    // measuring: the tier rolls come first and in tag order, so hide's and
-    // claw's are the same two draws the rows above shifted by bonus 1, which
-    // put hide at common (2) and claw at epic (5); unshifted they are poor
-    // (1) and rare (4): measured so. horn's and venomSac's tier rolls and all
-    // four rarity rolls land on stream positions no earlier pin recorded, so
-    // the tusk, gland and pristine counts were measured, not predicted:
-    // curved_tusk 2, venom_gland 4, pristine_hide 0 (hide's rarity roll, now
-    // the fifth draw, landed uncommon, under the signable floor).
     expect(MOBS.sethrael_palecoil.componentTags).toEqual(['hide', 'claw', 'horn', 'venomSac']);
     const serpent = yieldAt('sethrael_palecoil', undefined);
     expect(serpent.claimedBy).not.toBeNull();
@@ -4152,11 +3002,9 @@ describe('the concentration bonus on a mixed corpse, moved on purpose (#2514)', 
     corpse.corpseTimer = 9999;
     corpse.respawnTimer = 9999;
     internals.entities.set(corpse.id, corpse);
-    sim.harvestCorpse(corpse.id, undefined, a);
+    grantCorpseHarvestOnMob(sim, corpse, mustPlayer(internals, a), undefined);
     expect(sim.countItem('curved_tusk', a)).toBe(2);
     expect(sim.countItem('venom_gland', a)).toBe(4);
-    // ...and horn alone is a live concentrate at bonus 3 on this corpse now,
-    // where the same pick on the three-tag shape is the #2509 refusal.
     const hornOnly = yieldAt('sethrael_palecoil', ['horn']);
     expect(hornOnly.claimedBy).not.toBeNull();
     expect(hornOnly.draws).toBe(2);
@@ -4165,14 +3013,6 @@ describe('the concentration bonus on a mixed corpse, moved on purpose (#2514)', 
   });
 
   it('moves on the TWO-tag mixed corpse too, where the bonus arithmetic differs', () => {
-    // The three-tag shape above is one width. The `gills, hide` murlocs
-    // shipped the 2-tag shape until 11m mapped gills, where a single box is
-    // the whole refusal and the denominator is 2 rather than 3, so a change
-    // scoped to one width would slip past every row above. Literals, measured
-    // the same way, on the retagged two-tag fixture (MIXED2_TEMPLATE_ID); the
-    // shipped murloc follows, all-mapped, on the same seed. Moving the shape
-    // off mudfin_murloc was predicted to move no literal, for the same reason
-    // as the rows above, and measured so.
     const shape = (templateId: string, components: string[] | undefined) => {
       const { sim, internals, a } = setup(31);
       const template = MOBS[templateId];
@@ -4182,23 +3022,19 @@ describe('the concentration bonus on a mixed corpse, moved on purpose (#2514)', 
       corpse.corpseTimer = 9999;
       corpse.respawnTimer = 9999;
       internals.entities.set(corpse.id, corpse);
+      const meta = mustPlayer(internals, a);
       let draws = 0;
-      const rng = (sim as unknown as { rng: { setObserver: (o: (() => void) | null) => void } })
-        .rng;
-      rng.setObserver(() => {
+      sim.rng.setObserver(() => {
         draws++;
       });
-      sim.harvestCorpse(corpse.id, components, a);
-      rng.setObserver(null);
+      grantCorpseHarvestOnMob(sim, corpse, meta, components);
+      sim.rng.setObserver(null);
       sim.drainEvents();
       return {
         draws,
         hide: sim.countItem('rough_hide', a),
         pristine: sim.countItem('pristine_hide', a),
         scale: sim.countItem('mudfin_scale', a),
-        // Whether the HARVESTER claimed it, not which entity id they happen to
-        // be: the raw id depends on how many entities the world spawns before
-        // this fixture, which is content, not harvest behaviour.
         claimedByHarvester: corpse.harvestClaimedBy === a,
       };
     };
@@ -4208,24 +3044,11 @@ describe('the concentration bonus on a mixed corpse, moved on purpose (#2514)', 
       expect(MOBS[MIXED2_TEMPLATE_ID].componentTags).toEqual([UNMAPPED_FAMILY_2, 'hide']);
     });
 
-    // Was: bonus 0 over both tags, the unmapped family burning a tier roll
-    // for nothing (3 draws, hide 4, no pristine). Now the default IS the
-    // concentrate, because only one of the two families can be extracted at
-    // all.
     const concentrate = { draws: 2, hide: 3, pristine: 1, scale: 0, claimedByHarvester: true };
     expect(boar(undefined)).toEqual(concentrate);
     expect(boar([UNMAPPED_FAMILY_2, 'hide'])).toEqual(boar([]));
-    // Concentrating on hide is bonus 1, and was bonus 1 before: this is the
-    // row that moved to meet the others, not away from them. On a corpse with
-    // exactly one mapped family every legal pick is now one world, which is
-    // the consequence of the ruling worth stating out loud: the picker stops
-    // being a choice here, because a picker offering one live row and one dead
-    // one never was one.
     expect(boar(['hide'])).toEqual(concentrate);
     expect(boar(['hide'])).toEqual(boar(undefined));
-    // The refusal is untouched, which is the half of #2509 that #2514 does not
-    // supersede: the unmapped family alone still leaves the corpse unclaimed
-    // for the next harvester and still draws nothing.
     expect(boar([UNMAPPED_FAMILY_2])).toEqual({
       draws: 0,
       hide: 0,
@@ -4233,17 +3056,6 @@ describe('the concentration bonus on a mixed corpse, moved on purpose (#2514)', 
       scale: 0,
       claimedByHarvester: false,
     });
-    // The shipped murloc today, gills mapped to mudfin_scale (Phase 11m): the
-    // default is the bonus-0 spread over BOTH families again, 4 draws.
-    // Predicted before measuring: hide's tier roll would be the same first
-    // draw the row above shifted by bonus 1 to uncommon (3), so unshifted
-    // common (2). MEASURED 4, and the miss is the tag ORDER: the murloc's
-    // tags are `gills, hide`, so with gills extracted the first tier roll is
-    // the scale's and hide's moves to the second draw, a position no earlier
-    // pin recorded (it landed rare, 4). The scale's tier and both rarity
-    // rolls were measured too: mudfin_scale 2, pristine_hide 0. Gills alone
-    // is a live concentrate now, not the refusal the two-tag shape above
-    // still takes: it claims, draws 2 and grants the scale.
     expect(MOBS.mudfin_murloc.componentTags).toEqual(['gills', 'hide']);
     const murloc = shape('mudfin_murloc', undefined);
     expect(murloc).toEqual({ draws: 4, hide: 4, pristine: 0, scale: 2, claimedByHarvester: true });
@@ -4251,133 +3063,13 @@ describe('the concentration bonus on a mixed corpse, moved on purpose (#2514)', 
     expect(gillsOnly.claimedByHarvester).toBe(true);
     expect(gillsOnly.draws).toBe(2);
     expect(gillsOnly.hide).toBe(0);
-    // The EXACT count, predicted before it was measured: seed 31's first
-    // draw is tier index 1 (the concentrate row above lands hide 3 at bonus
-    // 1, and the spread row lands the scale at 2 at bonus 0), gills alone is
-    // bonus 1 on the two-tag murloc, and harvestTierQuantity is index plus
-    // bonus plus one: predicted 3, measured 3.
     expect(gillsOnly.scale).toBe(3);
-    // ...and hide alone on the shipped murloc is bonus 1 (2 - 1): the SAME
-    // numbers as the two-tag fixture's ['hide'] above, because the
-    // denominator is 2 on both and hide's tier roll is the first draw on
-    // both. This is the row that carries the gills tag's arithmetic: take
-    // gills off the murloc and ['hide'] becomes the full cover at bonus 0,
-    // hide 2 instead of 3.
     expect(shape('mudfin_murloc', ['hide'])).toEqual({
       draws: 2,
       hide: 3,
       pristine: 1,
       scale: 0,
       claimedByHarvester: true,
-    });
-  });
-});
-
-// Two servers, one command each: the refusal lives at the SIM boundary, so the
-// server must still forward an all-unmapped pick verbatim.
-describe('an unmapped-only pick over the wire, through a real GameServer (#2509)', () => {
-  it('forwards the pick verbatim: the SIM boundary is what refuses it, not the server', () => {
-    // Same argument as #2474 and #2504: the offline Sim and the headless env
-    // call harvestCorpse without ever passing through server/game.ts, so
-    // validating the tag vocabulary here would have left both hosts open. If a
-    // future change starts filtering on the server too, this test is the one to
-    // re-argue rather than quietly delete.
-    const server = new GameServer();
-    const session = joinServer(server, fakeWs(), 97, 'Alpha');
-    const raw = JSON.stringify({
-      t: 'cmd',
-      cmd: 'harvestCorpse',
-      id: 4242,
-      components: ['claw'],
-    });
-    const spy = vi.spyOn(server.sim, 'harvestCorpse').mockImplementation(() => {});
-    serverHarness(server).dispatchMessage(session, JSON.parse(raw), raw, 0);
-    expect(spy).toHaveBeenCalledWith(4242, ['claw'], session.pid);
-  });
-
-  it('refuses the frame end to end, claim intact, and reports it to that client only', () => {
-    // old_greyjaw's claw was mapped at #2905 and sethrael_palecoil's horn at
-    // Phase 11m; the retagged three-tag shape (MIXED_TEMPLATE_ID) carries the
-    // unmapped family beside two mapped ones for the whole case, since the
-    // server's sim reads MOBS at dispatch time.
-    withMixedTemplates(() => {
-      const server = new GameServer();
-      const fc = fakeWs();
-      const bystanderFc = fakeWs();
-      const session = joinServer(server, fc, 98, 'Alpha');
-      // A second client standing on the same corpse: the refusal is a personal
-      // event, so it must reach Alpha's socket and NOT Bravo's. Without this
-      // client the routing half of the title would assert nothing.
-      const bystander = joinServer(server, bystanderFc, 198, 'Bravo');
-      const internals = server.sim as unknown as SimInternals;
-      for (const pid of [session.pid, bystander.pid]) {
-        const e = expectDefined(internals.entities.get(pid));
-        e.pos = { x: 0, y: 0, z: 0 };
-        e.prevPos = { x: 0, y: 0, z: 0 };
-      }
-      const template = MOBS[MIXED_TEMPLATE_ID];
-      const mobId = Math.max(...internals.entities.keys()) + 1;
-      const mob = createMob(mobId, template, template.maxLevel, { x: 2, y: 0, z: 0 });
-      mob.dead = true;
-      mob.aiState = 'dead';
-      mob.corpseTimer = 9999;
-      mob.respawnTimer = 9999;
-      internals.entities.set(mob.id, mob);
-      // `t: 'cmd'` is the real envelope; without it the dispatcher drops the
-      // frame as a protocol anomaly and this test would pass on an untouched
-      // corpse for the wrong reason.
-      const raw = JSON.stringify({
-        t: 'cmd',
-        cmd: 'harvestCorpse',
-        id: mobId,
-        components: [UNMAPPED_FAMILY],
-      });
-      serverHarness(server).dispatchMessage(session, JSON.parse(raw), raw, 0);
-      expect(mob.harvestClaimedBy).toBeNull();
-      expect(server.sim.countItem('rough_hide', session.pid)).toBe(0);
-      // The refusal really rides the wire, to the harvester alone. A gate that
-      // returned silently would leave the claim intact too, so without this
-      // the whole "in silence" half of #2509 would go unpinned over the wire,
-      // and a gate that stamped the wrong pid would broadcast it to the
-      // bystander. routeEvents is the real fan-out the tick loop drives; the
-      // events frame is `{t:'events', list:[...]}`, separate from the snapshot
-      // frame.
-      serverHarness(server).routeEvents(server.sim.drainEvents());
-      const errorsFor = (sent: unknown[]) =>
-        sent
-          .filter(isEventsFrame)
-          .flatMap((frame) => frame.list)
-          .filter((e) => e.type === 'error')
-          .map((e) => e.text);
-      expect(errorsFor(fc.sent)).toEqual([
-        'Nothing you selected can be harvested from that corpse.',
-      ]);
-      expect(errorsFor(bystanderFc.sent)).toEqual([]);
-      // The discriminator over the same wire: a mapped pick on an identical
-      // second server does claim the corpse, so the refusal is the pick's
-      // doing.
-      const ok = new GameServer();
-      const okSession = joinServer(ok, fakeWs(), 99, 'Alpha');
-      const okInternals = ok.sim as unknown as SimInternals;
-      const okSelf = expectDefined(okInternals.entities.get(okSession.pid));
-      okSelf.pos = { x: 0, y: 0, z: 0 };
-      okSelf.prevPos = { x: 0, y: 0, z: 0 };
-      const okMobId = Math.max(...okInternals.entities.keys()) + 1;
-      const okMob = createMob(okMobId, template, template.maxLevel, { x: 2, y: 0, z: 0 });
-      okMob.dead = true;
-      okMob.aiState = 'dead';
-      okMob.corpseTimer = 9999;
-      okMob.respawnTimer = 9999;
-      okInternals.entities.set(okMob.id, okMob);
-      const okRaw = JSON.stringify({
-        t: 'cmd',
-        cmd: 'harvestCorpse',
-        id: okMobId,
-        components: ['hide'],
-      });
-      serverHarness(ok).dispatchMessage(okSession, JSON.parse(okRaw), okRaw, 0);
-      expect(okMob.harvestClaimedBy).toBe(okSession.pid);
-      expect(ok.sim.countItem('rough_hide', okSession.pid)).toBeGreaterThan(0);
     });
   });
 });

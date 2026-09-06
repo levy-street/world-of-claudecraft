@@ -153,6 +153,10 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
     cadenceBlockedQuests: [],
   };
   c.gatheringProficiency = {};
+  // The remembered corpse-harvest preference (Intentional Gathering PR3):
+  // null until the first `hpref` snapshot decodes, matching the class field
+  // default (src/net/online.ts).
+  c.harvestPreference = null;
   // The tslot/fplot self-delta mirrors and the static patch table, matching
   // the class's own static defaults (src/net/online.ts): a consumer test
   // reading IWorldFarming or the tool slots through this fixture must see
@@ -248,8 +252,11 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.actionBarSavePending = null;
   c.profanityDirty = false;
   c.pendingTargetEcho = null;
-  c.nextCommandOutcomeId = 1;
-  c.pendingCommandOutcomes = new Map();
+  // The lazy WorldInteractionRequests holder (src/net/world_interaction_requests.ts):
+  // undefined until the first cmdWithOutcome/corpseHarvestInfo/onMessage call,
+  // matching a freshly constructed online ClientWorld before it ever sends or
+  // routes such a request.
+  c.worldInteractionRequests = undefined;
   c.selfLockouts = {};
   c.selfOwnedMounts = [];
   c.selfRidingTrained = false;

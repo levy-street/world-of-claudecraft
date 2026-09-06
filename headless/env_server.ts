@@ -7,7 +7,17 @@
 //   <- {"obs":[...],"info":{...}}
 //   -> {"cmd":"step","action":4}
 //   <- {"obs":[...],"reward":0.01,"terminated":false,"truncated":false,"info":{...}}
+//   -> {"cmd":"gathering","verb":"inspect"}
+//   <- {"ok":true,"verb":"inspect","state":{...},"corpses":[...],"vendors":[...]}
 //   -> {"cmd":"close"}
+//
+// The optional `gathering` command is a closed request union (inspect,
+// buy_field_kit, set_preference, harvest) that never advances sim time or the
+// episode step: no tick runs and no `step`-mutation happens on that path, only
+// the existing `step`/noop advances casts. Exact request/result shapes and
+// discovery are documented in `gathering_protocol.ts` and
+// `docs/prd/intentional-gathering/headless-gathering-contract.md`; this header
+// only names the wire shape, not the contract.
 //
 // Run `node dist-env/env_server.cjs --bench` for a throughput benchmark.
 
@@ -17,6 +27,8 @@ import { ACTIONS, applyAction, encodeObs, NUM_ACTIONS, obsSize } from '../src/si
 import { type RewardCounters, Sim } from '../src/sim/sim';
 import { ALL_CLASSES, MAX_LEVEL, type PlayerClass } from '../src/sim/types';
 import { allocateHeadlessGathererIdentity } from './gatherer_identity';
+import { executeGatheringCommand } from './gathering_commands';
+import { GATHERING_CAPABILITY } from './gathering_protocol';
 import {
   MAX_INPUT_LINE_LENGTH,
   parseTalentResetRequest,
@@ -210,6 +222,7 @@ function serve(): void {
             num_actions: NUM_ACTIONS,
             actions: ACTIONS,
             max_level: MAX_LEVEL,
+            gathering: GATHERING_CAPABILITY,
           });
           break;
         case 'reset':
@@ -244,6 +257,9 @@ function serve(): void {
             }
             send(env.step(action));
           }
+          break;
+        case 'gathering':
+          send(executeGatheringCommand(env.sim, msg));
           break;
         case 'close':
           send({ ok: true });

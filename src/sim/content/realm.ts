@@ -514,6 +514,7 @@ export const REALM_NPCS: Record<string, NpcDef> = {
       'glacier_melt',
       'healing_potion',
       'mana_potion',
+      'field_kit',
     ],
     greeting: 'Bread still warm, water still sweet. The Hollow provides, and so do I.',
   },

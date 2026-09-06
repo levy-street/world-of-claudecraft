@@ -1142,6 +1142,39 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.horn': '角',
   'hudChrome.corpseHarvest.components.tusk': '牙',
   'hudChrome.corpseHarvest.components.cloth': '布',
+  'hudChrome.corpseHarvest.preferenceLabel': '採取の希望設定：{preference}',
+  'hudChrome.corpseHarvest.changeButton': '変更',
+  'hudChrome.corpseHarvest.harvestActionTooltip':
+    '現在の希望設定で{seconds}秒かけて採取します。フィールドキットが必要です。各死体は一度だけ採取できます。倒したプレイヤーとそのパーティは{prioritySeconds}秒間優先権を持ちます。ドロップした戦利品は引き続き取得できます。',
+  'hudChrome.corpseHarvest.checkingStatus': '採取状況を確認しています…',
+  'hudChrome.corpseHarvest.statusUnavailable': '現在、採取状況を取得できません。',
+  'hudChrome.corpseHarvest.harvestStarting': '採取を開始しています…',
+  'hudChrome.corpseHarvest.allBenefit': 'この死体から入手可能な素材をすべて採取します。',
+  'hudChrome.corpseHarvest.focusBenefit': '採取を{material}に集中させます。',
+  'hudChrome.corpseHarvest.tierBonusHint':
+    '採取を{material}に集中させます：全素材採取時よりティア+{tierBonus}。',
+  'hudChrome.corpseHarvest.denial.actorDead': '採取するには生きている必要があります。',
+  'hudChrome.corpseHarvest.denial.actorInCombat': '戦闘中は採取できません。',
+  'hudChrome.corpseHarvest.denial.actorBusy': 'すでに何かをしています。',
+  'hudChrome.corpseHarvest.denial.corpseInvalid': 'この死体はもう採取できません。',
+  'hudChrome.corpseHarvest.denial.wrongWorld': 'この死体はあなたのワールドにありません。',
+  'hudChrome.corpseHarvest.denial.outOfRange': 'この死体を採取するにはもっと近づいてください。',
+  'hudChrome.corpseHarvest.denial.noFieldKit': '採取するにはフィールドキットが必要です。',
+  'hudChrome.corpseHarvest.denial.reservedSelf': 'すでにこの死体を採取しています。',
+  'hudChrome.corpseHarvest.denial.reservedOther': '{name}がこの死体を採取しています。',
+  'hudChrome.corpseHarvest.denial.reservedOtherUnknown': '他のプレイヤーがこの死体を採取しています。',
+  'hudChrome.corpseHarvest.denial.priorityProtected':
+    '現在、他のプレイヤーがこの死体の優先権を持っています。',
+  'hudChrome.corpseHarvest.denial.corpseExpiring': 'この死体は採取を終えるまで持ちません。',
+  'hudChrome.corpseHarvest.denial.preferenceMalformed':
+    '採取の希望設定が無効です。続けるには設定を選んでください。',
+  'hudChrome.corpseHarvest.denial.nothingToHarvest':
+    'あなたのフィールドキットでは、この死体から採取できるものがありません。',
+  'hudChrome.corpseHarvest.denial.materialUnavailable': '{material}はこの死体にありません。',
+  'hudChrome.corpseHarvest.denial.materialUnavailableWithList':
+    '{material}はこの死体にありません。入手可能：{materials}。',
+  'hudChrome.corpseHarvest.denial.bagsFull': 'カバンがいっぱいで採取できません。',
+  'hudChrome.corpseHarvest.denial.malformedInput': '問題が発生しました。もう一度お試しください。',
   'hudChrome.townFocus.title': '町のフォーカス',
   'hudChrome.townFocus.hint':
     'フォーカスポイントは各素材の基本産出量にボーナスを加算します。フォーカスしていない素材は基本産出量のままです。',
@@ -9947,6 +9980,17 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.harvestJournal.noviceTitle': 'まだ作物畑を耕したことがありません',
   'hudChrome.harvestJournal.noviceBody':
     '作物を収穫するたびに農耕スキルが上がります。どの作物畑でもよいので、種をまいて始めましょう。',
+  // Intentional Gathering PR3: the shared corpse-harvest preference picker
+  // (Field Kit use, Professions, corpse Change entrances). M16 fills.
+  'hudChrome.harvestPreference.title': '採取設定',
+  'hudChrome.harvestPreference.allLabel': 'すべての素材',
+  'hudChrome.harvestPreference.applyButton': '適用',
+  'hudChrome.harvestPreference.cancelButton': 'キャンセル',
+  'hudChrome.harvestPreference.pickHint': '適用する前に採取するものを選んでください。',
+  'hudChrome.harvestPreference.currentUnavailable':
+    '現在選択中の{material}はここでは利用できません。',
+  'hudChrome.harvestPreference.unknownMaterial': '利用できない素材',
+  'hudChrome.harvestPreference.currentChoiceLabel': '現在：{choice}',
   'gatherEvent.pristineVein': '{finder}が純粋な鉱脈を掘り当てた！',
   'gatherEvent.ancientHeartwood': '{finder}が太古の心木を切り倒した！',
   'gatherEvent.moonlitBloom': '{finder}が月光の花を発見した！',
@@ -15163,6 +15207,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   // masterwrought Phase 13, the orange promotion (M16 fills). The Deed of
   // Making noun matches the sim_i18n.ts error.legendaryDeed row.
   'entities.items.deed_of_making.name': '創造の証書',
+  // Intentional Gathering PR3: the Field Kit's runtime item name. M16 fill.
+  'entities.items.field_kit.name': '野外用キット',
   'hudChrome.materialHint.deedOfMaking':
     '銘刻の証書。消費すると、完全化された名匠鍛造の作品を伝説へと昇格させ、名前を与えます。',
   'hudChrome.crafting.legendaryLine': '{item}は{name}として生まれ変わり、伝説となりました！',

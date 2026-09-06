@@ -339,6 +339,7 @@ export const EVERGARDEN_NPCS: Record<string, NpcDef> = {
       'evergarden_greens_seed',
       'gilded_yam_seed',
       'evergarden_pumpkin_seed',
+      'field_kit',
     ],
     farmer: true,
     greeting:

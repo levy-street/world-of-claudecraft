@@ -2412,6 +2412,35 @@ export const ja_JP: EnTranslations = {
         "tusk": "牙",
         "meat": "肉",
         "cloth": "布"
+      },
+      "preferenceLabel": "採取の希望設定：{preference}",
+      "changeButton": "変更",
+      "harvestActionTooltip": "現在の希望設定で{seconds}秒かけて採取します。フィールドキットが必要です。各死体は一度だけ採取できます。倒したプレイヤーとそのパーティは{prioritySeconds}秒間優先権を持ちます。ドロップした戦利品は引き続き取得できます。",
+      "checkingStatus": "採取状況を確認しています…",
+      "statusUnavailable": "現在、採取状況を取得できません。",
+      "harvestStarting": "採取を開始しています…",
+      "allBenefit": "この死体から入手可能な素材をすべて採取します。",
+      "focusBenefit": "採取を{material}に集中させます。",
+      "tierBonusHint": "採取を{material}に集中させます：全素材採取時よりティア+{tierBonus}。",
+      "denial": {
+        "actorDead": "採取するには生きている必要があります。",
+        "actorInCombat": "戦闘中は採取できません。",
+        "actorBusy": "すでに何かをしています。",
+        "corpseInvalid": "この死体はもう採取できません。",
+        "wrongWorld": "この死体はあなたのワールドにありません。",
+        "outOfRange": "この死体を採取するにはもっと近づいてください。",
+        "noFieldKit": "採取するにはフィールドキットが必要です。",
+        "reservedSelf": "すでにこの死体を採取しています。",
+        "reservedOther": "{name}がこの死体を採取しています。",
+        "reservedOtherUnknown": "他のプレイヤーがこの死体を採取しています。",
+        "priorityProtected": "現在、他のプレイヤーがこの死体の優先権を持っています。",
+        "corpseExpiring": "この死体は採取を終えるまで持ちません。",
+        "preferenceMalformed": "採取の希望設定が無効です。続けるには設定を選んでください。",
+        "nothingToHarvest": "あなたのフィールドキットでは、この死体から採取できるものがありません。",
+        "materialUnavailable": "{material}はこの死体にありません。",
+        "materialUnavailableWithList": "{material}はこの死体にありません。入手可能：{materials}。",
+        "bagsFull": "カバンがいっぱいで採取できません。",
+        "malformedInput": "問題が発生しました。もう一度お試しください。"
       }
     },
     "townFocus": {
@@ -2430,6 +2459,16 @@ export const ja_JP: EnTranslations = {
       "respecTierInstantOption": "即時（全額費用）",
       "respecCostFree": "無料",
       "respecCostLine": "{coin}と{materials}がかかります"
+    },
+    "harvestPreference": {
+      "title": "採取設定",
+      "allLabel": "すべての素材",
+      "applyButton": "適用",
+      "cancelButton": "キャンセル",
+      "pickHint": "適用する前に採取するものを選んでください。",
+      "currentUnavailable": "現在選択中の{material}はここでは利用できません。",
+      "unknownMaterial": "利用できない素材",
+      "currentChoiceLabel": "現在：{choice}"
     },
     "party": {
       "promoteLeader": "パーティリーダーに指定",
@@ -14760,6 +14799,9 @@ export const ja_JP: EnTranslations = {
       },
       "deed_of_making": {
         "name": "創造の証書"
+      },
+      "field_kit": {
+        "name": "野外用キット"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"

@@ -1240,6 +1240,10 @@ describe('axe: professions window tool-effect controls', () => {
       // count for its simplified-mode Farming-row arm (deviation (be)); none
       // here, the shape every non-farmer reads.
       myFarmPlots: [],
+      // IWorld.harvestPreference (professions.ts): the stored corpse-harvest
+      // choice the window's entry row reads; All is the shape every player
+      // without a saved preference carries.
+      harvestPreference: { kind: 'all' },
       player: { name: 'Testchar' },
     };
     const win = new ProfessionsWindow(

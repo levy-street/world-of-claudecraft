@@ -5,7 +5,12 @@
 // raw id as the last resort.
 import { describe, expect, it } from 'vitest';
 import { ABILITIES } from '../src/sim/data';
-import { CRAFT_CAST_ID, FARMING_CAST_ID, FISHING_CAST_ID } from '../src/sim/types';
+import {
+  CORPSE_HARVEST_CAST_ID,
+  CRAFT_CAST_ID,
+  FARMING_CAST_ID,
+  FISHING_CAST_ID,
+} from '../src/sim/types';
 import { castDisplayName, targetCastDisplayLabel } from '../src/ui/cast_display_name';
 import { t } from '../src/ui/i18n';
 
@@ -15,6 +20,11 @@ describe('castDisplayName', () => {
     expect(castDisplayName(FISHING_CAST_ID)).toBe(t('abilityUi.cast.fishing'));
     // The two labels must actually differ, or the arms above prove nothing.
     expect(castDisplayName(FARMING_CAST_ID)).not.toBe(castDisplayName(FISHING_CAST_ID));
+  });
+
+  it('reuses the existing "Harvest" label for the corpse-harvest cast, no new key', () => {
+    expect(castDisplayName(CORPSE_HARVEST_CAST_ID)).toBe(t('hudChrome.corpseHarvest.title'));
+    expect(castDisplayName(CORPSE_HARVEST_CAST_ID)).not.toBe(CORPSE_HARVEST_CAST_ID);
   });
 
   it('resolves a rift mechanic wind-up through its dedicated key', () => {

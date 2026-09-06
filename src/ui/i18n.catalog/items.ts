@@ -2952,6 +2952,9 @@ const ITEM_ENTITY_IDS = [
   // 'Deed of Making' noun there must match the sim_i18n.ts
   // error.legendaryDeed rows.
   'deed_of_making',
+  // The Field Kit: appended at the END under the append-only contract,
+  // behind the prior masterwrought appends; resolves BY KEY.
+  'field_kit',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -3557,6 +3560,7 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   // masterwrought Phase 13 (the orange promotion). The noun is shared with
   // the sim_i18n.ts error.legendaryDeed refusal rows in every locale.
   deed_of_making: 'Deed of Making',
+  field_kit: 'Field Kit',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

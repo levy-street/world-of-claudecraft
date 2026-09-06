@@ -28,10 +28,12 @@ import { GameServer } from '../server/game';
 import { MOBS, ZONES } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { FOCUS_POINT_BUDGET, POINTS_PER_TIER_BONUS } from '../src/sim/professions/focus';
+import { HARVEST_CAST_SECONDS } from '../src/sim/professions/harvest_admission';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
-import type { Entity } from '../src/sim/types';
+import { CORPSE_HARVEST_CAST_ID, DT, type Entity } from '../src/sim/types';
 import { stepTownFocus } from '../src/ui/town_focus_view';
+import { grantCorpseHarvestOnMob } from './helpers/corpse_harvest_grant';
 import { UNMAPPED_FAMILY } from './helpers/unmapped_family';
 
 // #1143: persistent, town-set focus allocation, applied on top of the #1142
@@ -79,6 +81,46 @@ function forceResolveTownFocus(internals: SimInternals, pid: number): void {
 function spawnHideWolf(internals: SimInternals, id: number, pos: { x: number; z: number }) {
   const template = MOBS.forest_wolf;
   const mob = createMob(id, template, template.maxLevel, { x: pos.x, y: 0, z: pos.z });
+  mob.dead = true;
+  mob.aiState = 'dead';
+  mob.corpseTimer = 9999;
+  mob.respawnTimer = 9999;
+  internals.entities.set(mob.id, mob);
+  return mob;
+}
+
+// The real, timed-cast `Sim.harvestCorpse` command needs a COHERENTLY grounded
+// actor (the `corpse_harvest_command.test.ts` rig): a hand-set y:0 like
+// `setup()`/`spawnHideWolf` above would read as real per-tick movement to the
+// cast's own displacement check as gravity pulls an ungrounded body down,
+// invalidating the cast before HARVEST_CAST_SECONDS elapses. Used ONLY by the
+// remembered-preference describe below, which drives the real command through
+// real ticks; every other describe in this file force-resolves state without
+// ticking and is unaffected.
+const TICKS_PER_CAST = Math.round(HARVEST_CAST_SECONDS / DT);
+
+function placeGrounded(sim: Sim, e: Entity, x: number, z: number): void {
+  e.pos = sim.groundPos(x, z);
+  e.prevPos = { ...e.pos };
+  e.vx = 0;
+  e.vy = 0;
+  e.vz = 0;
+  e.onGround = true;
+}
+
+function setupForHarvestCommand() {
+  const sim = new Sim({ seed: 21, playerClass: 'warrior', noPlayer: true });
+  const internals = sim as unknown as SimInternals;
+  const a = sim.addPlayer('warrior', 'Alpha');
+  sim.tick();
+  placeGrounded(sim, internals.entities.get(a)!, ZONE1.hub.x, ZONE1.hub.z);
+  sim.addItem('field_kit', 1, a);
+  return { sim, internals, a };
+}
+
+function spawnHideWolfGrounded(sim: Sim, internals: SimInternals, id: number): Entity {
+  const template = MOBS.forest_wolf;
+  const mob = createMob(id, template, template.maxLevel, sim.groundPos(ZONE1.hub.x, ZONE1.hub.z));
   mob.dead = true;
   mob.aiState = 'dead';
   mob.corpseTimer = 9999;
@@ -268,13 +310,16 @@ describe('harvestCorpse + town focus: additive bonus, baseline never lowered', (
         sim.setTownFocus({ hide: POINTS_PER_TIER_BONUS }, 'time', a);
         forceResolveTownFocus(internals, a);
       }
+      const meta = internals.players.get(a)!;
       let total = 0;
       for (let i = 0; i < trials; i++) {
         const mob = spawnHideWolf(internals, 10000 + i, ZONE1.hub);
         // Explicit [] = spread on both arms: this test isolates the focus
-        // yield bonus (an omitted pick would ALSO narrow the selection to
-        // the focused tags via the town-focus default).
-        sim.harvestCorpse(mob.id, [], a);
+        // yield bonus, driven through the grant-completion domain
+        // (grantCorpseHarvestOnMob) rather than the public timed-cast
+        // Sim.harvestCorpse, which no longer accepts a components override at
+        // all (tests/corpse_harvest_command.test.ts owns that contract).
+        grantCorpseHarvestOnMob(sim, mob, meta, []);
         total = sim.countItem('rough_hide', a);
       }
       return total;
@@ -299,12 +344,13 @@ describe('harvestCorpse + town focus: additive bonus, baseline never lowered', (
         sim.setTownFocus({ hide: points }, 'time', a);
         forceResolveTownFocus(internals, a);
       }
+      const meta = internals.players.get(a)!;
       let total = 0;
       for (let i = 0; i < trials; i++) {
         const mob = spawnHideWolf(internals, 30000 + i, ZONE1.hub);
         // Explicit [] = spread, keeping the pick identical on both arms so
         // only applyFocusBonus can produce the edge (see the test above).
-        sim.harvestCorpse(mob.id, [], a);
+        grantCorpseHarvestOnMob(sim, mob, meta, []);
         // drain the bag each harvest: richer merged-world yields can hit the
         // bag cap inside 300 trials, and a capped total reads as a dead heat
         const gained = sim.countItem('rough_hide', a);
@@ -322,18 +368,18 @@ describe('harvestCorpse + town focus: additive bonus, baseline never lowered', (
   it("an unfocused component's yield is unaffected by heavy focus spent on another component", () => {
     const { sim, internals, a } = setup();
     // spend the whole budget on 'fang'; 'hide' stays unfocused throughout.
-    // Explicit [] = spread on both arms: an omitted pick would narrow the
-    // focused run to fang alone (the town-focus default) and
-    // never harvest hide at all.
+    // Explicit [] = spread on both arms: an omitted pick would (pre-PR3) have
+    // narrowed the focused run to fang alone via the retired town-focus
+    // default, and never harvested hide at all.
     sim.setTownFocus({ fang: 10 }, 'time', a);
     forceResolveTownFocus(internals, a);
     const mob = spawnHideWolf(internals, 20000, ZONE1.hub);
-    sim.harvestCorpse(mob.id, [], a);
+    grantCorpseHarvestOnMob(sim, mob, internals.players.get(a)!, []);
     const withOtherFocused = sim.countItem('rough_hide', a);
 
     const { sim: sim2, internals: internals2, a: a2 } = setup();
     const mob2 = spawnHideWolf(internals2, 20001, ZONE1.hub);
-    sim2.harvestCorpse(mob2.id, [], a2);
+    grantCorpseHarvestOnMob(sim2, mob2, internals2.players.get(a2)!, []);
     const baseline = sim2.countItem('rough_hide', a2);
 
     // Both draw the same rng stream from a freshly-seeded Sim (seed 21), so the
@@ -342,53 +388,90 @@ describe('harvestCorpse + town focus: additive bonus, baseline never lowered', (
   });
 });
 
-// An OMITTED components argument derives the pick from the caller's
-// persistent town focus (the corpse tags holding points); an EXPLICIT array,
-// empty or not, keeps its #1142 meaning untouched. Each equivalence below runs
-// the counterpart pick on a fresh same-seed world so the rng stream and the
-// focus bonuses are identical; only the selection semantics differ.
-describe('harvestCorpse omitted-components town-focus default', () => {
-  function harvestWith(
-    focus: Record<string, number> | null,
-    components: string[] | undefined,
-  ): { hide: number; fang: number } {
-    const { sim, internals, a } = setup();
-    if (focus) {
-      sim.setTownFocus(focus, 'time', a);
-      forceResolveTownFocus(internals, a);
-    }
-    const mob = spawnHideWolf(internals, 40000, ZONE1.hub);
-    sim.harvestCorpse(mob.id, components, a);
-    return { hide: sim.countItem('rough_hide', a), fang: sim.countItem('wolf_fang', a) };
+// Intentional Gathering PR3 retired the legacy per-corpse town-focus default
+// this describe used to pin (an OMITTED components argument narrowing to
+// whatever town focus held points): the approved UX is that town focus is
+// PURELY a yield bonus (see the additive-bonus describe above) and the
+// remembered `harvestPreference` setting is the ONLY thing that decides what
+// gets extracted. This describe drives that real, current contract end to
+// end through the actual public `Sim.harvestCorpse(id, pid?)` command: a real
+// Field Kit, a real HARVEST_CAST_SECONDS cast ticked to completion (never
+// force-completed), exactly the `corpse_harvest_command.test.ts` rig shape.
+describe('harvestCorpse: the remembered harvest preference decides extraction, never town focus', () => {
+  function completeHarvest(sim: Sim, internals: SimInternals, mob: Entity, a: number): void {
+    expect(sim.harvestCorpse(mob.id, a)).toBe(true);
+    // A real timed cast, never an instant grant: nothing has landed yet, and
+    // the actor is genuinely casting until the ticks below elapse.
+    expect(sim.countItem('rough_hide', a) + sim.countItem('wolf_fang', a)).toBe(0);
+    expect(internals.entities.get(a)!.castingAbility).toBe(CORPSE_HARVEST_CAST_ID);
+    for (let i = 0; i < TICKS_PER_CAST; i++) sim.tick();
   }
 
-  it('omitted with hide focused narrows to hide, exactly like an explicit [hide] pick', () => {
-    const omitted = harvestWith({ hide: POINTS_PER_TIER_BONUS }, undefined);
-    const explicit = harvestWith({ hide: POINTS_PER_TIER_BONUS }, ['hide']);
-    expect(omitted).toEqual(explicit);
-    expect(omitted.hide).toBeGreaterThanOrEqual(1);
-    expect(omitted.fang).toBe(0); // the unfocused tag was not harvested
+  it('the default All preference ignores a town-focus selection entirely: every tag still yields', () => {
+    const { sim, internals, a } = setupForHarvestCommand();
+    // Heavy town focus on 'hide' alone: under the retired per-call default
+    // this would have narrowed the pick to hide; the current command never
+    // reads town focus for SELECTION at all (only its additive yield bonus,
+    // covered separately above).
+    sim.setTownFocus({ hide: POINTS_PER_TIER_BONUS }, 'time', a);
+    forceResolveTownFocus(internals, a);
+    const mob = spawnHideWolfGrounded(sim, internals, 40000);
+    sim.drainEvents();
+
+    completeHarvest(sim, internals, mob, a);
+
+    expect(mob.harvestClaimedBy).toBe(a);
+    expect(sim.countItem('rough_hide', a)).toBeGreaterThanOrEqual(1);
+    expect(sim.countItem('wolf_fang', a)).toBeGreaterThanOrEqual(1);
   });
 
-  it('omitted with zero focus spreads, exactly like an explicit empty pick', () => {
-    const omitted = harvestWith(null, undefined);
-    const explicit = harvestWith(null, []);
-    expect(omitted).toEqual(explicit);
-    // Spread proof: both of the wolf's tags yielded.
-    expect(omitted.hide).toBeGreaterThanOrEqual(1);
-    expect(omitted.fang).toBeGreaterThanOrEqual(1);
+  it('a selected rough_hide preference stays selected no matter what town focus is spending on', () => {
+    const { sim, internals, a } = setupForHarvestCommand();
+    sim.setHarvestPreference('rough_hide', a);
+    // Spend the whole budget on 'fang': if the command consulted town focus
+    // for selection, this would pull the pick toward fang instead.
+    sim.setTownFocus({ fang: FOCUS_POINT_BUDGET }, 'time', a);
+    forceResolveTownFocus(internals, a);
+    expect(sim.harvestPreferenceFor(a)).toEqual({ kind: 'material', itemId: 'rough_hide' });
+    const mob = spawnHideWolfGrounded(sim, internals, 40001);
+    sim.drainEvents();
+
+    completeHarvest(sim, internals, mob, a);
+
+    expect(mob.harvestClaimedBy).toBe(a);
+    expect(sim.countItem('rough_hide', a)).toBeGreaterThanOrEqual(1);
+    expect(sim.countItem('wolf_fang', a)).toBe(0);
   });
 
-  it('an explicit empty pick still spreads even with focus set (explicit beats derived)', () => {
-    const explicitEmpty = harvestWith({ hide: POINTS_PER_TIER_BONUS }, []);
-    expect(explicitEmpty.hide).toBeGreaterThanOrEqual(1);
-    expect(explicitEmpty.fang).toBeGreaterThanOrEqual(1);
-  });
+  it('an unavailable material preference refuses before any cast, reservation or rng draw, never falling back to spreading', () => {
+    const { sim, internals, a } = setupForHarvestCommand();
+    // spider_silk is a real, supported material (the 'silk' family), but this
+    // corpse is a forest_wolf (hide/fang only): the stored choice survives
+    // (accepted by the setter, still readable afterwards) while every attempt
+    // against THIS body refuses rather than silently spreading across hide
+    // and fang instead.
+    sim.setHarvestPreference('spider_silk', a);
+    expect(sim.harvestPreferenceFor(a)).toEqual({ kind: 'material', itemId: 'spider_silk' });
+    const mob = spawnHideWolfGrounded(sim, internals, 40002);
+    sim.drainEvents();
 
-  it('an explicit pick is respected over the focused allocation', () => {
-    const explicitFang = harvestWith({ hide: POINTS_PER_TIER_BONUS }, ['fang']);
-    expect(explicitFang.fang).toBeGreaterThanOrEqual(1);
-    expect(explicitFang.hide).toBe(0);
+    const draws: number[] = [];
+    sim.rng.setObserver((v) => draws.push(v));
+    const started = sim.harvestCorpse(mob.id, a);
+    sim.rng.setObserver(null);
+
+    expect(started).toBe(false);
+    expect(draws).toEqual([]);
+    expect(mob.corpseHarvestState?.reservedBy ?? null).toBeNull();
+    expect(mob.harvestClaimedBy).toBeNull();
+    const actor = internals.entities.get(a)!;
+    expect(actor.castingAbility).toBeNull();
+    expect(sim.drainEvents()).toEqual([
+      { type: 'error', pid: a, text: 'The material you chose is not on that corpse.' },
+    ]);
+    // The refused choice is still the player's stored preference afterwards:
+    // an unavailable pick is never silently reset to All.
+    expect(sim.harvestPreferenceFor(a)).toEqual({ kind: 'material', itemId: 'spider_silk' });
   });
 });
 
