@@ -14654,11 +14654,16 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Einzelzielschläge treffen zusätzlich {targets} nahen Gegner für {pct}% Schaden',
   'hudChrome.auraEffect.temporalEcho':
     'Der Arkanschaden des Wirkers heilt Euch um {singlePct}% bei Einzelziel- oder {areaPct}% bei Flächenschaden. Ätherwoge und Äthergeschosse erhalten bei einem individuellen Zeitlichen Echo einen 4-fachen Bonus. Gruppenechos erzeugen eine gleich große Heilreserve, die nach fehlender Gesundheit unter markierten Verbündeten mit weniger als 60% Gesundheit verteilt wird',
-  'hudChrome.auraEffect.varkhulCrucibleExposure': 'Das Blocken eines Schmelztiegelstrahls verursacht jede Sekunde steigenden Schaden an der maximalen Gesundheit. Die Stapel setzen sich in Normal 10 Sekunden und in Heroisch 60 Sekunden nach dem Verlassen eines Strahls zurück.',
-  'hudChrome.auraEffect.varkhulForgeLink': 'Fange einen aktiven Pfeilerstrahl ab, bevor er die Schmiede erreicht. Offene Strahlen fügen pro Sekunde 6% Hitze hinzu. In Normal kühlen geblockte Strahlen und inaktive Pfeiler die Schmiede ab; in Heroisch sinkt die Hitze nie. Bei 100% erleidet die Schmiede eine tödliche Kernschmelze.',
-  'hudChrome.auraEffect.varkhulMoltenCore': 'Trage diesen Kern zur Schmiede. Glühende Last verursacht alle {interval} Sek. steigenden Schaden, von {min}% bis {max}% der maximalen Gesundheit.',
-  'hudChrome.auraEffect.varkhulSentinelsGaze': 'Die Glutwache verfolgt dich. Halte sie vom Schlachtzug fern, bis sie zerstört ist.',
-  'hudChrome.auraEffect.varkhulSharedPyre': 'Verursacht {total}% der maximalen Gesundheit jedes Spielers, aufgeteilt unter den Spielern im Kreis ({perPlayer}% je Spieler bei {players} Spielern). Jeder fehlende Spieler verursacht zusätzlich {missingPenalty}% der maximalen Gesundheit am gesamten Schlachtzug, einschließlich der Spieler im Kreis.',
+  'hudChrome.auraEffect.varkhulCrucibleExposure':
+    'Das Blocken eines Schmelztiegelstrahls verursacht jede Sekunde steigenden Schaden an der maximalen Gesundheit. Die Stapel setzen sich in Normal 10 Sekunden und in Heroisch 60 Sekunden nach dem Verlassen eines Strahls zurück.',
+  'hudChrome.auraEffect.varkhulForgeLink':
+    'Fange einen aktiven Pfeilerstrahl ab, bevor er die Schmiede erreicht. Offene Strahlen fügen pro Sekunde 6% Hitze hinzu. In Normal kühlen geblockte Strahlen und inaktive Pfeiler die Schmiede ab; in Heroisch sinkt die Hitze nie. Bei 100% erleidet die Schmiede eine tödliche Kernschmelze.',
+  'hudChrome.auraEffect.varkhulMoltenCore':
+    'Trage diesen Kern zur Schmiede. Glühende Last verursacht alle {interval} Sek. steigenden Schaden, von {min}% bis {max}% der maximalen Gesundheit.',
+  'hudChrome.auraEffect.varkhulSentinelsGaze':
+    'Die Glutwache verfolgt dich. Halte sie vom Schlachtzug fern, bis sie zerstört ist.',
+  'hudChrome.auraEffect.varkhulSharedPyre':
+    'Verursacht {total}% der maximalen Gesundheit jedes Spielers, aufgeteilt unter den Spielern im Kreis ({perPlayer}% je Spieler bei {players} Spielern). Jeder fehlende Spieler verursacht zusätzlich {missingPenalty}% der maximalen Gesundheit am gesamten Schlachtzug, einschließlich der Spieler im Kreis.',
   'hudChrome.auraEffect.warlockAnchor':
     'Innerhalb von {range} m erneut wirken, um hierher zurückzukehren und den Anker zu verbrauchen',
   'hudChrome.auraEffect.wintersChill':
@@ -15414,8 +15419,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.benison_dawnweave.bonus4':
     'Wenn Seraphische Wacht ausgelöst wird, wird der Verbündete zusätzlich 10 Sek. lang um 15 Prozent seiner maximalen Gesundheit geheilt.',
   'entities.itemSets.benison_dawnweave.name': 'Gewand der Morgengewebten Gunst',
-  'entities.itemSets.chronoweave.bonus2': 'Zeitliches Echo wandelt 50% deines sonstigen Arkanen Einzelzielschadens in Heilung um. Ätherwoge und Äthergeschosse wandeln stattdessen 200% ihres verursachten Schadens um. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
-  'entities.itemSets.chronoweave.bonus4': 'Die Abklingzeit von Zeitliche Kaskade wird um 5 Sek. und ihre Manakosten werden um 30% verringert.',
+  'entities.itemSets.chronoweave.bonus2':
+    'Zeitliches Echo wandelt 50% deines sonstigen Arkanen Einzelzielschadens in Heilung um. Ätherwoge und Äthergeschosse wandeln stattdessen 200% ihres verursachten Schadens um. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
+  'entities.itemSets.chronoweave.bonus4':
+    'Die Abklingzeit von Zeitliche Kaskade wird um 5 Sek. und ihre Manakosten werden um 30% verringert.',
   'entities.itemSets.chronoweave.name': 'Gewänder des Äthergewebes',
   'entities.itemSets.cinderbark.bonus2':
     'Weitreichende Klauen haben eine Chance von 30 Prozent, zusätzliches Altes Blut zu speichern.',

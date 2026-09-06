@@ -33,7 +33,6 @@ export function renderAuraTooltipBodyHtml<T extends AuraTooltipInput>(
 function suppressAbilityDescription(aura: AuraTooltipInput): boolean {
   if (aura.id !== 'temporal_echo' || aura.kind !== 'temporal_echo') return false;
   return (
-    aura.echoGroup === true ||
-    (aura.value !== undefined && aura.value <= ECHO_GROUP_CONVERT_SINGLE)
+    aura.echoGroup === true || (aura.value !== undefined && aura.value <= ECHO_GROUP_CONVERT_SINGLE)
   );
 }

@@ -15293,8 +15293,10 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.benison_dawnweave.bonus4':
     'Wanneer Seraphic Vigil wordt geactiveerd, wordt zijn bondgenoot ook gedurende 10 sec. genezen voor 15 procent van diens maximale gezondheid.',
   'entities.itemSets.benison_dawnweave.name': 'Benison Dageraadweefsel',
-  'entities.itemSets.chronoweave.bonus2': 'Temporal Echo zet 50% van je overige Arcaneschade tegen één doel om in genezing. Aethergolf en Aetherpijlen zetten in plaats daarvan 200% van hun aangerichte schade om. Opgelopen schade vertraagt het uitspreken van je spreuken niet meer.',
-  'entities.itemSets.chronoweave.bonus4': 'De afkoeltijd van Temporal Cascade wordt met 5 sec. en de manakosten met 30% verlaagd.',
+  'entities.itemSets.chronoweave.bonus2':
+    'Temporal Echo zet 50% van je overige Arcaneschade tegen één doel om in genezing. Aethergolf en Aetherpijlen zetten in plaats daarvan 200% van hun aangerichte schade om. Opgelopen schade vertraagt het uitspreken van je spreuken niet meer.',
+  'entities.itemSets.chronoweave.bonus4':
+    'De afkoeltijd van Temporal Cascade wordt met 5 sec. en de manakosten met 30% verlaagd.',
   'entities.itemSets.chronoweave.name': 'Aetherweefsel-Gewaden',
   'entities.itemSets.cinderbark.bonus2':
     'Sweeping Claws heeft 30 procent kans om een extra Old Blood op te slaan.',

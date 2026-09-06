@@ -15090,8 +15090,10 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.benison_dawnweave.bonus4':
     'Når Seraphic Vigil udløses, helbredes dens allierede også for 15 procent af deres maksimale helbred over 10 sek.',
   'entities.itemSets.benison_dawnweave.name': 'Benison-daggryvæv',
-  'entities.itemSets.chronoweave.bonus2': 'Temporal Echo omdanner 50% af din øvrige Arkane enkeltmålsskade til heling. Æterbølge og Æterpile omdanner i stedet 200% af den skade, de gør. Modtaget skade forsinker ikke længere din besværgelse.',
-  'entities.itemSets.chronoweave.bonus4': 'Temporal Cascades nedkøling reduceres med 5 sek., og dens manaomkostning reduceres med 30%.',
+  'entities.itemSets.chronoweave.bonus2':
+    'Temporal Echo omdanner 50% af din øvrige Arkane enkeltmålsskade til heling. Æterbølge og Æterpile omdanner i stedet 200% af den skade, de gør. Modtaget skade forsinker ikke længere din besværgelse.',
+  'entities.itemSets.chronoweave.bonus4':
+    'Temporal Cascades nedkøling reduceres med 5 sek., og dens manaomkostning reduceres med 30%.',
   'entities.itemSets.chronoweave.name': 'Aethervævede gevandter',
   'entities.itemSets.cinderbark.bonus2':
     'Sweeping Claws har 30 procents chance for at oplagre et ekstra Old Blood.',

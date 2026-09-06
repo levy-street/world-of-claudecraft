@@ -15159,8 +15159,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.benison_dawnweave.bonus4':
     'När Serafisk vaksamhet utlöses helas dess allierade också med 15 procent av sin maximala hälsa under 10 sek.',
   'entities.itemSets.benison_dawnweave.name': 'Välsignelsens gryningsväv',
-  'entities.itemSets.chronoweave.bonus2': 'Tidsmässigt eko omvandlar 50% av din övriga Arkana skada mot ett mål till läkning. Etervåg och Eterpilar omvandlar i stället 200% av skadan de gör. Skada du tar fördröjer inte längre dina besvärjelser.',
-  'entities.itemSets.chronoweave.bonus4': 'Tidsmässig kaskads väntetid minskar med 5 sek. och dess manakostnad minskar med 30%.',
+  'entities.itemSets.chronoweave.bonus2':
+    'Tidsmässigt eko omvandlar 50% av din övriga Arkana skada mot ett mål till läkning. Etervåg och Eterpilar omvandlar i stället 200% av skadan de gör. Skada du tar fördröjer inte längre dina besvärjelser.',
+  'entities.itemSets.chronoweave.bonus4':
+    'Tidsmässig kaskads väntetid minskar med 5 sek. och dess manakostnad minskar med 30%.',
   'entities.itemSets.chronoweave.name': 'Etervävda klädnader',
   'entities.itemSets.cinderbark.bonus2':
     'Svepande klor har 30 procents chans att lagra ytterligare gammalt blod.',

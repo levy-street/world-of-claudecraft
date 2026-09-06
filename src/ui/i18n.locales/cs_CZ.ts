@@ -15018,8 +15018,10 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.benison_dawnweave.bonus4':
     'Po spuštění Serafínské bdělosti je její spojenec po dobu 10 s léčen za 15 procent svého maximálního zdraví.',
   'entities.itemSets.benison_dawnweave.name': 'Požehnaná úsvitová tkanina',
-  'entities.itemSets.chronoweave.bonus2': 'Časová ozvěna převádí 50% tvého ostatního arkánního poškození na jeden cíl na léčení. Éterová vlna a Éterové šipky místo toho převádějí 200% způsobeného poškození. Utržené poškození již nezpožďuje sesílání kouzel.',
-  'entities.itemSets.chronoweave.bonus4': 'Doba obnovy Časové kaskády se zkracuje o 5 s a její cena many se snižuje o 30%.',
+  'entities.itemSets.chronoweave.bonus2':
+    'Časová ozvěna převádí 50% tvého ostatního arkánního poškození na jeden cíl na léčení. Éterová vlna a Éterové šipky místo toho převádějí 200% způsobeného poškození. Utržené poškození již nezpožďuje sesílání kouzel.',
+  'entities.itemSets.chronoweave.bonus4':
+    'Doba obnovy Časové kaskády se zkracuje o 5 s a její cena many se snižuje o 30%.',
   'entities.itemSets.chronoweave.name': 'Roucha Éterové tkaniny',
   'entities.itemSets.cinderbark.bonus2':
     'Široké drápy mají 30procentní šanci uložit další Starou krev.',

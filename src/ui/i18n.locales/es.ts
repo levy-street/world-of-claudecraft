@@ -15367,8 +15367,10 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.benison_dawnweave.bonus4':
     'Cuando se activa Vigilancia Seráfica, su aliado también recupera un 15% de su salud máxima durante 10 s.',
   'entities.itemSets.benison_dawnweave.name': 'Trama del Alba Benévola',
-  'entities.itemSets.chronoweave.bonus2': 'Eco Temporal convierte un 50% de tu otro daño Arcano a un solo objetivo en sanación. Oleada de éter y Dardos de éter convierten en su lugar un 200% del daño que infligen. El daño recibido ya no retrasa tus hechizos.',
-  'entities.itemSets.chronoweave.bonus4': 'El tiempo de reutilización de Cascada Temporal se reduce 5 s y su coste de maná se reduce un 30%.',
+  'entities.itemSets.chronoweave.bonus2':
+    'Eco Temporal convierte un 50% de tu otro daño Arcano a un solo objetivo en sanación. Oleada de éter y Dardos de éter convierten en su lugar un 200% del daño que infligen. El daño recibido ya no retrasa tus hechizos.',
+  'entities.itemSets.chronoweave.bonus4':
+    'El tiempo de reutilización de Cascada Temporal se reduce 5 s y su coste de maná se reduce un 30%.',
   'entities.itemSets.chronoweave.name': 'Vestimentas de Trama Etérea',
   'entities.itemSets.cinderbark.bonus2':
     'Garras Barredoras tienen un 30% de probabilidad de almacenar Sangre Antigua adicional.',

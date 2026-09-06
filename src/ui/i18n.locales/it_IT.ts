@@ -15389,8 +15389,10 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.benison_dawnweave.bonus4':
     'Quando si attiva la Vigilanza Serafica, l’alleato viene curato anche del 15 percento della salute massima in 10 s.',
   'entities.itemSets.benison_dawnweave.name': 'Benedizione della Tessitura dell’Alba',
-  'entities.itemSets.chronoweave.bonus2': 'L’Eco Temporale converte il 50% degli altri danni Arcani a bersaglio singolo in cure. Impeto Etereo e Dardi Eterei convertono invece il 200% dei danni che infliggono. I danni subiti non ritardano più il lancio degli incantesimi.',
-  'entities.itemSets.chronoweave.bonus4': 'Il tempo di recupero della Cascata Temporale è ridotto di 5 s e il suo costo in mana del 30%.',
+  'entities.itemSets.chronoweave.bonus2':
+    'L’Eco Temporale converte il 50% degli altri danni Arcani a bersaglio singolo in cure. Impeto Etereo e Dardi Eterei convertono invece il 200% dei danni che infliggono. I danni subiti non ritardano più il lancio degli incantesimi.',
+  'entities.itemSets.chronoweave.bonus4':
+    'Il tempo di recupero della Cascata Temporale è ridotto di 5 s e il suo costo in mana del 30%.',
   'entities.itemSets.chronoweave.name': 'Vesti della Tessitura Eterea',
   'entities.itemSets.cinderbark.bonus2':
     'Artigli Turbinanti hanno il 30 percento di probabilità di conservare un Sangue Antico aggiuntivo.',

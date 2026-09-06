@@ -15289,8 +15289,10 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.benison_dawnweave.bonus4':
     'Quando a Vigilância Seráfica é ativada, seu aliado também é curado em 15% da vida máxima dele ao longo de 10 s.',
   'entities.itemSets.benison_dawnweave.name': 'Trama do Alvorecer Benévolo',
-  'entities.itemSets.chronoweave.bonus2': 'Eco Temporal converte 50% do seu outro dano Arcano de alvo único em cura. Surto de Éter e Dardos de Éter convertem em vez disso 200% do dano que causam. Dano sofrido não atrasa mais suas conjurações.',
-  'entities.itemSets.chronoweave.bonus4': 'O tempo de recarga da Cascata Temporal é reduzido em 5 s e seu custo de mana em 30%.',
+  'entities.itemSets.chronoweave.bonus2':
+    'Eco Temporal converte 50% do seu outro dano Arcano de alvo único em cura. Surto de Éter e Dardos de Éter convertem em vez disso 200% do dano que causam. Dano sofrido não atrasa mais suas conjurações.',
+  'entities.itemSets.chronoweave.bonus4':
+    'O tempo de recarga da Cascata Temporal é reduzido em 5 s e seu custo de mana em 30%.',
   'entities.itemSets.chronoweave.name': 'Vestes da Trama Etérea',
   'entities.itemSets.cinderbark.bonus2':
     'Garras Varredoras têm 30% de chance de armazenar um Sangue Antigo adicional.',

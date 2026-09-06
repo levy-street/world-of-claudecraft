@@ -15321,8 +15321,10 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.benison_dawnweave.bonus4':
     'Saat Kewaspadaan Serafim terpicu, sekutunya juga dipulihkan sebesar 15 persen dari kesehatan maksimum mereka selama 10 detik.',
   'entities.itemSets.benison_dawnweave.name': 'Tenunan Fajar Berkah',
-  'entities.itemSets.chronoweave.bonus2': 'Gema Temporal mengubah 50% kerusakan Arkana satu target lainnya menjadi penyembuhan. Gelombang Aether dan Panah Aether sebagai gantinya mengubah 200% dari kerusakan yang dihasilkan. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
-  'entities.itemSets.chronoweave.bonus4': 'Waktu pulih Lenyap Temporal berkurang 5 detik dan biaya mananya berkurang 30%.',
+  'entities.itemSets.chronoweave.bonus2':
+    'Gema Temporal mengubah 50% kerusakan Arkana satu target lainnya menjadi penyembuhan. Gelombang Aether dan Panah Aether sebagai gantinya mengubah 200% dari kerusakan yang dihasilkan. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
+  'entities.itemSets.chronoweave.bonus4':
+    'Waktu pulih Lenyap Temporal berkurang 5 detik dan biaya mananya berkurang 30%.',
   'entities.itemSets.chronoweave.name': 'Busana Tenunan Aether',
   'entities.itemSets.cinderbark.bonus2':
     'Cakar Sapu memiliki peluang 30 persen untuk menyimpan Darah Tua tambahan.',

@@ -14278,12 +14278,18 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.spellDamage': 'Tăng sát thương phép thêm {pct}%',
   'hudChrome.auraEffect.spellHaste': 'Tăng tốc độ thi triển phép thêm {pct}%',
   'hudChrome.auraEffect.stasis': 'Miễn nhiễm và không thể hành động',
-  'hudChrome.auraEffect.suddenDeath': 'Nấm Mồ Sớm tiếp theo của bạn không tốn Nộ Khí và bỏ qua yêu cầu về lượng máu',
-  'hudChrome.auraEffect.sureCrit': 'Còn lại {charges} lần thi triển kỹ năng gây sát thương chắc chắn chí mạng',
-  'hudChrome.auraEffect.sweepingStrikes': 'Đòn đánh đơn mục tiêu cũng trúng thêm {targets} kẻ địch gần đó với {pct}% sát thương',
-  'hudChrome.auraEffect.temporalEcho': 'Sát thương Bí Thuật của người thi triển hồi máu cho bạn bằng {singlePct}% sát thương đơn mục tiêu hoặc {areaPct}% sát thương diện rộng. Sóng Aether và Phi Tiêu Aether nhận thưởng x4 với Vọng Âm Thời Gian cá nhân. Vọng Âm nhóm tạo một lượng hồi máu dự trữ tương đương, được phân phối theo lượng máu đã mất giữa các đồng minh được đánh dấu còn dưới 60% máu',
-  'hudChrome.auraEffect.warlockAnchor': 'Thi triển lại trong bán kính {range} thước để quay về đây và tiêu hao neo',
-  'hudChrome.auraEffect.wintersChill': '{charges} tầng Giá Lạnh Mùa Đông: các phép tương thích xem mục tiêu này như đang bị đóng băng',
+  'hudChrome.auraEffect.suddenDeath':
+    'Nấm Mồ Sớm tiếp theo của bạn không tốn Nộ Khí và bỏ qua yêu cầu về lượng máu',
+  'hudChrome.auraEffect.sureCrit':
+    'Còn lại {charges} lần thi triển kỹ năng gây sát thương chắc chắn chí mạng',
+  'hudChrome.auraEffect.sweepingStrikes':
+    'Đòn đánh đơn mục tiêu cũng trúng thêm {targets} kẻ địch gần đó với {pct}% sát thương',
+  'hudChrome.auraEffect.temporalEcho':
+    'Sát thương Bí Thuật của người thi triển hồi máu cho bạn bằng {singlePct}% sát thương đơn mục tiêu hoặc {areaPct}% sát thương diện rộng. Sóng Aether và Phi Tiêu Aether nhận thưởng x4 với Vọng Âm Thời Gian cá nhân. Vọng Âm nhóm tạo một lượng hồi máu dự trữ tương đương, được phân phối theo lượng máu đã mất giữa các đồng minh được đánh dấu còn dưới 60% máu',
+  'hudChrome.auraEffect.warlockAnchor':
+    'Thi triển lại trong bán kính {range} thước để quay về đây và tiêu hao neo',
+  'hudChrome.auraEffect.wintersChill':
+    '{charges} tầng Giá Lạnh Mùa Đông: các phép tương thích xem mục tiêu này như đang bị đóng băng',
   'hudChrome.procOverlay.ruinMeter': 'Wrack',
   'hudChrome.procOverlay.ruinStatus': '{value} trên {max} Wrack',
   'hudChrome.procOverlay.soulFragmentsMeter': 'Mảnh Linh Hồn',
@@ -15250,8 +15256,10 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.benison_dawnweave.bonus4':
     'Khi Cảnh Giác Seraph kích hoạt, đồng minh của bạn cũng được hồi 15% máu tối đa trong 10 giây.',
   'entities.itemSets.benison_dawnweave.name': 'Phúc Lành Dệt Bình Minh',
-  'entities.itemSets.chronoweave.bonus2': 'Vọng Âm Thời Gian chuyển 50% sát thương Bí Thuật đơn mục tiêu khác của bạn thành hồi máu. Sóng Aether và Phi Tiêu Aether thay vào đó chuyển 200% sát thương chúng gây ra. Sát thương nhận vào không còn trì hoãn việc niệm phép.',
-  'entities.itemSets.chronoweave.bonus4': 'Thời gian hồi của Dòng Thác Thời Gian giảm 5 giây và tiêu hao mana giảm 30%.',
+  'entities.itemSets.chronoweave.bonus2':
+    'Vọng Âm Thời Gian chuyển 50% sát thương Bí Thuật đơn mục tiêu khác của bạn thành hồi máu. Sóng Aether và Phi Tiêu Aether thay vào đó chuyển 200% sát thương chúng gây ra. Sát thương nhận vào không còn trì hoãn việc niệm phép.',
+  'entities.itemSets.chronoweave.bonus4':
+    'Thời gian hồi của Dòng Thác Thời Gian giảm 5 giây và tiêu hao mana giảm 30%.',
   'entities.itemSets.chronoweave.name': 'Lễ Phục Dệt Aether',
   'entities.itemSets.cinderbark.name': 'Hộ Vệ Vỏ Tro',
   'entities.itemSets.cinderbark.bonus2':

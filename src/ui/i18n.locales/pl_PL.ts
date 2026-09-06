@@ -15259,8 +15259,10 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.benison_dawnweave.bonus4':
     'Po aktywowaniu Seraficznej Warty jej sojusznik zostaje uleczony o 15 procent maksymalnego zdrowia w ciągu 10 sek.',
   'entities.itemSets.benison_dawnweave.name': 'Błogosławiona Tkanina Świtu',
-  'entities.itemSets.chronoweave.bonus2': 'Echo Czasu zamienia 50% twoich pozostałych obrażeń Arkanów przeciw jednemu celowi w leczenie. Przypływ Eteru i Eteryczne Pociski zamieniają zamiast tego 200% zadanych obrażeń. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
-  'entities.itemSets.chronoweave.bonus4': 'Czas odnowienia Czasowej Kaskady skraca się o 5 sek., a jej koszt many maleje o 30%.',
+  'entities.itemSets.chronoweave.bonus2':
+    'Echo Czasu zamienia 50% twoich pozostałych obrażeń Arkanów przeciw jednemu celowi w leczenie. Przypływ Eteru i Eteryczne Pociski zamieniają zamiast tego 200% zadanych obrażeń. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
+  'entities.itemSets.chronoweave.bonus4':
+    'Czas odnowienia Czasowej Kaskady skraca się o 5 sek., a jej koszt many maleje o 30%.',
   'entities.itemSets.chronoweave.name': 'Szaty Eterowej Tkaniny',
   'entities.itemSets.cinderbark.bonus2':
     'Zamiatające Szpony mają 30 procent szans na zgromadzenie dodatkowej Starej Krwi.',

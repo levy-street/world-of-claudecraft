@@ -179,8 +179,7 @@ describe('post shed painter over the live chain', () => {
     expect(grade.enabled).toBe(false);
     expect(gradeFxaa.enabled).toBe(true);
     expect(
-      (gradeFxaa as unknown as { uniforms: { uSpirit: { value: number } } }).uniforms.uSpirit
-        .value,
+      (gradeFxaa as unknown as { uniforms: { uSpirit: { value: number } } }).uniforms.uSpirit.value,
     ).toBe(0.7);
     expect((bloom as unknown as { enabled: boolean }).enabled).toBe(true);
     expect(bloom.activeMips).toBe(5);
