@@ -32,6 +32,7 @@ import { weaponHand } from '../equipment_rules';
 import { emitIgnivarRaidNarrativeOnDeath } from '../ignivar_raid_lore';
 import { lockNormalDungeonResetOnBossKill, spawnBossExitPortal } from '../instances/dungeons';
 import { spawnWidowHatchlingOnEggDeath } from '../mob/egg_hatchling';
+import { isEvadingWildMob } from '../mob/evade_immunity';
 import { grantAbilityDevotion } from '../paladin_devotion';
 import { snapshotPetOnOwnerDeath } from '../pet/pet_owner_revive';
 import { pvpDamageMultiplier } from '../pvp';
@@ -241,7 +242,7 @@ export function dealDamage(
   // reflect ticks stay silent so a dotted evader does not spam a word per tick.
   // The early return keeps every downstream effect off: no threat, no combat
   // entry, no stealth break, no tap.
-  if (target.kind === 'mob' && target.aiState === 'evade' && target.ownerId === null) {
+  if (isEvadingWildMob(target)) {
     if (direct && source) {
       ctx.emit({
         type: 'damage',
