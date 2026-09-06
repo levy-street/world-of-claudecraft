@@ -3,9 +3,13 @@ import type { AdminAccountSort, AdminAccountSortDirection } from './admin_accoun
 import {
   type ClientPerfSummaryBuckets,
   cleanHours,
+  mapClientPerfModelRows,
   mapClientPerfSummaryRows,
   mapSuggestionCountRows,
   PERF_SUMMARY_LIMITS,
+  PERF_SUMMARY_MIN_GROUP_SAMPLES,
+  type PerfHpAdapterBucket,
+  type PerfModelBucket,
   type PerfSuggestionCount,
 } from './client_perf_summary_shape';
 import {
@@ -16,6 +20,11 @@ import {
   saveWorldState,
 } from './db';
 import type { GeneralChatRateLimit } from './general_chat_quota_db';
+// Interpolated into the GPU model statement's HAVING, on the same grounds as
+// PERF_SUMMARY_MIN_GROUP_SAMPLES above: a module-level `const` string export,
+// so an ESM importer cannot rebind it and the SQL text can never carry
+// anything but the pinned key.
+import { GL_MODEL_OTHER } from './gpu_model_bucket';
 import { REALM } from './realm';
 
 // Read-side queries for the admin dashboard. All inputs are parameterized;
@@ -457,6 +466,11 @@ export interface PerfSummary extends ClientPerfSummaryBuckets {
   // carried each allowlisted perf-doctor suggestion id. A report carries up to
   // three ids, so these never partition the totals row.
   suggestionCounts: PerfSuggestionCount[];
+  // The GPU model dimensions: per-(os, model) aggregates, and the subset of
+  // those that also reported a WebGPU high-performance adapter, keyed by it as
+  // well. Both come from ONE extra statement (see clientPerfSummary).
+  byModel: PerfModelBucket[];
+  byHpMismatch: PerfHpAdapterBucket[];
 }
 
 export interface PerfRawRow {
@@ -497,6 +511,10 @@ export interface PerfRawRow {
   glVendor: string;
   glRendererBucket: string;
   glBackend: string;
+  glRendererRaw: string;
+  glModel: string;
+  glLaptop: boolean | null;
+  gpuHpAdapter: string;
   zoneOrScenario: string;
   source: string;
   crowdBucket: string;
@@ -520,7 +538,7 @@ function cleanBeforeId(id: number | undefined): number | null {
 
 export async function clientPerfSummary(hoursInput = 24): Promise<PerfSummary> {
   const hours = cleanHours(hoursInput);
-  // TWO raised-timeout statements inside one transaction. The first (GROUPING
+  // THREE raised-timeout statements inside one transaction. The first (GROUPING
   // SETS over client_perf_reports) replaced the former seven serialized reads:
   // the () set is the totals row and each single-column set is one bucket list.
   // Postgres computes BOTH orderings as window ranks per grouping set (volume:
@@ -590,6 +608,93 @@ export async function clientPerfSummary(hoursInput = 24): Promise<PerfSummary> {
           OR (g_crowd = 0 AND vol_rank <= ${PERF_SUMMARY_LIMITS.byCrowd})`,
       [String(hours)],
     );
+    // The THIRD statement, and the reason it is not another grouping set in the
+    // first: byModel keys on a PAIR of columns, which the mapper's one-zero-bit
+    // classification cannot express, and byHpMismatch needs a row filter that a
+    // shared statement would apply to every other set too. Both still ride ONE
+    // pass here, as two grouping sets over the same window, capped per set
+    // exactly like the roll-up above.
+    //
+    // Everything that bounds this read is in the HAVING, which prunes at
+    // aggregation time, BEFORE the window sort. That placement is the whole
+    // design: the per-set rank caps bound only what crosses to Node, never what
+    // Postgres materializes and sorts, and gl_model is derived from a
+    // client-supplied string, so its key COUNT is attacker-influenced even
+    // though modelKey bounds each key's shape. The sample floor turns that into
+    // a structural bound (surviving groups are at most window rows over the
+    // floor) instead of a data-dependent one.
+    //
+    // The mismatch predicate is what byHpMismatch is NAMED for, and every arm
+    // guards a different way the list would lie: without the empty-string arms
+    // the adapter-less majority (every client with no WebGPU) takes the rank
+    // slots and a report carrying an adapter but NO renderer string reads as a
+    // mismatch against nothing, without the 'other' arms an unparsed renderer
+    // (a fingerprint-resistant browser reports one) reads as a disagreement
+    // when it is really an absence of evidence, and without the vendor
+    // comparison the AGREEING rows take the slots (on a real fleet, most of
+    // them). Rank first and filter after, or drop any arm, and the list comes
+    // back empty, truncated, or false while still looking like a complete
+    // answer.
+    //
+    // The comparison is at VENDOR granularity, the leading segment of the
+    // family key both sides carry, because that is the only granularity both
+    // sides can actually reach. Chrome populates GPUAdapterInfo.device and
+    // .description only behind its WebGPUDeveloperFeatures runtime flag, so a
+    // normal page's adapter is {vendor, architecture} and gpu_hp_adapter lands
+    // as the vendor-only key ('apple', 'nvidia') beside a model-level gl_model
+    // ('apple-m4-pro', 'nvidia-rtx-4070'). Comparing the whole keys filed every
+    // single-GPU Chrome client with a recognised WebGL model as a mismatch.
+    // Vendor granularity still catches the case the column exists for: an Intel
+    // or AMD iGPU rendering the page while a discrete NVIDIA part sits idle.
+    // 'software' is deliberately NOT excluded, but a reader must know WHICH
+    // side it came from. On gl_model it is the actionable case, the page
+    // rendering WebGL on a CPU rasterizer while a real adapter exists. On
+    // gpu_hp_adapter it would mean the opposite (WebGPU had no hardware
+    // adapter to offer, saying nothing about WebGL), so the client probe drops
+    // a fallback adapter rather than describing it
+    // (src/game/gpu_adapter_probe.ts, GPUAdapter.isFallbackAdapter) and the
+    // key should not reach that column from a browser that sets the flag.
+    //
+    // A rarer-than-the-floor mismatch is deliberately not counted here: this is
+    // the fleet-level dimension, and single-report forensics ride clientPerfRaw,
+    // which serves gl_renderer_raw and gpu_hp_adapter per row.
+    const models = await query(
+      `WITH agg AS (
+         SELECT
+           os_family,
+           gl_model,
+           gpu_hp_adapter,
+           GROUPING(gpu_hp_adapter) AS g_hp,
+           count(*)::int AS sample_count,
+           COALESCE(percentile_cont(0.5) WITHIN GROUP (ORDER BY fps_avg), 0)::real AS median_fps,
+           COALESCE(percentile_cont(0.95) WITHIN GROUP (ORDER BY frame_p95_ms), 0)::real AS p95_frame_ms,
+           COALESCE(percentile_cont(0.99) WITHIN GROUP (ORDER BY frame_p95_ms), 0)::real AS p99_frame_ms,
+           COALESCE(sum(context_lost_count), 0)::int AS context_loss_count,
+           COALESCE(avg(render_scale), 0)::real AS avg_render_scale,
+           COALESCE(avg(effective_render_scale), 0)::real AS avg_effective_render_scale
+         FROM client_perf_reports
+         WHERE created_at > now() - ($1 || ' hours')::interval
+         GROUP BY GROUPING SETS ((os_family, gl_model), (os_family, gl_model, gpu_hp_adapter))
+        HAVING count(*) >= ${PERF_SUMMARY_MIN_GROUP_SAMPLES}
+           AND (GROUPING(gpu_hp_adapter) = 1
+                OR (gpu_hp_adapter NOT IN ('', '${GL_MODEL_OTHER}')
+                    AND gl_model NOT IN ('', '${GL_MODEL_OTHER}')
+                    AND split_part(gpu_hp_adapter, '-', 1) <> split_part(gl_model, '-', 1)))
+       ),
+       ranked AS (
+         SELECT
+           agg.*,
+           (row_number() OVER (
+             PARTITION BY g_hp
+             ORDER BY sample_count DESC, os_family ASC, gl_model ASC, COALESCE(gpu_hp_adapter, '') ASC
+           ))::int AS vol_rank
+         FROM agg
+       )
+       SELECT * FROM ranked
+       WHERE (g_hp = 1 AND vol_rank <= ${PERF_SUMMARY_LIMITS.byModel})
+          OR (g_hp = 0 AND vol_rank <= ${PERF_SUMMARY_LIMITS.byHpMismatch})`,
+      [String(hours)],
+    );
     const suggestions = await query(
       `SELECT s.id AS suggestion_id, count(*)::int AS sample_count
          FROM client_perf_reports
@@ -600,12 +705,13 @@ export async function clientPerfSummary(hoursInput = 24): Promise<PerfSummary> {
         LIMIT ${PERF_SUMMARY_LIMITS.suggestionCounts}`,
       [String(hours)],
     );
-    return { summaryRows: summary.rows, suggestionRows: suggestions.rows };
+    return { summaryRows: summary.rows, modelRows: models.rows, suggestionRows: suggestions.rows };
   });
   return {
     hours,
     generatedAt: new Date().toISOString(),
     ...mapClientPerfSummaryRows(res.summaryRows),
+    ...mapClientPerfModelRows(res.modelRows),
     suggestionCounts: mapSuggestionCountRows(res.suggestionRows),
   };
 }
@@ -626,7 +732,8 @@ export async function clientPerfRaw(
        renderer_calls, renderer_triangles, renderer_textures, renderer_programs, context_lost_count,
        long_task_count, long_task_p95_ms, memory_used_mb, memory_limit_mb,
        dpr, viewport_bucket, device_memory, hardware_concurrency, mobile_touch,
-       browser_family, os_family, gl_vendor, gl_renderer_bucket, gl_backend, zone_or_scenario, source,
+       browser_family, os_family, gl_vendor, gl_renderer_bucket, gl_renderer_raw,
+       gl_backend, gl_model, gl_laptop, gpu_hp_adapter, zone_or_scenario, source,
        crowd_bucket, sim_entities, active_views, visible_views, worst_10s_frame_p95_ms,
        suggestion_ids, raw_summary
      FROM client_perf_reports
@@ -674,6 +781,14 @@ export async function clientPerfRaw(
     glVendor: r.gl_vendor,
     glRendererBucket: r.gl_renderer_bucket,
     glBackend: r.gl_backend,
+    // The raw renderer string is CLIENT text: it is stored verbatim (bounded to
+    // 160 chars, control characters stripped) and served here for per-report
+    // forensics behind the admin gate. Any renderer of this field must escape
+    // it like any other untrusted string; nothing may interpolate it as markup.
+    glRendererRaw: r.gl_renderer_raw,
+    glModel: r.gl_model,
+    glLaptop: r.gl_laptop,
+    gpuHpAdapter: r.gpu_hp_adapter,
     zoneOrScenario: r.zone_or_scenario,
     source: r.source,
     crowdBucket: r.crowd_bucket,

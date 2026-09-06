@@ -1397,6 +1397,10 @@ export async function ensureSchema(): Promise<void> {
         `[mail-partition-backfill] applied for realm ${REALM} (legacyRowFound=${mailBackfill.legacyRowFound}, recipients=${mailBackfill.recipientCount})`,
       );
     }
+    // Client perf telemetry: after SCHEMA (its FKs reference accounts and
+    // characters), late for the storage-purchase reason below (ADD COLUMN locks
+    // the highest-insert-rate table until COMMIT). Ordering pinned in tests.
+    await client.query(CLIENT_PERF_SCHEMA);
     // Storage purchase parent triggers land late so their first-rollout table
     // locks are held only briefly before COMMIT.
     await client.query(STORAGE_PURCHASE_SCHEMA);
@@ -4330,6 +4334,10 @@ export interface ClientPerfReportInsert {
   glVendor: string;
   glRendererBucket: string;
   glBackend: string;
+  glRendererRaw: string;
+  glModel: string;
+  glLaptop: boolean | null;
+  gpuHpAdapter: string;
   zoneOrScenario: string;
   source: string;
   crowdBucket: string;
@@ -4352,17 +4360,17 @@ export async function insertClientPerfReport(row: ClientPerfReportInsert): Promi
        dpr, viewport_bucket, device_memory, hardware_concurrency, mobile_touch,
        browser_family, os_family, gl_vendor, gl_renderer_bucket, gl_backend, zone_or_scenario, source,
        crowd_bucket, sim_entities, active_views, visible_views, worst_10s_frame_p95_ms,
-       suggestion_ids, raw_summary
+       suggestion_ids, raw_summary,
+       gl_renderer_raw, gl_model, gl_laptop, gpu_hp_adapter
      ) VALUES (
        $1, $2, $3, $4, $5, $6, $7,
        $8, $9, $10, $11, $12, $13,
        $14, $15, $16, $17,
        $18, $19, $20, $21, $22,
        $23, $24, $25, $26,
-       $27, $28, $29, $30, $31,
-       $32, $33, $34, $35, $36, $37, $38,
+       $27, $28, $29, $30, $31, $32, $33, $34, $35, $36, $37, $38,
        $39, $40, $41, $42, $43,
-       $44, $45
+       $44, $45, $46, $47, $48, $49
      )`,
     [
       row.schemaVersion,
@@ -4410,6 +4418,10 @@ export async function insertClientPerfReport(row: ClientPerfReportInsert): Promi
       row.worst10sFrameP95Ms,
       row.suggestionIds,
       JSON.stringify(row.rawSummary),
+      row.glRendererRaw,
+      row.glModel,
+      row.glLaptop,
+      row.gpuHpAdapter,
     ],
   );
 }

@@ -1282,6 +1282,28 @@ describe('perf reporter report dimensions', () => {
     >['lastFrame'];
   }
 
+  it('carries the WebGPU high-performance adapter, and null until the probe settles', () => {
+    (globalThis as any).location = { search: '' };
+    // The reporter passes the probe's cached value straight through, so a
+    // beacon built before it settles (or on a browser with no WebGPU at all)
+    // ships null rather than waiting on it. The server reads a missing or null
+    // field as "no adapter" and stores '' for it.
+    const pending = payloadFromSnapshot(snapshot(), new Settings(), 'sess1', 42, null, false)!;
+    expect(pending.gpuHpAdapter).toBe(null);
+    const settled = payloadFromSnapshot(
+      snapshot(),
+      new Settings(),
+      'sess1',
+      42,
+      null,
+      false,
+      'NVIDIA GeForce RTX 4070 Laptop GPU',
+    )!;
+    // Sent RAW: the server buckets it with the same parser it runs on
+    // glRenderer, so the client never gets to name a family key itself.
+    expect(settled.gpuHpAdapter).toBe('NVIDIA GeForce RTX 4070 Laptop GPU');
+  });
+
   it('emits the provider zone id as zoneOrScenario for gameplay sessions', () => {
     (globalThis as any).location = { search: '' };
     const body = payloadFromSnapshot(snapshot(), new Settings(), 'sess1', 42, {

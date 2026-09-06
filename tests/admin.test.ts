@@ -1032,6 +1032,8 @@ describe('admin api auth', () => {
       byScenario: [],
       byCrowd: [],
       worstGpuBuckets: [],
+      byModel: [],
+      byHpMismatch: [],
       suggestionCounts: [{ id: 'hardware-acceleration', sampleCount: 3 }],
     });
     vi.mocked(clientPerfRaw).mockResolvedValue([

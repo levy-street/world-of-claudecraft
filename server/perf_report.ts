@@ -6,9 +6,11 @@ import {
   insertClientPerfReport,
 } from './db';
 import { glBackendFromRenderer } from './gl_backend';
+import { glLaptop, glModel } from './gpu_model_bucket';
 import { clientPerfMetricsSink } from './http/client_perf_metrics';
 import type { RateLimitOutcome } from './http/types';
 import { json, readBody } from './http_util';
+import { stripControlChars, stripJsonControlChars } from './perf_report_text';
 import { rateLimitNow, requestIp, windowedRateLimitOutcome } from './ratelimit';
 import { REALM } from './realm';
 
@@ -132,7 +134,7 @@ function nullableNumberIn(value: unknown, min: number, max: number): number | nu
 }
 
 function textIn(value: unknown, max: number, fallback = ''): string {
-  const text = typeof value === 'string' ? value.trim() : '';
+  const text = typeof value === 'string' ? stripControlChars(value).trim() : '';
   return (text || fallback).slice(0, max);
 }
 
@@ -722,7 +724,11 @@ function rawSummary(value: unknown, devTraceAllowed = false): Record<string, unk
   if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
   try {
     const text = JSON.stringify(value);
-    const parsed = JSON.parse(text) as Record<string, unknown>;
+    // Before any other sanitizer, and over the WHOLE parsed value rather than
+    // the fields below: raw_summary is jsonb, which rejects a NUL escape the
+    // same way a text parameter rejects the character, and this object
+    // round-trips client-shaped keys and values that no field clamp here sees.
+    const parsed = stripJsonControlChars(JSON.parse(text) as Record<string, unknown>);
     if (!devTraceAllowed) delete parsed.devTrace;
     const browser = sanitizeBrowserSummary(parsed.browser);
     if (browser) parsed.browser = browser;
@@ -796,6 +802,12 @@ export async function handlePerfReport(
   const accountId = await authenticatedAccountId(req);
   const userAgent = String(req.headers['user-agent'] ?? '');
   const glRenderer = textIn(body.glRenderer, 160);
+  // The client's WebGPU high-performance adapter description
+  // (src/game/gpu_adapter_probe.ts), '' from a client that has none: an absent
+  // navigator.gpu, a refused adapter, or a client older than the probe. On
+  // Chrome this is the vendor/architecture pair ("nvidia ampere"), not a model
+  // name, so the key parsed off it below is usually vendor-level.
+  const gpuHpAdapter = textIn(body.gpuHpAdapter, 160);
   const releaseVersion = textIn(body.releaseVersion, 40);
   const buildId = textIn(body.buildId, 40);
   const source = choiceIn(body.source, ['gameplay', 'benchmark'], 'gameplay');
@@ -856,6 +868,19 @@ export async function handlePerfReport(
     // Derived from the SAME adapter name, never from the bucket: bucketGpu has
     // already thrown the API token away by then for every recognised vendor.
     glBackend: glBackendFromRenderer(glRenderer),
+    // GPU model dimensions, one block on purpose. The renderer string was
+    // sanitized to 160 chars at the top and then DROPPED before storage; it is
+    // stored as received now, and gpu_model_bucket.ts parses the family key and
+    // form-factor verdict off it server-side (the client is never trusted to
+    // bucket). An absent renderer stores '' rather than the 'other' key, so a
+    // grouped read tells "no evidence" apart from "unrecognised GPU". The
+    // adapter runs through the SAME parser so both columns speak one key
+    // vocabulary; the summary compares them on their vendor segment, which is
+    // as far as the adapter text a browser hands a normal page can reach.
+    glRendererRaw: glRenderer,
+    glModel: glRenderer ? glModel(glRenderer) : '',
+    glLaptop: glLaptop(glRenderer),
+    gpuHpAdapter: gpuHpAdapter ? glModel(gpuHpAdapter) : '',
     zoneOrScenario: textIn(
       body.zoneOrScenario,
       80,
@@ -880,6 +905,7 @@ export async function handlePerfReport(
 
 export const perfReportInternalsForTest = {
   bucketGpu,
+  stripControlChars,
   browserFamily,
   osFamily,
   viewportBucket,

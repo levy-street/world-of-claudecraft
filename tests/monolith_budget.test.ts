@@ -423,7 +423,10 @@ const MONOLITHS: MonolithRow[] = [
     // new shadow-reach test, so the renderer keeps only the two pushes and the
     // bitmask read. Re-pinned on the combined candidate after the live shadow
     // extent wiring from #3825. Exact count, zero headroom.
-    ceiling: 13212,
+    // Re-pinned after merging PR #3839 into the v0.42 candidate: the merged
+    // renderer lands between the candidate and PR-side pins. Exact count,
+    // zero headroom.
+    ceiling: 13213,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -845,18 +848,18 @@ const MONOLITHS: MonolithRow[] = [
     // post-unlock restructure in place. Exact count, zero slack.
     // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
     // merge: both parents had already ratcheted for their own work, so
-    // the composite is the honest size. Lowered -54 from that base when the
-    // client_perf_reports DDL moved verbatim out of SCHEMA into
-    // client_perf_schema.ts (ensureSchema applies it after the core tables it
-    // FK-references); the insert and prune primitives stay here, so only the
-    // table definition left. Exact count, zero slack.
-    // Up 5145 -> 5151 for the Realm Builder of the Month roll (PR #3695, at
-    // its release/v0.42.0 base merge): the table and its SQL live in
-    // server/realm_builder_db.ts; the residue here is the schema import and
-    // the one ensureSchema() apply line with its ordering note, the same
-    // shape every other domain *_SCHEMA takes. Exact merged count, zero
-    // slack; maintainer-review item.
-    ceiling: 5097,
+    // the composite is the honest size. Exact count, zero slack.
+    // Lowered by the client-perf dimensions work: the client_perf_reports DDL
+    // moved whole into server/client_perf_schema.ts, which more than paid for
+    // gl_backend and the four GPU model columns' insert wiring. The table's
+    // accessors stay here beside the pool. Exact count, zero slack.
+    // Re-pinned to the exact merged count of the release/v0.42.0 base merge
+    // (Realm Builder of the Month, PR #3695): that arm added the schema
+    // import and the one ensureSchema() apply line for
+    // server/realm_builder_db.ts (its own table and SQL live there); this
+    // branch's GPU-dimensions reduction still stands beside it. Measured on
+    // the merged tree, not summed by arithmetic. Exact count, zero slack.
+    ceiling: 5109,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {
