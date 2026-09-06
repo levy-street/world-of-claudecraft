@@ -214,6 +214,44 @@ function specializeStaticDenoise(material: ShaderMaterial): void {
   material.needsUpdate = true;
 }
 
+/**
+ * The depth-derived normal both the AO evaluation and the HALFRES compositer
+ * upsample reconstruct is normalize(cross(dpdx, dpdy)). Where the two position
+ * derivatives are parallel or one of them vanishes (a pixel whose neighbours
+ * reconstruct to the same world position), the cross product is zero and
+ * normalize returns NaN. In the compositer that NaN enters the bilateral weight
+ * (exp(NaN) times anything is NaN), so totalWeight is NaN, the divide guard is
+ * not taken, and a NaN texel is written into the composer beauty. Measured on
+ * Mali-G715 (Android Chrome): exactly one NaN pixel per affected frame, at a
+ * different place each time, on unrelated surfaces, while the raw beauty is
+ * finite; the bloom blur then spread it frame-wide. Guard with the same
+ * length-checked normalize n8ao itself uses elsewhere (its 1e-12 threshold is
+ * upstream's, not a derived bound); a zero-derivative pixel gets a screen-up
+ * normal in the view space these shaders work in, so its one weight is finite
+ * and bounded. The test is written so that its fallback branch is the one a
+ * NaN comparison lands on: GLSL ES leaves that comparison implementation
+ * defined, and a non-finite length squared must never reach the normalize.
+ * The depth downsample pass reconstructs the same normal into a HalfFloat
+ * attachment on the half-resolution tiers, so it carries the guard too.
+ */
+const DEGENERATE_NORMAL_RETURN = 'return normalize(cross(dpdx, dpdy));';
+const SAFE_NORMAL_RETURN = `vec3 faceNormal = cross(dpdx, dpdy);
+    float faceNormalLengthSq = dot(faceNormal, faceNormal);
+    return faceNormalLengthSq < 1e-12
+      ? vec3(0.0, 1.0, 0.0)
+      : faceNormal * inversesqrt(faceNormalLengthSq);`;
+
+function guardDegenerateNormal(material: ShaderMaterial): void {
+  if (material.fragmentShader.includes('faceNormalLengthSq')) return;
+  material.fragmentShader = replacePinned(
+    material.fragmentShader,
+    DEGENERATE_NORMAL_RETURN,
+    SAFE_NORMAL_RETURN,
+    1,
+  );
+  material.needsUpdate = true;
+}
+
 function suppressFullCoverageClear(quad: N8AOFullScreenTriangle | null | undefined): void {
   if (!quad || noClearQuads.has(quad)) return;
   const render = quad.render.bind(quad);
@@ -261,7 +299,10 @@ export class StaticOpaqueN8AOPass extends N8AOPass {
     assertStaticShaderConfiguration(this.configuration as unknown as N8AOStaticConfiguration);
     super.configureAOPass(depthBufferType, ortho);
     const state = this as unknown as N8AOStaticFrameInternals;
-    if (state.effectShaderQuad) specializeStaticEvaluation(state.effectShaderQuad.material);
+    if (state.effectShaderQuad) {
+      specializeStaticEvaluation(state.effectShaderQuad.material);
+      guardDegenerateNormal(state.effectShaderQuad.material);
+    }
     suppressFullCoverageClear(state.effectShaderQuad);
   }
 
@@ -277,6 +318,7 @@ export class StaticOpaqueN8AOPass extends N8AOPass {
     super.configureEffectCompositer(depthBufferType, ortho);
     const state = this as unknown as N8AOStaticFrameInternals;
     preserveAccumulationQuantization(state.effectCompositerQuad.material);
+    guardDegenerateNormal(state.effectCompositerQuad.material);
     suppressFullCoverageClear(state.effectCompositerQuad);
   }
 
@@ -284,6 +326,7 @@ export class StaticOpaqueN8AOPass extends N8AOPass {
     super.configureHalfResTargets();
     const state = this as unknown as N8AOStaticFrameInternals;
     if (state.depthDownsampleTarget) state.depthDownsampleTarget.depthBuffer = false;
+    if (state.depthDownsampleQuad) guardDegenerateNormal(state.depthDownsampleQuad.material);
     suppressFullCoverageClear(state.depthDownsampleQuad);
   }
 

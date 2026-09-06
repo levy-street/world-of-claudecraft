@@ -17,6 +17,7 @@ import {
   type WebGLRenderTarget,
 } from 'three';
 import { FullScreenQuad, Pass } from 'three/examples/jsm/postprocessing/Pass.js';
+import { FINITE_GUARD_GLSL } from './post_finite_guard_glsl';
 
 interface TimeUniform {
   value: number;
@@ -54,17 +55,16 @@ export const OUTPUT_GRADE_FRAGMENT_SHADER = /* glsl */ `
   // across every mip, so OutputGradePass adds a frame-wide NaN and the tonemap
   // maps it to black. NaN survives only in the float composer targets (the
   // direct-to-canvas UNSIGNED_BYTE tiers clamp it away), which is why low/medium
-  // are fine while the composer tiers go black. The IBL / PBR shader path emits
-  // those NaNs on some drivers (observed on ANGLE's OpenGL backend with NVIDIA on
-  // Linux). Every NaN comparison is false, so the (x < 0.0 || x >= 0.0) test
-  // keeps finite and infinite values and rewrites only NaN to zero. This must
-  // stay on the beauty AND the bloom read, since the blur already spread the NaN.
+  // are fine while the composer tiers go black. Sources seen so far: the IBL /
+  // PBR path on ANGLE's OpenGL backend (NVIDIA on Linux) and the N8AO
+  // compositer's depth-derived normal on Mali (Android Chrome). The scrub is the
+  // shared bit-exact guard (post_finite_guard_glsl.ts): the earlier comparison
+  // form let NaN through on Mali. It rewrites NaN and Inf to zero and must stay
+  // on the beauty AND the bloom read, since the blur already spread the NaN.
+  ${FINITE_GUARD_GLSL}
+
   vec3 sanitizeFinite(vec3 v) {
-    return vec3(
-      (v.x < 0.0 || v.x >= 0.0) ? v.x : 0.0,
-      (v.y < 0.0 || v.y >= 0.0) ? v.y : 0.0,
-      (v.z < 0.0 || v.z >= 0.0) ? v.z : 0.0
-    );
+    return wocSanitizeFinite(v);
   }
 
   // The display-referred image this pass grades: one scene sample with bloom
