@@ -884,7 +884,8 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the v0.41.0 base sync into the
     // raid branch: both arms extracted and added independently, so neither
     // parent pin fits the combined file; the merged count is the honest bound.
-    ceiling: 2433,
+    // Lowered after the rift sanctum slab plan moved to rift_platform_core.ts.
+    ceiling: 2424,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {

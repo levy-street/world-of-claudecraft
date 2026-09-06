@@ -572,6 +572,7 @@ const RENDER_PURE_CORES = [
   'src/render/wall_backface_cull_core.ts',
   'src/render/dungeon_banner_core.ts',
   'src/render/dungeon_tile_kind_core.ts',
+  'src/render/rift_platform_core.ts',
   'src/render/ignivar_dressing_plan_core.ts',
   'src/render/roof_darkness_core.ts',
   'src/render/varkhul_assembly_focus_core.ts',
