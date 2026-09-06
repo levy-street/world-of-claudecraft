@@ -2597,6 +2597,40 @@ describe('search and ownership filter', () => {
     expect(filtered.pageDetail?.total).toBe(3);
   });
 
+  it('hides illuminated pages from the shelf list on the Missing chip, and keeps only them on Catalogued', () => {
+    // A completionist reads the shelf to learn what is LEFT: with the chip on
+    // Missing an illuminated page (every relic catalogued) drops out of the
+    // list, and Catalogued is the mirror. Both leave the open page untouched.
+    const done: ReliquaryPageDef = {
+      ...page,
+      id: 'done_page',
+      relics: [{ kind: 'item', itemId: 'gilded_crown' }],
+    };
+    const both = (partial: Partial<ReliquaryViewInput> = {}) =>
+      filterInput({ pages: [page, done], pageId: null, ...partial });
+    expect(buildReliquaryView(both()).shelfPages.map((p) => p.pageId)).toEqual([
+      'filter_page',
+      'done_page',
+    ]);
+    const missing = buildReliquaryView(both({ ownedFilter: 'missing' }));
+    expect(missing.shelfPages.map((p) => p.pageId)).toEqual(['filter_page']);
+    expect(missing.filtered).toBe(true);
+    const owned = buildReliquaryView(both({ ownedFilter: 'owned' }));
+    expect(owned.shelfPages.map((p) => p.pageId)).toEqual(['done_page']);
+    expect(owned.filtered).toBe(true);
+    // A chip that hides nothing narrows nothing, so no announcement fires.
+    const all = buildReliquaryView(both({ ownedFilter: 'all' }));
+    expect(all.filtered).toBe(false);
+    // The chip and the needle intersect on the shelf exactly as on a grid.
+    const crossed = buildReliquaryView(both({ ownedFilter: 'owned', search: 'zzz' }));
+    expect(crossed.shelfPages).toEqual([]);
+    expect(crossed.filtered).toBe(true);
+    // Shelf sums stay the shelf's true completion: the rail never lies under a chip.
+    const shelf = missing.shelves.find((s) => s.id === 'conquerors');
+    expect(shelf?.owned).toBe(2);
+    expect(shelf?.total).toBe(4);
+  });
+
   it('narrows the shelf list by localized page name but still opens the active page', () => {
     const hit = buildReliquaryView(filterInput({ pageId: null, search: 'filtree' }));
     expect(hit.shelfPages.map((p) => p.pageId)).toEqual(['filter_page']);

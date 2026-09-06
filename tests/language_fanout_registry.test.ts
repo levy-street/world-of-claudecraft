@@ -296,9 +296,9 @@ const ANSWERED: readonly AnsweredSurface[] = [
   },
   {
     file: 'reliquary_window.ts',
-    memos: ['lastAnnounced', 'lastSig'],
+    memos: ['lastAnnounced', 'lastAnnouncedKey', 'lastSig'],
     answer: 'this.reliquaryWindow.render',
-    why: 'catalog progress, Curator rank labels, shelf page lists, and grid chrome; lastAnnounced holds the LOCALIZED live-region line, but the fan-out render is argument-less (the player-driven arm), which recomputes and rewrites the region unconditionally, so the memo cannot pin stale-language text past a switch',
+    why: 'catalog progress, Curator rank labels, shelf page lists, and grid chrome; lastAnnounced holds the LOCALIZED live-region line, but the fan-out render is argument-less (the player-driven arm), which recomputes the line and rewrites the region whenever the text differs, and a language switch always changes the text, so the memo cannot pin stale-language text past a switch; lastAnnouncedKey is language-free (nav, page id, needle, chip id) and only elides a rewrite of BYTE-IDENTICAL text',
   },
   {
     file: 'dungeon_finder_proposal_popup.ts',

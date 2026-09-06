@@ -627,6 +627,19 @@ export function relicVendorGate(
   return pageDelveId !== undefined ? delveShopGateForItem(pageDelveId, relic.itemId) : undefined;
 }
 
+/**
+ * Whether one shelf row survives the ownership chip. Illuminated pages are the
+ * "owned" side of the list (nothing left to find), every other page the
+ * "missing" side.
+ */
+export function shelfPagePassesOwnedFilter(
+  page: Pick<ReliquaryShelfPageModel, 'complete'>,
+  filter: ReliquaryOwnedFilter,
+): boolean {
+  if (filter === 'all') return true;
+  return filter === 'owned' ? page.complete : !page.complete;
+}
+
 /** Build ordered grid cells for one page (owned vs missing). */
 export function buildReliquaryPageCells(
   page: ReliquaryPageDef,
@@ -818,10 +831,16 @@ export function buildReliquaryView(input: ReliquaryViewInput): ReliquaryViewMode
   // Typing a relic name from the shelf shows you which page holds it instead
   // of an empty list (see pageMatches above). Cold path (one keystroke, not
   // per frame).
-  const shelfPages =
-    search === '' || !canMatchPages
-      ? allShelfPages
-      : allShelfPages.filter((p) => pageMatches(p.pageId));
+  // The ownership chip narrows the shelf list on the same axis it narrows a
+  // grid: a page is either illuminated (every relic catalogued) or still has
+  // relics to find, so Catalogued keeps the illuminated pages and Missing
+  // keeps the rest. That is what lets a completionist hide what is done and
+  // read only what remains, per shelf, without opening every page.
+  const shelfPages = allShelfPages.filter(
+    (p) =>
+      shelfPagePassesOwnedFilter(p, ownedFilter) &&
+      (search === '' || !canMatchPages || pageMatches(p.pageId)),
+  );
 
   let activePage: ReliquaryShelfPageModel | null = null;
   let pageDetail: ReliquaryPageDetailModel | null = null;
@@ -870,12 +889,14 @@ export function buildReliquaryView(input: ReliquaryViewInput): ReliquaryViewMode
   const nearlyNarrowed =
     nearly.length !== unfilteredNearly.length ||
     nearly.some((n, i) => n.pageId !== unfilteredNearly[i]?.pageId);
+  // The shelf answers on its painted list alone (needle OR chip), so a chip
+  // that hides every illuminated page announces exactly like a needle would.
   const filtered =
-    search === '' || !canMatchPages
-      ? false
-      : input.nav === 'overview'
-        ? recent.length !== recentTotal || nearlyNarrowed
-        : shelfPages.length !== allShelfPages.length;
+    input.nav !== 'overview'
+      ? shelfPages.length !== allShelfPages.length
+      : search === '' || !canMatchPages
+        ? false
+        : recent.length !== recentTotal || nearlyNarrowed;
 
   return {
     nav: input.nav,

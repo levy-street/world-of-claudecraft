@@ -11999,6 +11999,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.filterAll': 'すべて',
   'hudChrome.reliquary.filterOwned': '収蔵済み',
   'hudChrome.reliquary.filterMissing': '未発見',
+  'hudChrome.reliquary.filterIlluminated': '照耀済み',
+  'hudChrome.reliquary.filterRemaining': '未照耀',
+  'hudChrome.reliquary.filterEmptyPages': 'このフィルターに一致するページはありません。',
+  'hudChrome.reliquary.filterGroupAriaPages': '照耀状況でページを絞り込む',
   'hudChrome.reliquary.gridKeyboardHint':
     '矢印キーで聖遺物を移動、Home キーと End キーで先頭と末尾に移動します。',
   'hudChrome.plurals.reliquarySearchResults.one': '{count} 件見つかりました。',
