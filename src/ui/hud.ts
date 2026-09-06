@@ -639,6 +639,7 @@ import { MobileMoreDialogController } from './mobile_more_dialog';
 import { MOUNT_DESC_KEYS, mountSpecLines } from './mount_labels';
 import { MountRaceControls } from './mount_race_controls';
 import { MountRaceStrip } from './mount_race_strip';
+import { mouseoverCastTargetPid } from './mouseover_cast_core';
 import { type FrameDimension, MovableFrame } from './movable_frame';
 import { NoticeboardPopup } from './noticeboard_popup';
 import { NPC_WINDOW_CLOSE_RANGE } from './npc_service_range';
@@ -7460,16 +7461,17 @@ export class Hud {
           // Clique-style mouseover cast: a friendly (heal/buff) ability pressed
           // while hovering a party frame lands on the hovered member instead of
           // the current target; the sim validates and falls back if it went stale.
-          // Gated on the Interface option (mouseoverCast, on by default).
-          const def = resolved.def;
-          if (
-            this.hoveredPartyPid !== null &&
-            (this.optionsHooks?.settings.get('mouseoverCast') ?? true) &&
-            def.requiresTarget &&
-            def.targetType === 'friendly' &&
-            this.sim.entities.has(this.hoveredPartyPid)
-          ) {
-            this.sim.castAbilityOn(action.id, this.hoveredPartyPid);
+          // Gated on the Interface option (mouseoverCast, on by default). A member
+          // outside this client's interest scope (a RELEASED ghost waits at the
+          // graveyard) still redirects on the party roster alone: see
+          // mouseover_cast_core.ts.
+          const mouseoverPid = mouseoverCastTargetPid(this.hoveredPartyPid, resolved.def, {
+            enabled: this.optionsHooks?.settings.get('mouseoverCast') ?? true,
+            hasEntity: (pid) => this.sim.entities.has(pid),
+            partyMemberPids: () => localPartyMemberIds(this.sim.partyInfo),
+          });
+          if (mouseoverPid !== null) {
+            this.sim.castAbilityOn(action.id, mouseoverPid);
           } else {
             this.sim.castAbility(action.id);
           }
