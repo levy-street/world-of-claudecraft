@@ -570,9 +570,9 @@ export const id_ID: EnTranslations = {
       "tabsLabel": "Bagian Toko WOC",
       "storeTab": "Toko",
       "rewardsTab": "Hadiah Harian",
-      "mountsEyebrow": "Account Mounts",
-      "mountsTitle": "Machine Stable",
-      "mountBuyAria": "Purchase {item}",
+      "mountsEyebrow": "Pemasangan Akun",
+      "mountsTitle": "Mesin Stabil",
+      "mountBuyAria": "Beli {item}",
       "loading": "Memuat Toko WOC...",
       "error": "Toko WOC tidak tersedia saat ini. Silakan coba lagi sebentar lagi.",
       "balance": "Saldo Claudium",
@@ -978,7 +978,7 @@ export const id_ID: EnTranslations = {
       "mounts": "Tunggangan",
       "professions": "Profesi",
       "reliquary": "Relikuari",
-      "lootExplorer": "Loot Explorer",
+      "lootExplorer": "Penjelajah Penjarahan",
       "nameplates": "Nama",
       "haptics": "Haptik",
       "hapticsOff": "Haptik Nonaktif",
@@ -1312,9 +1312,9 @@ export const id_ID: EnTranslations = {
       "regroup": "Gabungkan kembali {meter}"
     },
     "targetDots": {
-      "title": "Target Dots",
-      "row": "{aura} on {target}",
-      "overflow": "{count} more not shown"
+      "title": "Titik Sasaran",
+      "row": "{aura} di {target}",
+      "overflow": "{count} lebih banyak tidak ditampilkan"
     },
     "targetAuras": {
       "title": "Aura Target",
@@ -1401,9 +1401,9 @@ export const id_ID: EnTranslations = {
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Percik Teror, Pengguncang Bumi",
       "name_drakemaw_raptor": "Raptor Drakemaw",
-      "name_mech_bird": "Cluckwork Mech Bird",
-      "name_lanternback_troll": "Grumbol the Lanternback",
-      "name_chimeglass_tortoise": "Tolliver the Chimeglass",
+      "name_mech_bird": "Burung Mekanik Cluckwork",
+      "name_lanternback_troll": "Grumbol si Punggung Lentera",
+      "name_chimeglass_tortoise": "Tolliver si Kaca Cerobong Asap",
       "name_rickshaw_mount": "Becak Terikat Tulang",
       "desc_valorsteed": "Kuda tunggangan tangguh berpijakan mantap yang memberikan kecepatan perjalanan tambahan.",
       "desc_grag_bear": "Beruang tangguh berpijakan mantap yang memberikan kecepatan perjalanan tambahan.",
@@ -1416,9 +1416,9 @@ export const id_ID: EnTranslations = {
       "desc_rallycart_rxt": "Mesin reli mungil yang meningkatkan kecepatan perjalanan.",
       "desc_terrorspark_groundshaker": "Mesin lapis baja ringkas dengan rantai roda berat, meriam berkaliber besar, dan pelana yang dibuat untuk pilot tanpa rasa takut.",
       "desc_drakemaw_raptor": "Seekor raptor sarang dari Kaldera Drakemaw yang telah dijinakkan untuk ditunggangi, seluruhnya otot dan kecepatan, masih samar berbau abu.",
-      "desc_mech_bird": "A hand-built clockwork war chicken that sprints on snapping servos, wind-up key still turning.",
-      "desc_lanternback_troll": "A hill troll broken to the yoke by lamplighters, carrying an iron throne across his shoulders with a storm lantern burning on either arm.",
-      "desc_chimeglass_tortoise": "A salt-flat tortoise who has outwalked three generations of caravans. Tinkers ground him spectacles from storm-glass and hung a bronze bell at his throat, so the road hears him long before it sees him.",
+      "desc_mech_bird": "Ayam perang jarum jam buatan tangan yang berlari dengan kecepatan servo, kunci putaran masih berputar.",
+      "desc_lanternback_troll": "Troll bukit dipatahkan oleh penyala lampu, membawa singgasana besi di bahunya dengan lentera badai menyala di kedua lengannya.",
+      "desc_chimeglass_tortoise": "Kura-kura dataran garam yang telah melampaui tiga generasi karavan. Tinker memberinya kacamata dari kaca badai dan menggantungkan lonceng perunggu di tenggorokannya, sehingga jalan mendengarnya jauh sebelum jalan melihatnya.",
       "desc_rickshaw_mount": "Gerobak tulang yang berderak, dengan serdadu kurus bertulang diikat pada porosnya, menarikmu melaju kencang."
     },
     "mountTraining": {
@@ -1588,8 +1588,8 @@ export const id_ID: EnTranslations = {
       "uiScale": "Skala UI",
       "playerFrameScale": "Skala Bingkai Pemain",
       "targetFrameScale": "Skala Bingkai Sasaran",
-      "playerHealthText": "Player Health Text",
-      "targetHealthText": "Target Health Text",
+      "playerHealthText": "Teks Kesehatan Pemain",
+      "targetHealthText": "Teks Kesehatan Sasaran",
       "aurasOnPlayerFrame": "Buff pada Bingkai Pemain",
       "auraBarBelowFrame": "Buff di bawah Bingkai Pemain",
       "alwaysShowAllBuffs": "Selalu Tampilkan Semua Buff",
@@ -1614,9 +1614,9 @@ export const id_ID: EnTranslations = {
       "showTargetOfTarget": "Tampilkan Sasaran dari Sasaran",
       "showTargetSwingTimer": "Tampilkan pengatur waktu ayunan target",
       "showPetFrame": "Tampilkan Peliharaan Anda",
-      "showNameplateDots": "Show My Dots on Nameplates",
-      "nameplateDotScale": "Nameplate Dot Size",
-      "showTargetDots": "Show Target Dots",
+      "showNameplateDots": "Tunjukkan Titik Saya di Papan Nama",
+      "nameplateDotScale": "Ukuran Titik Papan Nama",
+      "showTargetDots": "Tampilkan Titik Target",
       "waterRipples": "Riak Air (Ombak Jejak)",
       "showAttackButton": "Tampilkan Tombol Serang",
       "showDailyRewardsChest": "Tampilkan Peti Hadiah Harian",
@@ -2968,7 +2968,7 @@ export const id_ID: EnTranslations = {
       "healthPercent": "Persen",
       "healthCurrent": "Saat Ini",
       "healthCurrentMax": "Saat Ini / Maksimum",
-      "healthCurrentMaxPercent": "Current / Max (Percent)",
+      "healthCurrentMaxPercent": "Saat Ini / Maks (Persen)",
       "sort": "Urutkan Pemain",
       "sortGroup": "Grup",
       "sortRole": "Peran",
@@ -3008,7 +3008,7 @@ export const id_ID: EnTranslations = {
         "targetFrame": "Target",
         "partyFrames": "Party",
         "swingBar": "Serangan Otomatis",
-        "targetDots": "Target Dots"
+        "targetDots": "Titik Sasaran"
       },
       "framesMenu": "Pengaturan Bingkai",
       "framesMenuTitle": "Tampilkan atau sembunyikan bingkai satu per satu. Bingkai yang tidak dicentang tetap tersembunyi sampai kamu mencentangnya lagi atau mengatur ulang ke bawaan.",
@@ -3041,33 +3041,33 @@ export const id_ID: EnTranslations = {
       "wrongKind": "Kode itu berjenis ekspor yang berbeda."
     },
     "riftForge": {
-      "title": "Rift Forge",
-      "subtitle": "Riftbound bands",
+      "title": "Penempaan Keretakan",
+      "subtitle": "Band yang terikat erat",
       "currency": "{name}: {count}",
-      "empty": "No Riftbound band in your bags. A ranked Rift first clear mints one.",
-      "wornHint": "Worn. Unequip it to forge.",
-      "upgradeBtn": "Upgrade to item level {level} ({cost} essence)",
-      "upgradeMax": "Fully upgraded",
-      "gemPickAria": "Gem to socket",
+      "empty": "Tidak ada tali Riftbound di tas Anda. Mint bening pertama di Rift yang diberi peringkat.",
+      "wornHint": "Dipakai. Lepaskan perlengkapannya untuk menempa.",
+      "upgradeBtn": "Tingkatkan ke level item {level} (esensi {cost})",
+      "upgradeMax": "Ditingkatkan sepenuhnya",
+      "gemPickAria": "Permata ke soket",
       "gemOption": "{name} ({bonus})",
-      "socketReplaceHint": "Sockets full: the next gem replaces the oldest, {gem}.",
-      "socketBtn": "Socket",
-      "socketsNone": "no gems",
-      "noGems": "No Rift gems in your bags",
-      "refused": "The forge refused. Stand at the Riftwright and try again.",
+      "socketReplaceHint": "Soket penuh: permata berikutnya menggantikan yang terlama, {gem}.",
+      "socketBtn": "Soket",
+      "socketsNone": "tidak ada permata",
+      "noGems": "Tidak ada permata Rift di tas Anda",
+      "refused": "Bengkel itu menolak. Berdirilah di Riftwright dan coba lagi.",
       "reason": {
-        "notFound": "That band is not in your bags.",
-        "notRiftGear": "Only a Riftbound band can be forged.",
-        "maxUpgrade": "That band is fully upgraded.",
-        "insufficientEssence": "Not enough Rift Essence.",
-        "invalidGem": "You have no such Rift gem.",
-        "dead": "You can't do that while dead.",
-        "tooFar": "You are too far from the Rift Forge."
+        "notFound": "Band itu tidak ada di tasmu.",
+        "notRiftGear": "Hanya pita Riftbound yang dapat ditempa.",
+        "maxUpgrade": "Band itu telah ditingkatkan sepenuhnya.",
+        "insufficientEssence": "Esensi Rift tidak cukup.",
+        "invalidGem": "Anda tidak memiliki permata Rift seperti itu.",
+        "dead": "Anda tidak dapat melakukan itu saat mati.",
+        "tooFar": "Anda terlalu jauh dari Rift Forge."
       },
       "done": {
-        "upgrade": "Upgraded {name}.",
-        "socket": "Socketed a gem into {name}.",
-        "socketReplaced": "Socketed a gem into {name}; {gem} was destroyed."
+        "upgrade": "{name} yang ditingkatkan.",
+        "socket": "Memasang permata ke {name}.",
+        "socketReplaced": "Memasang permata ke {name}; {gem} hancur."
       }
     },
     "itemTooltip": {
@@ -3075,7 +3075,7 @@ export const id_ID: EnTranslations = {
       "riftTier": "Barang Rift peringkat {tier}",
       "riftUpgrade": "Peningkatan Rift {level}/{max}",
       "riftSockets": "Permata Rift {used}/{total}",
-      "riftGemSocket": "Socket bonus for a Riftbound band",
+      "riftGemSocket": "Bonus soket untuk band Riftbound",
       "statEnchanted": "+{value} {stat} (Dimantrai)",
       "enchantedFallback": "Dimantrai",
       "partyTradeWindow": "Kamu dapat memperdagangkan barang ini kepada pemain yang berbagi jarahannya selama {time} berikutnya. Memakainya mengakhiri jendela perdagangan."
@@ -3100,7 +3100,7 @@ export const id_ID: EnTranslations = {
       "close": "Tutup",
       "keybind": "Panel Discord",
       "disabled": "Integrasi Discord sedang tidak tersedia saat ini.",
-      "queuePingsLabel": "Send me a Discord direct message when my battleground or arena queue pops (needs a linked Discord account)",
+      "queuePingsLabel": "Kirimi saya pesan langsung Discord ketika antrian medan pertempuran atau arena saya muncul (membutuhkan akun Discord yang tertaut)",
       "tiers": {
         "none": "Tanpa Peringkat",
         "initiate": "Inisiat",
@@ -3358,13 +3358,13 @@ export const id_ID: EnTranslations = {
       "close": "Tutup"
     },
     "realmBuilder": {
-      "title": "Realm Builder of the Month",
-      "currentLabel": "Honoured this month",
-      "placeholderName": "Your Name Here",
-      "placeholderHint": "This plate is waiting for its first name.",
-      "pastTitle": "Past honourees",
-      "pastEmpty": "No names on the roll yet.",
-      "close": "Close"
+      "title": "Pembangun Alam Bulan Ini",
+      "currentLabel": "Dihormati bulan ini",
+      "placeholderName": "Nama Anda Di Sini",
+      "placeholderHint": "Piring ini sedang menunggu nama depannya.",
+      "pastTitle": "Penerima penghargaan sebelumnya",
+      "pastEmpty": "Belum ada nama yang masuk dalam daftar.",
+      "close": "Tutup"
     },
     "bank": {
       "title": "Bank",
@@ -3421,8 +3421,8 @@ export const id_ID: EnTranslations = {
       "depositAllDone": "Bahan disetor: {count}.",
       "depositAllFull": "Bahan disetor: {count}. Bank kini penuh.",
       "depositAllNone": "Bank penuh: tidak ada yang disetor.",
-      "depositAllNotable": "Materials deposited: {count}, including {item}.",
-      "depositAllNotableFull": "Materials deposited: {count}, including {item}. Bank now full.",
+      "depositAllNotable": "Bahan yang disimpan: {count}, termasuk {item}.",
+      "depositAllNotableFull": "Bahan yang disimpan: {count}, termasuk {item}. Bank sekarang penuh.",
       "bonusTitle": "Slot bonus",
       "bonusEarned": "+{count}",
       "bonusStatusEarned": "+{count}",
@@ -3461,8 +3461,8 @@ export const id_ID: EnTranslations = {
       "vaultDepositAllDone": "Material disetorkan: {count}.",
       "vaultDepositAllFull": "Material disetorkan: {count}. Beberapa batas maksimum sudah penuh.",
       "vaultDepositAllNone": "Batas maksimum brankas penuh: tidak ada yang disetorkan.",
-      "vaultDepositAllNotable": "Materials deposited: {count}, including {item}.",
-      "vaultDepositAllNotableFull": "Materials deposited: {count}, including {item}. Some ceilings are full.",
+      "vaultDepositAllNotable": "Bahan yang disimpan: {count}, termasuk {item}.",
+      "vaultDepositAllNotableFull": "Bahan yang disimpan: {count}, termasuk {item}. Beberapa langit-langit penuh.",
       "vaultWithdrawShort": "Hanya {fit} dari {count} yang muat di tasmu.",
       "vaultDepositHint": "Klik untuk menyetor ke brankasmu",
       "vaultCannotDeposit": "Tidak dapat masuk ke brankas",
@@ -3599,17 +3599,17 @@ export const id_ID: EnTranslations = {
         }
       },
       "roster": {
-        "seats": "{count} of {cap} seats",
-        "expand": "Expand roster (+{seats} seats for {price})",
-        "maxed": "The roster is at its largest size",
-        "confirm": "Expand the guild roster by {seats} seats for {price}? The gold comes from your own purse and is not refunded.",
-        "confirmAction": "Expand",
-        "expandedLine": "{name} has expanded the guild roster to {cap} members.",
+        "seats": "Kursi {count} dari {cap}",
+        "expand": "Perluas daftar pemain (+kursi {seats} untuk {price})",
+        "maxed": "Daftar tersebut berada pada ukuran terbesarnya",
+        "confirm": "Perluas daftar guild dengan kursi {seats} untuk {price}? Emas tersebut berasal dari dompet Anda sendiri dan tidak dapat dikembalikan.",
+        "confirmAction": "Perluas",
+        "expandedLine": "{name} telah memperluas daftar guild menjadi anggota {cap}.",
         "result": {
-          "notLeader": "Only the Guild Master may expand the guild roster.",
-          "maxed": "The guild roster cannot grow any larger.",
-          "cannotAfford": "You need {price} to expand the guild roster.",
-          "retry": "The guild roster changed while you were buying. Try again."
+          "notLeader": "Hanya Guild Master yang dapat memperluas daftar guild.",
+          "maxed": "Daftar guild tidak bisa bertambah besar lagi.",
+          "cannotAfford": "Anda memerlukan {price} untuk memperluas daftar guild.",
+          "retry": "Daftar guild berubah saat Anda membeli. Coba lagi."
         }
       }
     },
@@ -4028,7 +4028,7 @@ export const id_ID: EnTranslations = {
       "yieldLineRange": "{min} hingga {max} {item}",
       "alreadyEnchanted": "Barang itu sudah dimantrai.",
       "sameEnchant": "Barang itu sudah memiliki mantra itu.",
-      "riftGear": "Riftbound bands take Rift gems, not enchants.",
+      "riftGear": "Band Riftbound mengambil permata Rift, bukan pesona.",
       "replaceTag": "Menggantikan {enchant}",
       "sameEnchantTag": "Sudah diterapkan",
       "plainTag": "Belum dimantrai",
@@ -4361,10 +4361,10 @@ export const id_ID: EnTranslations = {
       "filterAll": "Semua",
       "filterOwned": "Terkatalog",
       "filterMissing": "Belum ada",
-      "filterIlluminated": "Illuminated",
-      "filterRemaining": "Remaining",
-      "filterEmptyPages": "No pages match this filter.",
-      "filterGroupAriaPages": "Filter pages by whether they are illuminated",
+      "filterIlluminated": "Diterangi",
+      "filterRemaining": "Tersisa",
+      "filterEmptyPages": "Tidak ada halaman yang cocok dengan filter ini.",
+      "filterGroupAriaPages": "Filter halaman berdasarkan apakah halaman tersebut menyala",
       "recentJumpAria": "Buka halaman untuk {name}",
       "recentEmpty": "Belum ada temuan. Relik yang kamu katalogkan mulai sekarang akan muncul di sini.",
       "nearlyEmpty": "Halaman yang hampir tuntas berkumpul di sini.",
@@ -4472,7 +4472,7 @@ export const id_ID: EnTranslations = {
       "summary": "Peta dunia. Pilih zona untuk membuka petanya.",
       "toWorld": "Peta dunia",
       "toZone": "Peta zona",
-      "toInstance": "Instance map",
+      "toInstance": "Peta contoh",
       "toggleAria": "Beralih antara peta dunia dan peta zona",
       "levels": "Level {min} hingga {max}"
     },
@@ -4507,7 +4507,7 @@ export const id_ID: EnTranslations = {
       "walletLinkedConnected": "Aplikasi dompet tertautmu sudah terhubung dan siap untuk pembelian $WOC.",
       "walletUsdBalance": "{amount} USD",
       "walletUsdUnknown": "Tidak diketahui",
-      "walletCardDismiss": "Hide wallet card",
+      "walletCardDismiss": "Sembunyikan kartu dompet",
       "rateNote": "Kurs: sekitar {tokens} $WOC per $1,00 USD per {time}.",
       "rateNotePaused": "Kurs terakhir yang diketahui: sekitar {tokens} $WOC per $1,00 USD per {time}.",
       "estimateNote": "Sekitar {tokens} $WOC untuk {usd} pada kurs saat ini.",
@@ -4701,41 +4701,41 @@ export const id_ID: EnTranslations = {
       "listingStatusUnsold": "Tidak Terjual"
     },
     "lootExplorer": {
-      "title": "Loot Explorer",
-      "close": "Close Loot Explorer",
-      "searchPlaceholder": "Search items...",
-      "searchAria": "Search items",
-      "filterCategoryAria": "Source",
-      "filterClassAria": "Class",
-      "filterStatAria": "Stat",
-      "filterQualityAria": "Quality",
-      "filterAll": "All",
-      "tabItems": "By Item",
-      "tabEncounters": "By Encounter",
+      "title": "Penjelajah Penjarahan",
+      "close": "Tutup Penjelajah Penjarahan",
+      "searchPlaceholder": "Cari item...",
+      "searchAria": "Cari item",
+      "filterCategoryAria": "Sumber",
+      "filterClassAria": "Kelas",
+      "filterStatAria": "Statistik",
+      "filterQualityAria": "Kualitas",
+      "filterAll": "Semua",
+      "tabItems": "Berdasarkan Barang",
+      "tabEncounters": "Oleh Pertemuan",
       "category": {
-        "raid": "Raid",
-        "dungeon": "Dungeon",
-        "delve": "Delve",
-        "open_world": "Open World",
-        "rift": "Rift",
-        "vendor": "Vendor",
-        "quest_reward": "Quest Reward",
-        "quest_objective": "Quest Objective",
-        "ground_object": "World Object",
-        "starting_equipment": "Starting Equipment"
+        "raid": "Serangan",
+        "dungeon": "penjara bawah tanah",
+        "delve": "Menyelidiki",
+        "open_world": "Dunia Terbuka",
+        "rift": "Keretakan",
+        "vendor": "Penjual",
+        "quest_reward": "Hadiah Pencarian",
+        "quest_objective": "Tujuan Pencarian",
+        "ground_object": "Objek Dunia",
+        "starting_equipment": "Peralatan Awal"
       },
       "difficulty": {
-        "normal": "Normal",
-        "heroic": "Heroic"
+        "normal": "Biasa",
+        "heroic": "Heroik"
       },
-      "riftRankLabel": "Rift Rank {rank}",
+      "riftRankLabel": "Peringkat Keretakan {rank}",
       "source": "{category}: {name}",
       "sourceWithContext": "{category}: {name} ({context})",
-      "chance": "{pct}% chance",
-      "guaranteed": "Guaranteed",
-      "gatedByQuest": "While questing: {quest}",
-      "empty": "No loot matches these filters.",
-      "resultCount": "{count} results"
+      "chance": "Peluang {pct}%.",
+      "guaranteed": "Dijamin",
+      "gatedByQuest": "Saat mencari: {quest}",
+      "empty": "Tidak ada jarahan yang cocok dengan filter ini.",
+      "resultCount": "Hasil {count}"
     }
   },
   "gatherEvent": {
@@ -4835,7 +4835,7 @@ export const id_ID: EnTranslations = {
       "swag_claimed": "Anda sudah mengklaim hadiah ini.",
       "swag_tier": "Capai peringkat yang lebih tinggi untuk mengklaim ini.",
       "swag_points": "Poin tidak cukup.",
-      "invalid_input": "Invalid input."
+      "invalid_input": "Masukan tidak valid."
     },
     "deeds": {
       "invalid_input": "Masukan tidak valid."
@@ -4889,9 +4889,9 @@ export const id_ID: EnTranslations = {
       "not_marked": "Akun tersebut tidak diberi tanda."
     },
     "kick": {
-      "reason_required": "A reason is required.",
-      "admin_target": "Operator accounts cannot be kicked.",
-      "target_offline": "That player is no longer online on this realm."
+      "reason_required": "Diperlukan suatu alasan.",
+      "admin_target": "Akun operator tidak dapat ditendang.",
+      "target_offline": "Pemain itu tidak lagi online di ranah ini."
     },
     "woc_market": {
       "invalid_input": "Masukan tidak valid.",
@@ -5326,8 +5326,8 @@ export const id_ID: EnTranslations = {
       "ifPlayerFrameScale": "Ukuran bingkai unit Anda sendiri.",
       "ifTargetFrameScale": "Ukuran bingkai sasaran Anda.",
       "ifPartyStyle": "Tata letak party: Otomatis mengikuti ukuran kelompok Anda, Klasik adalah susunan tradisional, dan Raid memadatkan semua orang ke dalam kisi ringkas.",
-      "ifPlayerHealthText": "What your own health bar prints: nothing, a percentage, current health, current and maximum, or both with the percentage beside them.",
-      "ifTargetHealthText": "What the target and target-of-target health bars print, with the same choices as your own frame.",
+      "ifPlayerHealthText": "Apa yang dicetak oleh bilah kesehatan Anda: tidak ada, persentase, kesehatan saat ini, saat ini dan maksimum, atau keduanya dengan persentase di sampingnya.",
+      "ifTargetHealthText": "Apa yang dicetak oleh bilah kesehatan target dan target-target, dengan pilihan yang sama dengan bingkai Anda sendiri.",
       "ifPartyHealthText": "Apa yang dicetak pada bilah party: tidak ada, persentase, nyawa saat ini, atau nyawa saat ini dan maksimum.",
       "ifPartySort": "Urutan anggota party dicantumkan: urutan grup, peran, atau nama.",
       "ifPartyShowAuras": "Apakah buff dan debuff ditampilkan pada bingkai party. Sakelar serupa mencakup bilah sumber daya, penyerapan, peliharaan, dan apakah Anda muncul pada daftar party Anda sendiri.",
@@ -5340,7 +5340,7 @@ export const id_ID: EnTranslations = {
       "ifChatOpacity": "Seberapa pekat latar belakang obrolan.",
       "ifCompactChat": "Merapatkan baris obrolan agar lebih banyak yang muat.",
       "ifChatTimestamps": "Menambahkan waktu pada setiap baris obrolan, dalam format 12 jam atau 24 jam.",
-      "ifFilterProfanity": "Masks profanity in chat with asterisks. On by default; switch it off here if you would rather read chat unfiltered.",
+      "ifFilterProfanity": "Menyamarkan kata-kata kotor dalam obrolan dengan tanda bintang. Aktif secara default; matikan di sini jika Anda lebih suka membaca obrolan tanpa filter.",
       "ifStartAttack": "Apakah memakai sebuah kemampuan juga memulai serangan otomatis Anda. Aktif secara bawaan, dan inilah perilaku klasik yang diharapkan sebagian besar pemain.",
       "ifStopAutoAttack": "Apakah berganti sasaran menghentikan ayunan Anda. Nonaktif secara bawaan, sehingga serangan Anda berlanjut ke sasaran yang baru.",
       "ifShowAttackButton": "Menampilkan tombol Serang secara eksplisit pada bilah aksi Anda.",
@@ -5353,7 +5353,7 @@ export const id_ID: EnTranslations = {
       "ifHideUnused": "Menyembunyikan slot aksi yang kosong sehingga hanya tombol yang benar-benar Anda pakai yang ditampilkan.",
       "ifLockBars": "Mengunci bilah Anda sehingga Anda tidak bisa menyeret sebuah kemampuan keluar dari slotnya secara tidak sengaja.",
       "keybindsHeading": "Panel Pengaturan Tombol",
-      "keybindsBody": "The key list is only half of that panel. Above it sit the switches that decide how your mouse drives the game: mouse camera, whether the cursor locks while you rotate, click to move and which mouse button triggers it, attack move, and the left-handed touch layout.",
+      "keybindsBody": "Daftar kuncinya hanya separuh dari panel itu. Di atasnya terdapat tombol yang menentukan cara mouse Anda menjalankan permainan: kamera mouse, apakah kursor terkunci saat Anda memutar, klik untuk bergerak dan tombol mouse mana yang memicunya, gerakan menyerang, dan tata letak sentuh kidal.",
       "keybindsMouseBody": "Ada dua hal di sana yang mudah terlewat. Tombol mouse bisa diikat seperti tombol papan ketik, sehingga klik roda dan tombol jempol bisa membawa kemampuan, sementara klik kiri dan kanan tetap dicadangkan untuk kamera dan untuk mengeklik dunia. Dan Anda bisa mengikat langsung dari bilah aksi: aktifkan mode pengikatan pada-bilah di sini, lalu klik sebuah slot dan tekan tombol yang Anda inginkan."
     },
     "combat": {
@@ -6152,7 +6152,7 @@ export const id_ID: EnTranslations = {
       "heroicRewardsBody": "Bos heroik menjatuhkan jarahan yang kamu kenal, ditingkatkan dan ditandai Heroik pada keterangannya, dan bos terakhir setiap penjelajahan menambahkan epik yang tidak ditemukan di tempat lain. Kematian terakhir itu juga meninggalkan Tanda Heroik bagi setiap peserta: mata uang yang dibelanjakan pada Kepala Perbekalan Vex di Highwatch, yang meja layannya adalah rak berisi cincin dan liontin yang tak bisa dibeli oleh apa pun selain bukti dari kedalaman heroik.",
       "heroicLockoutBody": "Dungeon biasa bisa dijelajahi sepanjang hari. Heroik menuntut kesabaran: kematian bos terakhir membatasi semua orang dalam penjelajahan itu pada satu penuntasan heroik dungeon tersebut per hari, dan raid menyimpan kunci harian untuk setiap tingkat kesulitan. Di alam daring semua kunci harian terlepas bersamaan pada jam penyetelan ulang malam milik alam itu, sehingga penuntasan yang diambil tepat sebelum jam itu dan yang diambil tepat sesudahnya jatuh pada dua hari berbeda; mainlah luring di peramban dan sebuah kunci akan berakhir begitu saja sehari setelah kematian bos versimu sendiri. Penjelajahan lima pemain yang sudah tuntas tetap terbuka bagi kelompoknya sendiri untuk lari mayat dan jarahan, sehingga tak seorang pun terkunci dari apa yang ia peroleh di sana. Raid lebih ketat: begitu kematiannya mengunci kamu, pintunya tetap tertutup sampai penyetelan ulang, dan satu-satunya jalan kembali masuk adalah lari mayat oleh seseorang yang tumbang persis dalam penjelajahan yang menguncinya, jadi seorang peraid hidup yang keluar berarti sudah keluar untuk hari itu. Kumpulkan rampasanmu sebelum meninggalkan arena. Setiap kunci ini milik karakter yang memperolehnya, jadi penuntasan pada karakter utamamu membiarkan karakter lainmu bebas.",
       "resetTitle": "Mereset instansimu",
-      "resetBody": "Switch difficulty while your group still holds claimed runs and the old claims linger for a while before clearing on their own. The party leader can let them go at once instead: choose Reset All Instances on their own portrait menu, or type /dungeon reset. A reset works only after the difficulty has actually been changed, only while nobody, living or fallen, remains inside, only once every corpse in there has been looted clean, and a short cooldown separates one reset from the next. Arrive at the door on the wrong difficulty and the game says so before the run starts. The raid resets the same way, its own lockout and corpse-return rules still standing on top.",
+      "resetBody": "Ganti tingkat kesulitan saat grup Anda masih memegang proses yang diklaim dan klaim lama bertahan beberapa saat sebelum diselesaikan sendiri. Pemimpin party dapat melepaskan mereka sekaligus: pilih Reset All Instances pada menu potret mereka sendiri, atau ketik /dungeon reset. Penyetelan ulang hanya berfungsi setelah tingkat kesulitan benar-benar diubah, hanya ketika tidak ada seorang pun, hidup atau mati, yang tetap berada di dalam, hanya setelah setiap mayat di sana telah dijarah hingga bersih, dan cooldown singkat memisahkan satu penyetelan ulang dari penyetelan ulang berikutnya. Tiba di pintu pada tingkat kesulitan yang salah dan permainan mengatakannya sebelum lari dimulai. Penggerebekan diatur ulang dengan cara yang sama, aturan penguncian dan pengembalian mayatnya sendiri masih berlaku.",
       "templeLoreTitle": "Kuil Tenggelam, sedikit lebih dalam",
       "templeLoreBody": "Kuil itu memiliki legendanya sendiri, lebih tua dari pemujaan yang kamu kejar di tempat lain. Di tepi Glimmermere, sebuah danau yang meneguk cahaya bulan dan mengembalikan mereka yang tenggelam, seorang pengawas sebatang kara menjaga sebuah gerbang cahaya pucat. Di bawah permukaan, sebuah tangga dari batu dingin menurun menuju ke sana. Orang-orang yang tenggelam di sana tidak mati karena kecelakaan: mereka adalah Paduan Suara Pucat, yang tenggelam dalam pemujaan dan tak pernah berhenti bernyanyi. Para penjaga tua menggores satu peringatan ke bebatuan sebelum air menelan mereka, sebuah doa kepada sesuatu yang mereka sebut Bulan Tenggelam, dengan tangan yang lebih mantap menambahkan dua kata di bawahnya: ia hanya tertidur.",
       "cryptLeadTitle": "Pintu yang seharusnya dijaga tetap tertutup oleh orang mati",
@@ -6185,8 +6185,8 @@ export const id_ID: EnTranslations = {
       "raceBody": "Setiap kelompok di realm ini bisa menyerang rift yang sama pada saat bersamaan, masing-masing di salinannya sendiri, dan hanya kelompok pertama yang menjatuhkan sosok di dasarnya yang menyegel rift itu. Ketika sebuah kelompok menang, realm mendengar nama dan catatan waktu mereka, dan jalan masuknya tertutup di belakang mereka. Kalah dalam balapan tidak mengakhiri larimu: salinanmu tetap terbuka, sosok di dasarnya tetap akan tumbang di tanganmu, dan kamu tetap berjalan keluar dengan kekuatanmu sendiri. Yang kamu bayar adalah semua yang seharusnya dibayar oleh sebuah penyegelan. Bos itu tidak meninggalkan apa pun bagi kelompok yang datang kedua, jadi yang kamu bawa pulang hanyalah apa yang dijatuhkan mob-mob di sepanjang jalan turun, dan tidak lebih dari itu. Kitab Jasa tetap menghitung penuntasanmu, karena kamu memang menjatuhkan sosok itu. Ini satu-satunya balapan dalam permainan yang bisa kamu kalah tanpa pernah melihat wajah orang-orang yang mengalahkanmu.",
       "rewardsHeading": "Apa yang kamu bawa pulang",
       "rewardsBody": "Menyegel sebuah rift, bukan sekadar bertahan hidup di dalamnya, adalah yang membayar. Jatuhkan rift itu lebih dulu dan ia membayar setara konten instans yang setingkat dengan peringkatnya, sehingga peringkat yang lebih berat sepadan dengan lari yang lebih berat pula. Menyegelnya juga menyerahkan sebuah Cincin Terikat Rift ke tangan setiap orang yang hadir di sana, disesuaikan dengan peran kelasmu dan pribadi untukmu, serta meninggalkan Sari Rift di dalam tasmu, ditambah permata rift di peringkat yang lebih berat. Selain jalan pulang, sosok di dasarnya juga meninggalkan sebuah peti tersegel yang bisa dibongkar kelompokmu untuk rampasan tambahan, memakai cara membobol kunci Jalur Tumbler yang sama seperti yang kamu kenal dari peti-peti delve, sehingga kerja yang bersih dan sabar membayar lebih baik daripada yang tergesa-gesa. Tak satu pun dari itu sampai ke kelompok yang datang kedua: balapan yang kalah hanya menyisakan apa yang dijatuhkan mob-mob di sepanjang jalan turun. Kitab Jasa adalah pengecualiannya, dan tetap menghitung penuntasanmu apa pun hasilnya, dengan satu jasa untuk menutup rift pertamamu dan satu lagi untuk menjatuhkan rift peringkat S.",
-      "forgeHeading": "The Rift Forge",
-      "forgeBody": "The band a ranked first clear mints is not finished when you receive it. Riftwright Maelis, who keeps a forge in the Watch Meadow on the Farshore, up the shore from Gullhaven beside the Breach Scholar, will raise its item level one step at a time and set the coloured gems the rifts drop into its sockets, each colour one combat rating. A full band takes a new gem in place of its oldest, so you can retune it later. All of that is paid in Rift Essence and Rift gems, the forge currency that falls from rift bosses and trades freely, so a friend can hand you the essence you are short. Take the band off before you bring it to her: she works on what is in your bags, and she does nothing at all unless you are standing at her forge.",
+      "forgeHeading": "Penempaan Keretakan",
+      "forgeBody": "Band yang menduduki peringkat pertama permen bening belum habis saat Anda menerimanya. Riftwright Maelis, yang menyimpan bengkel di Watch Meadow di Farshore, di tepi pantai Gullhaven di samping Breach Scholar, akan menaikkan level itemnya selangkah demi selangkah dan mengatur permata berwarna yang dijatuhkan oleh celah tersebut ke dalam soketnya, masing-masing memiliki satu peringkat pertempuran. Sebuah band penuh mengambil permata baru sebagai pengganti yang tertua, sehingga Anda dapat menyetelnya kembali nanti. Semua itu dibayar dalam Rift Essence dan permata Rift, mata uang palsu yang jatuh dari bos rift dan diperdagangkan secara bebas, sehingga seorang teman dapat memberikan esensi yang Anda miliki. Lepaskan talinya sebelum Anda membawanya: dia mengerjakan apa yang ada di tas Anda, dan dia tidak melakukan apa pun kecuali Anda berdiri di depan bengkelnya.",
       "trackerHeading": "Pelacak di layarmu",
       "trackerBody": "Selama kamu berada di dalam, sebuah strip kecil di layarmu menjaga arahmu tetap jelas: lantai keberapa yang sedang kamu jalani dari berapa total lantainya, dan sebuah hitung mundur langsung. Bacalah hitung mundur itu baik-baik, sebab itu bukan larimu yang habis waktu. Itu adalah pintu masuk kembali di dunia luar yang sedang menutup. Begitu kamu sudah masuk, kelompokmu menjalani rift itu dengan temponya sendiri, selama apa pun itu, tetapi begitu jam itu mencapai nol, jalan masuknya lenyap bagi semua orang, jadi pikirkan dua kali sebelum melangkah keluar menjelang akhirnya."
     },
@@ -8078,7 +8078,7 @@ export const id_ID: EnTranslations = {
       "forgeUpgraded": "Peningkatan Rift untuk {name} selesai.",
       "forgeEnchanted": "Pemantraan Rift untuk {name} selesai.",
       "forgeSocketed": "Permata Rift terpasang untuk {name}.",
-      "forgeGemReplaced": "Rift gem replaced for {name}: {gem} destroyed.",
+      "forgeGemReplaced": "Permata celah diganti untuk {name}: {gem} hancur.",
       "detonateGlacialGrave": "Makam Glasial meledak!",
       "detonateAbsoluteZero": "Nol Mutlak meletus!",
       "detonateMagmaWell": "Sumur Magma meletus!",
@@ -8736,7 +8736,7 @@ export const id_ID: EnTranslations = {
     "realmFull": "Dunia ini sedang penuh. Coba lagi dalam beberapa menit.",
     "tooManyConnections": "Terlalu banyak koneksi ke dunia ini dari jaringanmu. Tutup jendela permainan ekstra atau coba lagi dalam beberapa menit.",
     "messageRateExceeded": "Kamu terputus karena mengirim tindakan terlalu cepat. Tunggu sebentar, lalu masuk kembali.",
-    "kickedByModerator": "A moderator has disconnected you: {reason}",
+    "kickedByModerator": "Moderator telah memutus koneksi Anda: {reason}",
     "tips": {
       "classes": "Kiat: masing-masing dari 9 kelas memiliki gaya bermain berbeda. Cobalah beberapa sebelum menetapkan pilihan.",
       "talents": "Kiat: kamu dapat mengatur ulang talenta kapan saja saat tidak bertarung, jadi pilihan awal tidak akan menjadi jebakan.",
@@ -13374,7 +13374,7 @@ export const id_ID: EnTranslations = {
         "name": "Kuk Penyala Lentera: Grumbol"
       },
       "reins_chimeglass_tortoise": {
-        "name": "Roadwarden's Bellstrap: Tolliver"
+        "name": "Tali Lonceng Penjaga Jalan: Tolliver"
       },
       "reins_rickshaw_mount": {
         "name": "Kendali Terikat: Becak Terikat Tulang"
@@ -13383,7 +13383,7 @@ export const id_ID: EnTranslations = {
         "name": "Tali Kekang Raptor Drakemaw"
       },
       "reins_mech_bird": {
-        "name": "Ignition Key: Cluckwork Mech Bird"
+        "name": "Kunci Pengapian: Burung Mech Cluckwork"
       },
       "rimefang": {
         "name": "Taring Beku"
@@ -16010,9 +16010,9 @@ export const id_ID: EnTranslations = {
         "greeting": "Ia terbuka tepat di tempat jaring-jaring dikeringkan. Tepat di sana, tempat aku berdiri setiap pagi seumur hidupku. Aku tak lagi turun ke pantai. Aku tak lagi pergi ke mana pun sebenarnya."
       },
       "riftwright_maelis": {
-        "name": "Riftwright Maelis",
-        "title": "Rift Forgemaster",
-        "greeting": "A Riftbound band remembers the break that made it, {className}. Bring me the band, and the essence the breaks shed, and I will teach it to remember more."
+        "name": "Penulis Riftwright Maelis",
+        "title": "Ahli Tempa Retakan",
+        "greeting": "Sebuah band Riftbound mengingat terobosan yang membuatnya, {className}. Bawakan saya bandnya, dan inti dari jeda tersebut, dan saya akan mengajarinya untuk mengingat lebih banyak."
       },
       "forgemistress_darva": {
         "name": "Empu Tempa Darva",
@@ -19304,6 +19304,6 @@ export const id_ID: EnTranslations = {
     "delveRiteShrineSkullInteract": "Altar Tengkorak: Tekan F untuk menyentuhnya",
     "mailboxName": "Kotak Surat",
     "noticeboardName": "Papan Pengumuman",
-    "realmBuilderMonumentName": "Realm Builder Monument"
+    "realmBuilderMonumentName": "Monumen Pembangun Alam"
   }
 };

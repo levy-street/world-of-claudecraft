@@ -1313,7 +1313,7 @@ export const ja_JP: EnTranslations = {
     },
     "targetDots": {
       "title": "ターゲットデバフ",
-      "row": "{aura} on {target}",
+      "row": "{target} 上の {aura}",
       "overflow": "他に{count}件は非表示"
     },
     "targetAuras": {
@@ -4707,17 +4707,17 @@ export const ja_JP: EnTranslations = {
       "searchAria": "アイテムを検索",
       "filterCategoryAria": "入手元",
       "filterClassAria": "クラス",
-      "filterStatAria": "Stat",
+      "filterStatAria": "ステータス",
       "filterQualityAria": "品質",
-      "filterAll": "All",
-      "tabItems": "By Item",
+      "filterAll": "すべて",
+      "tabItems": "項目別",
       "tabEncounters": "入手先別",
       "category": {
-        "raid": "Raid",
+        "raid": "襲撃",
         "dungeon": "ダンジョン",
         "delve": "デルヴ",
         "open_world": "オープンワールド",
-        "rift": "Rift",
+        "rift": "リフト",
         "vendor": "商人",
         "quest_reward": "クエスト報酬",
         "quest_objective": "クエスト目標",
@@ -4728,7 +4728,7 @@ export const ja_JP: EnTranslations = {
         "normal": "ノーマル",
         "heroic": "ヒロイック"
       },
-      "riftRankLabel": "Rift Rank {rank}",
+      "riftRankLabel": "リフトランク{rank}",
       "source": "{category}: {name}",
       "sourceWithContext": "{category}: {name} ({context})",
       "chance": "ドロップ率 {pct}%",

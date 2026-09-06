@@ -570,9 +570,9 @@ export const sv_SE: EnTranslations = {
       "tabsLabel": "Delar av WOC-butiken",
       "storeTab": "Butik",
       "rewardsTab": "Dagliga belöningar",
-      "mountsEyebrow": "Account Mounts",
-      "mountsTitle": "Machine Stable",
-      "mountBuyAria": "Purchase {item}",
+      "mountsEyebrow": "Kontomontering",
+      "mountsTitle": "Maskinstabil",
+      "mountBuyAria": "Köp {item}",
       "loading": "Laddar WOC-butiken...",
       "error": "WOC-butiken är inte tillgänglig just nu. Försök igen om en stund.",
       "balance": "Claudium-saldo",
@@ -978,7 +978,7 @@ export const sv_SE: EnTranslations = {
       "mounts": "Riddjur",
       "professions": "Yrken",
       "reliquary": "Relikvarium",
-      "lootExplorer": "Loot Explorer",
+      "lootExplorer": "Bytesöversikt",
       "nameplates": "Namn",
       "haptics": "Haptik",
       "hapticsOff": "Haptik av",
@@ -1312,9 +1312,9 @@ export const sv_SE: EnTranslations = {
       "regroup": "Gruppera {meter} igen"
     },
     "targetDots": {
-      "title": "Target Dots",
-      "row": "{aura} on {target}",
-      "overflow": "{count} more not shown"
+      "title": "Målprickar",
+      "row": "{aura} på {target}",
+      "overflow": "{count} mer visas inte"
     },
     "targetAuras": {
       "title": "Målets auror",
@@ -1401,9 +1401,9 @@ export const sv_SE: EnTranslations = {
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Skräckgnista, markskakaren",
       "name_drakemaw_raptor": "Drakgapsraptor",
-      "name_mech_bird": "Cluckwork Mech Bird",
-      "name_lanternback_troll": "Grumbol the Lanternback",
-      "name_chimeglass_tortoise": "Tolliver the Chimeglass",
+      "name_mech_bird": "Cluckwork-mekafågel",
+      "name_lanternback_troll": "Lanternbacken Grumbol",
+      "name_chimeglass_tortoise": "Tolliver klockglaset",
       "name_rickshaw_mount": "Benbunden Rickshaw",
       "desc_valorsteed": "En uthållig, säkerfotad stridshäst som ger ökad reshastighet.",
       "desc_grag_bear": "En uthållig, säkerfotad björn som ger ökad reshastighet.",
@@ -1416,9 +1416,9 @@ export const sv_SE: EnTranslations = {
       "desc_rallycart_rxt": "En liten rallymaskin som ökar färdhastigheten.",
       "desc_terrorspark_groundshaker": "En kompakt bepansrad maskin med tunga larvband, en grovkalibrig kanon och en sadel byggd för orädda förare.",
       "desc_drakemaw_raptor": "En sadeltämjd kullraptor från Drakgapets kaldera, ren sena och sprint, som fortfarande doftar svagt av aska.",
-      "desc_mech_bird": "A hand-built clockwork war chicken that sprints on snapping servos, wind-up key still turning.",
-      "desc_lanternback_troll": "A hill troll broken to the yoke by lamplighters, carrying an iron throne across his shoulders with a storm lantern burning on either arm.",
-      "desc_chimeglass_tortoise": "A salt-flat tortoise who has outwalked three generations of caravans. Tinkers ground him spectacles from storm-glass and hung a bronze bell at his throat, so the road hears him long before it sees him.",
+      "desc_mech_bird": "En handbyggd urverkshöna som sprintar på knäppande servon medan upprullningsnyckeln fortfarande vrider sig.",
+      "desc_lanternback_troll": "Ett kulletroll bröts till oket av lamptändare, bärande en järntron över sina axlar med en stormlykta som brinner på vardera arm.",
+      "desc_chimeglass_tortoise": "En saltplattsköldpadda som har gått ur tre generationer husvagnar. Tinkers malde honom glasögon från stormglas och hängde en bronsklocka i hans hals, så vägen hör honom långt innan den ser honom.",
       "desc_rickshaw_mount": "En skramlande benkärra med en benig hantlangare fastspänd vid skalmarna, som drar dig fram i språngmarsch."
     },
     "mountTraining": {
@@ -1588,8 +1588,8 @@ export const sv_SE: EnTranslations = {
       "uiScale": "Gränssnittsskala",
       "playerFrameScale": "Spelarramens skala",
       "targetFrameScale": "Målramens skala",
-      "playerHealthText": "Player Health Text",
-      "targetHealthText": "Target Health Text",
+      "playerHealthText": "Spelarens hälsa Text",
+      "targetHealthText": "Målhälsotext",
       "aurasOnPlayerFrame": "Förstärkningar på spelarramen",
       "auraBarBelowFrame": "Förstärkningar under spelarramen",
       "alwaysShowAllBuffs": "Visa alltid alla förstärkningar",
@@ -1614,9 +1614,9 @@ export const sv_SE: EnTranslations = {
       "showTargetOfTarget": "Visa målets mål",
       "showTargetSwingTimer": "Visa målets svingtimer",
       "showPetFrame": "Visa ditt djur",
-      "showNameplateDots": "Show My Dots on Nameplates",
-      "nameplateDotScale": "Nameplate Dot Size",
-      "showTargetDots": "Show Target Dots",
+      "showNameplateDots": "Visa mina prickar på namnskyltar",
+      "nameplateDotScale": "Namnskylt Punktstorlek",
+      "showTargetDots": "Visa målprickar",
       "waterRipples": "Vattenkrusningar (kölvatten)",
       "showAttackButton": "Visa attackknapp",
       "showDailyRewardsChest": "Visa kistan för dagliga belöningar",
@@ -2968,7 +2968,7 @@ export const sv_SE: EnTranslations = {
       "healthPercent": "Procent",
       "healthCurrent": "Nuvarande",
       "healthCurrentMax": "Nuvarande / max",
-      "healthCurrentMaxPercent": "Current / Max (Percent)",
+      "healthCurrentMaxPercent": "Aktuell/max (procent)",
       "sort": "Sortera spelare",
       "sortGroup": "Grupp",
       "sortRole": "Roll",
@@ -3008,7 +3008,7 @@ export const sv_SE: EnTranslations = {
         "targetFrame": "Mål",
         "partyFrames": "Grupp",
         "swingBar": "Autoattack",
-        "targetDots": "Target Dots"
+        "targetDots": "Målprickar"
       },
       "framesMenu": "Raminställningar",
       "framesMenuTitle": "Visa eller göm enskilda ramar. En avbockad ram förblir dold tills du bockar för den igen eller återställer till standard.",
@@ -3041,33 +3041,33 @@ export const sv_SE: EnTranslations = {
       "wrongKind": "Den koden är av en annan exporttyp."
     },
     "riftForge": {
-      "title": "Rift Forge",
-      "subtitle": "Riftbound bands",
+      "title": "Spricksmedjan",
+      "subtitle": "Riftbundna band",
       "currency": "{name}: {count}",
-      "empty": "No Riftbound band in your bags. A ranked Rift first clear mints one.",
-      "wornHint": "Worn. Unequip it to forge.",
-      "upgradeBtn": "Upgrade to item level {level} ({cost} essence)",
-      "upgradeMax": "Fully upgraded",
-      "gemPickAria": "Gem to socket",
+      "empty": "Inget Riftbound-band i dina väskor. En rankad Rift först klarar ett.",
+      "wornHint": "Sliten. Utrusta den för att smida.",
+      "upgradeBtn": "Uppgradera till artikelnivå {level} ({cost} essens)",
+      "upgradeMax": "Helt uppgraderad",
+      "gemPickAria": "Gem till uttag",
       "gemOption": "{name} ({bonus})",
-      "socketReplaceHint": "Sockets full: the next gem replaces the oldest, {gem}.",
-      "socketBtn": "Socket",
-      "socketsNone": "no gems",
-      "noGems": "No Rift gems in your bags",
-      "refused": "The forge refused. Stand at the Riftwright and try again.",
+      "socketReplaceHint": "Uttag fulla: nästa pärla ersätter den äldsta, {gem}.",
+      "socketBtn": "Uttag",
+      "socketsNone": "inga pärlor",
+      "noGems": "Inga Rift-ädelstenar i dina väskor",
+      "refused": "Smedjan vägrade. Stå vid Riftwright och försök igen.",
       "reason": {
-        "notFound": "That band is not in your bags.",
-        "notRiftGear": "Only a Riftbound band can be forged.",
-        "maxUpgrade": "That band is fully upgraded.",
-        "insufficientEssence": "Not enough Rift Essence.",
-        "invalidGem": "You have no such Rift gem.",
-        "dead": "You can't do that while dead.",
-        "tooFar": "You are too far from the Rift Forge."
+        "notFound": "Det bandet finns inte i dina väskor.",
+        "notRiftGear": "Endast ett Riftbound-band kan smidas.",
+        "maxUpgrade": "Det bandet är helt uppgraderat.",
+        "insufficientEssence": "Inte tillräckligt med Rift Essence.",
+        "invalidGem": "Du har ingen sådan Rift-pärla.",
+        "dead": "Du kan inte göra det när du är död.",
+        "tooFar": "Du är för långt från Rift Forge."
       },
       "done": {
-        "upgrade": "Upgraded {name}.",
-        "socket": "Socketed a gem into {name}.",
-        "socketReplaced": "Socketed a gem into {name}; {gem} was destroyed."
+        "upgrade": "Uppgraderad {name}.",
+        "socket": "Socket en pärla i {name}.",
+        "socketReplaced": "Socket en pärla i {name}; {gem} förstördes."
       }
     },
     "itemTooltip": {
@@ -3075,7 +3075,7 @@ export const sv_SE: EnTranslations = {
       "riftTier": "Revföremål av grad {tier}",
       "riftUpgrade": "Revuppgradering {level}/{max}",
       "riftSockets": "Revstenar {used}/{total}",
-      "riftGemSocket": "Socket bonus for a Riftbound band",
+      "riftGemSocket": "Socketbonus för ett Riftbound-band",
       "statEnchanted": "+{value} {stat} (Förtrollad)",
       "enchantedFallback": "Förtrollad",
       "partyTradeWindow": "Du kan överlåta det här föremålet till spelare som delade bytet i {time} till. Att ta på det avslutar handelsfönstret."
@@ -3100,7 +3100,7 @@ export const sv_SE: EnTranslations = {
       "close": "Stäng",
       "keybind": "Discord-panel",
       "disabled": "Discord-integrationen är inte tillgänglig just nu.",
-      "queuePingsLabel": "Send me a Discord direct message when my battleground or arena queue pops (needs a linked Discord account)",
+      "queuePingsLabel": "Skicka mig ett Discord direktmeddelande när min slagfält eller arena kö dyker upp (behöver ett länkat Discord-konto)",
       "tiers": {
         "none": "Orankad",
         "initiate": "Novis",
@@ -3358,13 +3358,13 @@ export const sv_SE: EnTranslations = {
       "close": "Stäng"
     },
     "realmBuilder": {
-      "title": "Realm Builder of the Month",
-      "currentLabel": "Honoured this month",
-      "placeholderName": "Your Name Here",
-      "placeholderHint": "This plate is waiting for its first name.",
-      "pastTitle": "Past honourees",
-      "pastEmpty": "No names on the roll yet.",
-      "close": "Close"
+      "title": "Månadens Realm Builder",
+      "currentLabel": "Hedrades denna månad",
+      "placeholderName": "Ditt namn här",
+      "placeholderHint": "Denna tallrik väntar på sitt förnamn.",
+      "pastTitle": "Tidigare hederstagare",
+      "pastEmpty": "Inga namn på listan ännu.",
+      "close": "Stäng"
     },
     "bank": {
       "title": "Bank",
@@ -3421,8 +3421,8 @@ export const sv_SE: EnTranslations = {
       "depositAllDone": "Material insatta: {count}.",
       "depositAllFull": "Material insatta: {count}. Banken är nu full.",
       "depositAllNone": "Banken är full: inget sattes in.",
-      "depositAllNotable": "Materials deposited: {count}, including {item}.",
-      "depositAllNotableFull": "Materials deposited: {count}, including {item}. Bank now full.",
+      "depositAllNotable": "Material deponerat: {count}, inklusive {item}.",
+      "depositAllNotableFull": "Material deponerat: {count}, inklusive {item}. Banken är nu full.",
       "bonusTitle": "Bonusfack",
       "bonusEarned": "+{count}",
       "bonusStatusEarned": "+{count}",
@@ -3461,8 +3461,8 @@ export const sv_SE: EnTranslations = {
       "vaultDepositAllDone": "Material insatta: {count}.",
       "vaultDepositAllFull": "Material insatta: {count}. Vissa tak är fulla.",
       "vaultDepositAllNone": "Valvets tak är fulla: inget sattes in.",
-      "vaultDepositAllNotable": "Materials deposited: {count}, including {item}.",
-      "vaultDepositAllNotableFull": "Materials deposited: {count}, including {item}. Some ceilings are full.",
+      "vaultDepositAllNotable": "Material deponerat: {count}, inklusive {item}.",
+      "vaultDepositAllNotableFull": "Material deponerat: {count}, inklusive {item}. Vissa tak är fulla.",
       "vaultWithdrawShort": "Bara {fit} av {count} får plats i dina väskor.",
       "vaultDepositHint": "Klicka för att sätta in i ditt valv",
       "vaultCannotDeposit": "Kan inte förvaras i valvet",
@@ -3599,17 +3599,17 @@ export const sv_SE: EnTranslations = {
         }
       },
       "roster": {
-        "seats": "{count} of {cap} seats",
-        "expand": "Expand roster (+{seats} seats for {price})",
-        "maxed": "The roster is at its largest size",
-        "confirm": "Expand the guild roster by {seats} seats for {price}? The gold comes from your own purse and is not refunded.",
-        "confirmAction": "Expand",
-        "expandedLine": "{name} has expanded the guild roster to {cap} members.",
+        "seats": "{count} av {cap} säten",
+        "expand": "Utöka förteckningen (+{seats} platser för {price})",
+        "maxed": "Listan är i sin största storlek",
+        "confirm": "Utöka guildlistan med {seats}-platser för {price}? Guldet kommer från din egen handväska och återbetalas inte.",
+        "confirmAction": "Expandera",
+        "expandedLine": "{name} har utökat guildlistan till {cap}-medlemmar.",
         "result": {
-          "notLeader": "Only the Guild Master may expand the guild roster.",
-          "maxed": "The guild roster cannot grow any larger.",
-          "cannotAfford": "You need {price} to expand the guild roster.",
-          "retry": "The guild roster changed while you were buying. Try again."
+          "notLeader": "Endast Guild Master får utöka guildlistan.",
+          "maxed": "Skrålistan kan inte växa sig större.",
+          "cannotAfford": "Du behöver {price} för att utöka guildlistan.",
+          "retry": "Guildlistan ändrades medan du köpte. Försök igen."
         }
       }
     },
@@ -4028,7 +4028,7 @@ export const sv_SE: EnTranslations = {
       "yieldLineRange": "{min} till {max} {item}",
       "alreadyEnchanted": "Det föremålet är redan förtrollat.",
       "sameEnchant": "Det föremålet har redan den förtrollningen.",
-      "riftGear": "Riftbound bands take Rift gems, not enchants.",
+      "riftGear": "Riftbundna band tar Rift-ädelstenar, inte förtrollningar.",
       "replaceTag": "Ersätter {enchant}",
       "sameEnchantTag": "Redan applicerad",
       "plainTag": "Inte förtrollad",
@@ -4361,10 +4361,10 @@ export const sv_SE: EnTranslations = {
       "filterAll": "Alla",
       "filterOwned": "Katalogiserade",
       "filterMissing": "Saknade",
-      "filterIlluminated": "Illuminated",
-      "filterRemaining": "Remaining",
-      "filterEmptyPages": "No pages match this filter.",
-      "filterGroupAriaPages": "Filter pages by whether they are illuminated",
+      "filterIlluminated": "Upplyst",
+      "filterRemaining": "Kvar",
+      "filterEmptyPages": "Inga sidor matchar detta filter.",
+      "filterGroupAriaPages": "Filtrera sidor efter om de är upplysta",
       "recentJumpAria": "Öppna sidan för {name}",
       "recentEmpty": "Inga fynd än. Reliker du katalogiserar från och med nu hamnar här.",
       "nearlyEmpty": "Sidor som närmar sig fullbordan samlas här.",
@@ -4472,7 +4472,7 @@ export const sv_SE: EnTranslations = {
       "summary": "Världskarta. Välj en zon för att öppna dess karta.",
       "toWorld": "Världskarta",
       "toZone": "Zonkarta",
-      "toInstance": "Instance map",
+      "toInstance": "Instanskarta",
       "toggleAria": "Växla mellan världskartan och zonkartan",
       "levels": "Nivåer {min} till {max}"
     },
@@ -4507,7 +4507,7 @@ export const sv_SE: EnTranslations = {
       "walletLinkedConnected": "Din länkade plånboksapp är ansluten och redo för $WOC-köp.",
       "walletUsdBalance": "{amount} USD",
       "walletUsdUnknown": "Okänt",
-      "walletCardDismiss": "Hide wallet card",
+      "walletCardDismiss": "Dölj plånbokskort",
       "rateNote": "Kurs: ungefär {tokens} $WOC per 1 USD, per {time}.",
       "rateNotePaused": "Senast kända kurs: ungefär {tokens} $WOC per 1 USD, per {time}.",
       "estimateNote": "Ungefär {tokens} $WOC för {usd} till aktuell kurs.",
@@ -4701,41 +4701,41 @@ export const sv_SE: EnTranslations = {
       "listingStatusUnsold": "Osåld"
     },
     "lootExplorer": {
-      "title": "Loot Explorer",
-      "close": "Close Loot Explorer",
-      "searchPlaceholder": "Search items...",
-      "searchAria": "Search items",
-      "filterCategoryAria": "Source",
-      "filterClassAria": "Class",
-      "filterStatAria": "Stat",
-      "filterQualityAria": "Quality",
-      "filterAll": "All",
-      "tabItems": "By Item",
-      "tabEncounters": "By Encounter",
+      "title": "Bytesöversikt",
+      "close": "Stäng Loot Explorer",
+      "searchPlaceholder": "Sök efter objekt...",
+      "searchAria": "Sök föremål",
+      "filterCategoryAria": "Källa",
+      "filterClassAria": "Klass",
+      "filterStatAria": "Attribut",
+      "filterQualityAria": "Kvalitet",
+      "filterAll": "Alla",
+      "tabItems": "Efter artikel",
+      "tabEncounters": "Genom möte",
       "category": {
-        "raid": "Raid",
-        "dungeon": "Dungeon",
-        "delve": "Delve",
-        "open_world": "Open World",
-        "rift": "Rift",
-        "vendor": "Vendor",
-        "quest_reward": "Quest Reward",
-        "quest_objective": "Quest Objective",
-        "ground_object": "World Object",
-        "starting_equipment": "Starting Equipment"
+        "raid": "Räd",
+        "dungeon": "Instans",
+        "delve": "Fördjupa",
+        "open_world": "Öppen värld",
+        "rift": "Spricka",
+        "vendor": "Försäljare",
+        "quest_reward": "Quest Belöning",
+        "quest_objective": "Quest mål",
+        "ground_object": "Världsobjekt",
+        "starting_equipment": "Startutrustning"
       },
       "difficulty": {
-        "normal": "Normal",
-        "heroic": "Heroic"
+        "normal": "Normal svårighet",
+        "heroic": "Heroisk"
       },
-      "riftRankLabel": "Rift Rank {rank}",
+      "riftRankLabel": "Sprickrang {rank}",
       "source": "{category}: {name}",
       "sourceWithContext": "{category}: {name} ({context})",
-      "chance": "{pct}% chance",
-      "guaranteed": "Guaranteed",
-      "gatedByQuest": "While questing: {quest}",
-      "empty": "No loot matches these filters.",
-      "resultCount": "{count} results"
+      "chance": "{pct} % chans",
+      "guaranteed": "Garanterat",
+      "gatedByQuest": "Medan du söker: {quest}",
+      "empty": "Inget byte matchar dessa filter.",
+      "resultCount": "{count} resultat"
     }
   },
   "gatherEvent": {
@@ -4835,7 +4835,7 @@ export const sv_SE: EnTranslations = {
       "swag_claimed": "Du har redan hämtat den här belöningen.",
       "swag_tier": "Nå en högre rang för att hämta den här.",
       "swag_points": "Inte tillräckligt med poäng.",
-      "invalid_input": "Invalid input."
+      "invalid_input": "Ogiltig inmatning."
     },
     "deeds": {
       "invalid_input": "Ogiltig indata."
@@ -4889,9 +4889,9 @@ export const sv_SE: EnTranslations = {
       "not_marked": "Det kontot är inte märkt."
     },
     "kick": {
-      "reason_required": "A reason is required.",
-      "admin_target": "Operator accounts cannot be kicked.",
-      "target_offline": "That player is no longer online on this realm."
+      "reason_required": "En anledning krävs.",
+      "admin_target": "Operatörskonton kan inte sparkas.",
+      "target_offline": "Den spelaren är inte längre online i denna värld."
     },
     "woc_market": {
       "invalid_input": "Ogiltig inmatning.",
@@ -5326,8 +5326,8 @@ export const sv_SE: EnTranslations = {
       "ifPlayerFrameScale": "Storleken på din egen ram.",
       "ifTargetFrameScale": "Storleken på din målram.",
       "ifPartyStyle": "Gruppens layout: Automatisk följer gruppens storlek, Klassisk är den traditionella stapeln, och Raid packar alla i det kompakta rutnätet.",
-      "ifPlayerHealthText": "What your own health bar prints: nothing, a percentage, current health, current and maximum, or both with the percentage beside them.",
-      "ifTargetHealthText": "What the target and target-of-target health bars print, with the same choices as your own frame.",
+      "ifPlayerHealthText": "Vad ditt eget hälsofält skriver ut: ingenting, en procentsats, aktuell hälsa, aktuell och maximal, eller båda med procenten bredvid.",
+      "ifTargetHealthText": "Vad mål- och mål-av-mål-hälsofälten skriver ut, med samma val som din egen ram.",
       "ifPartyHealthText": "Vad gruppfälten visar: inget, en procentsats, nuvarande hälsa, eller nuvarande och maximal.",
       "ifPartySort": "Ordningen gruppmedlemmarna listas i: gruppordning, roll eller namn.",
       "ifPartyShowAuras": "Om buffar och debuffar visas på gruppramarna. Motsvarande brytare täcker resursfält, absorptioner, djur och om du själv syns i din egen grupplista.",
@@ -5340,7 +5340,7 @@ export const sv_SE: EnTranslations = {
       "ifChatOpacity": "Hur solid chattens bakgrund är.",
       "ifCompactChat": "Gör chattraderna tätare så att fler ryms.",
       "ifChatTimestamps": "Lägger till en tid på varje chattrad, i 12- eller 24-timmarsformat.",
-      "ifFilterProfanity": "Masks profanity in chat with asterisks. On by default; switch it off here if you would rather read chat unfiltered.",
+      "ifFilterProfanity": "Maskerar svordomar i chatt med asterisker. På som standard; stäng av den här om du hellre vill läsa chatten ofiltrerad.",
       "ifStartAttack": "Om det att använda en förmåga även startar ditt automatiska anfall. Aktiverat som standard, och det klassiska beteendet de flesta spelare förväntar sig.",
       "ifStopAutoAttack": "Om målbyte stoppar ditt anfall. Avstängt som standard, så ditt anfall fortsätter över till det nya målet.",
       "ifShowAttackButton": "Lägger en tydlig Anfall-knapp på ditt handlingsfält.",
@@ -5353,7 +5353,7 @@ export const sv_SE: EnTranslations = {
       "ifHideUnused": "Döljer tomma handlingsplatser så att bara knapparna du faktiskt använder ritas ut.",
       "ifLockBars": "Låser dina handlingsfält så att du inte råkar dra ut en förmåga ur en plats av misstag.",
       "keybindsHeading": "Panelen Tangentbindningar",
-      "keybindsBody": "The key list is only half of that panel. Above it sit the switches that decide how your mouse drives the game: mouse camera, whether the cursor locks while you rotate, click to move and which mouse button triggers it, attack move, and the left-handed touch layout.",
+      "keybindsBody": "Nyckellistan är bara hälften av den panelen. Ovanför den sitter strömbrytarna som bestämmer hur din mus driver spelet: muskamera, om markören låser sig medan du roterar, klicka för att flytta och vilken musknapp som utlöser den, attackrörelse och vänsterhandspeklayouten.",
       "keybindsMouseBody": "Två saker där är lätta att missa. Musknappar binds som tangenter, så klick på hjulet och tumknapparna kan bära förmågor, medan vänster- och högerklick förblir reserverade för kameran och för att klicka i världen. Och du kan binda direkt från handlingsfältet: slå på läget för att binda från fältet här, klicka sedan på en plats och tryck på tangenten du vill ha."
     },
     "combat": {
@@ -6152,7 +6152,7 @@ export const sv_SE: EnTranslations = {
       "heroicRewardsBody": "Heroiska bossar tappar bytet du känner till, uppgraderat och märkt Heroiskt i informationsrutan, och slutbossen i varje vända lägger till episka föremål som inte finns någon annanstans. Den sista segern lämnar också Heroiska märken till varje deltagare: en valuta som spenderas hos kvartermästare Vex i Highwatch, vars disk är en hylla med ringar och hängen som ingenting utom beviset från de heroiska djupen kan köpa.",
       "heroicLockoutBody": "Vanliga fängelsehålor går att löpa hela dagen. Heroiskt kräver tålamod: slutbossens fall begränsar alla i vändan till en enda heroisk genomgång av den fängelsehålan per dag, och raiden håller en daglig spärr för varje svårighetsgrad. På ett aktivt rike släpper alla dagliga spärrar tillsammans vid rikets egen nattliga återställningstimme, så en genomgång tagen strax före den timmen och en tagen strax efter hamnar på två olika dagar; spela i stället offline i din webbläsare och en spärr löper helt enkelt ut ett dygn efter ditt eget bossfall. En redan klarad vända för fem spelare står kvar öppen för den egna gruppen för likvandringar och byte, så ingen låses ute från det den förtjänat där. Raiden är strängare: när dess seger väl har spärrat dig står dörren stängd till återställningen, och enda vägen tillbaka in är en likvandring av någon som föll i just den vända som spärrade dem, så en levande raidare som går ut har gått ut för dagen. Samla ihop dina byten innan du lämnar arenan. Var och en av dessa spärrar tillhör den rollperson som förtjänade den, så en genomgång på din huvudperson lämnar dina andra rollpersoner fria.",
       "resetTitle": "Återställa dina instanser",
-      "resetBody": "Switch difficulty while your group still holds claimed runs and the old claims linger for a while before clearing on their own. The party leader can let them go at once instead: choose Reset All Instances on their own portrait menu, or type /dungeon reset. A reset works only after the difficulty has actually been changed, only while nobody, living or fallen, remains inside, only once every corpse in there has been looted clean, and a short cooldown separates one reset from the next. Arrive at the door on the wrong difficulty and the game says so before the run starts. The raid resets the same way, its own lockout and corpse-return rules still standing on top.",
+      "resetBody": "Växlingssvårigheter medan din grupp fortfarande har anspråk på körningar och de gamla anspråken dröjer sig kvar ett tag innan de rensas av sig själva. Partiledaren kan släppa dem på en gång istället: välj Återställ alla instanser på sin egen porträttmeny, eller skriv /dungeon reset. En återställning fungerar bara efter att svårighetsgraden faktiskt har ändrats, bara medan ingen, levande eller fallen, är kvar inne, bara när varje lik där inne har plundrats rent, och en kort nedkylning skiljer en återställning från nästa. Anländer till dörren på fel svårighetsgrad och spelet säger det innan löpningen börjar. Raiden återställs på samma sätt, dess egna lockout och regler för återlämnande av lik står fortfarande överst.",
       "templeLoreTitle": "Det dränkta templet, lite djupare",
       "templeLoreBody": "Templet har sin egen legend, äldre än kulten du jagar på andra håll. Vid stranden av Glimmertjärnen, en tjärn som dricker månljuset och ger tillbaka de dränkta, vaktar en ensam väktare en port av blekt ljus. Under ytan löper en trappa av kall sten ner till den. Folket som sjönk där dränktes inte av olyckshändelse: de var Den bleka kören, som gick under i tillbedjan och aldrig slutade sjunga. De gamla väktarna ristade en enda varning i klipporna innan vattnet tog dem, en bön till något de kallade Den dränkta månen, med en stadigare hand som lade till två ord under den: den bara sover.",
       "cryptLeadTitle": "En dörr de döda var menade att hålla stängd",
@@ -6185,8 +6185,8 @@ export const sv_SE: EnTranslations = {
       "raceBody": "Varje grupp i riket kan anfalla samma reva samtidigt, var och en i sin egen kopia, och bara den första som fäller det som väntar längst ner förseglar den. När en grupp vinner hör riket deras namn och deras tid, och vägen in stängs bakom dem. Att förlora kapplöpningen avslutar inte er kopia: den står kvar öppen, det som väntar längst ner faller ändå för er, och ni går ut på egna ben ändå. Vad det kostar er är allt det som en riktig rensning skulle ha betalat. Bossen lämnar ingenting efter sig åt gruppen som kom tvåa, så det ni bär hem är bara det som föll från de andra fienderna på vägen ner, och inget mer. Bedrifternas bok räknar rensningen ändå, för ni fällde faktiskt det som väntade. Det är den enda kapplöpningen i spelet ni kan förlora utan att någonsin se de som slog er.",
       "rewardsHeading": "Vad ni bär ut",
       "rewardsBody": "Det är att försegla en reva, inte bara att överleva en, som lönar sig. Fäller ni revan först betalar den som det instansinnehåll dess grad står bredvid, så de hårdare graderna är värda den hårdare körningen. Att försegla lägger också en Revbunden ring i händerna på alla som var där, var och en skuren efter den egna klassens roll och personlig för den spelaren, och lämnar Revessens i era väskor därtill, med revstenar ovanpå det på de hårdare graderna. Vid sidan av vägen hem lämnar det som väntar längst ner ett förseglat förråd er grupp kan dyrka upp för extra byte, med samma Tappens väg-dyrkning ni känner från delve-kistor, så ett rent, tålmodigt arbete lönar sig bättre än ett hastigt. Inget av detta når en grupp som kom tvåa: en förlorad kapplöpning lämnar er bara det som föll från fienderna på vägen ner. Bedrifternas bok är undantaget, och den räknar er rensning oavsett, med en bedrift för att försegla er första reva och en till för att fälla en av grad S.",
-      "forgeHeading": "The Rift Forge",
-      "forgeBody": "The band a ranked first clear mints is not finished when you receive it. Riftwright Maelis, who keeps a forge in the Watch Meadow on the Farshore, up the shore from Gullhaven beside the Breach Scholar, will raise its item level one step at a time and set the coloured gems the rifts drop into its sockets, each colour one combat rating. A full band takes a new gem in place of its oldest, so you can retune it later. All of that is paid in Rift Essence and Rift gems, the forge currency that falls from rift bosses and trades freely, so a friend can hand you the essence you are short. Take the band off before you bring it to her: she works on what is in your bags, and she does nothing at all unless you are standing at her forge.",
+      "forgeHeading": "Rift Forge",
+      "forgeBody": "Bandet en rankad första klara mints är inte färdig när du får den. Riftwright Maelis, som håller en smedja i Watch Meadow på Farshore, upp längs stranden från Gullhaven bredvid Breach Scholar, kommer att höja sin objektnivå ett steg i taget och sätta de färgade ädelstenarna som klyftorna faller i sina hylsor, varje färg ett stridsbetyg. Ett helt band tar en ny pärla i stället för sin äldsta, så du kan stämma om den senare. Allt detta betalas i Rift Essence och Rift gems, smidesvalutan som faller från riftbossarna och handlar fritt, så en vän kan ge dig essensen som du är kort. Ta av bandet innan du tar med det till henne: hon jobbar med det som finns i dina väskor, och hon gör ingenting alls om du inte står vid hennes smedja.",
       "trackerHeading": "Spåraren på din skärm",
       "trackerBody": "Medan ni är därinne håller en liten rad på skärmen er orienterade: vilken våning ni är på av hur många, och en levande nedräkning. Läs den nedräkningen noga, för det är inte er kopia som rinner ut. Det är ingången tillbaka ut i världen som stängs. När ni väl är igenom spelar er grupp ut revan i sin egen takt, hur lång tid det än tar, men när klockan når noll är vägen in borta för alla, så tänk er för innan ni kliver ut nära slutet av den."
     },
@@ -8078,7 +8078,7 @@ export const sv_SE: EnTranslations = {
       "forgeUpgraded": "Revuppgradering slutförd för {name}.",
       "forgeEnchanted": "Revförtrollning slutförd för {name}.",
       "forgeSocketed": "Revsten monterad för {name}.",
-      "forgeGemReplaced": "Rift gem replaced for {name}: {gem} destroyed.",
+      "forgeGemReplaced": "Riftpärla ersatt för {name}: {gem} förstört.",
       "detonateGlacialGrave": "Glaciärgraven detonerar!",
       "detonateAbsoluteZero": "Absoluta nollpunkten bryter ut!",
       "detonateMagmaWell": "Magmakällan bryter ut!",
@@ -8736,7 +8736,7 @@ export const sv_SE: EnTranslations = {
     "realmFull": "Denna värld är full just nu. Försök igen om några minuter.",
     "tooManyConnections": "För många anslutningar till denna värld kommer från ditt nätverk. Stäng extra spelfönster eller försök igen om några minuter.",
     "messageRateExceeded": "Du kopplades från för att du skickade handlingar för snabbt. Vänta en stund och logga in igen.",
-    "kickedByModerator": "A moderator has disconnected you: {reason}",
+    "kickedByModerator": "En moderator har kopplat bort dig: {reason}",
     "tips": {
       "classes": "Tips: var och en av de 9 klasserna spelas på sitt eget sätt. Prova några innan du bestämmer dig för en.",
       "talents": "Tips: du kan återställa dina talanger när du inte strider, så ett tidigt val blir aldrig en fälla.",
@@ -13374,7 +13374,7 @@ export const sv_SE: EnTranslations = {
         "name": "Lykttändarens ok: Grumbol"
       },
       "reins_chimeglass_tortoise": {
-        "name": "Roadwarden's Bellstrap: Tolliver"
+        "name": "Vägvaktarens klockrem: Tolliver"
       },
       "reins_rickshaw_mount": {
         "name": "Bundna tyglar: Benbunden Rickshaw"
@@ -13383,7 +13383,7 @@ export const sv_SE: EnTranslations = {
         "name": "Tyglar till Drakgapsraptorn"
       },
       "reins_mech_bird": {
-        "name": "Ignition Key: Cluckwork Mech Bird"
+        "name": "Tändningsnyckel: Cluckwork Mech Bird"
       },
       "rimefang": {
         "name": "Rimtand"
@@ -16010,9 +16010,9 @@ export const sv_SE: EnTranslations = {
         "greeting": "Den öppnades precis där näten torkar. Precis där, där jag stod varje morgon i mitt liv. Jag går inte ner till stranden längre. Jag går inte till så mycket alls längre."
       },
       "riftwright_maelis": {
-        "name": "Riftwright Maelis",
-        "title": "Rift Forgemaster",
-        "greeting": "A Riftbound band remembers the break that made it, {className}. Bring me the band, and the essence the breaks shed, and I will teach it to remember more."
+        "name": "Riftsmed Maelis",
+        "title": "Riftsmedmästare",
+        "greeting": "Ett Riftbound-band minns pausen som gjorde det, {className}. Ta med mig bandet och essensen som rasterna fäller, så ska jag lära det att komma ihåg mer."
       },
       "forgemistress_darva": {
         "name": "Smedmästarinnan Darva",
@@ -19304,6 +19304,6 @@ export const sv_SE: EnTranslations = {
     "delveRiteShrineSkullInteract": "Skallhelgedom: Tryck på F för att röra vid den",
     "mailboxName": "Brevlåda",
     "noticeboardName": "Anslagstavla",
-    "realmBuilderMonumentName": "Realm Builder Monument"
+    "realmBuilderMonumentName": "Riksbyggarmonument"
   }
 };

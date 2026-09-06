@@ -1313,7 +1313,7 @@ export const ko_KR: EnTranslations = {
     },
     "targetDots": {
       "title": "대상 디버프",
-      "row": "{aura} on {target}",
+      "row": "{target}의 {aura}",
       "overflow": "{count}개 더 있음, 표시되지 않음"
     },
     "targetAuras": {
@@ -4707,17 +4707,17 @@ export const ko_KR: EnTranslations = {
       "searchAria": "아이템 검색",
       "filterCategoryAria": "출처",
       "filterClassAria": "직업",
-      "filterStatAria": "Stat",
+      "filterStatAria": "통계",
       "filterQualityAria": "품질",
-      "filterAll": "All",
-      "tabItems": "By Item",
+      "filterAll": "모두",
+      "tabItems": "품목별",
       "tabEncounters": "출처별",
       "category": {
-        "raid": "Raid",
+        "raid": "레이드",
         "dungeon": "던전",
         "delve": "탐굴",
         "open_world": "오픈 월드",
-        "rift": "Rift",
+        "rift": "균열",
         "vendor": "상인",
         "quest_reward": "퀘스트 보상",
         "quest_objective": "퀘스트 목표",
@@ -4728,7 +4728,7 @@ export const ko_KR: EnTranslations = {
         "normal": "일반",
         "heroic": "영웅"
       },
-      "riftRankLabel": "Rift Rank {rank}",
+      "riftRankLabel": "리프트 랭크 {rank}",
       "source": "{category}: {name}",
       "sourceWithContext": "{category}: {name} ({context})",
       "chance": "드롭 확률 {pct}%",

@@ -570,9 +570,9 @@ export const tr_TR: EnTranslations = {
       "tabsLabel": "WOC Mağaza bölümleri",
       "storeTab": "Mağaza",
       "rewardsTab": "Günlük Ödüller",
-      "mountsEyebrow": "Account Mounts",
-      "mountsTitle": "Machine Stable",
-      "mountBuyAria": "Purchase {item}",
+      "mountsEyebrow": "Hesap Bağlantıları",
+      "mountsTitle": "Makine Stabil",
+      "mountBuyAria": "{item}'yi satın alın",
       "loading": "WOC Mağazası yükleniyor...",
       "error": "WOC Mağazası şu anda kullanılamıyor. Lütfen kısa süre sonra tekrar deneyin.",
       "balance": "Claudium Bakiyesi",
@@ -978,7 +978,7 @@ export const tr_TR: EnTranslations = {
       "mounts": "Binekler",
       "professions": "Meslekler",
       "reliquary": "Yadigârlık",
-      "lootExplorer": "Loot Explorer",
+      "lootExplorer": "Ganimet Gezgini",
       "nameplates": "İsimler",
       "haptics": "Dokunsal Geri Bildirim",
       "hapticsOff": "Dokunsal Kapalı",
@@ -1312,9 +1312,9 @@ export const tr_TR: EnTranslations = {
       "regroup": "Yeniden grupla: {meter}"
     },
     "targetDots": {
-      "title": "Target Dots",
-      "row": "{aura} on {target}",
-      "overflow": "{count} more not shown"
+      "title": "Hedef Noktalar",
+      "row": "{target} üzerinde {aura}",
+      "overflow": "{count} daha fazlası gösterilmiyor"
     },
     "targetAuras": {
       "title": "Hedef Auraları",
@@ -1401,9 +1401,9 @@ export const tr_TR: EnTranslations = {
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Dehşetkıvılcım, Yer Sarsan",
       "name_drakemaw_raptor": "Ejder Ağzı Raptoru",
-      "name_mech_bird": "Cluckwork Mech Bird",
-      "name_lanternback_troll": "Grumbol the Lanternback",
-      "name_chimeglass_tortoise": "Tolliver the Chimeglass",
+      "name_mech_bird": "Cluckwork Makine Kuşu",
+      "name_lanternback_troll": "Fener Sırtlı Grumbol",
+      "name_chimeglass_tortoise": "Tolliver Chimeglass",
       "name_rickshaw_mount": "Kemikbağlı Çekçek",
       "desc_valorsteed": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve sağlam adımlı bir küheylan.",
       "desc_grag_bear": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve sağlam adımlı bir ayı.",
@@ -1416,9 +1416,9 @@ export const tr_TR: EnTranslations = {
       "desc_rallycart_rxt": "Yolculuk hızını artıran küçük bir ralli makinesi.",
       "desc_terrorspark_groundshaker": "Ağır paletleri, büyük çaplı bir topu ve korkusuz pilotlar için yapılmış bir eyeri olan kompakt zırhlı bir makine.",
       "desc_drakemaw_raptor": "Ejder Ağzı Kalderası'ndan gelen, eyere alıştırılmış bir yuva raptoru: tepeden tırnağa kas ve hız, hâlâ hafiften kül kokuyor.",
-      "desc_mech_bird": "A hand-built clockwork war chicken that sprints on snapping servos, wind-up key still turning.",
-      "desc_lanternback_troll": "A hill troll broken to the yoke by lamplighters, carrying an iron throne across his shoulders with a storm lantern burning on either arm.",
-      "desc_chimeglass_tortoise": "A salt-flat tortoise who has outwalked three generations of caravans. Tinkers ground him spectacles from storm-glass and hung a bronze bell at his throat, so the road hears him long before it sees him.",
+      "desc_mech_bird": "Kapanan servolarla koşan, kurma anahtarı hâlâ dönen, el yapımı, saat mekanizmalı bir savaş tavuğu.",
+      "desc_lanternback_troll": "Omuzlarında demir bir taht taşıyan, her iki kolunda da yanan bir fırtına feneri taşıyan, fener yakanlar tarafından boyunduruğa alınan bir tepe trolü.",
+      "desc_chimeglass_tortoise": "Üç nesildir karavanları geride bırakan, tuzla kaplı bir kaplumbağa. Tamirciler ona fırtına camından gözlük taktı ve boğazına bronz bir çan astı, böylece yol onu görmeden çok önce onu duyardı.",
       "desc_rickshaw_mount": "Sırıklarına kemikleri çıkmış bir avanenin koşulduğu, seni ölümüne bir koşuyla çeken takırdayan kemik arabası."
     },
     "mountTraining": {
@@ -1588,8 +1588,8 @@ export const tr_TR: EnTranslations = {
       "uiScale": "Arayüz Ölçeği",
       "playerFrameScale": "Oyuncu Çerçevesi Ölçeği",
       "targetFrameScale": "Hedef Çerçevesi Ölçeği",
-      "playerHealthText": "Player Health Text",
-      "targetHealthText": "Target Health Text",
+      "playerHealthText": "Oyuncu Sağlığı Metni",
+      "targetHealthText": "Hedef Sağlık Metni",
       "aurasOnPlayerFrame": "Oyuncu Çerçevesinde Güçlendirmeler",
       "auraBarBelowFrame": "Oyuncu Çerçevesinin Altındaki Güçlendirmeler",
       "alwaysShowAllBuffs": "Her Zaman Tüm Güçlendirmeleri Göster",
@@ -1614,9 +1614,9 @@ export const tr_TR: EnTranslations = {
       "showTargetOfTarget": "Hedefin Hedefini Göster",
       "showTargetSwingTimer": "Hedefin savurma zamanlayıcısını göster",
       "showPetFrame": "Yoldaşını Göster",
-      "showNameplateDots": "Show My Dots on Nameplates",
-      "nameplateDotScale": "Nameplate Dot Size",
-      "showTargetDots": "Show Target Dots",
+      "showNameplateDots": "İsim Plakalarındaki Noktalarımı Göster",
+      "nameplateDotScale": "İsim Plakası Nokta Boyutu",
+      "showTargetDots": "Hedef Noktaları Göster",
       "waterRipples": "Su Dalgacıkları (İz Dalgaları)",
       "showAttackButton": "Saldırı Düğmesini Göster",
       "showDailyRewardsChest": "Günlük Ödül Sandığını Göster",
@@ -2968,7 +2968,7 @@ export const tr_TR: EnTranslations = {
       "healthPercent": "Yüzde",
       "healthCurrent": "Mevcut",
       "healthCurrentMax": "Mevcut / Azami",
-      "healthCurrentMaxPercent": "Current / Max (Percent)",
+      "healthCurrentMaxPercent": "Akım / Maksimum (Yüzde)",
       "sort": "Oyuncuları Sırala",
       "sortGroup": "Grup",
       "sortRole": "Rol",
@@ -3008,7 +3008,7 @@ export const tr_TR: EnTranslations = {
         "targetFrame": "Hedef",
         "partyFrames": "Grup",
         "swingBar": "Otomatik Saldırı",
-        "targetDots": "Target Dots"
+        "targetDots": "Hedef Noktalar"
       },
       "framesMenu": "Çerçeve Ayarları",
       "framesMenuTitle": "Ayrı ayrı çerçeveleri göster ya da gizle. İşareti kaldırılmış bir çerçeve, tekrar işaretleyene ya da varsayılanlara sıfırlayana kadar gizli kalır.",
@@ -3041,33 +3041,33 @@ export const tr_TR: EnTranslations = {
       "wrongKind": "Bu kod farklı bir dışa aktarma türüne ait."
     },
     "riftForge": {
-      "title": "Rift Forge",
-      "subtitle": "Riftbound bands",
+      "title": "Yarık Demirhanesi",
+      "subtitle": "Rift bağlı bantlar",
       "currency": "{name}: {count}",
-      "empty": "No Riftbound band in your bags. A ranked Rift first clear mints one.",
-      "wornHint": "Worn. Unequip it to forge.",
-      "upgradeBtn": "Upgrade to item level {level} ({cost} essence)",
-      "upgradeMax": "Fully upgraded",
-      "gemPickAria": "Gem to socket",
+      "empty": "Çantalarınızda Riftbound bant yok. Dereceli bir Rift ilk olarak naneli şekeri temizler.",
+      "wornHint": "Aşınmış. Onu dövmek için donatmayın.",
+      "upgradeBtn": "{level} ({cost} özü) öğe seviyesine yükseltme",
+      "upgradeMax": "Tamamen yükseltildi",
+      "gemPickAria": "Sokete taş",
       "gemOption": "{name} ({bonus})",
-      "socketReplaceHint": "Sockets full: the next gem replaces the oldest, {gem}.",
-      "socketBtn": "Socket",
-      "socketsNone": "no gems",
-      "noGems": "No Rift gems in your bags",
-      "refused": "The forge refused. Stand at the Riftwright and try again.",
+      "socketReplaceHint": "Soketler dolu: sonraki mücevher en eskisinin yerini alır, {gem}.",
+      "socketBtn": "Soket",
+      "socketsNone": "mücevher yok",
+      "noGems": "Çantalarınızda Rift mücevherleri yok",
+      "refused": "Demirci bunu reddetti. Riftwright'ta durun ve tekrar deneyin.",
       "reason": {
-        "notFound": "That band is not in your bags.",
-        "notRiftGear": "Only a Riftbound band can be forged.",
-        "maxUpgrade": "That band is fully upgraded.",
-        "insufficientEssence": "Not enough Rift Essence.",
-        "invalidGem": "You have no such Rift gem.",
-        "dead": "You can't do that while dead.",
-        "tooFar": "You are too far from the Rift Forge."
+        "notFound": "O grup çantanda değil.",
+        "notRiftGear": "Yalnızca Riftbound bandı oluşturulabilir.",
+        "maxUpgrade": "Bu grup tamamen yükseltildi.",
+        "insufficientEssence": "Yeterli Rift Özü yok.",
+        "invalidGem": "Böyle bir Rift mücevheriniz yok.",
+        "dead": "Ölüyken bunu yapamazsın.",
+        "tooFar": "Rift Forge'dan çok uzaktasınız."
       },
       "done": {
-        "upgrade": "Upgraded {name}.",
-        "socket": "Socketed a gem into {name}.",
-        "socketReplaced": "Socketed a gem into {name}; {gem} was destroyed."
+        "upgrade": "{name} yükseltildi.",
+        "socket": "{name}'a bir mücevher yerleştirildi.",
+        "socketReplaced": "{name}'a bir mücevher yerleştirildi; {gem} yok edildi."
       }
     },
     "itemTooltip": {
@@ -3075,7 +3075,7 @@ export const tr_TR: EnTranslations = {
       "riftTier": "{tier} dereceli Yarık eşyası",
       "riftUpgrade": "Yarık yükseltmesi {level}/{max}",
       "riftSockets": "Yarık mücevherleri {used}/{total}",
-      "riftGemSocket": "Socket bonus for a Riftbound band",
+      "riftGemSocket": "Riftbound grubu için soket bonusu",
       "statEnchanted": "+{value} {stat} (Büyülü)",
       "enchantedFallback": "Büyülü",
       "partyTradeWindow": "Bu eşyayı, düşüşünü paylaşan oyunculara önümüzdeki {time} boyunca takas edebilirsin. Kuşanmak takas penceresini sona erdirir."
@@ -3100,7 +3100,7 @@ export const tr_TR: EnTranslations = {
       "close": "Kapat",
       "keybind": "Discord Paneli",
       "disabled": "Discord entegrasyonu şu anda kullanılamıyor.",
-      "queuePingsLabel": "Send me a Discord direct message when my battleground or arena queue pops (needs a linked Discord account)",
+      "queuePingsLabel": "Savaş alanım veya arena kuyruğum belirdiğinde bana bir Discord doğrudan mesajı gönder (bağlı bir Discord hesabına ihtiyaç duyar)",
       "tiers": {
         "none": "Rütbesiz",
         "initiate": "Çömez",
@@ -3358,13 +3358,13 @@ export const tr_TR: EnTranslations = {
       "close": "Kapat"
     },
     "realmBuilder": {
-      "title": "Realm Builder of the Month",
-      "currentLabel": "Honoured this month",
-      "placeholderName": "Your Name Here",
-      "placeholderHint": "This plate is waiting for its first name.",
-      "pastTitle": "Past honourees",
-      "pastEmpty": "No names on the roll yet.",
-      "close": "Close"
+      "title": "Ayın Diyar Oluşturucusu",
+      "currentLabel": "Bu ay onurlandırıldım",
+      "placeholderName": "Adınız Burada",
+      "placeholderHint": "Bu tabak ilk adını bekliyor.",
+      "pastTitle": "Geçmiş ödüller",
+      "pastEmpty": "Listede henüz isim yok.",
+      "close": "Kapat"
     },
     "bank": {
       "title": "Banka",
@@ -3421,8 +3421,8 @@ export const tr_TR: EnTranslations = {
       "depositAllDone": "Yatırılan malzeme: {count}.",
       "depositAllFull": "Yatırılan malzeme: {count}. Banka artık dolu.",
       "depositAllNone": "Banka dolu: hiçbir şey yatırılmadı.",
-      "depositAllNotable": "Materials deposited: {count}, including {item}.",
-      "depositAllNotableFull": "Materials deposited: {count}, including {item}. Bank now full.",
+      "depositAllNotable": "Depolanan malzemeler: {count}, {item} dahil.",
+      "depositAllNotableFull": "Depolanan malzemeler: {count}, {item} dahil. Banka şu anda dolu.",
       "bonusTitle": "Bonus yuvalar",
       "bonusEarned": "+{count}",
       "bonusStatusEarned": "+{count}",
@@ -3461,8 +3461,8 @@ export const tr_TR: EnTranslations = {
       "vaultDepositAllDone": "Yatırılan malzeme: {count}.",
       "vaultDepositAllFull": "Yatırılan malzeme: {count}. Bazı sınırlar dolu.",
       "vaultDepositAllNone": "Kasa sınırları dolu: hiçbir şey yatırılmadı.",
-      "vaultDepositAllNotable": "Materials deposited: {count}, including {item}.",
-      "vaultDepositAllNotableFull": "Materials deposited: {count}, including {item}. Some ceilings are full.",
+      "vaultDepositAllNotable": "Depolanan malzemeler: {count}, {item} dahil.",
+      "vaultDepositAllNotableFull": "Depolanan malzemeler: {count}, {item} dahil. Bazı tavanlar dolu.",
       "vaultWithdrawShort": "Çantalarına {count} üzerinden yalnızca {fit} tanesi sığar.",
       "vaultDepositHint": "Kasana yatırmak için tıkla",
       "vaultCannotDeposit": "Kasaya konulamaz",
@@ -3599,17 +3599,17 @@ export const tr_TR: EnTranslations = {
         }
       },
       "roster": {
-        "seats": "{count} of {cap} seats",
-        "expand": "Expand roster (+{seats} seats for {price})",
-        "maxed": "The roster is at its largest size",
-        "confirm": "Expand the guild roster by {seats} seats for {price}? The gold comes from your own purse and is not refunded.",
-        "confirmAction": "Expand",
-        "expandedLine": "{name} has expanded the guild roster to {cap} members.",
+        "seats": "{cap} koltukların {count}'si",
+        "expand": "Kadroyu genişlet (+{price} için {seats} koltuklar)",
+        "maxed": "Kadro en büyük boyutunda",
+        "confirm": "Lonca kadrosu {price} için {seats} koltuklarıyla genişletilsin mi? Altın kendi kesenizden gelir ve iade edilmez.",
+        "confirmAction": "Genişlet",
+        "expandedLine": "{name}, lonca kadrosunu {cap} üyelerini de içerecek şekilde genişletti.",
         "result": {
-          "notLeader": "Only the Guild Master may expand the guild roster.",
-          "maxed": "The guild roster cannot grow any larger.",
-          "cannotAfford": "You need {price} to expand the guild roster.",
-          "retry": "The guild roster changed while you were buying. Try again."
+          "notLeader": "Lonca kadrosunu yalnızca Lonca Lideri genişletebilir.",
+          "maxed": "Lonca kadrosu daha fazla büyüyemez.",
+          "cannotAfford": "Lonca kadrosunu genişletmek için {price}'ye ihtiyacınız var.",
+          "retry": "Siz satın alırken lonca kadrosu değişti. Tekrar deneyin."
         }
       }
     },
@@ -4028,7 +4028,7 @@ export const tr_TR: EnTranslations = {
       "yieldLineRange": "{min} ile {max} arası {item}",
       "alreadyEnchanted": "O eşya zaten büyülü.",
       "sameEnchant": "O eşyada zaten bu büyü var.",
-      "riftGear": "Riftbound bands take Rift gems, not enchants.",
+      "riftGear": "Riftbound grupları efsunları değil, Rift mücevherlerini alır.",
       "replaceTag": "{enchant} yerine geçer",
       "sameEnchantTag": "Zaten uygulandı",
       "plainTag": "Büyüsüz",
@@ -4361,10 +4361,10 @@ export const tr_TR: EnTranslations = {
       "filterAll": "Tümü",
       "filterOwned": "Kataloglanmış",
       "filterMissing": "Eksik",
-      "filterIlluminated": "Illuminated",
-      "filterRemaining": "Remaining",
-      "filterEmptyPages": "No pages match this filter.",
-      "filterGroupAriaPages": "Filter pages by whether they are illuminated",
+      "filterIlluminated": "Aydınlatılmış",
+      "filterRemaining": "Kalan",
+      "filterEmptyPages": "Bu filtreyle eşleşen sayfa yok.",
+      "filterGroupAriaPages": "Sayfaları aydınlatılıp aydınlatılmamasına göre filtreleyin",
       "recentJumpAria": "{name} için sayfayı aç",
       "recentEmpty": "Henüz bulunan yok. Bundan sonra kataloğa geçirdiğin yadigârlar buraya düşer.",
       "nearlyEmpty": "Tamamlanmaya yaklaşan sayfalar burada toplanır.",
@@ -4472,7 +4472,7 @@ export const tr_TR: EnTranslations = {
       "summary": "Dünya haritası. Haritasını açmak için bir bölge seç.",
       "toWorld": "Dünya haritası",
       "toZone": "Bölge haritası",
-      "toInstance": "Instance map",
+      "toInstance": "Örnek haritası",
       "toggleAria": "Dünya haritası ile bölge haritası arasında geçiş yap",
       "levels": "Seviye {min} ile {max} arası"
     },
@@ -4507,7 +4507,7 @@ export const tr_TR: EnTranslations = {
       "walletLinkedConnected": "Bağlı cüzdan uygulaman bağlı ve $WOC satın alımları için hazır.",
       "walletUsdBalance": "{amount} USD",
       "walletUsdUnknown": "Bilinmiyor",
-      "walletCardDismiss": "Hide wallet card",
+      "walletCardDismiss": "Cüzdan kartını gizle",
       "rateNote": "Kur: {time} itibarıyla 1,00 USD başına yaklaşık {tokens} $WOC.",
       "rateNotePaused": "Son bilinen kur: {time} itibarıyla 1,00 USD başına yaklaşık {tokens} $WOC.",
       "estimateNote": "Güncel kura göre {usd} karşılığında yaklaşık {tokens} $WOC.",
@@ -4701,41 +4701,41 @@ export const tr_TR: EnTranslations = {
       "listingStatusUnsold": "Satılmadı"
     },
     "lootExplorer": {
-      "title": "Loot Explorer",
-      "close": "Close Loot Explorer",
-      "searchPlaceholder": "Search items...",
-      "searchAria": "Search items",
-      "filterCategoryAria": "Source",
-      "filterClassAria": "Class",
-      "filterStatAria": "Stat",
-      "filterQualityAria": "Quality",
-      "filterAll": "All",
-      "tabItems": "By Item",
-      "tabEncounters": "By Encounter",
+      "title": "Ganimet Gezgini",
+      "close": "Loot Explorer'ı kapat",
+      "searchPlaceholder": "Öğeleri ara...",
+      "searchAria": "Öğeleri ara",
+      "filterCategoryAria": "Kaynak",
+      "filterClassAria": "Sınıf",
+      "filterStatAria": "İstatistik",
+      "filterQualityAria": "Kalite",
+      "filterAll": "Hepsi",
+      "tabItems": "Öğeye göre",
+      "tabEncounters": "Karşılaşma yoluyla",
       "category": {
-        "raid": "Raid",
-        "dungeon": "Dungeon",
-        "delve": "Delve",
-        "open_world": "Open World",
-        "rift": "Rift",
-        "vendor": "Vendor",
-        "quest_reward": "Quest Reward",
-        "quest_objective": "Quest Objective",
-        "ground_object": "World Object",
-        "starting_equipment": "Starting Equipment"
+        "raid": "Baskın",
+        "dungeon": "Zindan",
+        "delve": "Derinlik",
+        "open_world": "Açık Dünya",
+        "rift": "Yarık",
+        "vendor": "Satıcı",
+        "quest_reward": "Görev Ödülü",
+        "quest_objective": "Görev Amacı",
+        "ground_object": "Dünya Nesnesi",
+        "starting_equipment": "Başlangıç Ekipmanı"
       },
       "difficulty": {
-        "normal": "Normal",
-        "heroic": "Heroic"
+        "normal": "normal",
+        "heroic": "Kahramanca"
       },
-      "riftRankLabel": "Rift Rank {rank}",
+      "riftRankLabel": "Rift Sıralaması {rank}",
       "source": "{category}: {name}",
       "sourceWithContext": "{category}: {name} ({context})",
-      "chance": "{pct}% chance",
-      "guaranteed": "Guaranteed",
-      "gatedByQuest": "While questing: {quest}",
-      "empty": "No loot matches these filters.",
-      "resultCount": "{count} results"
+      "chance": "%{pct} şans",
+      "guaranteed": "Garantili",
+      "gatedByQuest": "Görev yaparken: {quest}",
+      "empty": "Bu filtrelerle eşleşen ganimet yok.",
+      "resultCount": "{count} sonuçları"
     }
   },
   "gatherEvent": {
@@ -4835,7 +4835,7 @@ export const tr_TR: EnTranslations = {
       "swag_claimed": "Bu ödülü zaten aldınız.",
       "swag_tier": "Bunu almak için daha yüksek bir rütbeye ulaşın.",
       "swag_points": "Yeterli puan yok.",
-      "invalid_input": "Invalid input."
+      "invalid_input": "Geçersiz giriş."
     },
     "deeds": {
       "invalid_input": "Geçersiz girdi."
@@ -4889,9 +4889,9 @@ export const tr_TR: EnTranslations = {
       "not_marked": "Bu hesap işaretli değil."
     },
     "kick": {
-      "reason_required": "A reason is required.",
-      "admin_target": "Operator accounts cannot be kicked.",
-      "target_offline": "That player is no longer online on this realm."
+      "reason_required": "Bir neden gereklidir.",
+      "admin_target": "Operatör hesapları atılamaz.",
+      "target_offline": "Bu oyuncu artık bu alanda çevrimiçi değil."
     },
     "woc_market": {
       "invalid_input": "Geçersiz girdi.",
@@ -5326,8 +5326,8 @@ export const tr_TR: EnTranslations = {
       "ifPlayerFrameScale": "Kendi birim çerçevenizin boyutu.",
       "ifTargetFrameScale": "Hedef çerçevenizin boyutu.",
       "ifPartyStyle": "Grup düzeni: Otomatik grup boyutunu takip eder, Klasik geleneksel yığındır ve Akın herkesi kompakt ızgaraya sıkıştırır.",
-      "ifPlayerHealthText": "What your own health bar prints: nothing, a percentage, current health, current and maximum, or both with the percentage beside them.",
-      "ifTargetHealthText": "What the target and target-of-target health bars print, with the same choices as your own frame.",
+      "ifPlayerHealthText": "Kendi sağlık çubuğunuzun yazdırdığı şey: hiçbir şey, yüzde, mevcut sağlık, mevcut ve maksimum veya yanlarında yüzdeyle birlikte her ikisi.",
+      "ifTargetHealthText": "Kendi çerçevenizle aynı seçeneklerle, hedef ve hedefin hedefi sağlık çubuklarının yazdırdığı şey.",
       "ifPartyHealthText": "Grup çubuklarının ne yazdığı: hiçbir şey, bir yüzde, mevcut can ya da mevcut ve maksimum can.",
       "ifPartySort": "Grup üyelerinin listelenme sırası: grup sırası, rol ya da ad.",
       "ifPartyShowAuras": "Güçlendirmelerin ve zayıflatmaların grup çerçevelerinde gösterilip gösterilmeyeceği. Eşleşen anahtarlar kaynak çubuklarını, emilimleri, evcil hayvanları ve kendi grup listenizde görünüp görünmeyeceğinizi de kapsar.",
@@ -5340,7 +5340,7 @@ export const tr_TR: EnTranslations = {
       "ifChatOpacity": "Sohbet arka planının ne kadar dolgun olduğu.",
       "ifCompactChat": "Sohbet satırlarını sıkılaştırarak daha fazlasının sığmasını sağlar.",
       "ifChatTimestamps": "Her sohbet satırına 12 saatlik ya da 24 saatlik biçimde bir zaman ekler.",
-      "ifFilterProfanity": "Masks profanity in chat with asterisks. On by default; switch it off here if you would rather read chat unfiltered.",
+      "ifFilterProfanity": "Sohbetteki küfürleri yıldız işaretleriyle maskeler. Varsayılan olarak açık; Sohbeti filtrelenmeden okumayı tercih ediyorsanız buradan kapatın.",
       "ifStartAttack": "Bir yetenek kullanmanın otomatik saldırınızı da başlatıp başlatmayacağı. Varsayılan olarak açıktır ve çoğu oyuncunun beklediği klasik davranıştır.",
       "ifStopAutoAttack": "Hedef değiştirmenin savuruşunuzu durdurup durdurmayacağı. Varsayılan olarak kapalıdır, bu yüzden saldırınız yeni hedefe taşınır.",
       "ifShowAttackButton": "Eylem çubuğuna belirgin bir Saldır düğmesi ekler.",
@@ -5353,7 +5353,7 @@ export const tr_TR: EnTranslations = {
       "ifHideUnused": "Boş eylem yuvalarını gizler, böylece yalnızca gerçekten kullanılan düğmeler çizilir.",
       "ifLockBars": "Çubukları kilitler, böylece bir yetenek yanlışlıkla bir yuvadan sürüklenip çıkarılamaz.",
       "keybindsHeading": "Tuş Atamaları paneli",
-      "keybindsBody": "The key list is only half of that panel. Above it sit the switches that decide how your mouse drives the game: mouse camera, whether the cursor locks while you rotate, click to move and which mouse button triggers it, attack move, and the left-handed touch layout.",
+      "keybindsBody": "Anahtar listesi bu panelin yalnızca yarısıdır. Üstünde, farenizin oyunu nasıl yönlendireceğine karar veren anahtarlar bulunur: fare kamerası, dönerken imlecin kilitlenip kilitlenmeyeceği, taşımak için tıklama ve hangi fare düğmesinin onu tetiklediği, saldırı hareketi ve sol elle dokunma düzeni.",
       "keybindsMouseBody": "Orada gözden kaçması kolay iki şey var. Fare düğmeleri tuşlar gibi atanır, bu yüzden tekerlek tıklaması ve baş parmak düğmeleri yetenek taşıyabilir; sol ve sağ tık ise kamera ve dünyaya tıklamak için ayrılmış kalır. Ayrıca doğrudan eylem çubuğundan da atama yapabilirsiniz: buradan çubuk üzerinden atama kipini açın, ardından bir yuvaya tıklayıp istediğiniz tuşa basın."
     },
     "combat": {
@@ -6152,7 +6152,7 @@ export const tr_TR: EnTranslations = {
       "heroicRewardsBody": "Kahramanca patronlar bildiğin ganimeti düşürür, yükseltilmiş ve ipucunda Kahramanca olarak işaretli, ve her seferin son patronu başka hiçbir yerde bulunmayan epikler ekler. O son öldürüş ayrıca her katılımcıya Kahramanca Nişan bırakır: Highwatch'ta levazımcı Vex'te harcanan bir para birimi; onun tezgâhı, kahramanca derinliklerin kanıtından başka hiçbir şeyin satın alamayacağı yüzükler ve kolye uçlarıyla dolu bir raftır.",
       "heroicLockoutBody": "Normal zindanlar gün boyu gezilebilir. Kahramanca sabır ister: son patronun ölümü seferdeki herkesi o zindanın günde tek bir kahramanca temizliğiyle sınırlar ve akın her zorluk için ayrı bir günlük kilit tutar. Canlı bir diyarda tüm günlük kilitler diyarın kendi gecelik sıfırlama saatinde birlikte düşer, dolayısıyla o saatten hemen önce alınan bir temizlik ile hemen sonra alınan biri iki ayrı güne düşer; bunun yerine tarayıcında çevrimdışı oyna, kilit basitçe kendi öldürüşünden bir gün sonra sona erer. Halihazırda temizlenmiş beş kişilik bir sefer, kendi grubuna ceset koşuları ve ganimet için açık kalır, böylece kimse orada kazandığından mahrum kalmaz. Akın daha katıdır: öldürüşü seni bir kez kilitledi mi kapı sıfırlamaya dek kapalı kalır ve içeri dönmenin tek yolu, tam da kendisini kilitleyen o seferde düşmüş birinin ceset koşusudur, dolayısıyla dışarı çıkan canlı bir akıncı o gün için dışarı çıkmıştır. Arenayı terk etmeden önce ganimetini topla. Bu kilitlerin her biri onu kazanan karaktere aittir, dolayısıyla ana karakterindeki bir temizlik diğer karakterlerini serbest bırakır.",
       "resetTitle": "Örneklerini sıfırlama",
-      "resetBody": "Switch difficulty while your group still holds claimed runs and the old claims linger for a while before clearing on their own. The party leader can let them go at once instead: choose Reset All Instances on their own portrait menu, or type /dungeon reset. A reset works only after the difficulty has actually been changed, only while nobody, living or fallen, remains inside, only once every corpse in there has been looted clean, and a short cooldown separates one reset from the next. Arrive at the door on the wrong difficulty and the game says so before the run starts. The raid resets the same way, its own lockout and corpse-return rules still standing on top.",
+      "resetBody": "Grubunuz hala hak talebinde bulunulan koşuları tutarken ve eski hak talepleri kendi kendine temizlenmeden önce bir süre daha oyalanırken zorluğu değiştirin. Grup lideri bunun yerine onların hemen gitmesine izin verebilir: kendi portre menüsünde Tüm Örnekleri Sıfırla'yı seçin veya /dungeon reset yazın. Sıfırlama ancak zorluk gerçekten değiştirildikten sonra, içeride yaşayan veya düşmüş hiç kimse kalmadığında, yalnızca içerideki tüm cesetler temiz bir şekilde yağmalandıktan ve bir sıfırlamayı diğerinden ayıran kısa bir bekleme süresinden sonra işe yarar. Yanlış zorluk seviyesinde kapıya gelin ve oyun bunu koşu başlamadan önce söylüyor. Baskın aynı şekilde sıfırlanıyor; kendi kilitleme ve ceset iade kuralları hâlâ geçerli.",
       "templeLoreTitle": "Boğulmuş Tapınak, biraz daha derinde",
       "templeLoreBody": "Tapınağın, başka yerlerde peşine düştüğünüz tarikattan daha eski, kendi efsanesi vardır. Ay ışığını içip boğulmuşları geri veren bir gölet olan Işıltıgöl'ün kıyısında, yalnız bir gözcü solgun ışıktan bir geçidi korur. Yüzeyin altında, soğuk taştan bir merdiven ona doğru iner. Oraya batan halk bir kazayla boğulmadı: ibadet ederek suya gömülen ve şarkı söylemeyi hiç bırakmayan Solgun Koro'ydu onlar. Eski muhafızlar, sular onları almadan önce kayalara tek bir uyarı kazıdılar, Boğulmuş Ay dedikleri bir şeye bir dua; daha sağlam bir el de altına iki kelime ekledi: yalnızca uyuyor.",
       "cryptLeadTitle": "Ölülerin kapalı tutması gereken bir kapı",
@@ -6185,8 +6185,8 @@ export const tr_TR: EnTranslations = {
       "raceBody": "Diyardaki her grup aynı Yarığa aynı anda saldırabilir, her biri kendi kopyasında, ve yalnızca diptekini ilk deviren onu mühürler. Bir grup kazandığında diyar onların adlarını ve sürelerini duyar, ve giriş yolu ardlarından kapanır. Yarışı kaybetmek koşunu bitirmez: kopyan açık kalır, diptekini yine de sen devirirsin ve yine de kendi gücünle dışarı yürürsün. Sana mal olan şey, onu temizlemenin ödeyeceği her şeydir. Patron, ikinci gelen grup için hiçbir şey bırakmaz, bu yüzden eve taşıdığın şey yalnızca inişte canavarlardan düşenlerdir, ondan fazlası değil. Yiğitlikler Kitabı temizliği yine de sayar, çünkü diptekini gerçekten sen devirdin. Bu, seni yenen insanların yüzünü hiç görmeden kaybedebileceğin oyundaki tek yarıştır.",
       "rewardsHeading": "Dışarı ne çıkarırsın",
       "rewardsBody": "Ödeyen şey bir Yarığı yalnızca atlatmak değil, onu mühürlemektir. Yarığı ilk sen devirirsen, derecesinin yanında durduğu kopya alanlı içerik gibi öder, bu yüzden daha zor dereceler daha zor koşuya değer. Mühürlemek ayrıca orada bulunan herkesin eline, sınıfının rolüne göre kesilmiş ve sana özel bir Yarık Bağlı halka koyar, çantalarına da üstüne Yarık Özü bırakır, daha zor derecelerde bunun üstüne Yarık Mücevherleri de eklenir. Eve giden yolun yanı sıra, diptekinin bıraktığı mühürlü bir zulayı grubun, mağara sandıklarından bildiğin aynı Maşa Yolu kilit açma yöntemiyle ekstra ganimet için açabilir, bu yüzden temiz ve sabırlı bir iş, acele edilmiş birinden daha iyi öder. Bunların hiçbiri ikinci gelen bir gruba ulaşmaz: kaybedilen bir yarış sana yalnızca inişte canavarlardan düşenleri bırakır. Yiğitlikler Kitabı bir istisnadır ve temizliğini her hâlükârda sayar; ilk Yarığını kapatman için bir yiğitlik, bir S dereceli olanı devirmen için bir başkası vardır.",
-      "forgeHeading": "The Rift Forge",
-      "forgeBody": "The band a ranked first clear mints is not finished when you receive it. Riftwright Maelis, who keeps a forge in the Watch Meadow on the Farshore, up the shore from Gullhaven beside the Breach Scholar, will raise its item level one step at a time and set the coloured gems the rifts drop into its sockets, each colour one combat rating. A full band takes a new gem in place of its oldest, so you can retune it later. All of that is paid in Rift Essence and Rift gems, the forge currency that falls from rift bosses and trades freely, so a friend can hand you the essence you are short. Take the band off before you bring it to her: she works on what is in your bags, and she does nothing at all unless you are standing at her forge.",
+      "forgeHeading": "Rift Demirhanesi",
+      "forgeBody": "İlk sırada yer alan açık naneli grup, onu aldığınızda bitmemiş demektir. Gullhaven kıyısında, Breach Scholar'ın yanında, Farshore'deki Watch Meadow'da bir demir ocağı tutan Riftwright Maelis, eşya seviyesini her seferinde bir adım yükseltecek ve yarıkların bıraktığı renkli mücevherleri, her biri bir savaş puanı olan yuvalarına yerleştirecek. Tam bir grup, en eskisinin yerine yeni bir mücevher alır, böylece onu daha sonra yeniden ayarlayabilirsiniz. Bunların tümü, Rift Essence ve Rift gemleri ile ödenir; bu, Rift boss'larından düşen ve serbestçe ticareti yapılan dövme para birimidir, böylece bir arkadaşınız size eksik olduğunuz özü verebilir. Ona götürmeden önce bandı çıkarın: Çantanızda ne varsa çalışıyor ve siz onun demirhanesinin önünde durmadığınız sürece hiçbir şey yapmıyor.",
       "trackerHeading": "Ekranındaki takipçi",
       "trackerBody": "İçerideyken, ekranındaki küçük bir şerit seni yönlendirir: kaç kattan hangisinde olduğunu ve canlı bir geri sayımı gösterir. O geri sayımı dikkatle oku, çünkü tükenen şey koşun değildir. Tükenen, dünyadaki dönüş girişidir. Bir kez içeri girdikten sonra, grubun Yarığı ne kadar sürerse sürsün kendi hızında oynar, ama o saat sıfıra ulaştığında giriş yolu herkes için kaybolur, bu yüzden süre bitimine yakın dışarı adım atmayı iki kez düşün."
     },
@@ -8078,7 +8078,7 @@ export const tr_TR: EnTranslations = {
       "forgeUpgraded": "{name} için Yarık yükseltmesi tamamlandı.",
       "forgeEnchanted": "{name} için Yarık büyüsü tamamlandı.",
       "forgeSocketed": "{name} için Yarık mücevheri yuvalandı.",
-      "forgeGemReplaced": "Rift gem replaced for {name}: {gem} destroyed.",
+      "forgeGemReplaced": "{name} için yarık taşı değiştirildi: {gem} yok edildi.",
       "detonateGlacialGrave": "Buzul Mezarı patlıyor!",
       "detonateAbsoluteZero": "Mutlak Sıfır patlıyor!",
       "detonateMagmaWell": "Magma Kuyusu patlıyor!",
@@ -8736,7 +8736,7 @@ export const tr_TR: EnTranslations = {
     "realmFull": "Bu dünya şu an dolu. Lütfen birkaç dakika sonra tekrar dene.",
     "tooManyConnections": "Ağından bu dünyaya çok fazla bağlantı geliyor. Lütfen fazladan oyun pencerelerini kapat ya da birkaç dakika sonra tekrar dene.",
     "messageRateExceeded": "Eylemleri çok hızlı gönderdiğiniz için bağlantınız kesildi. Lütfen biraz bekleyip tekrar giriş yapın.",
-    "kickedByModerator": "A moderator has disconnected you: {reason}",
+    "kickedByModerator": "Bir moderatör bağlantınızı kesti: {reason}",
     "tips": {
       "classes": "İpucu: 9 sınıfın her biri farklı oynanır. Birine bağlanmadan önce birkaçını dene.",
       "talents": "İpucu: savaş dışında olduğun sürece yeteneklerini istediğin zaman sıfırlayabilirsin, bu yüzden erken bir seçim asla tuzak değildir.",
@@ -13374,7 +13374,7 @@ export const tr_TR: EnTranslations = {
         "name": "Fenerci Boyunduruğu: Grumbol"
       },
       "reins_chimeglass_tortoise": {
-        "name": "Roadwarden's Bellstrap: Tolliver"
+        "name": "Yol Sorumlusunun Zil Kayışı: Tolliver"
       },
       "reins_rickshaw_mount": {
         "name": "Bağlı Dizginler: Kemikbağlı Çekçek"
@@ -13383,7 +13383,7 @@ export const tr_TR: EnTranslations = {
         "name": "Ejder Ağzı Raptoru'nun Dizginleri"
       },
       "reins_mech_bird": {
-        "name": "Ignition Key: Cluckwork Mech Bird"
+        "name": "Kontak Anahtarı: Cluckwork Makine Kuşu"
       },
       "rimefang": {
         "name": "Kırağı Dişi"
@@ -16010,9 +16010,9 @@ export const tr_TR: EnTranslations = {
         "greeting": "Tam ağların kurutulduğu yerde açıldı. Tam orada, hayatım boyunca her sabah durduğum yerde. Artık kıyıya inmiyorum. Artık pek bir yere gitmiyorum."
       },
       "riftwright_maelis": {
-        "name": "Riftwright Maelis",
-        "title": "Rift Forgemaster",
-        "greeting": "A Riftbound band remembers the break that made it, {className}. Bring me the band, and the essence the breaks shed, and I will teach it to remember more."
+        "name": "Yarık yazarı Maelis",
+        "title": "Yarık Demirci Ustası",
+        "greeting": "Bir Riftbound grubu, onu yaratan kırılma noktasını hatırlıyor: {className}. Bana grubu ve molaların döktüğü özü getirin, ben de ona daha fazlasını hatırlamayı öğreteyim."
       },
       "forgemistress_darva": {
         "name": "Dövme Ustası Darva",
@@ -19304,6 +19304,6 @@ export const tr_TR: EnTranslations = {
     "delveRiteShrineSkullInteract": "Kafatası Sunağı: Dokunmak için F'ye bas",
     "mailboxName": "Posta Kutusu",
     "noticeboardName": "İlan Tahtası",
-    "realmBuilderMonumentName": "Realm Builder Monument"
+    "realmBuilderMonumentName": "Bölge Oluşturucu Anıtı"
   }
 };

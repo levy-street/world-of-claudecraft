@@ -1313,7 +1313,7 @@ export const zh_CN: EnTranslations = {
     },
     "targetDots": {
       "title": "目标减益",
-      "row": "{aura} on {target}",
+      "row": "{aura} 上 {target}",
       "overflow": "还有 {count} 个未显示"
     },
     "targetAuras": {
@@ -4707,17 +4707,17 @@ export const zh_CN: EnTranslations = {
       "searchAria": "搜索物品",
       "filterCategoryAria": "来源",
       "filterClassAria": "职业",
-      "filterStatAria": "Stat",
+      "filterStatAria": "统计数据",
       "filterQualityAria": "品质",
-      "filterAll": "All",
-      "tabItems": "By Item",
+      "filterAll": "全部",
+      "tabItems": "按项目",
       "tabEncounters": "按来源",
       "category": {
-        "raid": "Raid",
+        "raid": "突袭",
         "dungeon": "地下城",
         "delve": "探秘",
         "open_world": "开放世界",
-        "rift": "Rift",
+        "rift": "裂谷",
         "vendor": "商人",
         "quest_reward": "任务奖励",
         "quest_objective": "任务目标",
@@ -4728,9 +4728,9 @@ export const zh_CN: EnTranslations = {
         "normal": "普通",
         "heroic": "英雄"
       },
-      "riftRankLabel": "Rift Rank {rank}",
+      "riftRankLabel": "裂谷排名 {rank}",
       "source": "{category}: {name}",
-      "sourceWithContext": "{category}: {name} ({context})",
+      "sourceWithContext": "{category}：{name}（{context}）",
       "chance": "{pct}% 掉落几率",
       "guaranteed": "必得",
       "gatedByQuest": "任务进行中：{quest}",

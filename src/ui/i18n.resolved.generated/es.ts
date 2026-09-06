@@ -570,9 +570,9 @@ export const es: EnTranslations = {
       "tabsLabel": "Secciones de la tienda WOC",
       "storeTab": "Tienda",
       "rewardsTab": "Recompensas diarias",
-      "mountsEyebrow": "Account Mounts",
-      "mountsTitle": "Machine Stable",
-      "mountBuyAria": "Purchase {item}",
+      "mountsEyebrow": "Montajes de cuenta",
+      "mountsTitle": "Estable de la máquina",
+      "mountBuyAria": "Comprar {item}",
       "loading": "Cargando la tienda WOC...",
       "error": "La tienda WOC no está disponible en este momento. Vuelve a intentarlo dentro de poco.",
       "balance": "Saldo de Claudium",
@@ -978,7 +978,7 @@ export const es: EnTranslations = {
       "mounts": "Monturas",
       "professions": "Profesiones",
       "reliquary": "Relicario",
-      "lootExplorer": "Loot Explorer",
+      "lootExplorer": "Explorador de botín",
       "nameplates": "Nombres",
       "haptics": "Vibración",
       "hapticsOff": "Vibración desactivada",
@@ -1312,9 +1312,9 @@ export const es: EnTranslations = {
       "regroup": "Reagrupar {meter}"
     },
     "targetDots": {
-      "title": "Target Dots",
-      "row": "{aura} on {target}",
-      "overflow": "{count} more not shown"
+      "title": "Puntos de destino",
+      "row": "{aura} en {target}",
+      "overflow": "{count} no se muestran más"
     },
     "targetAuras": {
       "title": "Auras del objetivo",
@@ -1401,9 +1401,9 @@ export const es: EnTranslations = {
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Aterrachispa, Sacudetierras",
       "name_drakemaw_raptor": "Raptor de Drakemaw",
-      "name_mech_bird": "Cluckwork Mech Bird",
-      "name_lanternback_troll": "Grumbol the Lanternback",
-      "name_chimeglass_tortoise": "Tolliver the Chimeglass",
+      "name_mech_bird": "Cluckwork Pájaro mecánico",
+      "name_lanternback_troll": "Grumbol el lomo de linterna",
+      "name_chimeglass_tortoise": "Tolliver el timbre de cristal",
       "name_rickshaw_mount": "Rickshaw Atahuesos",
       "desc_valorsteed": "Un corcel resistente y de paso firme que aumenta la velocidad de viaje.",
       "desc_grag_bear": "Un oso resistente y de paso firme que aumenta la velocidad de viaje.",
@@ -1416,9 +1416,9 @@ export const es: EnTranslations = {
       "desc_rallycart_rxt": "Una máquina de rally en miniatura que proporciona mayor velocidad de viaje.",
       "desc_terrorspark_groundshaker": "Una máquina blindada y compacta con orugas pesadas, un cañón de gran calibre y una silla hecha para pilotos intrépidos.",
       "desc_drakemaw_raptor": "Un raptor de cría domado para la silla, procedente de la Caldera de Drakemaw, puro tendón y arranque, que aún huele ligeramente a ceniza.",
-      "desc_mech_bird": "A hand-built clockwork war chicken that sprints on snapping servos, wind-up key still turning.",
-      "desc_lanternback_troll": "A hill troll broken to the yoke by lamplighters, carrying an iron throne across his shoulders with a storm lantern burning on either arm.",
-      "desc_chimeglass_tortoise": "A salt-flat tortoise who has outwalked three generations of caravans. Tinkers ground him spectacles from storm-glass and hung a bronze bell at his throat, so the road hears him long before it sees him.",
+      "desc_mech_bird": "Un pollo de guerra mecánico hecho a mano que corre con servos chasqueantes y la llave de cuerda sigue girando.",
+      "desc_lanternback_troll": "Un troll de las colinas sometido al yugo de los faroleros, que lleva un trono de hierro sobre los hombros y una linterna de tormenta encendida en cada brazo.",
+      "desc_chimeglass_tortoise": "Una tortuga salada que ha dejado atrás a tres generaciones de caravanas. Los caldereros le quitaron las gafas de cristal de tormenta y le colgaron una campana de bronce en el cuello, de modo que la carretera le oye mucho antes de verlo.",
       "desc_rickshaw_mount": "Un carromato de huesos traqueteante, con un soldado esquelético enganchado a las varas, que te arrastra a toda carrera."
     },
     "mountTraining": {
@@ -1588,8 +1588,8 @@ export const es: EnTranslations = {
       "uiScale": "Escala de la interfaz",
       "playerFrameScale": "Escala del marco del jugador",
       "targetFrameScale": "Escala del marco del objetivo",
-      "playerHealthText": "Player Health Text",
-      "targetHealthText": "Target Health Text",
+      "playerHealthText": "Texto de salud del jugador",
+      "targetHealthText": "Texto de salud objetivo",
       "aurasOnPlayerFrame": "Beneficios en el marco del jugador",
       "auraBarBelowFrame": "Beneficios debajo del marco del jugador",
       "alwaysShowAllBuffs": "Mostrar siempre todos los beneficios",
@@ -1614,9 +1614,9 @@ export const es: EnTranslations = {
       "showTargetOfTarget": "Mostrar el objetivo del objetivo",
       "showTargetSwingTimer": "Mostrar temporizador de golpe del objetivo",
       "showPetFrame": "Mostrar tu mascota",
-      "showNameplateDots": "Show My Dots on Nameplates",
-      "nameplateDotScale": "Nameplate Dot Size",
-      "showTargetDots": "Show Target Dots",
+      "showNameplateDots": "Mostrar mis puntos en las placas de identificación",
+      "nameplateDotScale": "Tamaño del punto de la placa de identificación",
+      "showTargetDots": "Mostrar puntos de destino",
       "waterRipples": "Ondas en el agua (estelas)",
       "showAttackButton": "Mostrar boton de ataque",
       "showDailyRewardsChest": "Mostrar cofre de recompensas diarias",
@@ -2968,7 +2968,7 @@ export const es: EnTranslations = {
       "healthPercent": "Porcentaje",
       "healthCurrent": "Actual",
       "healthCurrentMax": "Actual / máxima",
-      "healthCurrentMaxPercent": "Current / Max (Percent)",
+      "healthCurrentMaxPercent": "Actual / Máx. (Porcentaje)",
       "sort": "Ordenar jugadores",
       "sortGroup": "Grupo",
       "sortRole": "Rol",
@@ -3008,7 +3008,7 @@ export const es: EnTranslations = {
         "targetFrame": "Objetivo",
         "partyFrames": "Grupo",
         "swingBar": "Ataque automático",
-        "targetDots": "Target Dots"
+        "targetDots": "Puntos de destino"
       },
       "framesMenu": "Ajustes de marcos",
       "framesMenuTitle": "Muestra u oculta marcos individuales. Un marco sin marcar permanece oculto hasta que vuelvas a marcarlo o restablezcas los valores predeterminados.",
@@ -3041,33 +3041,33 @@ export const es: EnTranslations = {
       "wrongKind": "Ese código es de un tipo de exportación distinto."
     },
     "riftForge": {
-      "title": "Rift Forge",
-      "subtitle": "Riftbound bands",
+      "title": "Forja de grieta",
+      "subtitle": "Bandas ligadas a la grieta",
       "currency": "{name}: {count}",
-      "empty": "No Riftbound band in your bags. A ranked Rift first clear mints one.",
-      "wornHint": "Worn. Unequip it to forge.",
-      "upgradeBtn": "Upgrade to item level {level} ({cost} essence)",
-      "upgradeMax": "Fully upgraded",
-      "gemPickAria": "Gem to socket",
+      "empty": "No hay banda Riftbound en tus bolsos. Un Rift clasificado primero elimina uno.",
+      "wornHint": "Usado. Desequiparlo para forjar.",
+      "upgradeBtn": "Mejora al nivel de objeto {level} (esencia {cost})",
+      "upgradeMax": "Completamente actualizado",
+      "gemPickAria": "Gema al zócalo",
       "gemOption": "{name} ({bonus})",
-      "socketReplaceHint": "Sockets full: the next gem replaces the oldest, {gem}.",
-      "socketBtn": "Socket",
-      "socketsNone": "no gems",
-      "noGems": "No Rift gems in your bags",
-      "refused": "The forge refused. Stand at the Riftwright and try again.",
+      "socketReplaceHint": "Zócalos llenos: la siguiente gema reemplaza a la más antigua, {gem}.",
+      "socketBtn": "Zócalo",
+      "socketsNone": "sin gemas",
+      "noGems": "No hay gemas Rift en tus bolsos",
+      "refused": "La fragua se negó. Párese en Riftwright e inténtelo de nuevo.",
       "reason": {
-        "notFound": "That band is not in your bags.",
-        "notRiftGear": "Only a Riftbound band can be forged.",
-        "maxUpgrade": "That band is fully upgraded.",
-        "insufficientEssence": "Not enough Rift Essence.",
-        "invalidGem": "You have no such Rift gem.",
-        "dead": "You can't do that while dead.",
-        "tooFar": "You are too far from the Rift Forge."
+        "notFound": "Esa banda no está en tus bolsos.",
+        "notRiftGear": "Sólo se puede forjar una banda Riftbound.",
+        "maxUpgrade": "Esa banda está completamente actualizada.",
+        "insufficientEssence": "No hay suficiente esencia de falla.",
+        "invalidGem": "No tienes esa joya del Rift.",
+        "dead": "No puedes hacer eso mientras estás muerto.",
+        "tooFar": "Estás demasiado lejos de Rift Forge."
       },
       "done": {
-        "upgrade": "Upgraded {name}.",
-        "socket": "Socketed a gem into {name}.",
-        "socketReplaced": "Socketed a gem into {name}; {gem} was destroyed."
+        "upgrade": "{name} actualizado.",
+        "socket": "Engarzó una gema en {name}.",
+        "socketReplaced": "Engarzó una gema en {name}; {gem} fue destruido."
       }
     },
     "itemTooltip": {
@@ -3075,7 +3075,7 @@ export const es: EnTranslations = {
       "riftTier": "Objeto de Brecha de rango {tier}",
       "riftUpgrade": "Mejora de brecha {level}/{max}",
       "riftSockets": "Gemas de brecha {used}/{total}",
-      "riftGemSocket": "Socket bonus for a Riftbound band",
+      "riftGemSocket": "Bonificación de ranura para una banda Riftbound",
       "statEnchanted": "+{value} {stat} (Encantado)",
       "enchantedFallback": "Encantado",
       "partyTradeWindow": "Puedes intercambiar este objeto con jugadores que compartieron su botín durante los próximos {time}. Equiparlo termina la ventana de intercambio."
@@ -3100,7 +3100,7 @@ export const es: EnTranslations = {
       "close": "Cerrar",
       "keybind": "Panel de Discord",
       "disabled": "La integración con Discord no está disponible en este momento.",
-      "queuePingsLabel": "Send me a Discord direct message when my battleground or arena queue pops (needs a linked Discord account)",
+      "queuePingsLabel": "Envíame un mensaje directo de Discord cuando aparezca mi cola de campo de batalla o arena (necesita una cuenta Discord vinculada)",
       "tiers": {
         "none": "Sin rango",
         "initiate": "Iniciado",
@@ -3358,13 +3358,13 @@ export const es: EnTranslations = {
       "close": "Cerrar"
     },
     "realmBuilder": {
-      "title": "Realm Builder of the Month",
-      "currentLabel": "Honoured this month",
-      "placeholderName": "Your Name Here",
-      "placeholderHint": "This plate is waiting for its first name.",
-      "pastTitle": "Past honourees",
-      "pastEmpty": "No names on the roll yet.",
-      "close": "Close"
+      "title": "Constructor de reinos del mes",
+      "currentLabel": "Honrado este mes",
+      "placeholderName": "Tu nombre aquí",
+      "placeholderHint": "Esta placa está esperando su primer nombre.",
+      "pastTitle": "Homenajeados anteriores",
+      "pastEmpty": "Aún no hay nombres en la lista.",
+      "close": "Cerrar"
     },
     "bank": {
       "title": "Banco",
@@ -3421,8 +3421,8 @@ export const es: EnTranslations = {
       "depositAllDone": "Materiales depositados: {count}.",
       "depositAllFull": "Materiales depositados: {count}. El banco está ahora lleno.",
       "depositAllNone": "Banco lleno: no se depositó nada.",
-      "depositAllNotable": "Materials deposited: {count}, including {item}.",
-      "depositAllNotableFull": "Materials deposited: {count}, including {item}. Bank now full.",
+      "depositAllNotable": "Materiales depositados: {count}, incluido {item}.",
+      "depositAllNotableFull": "Materiales depositados: {count}, incluido {item}. Banco ahora lleno.",
       "bonusTitle": "Espacios extra",
       "bonusEarned": "+{count}",
       "bonusStatusEarned": "+{count}",
@@ -3461,8 +3461,8 @@ export const es: EnTranslations = {
       "vaultDepositAllDone": "Materiales depositados: {count}.",
       "vaultDepositAllFull": "Materiales depositados: {count}. Algunos límites están llenos.",
       "vaultDepositAllNone": "Límites de la bóveda llenos: no se depositó nada.",
-      "vaultDepositAllNotable": "Materials deposited: {count}, including {item}.",
-      "vaultDepositAllNotableFull": "Materials deposited: {count}, including {item}. Some ceilings are full.",
+      "vaultDepositAllNotable": "Materiales depositados: {count}, incluido {item}.",
+      "vaultDepositAllNotableFull": "Materiales depositados: {count}, incluido {item}. Algunos techos están llenos.",
       "vaultWithdrawShort": "Solo caben {fit} de {count} en tus bolsas.",
       "vaultDepositHint": "Haz clic para depositar en tu bóveda",
       "vaultCannotDeposit": "No puede ir en la bóveda",
@@ -3599,17 +3599,17 @@ export const es: EnTranslations = {
         }
       },
       "roster": {
-        "seats": "{count} of {cap} seats",
-        "expand": "Expand roster (+{seats} seats for {price})",
-        "maxed": "The roster is at its largest size",
-        "confirm": "Expand the guild roster by {seats} seats for {price}? The gold comes from your own purse and is not refunded.",
-        "confirmAction": "Expand",
-        "expandedLine": "{name} has expanded the guild roster to {cap} members.",
+        "seats": "{count} de asientos {cap}",
+        "expand": "Ampliar lista (+ asientos {seats} para {price})",
+        "maxed": "La plantilla está en su mayor tamaño",
+        "confirm": "¿Ampliar la lista del gremio con asientos {seats} para {price}? El oro proviene de tu propio bolso y no se reembolsa.",
+        "confirmAction": "Expandir",
+        "expandedLine": "{name} ha ampliado la lista del gremio a miembros de {cap}.",
         "result": {
-          "notLeader": "Only the Guild Master may expand the guild roster.",
-          "maxed": "The guild roster cannot grow any larger.",
-          "cannotAfford": "You need {price} to expand the guild roster.",
-          "retry": "The guild roster changed while you were buying. Try again."
+          "notLeader": "Sólo el Guild Master puede ampliar la lista del gremio.",
+          "maxed": "La lista del gremio no puede crecer más.",
+          "cannotAfford": "Necesitas {price} para expandir la lista del gremio.",
+          "retry": "La lista del gremio cambió mientras estabas comprando. Intentar otra vez."
         }
       }
     },
@@ -4028,7 +4028,7 @@ export const es: EnTranslations = {
       "yieldLineRange": "{min} a {max} {item}",
       "alreadyEnchanted": "Ese objeto ya está encantado.",
       "sameEnchant": "Ese objeto ya tiene ese encantamiento.",
-      "riftGear": "Riftbound bands take Rift gems, not enchants.",
+      "riftGear": "Las bandas ligadas al Rift toman gemas del Rift, no encantamientos.",
       "replaceTag": "Reemplaza {enchant}",
       "sameEnchantTag": "Ya aplicado",
       "plainTag": "Sin encantar",
@@ -4361,10 +4361,10 @@ export const es: EnTranslations = {
       "filterAll": "Todas",
       "filterOwned": "Catalogadas",
       "filterMissing": "Pendientes",
-      "filterIlluminated": "Illuminated",
-      "filterRemaining": "Remaining",
-      "filterEmptyPages": "No pages match this filter.",
-      "filterGroupAriaPages": "Filter pages by whether they are illuminated",
+      "filterIlluminated": "Iluminado",
+      "filterRemaining": "restante",
+      "filterEmptyPages": "Ninguna página coincide con este filtro.",
+      "filterGroupAriaPages": "Filtrar páginas según si están iluminadas",
       "recentJumpAria": "Abrir la página de {name}",
       "recentEmpty": "Todavía no hay hallazgos. Las reliquias que catalogues a partir de ahora aparecerán aquí.",
       "nearlyEmpty": "Aquí se reúnen las páginas que están a punto de completarse.",
@@ -4472,7 +4472,7 @@ export const es: EnTranslations = {
       "summary": "Mapa del mundo. Elige una zona para abrir su mapa.",
       "toWorld": "Mapa del mundo",
       "toZone": "Mapa de la zona",
-      "toInstance": "Instance map",
+      "toInstance": "Mapa de instancia",
       "toggleAria": "Alternar entre el mapa del mundo y el mapa de la zona",
       "levels": "Niveles {min} a {max}"
     },
@@ -4507,7 +4507,7 @@ export const es: EnTranslations = {
       "walletLinkedConnected": "Tu aplicación de cartera vinculada está conectada y lista para compras en $WOC.",
       "walletUsdBalance": "{amount} USD",
       "walletUsdUnknown": "Desconocido",
-      "walletCardDismiss": "Hide wallet card",
+      "walletCardDismiss": "Ocultar tarjeta de billetera",
       "rateNote": "Tasa: unos {tokens} $WOC por cada 1,00 USD, a fecha de {time}.",
       "rateNotePaused": "Última tasa conocida: unos {tokens} $WOC por cada 1,00 USD, a fecha de {time}.",
       "estimateNote": "Unos {tokens} $WOC por {usd} a la tasa actual.",
@@ -4701,41 +4701,41 @@ export const es: EnTranslations = {
       "listingStatusUnsold": "Sin vender"
     },
     "lootExplorer": {
-      "title": "Loot Explorer",
-      "close": "Close Loot Explorer",
-      "searchPlaceholder": "Search items...",
-      "searchAria": "Search items",
-      "filterCategoryAria": "Source",
-      "filterClassAria": "Class",
-      "filterStatAria": "Stat",
-      "filterQualityAria": "Quality",
-      "filterAll": "All",
-      "tabItems": "By Item",
-      "tabEncounters": "By Encounter",
+      "title": "Explorador de botín",
+      "close": "Cerrar el explorador de botín",
+      "searchPlaceholder": "Buscar elementos...",
+      "searchAria": "Buscar elementos",
+      "filterCategoryAria": "Fuente",
+      "filterClassAria": "clase",
+      "filterStatAria": "estadística",
+      "filterQualityAria": "Calidad",
+      "filterAll": "Todos",
+      "tabItems": "Por artículo",
+      "tabEncounters": "Por encuentro",
       "category": {
-        "raid": "Raid",
-        "dungeon": "Dungeon",
-        "delve": "Delve",
-        "open_world": "Open World",
-        "rift": "Rift",
-        "vendor": "Vendor",
-        "quest_reward": "Quest Reward",
-        "quest_objective": "Quest Objective",
-        "ground_object": "World Object",
-        "starting_equipment": "Starting Equipment"
+        "raid": "incursión",
+        "dungeon": "mazmorra",
+        "delve": "profundizar",
+        "open_world": "Mundo abierto",
+        "rift": "grieta",
+        "vendor": "vendedor",
+        "quest_reward": "Recompensa de misión",
+        "quest_objective": "Objetivo de la misión",
+        "ground_object": "Objeto mundial",
+        "starting_equipment": "Equipo de arranque"
       },
       "difficulty": {
-        "normal": "Normal",
-        "heroic": "Heroic"
+        "normal": "normales",
+        "heroic": "heroico"
       },
-      "riftRankLabel": "Rift Rank {rank}",
+      "riftRankLabel": "Rango de falla {rank}",
       "source": "{category}: {name}",
       "sourceWithContext": "{category}: {name} ({context})",
-      "chance": "{pct}% chance",
-      "guaranteed": "Guaranteed",
-      "gatedByQuest": "While questing: {quest}",
-      "empty": "No loot matches these filters.",
-      "resultCount": "{count} results"
+      "chance": "{pct}% de probabilidad",
+      "guaranteed": "Garantizado",
+      "gatedByQuest": "Mientras busca: {quest}",
+      "empty": "Ningún botín coincide con estos filtros.",
+      "resultCount": "{count} resultados"
     }
   },
   "gatherEvent": {
@@ -4835,7 +4835,7 @@ export const es: EnTranslations = {
       "swag_claimed": "Ya has reclamado esta recompensa.",
       "swag_tier": "Alcanza un rango superior para reclamar esto.",
       "swag_points": "Puntos insuficientes.",
-      "invalid_input": "Invalid input."
+      "invalid_input": "Entrada no válida."
     },
     "deeds": {
       "invalid_input": "Entrada no válida."
@@ -4889,9 +4889,9 @@ export const es: EnTranslations = {
       "not_marked": "Esa cuenta no tiene la marca."
     },
     "kick": {
-      "reason_required": "A reason is required.",
-      "admin_target": "Operator accounts cannot be kicked.",
-      "target_offline": "That player is no longer online on this realm."
+      "reason_required": "Se requiere una razón.",
+      "admin_target": "Las cuentas de los operadores no se pueden expulsar.",
+      "target_offline": "Ese jugador ya no está en línea en este reino."
     },
     "woc_market": {
       "invalid_input": "Entrada no válida.",
@@ -5326,8 +5326,8 @@ export const es: EnTranslations = {
       "ifPlayerFrameScale": "El tamaño de tu propio marco de unidad.",
       "ifTargetFrameScale": "El tamaño de tu marco de objetivo.",
       "ifPartyStyle": "La disposición del grupo: Automático sigue el tamaño de tu grupo, Clásico es la pila tradicional, y Banda agrupa a todos en la cuadrícula compacta.",
-      "ifPlayerHealthText": "What your own health bar prints: nothing, a percentage, current health, current and maximum, or both with the percentage beside them.",
-      "ifTargetHealthText": "What the target and target-of-target health bars print, with the same choices as your own frame.",
+      "ifPlayerHealthText": "Lo que imprime tu propia barra de salud: nada, un porcentaje, salud actual, actual y máxima, o ambos con el porcentaje al lado.",
+      "ifTargetHealthText": "Lo que imprimen las barras de salud del objetivo y del objetivo, con las mismas opciones que tu propio marco.",
       "ifPartyHealthText": "Lo que imprimen las barras de grupo: nada, un porcentaje, la salud actual, o la actual y la máxima.",
       "ifPartySort": "El orden en que se listan los miembros del grupo: por grupo, por rol o por nombre.",
       "ifPartyShowAuras": "Si los beneficios y perjuicios se muestran en los marcos de grupo. Interruptores equivalentes cubren las barras de recursos, los escudos de absorción, las mascotas y si apareces en tu propia lista de grupo.",
@@ -5340,7 +5340,7 @@ export const es: EnTranslations = {
       "ifChatOpacity": "Qué tan sólido es el fondo del chat.",
       "ifCompactChat": "Compacta las líneas de chat para que quepan más.",
       "ifChatTimestamps": "Añade una hora a cada línea de chat, en formato de 12 o 24 horas.",
-      "ifFilterProfanity": "Masks profanity in chat with asterisks. On by default; switch it off here if you would rather read chat unfiltered.",
+      "ifFilterProfanity": "Enmascara malas palabras en el chat con asteriscos. Activado de forma predeterminada; Desactívalo aquí si prefieres leer el chat sin filtrar.",
       "ifStartAttack": "Si usar una habilidad también inicia tu ataque automático. Activado de forma predeterminada, y el comportamiento clásico que la mayoría de los jugadores espera.",
       "ifStopAutoAttack": "Si cambiar de objetivo detiene tu ataque. Desactivado de forma predeterminada, así que tu ataque continúa sobre el nuevo objetivo.",
       "ifShowAttackButton": "Pone un botón explícito de Atacar en tu barra de acción.",
@@ -5353,7 +5353,7 @@ export const es: EnTranslations = {
       "ifHideUnused": "Oculta las ranuras de acción vacías para que solo se dibujen los botones que realmente usas.",
       "ifLockBars": "Bloquea tus barras para que no puedas arrastrar una habilidad fuera de una ranura por accidente.",
       "keybindsHeading": "El panel de Atajos de teclado",
-      "keybindsBody": "The key list is only half of that panel. Above it sit the switches that decide how your mouse drives the game: mouse camera, whether the cursor locks while you rotate, click to move and which mouse button triggers it, attack move, and the left-handed touch layout.",
+      "keybindsBody": "La lista clave es sólo la mitad de ese panel. Encima se encuentran los interruptores que deciden cómo el mouse controla el juego: la cámara del mouse, si el cursor se bloquea mientras giras, haz clic para moverte y qué botón del mouse lo activa, el movimiento de ataque y el diseño táctil para zurdos.",
       "keybindsMouseBody": "Hay dos cosas ahí fáciles de pasar por alto. Los botones del ratón se asignan como si fueran teclas, así que el clic de la rueda y los botones laterales pueden llevar habilidades, mientras que el clic izquierdo y el derecho siguen reservados para la cámara y para hacer clic en el mundo. Y puedes asignar teclas directamente desde la barra de acción: activa aquí el modo de edición de teclas de la barra de acción, luego haz clic en una ranura y presiona la tecla que quieras."
     },
     "combat": {
@@ -6152,7 +6152,7 @@ export const es: EnTranslations = {
       "heroicRewardsBody": "Los jefes heroicos sueltan el botín que ya conoces, mejorado y marcado como Heroico en la información, y el jefe final de cada incursión añade épicos que no se encuentran en ningún otro sitio. Esa última muerte también deja Marcas Heroicas a cada participante: una moneda que se gasta con el intendente Vex en Highwatch, cuyo mostrador es un estante de anillos y colgantes que nada salvo la prueba de las profundidades heroicas puede comprar.",
       "heroicLockoutBody": "Las mazmorras normales se pueden recorrer todo el día. El heroico pide paciencia: la muerte del jefe final limita a todos los de la incursión a un solo despeje heroico de esa mazmorra al día, y la banda mantiene un bloqueo diario para cada dificultad. En un reino en vivo todos los bloqueos diarios se liberan juntos a la hora del reinicio nocturno propio del reino, así que un despeje tomado justo antes de esa hora y otro tomado justo después caen en días distintos; juega en tu navegador sin conexión y un bloqueo simplemente expira un día después de tu propia muerte del jefe. Una incursión de cinco jugadores ya despejada sigue abierta a su propio grupo para carreras de cadáver y botín, así que nadie queda apartado de lo que ganó allí. La banda es más estricta: una vez que su muerte te bloquea, la puerta permanece cerrada hasta el reinicio, y la única forma de volver a cruzarla es una carrera de cadáver de alguien que cayó en la misma incursión que lo bloqueó, así que un incursor vivo que sale ha salido por ese día. Recoge tus despojos antes de dejar la arena. Cada uno de estos bloqueos pertenece al personaje que se lo ganó, así que un despeje en tu personaje principal deja libres a tus demás personajes.",
       "resetTitle": "Restablecer tus instancias",
-      "resetBody": "Switch difficulty while your group still holds claimed runs and the old claims linger for a while before clearing on their own. The party leader can let them go at once instead: choose Reset All Instances on their own portrait menu, or type /dungeon reset. A reset works only after the difficulty has actually been changed, only while nobody, living or fallen, remains inside, only once every corpse in there has been looted clean, and a short cooldown separates one reset from the next. Arrive at the door on the wrong difficulty and the game says so before the run starts. The raid resets the same way, its own lockout and corpse-return rules still standing on top.",
+      "resetBody": "Cambie de dificultad mientras su grupo todavía tiene carreras reclamadas y los reclamos antiguos persisten por un tiempo antes de borrarse por sí solos. En su lugar, el líder del grupo puede dejarlos ir de inmediato: elija Restablecer todas las instancias en su propio menú vertical o escriba /dungeon reset. Un reinicio funciona solo después de que se ha cambiado la dificultad, solo mientras nadie, vivo o caído, permanece dentro, solo una vez que todos los cadáveres allí han sido saqueados y limpios, y un breve tiempo de reutilización separa un reinicio del siguiente. Llega a la puerta en la dificultad equivocada y el juego lo dice antes de que comience la carrera. La incursión se reinicia de la misma manera, con sus propias reglas de bloqueo y devolución de cadáveres aún vigentes.",
       "templeLoreTitle": "El Templo Ahogado, un poco más a fondo",
       "templeLoreBody": "El templo tiene su propia leyenda, más antigua que el culto que persigues en otros lugares. En la orilla del Glimmermere, un lago que bebe la luz de la luna y devuelve a los ahogados, un vigía solitario custodia una puerta de luz pálida. Bajo la superficie, una escalera de piedra fría desciende hasta él. Las gentes que se hundieron allí no se ahogaron por desventura: eran el Coro Pálido, que se sumergió en adoración y nunca dejó de cantar. Los viejos guardianes grabaron una sola advertencia en las rocas antes de que el agua se los llevara, una plegaria a algo que llamaban la Luna Ahogada, con una mano más firme añadiendo dos palabras debajo: solo duerme.",
       "cryptLeadTitle": "Una puerta que los muertos debían mantener cerrada",
@@ -6185,8 +6185,8 @@ export const es: EnTranslations = {
       "raceBody": "Todos los grupos del reino pueden atacar la misma brecha a la vez, cada uno en su propia copia, y solo el primero en derribar a lo que espera al fondo la sella. Cuando un grupo gana, el reino se entera de sus nombres y de su tiempo, y la entrada se cierra tras ellos. Perder la carrera no acaba tu partida: tu copia sigue abierta, lo que espera al fondo sigue cayendo ante ti, y sigues saliendo por tu propio pie. Lo que pierdes es cuanto te habría pagado despejarla. El jefe no deja nada para el grupo que llega segundo, así que lo que te llevas a casa es lo que soltaron los monstruos por el camino, y nada más. El Libro de Gestas sigue contando el despeje, porque tú sí derribaste a la criatura. Es la única carrera del juego que puedes perder sin llegar a ver jamás a quienes te ganaron.",
       "rewardsHeading": "Lo que te llevas",
       "rewardsBody": "Sellar una brecha, no simplemente sobrevivirla, es lo que paga. Gánala primero y paga como el contenido instanciado junto al que se sitúa su rango, así que los rangos más duros merecen la partida más dura. Sellarla también pone una banda ligada a la brecha en las manos de todos los que estaban presentes, ajustada al rol de tu clase y personal para ti, y además deja Esencia de la Brecha en tus bolsas, con gemas de brecha añadidas en los rangos más duros. Además del camino a casa, lo que espera al fondo deja un alijo sellado que tu grupo puede forzar para obtener botín extra, usando el mismo forzado de cerraduras de la Senda del Tambor que conoces de los cofres de expedición, así que un trabajo limpio y paciente paga mejor que uno apresurado. Nada de eso llega a un grupo que quedó segundo: una carrera perdida solo te deja lo que soltaron los monstruos por el camino. El Libro de Gestas es la excepción, y cuenta tu despeje de cualquier modo, con una gesta por cerrar tu primera brecha y otra por derribar una de rango S.",
-      "forgeHeading": "The Rift Forge",
-      "forgeBody": "The band a ranked first clear mints is not finished when you receive it. Riftwright Maelis, who keeps a forge in the Watch Meadow on the Farshore, up the shore from Gullhaven beside the Breach Scholar, will raise its item level one step at a time and set the coloured gems the rifts drop into its sockets, each colour one combat rating. A full band takes a new gem in place of its oldest, so you can retune it later. All of that is paid in Rift Essence and Rift gems, the forge currency that falls from rift bosses and trades freely, so a friend can hand you the essence you are short. Take the band off before you bring it to her: she works on what is in your bags, and she does nothing at all unless you are standing at her forge.",
+      "forgeHeading": "La fragua de la grieta",
+      "forgeBody": "La banda, una de las primeras casas de moneda claras clasificadas, no está terminada cuando la recibes. Riftwright Maelis, que mantiene una forja en Watch Meadow en Farshore, en la costa de Gullhaven al lado de Breach Scholar, aumentará su nivel de objeto paso a paso y colocará las gemas de colores que las grietas dejan caer en sus cuencas, cada color con una calificación de combate. Una banda completa toma una nueva gema en lugar de la más antigua, para que puedas volver a sintonizarla más tarde. Todo eso se paga en Rift Essence y Rift Gems, la moneda de forja que cae de los jefes de Rift y se comercializa libremente, para que un amigo pueda entregarte la esencia que te falta. Quítate la banda antes de llevársela: ella trabaja en lo que hay en tus bolsos y no hace nada en absoluto a menos que estés parado en su forja.",
       "trackerHeading": "El rastreador en tu pantalla",
       "trackerBody": "Mientras estás dentro, una pequeña franja en tu pantalla te mantiene orientado: en qué piso estás de cuántos hay, y una cuenta atrás en vivo. Lee esa cuenta atrás con atención, porque no es tu partida la que se agota. Es la entrada de vuelta al mundo la que se está cerrando. Una vez que has entrado, tu grupo juega la brecha a su propio ritmo, por mucho que tarde, pero cuando ese reloj llega a cero, la entrada desaparece para todos, así que piénsatelo dos veces antes de salir cerca del final."
     },
@@ -8078,7 +8078,7 @@ export const es: EnTranslations = {
       "forgeUpgraded": "Mejora de brecha completada para {name}.",
       "forgeEnchanted": "Encantamiento de brecha completado para {name}.",
       "forgeSocketed": "Gema de brecha engarzada para {name}.",
-      "forgeGemReplaced": "Rift gem replaced for {name}: {gem} destroyed.",
+      "forgeGemReplaced": "Gema de grieta reemplazada por {name}: {gem} destruido.",
       "detonateGlacialGrave": "¡La Tumba Glacial detona!",
       "detonateAbsoluteZero": "¡Cero Absoluto estalla!",
       "detonateMagmaWell": "¡El Pozo de Magma estalla!",
@@ -8736,7 +8736,7 @@ export const es: EnTranslations = {
     "realmFull": "Este mundo esta lleno en este momento. Por favor, intentalo de nuevo en unos minutos.",
     "tooManyConnections": "Hay demasiadas conexiones a este mundo desde tu red. Cierra ventanas adicionales del juego o intentalo de nuevo en unos minutos.",
     "messageRateExceeded": "Se te desconectó por enviar acciones demasiado rápido. Espera un momento y vuelve a iniciar sesión.",
-    "kickedByModerator": "A moderator has disconnected you: {reason}",
+    "kickedByModerator": "Un moderador te ha desconectado: {reason}",
     "tips": {
       "classes": "Consejo: cada una de las 9 clases se juega de forma distinta. Prueba varias antes de decidirte por una.",
       "talents": "Consejo: puedes restablecer tus talentos cuando estés fuera de combate, así que una elección temprana nunca es definitiva.",
@@ -13374,7 +13374,7 @@ export const es: EnTranslations = {
         "name": "Yugo del farolero: Grumbol"
       },
       "reins_chimeglass_tortoise": {
-        "name": "Roadwarden's Bellstrap: Tolliver"
+        "name": "Campana del guardián del camino: Tolliver"
       },
       "reins_rickshaw_mount": {
         "name": "Riendas vinculadas: Rickshaw Atahuesos"
@@ -13383,7 +13383,7 @@ export const es: EnTranslations = {
         "name": "Riendas del Raptor de Drakemaw"
       },
       "reins_mech_bird": {
-        "name": "Ignition Key: Cluckwork Mech Bird"
+        "name": "Llave de encendido: Cluckwork Mech Bird"
       },
       "rimefang": {
         "name": "Colmillo de Escarcha"
@@ -16010,9 +16010,9 @@ export const es: EnTranslations = {
         "greeting": "Se abrió justo donde se secan las redes. Justo ahí, donde estuve cada mañana de mi vida. Ya no bajo a la orilla. Ya casi no voy a ningún sitio."
       },
       "riftwright_maelis": {
-        "name": "Riftwright Maelis",
-        "title": "Rift Forgemaster",
-        "greeting": "A Riftbound band remembers the break that made it, {className}. Bring me the band, and the essence the breaks shed, and I will teach it to remember more."
+        "name": "Constructor de grietas Maelis",
+        "title": "Maestro de falsificación de la grieta",
+        "greeting": "Una banda de Riftbound recuerda la ruptura que lo logró, {className}. Tráeme la banda, y la esencia que arrojan las rupturas, y le enseñaré a recordar más."
       },
       "forgemistress_darva": {
         "name": "Maestra Forjadora Darva",
@@ -19304,6 +19304,6 @@ export const es: EnTranslations = {
     "delveRiteShrineSkullInteract": "Santuario de la Calavera: pulsa F para tocarlo",
     "mailboxName": "Buzón",
     "noticeboardName": "Tablón de anuncios",
-    "realmBuilderMonumentName": "Realm Builder Monument"
+    "realmBuilderMonumentName": "Monumento al constructor de reinos"
   }
 };

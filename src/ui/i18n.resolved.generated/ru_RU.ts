@@ -1313,7 +1313,7 @@ export const ru_RU: EnTranslations = {
     },
     "targetDots": {
       "title": "Эффекты на целях",
-      "row": "{aura} on {target}",
+      "row": "{aura} на {target}",
       "overflow": "ещё {count}, не показаны"
     },
     "targetAuras": {
@@ -4707,17 +4707,17 @@ export const ru_RU: EnTranslations = {
       "searchAria": "Поиск предметов",
       "filterCategoryAria": "Источник",
       "filterClassAria": "Класс",
-      "filterStatAria": "Stat",
+      "filterStatAria": "Стат",
       "filterQualityAria": "Качество",
-      "filterAll": "All",
-      "tabItems": "By Item",
+      "filterAll": "Все",
+      "tabItems": "По товару",
       "tabEncounters": "По источникам",
       "category": {
-        "raid": "Raid",
+        "raid": "Рейд",
         "dungeon": "Подземелье",
         "delve": "Вылазка",
         "open_world": "Открытый мир",
-        "rift": "Rift",
+        "rift": "Рифт",
         "vendor": "Торговец",
         "quest_reward": "Награда за задание",
         "quest_objective": "Цель задания",
@@ -4728,7 +4728,7 @@ export const ru_RU: EnTranslations = {
         "normal": "Обычная",
         "heroic": "Героическая"
       },
-      "riftRankLabel": "Rift Rank {rank}",
+      "riftRankLabel": "Ранг Разлома {rank}",
       "source": "{category}: {name}",
       "sourceWithContext": "{category}: {name} ({context})",
       "chance": "Шанс {pct}%",
