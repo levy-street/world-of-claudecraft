@@ -203,6 +203,7 @@ function makeCtx() {
     isControlAura: vi.fn(() => false),
     applyRootAura: vi.fn(),
     applyKnockback: vi.fn(() => 0),
+    isIceBlocked: vi.fn(() => false),
     diminishedCrowdControlDuration: vi.fn(() => null),
     hostilesInRadius: vi.fn(() => []),
     friendliesInRadius: vi.fn(() => []),

@@ -567,6 +567,7 @@ export interface SimContextCallbacks {
     breakThreshold?: number,
   ): void;
   applyKnockback(source: Entity, target: Entity, distance: number): number;
+  isIceBlocked(target: Entity): boolean;
   diminishedCrowdControlDuration(
     source: Entity,
     target: Entity,
@@ -1509,6 +1510,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     isControlAura: host.isControlAura,
     applyRootAura: host.applyRootAura,
     applyKnockback: host.applyKnockback,
+    isIceBlocked: host.isIceBlocked,
     diminishedCrowdControlDuration: host.diminishedCrowdControlDuration,
     hostilesInRadius: host.hostilesInRadius,
     friendliesInRadius: host.friendliesInRadius,

@@ -498,7 +498,17 @@ const MONOLITHS: MonolithRow[] = [
     // Plus 2 for the Phase B set-bonus seam: the set_bonus_mods import and
     // the setPlayerLevel writer routing through computeCharacterModifiers
     // (the resolver itself is the extracted module). Exact count, zero slack.
-    ceiling: 12465,
+    // Re-pinned at the release/v0.42.0 sync into the knockback-wall-pin branch:
+    // this branch's applyKnockback extraction (the shove loop, the
+    // SKIN_WIDTH-padded resolve, and the landing seat moved verbatim to
+    // src/sim/knockback.ts behind SimContext, leaving only a thin delegate
+    // plus the ctx binding and isIceBlocked wiring) lands under the release
+    // arm's own growth (the Crucible vendor delegate, the
+    // partyTradeMsRemaining facet wiring, the Phase B set-bonus seam), and
+    // the branch's own removal outweighs the release arm's additions.
+    // Measured on the merged tree, never reconciled by arithmetic. Exact
+    // count, zero slack.
+    ceiling: 12271,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
