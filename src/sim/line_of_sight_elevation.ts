@@ -23,21 +23,25 @@ function openWorldSightHeights(seed: number, pos: Vec3): OpenWorldSightHeights |
   };
 }
 
-function boundedSightFeet(pos: Vec3, heights: OpenWorldSightHeights): number {
+function boundedSightFeet(pos: Vec3, heights: OpenWorldSightHeights, onGround: boolean): number {
   // Open-world endpoints may retain authored support beneath their current
-  // footprint, but never contribute raw airborne height above that support.
-  return Math.min(pos.y, Math.max(heights.ground, heights.support));
+  // footprint. When grounded, sight feet are at least the support height
+  // (stall canopy, crate top, etc.) so a mounted player on a stall sees from
+  // the stall height, not from ground+mount height. When airborne, sight is
+  // clamped to the support we left so a jump doesn't lift the eye over cover.
+  const support = Math.max(heights.ground, heights.support);
+  return onGround ? Math.max(pos.y, support) : Math.min(pos.y, support);
 }
 
 function playerSightFeet(seed: number, entity: Entity): number | undefined {
   if (entity.kind !== 'player') return undefined;
   const heights = openWorldSightHeights(seed, entity.pos);
-  return heights ? boundedSightFeet(entity.pos, heights) : undefined;
+  return heights ? boundedSightFeet(entity.pos, heights, entity.onGround) : undefined;
 }
 
 function bodySightFeet(seed: number, body: Vec3): number | undefined {
   const heights = openWorldSightHeights(seed, body);
-  return heights ? boundedSightFeet(body, heights) : undefined;
+  return heights ? boundedSightFeet(body, heights, true) : undefined;
 }
 
 export function entityLineOfSightClear(

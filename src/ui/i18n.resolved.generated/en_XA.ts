@@ -9624,6 +9624,8 @@ export const en_XA: EnTranslations = {
       "tool_recharge": "[Ŕéçĥáŕĝíñĝ]",
       "demonHeal": "[Ðéɱóñ Ĥéáļ]",
       "thunzharrStormcall": "[Šţóŕɱçáļļ]",
+      "nythraxisWardChannel": "[Ŵáŕðšţóñé Çĥáññéļ]",
+      "nythraxisDeathlessRage": "[Ðéáţĥļéšš Ŕáĝé]",
       "rift_frost_execution": "[Ĝļáçíáļ Ĝŕáʋé]",
       "rift_frost_strike": "[Áƀšóļúţé Žéŕó]",
       "rift_ember_execution": "[Ɱáĝɱá Ŵéļļ]",

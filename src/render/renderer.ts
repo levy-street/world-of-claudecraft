@@ -12584,6 +12584,26 @@ export class Renderer {
     this.travelSpeedFx.dispose();
     this.varkhulForgestormVisuals?.dispose();
     this.blobShadows?.dispose();
+    this.vfx.dispose();
+    // Dispose of flames (THREE.Mesh[])
+    for (const flame of this.flames) {
+      if (flame.parent) flame.parent.remove(flame);
+      if (flame.geometry) flame.geometry.dispose();
+      if (flame.material) {
+        if (Array.isArray(flame.material)) {
+          for (const m of flame.material) m.dispose();
+        } else {
+          flame.material.dispose();
+        }
+      }
+    }
+    this.flames = [];
+    // Dispose of fireLights (THREE.PointLight[])
+    for (const light of this.fireLights) {
+      if (light.parent) light.parent.remove(light);
+      if (light.shadow && light.shadow.map) light.shadow.map.dispose();
+    }
+    this.fireLights = [];
   }
 
   /**

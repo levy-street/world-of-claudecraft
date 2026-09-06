@@ -391,11 +391,16 @@ export class RenderBudgetGovernor {
       this.stallPressure < 0.5 &&
       drawPressure < 1 &&
       grassPressure < 1;
+    // Avoid false positives when non-renderer work (HUD, snapshot apply, etc.) stretches the frame time.
+    // Require that the renderer itself accounts for a significant portion of the frame time.
+    const rendererFrameRatio = totalMs > 0 ? frameMs / totalMs : 0;
+    const rendererIsMainContributor = rendererFrameRatio >= 0.7;
     this.externalFrameCap =
       rawFramePressure >= 1 &&
       cadenceMs >= EXTERNAL_FRAME_CAP_MIN_MS &&
       cadenceMs <= EXTERNAL_FRAME_CAP_MAX_MS &&
-      renderWorkHasHeadroom;
+      renderWorkHasHeadroom &&
+      rendererIsMainContributor;
     const framePressure = this.externalFrameCap ? 0 : rawFramePressure;
     this.pressure = Math.max(
       framePressure,
@@ -474,7 +479,7 @@ export class RenderBudgetGovernor {
     // Measured headroom, the gate on ALL recovery: every clause is a real cost
     // reading, never inferred from wall cadence.
     const canRecover =
-      (this.externalFrameCap || this.frameMsEma <= this.budget.recoverFrameMs) &&
+      this.frameMsEma <= this.budget.recoverFrameMs &&
       totalMs <= this.budget.recoverFrameMs &&
       submitMs <= Math.max(8, this.budget.recoverFrameMs * 0.7) &&
       rawSubmitMs <= SUBMIT_STALL_RECOVERY_CEILING_MS &&

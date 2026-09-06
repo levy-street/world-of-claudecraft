@@ -592,6 +592,7 @@ import { ReannounceMarker } from './live_region_reannounce';
 import { isCombatFlavorLog } from './log_event_route';
 import { lowHealthVignette } from './low_health';
 import { type LowResourceView, lowResourceViewInto } from './low_resource';
+import { blurIfPointerClick } from './pointer_blur';
 import { mailIndicatorView } from './mailbox_view';
 import { MailboxWindow } from './mailbox_window';
 import { onMapArtReady } from './map_art';
@@ -1064,6 +1065,8 @@ const castDisplayName = (id: string): string => {
   if (id === TOOL_RECHARGE_CAST_ID) return t('abilityUi.cast.tool_recharge');
   if (id === 'demon_heal') return t('abilityUi.cast.demonHeal');
   if (id === 'thunzharr_stormcall') return t('abilityUi.cast.thunzharrStormcall');
+  if (id === 'nythraxis_ward_channel') return t('abilityUi.cast.nythraxisWardChannel');
+  if (id === 'nythraxis_deathless_rage') return t('abilityUi.cast.nythraxisDeathlessRage');
   const riftKey = `abilityUi.cast.${id}` as TranslationKey;
   if (riftKey in RIFT_CAST_DISPLAY_KEYS) return t(riftKey);
   const ability = ABILITIES[id];
@@ -9781,6 +9784,7 @@ export class Hud {
     el.addEventListener('click', (ev) => {
       ev.preventDefault();
       ev.stopPropagation();
+      blurIfPointerClick(ev, el);
       this.openMailbox();
     });
     el.addEventListener('keydown', (ev) => {
@@ -17529,6 +17533,10 @@ export class Hud {
   // -------------------------------------------------------------------------
 
   toggleTalents(): void {
+    const player = this.sim.entities.get(this.sim.primaryId);
+    if (player?.inCombat || player?.nythraxis) {
+      return; // prevent opening talents during combat or boss encounter
+    }
     const el = $('#talents-window');
     if (el.style.display === 'block') {
       this.talentsWindow.close();

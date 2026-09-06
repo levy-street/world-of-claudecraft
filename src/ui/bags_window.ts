@@ -285,7 +285,8 @@ export interface BagsWindowDeps extends PainterHostPresentation {
 }
 
 export class BagsWindow {
-  // Window-local filter state: category chips + sort + live search, persisted across
+private resizeObserver: (() => void) | null = null;
+// Window-local filter state: category chips + sort + live search, persisted across
   // sessions. Pure logic lives in bag_filter.ts / bags_view.ts; this is the consumer.
   private filter: BagFilterState = (() => {
     try {
@@ -339,8 +340,12 @@ export class BagsWindow {
   // from arming forever.
   private sortSettleArmedAt = 0;
   private lastSortBaseline = '';
+  private resizeObserver: (() => void) | null = null;
 
-  constructor(private readonly deps: BagsWindowDeps) {}
+  constructor(private readonly deps: BagsWindowDeps) {
+    this.resizeObserver = () => this.onWindowResized();
+    window.addEventListener('resize', this.resizeObserver);
+  }
 
   private armSortSettle(): void {
     this.sortSettleArmedAt = performance.now();
@@ -348,6 +353,38 @@ export class BagsWindow {
     // synchronously on the same call stack as the click handler).
     this.lastSortBaseline = bagSortSignature(this.deps.world().inventory);
   }
+
+  private onWindowResized(): void {
+    if (!this.deps.root()) return;
+    const el = this.deps.root();
+    if (el.style.display === 'none') return;
+    const rect = el.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      let needsReposition = false;
+      let newLeft = rect.left;
+      let newTop = rect.top;
+      if (rect.left < 0) {
+        newLeft = 0;
+        needsReposition = true;
+      }
+      if (rect.top < 0) {
+        newTop = 0;
+        needsReposition = true;
+      }
+      if (rect.right > viewportWidth) {
+        newLeft = viewportWidth - rect.width;
+        needsReposition = true;
+      }
+      if (rect.bottom > viewportHeight) {
+        newTop = viewportHeight - rect.height;
+        needsReposition = true;
+      }
+      if (needsReposition) {
+        el.style.left = `${newLeft}px`;
+        el.style.top = `${newTop}px`;
+      }
+    }
 
   /**
    * Repaint the money row when the purse moved, the staleness contract this window
@@ -433,6 +470,10 @@ export class BagsWindow {
     this.deps.restoreFocus(this.openerFocus);
     this.openerFocus = null;
     this.deps.onClosed();
+      if (this.resizeObserver) {
+        window.removeEventListener('resize', this.resizeObserver);
+        this.resizeObserver = null;
+      }
   }
 
   render(): void {

@@ -9624,6 +9624,8 @@ export const zh_CN: EnTranslations = {
       "tool_recharge": "充能",
       "demonHeal": "恶魔治疗",
       "thunzharrStormcall": "风暴召唤",
+      "nythraxisWardChannel": "守护石信道",
+      "nythraxisDeathlessRage": "不灭之怒",
       "rift_frost_execution": "冰川之墓",
       "rift_frost_strike": "绝对零度",
       "rift_ember_execution": "岩浆泉",

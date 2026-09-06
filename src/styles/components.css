@@ -1674,6 +1674,11 @@
   .spell-row .spell-name,
   .spell-row .spell-sub {
     overflow-wrap: anywhere;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
   }
   .spell-icon {
     width: 34px;
@@ -11543,7 +11548,7 @@
   }
   .df-cols {
     display: grid;
-    grid-template-columns: 236px 1fr;
+    grid-template-columns: minmax(180px, 236px) 1fr;
     gap: 10px;
     flex: 1 1 auto;
     min-height: 0;

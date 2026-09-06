@@ -2680,6 +2680,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.gathering': '采集',
   'abilityUi.cast.thunzharrStormcall': '风暴召唤',
   'abilityUi.cast.demonHeal': '恶魔治疗',
+  'abilityUi.cast.nythraxisWardChannel': '守护石信道',
+  'abilityUi.cast.nythraxisDeathlessRage': '不灭之怒',
   'abilityUi.cast.rift_arcane_execution': '虚空裂隙',
   'abilityUi.cast.rift_arcane_strike': '奥术湮灭',
   'abilityUi.cast.rift_brute_execution': '碎地之力',

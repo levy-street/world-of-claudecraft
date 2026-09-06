@@ -30,6 +30,8 @@ export type TranslationKeyFlat =
   | 'abilityUi.cast.enchanting_apply'
   | 'abilityUi.cast.fishing'
   | 'abilityUi.cast.gathering'
+  | 'abilityUi.cast.nythraxisDeathlessRage'
+  | 'abilityUi.cast.nythraxisWardChannel'
   | 'abilityUi.cast.rift_arcane_execution'
   | 'abilityUi.cast.rift_arcane_strike'
   | 'abilityUi.cast.rift_brute_execution'

@@ -1249,7 +1249,9 @@ export class DungeonInteriors {
     const steps = Math.max(5, Math.min(20, Math.round(rampLen / 2.2)));
     const stepDepth = rampLen / steps;
     for (let i = 0; i < steps; i++) {
-      const topY = (height * (i + 1)) / steps;
+      // Step top samples the ramp at the step's CENTER (not back edge), so the
+      // character's feet track the drawn treads instead of sinking a full step.
+      const topY = (height * (i + 0.5)) / steps;
       const step = new THREE.Mesh(new THREE.BoxGeometry(halfW * 2, topY, stepDepth + 0.05), mat);
       step.position.set(0, topY / 2, rampZ0 + (i + 0.5) * stepDepth);
       step.receiveShadow = true;

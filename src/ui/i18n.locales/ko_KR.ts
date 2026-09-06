@@ -2769,6 +2769,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.gathering': '채집',
   'abilityUi.cast.thunzharrStormcall': '폭풍의 부름',
   'abilityUi.cast.demonHeal': '악마 치유',
+  'abilityUi.cast.nythraxisWardChannel': '워드스톤 채널링',
+  'abilityUi.cast.nythraxisDeathlessRage': '죽음 없는 분노',
   'abilityUi.cast.rift_arcane_execution': '공허 균열',
   'abilityUi.cast.rift_arcane_strike': '비전 소멸',
   'abilityUi.cast.rift_brute_execution': '대지 분쇄',

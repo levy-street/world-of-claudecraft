@@ -9624,6 +9624,8 @@ export const da_DK: EnTranslations = {
       "tool_recharge": "Genopladning",
       "demonHeal": "Dæmonhelbredelse",
       "thunzharrStormcall": "Stormkald",
+      "nythraxisWardChannel": "Wardstone Channel",
+      "nythraxisDeathlessRage": "Deathless Rage",
       "rift_frost_execution": "Iskold Grav",
       "rift_frost_strike": "Absolut Nulpunkt",
       "rift_ember_execution": "Magmakilde",
