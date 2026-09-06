@@ -3,6 +3,7 @@ import {
   HEROIC_DUNGEON_TUNING,
   HEROIC_MOB_TUNING,
   NORMAL_DUNGEON_TUNING,
+  VARKHUL_HEROIC_ADD_HEALTH_RETUNE,
 } from '../src/sim/content/dungeon_difficulty';
 import { DUNGEONS } from '../src/sim/data';
 import {
@@ -77,10 +78,12 @@ describe('Ignivar raid trash tuning', () => {
     expect(NORMAL_DUNGEON_TUNING[IGNIVAR_SECOND_WING_ID]).toBeUndefined();
     expect(HEROIC_DUNGEON_TUNING[IGNIVAR_SECOND_WING_ID]).toMatchObject({
       healthMultiplier: 5 / 3,
+      // The per-role progression times the 2026-09 adds-phase retune; the
+      // spawned pools are pinned in tests/ignivar_varkhul_health.test.ts.
       healthMultiplierByMob: {
-        ignivar_ember_sentinel: (1_200 * 1.2) / 1_300,
-        ignivar_crucible_warden: (1_395 * 1.25) / 1_505,
-        ignivar_cinder_artificer: (2_170 * 1.3) / 2_330,
+        ignivar_ember_sentinel: ((1_200 * 1.2) / 1_300) * VARKHUL_HEROIC_ADD_HEALTH_RETUNE,
+        ignivar_crucible_warden: ((1_395 * 1.25) / 1_505) * VARKHUL_HEROIC_ADD_HEALTH_RETUNE,
+        ignivar_cinder_artificer: ((2_170 * 1.3) / 2_330) * VARKHUL_HEROIC_ADD_HEALTH_RETUNE,
       },
       damageMultiplierByMob: {
         ignivar_ember_sentinel: (101.8 * 1.25) / 110.2,

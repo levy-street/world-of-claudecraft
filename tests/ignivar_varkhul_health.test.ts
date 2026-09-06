@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
+import {
+  HEROIC_DUNGEON_TUNING,
+  VARKHUL_HEROIC_ADD_HEALTH_RETUNE,
+} from '../src/sim/content/dungeon_difficulty';
 import { DUNGEON_MOBS } from '../src/sim/content/dungeons';
 import { createMob } from '../src/sim/entity';
 import {
@@ -38,15 +41,25 @@ describe('Ignivar and Varkhul raid health bands', () => {
   });
 
   it('scales Heroic automata after compensating for their level 20 to 22 jump', () => {
+    // The Heroic pools are the per-role progression (+20% / +25% / +30% over
+    // the level-22 transform, elite x2.3 included) times the 2026-09 adds-phase
+    // retune. At 1x they were 3,312 / 4,011 / 6,488 and no live raid finished
+    // the Master's Assembly; 0.7x is the "very difficult, not impossible" line.
+    expect(VARKHUL_HEROIC_ADD_HEALTH_RETUNE).toBe(0.7);
     const rows = [
-      [IGNIVAR_EMBER_SENTINEL_ID, 2_760, 3_312],
-      [IGNIVAR_CRUCIBLE_WARDEN_ID, 3_208, 4_011],
-      [IGNIVAR_CINDER_ARTIFICER_ID, 4_991, 6_488],
+      [IGNIVAR_EMBER_SENTINEL_ID, 2_760, 2_318],
+      [IGNIVAR_CRUCIBLE_WARDEN_ID, 3_208, 2_807],
+      [IGNIVAR_CINDER_ARTIFICER_ID, 4_991, 4_542],
     ] as const;
     for (const [templateId, normalHp, heroicHp] of rows) {
       expect(spawned(templateId, 'ignivar_inner_crucible', 'normal').maxHp).toBe(normalHp);
       expect(spawned(templateId, 'ignivar_inner_crucible', 'heroic').maxHp).toBe(heroicHp);
     }
+    // The whole intermission (16 Sentinels, 4 Wardens, 3 Artificers) must stay
+    // a harder throughput check than Normal's 12 + 3 inside its 60 s cap.
+    const heroicPool = 16 * 2_318 + 4 * 2_807 + 3 * 4_542;
+    const normalPool = 9 * 2_760 + 3 * 3_208 + 3 * 4_991;
+    expect(heroicPool / 70).toBeGreaterThan(normalPool / 60);
   });
 
   it('raises Heroic tank and add melee without multiplying support damage wildly', () => {
