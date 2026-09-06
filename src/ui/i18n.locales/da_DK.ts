@@ -2217,6 +2217,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.items.gatherers_cache.name': 'Indsamlerens Gemme',
   'entities.items.artisans_eye.name': 'Håndværkerens Øje',
   'entities.items.reins_terrorspark_groundshaker.name': 'Tændingsnøgle: Skrækgnist, jordrysteren',
+  'entities.items.reins_lanternback_troll.name':
+    'Lygtetænderens åg: Grumbol',
   'hud.options.graphicsPresetInsane': 'Ekstrem',
   'hud.options.surfaceDetail': 'Overfladedetaljer',
   'hud.options.surfaceDetailBasic': 'Basis',

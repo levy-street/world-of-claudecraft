@@ -49,6 +49,7 @@ import {
   normalizeStreamerLink,
   type StreamerLinks,
 } from '../sim/account_flair';
+import { isOwnAura } from '../sim/aura_classify';
 import { bagPools } from '../sim/bags';
 import { resolveActionReplacement } from '../sim/combat/action_replacement';
 import { resolveColdsightAbilityForSpec } from '../sim/combat/hunter_coldsight';
@@ -87,7 +88,7 @@ import {
 } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
 import { canEquipItem, isUniqueEquipped, weaponHand } from '../sim/equipment_rules';
-import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
+import { isItemLevelEligible } from '../sim/item_level';
 import { requiredLevelFor } from '../sim/item_level_req';
 import type { Ante, PickAction } from '../sim/lockpick';
 import { petCanForceTaunt } from '../sim/pet/pet_taunt_gate';
@@ -102,9 +103,7 @@ import { TIER_SKILL_STEP, tierForSkill } from '../sim/professions/wheel';
 import { questObjectivesForMob } from '../sim/quest_targets';
 import type { ResolvedAbility } from '../sim/sim';
 import {
-  type AbilityDef,
   type AuraKind,
-  type CalendarResultCode,
   CONSUME_DURATION,
   CRAFT_CAST_ID,
   canPrestige,
@@ -115,15 +114,12 @@ import {
   type EquipSlot,
   FISHING_CAST_ID,
   GATHER_CAST_ID,
-  type HonorReason,
   type InvSlot,
   type ItemDef,
   type ItemInstancePayload,
   isMechWearer,
   isPetClass,
   MAX_LEVEL,
-  type MailResultCode,
-  type MotdResultCode,
   type PetMode,
   type PlayerClass,
   type ResourceType,
@@ -153,6 +149,7 @@ import {
   formatAbilityNumber,
 } from './ability_description';
 import { abilityDisplayName, abilityDisplayNameFromSource } from './ability_display_name';
+import { abilityRequirementLines, describeAbilitySummary } from './ability_tooltip_lines';
 import { ArenaWindow } from './arena_window';
 import { auraDisplayNameForHud, auraDisplayNameFromSource } from './aura_display_name';
 import {
@@ -366,10 +363,6 @@ import {
 } from './heal_landing_feedback_core';
 import { honorFloatText } from './honor_float_view';
 import {
-  type AbilityRequirementResolve,
-  abilityRequirementKeys,
-} from './hud/action_bar/ability_requirement_keys';
-import {
   type ActionBarBindState,
   actionBarBindEnter,
   actionBarBindResolveCapture,
@@ -387,11 +380,7 @@ import {
   ACTION_BAR_ABILITY_SLOTS_PER_ROW,
   actionBarRowForSlot,
 } from './hud/action_bar/action_bar_layout_core';
-import {
-  applyActionBarLayout,
-  captureActionBarLayout,
-  planActionBarRestore,
-} from './hud/action_bar/action_bar_layout_sync';
+import { actionBarLayoutProfileForSurface } from './hud/action_bar/action_bar_layout_sync';
 import { isActionBarEditAllowed } from './hud/action_bar/action_bar_lock';
 import { ActionBarPainter } from './hud/action_bar/action_bar_painter';
 import {
@@ -516,8 +505,10 @@ import { QuestTrackerController } from './hud/quest/quest_tracker_controller';
 import { QuestLogWindow } from './hud/quest/questlog_window';
 import { RiftMapPainter } from './hud/rift';
 import { RiftFloorTrackerController } from './hud/rift/rift_floor_tracker_controller';
+import { RiftForgeWindow, riftForgeInReach } from './hud/rift_forge';
 import { StanceBarController } from './hud/stance';
 import { closeOpenTouchMenu } from './hud/tap_menu';
+import { createTargetDotsView, type TargetDotsInput, TargetDotsPainter } from './hud/target_dots';
 import { dismissBuyQuantityPrompts } from './hud/vendor/buy_quantity_prompt_window';
 import { buildCrucibleVendorView } from './hud/vendor/crucible_vendor_view';
 import { renderCrucibleVendorWindow } from './hud/vendor/crucible_vendor_window';
@@ -553,7 +544,7 @@ import {
 } from './i18n';
 import { iconDataUrl, QUALITY_COLOR, raidMarkerDataUrl } from './icons';
 import { InspectWindow } from './inspect_window';
-import { InterfaceUnlock, makeUiRootDetacher } from './interface_unlock';
+import { InterfaceUnlock, makeUiRootDetacher, restoreFrameHome } from './interface_unlock';
 import { HUD_FRAME_SPECS } from './interface_unlock_core';
 import {
   buildFramesMenuSelects,
@@ -563,10 +554,14 @@ import {
 } from './interface_unlock_menu_core';
 import { InterfaceUnlockPreview } from './interface_unlock_preview';
 import { InteriorMapController } from './interior_map_controller';
-import { compareStatLabelKey, itemAffixTooltipLines } from './item_affix_tooltip';
+import {
+  compareStatLabelKey,
+  itemAffixTooltipLines,
+  itemRatingTooltipLines,
+} from './item_affix_tooltip';
 import { itemArmorTypeLabelKey } from './item_armor_type';
 import { requiredClassesForTooltip } from './item_class_restriction';
-import { itemStatDeltas } from './item_compare';
+import { itemStatDeltas, shouldCompareCopies } from './item_compare';
 import { ItemDragState } from './item_drag_state';
 import {
   instanceBadgeLines,
@@ -577,6 +572,7 @@ import {
   instancePartyTradeLine,
   itemNumber,
   itemStatName,
+  wornTooltipInstance,
 } from './item_instance_tooltip';
 import { itemKindLabel, itemQualityLabel } from './item_kind_label';
 import { itemNameColor } from './item_name_color';
@@ -716,6 +712,7 @@ import { questProgressEventText } from './quest_progress_text';
 import { RaidBossGuideWindow, raidBossGuideContextFallback } from './raid_boss_guide_window';
 import { lockoutParts, lockoutShape } from './raid_lockout';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
+import { presentRealmBuilder, RealmBuilderPopup } from './realm_builder_popup';
 import {
   reliquaryIlluminationBroadcastLine,
   reliquaryIlluminationBroadcastRendered,
@@ -740,6 +737,19 @@ import {
 } from './reliquary_view';
 import { curatorRankNameKey, ReliquaryWindow } from './reliquary_window';
 import { restView } from './rest_indicator';
+import {
+  CALENDAR_RESULT_FALLBACK_KEY,
+  CALENDAR_RESULT_KEYS,
+  GUILD_ROSTER_RESULT_FALLBACK_KEY,
+  GUILD_ROSTER_RESULT_KEYS,
+  HONOR_REASON_FALLBACK_KEY,
+  HONOR_REASON_KEYS,
+  MAIL_RESULT_ERROR_KEYS,
+  MAIL_RESULT_FALLBACK_KEY,
+  MOTD_RESULT_FALLBACK_KEY,
+  MOTD_RESULT_KEYS,
+} from './result_code_keys';
+import { itemLevelReadout, riftBandTooltipLines, riftGemTooltipLines } from './rift_band_tooltip';
 import { isTalentRowUnlockLevel } from './row_unlock_toast';
 import { localizeServerText } from './server_i18n';
 import {
@@ -767,12 +777,7 @@ import {
   type StatTooltipModel,
   weaponDps,
 } from './stat_tooltip';
-import {
-  type StatTooltipI18n,
-  statCellHtml,
-  statNameKey,
-  statTooltipHtml,
-} from './stat_tooltip_view';
+import { type StatTooltipI18n, statCellHtml, statTooltipHtml } from './stat_tooltip_view';
 import { clearOpenStoreResult } from './store_decision_prompt';
 import { mountStorePromoCard, type StorePromoCardController } from './store_promo_card';
 import { recordStoreStackSample } from './store_stack_diag';
@@ -1069,53 +1074,8 @@ const castDisplayName = (id: string): string => {
   return ability ? abilityDisplayName(ability) : id;
 };
 
-// Ravenpost mailResult refusal codes to their toast lines. `sent`/`collected`
-// are successes rendered as chat-log lines in handleEvents, but they map here
-// too; codes outside THIS bundle's union take the fallback below.
-const MAIL_RESULT_ERROR_KEYS: Record<MailResultCode, TranslationKey> = {
-  sent: 'hudChrome.mailbox.result.sent',
-  collected: 'hudChrome.mailbox.result.collected',
-  tooFar: 'hudChrome.mailbox.result.tooFar',
-  needRecipient: 'hudChrome.mailbox.result.needRecipient',
-  noRecipient: 'hudChrome.mailbox.result.noRecipient',
-  tooManyParcels: 'hudChrome.mailbox.result.tooManyParcels',
-  noMailQuestItems: 'hudChrome.mailbox.result.noMailQuestItems',
-  noMailBound: 'hudChrome.mailbox.result.noMailBound',
-  noMailSoulbound: 'hudChrome.itemSoulbound',
-  notEnoughItems: 'hudChrome.mailbox.result.notEnoughItems',
-  cantAffordPostage: 'hudChrome.mailbox.result.cantAffordPostage',
-  recipientBoxFull: 'hudChrome.mailbox.result.recipientBoxFull',
-  letterGone: 'hudChrome.mailbox.result.letterGone',
-  takeParcelsFirst: 'hudChrome.mailbox.result.takeParcelsFirst',
-};
-// Guild calendar outcome lines (created/removed are chat-log successes).
-const CALENDAR_RESULT_KEYS: Record<CalendarResultCode, TranslationKey> = {
-  created: 'hudChrome.calendar.result.created',
-  removed: 'hudChrome.calendar.result.removed',
-  notInGuild: 'hudChrome.calendar.result.notInGuild',
-  notOfficer: 'hudChrome.calendar.result.notOfficer',
-  badInput: 'hudChrome.calendar.result.badInput',
-  calendarFull: 'hudChrome.calendar.result.calendarFull',
-  eventGone: 'hudChrome.calendar.result.eventGone',
-};
-// Guild billboard outcome lines (`set` is the chat-log success).
-const MOTD_RESULT_KEYS: Record<MotdResultCode, TranslationKey> = {
-  set: 'hudChrome.social.billboard.result.set',
-  notInGuild: 'hudChrome.calendar.result.notInGuild',
-  notOfficer: 'hudChrome.social.billboard.result.notOfficer',
-};
-const HONOR_REASON_KEYS: Record<HonorReason, TranslationKey> = {
-  arena_win: 'hudChrome.warfare.reasons.arenaWin',
-  arena_complete: 'hudChrome.warfare.reasons.arenaComplete',
-  fiesta_kill: 'hudChrome.warfare.reasons.fiestaKill',
-  fiesta_complete: 'hudChrome.warfare.reasons.fiestaComplete',
-  fiesta_win: 'hudChrome.warfare.reasons.fiestaWin',
-  battleground_win: 'hudChrome.warfare.reasons.battlegroundWin',
-  battleground_first_win: 'hudChrome.warfare.reasons.battlegroundFirstWin',
-  battleground_complete: 'hudChrome.warfare.reasons.battlegroundComplete',
-  battleground_kill: 'hudChrome.warfare.reasons.battlegroundKill',
-  battleground_assist: 'hudChrome.warfare.reasons.battlegroundAssist',
-};
+// The wire-union result-code key maps (mail, calendar, billboard, roster
+// expansion, honor) and their fallbacks live in result_code_keys.ts.
 // The combat-log color for each Thornhollow Fields finish-line tone. WHICH lines
 // exist and what they say is the pure core's decision
 // (hud/battleground/bg_end_banner_view.ts); only the color stays here, because
@@ -1130,14 +1090,6 @@ const BG_END_LOG_COLORS: Record<BgEndLogTone, string> = {
 /** The remaining-time call's own log colour, the same gold the capture line
  *  uses: it is a match-critical call, not a result. */
 const BG_TIME_WARNING_LOG_COLOR = '#ffd24a';
-// The wire-union fallbacks (R34's enum axis): every code above is a SERVER
-// value a newer deploy can widen, and t() throws on an undefined key, so an
-// off-vocabulary code degrades to the family's most generic line instead of
-// killing the event batch (the RAID_MARKER_LABEL_KEYS idiom below).
-const MAIL_RESULT_FALLBACK_KEY: TranslationKey = 'hudChrome.mailbox.result.letterGone';
-const CALENDAR_RESULT_FALLBACK_KEY: TranslationKey = 'hudChrome.calendar.result.badInput';
-const MOTD_RESULT_FALLBACK_KEY: TranslationKey = 'hudChrome.social.billboard.result.notOfficer';
-const HONOR_REASON_FALLBACK_KEY: TranslationKey = 'hudChrome.warfare.reasons.arenaWin';
 const RAID_MARKER_LABEL_KEYS = [
   'hud.markers.names.star',
   'hud.markers.names.circle',
@@ -1148,10 +1100,6 @@ const RAID_MARKER_LABEL_KEYS = [
   'hud.markers.names.cross',
   'hud.markers.names.skull',
 ] as const satisfies readonly TranslationKey[];
-const FORM_LABEL_KEYS: Record<'bear' | 'cat', TranslationKey> = {
-  bear: 'abilityUi.forms.bear',
-  cat: 'abilityUi.forms.cat',
-};
 const PET_MODE_LABEL_KEYS: Record<PetMode, TranslationKey> = {
   passive: 'hud.pet.passive',
   defensive: 'hud.pet.defensive',
@@ -1541,6 +1489,7 @@ export class Hud {
   private targetResEl = $('#tf-res');
   private targetResTextEl = $('#tf-res-text');
   private targetDebuffsEl = $('#tf-debuffs');
+  private targetDotsEl = $('#target-dots');
   // Target of Target (showTargetOfTarget option): element refs for the #totarget-frame
   // mini-frame, resolved ONCE like the target refs above (never per-frame queried). The
   // frame is a THIRD instance of the unit_frame family (totFramePainter below).
@@ -2131,6 +2080,7 @@ export class Hud {
   private tutorial = new TutorialOverlay();
   private bootcamp = new BootcampOverlay();
   private noticeboardPopup = new NoticeboardPopup();
+  private realmBuilderPopup = new RealmBuilderPopup();
   private lastPetBarSig = '';
   // Value-diffed body-class flag: true while a live pet bar is shown. The mobile
   // top-band layout reads body.mobile-pet-active to yield the top-centre line to the
@@ -2247,10 +2197,13 @@ export class Hud {
       knownAbilityIds: () => this.sim.known.map((known) => known.def.id),
       hasAura: (kind) => this.sim.player.auras.some((aura) => aura.kind === kind),
       showAttackButton: () => this.optionsHooks?.settings.get('showAttackButton') ?? true,
+      // The arrangement profile for this device's interface (desktop or touch),
+      // read from the same body.mobile-touch signal every touch-gated path uses.
+      profile: () => actionBarLayoutProfileForSurface(this.isMobileLayout()),
       // Persistence seam: online, the ClientWorld debounces a per-character wire
       // save; offline, Sim.saveActionBarLayout is a no-op (localStorage is the
       // store). The controller always writes the localStorage mirror itself.
-      persistLayout: (layout) => this.sim.saveActionBarLayout(layout),
+      persistLayout: (profile, layout) => this.sim.saveActionBarLayout(profile, layout),
     });
     this.delveTracker = new DelveTrackerController({
       element: $('#delve-tracker'),
@@ -3706,6 +3659,9 @@ export class Hud {
       case 'guild-board-window':
         this.guildBoardWindow.close();
         break;
+      case 'rift-forge-window':
+        this.riftForgeWindow.close();
+        break;
       case 'daily-rewards-window':
         this.dailyRewardsWindow.close();
         break;
@@ -4042,6 +3998,13 @@ export class Hud {
       const cls = this.sim.cfg.playerClass;
       return cls === 'warrior' || cls === 'paladin';
     }
+    // The Target dots tracker answers "possible", not "visible", like the unit
+    // frames: every class applies debuffs, so unlocking always shows its
+    // placeholder even though the frame itself is hidden whenever no dots are
+    // out. Its own setting is what genuinely removes it.
+    if (id === 'targetDots') {
+      return (this.optionsHooks?.settings.get('showTargetDots') ?? true) === true;
+    }
     return true;
   }
 
@@ -4076,9 +4039,10 @@ export class Hud {
     // this same feature, so it splits back apart too, routed through the
     // settings seam so the checkbox, persistence and body class stay in sync.
     // Settings that merely SHOW or HIDE content (the optional bars, the pet
-    // frame, buffs on the player frame) keep the player's choice: they have
-    // their own checkboxes and are not frame layout.
+    // frame, buffs on the player frame) keep the player's choice; the buff
+    // row's reset can seat it in the aura column, so its anchor re-applies.
     this.interfaceUnlock.resetAll();
+    this.applyAuraAnchor();
     this.doomMeter.resetPosition();
     this.chatGeometry.reset();
     this.meters.resetFrames();
@@ -4173,13 +4137,13 @@ export class Hud {
   // BUFF row into #player-frame, where CSS anchors it to the frame (above it
   // while docked over the action bars, below it once moved) and the frame's
   // children-zoom scale applies. The DEBUFF row never rides the frame: with the
-  // option on it slides up beside the minimap into the spot the buff row
-  // vacated (body.auras-on-frame, hud.css), classic WoW's debuff corner, so
-  // incoming debuffs stay in one glanceable place. Off (or the mobile layout,
-  // which owns its stock aura placement) restores the classic two-row corner;
-  // the aura painters' element refs are live nodes, so they survive the moves.
+  // option on it is the only child left in the #aura-stack column, so flow
+  // lifts it into the spot the buff row vacated, classic WoW's debuff corner.
+  // Off (or the mobile layout, which owns its stock aura placement) restores
+  // the two-row corner through restoreFrameHome, which puts the row on #ui
+  // while a saved position still applies and else back at the head of the
+  // column; the aura painters' element refs are live nodes, so they survive.
   private aurasOnPlayerFrame = false;
-  private buffBarHome: { parent: ParentNode; next: Node | null } | null = null;
 
   setAurasOnPlayerFrame(on: boolean): void {
     this.aurasOnPlayerFrame = on;
@@ -4196,18 +4160,11 @@ export class Hud {
 
   private applyAuraAnchor(): void {
     const on = this.aurasOnPlayerFrame && !this.isMobileLayout();
-    document.body.classList.toggle('auras-on-frame', on);
     const frame = this.playerFrameEl;
-    // The buff bar's stock home: right before its sibling debuff bar (which
-    // stays put in the DOM; only its CSS spot shifts with the body class).
-    this.buffBarHome ??= {
-      parent: this.buffBarEl.parentNode as ParentNode,
-      next: this.debuffBarEl,
-    };
     if (on) {
       if (this.buffBarEl.parentElement !== frame) frame.appendChild(this.buffBarEl);
     } else if (this.buffBarEl.parentElement === frame) {
-      this.buffBarHome.parent.insertBefore(this.buffBarEl, this.buffBarHome.next);
+      restoreFrameHome(document, 'buffBar');
     }
   }
 
@@ -4937,7 +4894,7 @@ export class Hud {
     // Own-aura check for the target strip's ownFirst prominence: a missing/zero
     // sourceId (an old server's mirror) is never own, so the strip degrades to
     // the un-prioritized layout instead of misattributing another caster's dot.
-    isOwn: (a) => a.sourceId !== undefined && a.sourceId !== 0 && a.sourceId === this.sim.playerId,
+    isOwn: (a) => isOwnAura(a, this.sim.playerId),
   };
   private readonly aurasPainterDeps: AurasPainterDeps = {
     resolveIconUrl: resolveHudAuraIconUrl,
@@ -5025,6 +4982,38 @@ export class Hud {
     this.aurasPainterDeps,
     document,
   );
+  // Target dots (#target-dots): the multi-target tracker for every debuff the
+  // LOCAL player has out. The selection core is class-agnostic (ownership plus
+  // isDebuffAura), so it needs no class knowledge here; the Hud supplies only the
+  // ownership predicate it already shares with the target strip, and the
+  // localization callbacks the core must not make itself.
+  private readonly targetDotsView = createTargetDotsView<Entity>({
+    isOwn: (a) => isOwnAura(a, this.sim.playerId),
+    auraName: (a) =>
+      auraDisplayNameForHud(a.name, ABILITIES[a.id] ? abilityDisplayName(ABILITIES[a.id]) : null),
+    targetName: (e) => entityDisplayName(e),
+    iconKey: (a) => resolveHudAuraIconId(a),
+  });
+  private readonly targetDotsPainter = new TargetDotsPainter({
+    root: () => this.targetDotsEl,
+    writers: this.writerFacet,
+    iconBackground: resolveHudAuraIconUrl,
+    rowLabel: (aura, target) => t('hudChrome.targetDots.row', { aura, target }),
+    frameLabel: () => t('hudChrome.targetDots.title'),
+    overflowLabel: (count) =>
+      t('hudChrome.targetDots.overflow', {
+        count: formatNumber(count, { maximumFractionDigits: 0 }),
+      }),
+    secondsSuffix: () => t('hudChrome.unitFrame.durationUnitSeconds'),
+  });
+  // REUSED input container for the tracker's per-frame tick (the allocation-light
+  // contract the durationUnits() dep already follows): the fields are rewritten
+  // each frame, the object never is.
+  private readonly targetDotsInput: TargetDotsInput<Entity> = {
+    entities: [],
+    targetId: null,
+    enabled: true,
+  };
   // Overworld minimap canvas painter (the delve branch stays with delvePainter). Owns
   // the marker core; redraws from the fastHud (~10Hz) band. classCss colors the party
   // discs/arrows; zoneDisplayName localizes the '#zone-label' it writes via setText.
@@ -5625,6 +5614,17 @@ export class Hud {
     ...this.windowFocus('#guild-board-window'),
     onVisibilityChange: () => this.syncAnyWindowOpenState(),
     maskPlayerText: (text) => this.maskChat(text),
+  });
+  // The Rift Forge (src/ui/hud/rift_forge/): opened by the Riftwright's
+  // interaction event, never a menu button; the forge lives in the world.
+  private readonly riftForgeWindow = new RiftForgeWindow({
+    root: () => $('#rift-forge-window'),
+    world: () => this.sim,
+    closeOthers: () => this.closeOtherWindows('#rift-forge-window'),
+    ...this.windowFocus('#rift-forge-window'),
+    onVisibilityChange: () => this.syncAnyWindowOpenState(),
+    itemTooltip: (item, instance?: ItemInstancePayload) => this.itemTooltip(item, true, instance),
+    attachTooltip: (el, html) => this.attachTooltip(el, html),
   });
   // The $WOC Exchange is online-only, browser web + website desktop. Its
   // launcher stays hidden until main.ts attaches hooks; a denied non-native
@@ -6440,14 +6440,14 @@ export class Hud {
     // hover. Combat gear only: sourceless items (vendor/starter) have no level,
     // and non-combat items never get an item-level line.
     if (isItemLevelEligible(item) && this.optionsHooks?.settings.get('showItemLevel')) {
-      const level = itemLevel(item);
-      if (level !== undefined) {
+      const readout = itemLevelReadout(item, instance);
+      if (readout !== undefined) {
         html += `<div class="tt-stat" style="color:var(--gold)">${esc(
-          t('hudChrome.options.itemLevelLine', { level: itemNumber(level) }),
+          t('hudChrome.options.itemLevelLine', { level: itemNumber(readout.level) }),
         )}</div>`;
         html += `<div class="tt-sub">${esc(
           t('hudChrome.options.itemScoreLine', {
-            score: itemNumber(itemScore(item), 1),
+            score: itemNumber(readout.score, 1),
           }),
         )}</div>`;
       }
@@ -6503,46 +6503,10 @@ export class Hud {
       }
     }
     html += instanceBonusStatLines(instance);
-    if (instance?.rift) {
-      html += `<div class="tt-sub">${esc(
-        t('hudChrome.itemTooltip.riftTier', { tier: instance.rift.tier }),
-      )}</div>`;
-      html += `<div class="tt-sub">${esc(
-        t('hudChrome.itemTooltip.riftUpgrade', {
-          level: itemNumber(instance.rift.upgradeLevel),
-          max: itemNumber(instance.rift.maxUpgradeLevel),
-        }),
-      )}</div>`;
-      html += `<div class="tt-sub">${esc(
-        t('hudChrome.itemTooltip.riftSockets', {
-          used: itemNumber(instance.rift.gems.length),
-          total: itemNumber(instance.rift.gemSlots),
-        }),
-      )}</div>`;
-    }
+    html += riftBandTooltipLines(instance);
     html += itemAffixTooltipLines(item);
-    const warfareRating = Math.min(item.pvpOffenseRating ?? 0, item.pvpDefenseRating ?? 0);
-    if (warfareRating > 0) {
-      html += `<div class="tt-green">${esc(
-        t('itemUi.tooltip.stat', {
-          value: itemNumber(warfareRating),
-          stat: t(statNameKey('warfare') as TranslationKey),
-        }),
-      )}</div>`;
-    }
-    // Combat ratings (hit / crit / haste): shown as classic "+N Rating" affix lines,
-    // sharing the character-sheet HUD-chrome labels. Hit answers the higher-level
-    // miss/resist penalty; crit and haste add throughput.
-    for (const ratingStat of ['hitRating', 'critRating', 'hasteRating'] as const) {
-      const value = item[ratingStat] ?? 0;
-      if (value <= 0) continue;
-      html += `<div class="tt-green">${esc(
-        t('itemUi.tooltip.stat', {
-          value: itemNumber(value),
-          stat: t(statNameKey(ratingStat) as TranslationKey),
-        }),
-      )}</div>`;
-    }
+    html += riftGemTooltipLines(item);
+    html += itemRatingTooltipLines(item);
     if (item.foodHp)
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useFood', { amount: itemNumber(item.foodHp), seconds: itemNumber(CONSUME_DURATION) }))}</div>`;
     if (item.drinkMana)
@@ -6639,7 +6603,7 @@ export class Hud {
     // player actively tries to sell back.
     if (item.sellValue > 0 && !item.noVendorSell && !item.soulbound)
       html += `<div class="tt-sub">${esc(t('itemUi.tooltip.sellPrice', { money: formatLocalizedMoney(item.sellValue) }))}</div>`;
-    if (compare) html += this.itemCompareBlock(item);
+    if (compare) html += this.itemCompareBlock(item, instance);
     return html;
   }
 
@@ -6740,20 +6704,26 @@ export class Hud {
   // item currently worn in that slot plus the stat change you'd see if you
   // swapped to it (green = gain, red = loss). Reads IWorld.equipment, so it
   // works identically offline and online.
-  private itemCompareBlock(item: ItemDef): string {
+  private itemCompareBlock(item: ItemDef, instance?: ItemInstancePayload): string {
     if (!item.slot) return '';
     // A hovered ring compares against BOTH worn rings (classic behavior); every
     // other slot kind is its own single equipment key.
     const slots: readonly EquipSlot[] = item.slot === 'ring' ? ['ring1', 'ring2'] : [item.slot];
-    return slots.map((slot) => this.itemCompareBlockForSlot(item, slot)).join('');
+    return slots.map((slot) => this.itemCompareBlockForSlot(item, slot, instance)).join('');
   }
 
-  private itemCompareBlockForSlot(item: ItemDef, slot: EquipSlot): string {
+  private itemCompareBlockForSlot(
+    item: ItemDef,
+    slot: EquipSlot,
+    instance?: ItemInstancePayload,
+  ): string {
     const equippedId = this.sim.equipment[slot];
-    if (!equippedId || equippedId === item.id) return '';
+    const worn = wornTooltipInstance(this.sim.equipmentInstances[slot]);
+    // Same-id hovers compare per copy, never a copy against itself (item_compare.ts).
+    if (!equippedId || !shouldCompareCopies(item.id, equippedId, instance, worn)) return '';
     const equipped = ITEMS[equippedId];
     if (!equipped) return '';
-    const deltas = itemStatDeltas(item, equipped)
+    const deltas = itemStatDeltas(item, equipped, instance, worn)
       .map((d) => {
         const cls = d.delta > 0 ? 'tt-green' : 'tt-red';
         const sign = d.delta > 0 ? '+' : '−'; // proper minus sign
@@ -6767,7 +6737,7 @@ export class Hud {
       })
       .join('');
     let html = `<div class="tt-cmp"><div class="tt-cmp-head">${esc(t('itemUi.tooltip.currentlyEquipped'))}</div>`;
-    html += `<div class="tt-cmp-body">${this.itemTooltip(equipped, false)}</div>`;
+    html += `<div class="tt-cmp-body">${this.itemTooltip(equipped, false, worn)}</div>`;
     if (deltas)
       html += `<div class="tt-cmp-head">${esc(t('itemUi.tooltip.ifYouEquip'))}</div>${deltas}`;
     html += `</div>`;
@@ -6903,6 +6873,11 @@ export class Hud {
 
   private refreshLocalizedDynamicUi(): void {
     this.doomMeter.relocalize();
+    // The Target dots frame's accessible name is written once in its painter's
+    // constructor, so it is the one string in that frame a runtime language
+    // switch would otherwise leave in the previous locale (the row text itself
+    // re-resolves every frame through t()).
+    this.targetDotsPainter.relocalize();
     // The chat box's geometry chrome (move/resize labels, the arrange-mode
     // name chip) is written once at init, so the switch must rewrite it.
     this.chatGeometry.relocalize();
@@ -7002,7 +6977,9 @@ export class Hud {
     this.tutorial.relocalize(this.sim, this.keybinds);
     this.bootcamp.relocalize(this.sim, this.keybinds);
     this.noticeboardPopup.relocalize();
+    this.realmBuilderPopup.relocalize();
     this.guildBoardWindow.relocalize();
+    this.riftForgeWindow.relocalize();
     // The ring latches its page indicator on the page/count pair; dropping the
     // latch relabels it on the next paint (mobile layouts only build the ring).
     this.mobileActionRingPainter?.relocalize();
@@ -7159,26 +7136,16 @@ export class Hud {
   }
 
   // Runs once at world entry (polled each frame until the world resolves the
-  // decision): reconcile the device's local action-bar layout with the server
-  // copy. Offline resolves immediately to 'noop'. Online waits for the login
-  // self-payload, then either the server copy WINS (overwrite the local mirror
-  // and re-seed the controller) or the local layout seeds the first server copy.
+  // decision): reconcile this device's profile of the action-bar layout with
+  // the server copy (ActionBarController.restoreLayout owns the rule). Offline
+  // resolves immediately to 'noop'; online it waits for the login self-payload.
   private maybeRestoreActionBarLayout(): void {
     if (this.actionBarLayoutRestored) return;
     const restore = this.sim.takeActionBarLayoutRestore();
     if (restore === undefined) return; // still pending (online, pre-login-payload)
     this.actionBarLayoutRestored = true;
-    const playerClass = this.sim.cfg.playerClass;
-    const playerName = this.sim.player.name;
-    const plan = planActionBarRestore(restore, () =>
-      captureActionBarLayout(localStorage, playerClass, playerName),
-    );
-    if (plan.action === 'apply-server') {
-      applyActionBarLayout(localStorage, playerClass, playerName, plan.layout);
-      this.actionBarController.reload();
+    if (this.actionBarController.restoreLayout(restore)) {
       this.spellbookWindow.refreshHotbarControls();
-    } else if (plan.action === 'seed-local') {
-      this.sim.saveActionBarLayout(plan.layout);
     }
   }
 
@@ -7196,7 +7163,9 @@ export class Hud {
   }
 
   private syncActiveHotbarForm(): void {
-    if (!this.actionBarController.syncActiveForm()) return;
+    const profileSwitched = this.actionBarController.syncProfile();
+    if (profileSwitched) this.spellbookWindow.refreshHotbarControls();
+    if (!profileSwitched && !this.actionBarController.syncActiveForm()) return;
     this.dragAction = null;
     this.mobileActionPage = this.currentMobileActionPage();
   }
@@ -9088,6 +9057,18 @@ export class Hud {
     this.buffBarPainter.paint(this.buffBarView.tick(p));
     this.debuffBarPainter.paint(this.debuffBarView.tick(p));
 
+    // Target dots: the multi-target tracker for the debuffs the LOCAL player has
+    // out, across every enemy in interest range. Same band as the aura strips
+    // (its countdowns are what a refresh is timed against) and, for the same
+    // reason as the strips above, NEVER tier-gated: the showTargetDots setting is
+    // the only switch. The core returns an empty state when it is off, which the
+    // painter renders as a hidden frame.
+    this.targetDotsInput.entities = sim.entities.values();
+    this.targetDotsInput.targetId = p.targetId;
+    this.targetDotsInput.enabled =
+      (this.optionsHooks?.settings.get('showTargetDots') ?? true) === true;
+    this.targetDotsPainter.update(this.targetDotsView.tick(this.targetDotsInput));
+
     // target frame: the SECOND instance of the unit_frame family. The shared
     // frame (display/name/level/hp/absorb/portrait gate) goes through the family
     // painter; the target-only concerns (the elite class + tag, the hostile/friendly
@@ -9731,6 +9712,13 @@ export class Hud {
     if (slowHud && this.marketWindow.isOpen) {
       if (!this.nearbyMarketNpc()) this.marketWindow.close();
       else this.marketWindow.refreshIfChanged();
+    }
+    // The forge window follows the player out of the Riftwright's reach (the
+    // market rule); the sim's own place gate refuses the commands regardless.
+    if (slowHud && this.riftForgeWindow.isOpen) {
+      const p = this.sim.player;
+      if (!riftForgeInReach(p, this.sim.entities.values(), NPC_WINDOW_CLOSE_RANGE))
+        this.riftForgeWindow.close();
     }
     // The mailbox closes itself when the mail mirror goes null (walked away).
     if (slowHud && this.mailboxWindow.isOpen) this.mailboxWindow.refreshIfChanged();
@@ -12554,6 +12542,12 @@ export class Hud {
           // Keyboard/sim interact at a banker NPC: open the bank window.
           this.openBank();
           break;
+        case 'riftForge':
+          // Interact at the Riftwright: open the Rift Forge window (which
+          // quotes her greeting) and speak the greeting cue.
+          voice.play('greeting__riftwright_maelis');
+          this.openRiftForge();
+          break;
         case 'noticeboard':
           // The structured private event keeps this feedback localized and
           // identical offline and online. A board carrying authored listings
@@ -12570,6 +12564,9 @@ export class Hud {
             // looks inert on any host.
             this.openGuildBoard();
           }
+          break;
+        case 'realmBuilder':
+          presentRealmBuilder(this.realmBuilderPopup, this.renderer, ev.current, ev.past);
           break;
         case 'mailArrived': {
           // Player names splice verbatim; authored letters carry their
@@ -12624,6 +12621,24 @@ export class Hud {
           }
           break;
         }
+        case 'guildRosterResult': {
+          // Every code is a refusal (the success is the guild-wide line below);
+          // {price} is only read by the cannotAfford line.
+          const values = { price: formatLocalizedMoney(ev.price ?? 0) };
+          this.showError(
+            t(GUILD_ROSTER_RESULT_KEYS[ev.code] ?? GUILD_ROSTER_RESULT_FALLBACK_KEY, values),
+          );
+          break;
+        }
+        case 'guildRosterExpanded':
+          this.log(
+            t('hudChrome.social.roster.expandedLine', {
+              name: ev.byName,
+              cap: formatNumber(ev.cap, { maximumFractionDigits: 0 }),
+            }),
+            '#40ff7f',
+          );
+          break;
         case 'deedBroadcast': {
           // A guildmate's or followed friend's marquee unlock. Id-based on
           // the wire (server sends the deed id, never English); the visible
@@ -13597,8 +13612,10 @@ export class Hud {
           }
           break;
         case 'riftRaceWorld':
+          break; // its localized log line carries the non-modal detail
         case 'riftForgeResult':
-          break; // their localized log line carries the non-modal detail
+          this.riftForgeWindow.onResult(ev); // the window owns the reason line
+          break;
         case 'companionBark': {
           // Acolyte Tessa's voice line: overhead bubble over her (when on-screen),
           // plus an attributed combat-log line so it is never missed off-screen.
@@ -16527,6 +16544,7 @@ export class Hud {
       this.renderTrain();
     if (this.openUnbindNpcId !== null && $('#unbind-window').style.display === 'block')
       this.renderUnbind();
+    if (this.riftForgeWindow.isOpen) this.riftForgeWindow.render();
   }
 
   onCosmeticsChanged(): void {
@@ -17383,6 +17401,11 @@ export class Hud {
    *  (and the E2E capture rigs); there is no menu launcher on purpose. */
   openGuildBoard(): void {
     this.guildBoardWindow.open();
+  }
+
+  /** The Rift Forge: opened by the Riftwright interaction (and the capture rigs). */
+  openRiftForge(): void {
+    this.riftForgeWindow.open();
   }
 
   toggleDailyRewards(): void {
@@ -18810,87 +18833,10 @@ export class Hud {
   }
 }
 
-function describeAbilitySummary(
-  known: ResolvedAbility,
-  resourceType: ResourceType | null,
-  spellHaste = 0,
-): string {
-  const parts: string[] = [];
-  if (known.cost > 0) {
-    parts.push(
-      t('abilityUi.tooltip.cost', {
-        cost: formatAbilityNumber(known.cost),
-        resource: resourceDisplayName(resourceType),
-      }),
-    );
-  }
-  if ((known.def.ruinCost ?? 0) > 0) {
-    parts.push(
-      t('abilityUi.tooltip.ruinCost', {
-        cost: formatAbilityNumber(known.def.ruinCost ?? 0),
-      }),
-    );
-  }
-  parts.push(abilityCastLine(known, spellHaste));
-  // Resolved cooldown (after talent cooldown modifiers), not the base def cooldown.
-  if (known.cooldown > 0) {
-    parts.push(
-      t('abilityUi.tooltip.cooldownSeconds', {
-        seconds: formatAbilityNumber(known.cooldown),
-      }),
-    );
-  }
-  return parts.join(' · ');
-}
+// describeAbilitySummary and abilityRequirementLines moved to
+// ./ability_tooltip_lines (pure i18n mappers with no Hud state). Deliberately NOT
+// re-exported: nothing imports either of them from here.
 
-// Thin i18n mapper over the pure resolver (ability_requirement_keys.ts), which
-// owns the truth table incl. the Skulduggery-only stealth-bypass line.
-export function abilityRequirementLines(
-  def: AbilityDef,
-  spec?: string | null,
-  resolved?: AbilityRequirementResolve,
-): string[] {
-  return abilityRequirementKeys(def, spec, resolved).map((req) => {
-    switch (req.key) {
-      case 'requiresForm':
-        if (req.form) {
-          return t('abilityUi.tooltip.requiresForm', { form: t(FORM_LABEL_KEYS[req.form]) });
-        }
-        return t('abilityUi.tooltip.selfOnly');
-      case 'requiresStealth':
-        return t('abilityUi.tooltip.requiresStealth');
-      case 'requiresStealthSkulduggery':
-        return t('abilityUi.tooltip.requiresStealthSkulduggery');
-      case 'requiresCombo':
-        return t('abilityUi.tooltip.requiresCombo');
-      case 'requiresDodge':
-        return t('abilityUi.tooltip.requiresDodge');
-      case 'requiresOutOfCombat':
-        return t('abilityUi.tooltip.requiresOutOfCombat');
-      case 'requiresTargetHealthBelow':
-        if (req.percent !== undefined) {
-          return t('abilityUi.tooltip.requiresTargetHealthBelow', {
-            percent: formatAbilityNumber(req.percent),
-          });
-        }
-        return t('abilityUi.tooltip.selfOnly');
-      case 'onNextSwing':
-        return t('abilityUi.tooltip.onNextSwing');
-      case 'offGlobalCooldown':
-        return t('abilityUi.tooltip.offGlobalCooldown');
-      case 'friendlyTarget':
-        return t('abilityUi.tooltip.friendlyTarget');
-      case 'enemyTarget':
-        return t('abilityUi.tooltip.enemyTarget');
-      case 'anyTarget':
-        return t('abilityUi.tooltip.anyTarget');
-      case 'selfOnly':
-        return t('abilityUi.tooltip.selfOnly');
-      default:
-        return t('abilityUi.tooltip.selfOnly');
-    }
-  });
-}
 // A 2D canvas context is non-null for any attached canvas in this app; centralize
 // the assertion so the call sites do not each carry a non-null bang. Throws (a
 // dev-surfaced failure, never reached in practice) rather than asserting.

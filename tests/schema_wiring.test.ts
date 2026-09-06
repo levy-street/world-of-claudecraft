@@ -623,6 +623,16 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS ad_spend');
   });
 
+  it('applies the Realm Builder honours schema', async () => {
+    // REALM_BUILDER_SCHEMA (server/realm_builder_db.ts) backs the Eastbrook
+    // monument's honour roll. tests/server/realm_builder.test.ts fakes the
+    // whole db seam, so without this pin deleting the ensureSchema line in
+    // server/db.ts would fail nowhere until the first dashboard save.
+    await ensureSchema();
+    const applied = h.calls.join('\n');
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS realm_builder_honours');
+  });
+
   it('applies the $WOC Exchange schema (listings plus a dependent table)', async () => {
     // WOC_MARKET_SCHEMA (server/woc_market_db.ts) backs every marketplace
     // table. Same defined-but-unwired hazard as the DISCORD_SCHEMA lesson:

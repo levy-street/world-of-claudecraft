@@ -26,6 +26,7 @@ import { bagPools, canGrantItemInstance, fitsAll } from './bags';
 import { NOTICEBOARD_LISTINGS } from './content/noticeboard_listings';
 import { type NoticeboardDef, noticeboardDefByEntityId } from './content/noticeboards';
 import { HARVEST_COMPONENT_SPECIMENS, monsterMaterialTierFor } from './content/professions';
+import { currentRealmBuilder, pastRealmBuilders } from './content/realm_builders';
 import { corpseCanInteract, corpseInteractionAvailability } from './corpse_interaction';
 import { ITEMS, MOBS, QUESTS, SPIRIT_HEALER_NPC_ID } from './data';
 import * as deedsMod from './deeds';
@@ -73,6 +74,7 @@ import {
 import { isQuestGatedGroundObjectHidden } from './quest_gated_entity';
 import { noteReliquaryMark } from './reliquary';
 import { corpseHasDecayed } from './respawn_policy';
+import { isRiftForgeNpc } from './rift/forge_gate';
 import type { SimContext } from './sim_context';
 import { interactSoulwell } from './soulwell';
 import { creditSignpostRead } from './tutorial/signpost_read';
@@ -83,6 +85,8 @@ import {
   INTERACT_RANGE,
   type InvSlot,
   OBJECT_RESPAWN,
+  REALM_BUILDER_MONUMENT_INTERACT_RADIUS,
+  REALM_BUILDER_MONUMENT_TEMPLATE_ID,
 } from './types';
 import { markWorldBossLooted } from './world_boss';
 
@@ -775,13 +779,31 @@ export function pickUpObject(
   const obj = ctx.entities.get(objId);
   if (obj?.kind !== 'object' || !obj.lootable) return false;
   const noticeboardDef = noticeboardDefByEntityId(noticeboardDefinitions, obj.id);
+  const isRealmBuilderMonument = obj.templateId === REALM_BUILDER_MONUMENT_TEMPLATE_ID;
   // Preserve the historical no-op for malformed/non-pickup objects. The board
-  // is the one intentional lootable object without an item payload.
-  if (!noticeboardDef && !obj.objectItemId) return false;
+  // and the monument are the intentional lootable objects without an item
+  // payload: both are read, never taken.
+  if (!noticeboardDef && !isRealmBuilderMonument && !obj.objectItemId) return false;
   const interactionRange = noticeboardDef?.interactionRadius ?? INTERACT_RANGE;
+  if (isRealmBuilderMonument && dist2d(p.pos, obj.pos) > REALM_BUILDER_MONUMENT_INTERACT_RADIUS) {
+    ctx.error(meta.entityId, 'Too far away.');
+    return false;
+  }
   if (dist2d(p.pos, obj.pos) > interactionRange) {
     ctx.error(meta.entityId, 'Too far away.');
     return false;
+  }
+  if (isRealmBuilderMonument) {
+    // The whole roll travels with the event so the card reads identically
+    // offline and online, and so pointing content/realm_builders.ts at a live
+    // source later needs no change on either side of the wire.
+    ctx.emit({
+      type: 'realmBuilder',
+      current: currentRealmBuilder(),
+      past: pastRealmBuilders(),
+      pid: meta.entityId,
+    });
+    return true;
   }
   if (noticeboardDef) {
     // The tutorial island's signpost lesson rides the same click as the
@@ -974,6 +996,12 @@ export function interact(
         ctx.emit({ type: 'bank', pid: p.id });
         return;
       }
+      if (target.kind === 'npc' && isRiftForgeNpc(target)) {
+        // Still an NPC conversation for the deeds ledger (Saul's streak resets).
+        deedsMod.onNpcTalkedForDeeds(ctx, r.meta, target.templateId);
+        ctx.emit({ type: 'riftForge', pid: p.id });
+        return;
+      }
       if (ctx.isQuestInteractionEntity(target)) {
         ctx.talkToNpc(target.id, p.id);
         return;
@@ -1007,7 +1035,15 @@ export function interact(
       // world (the client withholds its view entirely), so the interact key must
       // not select it either: picking it would refuse below, and worse, a shiny
       // nobody can see would outrank a visible NPC or node standing further away.
-      !isQuestGatedGroundObjectHidden(e, r.meta.questLog)
+      !isQuestGatedGroundObjectHidden(e, r.meta.questLog) &&
+      // The monument is a permanent lootable object in the middle of the
+      // square, so it competes in this slot with the mailbox 6.21 yd away:
+      // its own catchment keeps it out of the race unless the player is at
+      // the plinth.
+      !(
+        e.templateId === REALM_BUILDER_MONUMENT_TEMPLATE_ID &&
+        d2 > REALM_BUILDER_MONUMENT_INTERACT_RADIUS ** 2
+      )
     ) {
       const noticeboardDef = noticeboardDefByEntityId(noticeboardDefinitions, e.id);
       if (!noticeboardDef || d2 <= noticeboardDef.interactionRadius ** 2) {
@@ -1075,6 +1111,12 @@ export function interact(
     // Opening the bank window counts as banker business for the NPC ledger.
     deedsMod.onBankerBusinessForDeeds(ctx, r.meta, questEntity.templateId);
     ctx.emit({ type: 'bank', pid: p.id });
+    return;
+  }
+  if (questEntity && isRiftForgeNpc(questEntity)) {
+    // Still an NPC conversation for the deeds ledger (Saul's streak resets).
+    deedsMod.onNpcTalkedForDeeds(ctx, r.meta, questEntity.templateId);
+    ctx.emit({ type: 'riftForge', pid: p.id });
     return;
   }
   if (questEntity) ctx.talkToNpc(questEntity.id, p.id);

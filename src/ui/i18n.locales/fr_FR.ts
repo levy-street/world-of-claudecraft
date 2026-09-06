@@ -2262,6 +2262,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.artisans_eye.name': "Œil de l'artisan",
   'entities.items.reins_terrorspark_groundshaker.name':
     'Clé de contact : Terrétincelle, l’Ébranleur de sol',
+  'entities.items.reins_lanternback_troll.name':
+    'Joug de l’allumeur de réverbères : Grumbol',
   'hudChrome.auraOverlay.allOff': 'Tout désactiver',
   'hudChrome.auraOverlay.allOn': 'Tout activer',
   'hudChrome.auraOverlay.arcs': 'Croissants latéraux',

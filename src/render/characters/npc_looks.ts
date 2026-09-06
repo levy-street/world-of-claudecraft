@@ -476,6 +476,25 @@ export const NPC_LOOKS: Record<string, NpcLookDef> = {
     worn: kit('mage'),
     props: 'tome',
   },
+  // Riftwright Maelis, Rift Forgemaster: violet-lit, soot-dark skin, hair
+  // cropped for the forge, eyes that catch the rift light; a hammer at hand.
+  riftwright_maelis: {
+    app: {
+      gender: 'female',
+      hair: 'pixie',
+      ...hair(275, 0.45, 0.35),
+      brows: 'flat',
+      eyeShape: 'almond',
+      ...eyes(280, 0.6, 0.55),
+      ...skin(24, 0.35, 0.3),
+      mouth: 'smile',
+      face: face({ jaw: 0.1, brow: 0.1 }),
+      body: body({ shoulders: 0.15, hands: 0.2 }),
+      outfit: 'violet',
+    },
+    worn: kit('knight', { head: null }),
+    props: 'hammer',
+  },
   // Quartermaster Edda, Redoubt Armorer: steel and salt, hair tied back for work.
   quartermaster_edda: {
     app: {

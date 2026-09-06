@@ -58,6 +58,7 @@
 import { bagPools, consumeOneScratch, countFit, fitsAll, removeStacked } from '../bags';
 import { ENCHANTS, type EnchantDef } from '../content/enchants';
 import { ENCHANT_FAMILY_CAST_DURATION_SEC } from '../content/professions';
+import { RIFT_GEAR_ITEM_ID_SET } from '../content/rift/items';
 import { ITEMS } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { consumeSelectedInventorySlot, itemCopyPin } from '../item_copy_ref';
@@ -156,6 +157,11 @@ export { DISENCHANT_MATERIAL_BY_QUALITY };
  *  double-enchant prevention holds for both legacy and marker-carrying
  *  copies. */
 export function isEnchantedInstance(instance: ItemInstancePayload): boolean {
+  // A Riftbound band's bare rolled.stats are its ladder-priced stat line
+  // (rift/band_ladder.ts), not an enchant; the rift record is what explains
+  // them, the way rolled.masterwork explains a masterwork bake. Bands are
+  // forge-only, refused by id in resolveApplyEnchant below.
+  if (instance.rift) return false;
   return (
     instance.enchant !== undefined || (!!instance.rolled?.stats && !instance.rolled.masterwork)
   );
@@ -706,6 +712,9 @@ export interface ApplyEnchantResult {
     // because its accept would be pure reagent loss with zero state change.
     | 'already_enchanted'
     | 'same_enchant'
+    // A Riftbound band: forge-only gear (its stat line is rebuilt from the
+    // rift record at every load, so an enchant could never survive one).
+    | 'rift_gear'
     | 'busy';
 }
 
@@ -1228,6 +1237,12 @@ export function resolveApplyEnchant(
   if (!itemDef) return { ok: false, itemId, enchantId, reason: 'unknown_item' };
   const enchant = ENCHANTS[enchantId];
   if (!enchant) return { ok: false, itemId, enchantId, reason: 'unknown_enchant' };
+  // Bands are forge-only (rift/band_ladder.ts): their stat line is rebuilt from
+  // the rift record at every load, so an enchant could never survive one.
+  // Mirrored in evaluateApplyEnchantAdmission so a doomed cast never starts.
+  if (RIFT_GEAR_ITEM_ID_SET.has(itemId)) {
+    return { ok: false, itemId, enchantId, reason: 'rift_gear' };
+  }
   // The slot-kind gate is shared by both arms: an item declares its slot KIND
   // ('ring' for either finger, 'mainhand' for a one-hand weapon worn in either
   // hand), which is what an enchant's itemSlot names.
@@ -1359,6 +1374,9 @@ export function evaluateApplyEnchantAdmission(
   if (!itemDef) return { ok: false, itemId, enchantId, reason: 'unknown_item' };
   const enchant = ENCHANTS[enchantId];
   if (!enchant) return { ok: false, itemId, enchantId, reason: 'unknown_enchant' };
+  if (RIFT_GEAR_ITEM_ID_SET.has(itemId)) {
+    return { ok: false, itemId, enchantId, reason: 'rift_gear' };
+  }
   if (itemDef.slot !== enchant.itemSlot) {
     return { ok: false, itemId, enchantId, reason: 'wrong_slot' };
   }

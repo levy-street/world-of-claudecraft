@@ -7,6 +7,7 @@
 // hand-rolling either fixture again.
 
 import type { ClientSession, GameServer } from '../../server/game';
+import { ActionBarLayoutUploader } from '../../src/net/action_bar_upload';
 import { ClientWorld } from '../../src/net/online';
 import { emptyAllocation } from '../../src/sim/content/talents';
 import { ALL_RECIPES } from '../../src/sim/data';
@@ -236,9 +237,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.cosmeticsChanged = false;
   c.actionBarRestore = undefined;
   c.actionBarRestoreResolved = false;
-  c.actionBarSaveTimer = null;
-  c.actionBarSaveLastJson = null;
-  c.actionBarSavePending = null;
+  c.actionBarUploader = new ActionBarLayoutUploader((command) => c.cmd(command));
   c.profanityDirty = false;
   c.pendingTargetEcho = null;
   c.nextCommandOutcomeId = 1;

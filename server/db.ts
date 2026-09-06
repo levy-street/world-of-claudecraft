@@ -9,7 +9,7 @@ import { LEADERBOARD_MAX } from '../src/sim/leaderboard_page';
 import { sanitizeRemovedZone1Content } from '../src/sim/removed_zone1_content';
 import type { CharacterState, MailSave, MarketSave } from '../src/sim/sim';
 import type { ArenaFormat, PlayerClass } from '../src/sim/types';
-import type { ActionBarLayout } from '../src/world_api/action_bar';
+import type { ActionBarLayoutProfiles, StoredActionBarLayout } from '../src/world_api/action_bar';
 import { ACCOUNT_WEALTH_SCHEMA } from './account_wealth_db';
 import { AD_SPEND_SCHEMA } from './ad_spend_db';
 import { bustAdminGuildListReads } from './admin_guilds_read';
@@ -120,6 +120,7 @@ import {
 import { PROGRESS_EVENTS_SCHEMA } from './progress_events_db';
 import { RATELIMIT_PRUNE_SQL, RATELIMIT_SCHEMA } from './ratelimit_db';
 import { REALM, REALM_DIRECTORY } from './realm';
+import { REALM_BUILDER_SCHEMA } from './realm_builder_db';
 import { chooseArchiveName } from './reclaim_name';
 import { attachSchemaNoticeForwarder } from './schema_notices';
 import { SEEKER_ENTITLEMENT_SCHEMA } from './seeker_entitlement_db';
@@ -417,7 +418,7 @@ ALTER TABLE characters ADD COLUMN IF NOT EXISTS last_login TIMESTAMPTZ;
 -- blob: keeping it out of CharacterState leaves sim serialization byte-identical
 -- and the offline Sim host-agnostic. Nullable/absent until the character first
 -- saves one; the server treats the value as opaque and re-validates its bounds
--- (sanitizeActionBarLayout) on both read and write.
+-- (sanitizeActionBarLayoutProfiles) on read; a write merges ONE surface profile.
 ALTER TABLE characters ADD COLUMN IF NOT EXISTS hotbar_layout JSONB;
 -- The character's authored modular-creator look (ModularAppearance). Client
 -- PRESENTATION state exactly like hotbar_layout above: its own additive column,
@@ -1290,6 +1291,11 @@ export async function ensureSchema(): Promise<void> {
     // beside the other analytics schemas. Bounded (one row per campaign-day),
     // deliberately keep-forever (see ad_spend_db.ts).
     await client.query(AD_SPEND_SCHEMA);
+    // The Realm Builder of the Month roll (the Eastbrook Vale monument, named
+    // from the admin dashboard). FK-references accounts(id) for the "who named
+    // them" column, so it runs after SCHEMA. Bounded at one row a month and
+    // deliberately keep-forever: deleting an old row erases a real award.
+    await client.query(REALM_BUILDER_SCHEMA);
     await client.query(SOCIAL_SCHEMA);
     await client.query(ADMIN_GUILDS_SCHEMA);
     await client.query(SEEKER_ENTITLEMENT_SCHEMA);
@@ -2987,7 +2993,7 @@ export interface CharacterRow {
   playtime_seconds?: string | number | null;
   // Per-character action-bar layout (own JSONB column, not the sim state blob).
   // Opaque to the server beyond bounds validation; only the join path selects it.
-  hotbar_layout?: ActionBarLayout | null;
+  hotbar_layout?: StoredActionBarLayout | null;
   // The authored modular-creator look (own JSONB column, hotbar_layout's
   // pattern). Normalized at write; NULL = pre-creator character (legacy rig).
   appearance?: Record<string, unknown> | null;
@@ -3086,13 +3092,13 @@ export async function getCharacter(
   return res.rows[0] ?? null;
 }
 
-/** Persist a character's action-bar layout in its dedicated JSONB column. The
- *  layout is already sanitized/bounded by the caller (server-side, untrusted
- *  client input); stored as an opaque document, replaced whole (last write wins).
- *  Parameterized: characterId is $1, the JSON document is $2. */
+/** Persist a character's action-bar layout document in its dedicated JSONB
+ *  column. Already sanitized/bounded by the caller (untrusted client input, the
+ *  saved profile merged in by server/hotbar_layout.ts); stored as an opaque
+ *  document, replaced whole. Parameterized: characterId is $1, the JSON is $2. */
 export async function setCharacterHotbarLayout(
   characterId: number,
-  layout: ActionBarLayout,
+  layout: ActionBarLayoutProfiles,
 ): Promise<void> {
   await pool.query('UPDATE characters SET hotbar_layout = $2::jsonb WHERE id = $1', [
     characterId,

@@ -57,8 +57,9 @@ describe('resized-window fill CSS', () => {
     // and board would lay out side by side instead.
     // The guild board window shares the rule (one grouped selector, same
     // family: it opens display:flex the same way).
-    expect(components).toContain(
-      '#leaderboard-window, #guild-board-window { flex-direction: column; }',
+    // The rift forge window joined the group (same family: it opens display:flex).
+    expect(components.replace(/\s+/g, ' ')).toContain(
+      '#leaderboard-window, #guild-board-window, #rift-forge-window { flex-direction: column; }',
     );
   });
 

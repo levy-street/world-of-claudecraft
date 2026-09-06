@@ -15,7 +15,7 @@
 
 import type { TradeInfo } from '../../world_api';
 import { addStacked, bagPools, countFit } from '../bags';
-import { RIFT_GEAR_ITEM_IDS } from '../content/rift/items';
+import { RIFT_GEAR_ITEM_ID_SET } from '../content/rift/items';
 import { ITEMS } from '../data';
 import { itemCopyPin } from '../item_copy_ref';
 import { itemInstancePayloadsEqual } from '../item_instance_merge';
@@ -32,7 +32,6 @@ import { cloneItemInstancePayload, dist2d, type InvSlot, type ItemInstancePayloa
 // A trade is only offered/kept while both parties are within this many yards;
 // the drift sweep cancels an open session once they wander past TRADE_RANGE + 4.
 const TRADE_RANGE = 10;
-const RIFT_GEAR_ITEMS = new Set<string>(RIFT_GEAR_ITEM_IDS);
 
 // The one trade-locked predicate (Professions 2.0). A copy is
 // trade-locked once its payload carries boundTo: a bound instance stays with
@@ -280,7 +279,7 @@ export function tradeSetOffer(
     // admits exactly the copies whose bind-on-pickup party trade window
     // covers this counterparty, and silently drops the rest (the historical
     // behavior for every windowless soulbound copy).
-    if (!def || def.kind === 'quest' || RIFT_GEAR_ITEMS.has(slot.itemId)) {
+    if (!def || def.kind === 'quest' || RIFT_GEAR_ITEM_ID_SET.has(slot.itemId)) {
       continue;
     }
     merged.set(slot.itemId, (merged.get(slot.itemId) ?? 0) + count);

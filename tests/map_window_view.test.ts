@@ -422,7 +422,7 @@ describe('buildOverworldMapModel (pure draw model)', () => {
     ]);
     expect(
       detail.props.filter((marker) => marker.kind === 'well').map((marker) => marker.id),
-    ).toEqual([EASTBROOK_LAYOUT.civic.wellBeacon.id]);
+    ).toEqual([EASTBROOK_LAYOUT.civic.monument.id]);
     const stallMarkerIds = detail.props
       .filter((marker) => marker.kind === 'stall')
       .map((marker) => marker.id);

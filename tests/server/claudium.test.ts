@@ -46,6 +46,7 @@ import { FakeRes, fakeCtx, makeReq } from './helpers';
 const spendMock = vi.mocked(claudiumSpend);
 const storeMock = vi.mocked(claudiumStore);
 const grantWeaponSkins = vi.fn();
+const grantStoreMounts = vi.fn();
 const storagePurchase = vi.fn(async () => ({
   granted: false,
   balance: null,
@@ -75,7 +76,7 @@ const MONETARY_MUTATION_ROUTES = [
 beforeEach(() => {
   vi.clearAllMocks();
   resetClaudiumMutationRateLimits();
-  configureClaudiumRuntime({ grantWeaponSkins, storagePurchase });
+  configureClaudiumRuntime({ grantWeaponSkins, grantStoreMounts, storagePurchase });
 });
 
 afterEach(() => {
@@ -417,6 +418,141 @@ describe('Claudium spend entitlement mirroring', () => {
     });
     expect(storeMock).toHaveBeenCalledWith(7);
     expect(grantWeaponSkins).toHaveBeenCalledWith(7, ['guildmark_arming_sword']);
+  });
+
+  it('accepts the store-mount SKU (kind item) and mirrors it through the mount grant hook', () => {
+    spendMock.mockResolvedValue({ granted: true, balance: 800, costClaudium: 1200, reason: null });
+    storeMock.mockResolvedValue({
+      available: true,
+      items: [
+        {
+          itemId: 'reins_mech_bird',
+          name: 'Ignition Key: Cluckwork Mech Bird',
+          kind: 'item',
+          costClaudium: 1200,
+          owned: true,
+        },
+      ],
+    });
+    const res = new FakeRes();
+    return handleClaudiumApi(
+      makeReq({
+        method: 'POST',
+        url: '/api/claudium/spend',
+        body: {
+          itemId: 'reins_mech_bird',
+          kind: 'item',
+          expectedCostClaudium: 1200,
+          idempotencyKey: 'mount-key',
+        },
+      }),
+      res as never,
+      7,
+    ).then(() => {
+      expect(spendMock).toHaveBeenCalledWith({
+        accountId: 7,
+        itemId: 'reins_mech_bird',
+        kind: 'item',
+        expectedCostClaudium: 1200,
+        idempotencyKey: 'mount-key',
+      });
+      // Routed by kind: the mount hook fires, the skin hook does not.
+      expect(grantStoreMounts).toHaveBeenCalledWith(7, ['reins_mech_bird']);
+      expect(grantWeaponSkins).not.toHaveBeenCalled();
+    });
+  });
+
+  it('never mirrors a mount the authoritative store does not confirm as owned (anti-forge)', () => {
+    spendMock.mockResolvedValue({
+      granted: true,
+      balance: 800,
+      costClaudium: 1200,
+      reason: 'already_granted',
+    });
+    storeMock.mockResolvedValue({
+      available: true,
+      items: [
+        {
+          itemId: 'reins_mech_bird',
+          name: 'Ignition Key: Cluckwork Mech Bird',
+          kind: 'item',
+          costClaudium: 1200,
+          owned: false,
+        },
+      ],
+    });
+    const res = new FakeRes();
+    return handleClaudiumApi(
+      makeReq({
+        method: 'POST',
+        url: '/api/claudium/spend',
+        body: {
+          itemId: 'reins_mech_bird',
+          kind: 'item',
+          expectedCostClaudium: 1200,
+          idempotencyKey: 'replayed-key',
+        },
+      }),
+      res as never,
+      7,
+    ).then(() => {
+      expect(grantStoreMounts).not.toHaveBeenCalled();
+      expect(grantWeaponSkins).not.toHaveBeenCalled();
+    });
+  });
+
+  it('rejects the mount SKU under the wrong kind before debiting Claudium', async () => {
+    const res = new FakeRes();
+    await handleClaudiumApi(
+      makeReq({
+        method: 'POST',
+        url: '/api/claudium/spend',
+        body: {
+          itemId: 'reins_mech_bird',
+          kind: 'skin',
+          expectedCostClaudium: 1200,
+          idempotencyKey: 'wrong-kind',
+        },
+      }),
+      res as never,
+      7,
+    );
+    expect(responseJson(res)).toMatchObject({ granted: false, reason: 'unknown_item' });
+    expect(spendMock).not.toHaveBeenCalled();
+  });
+
+  it('passes the store-mount SKU through the store read and reconciles its grant', () => {
+    storeMock.mockResolvedValue({
+      available: true,
+      items: [
+        {
+          itemId: 'reins_mech_bird',
+          name: 'Ignition Key: Cluckwork Mech Bird',
+          kind: 'item',
+          costClaudium: 1200,
+          owned: true,
+        },
+        {
+          itemId: 'some_unrelated_item',
+          name: 'Unrelated',
+          kind: 'item',
+          costClaudium: 50,
+          owned: true,
+        },
+      ],
+    });
+    const res = new FakeRes();
+    return handleClaudiumApi(
+      makeReq({ method: 'GET', url: '/api/claudium/store' }),
+      res as never,
+      7,
+    ).then(() => {
+      const body = responseJson(res) as { items: { itemId: string }[] };
+      // The declared store mount survives the whitelist; the unknown item is
+      // filtered out and never reconciled.
+      expect(body.items.map((i) => i.itemId)).toEqual(['reins_mech_bird']);
+      expect(grantStoreMounts).toHaveBeenCalledWith(7, ['reins_mech_bird']);
+    });
   });
 });
 

@@ -213,6 +213,7 @@ const UI_PURE_CORES = [
   'src/ui/map_semantic_accessibility_core.ts',
   'src/ui/paladin_devotion_view.ts',
   'src/ui/aura_icon_view.ts',
+  'src/ui/aura_strip_order_core.ts',
   'src/ui/aura_overlay_view.ts',
   'src/ui/banner_queue.ts',
   'src/ui/item_kind_label.ts',
@@ -324,6 +325,9 @@ const UI_PURE_CORES = [
   // The Season 1 Armory's section / card / class-chip markup, the charter_card_view
   // twin on the other half of the same store body (Bank Storage phase 15).
   'src/ui/armory_card_view.ts',
+  // The Machine Stable's section / card markup (the store-mount strip), the
+  // armory_card_view twin for the account-mount SKUs.
+  'src/ui/store_mount_card_view.ts',
   // The daily-rewards spin wheel's markup and its landing geometry (Bank Storage
   // phase 17). The overlay ELEMENT lives in the thin painter beside it.
   'src/ui/daily_rewards_spin_view.ts',
@@ -415,6 +419,7 @@ const UI_PURE_CORES = [
   'src/ui/wallet_bridge_reason_text.ts',
   'src/ui/terms_link.ts',
   'src/ui/duration_text.ts',
+  'src/ui/realm_builder_name.ts',
   'src/ui/woc_affordable_core.ts',
   'src/ui/woc_market_poll_core.ts',
   'src/ui/woc_market_reason_text.ts',
@@ -452,6 +457,8 @@ const UI_PURE_CORES = [
   // The signpost guild board's roster drill-in core (the board itself reuses
   // guild_leaderboard_view above).
   'src/ui/hud/guild_board/guild_roster_view.ts',
+  // The Rift Forge window's row/affordance core (the Riftwright's service).
+  'src/ui/hud/rift_forge/rift_forge_view.ts',
   'src/ui/dev_leaderboard_view.ts',
   'src/ui/dev_command_view.ts',
   'src/ui/dev_item_picker_view.ts',
@@ -534,6 +541,7 @@ const UI_PURE_CORES = [
   'src/ui/trade_woc_view.ts',
   'src/ui/hud/rift/rift_floor_tracker_view.ts',
   'src/ui/hud/woc_trade/woc_trade_offer_view.ts',
+  'src/ui/hud/target_dots/target_dots_view.ts',
   'src/ui/safe_local_storage.ts',
 ].map((rel) => join(repoRoot, rel));
 
@@ -593,7 +601,9 @@ const RENDER_PURE_CORES = [
   'src/render/characters/soul_rend_prewarm_core.ts',
   'src/render/characters/design_code_core.ts',
   'src/render/live_program_watch_core.ts',
+  'src/render/realm_builder_monument_fx_core.ts',
   'src/render/reveal_gate_core.ts',
+  'src/render/stride_audio_core.ts',
   'src/render/town_reveal_core.ts',
   'src/render/foliage_bucket_reveal_core.ts',
   'src/render/foliage_prewarm_twins_core.ts',
@@ -682,6 +692,7 @@ const RENDER_PURE_CORES = [
   'src/render/nameplate_view.ts',
   'src/render/nameplate_pick_core.ts',
   'src/render/nameplate_heraldry_core.ts',
+  'src/render/nameplate_dots_core.ts',
   'src/render/net_interp_core.ts',
   'src/render/paladin_ascension_core.ts',
   'src/render/paladin_sun_verdict_core.ts',
@@ -780,6 +791,7 @@ const BARE_NAMED = [
   'src/ui/wallet_bridge_reason_text.ts',
   'src/ui/terms_link.ts',
   'src/ui/duration_text.ts',
+  'src/ui/realm_builder_name.ts',
   'src/ui/woc_market_reason_text.ts',
   'src/render/foliage_lod.ts',
   'src/render/frame_present.ts',
@@ -1895,6 +1907,7 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/purchase_intent_record.ts',
   'src/ui/quality_glow.ts',
   'src/ui/quest_marker_tags.ts',
+  'src/ui/realm_builder_name.ts',
   'src/ui/reliquary_cell_art.ts',
   'src/ui/rest_indicator.ts',
   'src/ui/roving_index.ts',
@@ -2350,6 +2363,7 @@ const UI_DOM_MODULES = [
   'src/ui/movable_frame.ts',
   'src/ui/native_update_prompt.ts',
   'src/ui/noticeboard_popup.ts',
+  'src/ui/realm_builder_popup.ts',
   'src/ui/options_window.ts',
   'src/ui/ota_update_overlay.ts',
   'src/ui/perf_metrics_sampler.ts',

@@ -290,6 +290,58 @@ describe('the Mother of Pearl chain in a real sim', () => {
     expect(sim.entities.has(second.id)).toBe(false);
   });
 
+  it('announces the summon only to the summoner, never the whole shore', () => {
+    const sim = makeSim();
+    startQuest(sim);
+    teleportTo(sim, CRAB_SUMMON_SITE.x, CRAB_SUMMON_SITE.z);
+    sim.drainEvents();
+    sim.useItem(LURE_ITEM_ID);
+    const logs = sim
+      .drainEvents()
+      .filter((e): e is Extract<SimEvent, { type: 'log' }> => e.type === 'log');
+    const awaken = logs.find((e) => e.text === 'Mister Crabs awakens!');
+    const yell = logs.find((e) =>
+      e.text.startsWith('Mister Crabs yells, "MINE! The pearl is mine'),
+    );
+    if (!awaken || !yell) throw new Error('Expected the awaken line and the opening yell');
+    // Both summon lines are personal (pid-scoped) events: the server delivers
+    // them only to the summoner's session, so a shared island never fills
+    // everyone's chat with someone else's private quest beat.
+    expect(awaken.pid).toBe(sim.playerId);
+    expect(yell.pid).toBe(sim.playerId);
+    // The yell keeps its entity anchor so the chat bubble still points at him.
+    expect(yell.entityId).toBe(requireLiveBoss(sim).id);
+  });
+
+  it('keeps the default summon announcement world-visible (the Nythraxis beats)', () => {
+    const sim = makeSim();
+    sim.drainEvents();
+    // A summon WITHOUT announceOwnerOnly (the graveside ambush shape) still
+    // broadcasts: those beats happen inside the summoner's own instance.
+    summonQuestMob(
+      sim.ctx,
+      CRAB_MOB_ID,
+      { x: CRAB_SUMMON_SITE.x, y: 0, z: CRAB_SUMMON_SITE.z },
+      -1,
+      {
+        perOwner: true,
+      },
+    );
+    const logs = sim
+      .drainEvents()
+      .filter((e): e is Extract<SimEvent, { type: 'log' }> => e.type === 'log');
+    const awaken = logs.find((e) => e.text === 'Mister Crabs awakens!');
+    const yell = logs.find((e) =>
+      e.text.startsWith('Mister Crabs yells, "MINE! The pearl is mine'),
+    );
+    if (!awaken || !yell) throw new Error('Expected the awaken line and the opening yell');
+    expect(awaken.pid).toBeUndefined();
+    // The yell is pinned on its own: the pid-less branch of emitQuestMobDialogue
+    // must stay world-visible AND keep its entity anchor for the chat bubble.
+    expect(yell.pid).toBeUndefined();
+    expect(yell.entityId).toBe(requireLiveBoss(sim).id);
+  });
+
   it('stays silent for a player who never took the quest', () => {
     const sim = makeSim();
     // No quest, standing right at the pool with a lure smuggled into bags:

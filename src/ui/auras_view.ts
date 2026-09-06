@@ -7,13 +7,15 @@
 // a typed keyed per-aura node pool (Top risk 3: the pool's tooltip closure reads a
 // LIVE mutable slot, never a captured aura).
 //
-// Component contract: the core is INSTANCE-PARAMETERIZED by the aura
-// MODE ('all' for the buff bar, 'debuffs' for the target frame). createAurasView(mode,
-// deps) preallocates a per-aura slot pool ONCE and returns a tick(entity) that mutates
-// it IN PLACE and returns the SAME { slots, count } container every call, so a correct
-// frame allocates no new array/object garbage (the reused-reference allocation proxy,
-// tests/util/alloc_probe.ts). Two modes yield two independent views (the buff bar and
-// the target debuffs are two instances, not a code fork).
+// Component contract: the core is INSTANCE-PARAMETERIZED by the aura MODE ('buffs'
+// and 'debuffs' for the player's own two rows, 'all' for the target strip and the
+// party mini-strips; the mode semantics comment on createAurasView is the one the
+// ordering design leans on). createAurasView(mode, deps) preallocates a per-aura slot
+// pool ONCE and returns a tick(entity) that mutates it IN PLACE and returns the SAME
+// { slots, count } container every call, so a correct frame allocates no new
+// array/object garbage (the reused-reference allocation proxy,
+// tests/util/alloc_probe.ts). Each mode yields an independent view (the player rows
+// and the target strip are separate instances, not a code fork).
 //
 // The DEBUFF display allowlist lives in the host-agnostic sim/aura_classify leaf.
 // This core stays DOM-free and i18n-MECHANISM-free (no i18n runtime import): the
@@ -35,6 +37,7 @@ import { isCancelableAura } from '../sim/combat/aura_cancel';
 import { isPersistentEngineAura } from '../sim/persistent_aura';
 import type { AuraKind } from '../sim/types';
 import type { AuraSchool } from './aura_effect';
+import { AURA_URGENCY_BUCKET_COUNT, auraUrgencyBucket } from './aura_strip_order_core';
 
 // Re-export the shared set for the view contract and its exact-set regression test.
 // Classification itself stays in the sim leaf so HUD display surfaces cannot drift.
@@ -88,6 +91,18 @@ const NEVER_SHED_IDS: ReadonlySet<string> = new Set([CARRIED_FLAG_AURA_ID]);
 // for its vanish (kind 'stealth' with full move speed), but it is a fixed 20s
 // buff, not a toggle, so it must show its remaining time like any other buff.
 const TIMED_IDS: ReadonlySet<string> = new Set(['greater_invisibility']);
+
+/** Whether this aura reads as a MODE rather than a timed effect (a stance, a druid
+ *  form, stealth, Ghost Wolf, the carried flag). Named because two callers need the
+ *  same answer: the slot's suppressed countdown (`toggle`) and the urgency band an
+ *  ordered strip sorts by (`auraUrgencyBucket`). Keeping it one function is what stops
+ *  the strip from banding an aura as a mode while still printing a countdown under it. */
+function isToggleAura(a: AuraInput): boolean {
+  return (
+    (TOGGLE_KINDS.has(a.kind) || TOGGLE_IDS.has(a.id) || isPersistentEngineAura(a.id)) &&
+    !TIMED_IDS.has(a.id)
+  );
+}
 
 /** Whether cancelling this aura performs a GAMEPLAY action rather than merely
  *  dropping a buff, so a touch host must confirm it before it fires. Today that
@@ -391,12 +406,23 @@ function makeSlotState(): AuraSlotState {
 export function createAurasView(
   mode: AuraMode,
   deps: AurasDeps,
-  opts?: { ownFirst?: boolean; effectHtmlCacheVersion?: () => unknown },
+  opts?: { ownFirst?: boolean; orderByUrgency?: boolean; effectHtmlCacheVersion?: () => unknown },
 ): AurasView {
   const slots: AuraSlotState[] = [];
   const effectHtmlCache: Array<AuraEffectHtmlCache | undefined> = [];
   const state: AurasState = { slots, count: 0 };
   const ownFirst = opts?.ownFirst === true;
+  // Urgency ordering is a property of the PLAYER-STRIP modes, not an option the caller
+  // has to remember. 'buffs' and 'debuffs' exist for exactly one thing, the player's own
+  // two rows in hud.ts, and those are the rows a player scans for what is about to run
+  // out. 'all' is the SHARED mode (the target strip and the party mini-strips in
+  // party_frame_row.ts), which reads as a roster of what is on somebody else and keeps
+  // sim application order. An explicit opts.orderByUrgency still overrides either way.
+  //
+  // ownFirst wins where both apply: on the target strip "these are MY dots" is the
+  // stronger read than "this one expires soonest", and the two orderings would otherwise
+  // fight over the same leading slots.
+  const orderByUrgency = (opts?.orderByUrgency ?? mode !== 'all') && !ownFirst;
   const effectHtmlCacheVersion = opts?.effectHtmlCacheVersion;
 
   return {
@@ -430,9 +456,7 @@ export function createAurasView(
         slot.iconKey = deps.iconId(a);
         slot.isDebuff = debuff;
         slot.school = debuff ? (a.school ?? 'physical') : '';
-        const toggle =
-          (TOGGLE_KINDS.has(a.kind) || TOGGLE_IDS.has(a.id) || isPersistentEngineAura(a.id)) &&
-          !TIMED_IDS.has(a.id);
+        const toggle = isToggleAura(a);
         slot.durationText = toggle ? '' : compactAuraDuration(a.remaining, units);
         // Toggles show no countdown, so they never blink either.
         slot.expiring = !toggle && isAuraExpiring(a.remaining, a.duration);
@@ -514,6 +538,17 @@ export function createAurasView(
       if (ownFirst) {
         for (const a of entity.auras) if (deps.isOwn(a)) fill(a, true);
         for (const a of entity.auras) if (!deps.isOwn(a)) fill(a, false);
+      } else if (orderByUrgency) {
+        // One pass per urgency band (aura_strip_order_core.ts), most urgent first, so the
+        // slots nearest the strip's anchor hold what is about to expire. Same shape as
+        // the ownFirst two-pass above: no sort, no comparator, no per-frame allocation,
+        // and the sim's application order survives INSIDE each band, so an icon only
+        // ever moves when its aura crosses a band boundary.
+        for (let b = 0; b < AURA_URGENCY_BUCKET_COUNT; b++) {
+          for (const a of entity.auras) {
+            if (auraUrgencyBucket(a.remaining, isToggleAura(a)) === b) fill(a, false);
+          }
+        }
       } else {
         for (const a of entity.auras) fill(a, false);
       }

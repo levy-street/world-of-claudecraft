@@ -2247,6 +2247,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.artisans_eye.name': 'Olhar do Artesão',
   'entities.items.reins_terrorspark_groundshaker.name':
     'Chave de ignição: Faíscaterror, Abala-Terra',
+  'entities.items.reins_lanternback_troll.name':
+    'Canga do acendedor de lampiões: Grumbol',
   'hudChrome.auraOverlay.allOff': 'Desativar tudo',
   'hudChrome.auraOverlay.allOn': 'Ativar tudo',
   'hudChrome.auraOverlay.arcs': 'Meias-luas laterais',

@@ -570,6 +570,9 @@ export const zh_CN: EnTranslations = {
       "tabsLabel": "WOC 商店分区",
       "storeTab": "商店",
       "rewardsTab": "每日奖励",
+      "mountsEyebrow": "账号坐骑",
+      "mountsTitle": "机械马厩",
+      "mountBuyAria": "购买{item}",
       "loading": "正在加载 WOC 商店…",
       "error": "WOC 商店暂时不可用，请稍后再试。",
       "balance": "Claudium 余额",
@@ -1304,6 +1307,11 @@ export const zh_CN: EnTranslations = {
       "separate": "分离{meter}",
       "regroup": "合并{meter}"
     },
+    "targetDots": {
+      "title": "目标减益",
+      "row": "{aura} on {target}",
+      "overflow": "还有 {count} 个未显示"
+    },
     "targetAuras": {
       "title": "目标光环",
       "keybindLabel": "目标增益和减益效果",
@@ -1387,6 +1395,9 @@ export const zh_CN: EnTranslations = {
       "name_thunderstrut_gobbler": "雷霆阔步大火鸡",
       "name_terrorspark_groundshaker": "惊雷撼地者",
       "name_drakemaw_raptor": "龙喉迅猛龙",
+      "name_mech_bird": "发条机械鸟",
+      "name_lanternback_troll": "提灯背者格伦博",
+      "name_chimeglass_tortoise": "钟晶的托利弗",
       "name_rickshaw_mount": "白骨人力车",
       "desc_valorsteed": "一匹坚韧稳健的骏马，可提升旅行速度。",
       "desc_grag_bear": "一头坚韧稳健的巨熊，可提升旅行速度。",
@@ -1397,6 +1408,9 @@ export const zh_CN: EnTranslations = {
       "desc_thunderstrut_gobbler": "一只风暴所生的庞然大火鸡，从觉醒之峰昂首阔步而下，尾羽如雷云般展开。",
       "desc_terrorspark_groundshaker": "一台紧凑的装甲机械，配备重型履带、大口径火炮，以及为无畏驾驶员打造的鞍座。",
       "desc_drakemaw_raptor": "来自龙喉火山口的驯服巢生迅猛龙，浑身筋肉、疾若奔雷，身上仍带着淡淡的灰烬气味。",
+      "desc_mech_bird": "一只手工打造的发条战斗鸡，伺服关节铿锵疾驰，发条钥匙仍在转动。",
+      "desc_lanternback_troll": "被点灯人驯服的山地巨魔，肩上扛着一把铁王座，两侧扶手各挂一盏燃烧的风灯。",
+      "desc_chimeglass_tortoise": "盐原上的陆龟，走过了三代商队。收留他的补锅匠用暴风晶磨成眼镜，又在他喉前挂上一枚青铜铃——道路总是先听见他，才看见他。",
       "desc_rickshaw_mount": "一辆嘎吱作响的骸骨货车，一具瘦骨嶙峋的杂兵被套在辕木间，拖着你狂奔向前。"
     },
     "mountTraining": {
@@ -1589,6 +1603,9 @@ export const zh_CN: EnTranslations = {
       "showTargetOfTarget": "显示目标的目标",
       "showTargetSwingTimer": "显示目标的挥击计时器",
       "showPetFrame": "显示你的宠物",
+      "showNameplateDots": "在姓名板上显示我的减益",
+      "nameplateDotScale": "姓名板减益图标大小",
+      "showTargetDots": "显示目标减益追踪",
       "waterRipples": "水面涟漪（尾波）",
       "showAttackButton": "显示攻击按钮",
       "showDailyRewardsChest": "显示每日奖励宝箱",
@@ -2976,7 +2993,8 @@ export const zh_CN: EnTranslations = {
         "playerFrame": "玩家",
         "targetFrame": "目标",
         "partyFrames": "队伍",
-        "swingBar": "自动攻击"
+        "swingBar": "自动攻击",
+        "targetDots": "目标减益"
       },
       "framesMenu": "框体设置",
       "framesMenuTitle": "显示或隐藏各个框体。取消勾选的框体会一直隐藏，直到你重新勾选或恢复默认设置。",
@@ -3008,11 +3026,42 @@ export const zh_CN: EnTranslations = {
       "invalid": "这不是有效的导出代码。",
       "wrongKind": "该代码属于另一种导出类型。"
     },
+    "riftForge": {
+      "title": "裂隙熔炉",
+      "subtitle": "裂隙之戒",
+      "currency": "{name}: {count}",
+      "empty": "背包里没有裂隙之戒。首次通关排位裂隙会铸造一枚。",
+      "wornHint": "已装备。卸下后才能锻造。",
+      "upgradeBtn": "强化至物品等级 {level}（{cost} 精华）",
+      "upgradeMax": "已强化至满级",
+      "gemPickAria": "要镶嵌的宝石",
+      "gemOption": "{name} ({bonus})",
+      "socketReplaceHint": "插槽已满：下一颗宝石将替换最早镶嵌的 {gem}。",
+      "socketBtn": "镶嵌",
+      "socketsNone": "没有宝石",
+      "noGems": "背包里没有裂隙宝石",
+      "refused": "熔炉拒绝了。请站在裂隙锻匠身旁再试。",
+      "reason": {
+        "notFound": "那枚戒指不在你的背包里。",
+        "notRiftGear": "只有裂隙之戒才能锻造。",
+        "maxUpgrade": "那枚戒指已强化至满级。",
+        "insufficientEssence": "裂隙精华不足。",
+        "invalidGem": "你没有那种裂隙宝石。",
+        "dead": "死亡时无法这么做。",
+        "tooFar": "你离裂隙熔炉太远了。"
+      },
+      "done": {
+        "upgrade": "已强化{name}。",
+        "socket": "已为{name}镶嵌一颗宝石。",
+        "socketReplaced": "已将宝石镶入{name}；{gem}已被摧毁。"
+      }
+    },
     "itemTooltip": {
       "requiresLevel": "需要等级 {level}",
       "riftTier": "{tier}级裂隙物品",
       "riftUpgrade": "裂隙强化 {level}/{max}",
       "riftSockets": "裂隙宝石 {used}/{total}",
+      "riftGemSocket": "裂隙之戒的镶嵌加成",
       "statEnchanted": "+{value} {stat}（附魔）",
       "enchantedFallback": "已附魔",
       "partyTradeWindow": "在接下来的{time}内，你可以将此物品交易给共同获得该掉落的玩家。装备后交易期限即告结束。"
@@ -3293,6 +3342,15 @@ export const zh_CN: EnTranslations = {
       "popupTitle": "公会告示柱",
       "close": "关闭"
     },
+    "realmBuilder": {
+      "title": "本月王国建造者",
+      "currentLabel": "本月荣誉获得者",
+      "placeholderName": "你的名字",
+      "placeholderHint": "这块铭牌还在等待它的第一个名字。",
+      "pastTitle": "历届荣誉获得者",
+      "pastEmpty": "荣誉榜上还没有名字。",
+      "close": "关闭"
+    },
     "bank": {
       "title": "银行",
       "subtitle": "镀金保险箱",
@@ -3519,6 +3577,20 @@ export const zh_CN: EnTranslations = {
         "result": {
           "set": "公会公告板已更新。",
           "notOfficer": "只有官员和会长可以编辑公告板。"
+        }
+      },
+      "roster": {
+        "seats": "{count} / {cap} 席位",
+        "expand": "扩充名册（+{seats} 席位，{price}）",
+        "maxed": "名册已达最大规模",
+        "confirm": "花费 {price} 为公会名册扩充 {seats} 个席位？金币从你自己的钱包扣除，不予退还。",
+        "confirmAction": "扩充",
+        "expandedLine": "{name} 已将公会名册扩充至 {cap} 名成员。",
+        "result": {
+          "notLeader": "只有会长可以扩充公会名册。",
+          "maxed": "公会名册无法再扩充。",
+          "cannotAfford": "扩充公会名册需要 {price}。",
+          "retry": "购买期间公会名册已发生变化，请重试。"
         }
       }
     },
@@ -3937,6 +4009,7 @@ export const zh_CN: EnTranslations = {
       "yieldLineRange": "{item} {min} 至 {max} 个",
       "alreadyEnchanted": "那件物品已经附魔。",
       "sameEnchant": "那件物品已经拥有该附魔。",
+      "riftGear": "裂隙之戒只能镶嵌裂隙宝石，无法附魔。",
       "replaceTag": "替换{enchant}",
       "sameEnchantTag": "已施加",
       "plainTag": "未附魔",
@@ -6031,6 +6104,8 @@ export const zh_CN: EnTranslations = {
       "raceBody": "王国里的每一支队伍都可以同时攻打同一道裂隙，各打各的那一份副本，但只有第一个把最底下那个东西放倒的队伍才能封印它。有队伍获胜时，全王国都会听到他们的名字和用时，入口也随之在他们身后关闭。输掉这场竞速并不会结束你的这一趟：你的副本仍然开着，最底下那个东西照样会倒在你手上，你也照样能靠自己走出来。你失去的，是通关本该带来的一切。首领不会为第二名留下任何东西，所以你带回家的，只有一路向下时从小怪身上掉出来的东西，再无其他。功绩之书仍然会记下这次通关，因为那东西确实是你放倒的。这是游戏里唯一一场你可能输掉、却连赢家的面都见不着的竞速。",
       "rewardsHeading": "你能带走什么",
       "rewardsBody": "真正给报酬的，是封印一道裂隙，而不只是活着从里面出来。抢先把裂隙打下来，它的报酬就对得起与它等级相当的副本内容，所以更高的等级值得你跑更难的一趟。封印还会把一枚裂隙之戒交到在场每个人手里，按你职业的定位裁剪打造，并且专属于你，同时在你的背包里留下裂隙精华和裂隙宝石。除了归途之外，最底下那个东西还会留下一口封着的储藏，你的队伍可以撬开它取走额外的战利品，用的正是你在探秘宝箱那里熟悉的锁簧之径撬锁，所以干净沉稳地撬，比慌乱赶工赚得更多。这些第二名的队伍一样都拿不到：输掉的竞速只留给你一路向下时从小怪身上掉出来的东西。功绩之书是唯一的例外，无论输赢它都会记下你的通关，其中一个功绩为封闭你的第一道裂隙，另一个为放倒一道 S 级裂隙。",
+      "forgeHeading": "裂隙熔炉",
+      "forgeBody": "首次通关排位裂隙铸造的戒指，在你拿到手时还没有完工。裂隙锻匠梅莉丝在远滩的守望草甸、沿岸上行离开鸥港后的破裂学者身旁守着一座熔炉，她会一步步提升戒指的物品等级，并把裂隙掉落的彩色宝石镶进插槽，每种颜色对应一项战斗评级。插槽已满的戒指会用新宝石替换最早镶嵌的那颗，所以日后还能重新调整。这一切都以裂隙精华和裂隙宝石支付，它们是裂隙首领掉落、可自由交易的熔炉货币，所以缺的精华可以请朋友递给你。带去之前先把戒指卸下：她只处理背包里的东西，而且除非你站在她的熔炉旁，否则她什么都不会做。",
       "trackerHeading": "屏幕上的追踪条",
       "trackerBody": "在里面时，屏幕上的一小条会帮你保持方向：你在第几层、总共几层，以及一个实时倒计时。这个倒计时要看仔细，因为它数的不是你这一趟剩下的时间，而是外面世界里的入口对新队伍关闭的时间。只要你已经进来了，你的小队就能按自己的节奏把这道裂隙打完，花多久都行。"
     },
@@ -7922,6 +7997,7 @@ export const zh_CN: EnTranslations = {
       "forgeUpgraded": "{name} 的裂隙强化已完成。",
       "forgeEnchanted": "{name} 的裂隙附魔已完成。",
       "forgeSocketed": "已为 {name} 镶嵌裂隙宝石。",
+      "forgeGemReplaced": "已为 {name} 更换裂隙宝石：{gem} 已被摧毁。",
       "detonateGlacialGrave": "冰川之墓引爆！",
       "detonateAbsoluteZero": "绝对零度爆发！",
       "detonateMagmaWell": "岩浆泉喷涌！",
@@ -13205,11 +13281,20 @@ export const zh_CN: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "惊雷撼地者点火钥匙"
       },
+      "reins_lanternback_troll": {
+        "name": "点灯人之轭：格伦博"
+      },
+      "reins_chimeglass_tortoise": {
+        "name": "守道人的铃带：托利弗"
+      },
       "reins_rickshaw_mount": {
         "name": "白骨人力车缚绳"
       },
       "reins_drakemaw_raptor": {
         "name": "龙喉迅猛龙的缰绳"
+      },
+      "reins_mech_bird": {
+        "name": "发条机械鸟点火钥匙"
       },
       "rimefang": {
         "name": "霜牙"
@@ -15834,6 +15919,11 @@ export const zh_CN: EnTranslations = {
         "name": "受惊的奈尔",
         "title": "鸥港渔民",
         "greeting": "它就在晾网的地方裂开了。就在那儿，我这辈子每天清晨都站着的地方。我再也不下到海岸去了。如今我哪儿都不太去了。"
+      },
+      "riftwright_maelis": {
+        "name": "裂隙锻匠梅莉丝",
+        "title": "裂隙熔炉大师",
+        "greeting": "裂隙之戒记得造就它的那道裂隙，{className}。把戒指和裂隙散落的精华带来，我会教它记住更多。"
       },
       "forgemistress_darva": {
         "name": "达尔瓦锻造师",
@@ -19124,6 +19214,7 @@ export const zh_CN: EnTranslations = {
     "delveRiteShrineReedInteract": "芦苇神龛：按 F 触碰",
     "delveRiteShrineSkullInteract": "骷髅神龛：按 F 触碰",
     "mailboxName": "邮箱",
-    "noticeboardName": "告示板"
+    "noticeboardName": "告示板",
+    "realmBuilderMonumentName": "王国建造者纪念碑"
   }
 };

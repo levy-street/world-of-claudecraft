@@ -18,6 +18,7 @@ import { esc } from './esc';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
 import { MASTERWORK_SEAL_IMAGE_URL } from './profession_art';
+import { statNameKey } from './stat_tooltip_view';
 import { svgIcon } from './ui_icons';
 
 const ITEM_STAT_LABEL_KEYS: Partial<Record<keyof Stats, TranslationKey>> = {
@@ -33,9 +34,32 @@ function cap(s: string): string {
   return s ? s[0].toUpperCase() + s.slice(1) : s;
 }
 
+/** The label key for a rating or affix stat: the character-sheet names, with
+ *  Healing Power (no StatId cell) resolved here. Shared by the compare rows
+ *  (hud.ts), the affix lines (item_affix_tooltip.ts), and the per-copy bonus
+ *  lines below, so a stat key spells its label in exactly one place. */
+export function compareStatLabelKey(stat: string): string {
+  return stat === 'healPower'
+    ? 'hudChrome.statInfo.names.healPower'
+    : statNameKey(stat as Parameters<typeof statNameKey>[0]);
+}
+
+/** Per-copy rolled stats can carry rating and affix keys (a Riftbound band's
+ *  gem lines, rift/band_ladder.ts); those label through compareStatLabelKey. */
+const LABELLED_BONUS_KEYS: ReadonlySet<string> = new Set([
+  'critRating',
+  'hasteRating',
+  'hitRating',
+  'spellPower',
+  'healPower',
+  'warfare',
+]);
+
 export function itemStatName(stat: string): string {
   const key = ITEM_STAT_LABEL_KEYS[stat as keyof Stats];
-  return key ? t(key) : cap(stat);
+  if (key) return t(key);
+  if (LABELLED_BONUS_KEYS.has(stat)) return t(compareStatLabelKey(stat) as TranslationKey);
+  return cap(stat);
 }
 
 export function itemNumber(value: number, fractionDigits = 0): string {
@@ -46,14 +70,15 @@ export function itemNumber(value: number, fractionDigits = 0): string {
 }
 
 /** The WORN-slot tooltip payload (Professions 2.0): exactly the
- *  fields the public eqi wire carries (signer/enchant/rolled, the
- *  worn-identity trim), so the offline paperdoll and the online mirror
- *  render identical worn tooltips. Online, equippedInstances is decoded from
- *  the stripped eqi allowlist and never carries bindOnTrade/boundTo/charges;
- *  offline the self entity holds the FULL payload, so without this trim the
- *  Maker's Bond lines would render on worn gear in one host only. The bond
- *  is a bag-surface fact by construction (the eqi data minimization is
- *  deliberate); both hosts now agree by sharing this one projection. */
+ *  fields the public eqi wire carries (signer/enchant/rolled, plus a
+ *  Riftbound band's rift record: the worn-identity trim), so the offline
+ *  paperdoll, the compare block, and the online mirror render identical worn
+ *  tooltips. Online, equippedInstances is decoded from the stripped eqi
+ *  allowlist and never carries bindOnTrade/boundTo/charges; offline the self
+ *  entity holds the FULL payload, so without this trim the Maker's Bond lines
+ *  would render on worn gear in one host only. The bond is a bag-surface fact
+ *  by construction (the eqi data minimization is deliberate); both hosts now
+ *  agree by sharing this one projection. */
 export function wornTooltipInstance(
   instance?: ItemInstancePayload,
 ): ItemInstancePayload | undefined {
@@ -62,6 +87,7 @@ export function wornTooltipInstance(
   if (instance.signer !== undefined) worn.signer = instance.signer;
   if (instance.enchant !== undefined) worn.enchant = instance.enchant;
   if (instance.rolled !== undefined) worn.rolled = instance.rolled;
+  if (instance.rift !== undefined) worn.rift = instance.rift;
   return worn;
 }
 
@@ -79,7 +105,9 @@ export function instanceBindingLines(
   instance?: ItemInstancePayload,
   kind?: ItemDef['kind'],
 ): string {
-  if (!instance || !isCommissionEligibleKind(kind)) return '';
+  // A Riftbound band is owner-bound personal reward gear, not a commission:
+  // its own Soulbound line (rift_band_tooltip.ts) states the bind.
+  if (!instance || instance.rift || !isCommissionEligibleKind(kind)) return '';
   if (instance.boundTo !== undefined) {
     return `<div class="tt-sub" style="color:var(--gold)">${esc(t('hudChrome.crafting.commissionBound'))}</div>`;
   }

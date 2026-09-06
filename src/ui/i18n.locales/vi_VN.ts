@@ -2095,6 +2095,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.items.artisans_eye.name': 'Con Mắt Nghệ Nhân',
   'entities.items.reins_terrorspark_groundshaker.name':
     'Chìa Khóa Khởi Động: Tia Kinh Hoàng, Kẻ Rung Chuyển Mặt Đất',
+  'entities.items.reins_lanternback_troll.name':
+    'Ách của Người Thắp Đèn: Grumbol',
   'hud.options.graphicsPresetInsane': 'Cực Đại',
   'hud.options.surfaceDetail': 'Chi Tiết Bề Mặt',
   'hud.options.surfaceDetailBasic': 'Cơ Bản',

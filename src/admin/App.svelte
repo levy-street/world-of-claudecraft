@@ -32,6 +32,7 @@
   import AntibotConfig from './pages/AntibotConfig.svelte';
   import SharedIps from './pages/SharedIps.svelte';
   import ChatFilter from './pages/ChatFilter.svelte';
+  import RealmBuilders from './pages/RealmBuilders.svelte';
   import BlockedIps from './pages/BlockedIps.svelte';
   import BugReports from './pages/BugReports.svelte';
   import UnstuckReports from './pages/UnstuckReports.svelte';
@@ -62,6 +63,7 @@
     'antibot-config': AntibotConfig,
     'shared-ips': SharedIps,
     'chat-filter': ChatFilter,
+    'realm-builders': RealmBuilders,
     'blocked-ips': BlockedIps,
     'bug-reports': BugReports,
     'unstuck-reports': UnstuckReports,

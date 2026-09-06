@@ -119,6 +119,13 @@ export const SFX = [
     key: 'mount_run_thunderstrut_gobbler',
     custom: true,
   },
+  // The Lanternback Troll and the Chimeglass Tortoise deliberately have NO
+  // mount_run_ entry. Both shipped synthesised cues and both read as cheap and
+  // nagging at the mounted gallop's ~0.46s stride beat; rather than keep
+  // tuning a synth, they now borrow the player's own surface footfall
+  // (foot_<surface>) through Sfx.mountRun's fallback branch. A mount is opted
+  // into that fallback purely by the ABSENCE of its key here, so adding one
+  // back is all it takes to give either of them a bespoke stride again.
   {
     key: 'mount_run_terrorspark_groundshaker_start',
     custom: true,
@@ -140,6 +147,31 @@ export const SFX = [
   },
   {
     key: 'mount_run_terrorspark_groundshaker_stop',
+    custom: true,
+  },
+  {
+    // The Mech Bird's gait beat: the recorded servo footsteps assembled 1-2-1
+    // (step one, step two, step one) per stride by scripts/gen_mech_bird_sfx.mjs.
+    key: 'mount_run_mech_bird',
+    custom: true,
+  },
+  {
+    // The Mech Bird's standstill powered-on hum: driven through Sfx.loop()
+    // while mounted and stationary (see mountIdle in src/game/sfx.ts), so the
+    // manifest loop flag must say so, like the tank engine sustain above.
+    key: 'mount_idle_mech_bird',
+    custom: true,
+    loop: true,
+  },
+  {
+    // Launch servo one-shot: replaces the generic move_jump while riding the
+    // Mech Bird (the mount-aware arm of Sfx.movement).
+    key: 'mount_jump_mech_bird',
+    custom: true,
+  },
+  {
+    // Landing clank one-shot: replaces the generic move_land while riding.
+    key: 'mount_land_mech_bird',
     custom: true,
   },
   {

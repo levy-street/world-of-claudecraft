@@ -1034,10 +1034,25 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the Drakelands entrance merge into the raid branch (PRs 3689
 // plus 3734: both arms had re-minted, the merged renderer and evidence inputs
 // land together). No capture was retaken.
+// Re-minted at the release/v0.42.0 sync of PR #3439: renderer.ts moved for the
+// mount lifecycle seam (mount_lifecycle.ts) and the rickshaw hooks it absorbed.
+// Re-minted for the Cluckwork Mech Bird store mount (PR #3464) on top of the
+// v0.42.0 mount-lifecycle move: the renderer's stride accumulator moved to
+// src/render/stride_audio_core.ts and the mounted audio branch gained the
+// idle-hum poll. No capture was retaken.
+// Re-minted for the Realm Builder monument (PR #3695) at its release/v0.42.0
+// base merge: the civic centrepiece changed asset, subject and shader cache
+// key, so every provenance block was swept onto the merged fingerprinted
+// inputs. No capture was retaken.
+// Re-minted for the PR #3695 review fixes: the impostor fragment's fog and
+// tone-mapping tail moved realm_builder_monument_fx.ts. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'a5c2116d1b9087ee0a1471a4e3bcaf8e81edb88c09b4ef6de792305b778ba94c';
+  'aae303c8be1af767739709f2749a17c0e111cdf570280c166ef59466401ba34e';
+// Re-minted at the release/v0.42.0 sync of PR #3439: renderer.ts moved for the
+// mount lifecycle seam (mount_lifecycle.ts) and the rickshaw hooks it absorbed.
+// Re-minted again for the PR #3695 review fixes (the impostor fragment tail).
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '89c8a62f400d63c10f85c61eac2c93f2f0a43d1e822679027d03bbed6ee82d0d';
+  '85392484fb6509a37aa445bcc5bd5ebba58819939847318ccf288b048341b708';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2193,7 +2208,15 @@ describe('Eastbrook polish performance and contact evidence', () => {
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
       // Re-minted for the Drakelands entrance merge into the raid branch: the
       // composite first, then this seal. No capture was retaken.
-    ).toBe('eca473321cb438c8ecdd9bfadf949fcf23f0b38fd1830590822d878950ce6a55');
+      // Re-minted for the Realm Builder monument (PR #3695) at its
+      // release/v0.42.0 base merge: the first-order composite follows the
+      // renderer, town and civicShader leaves, then this second-order seal
+      // follows the swept evidence bytes. No capture was retaken.
+      // Re-minted for the PR #3695 review fixes: the impostor fragment's fog
+      // and tone-mapping tail moved realm_builder_monument_fx.ts, the composite
+      // followed it, then this seal followed the swept bytes. No capture was
+      // retaken.
+    ).toBe('c5c6bdac1fc2fe0c2848300d5ca6deec0c52793b376fce1c3609ca1a39f6f754');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

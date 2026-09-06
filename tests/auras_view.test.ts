@@ -883,3 +883,165 @@ describe('hud.ts: the buff-bar cancel routes a flag drop through the touch confi
     expect(instant).toBeGreaterThan(gate);
   });
 });
+
+// ---------------------------------------------------------------------------
+// Urgency ordering on the player's own strips (opts.orderByUrgency). The band
+// resolver itself is unit-tested in tests/aura_strip_order_core.test.ts; what matters
+// here is that the view turns bands into SLOT ORDER, leaves every other view's
+// order exactly as it was, and does not break the reused-pool allocation contract.
+// ---------------------------------------------------------------------------
+describe('auras view: urgency ordering', () => {
+  // Deliberately built in the WRONG reading order: long raid buffs applied first
+  // (as they are in a real pull), the cooldowns you actually time applied last.
+  const raidBuffed = (): AuraInput[] => [
+    aura({ id: 'bl_might', remaining: 1800, duration: 1800 }),
+    aura({ id: 'arcane_int', kind: 'buff_int', remaining: 1800, duration: 1800 }),
+    aura({ id: 'well_fed', kind: 'buff_sta', remaining: 900, duration: 900 }),
+    aura({ id: 'battle_shout', remaining: 120, duration: 120 }),
+    aura({ id: 'sprint', kind: 'buff_speed', remaining: 9, duration: 15 }),
+    aura({ id: 'heroism', kind: 'buff_haste', remaining: 34, duration: 40 }),
+  ];
+  const keys = (s: { slots: { key: string }[]; count: number }) =>
+    s.slots.slice(0, s.count).map((x) => x.key);
+
+  it('puts the soonest-to-expire band nearest the anchor and upkeep at the far end', () => {
+    const view = createAurasView('buffs', deps(), { orderByUrgency: true });
+    expect(keys(view.tick(entity(raidBuffed())))).toEqual([
+      // band 0 (under a minute), then 1 (under five), then 2 (under thirty), then upkeep
+      'sprint',
+      'heroism',
+      'battle_shout',
+      'well_fed',
+      'bl_might',
+      'arcane_int',
+    ]);
+  });
+
+  it('orders BOTH player-strip modes by default, with no option passed', () => {
+    // The default is what hud.ts actually constructs, so a regression that only shows up
+    // without the explicit flag would otherwise ship unseen.
+    expect(keys(createAurasView('buffs', deps()).tick(entity(raidBuffed())))).toEqual([
+      'sprint',
+      'heroism',
+      'battle_shout',
+      'well_fed',
+      'bl_might',
+      'arcane_int',
+    ]);
+    const debuffs = [
+      aura({ id: 'curse_weak', kind: 'debuff_ap', remaining: 110, duration: 120 }),
+      aura({ id: 'frostbite', kind: 'slow', remaining: 5, duration: 8 }),
+    ];
+    expect(keys(createAurasView('debuffs', deps()).tick(entity(debuffs)))).toEqual([
+      'frostbite',
+      'curse_weak',
+    ]);
+  });
+
+  it("leaves the SHARED 'all' mode in sim application order by default", () => {
+    // 'all' drives the target strip and the party mini-strips (party_frame_row.ts), which
+    // must not silently pick up the player-strip ordering.
+    expect(keys(createAurasView('all', deps()).tick(entity(raidBuffed())))).toEqual([
+      'bl_might',
+      'arcane_int',
+      'well_fed',
+      'battle_shout',
+      'sprint',
+      'heroism',
+    ]);
+  });
+
+  it('lets an explicit opt-out fall back to sim application order', () => {
+    const view = createAurasView('buffs', deps(), { orderByUrgency: false });
+    expect(keys(view.tick(entity(raidBuffed())))).toEqual([
+      'bl_might',
+      'arcane_int',
+      'well_fed',
+      'battle_shout',
+      'sprint',
+      'heroism',
+    ]);
+  });
+
+  it('keeps sim application order INSIDE a band, so equal-urgency icons never swap', () => {
+    const view = createAurasView('buffs', deps(), { orderByUrgency: true });
+    const same = [
+      aura({ id: 'first', remaining: 20, duration: 30 }),
+      aura({ id: 'second', remaining: 10, duration: 30 }),
+      aura({ id: 'third', remaining: 30, duration: 30 }),
+    ];
+    // All three are band 0. A comparator-based sort would order them 10/20/30; the
+    // banding pass must not, because that is the per-tick reshuffle it exists to avoid.
+    expect(keys(view.tick(entity(same)))).toEqual(['first', 'second', 'third']);
+  });
+
+  it('sends a toggle to the far end even though the sim backs it with a long duration', () => {
+    const view = createAurasView('buffs', deps(), { orderByUrgency: true });
+    const withStance = [
+      aura({ id: 'battle_stance', kind: 'battle_stance', remaining: 3600, duration: 3600 }),
+      aura({ id: 'bl_might', remaining: 1800, duration: 1800 }),
+      aura({ id: 'sprint', kind: 'buff_speed', remaining: 9, duration: 15 }),
+    ];
+    // Not merely "after sprint": the stance must land behind the 30 minute buff too,
+    // which banding by its raw 3600s remaining would also produce by accident.
+    expect(keys(view.tick(entity(withStance)))).toEqual(['sprint', 'bl_might', 'battle_stance']);
+  });
+
+  it('orders the debuff strip on the same rule', () => {
+    const view = createAurasView('debuffs', deps(), { orderByUrgency: true });
+    const debuffs = [
+      aura({ id: 'curse_weak', kind: 'debuff_ap', remaining: 110, duration: 120 }),
+      aura({ id: 'frostbite', kind: 'slow', remaining: 5, duration: 8 }),
+    ];
+    expect(keys(view.tick(entity(debuffs)))).toEqual(['frostbite', 'curse_weak']);
+  });
+
+  it('lets ownFirst win when both are asked for, so the target strip is untouched', () => {
+    const view = createAurasView('all', deps(), { ownFirst: true, orderByUrgency: true });
+    const mixed = [
+      // Someone else's, and the most urgent thing on the target.
+      aura({ id: 'other_dot', kind: 'dot', remaining: 3, duration: 12, sourceId: 99 }),
+      // Yours, and the least urgent.
+      aura({ id: 'my_dot', kind: 'dot', remaining: 900, duration: 900, sourceId: OWN_PLAYER_ID }),
+    ];
+    // Urgency alone would lead with other_dot; ownFirst must still lead with yours.
+    expect(keys(view.tick(entity(mixed)))).toEqual(['my_dot', 'other_dot']);
+  });
+
+  it('an aura crossing a band boundary moves, and nothing else does', () => {
+    const view = createAurasView('buffs', deps(), { orderByUrgency: true });
+    const at = (heroism: number) =>
+      keys(
+        view.tick(
+          entity([
+            aura({ id: 'bl_might', remaining: 1800, duration: 1800 }),
+            aura({ id: 'battle_shout', remaining: 120, duration: 120 }),
+            aura({ id: 'heroism', kind: 'buff_haste', remaining: heroism, duration: 300 }),
+          ]),
+        ),
+      );
+    // Heroism at 90s shares the under-five-minutes band with the shout, and lost the
+    // tie to it on application order.
+    expect(at(90)).toEqual(['battle_shout', 'heroism', 'bl_might']);
+    // Ticking under a minute promotes it a band, and only it moves.
+    expect(at(59)).toEqual(['heroism', 'battle_shout', 'bl_might']);
+  });
+
+  it('keeps the reused-pool allocation contract under the extra passes', () => {
+    const view = createAurasView('buffs', deps(), { orderByUrgency: true });
+    let frame = 0;
+    const tick = () => {
+      frame += 1;
+      // Ticks a buff ACROSS a band boundary during the probe, so the ordering passes
+      // are genuinely re-running rather than settling into one stable answer.
+      return view.tick(
+        entity([
+          aura({ id: 'bl_might', remaining: 1800 - frame, duration: 1800 }),
+          aura({ id: 'heroism', kind: 'buff_haste', remaining: 62 - frame, duration: 300 }),
+        ]),
+      );
+    };
+    expect(() => assertAllocationStable(tick)).not.toThrow();
+    expect(() => assertAllocationStable(() => tick().slots)).not.toThrow();
+  });
+});

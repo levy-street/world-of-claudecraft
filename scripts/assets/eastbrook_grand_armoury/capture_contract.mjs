@@ -379,11 +379,18 @@ export const EASTBROOK_TOWN_POLISH_CAPTURE_VIEWS = Object.freeze([
     camera: Object.freeze({ x: 1, y: 6, z: -92.5 }),
     target: Object.freeze({ x: 3.844569834250236, y: 2.2, z: -89.79055748182878 }),
   }),
+  // Round 7 pointed this at the Realm Builder monument, which replaced the well
+  // beacon on the same civic point; round 8 doubled that statue, and the aim
+  // had to move out with it. It sits on the southwest diagonal, between the
+  // south and west benches and a yard clear of the plinth: due south is a
+  // seat, the middle is the statue, and this point is probed for collision
+  // with a half-yard body. Camera unchanged, so it is still the flank it
+  // always framed, now with a great deal more to frame.
   Object.freeze({
     name: 'civic-motion',
-    subject: 'eastbrook_civic_well_beacon',
+    subject: 'eastbrook_realm_builder_monument',
     camera: Object.freeze({ x: -8, y: 6, z: -110 }),
-    target: Object.freeze({ x: -14.75, y: 2.8, z: -104 }),
+    target: Object.freeze({ x: -12.05, y: 4.5, z: -105.2 }),
   }),
   Object.freeze({
     name: 'ravenpost-chronicler',
@@ -437,8 +444,13 @@ export const EASTBROOK_TOWN_POLISH_MATCHED_VIEW_OVERRIDES = Object.freeze({
     target: Object.freeze({ x: -42.82589170715949, y: 3, z: -90.73189846640925 }),
   }),
   'chapel-and-weaving': Object.freeze({
+    // Round 8: the aim was (-13, -100), the middle of the square, and the
+    // doubled Realm Builder monument now stands there: a target inside a
+    // collider fails the clearance probe. Moved a yard past the plinth's west
+    // face, still an establishing shot across the square with the statue as
+    // its backdrop.
     camera: Object.freeze({ x: 26, y: 12, z: -100 }),
-    target: Object.freeze({ x: -13, y: 3, z: -100 }),
+    target: Object.freeze({ x: -10.5, y: 3, z: -100 }),
   }),
   'toolworks-service-perimeter': Object.freeze({
     camera: Object.freeze({ x: -11, y: 7, z: -120 }),
@@ -464,6 +476,14 @@ export const EASTBROOK_TOWN_POLISH_MATCHED_CAPTURE_VIEWS = Object.freeze([
   }),
 ]);
 
+// FROZEN EVIDENCE, not a live description. Every field below is compared
+// against the committed capture metadata in
+// docs/screenshots/eastbrook-vale-rebuild/polish/metadata/, which records the
+// town as it stood when those frames were shot: the well beacon, and the
+// beacon shader at v1. The Realm Builder monument replaced both in round 7 and
+// the captures were NOT retaken, so this keeps saying what the pictures show.
+// Retaking them is its own deliberate change, and it moves these names, the
+// asset list above and the legacy inventory together.
 export const EASTBROOK_TOWN_MOTION_CAPTURE = Object.freeze({
   viewName: 'civic-motion',
   frameIntervalMs: 1_600,
@@ -485,7 +505,13 @@ export const EASTBROOK_POLISH_BASELINE_REVISION = '3ab740db453bd8b5858a52c304edc
 export const EASTBROOK_POLISH_PROVENANCE_INPUTS = Object.freeze({
   townAssetSourceFingerprint: 'scripts/assets/eastbrook_town/source_fingerprint.mjs',
   authoritativeLayout: 'src/sim/eastbrook_layout.ts',
-  civicShader: 'src/render/eastbrook_civic_beacon.ts',
+  // Round 8 repointed this leaf. It used to be eastbrook_civic_beacon.ts, the
+  // shader that animated the well beacon's floating crystal inside the merged
+  // emissive batch; that module was deleted when the Realm Builder monument
+  // replaced the crystal and left the batch entirely. The KEY is unchanged on
+  // purpose (it is a name in the committed capture metadata), and it still
+  // means the same thing: the module that animates the square's centrepiece.
+  civicShader: 'src/render/realm_builder_monument_fx.ts',
   townRuntime: 'src/render/eastbrook_town.ts',
   mailboxRuntime: 'src/render/mailbox.ts',
   noticeboardRuntime: 'src/render/noticeboard.ts',

@@ -758,38 +758,41 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
   ],
   // ============== Crucible of the Last Spring (Heroic-only appends) ==============
   // The Ignivar raid has NO heroic item-level layer (docs/prd/ignivar-raid-loot.md):
-  // a Heroic kill drops its Normal groups PLUS these, so Heroic pays in access
-  // (the Robe sigil that finishes the 5-piece, the shields) at the same ilvl 35.
-  // The ids register at IGNIVAR_RAID_LOOT_SOURCE_LEVEL in item_level.ts, which
-  // out-ranks this table's default source. Heroic weapon groups join at the end
-  // with the weapon wave. APPEND-only, never reorder.
+  // a Heroic kill pays the SAME count as Normal (one item per five raiders, so
+  // two on the 10-player raid) at the same ilvl 35, and differs only in WHICH
+  // items it can drop. Each boss's Normal-only off-set slot (LootEntry.normalOnly
+  // in dungeons.ts) is skipped on a heroic claim and this ONE exclusive group
+  // pays in its place: the Robe sigil that finishes the 5-piece, the marquee
+  // weapons, and (Varkhul) the shields. The ids register at
+  // IGNIVAR_RAID_LOOT_SOURCE_LEVEL in item_level.ts, which out-ranks this table's
+  // default source. Re-cut 2026-09-02 from the launch appends (one robe group
+  // plus one weapon group per boss, plus Varkhul's shield group); from here the
+  // partition is APPEND-only, never reorder.
   [IGNIVAR_BOSS_ID]: [
-    { itemId: 'sigil_anvil_chest', chance: 0.34, rollGroup: 'ignivar_h_sigil_robe' },
-    { itemId: 'sigil_ember_chest', chance: 0.33, rollGroup: 'ignivar_h_sigil_robe' },
-    { itemId: 'sigil_tempest_chest', chance: 0.33, rollGroup: 'ignivar_h_sigil_robe' },
-    // Three entries, not four: the Emberflight Longbow was pulled from the
+    // Robes 0.50 / marquee weapons 0.50; Anvil 0.34 / Ember 0.33 / Tempest 0.33.
+    { itemId: 'sigil_anvil_chest', chance: 0.17, rollGroup: 'ignivar_h_exclusive' },
+    { itemId: 'sigil_ember_chest', chance: 0.17, rollGroup: 'ignivar_h_exclusive' },
+    { itemId: 'sigil_tempest_chest', chance: 0.16, rollGroup: 'ignivar_h_exclusive' },
+    // Three weapons, not four: the Emberflight Longbow was pulled from the
     // tier (bows wait for the hunter ranged-slot rework; maintainer decision
     // 2026-08-28), and the hunter ranged marquee returns with that rework.
-    { itemId: 'forgefathers_warhammer', chance: 0.34, rollGroup: 'ignivar_h_weapon' },
-    { itemId: 'anvilguard_blade', chance: 0.33, rollGroup: 'ignivar_h_weapon' },
-    { itemId: 'springtouched_crozier', chance: 0.33, rollGroup: 'ignivar_h_weapon' },
+    { itemId: 'forgefathers_warhammer', chance: 0.17, rollGroup: 'ignivar_h_exclusive' },
+    { itemId: 'anvilguard_blade', chance: 0.17, rollGroup: 'ignivar_h_exclusive' },
+    { itemId: 'springtouched_crozier', chance: 0.16, rollGroup: 'ignivar_h_exclusive' },
   ],
   [VARKHUL_BOSS_ID]: [
-    { itemId: 'sigil_anvil_chest', chance: 0.34, rollGroup: 'varkhul_h_sigil_robe' },
-    { itemId: 'sigil_ember_chest', chance: 0.33, rollGroup: 'varkhul_h_sigil_robe' },
-    { itemId: 'sigil_tempest_chest', chance: 0.33, rollGroup: 'varkhul_h_sigil_robe' },
-    // Emberward shares the existing shield partition so its 3 percent chance
-    // adds no heroic RNG draw. The two epic outcomes split the remaining 97
-    // percent evenly, and the group still guarantees exactly one shield.
-    {
-      itemId: 'bulwark_of_the_inner_crucible',
-      chance: 0.485,
-      rollGroup: 'varkhul_h_shields',
-    },
-    { itemId: 'ember_wardens_barrier', chance: 0.485, rollGroup: 'varkhul_h_shields' },
-    { itemId: 'varkhul_emberward', chance: 0.03, rollGroup: 'varkhul_h_shields' },
-    { itemId: 'heart_of_the_end_greatblade', chance: 0.34, rollGroup: 'varkhul_h_weapon' },
-    { itemId: 'forgefire_spire', chance: 0.33, rollGroup: 'varkhul_h_weapon' },
-    { itemId: 'staff_of_the_last_spring', chance: 0.33, rollGroup: 'varkhul_h_weapon' },
+    // Robes 0.35 / shields 0.30 / marquee weapons 0.35. Emberward keeps its
+    // ABSOLUTE 3 percent per heroic kill inside the shield share (the two epic
+    // shields split the remaining 0.27 evenly), so the legendary's odds did not
+    // move with the re-cut and the group still adds no extra heroic rng draw.
+    { itemId: 'sigil_anvil_chest', chance: 0.12, rollGroup: 'varkhul_h_exclusive' },
+    { itemId: 'sigil_ember_chest', chance: 0.12, rollGroup: 'varkhul_h_exclusive' },
+    { itemId: 'sigil_tempest_chest', chance: 0.11, rollGroup: 'varkhul_h_exclusive' },
+    { itemId: 'bulwark_of_the_inner_crucible', chance: 0.135, rollGroup: 'varkhul_h_exclusive' },
+    { itemId: 'ember_wardens_barrier', chance: 0.135, rollGroup: 'varkhul_h_exclusive' },
+    { itemId: 'varkhul_emberward', chance: 0.03, rollGroup: 'varkhul_h_exclusive' },
+    { itemId: 'heart_of_the_end_greatblade', chance: 0.12, rollGroup: 'varkhul_h_exclusive' },
+    { itemId: 'forgefire_spire', chance: 0.12, rollGroup: 'varkhul_h_exclusive' },
+    { itemId: 'staff_of_the_last_spring', chance: 0.11, rollGroup: 'varkhul_h_exclusive' },
   ],
 };

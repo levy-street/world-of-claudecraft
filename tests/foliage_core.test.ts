@@ -106,9 +106,12 @@ describe('Eastbrook town grass exclusion', () => {
       expect(byId.get(id)).toMatchObject({ kind: 'obb', halfWidth, halfDepth });
       expect(byId.get(`${id}:serviceApron`)).toMatchObject({ kind: 'circle', radius: 1.5 });
     }
-    expect(byId.get('eastbrook_civic_well_beacon')).toMatchObject({
+    // Round 7 replaced the well beacon with the Realm Builder monument on the
+    // same point, and round 8 doubled it: the exclusion is the sculpt's own
+    // tight cylinder at that size, not the beacon's looser 1.5.
+    expect(byId.get('eastbrook_realm_builder_monument')).toMatchObject({
       kind: 'circle',
-      radius: 1.5,
+      radius: 3.19,
     });
     expect(byId.get('eastbrook_noticeboard')).toMatchObject({
       kind: 'obb',
@@ -208,7 +211,7 @@ describe('Eastbrook town grass exclusion', () => {
 
   it('keeps grass out of the well and wall while preserving every exact gate opening', () => {
     const exclusions = eastbrookGrassExclusions(PROPS.buildings, true, BUILTIN_NOTICEBOARDS);
-    const well = EASTBROOK_LAYOUT.civic.wellBeacon;
+    const well = EASTBROOK_LAYOUT.civic.monument;
     expect(
       insideEastbrookGrassExclusion(exclusions, well.position.x, well.position.z, PADDING),
     ).toBe(true);

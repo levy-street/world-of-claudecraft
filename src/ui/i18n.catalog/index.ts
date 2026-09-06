@@ -916,6 +916,7 @@ export const en = {
       forgeUpgraded: 'Rift upgrade completed for {name}.',
       forgeEnchanted: 'Rift enchant completed for {name}.',
       forgeSocketed: 'Rift gem socketed for {name}.',
+      forgeGemReplaced: 'Rift gem replaced for {name}: {gem} destroyed.',
       // Boss lethal death-zone detonation log lines (src/sim/mob/locomotion.ts).
       // Each fires at the moment a telegraphed zone expires. Emitted in English
       // by the sim; re-localized via the sim.rift.detonate* rules in sim_i18n.ts.

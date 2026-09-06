@@ -1,6 +1,11 @@
 import type { PlayerEquipmentInstances } from '../sim/entity';
+import type { RiftForgeResult } from '../sim/rift/progression';
 import type { EquipSlot, InvSlot, ItemInstancePayload } from '../sim/types';
 import type { VendorBuyOptions } from '../sim/vendor_buy_stack';
+
+/** The forge pair's host-dependent answer: the offline Sim's synchronous
+ *  RiftForgeResult, or ClientWorld's awaited commandOutcome ack. */
+export type RiftForgeOutcome = RiftForgeResult | Promise<boolean>;
 
 export interface IWorldInventory {
   inventory: InvSlot[];
@@ -72,9 +77,17 @@ export interface IWorldInventory {
     instance?: ItemInstancePayload,
     craftedRecipeId?: string,
   ): void;
-  upgradeRiftItem(itemId: string, target?: { slotIndex: number }): void;
-  enchantRiftItem(itemId: string, stat: string, target?: { slotIndex: number }): void;
-  socketRiftGem(itemId: string, gemId: string, target?: { slotIndex: number }): void;
+  /** The Rift Forge pair (src/sim/rift/progression.ts): an essence upgrade
+   *  raises the copy's item level by one; a gem socket adds (or, on a full
+   *  band, replaces the oldest) rating line. The offline Sim answers
+   *  synchronously with the sim's RiftForgeResult; ClientWorld answers the
+   *  commandOutcome ack (false on a closed or refused forge). Either way the
+   *  riftForgeResult event carries the reason; a caller only needs the outcome
+   *  to know whether to re-read the ring or show the refusal. The retired
+   *  forge enchant (`rift_enchant_item`) has no member: the wire token survives
+   *  as a dispatch-only tombstone because the vocabulary is append-only. */
+  upgradeRiftItem(itemId: string, target?: { slotIndex: number }): RiftForgeOutcome;
+  socketRiftGem(itemId: string, gemId: string, target?: { slotIndex: number }): RiftForgeOutcome;
   /** Milliseconds left before the bind-on-pickup party trade deadline
    *  `untilMs` (an ItemInstancePayload.partyTrade.untilMs value), clamped to
    *  zero. Host-aware on purpose: `untilMs` is stamped from the sim's

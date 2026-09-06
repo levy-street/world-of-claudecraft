@@ -607,7 +607,7 @@ describe('enchant_apply_view: preservedReplaceTraits (#2421)', () => {
     const body = (block?.[0] ?? '').replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
     const projected = [...body.matchAll(/pub\.(\w+) = inst\.\w+/g)].map((m) => m[1]);
     // Exactly the cosmetic inspect fields, and NOTHING that carries bind state.
-    expect(projected.sort()).toEqual(['enchant', 'rolled', 'signer']);
+    expect(projected.sort()).toEqual(['enchant', 'rift', 'rolled', 'signer']);
     // Syntax-independent backstop: the extractor above only sees dot-notation
     // assignment, so a widening written as pub['boundTo'] = inst.boundTo or an
     // Object.assign spread would slip past it. Pin the FIELD NAMES out of the

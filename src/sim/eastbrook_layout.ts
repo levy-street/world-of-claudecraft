@@ -767,13 +767,84 @@ function makeObbPlacement(
   };
 }
 
+// The square's centrepiece: the Realm Builder monument, which replaced the
+// well beacon and its floating crystal.
+//
+// nativeDimensions are the SHIPPED sculpt's own bounding box scaled to the
+// height below, and they have to stay proportional: eastbrook_town.ts
+// placementMatrix scales each axis independently, so a hand-rounded entry
+// shears the statue.
+//
+// Round 8 (owner): DOUBLED, 3.8 yards to 7.6. The plinth now stands about 2.2
+// yards, over head height, with its honour plates between knee and chest as
+// you walk up; the builder is another 5.4 yards above that. It is the tallest
+// thing in the square by a long way, which is the point. It does overlap the
+// nominal civic ring band, and that is fine: `civic.ring` is a stated
+// intent that nothing reads for collision or drawing (only a layout-suite pin
+// reads it at all). What the size DOES cost is bench room, see BENCH_RING_RADIUS.
+const MONUMENT_HEIGHT = 7.6;
+const MONUMENT_SOURCE = { width: 0.755235, height: 0.991974, depth: 0.702649 } as const;
+const MONUMENT_SCALE = MONUMENT_HEIGHT / MONUMENT_SOURCE.height;
+// Tight cylinder, not the old loose 1.5: the widest point in the sculpt is the
+// lantern outrigger ring at 0.415158 source units, and nothing above it reaches
+// past 0.36, so one cylinder at that radius hugs the whole silhouette. Rounded
+// UP by a 1cm skin so the collider never cuts inside its own art.
+const MONUMENT_SOURCE_RADIUS = 0.415158;
+const MONUMENT_RADIUS = Math.ceil(MONUMENT_SOURCE_RADIUS * MONUMENT_SCALE * 100) / 100;
+// Front plate, and the builder's own face, aim down the east quadrant: the
+// open spawn-to-square arrival lane, so the first side of the monument a
+// player meets is the one carrying the current honouree. The sculpt faces +Z
+// at rotation 0, and east in this town is NEGATIVE x (the arrival is at
+// x -94 and the bench named "west" sits at +x of the civic centre), so the
+// quarter turn goes the other way: a Y Euler rotation maps local +Z to world
+// (sin, cos), and only -PI/2 lands that on -x. (Spelled without naming the
+// renderer library, which this module is asserted never to mention.)
+const MONUMENT_ROTATION = -Math.PI / 2;
+
+const MONUMENT = {
+  id: 'eastbrook_realm_builder_monument',
+  assetId: '/models/props/eastbrook_realm_builder_monument.glb',
+  // Reserved static-service id. The noticeboard band (content/noticeboards.ts)
+  // runs 2_000_000_001 upward and is APPEND ONLY, so the monument takes a slot
+  // clear of it rather than the next free number.
+  entityId: 2_000_000_100,
+  // The literal, not the types.ts constant: this module is asserted to carry
+  // ZERO imports (tests/eastbrook_layout_suite.test.ts), so the two are pinned
+  // equal by tests/realm_builder_monument.test.ts instead.
+  templateId: 'realm_builder_monument',
+  name: 'Realm Builder Monument',
+  position: CIVIC_FEATURE_CENTER,
+  rotation: MONUMENT_ROTATION,
+  radius: MONUMENT_RADIUS,
+  height: MONUMENT_HEIGHT,
+  nativeDimensions: {
+    width: MONUMENT_SOURCE.width * MONUMENT_SCALE,
+    height: MONUMENT_HEIGHT,
+    depth: MONUMENT_SOURCE.depth * MONUMENT_SCALE,
+  },
+} as const;
+
 // Three cardinal benches occupy the quiet sides of the civic ring. The east
 // quadrant deliberately remains open as the spawn-to-square arrival lane.
+//
+// Round 7 re-seated them for the monument, and moved what they ring. They used
+// to sit 2.9 yards off CIVIC_CENTER, the square's own point; a statue is what
+// people sit facing, so they now ring CIVIC_FEATURE_CENTER, the statue's own.
+//
+// Round 8 pushed them as far out as the square allows, because the doubled
+// monument eats most of the room they used to have. The ceiling is the
+// SOUTHWEST ROAD: its last centreline sample sits at (-9, -100.4), and the
+// west bench's own box has to stay 1.5 yards off it, which caps the ring at
+// 4.12 (solve hypot(|5.75 - R| - 0.3, 0.7) >= 1.5). At 4.1 that leaves about
+// 0.6 yards between a bench back and the plinth: snug rather than roomy, and
+// the most the square can give once the statue is this size. Anything wider
+// reds tests/eastbrook_layout_suite.test.ts on the lane clearance.
+const BENCH_RING_RADIUS = 4.1;
 const BENCHES = [
   makeObbPlacement(
     'eastbrook_civic_bench_north',
     '/models/dungeon/bench.glb',
-    { x: -14, z: -99.1 },
+    { x: CIVIC_FEATURE_CENTER.x, z: CIVIC_FEATURE_CENTER.z + BENCH_RING_RADIUS },
     1.8,
     0.6,
     Math.PI,
@@ -781,7 +852,7 @@ const BENCHES = [
   makeObbPlacement(
     'eastbrook_civic_bench_south',
     '/models/dungeon/bench.glb',
-    { x: -14, z: -104.9 },
+    { x: CIVIC_FEATURE_CENTER.x, z: CIVIC_FEATURE_CENTER.z - BENCH_RING_RADIUS },
     1.8,
     0.6,
     0,
@@ -789,7 +860,7 @@ const BENCHES = [
   makeObbPlacement(
     'eastbrook_civic_bench_west',
     '/models/dungeon/bench.glb',
-    { x: -11.1, z: -102 },
+    { x: CIVIC_FEATURE_CENTER.x + BENCH_RING_RADIUS, z: CIVIC_FEATURE_CENTER.z },
     1.8,
     0.6,
     Math.PI / 2,
@@ -1344,14 +1415,7 @@ export const EASTBROOK_LAYOUT = deepFreeze({
   civic: {
     center: CIVIC_CENTER,
     ring: { radius: 4.75, pathHalfWidth: 1.5 },
-    wellBeacon: {
-      id: 'eastbrook_civic_well_beacon',
-      assetId: '/models/props/eastbrook_civic_well_beacon.glb',
-      position: CIVIC_FEATURE_CENTER,
-      radius: 1.5,
-      height: 3.1,
-      nativeDimensions: { width: 3.2, height: 3.1, depth: 3.2 },
-    },
+    monument: MONUMENT,
     benches: BENCHES,
   },
   market: {

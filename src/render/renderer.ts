@@ -145,7 +145,6 @@ import {
   type CharacterVisual,
   composedLookPiecesOf,
   createCharacterVisual,
-  createMountVisual,
   type FarBakeGate,
   lookPiecesStats,
   modularLookFor,
@@ -167,10 +166,8 @@ import {
   characterResidencySources,
   isWeaponSkinModelUrl,
   mechAssetsReady,
-  mountAssetsReady,
   onCharacterAssetReady,
   preloadMechAssets,
-  preloadMountAssets,
   preloadTrainingDummyAssets,
   trainingDummyAssetsReady,
 } from './characters/assets';
@@ -417,7 +414,17 @@ import { collectObjectTextures } from './material_texture_slots';
 import { buildMobNightGlow, type MobNightGlowView } from './mob_night_glow';
 import { buildMotes, type MotesView } from './motes';
 import { MountBeacon } from './mount_beacon';
+import { type MountGlows, updateMountGlows } from './mount_glow';
 import { applyMountJumpAttitude } from './mount_jump_attitude';
+import { type MountLamps, updateMountLamps } from './mount_lamps';
+import {
+  disposeMountView,
+  type MountViewHost,
+  placeRider,
+  seatRiderOnBone,
+  syncMountTransitionFx,
+  syncMountVisual,
+} from './mount_lifecycle';
 import {
   mountPrewarmKeys,
   stageMountPrewarmVisual,
@@ -575,6 +582,7 @@ import {
   syncRaidEncounterRigVisuals,
 } from './raid_encounter_visuals';
 import { isOwnedPetHostile } from './reaction';
+import { buildRealmBuilderMonumentPickBody } from './realm_builder_monument_fx';
 import { buildRealmFlora, type RealmFloraView } from './realm_flora';
 import {
   RenderBudgetGovernor,
@@ -610,11 +618,7 @@ import { createRevealCompileHost, REVEAL_GATE_PREP_KIND } from './reveal_compile
 import { createRevealGate } from './reveal_gate';
 import type { RevealGateCore } from './reveal_gate_core';
 import {
-  attachPullerIfRickshaw,
-  preloadPullerIfRickshaw,
   type RickshawMountViewState,
-  releaseRickshawMountState,
-  rickshawMountBuildReady,
   spinMountWheels,
   updateRickshawPuller,
   updateRollingMountLoop,
@@ -679,6 +683,7 @@ import { buildStationProps } from './stations';
 import { shouldRenderStealthGhost } from './stealth';
 import { createStepSmooth, type StepSmoothState, stepSmoothHeight } from './step_smooth_core';
 import { buildStreetlamps, type StreetlampsView } from './streetlamps';
+import { strideHit } from './stride_audio_core';
 import { buildFlaredConeFan, buildRingXZ, drapeConeWorld } from './target_cone_debug';
 import {
   syncTemporalHourglassVisual,
@@ -1091,6 +1096,9 @@ export interface EntityView extends RickshawMountViewState {
   travelVisual: CharacterVisual | null; // druid travel form (chicken-cow), built lazily
   mountVisual: CharacterVisual | null; // rideable mount under a player, built lazily
   mountVisualKey: string; // '' = none; diffed each frame for live mount swaps
+  mountLamps: MountLamps | null; // point lights the mount carries on its own bones
+  mountGlows: MountGlows | null; // additive halos the mount carries on its own bones
+  mountSeatBone: THREE.Object3D | null; // resolved seat bone the rider anchors to
   /** world-unit rider saddle lift while mounted (0 dismounted); the nameplate,
    *  chat-bubble, and sloppy-pick overhead anchors add it (scaled by e.scale) */
   mountLift: number;
@@ -1676,6 +1684,11 @@ export class Renderer {
   /** The foliage bucket reveal gate (armed at world entry, like the bands). */
   private foliageRevealGate: RevealGateCore | null = null;
   private eastbrookTownView!: EastbrookTownView;
+
+  /** Re-bake the monument's projected name (src/game/realm_builder_boot.ts). */
+  setRealmBuilderHonouree(name: string): void {
+    this.eastbrookTownView?.setRealmBuilderHonouree(name);
+  }
   private fenbridgeTownView!: FenbridgeTownView;
   private hollowGates!: HollowGatesView;
   private lightRank: RankedPointLight[] = [];
@@ -8263,6 +8276,12 @@ export class Renderer {
       body = built.group;
       height = built.height;
       objectMesh = body;
+    } else if (e.kind === 'object' && e.templateId === 'realm_builder_monument') {
+      // Art lives in the town view: this entity is a pick volume only.
+      const built = buildRealmBuilderMonumentPickBody();
+      body = built.group;
+      height = built.height;
+      objectMesh = body;
     } else if (e.kind === 'object' && e.objectItemId === 'soulwell') {
       // Temporary Warlock party utility: bespoke procedural prop today, kept
       // behind buildSoulwell so a generated GLB can replace it later.
@@ -8476,6 +8495,9 @@ export class Renderer {
       travelVisual: null,
       mountVisual: null,
       mountVisualKey: '',
+      mountLamps: null,
+      mountGlows: null,
+      mountSeatBone: null,
       mountPullerVisual: null,
       mountLift: 0,
       mountJumpPitch: 0,
@@ -8895,6 +8917,12 @@ export class Renderer {
       if (view) this.applyWeaponSkin(view, entry.skinId, kind);
     }
   }
+
+  private readonly mountHost: MountViewHost = {
+    reconcileViewLights: (v) => this.reconcileViewLights(v as EntityView),
+    gateSwapFlagOnCompile: (root, done) => this.gateSwapFlagOnCompile(root, done),
+    recordBuild: (ms, startedAt) => this.buildLedger.record('view:mount', ms, startedAt),
+  };
 
   private reconcileViewLights(v: EntityView): void {
     const reconciled = reconcileViewPointLights(v.group, v.viewLights, this.viewLights);
@@ -9988,9 +10016,8 @@ export class Renderer {
       v.bearVisual?.dispose();
       v.catVisual?.dispose();
       v.travelVisual?.dispose();
-      v.mountVisual?.dispose();
+      disposeMountView(v);
       v.metamorphVisual?.dispose();
-      releaseRickshawMountState(v, true);
       v.fireballTravelVisual?.dispose();
     } else {
       if (!terminal && v.objectPoolKey && v.objectMesh instanceof THREE.Group) {
@@ -10870,12 +10897,15 @@ export class Renderer {
       v.visual.setFerocityStage(petFrenzy ? 3 : ferocityStage);
       v.visual.setPresentationScale(hunterPetVisualScale(ferocityStage, petFrenzy));
 
-      // live sheathe toggle (Z key): the sim's weaponStowed bit moves held
-      // props between the hands and the on-back pose (self or a peer)
-      if (e.weaponStowed !== v.weaponStowed) {
-        v.weaponStowed = e.weaponStowed;
-        v.visual.setWeaponStowed(e.weaponStowed);
-      }
+      // The live sheathe toggle (Z key) is diffed further down, folded into the
+      // swim/mount stow overlay: ONE writer for `v.weaponStowed`. Two diffs
+      // against the same field fight, because they compute different targets:
+      // this one the bare sim bit, the other the union with swimming/riding. A
+      // swimmer with a weapon drawn had them ping-pong the field every frame,
+      // replaying the sheathe one-shot forever (for a player rig that clip is
+      // 1H_Melee_Attack_Chop), which pins `currentIsOneShot` true and so
+      // suppresses every base-state fade: the authored strokes never played and
+      // the body froze in the chop's windup.
 
       // lazy form visuals, swapped by visibility like the old sheep/bear rigs
       // (build, compile gate and encounter prewarm all live in buildFormVisual)
@@ -10910,41 +10940,7 @@ export class Renderer {
       // is untouched either way).
       const mountSpec = e.kind === 'player' && e.mountKey ? mountVisualSpec(e.mountKey) : null;
       const mountShown = !!mountSpec && requestedForm === 'base' && !e.dead;
-      if (mountSpec && v.mountVisualKey !== mountSpec.visualKey) {
-        if (v.mountVisual) {
-          v.group.remove(v.mountVisual.root);
-          v.mountVisual.dispose();
-          v.mountVisual = null;
-        }
-        releaseRickshawMountState(v, true);
-        v.mountVisualKey = '';
-        if (rickshawMountBuildReady(mountSpec.visualKey, mountAssetsReady(mountSpec.visualKey))) {
-          const mountStarted = performance.now();
-          v.mountVisual = createMountVisual(mountSpec.visualKey);
-          this.buildLedger.record('view:mount', performance.now() - mountStarted, mountStarted);
-          v.group.add(v.mountVisual.root); // group.scale already carries e.scale
-          v.mountVisualKey = mountSpec.visualKey;
-          attachPullerIfRickshaw(v, mountSpec.visualKey, v.mountVisual.root);
-          // A newly summoned mount is exactly a brand-new rig's materials
-          // linking for the first time; gate it like a gear swap instead of
-          // freezing the frame the mount lands on (#2571).
-          v.mountCompilePending = true;
-          this.gateSwapFlagOnCompile(v.mountVisual.root, () => {
-            v.mountCompilePending = false;
-          });
-        } else {
-          void preloadMountAssets(mountSpec.visualKey).catch((err) =>
-            console.error('Failed to preload mount model:', err),
-          );
-          preloadPullerIfRickshaw(mountSpec.visualKey);
-        }
-      } else if (!mountSpec && v.mountVisual) {
-        v.group.remove(v.mountVisual.root);
-        v.mountVisual.dispose();
-        v.mountVisual = null;
-        releaseRickshawMountState(v, true);
-        v.mountVisualKey = '';
-      }
+      syncMountVisual(v, mountSpec, this.mountHost);
       if (v.mountVisual) v.mountVisual.root.visible = mountShown && !v.mountCompilePending;
       v.mountLift = mountShown && v.mountVisual ? mountSpec.seat : 0;
       const active = activeCharacterFormVisual(
@@ -10992,8 +10988,17 @@ export class Renderer {
       // the seat height while mounted; 0 whenever the mount is absent/hidden.
       // seatFwd slides the rider along facing onto saddles that sit off the
       // model origin (the toad's is well back toward the tail).
-      v.visual.root.position.y = v.mountLift;
-      v.visual.root.position.z = v.mountLift > 0 && mountSpec ? mountSpec.seatFwd : 0;
+      // A mount with a straddle spec re-poses the rider's legs around its
+      // barrel (characters/visual.ts setRidePose). The seated loop stays the
+      // base underneath: it is what carries his hips down onto the saddle, and
+      // every seat offset in this file was fitted against it.
+      v.visual.setRidePose(mountShown && mountSpec ? mountSpec.ride : null);
+      // The presented mount block below re-derives the whole rider transform
+      // after the mixer advances (attitude, bob, seat bone), so the seat is
+      // solved here only when that block will not run this frame.
+      if (!(runCharacterPresentation && mountShown && v.mountVisual)) {
+        placeRider(v, v.visual.root, mountSpec, v.mountLift, 0);
+      }
       // Dismounted: relax the tip, or the rider keeps the cart's last attitude.
       if (!mountShown) {
         v.mountJumpPitch = 0;
@@ -11060,7 +11065,11 @@ export class Renderer {
       // drawn, and a peer's weapon rides their back the moment they start
       // swimming without any wire traffic. (This diff sits here, after the swim
       // latch, precisely so both halves are known in the same frame.)
-      const stowed = e.weaponStowed || swimming;
+      // Riding stows too, on the same overlay terms as swimming: a rider with a
+      // polearm drawn fouls the throne he is sitting in, and both hands are on
+      // the reins anyway. The player's own sheathe choice is untouched, so
+      // dismounting restores exactly what they had drawn.
+      const stowed = e.weaponStowed || swimming || v.mountLift > 0;
       if (stowed !== v.weaponStowed) {
         v.weaponStowed = stowed;
         v.visual.setWeaponStowed(stowed);
@@ -11276,14 +11285,15 @@ export class Renderer {
       const sink = this.audioSink;
       if (sink && d2 < SFX_MOVE_RANGE_SQ) {
         // jump / land / water-entry edges
-        if (airborne && !v.wasAirborne && !visuallyDead) sink.movement('jump', ax, ay, az, isSelf);
+        if (airborne && !v.wasAirborne && !visuallyDead)
+          sink.movement('jump', ax, ay, az, isSelf, e.mountKey || undefined);
         else if (!airborne && v.wasAirborne && !visuallyDead) {
           // A flight that ends by catching a ledge is not a fall, and the
           // heavy landing thud on one reads as a bug: you hopped onto a rock
           // mid-arc and the game played a crash. Anything softer than a plain
           // jump's own landing speed gets a footfall instead.
           if (v.fallSpeed >= SOFT_LANDING_SPEED) {
-            sink.movement('land', ax, ay, az, isSelf);
+            sink.movement('land', ax, ay, az, isSelf, e.mountKey || undefined);
           } else {
             sink.footstep(ax, ay, az, this.surfaceAt(ax, az, ay), false, isSelf);
           }
@@ -11301,25 +11311,20 @@ export class Renderer {
         // footfalls / swim strokes via a distance accumulator (no timers)
         if (visuallyDead || (st.sitting && !riderMounted)) {
           v.stepAccum = 0;
+          sink.mountEngineReset(e.id); // a dead rider must not hold a frozen engine/idle loop
         } else if (swimming) {
-          v.stepAccum += loco.speed * dt;
-          if (v.stepAccum >= SWIM_STRIDE) {
-            v.stepAccum = 0;
-            sink.movement('swim', ax, ay, az, isSelf);
-          }
+          if (strideHit(v, loco.speed, dt, SWIM_STRIDE)) sink.movement('swim', ax, ay, az, isSelf);
         } else if (logicallyMounted && moving && !airborne) {
           // An engine mount (windup/loop/winddown take set, e.g. the tank
           // mount) drives its own state machine every frame instead of the
           // per-stride gait beat below; mountEngine reports whether this
           // mountKey actually has one, so ordinary mounts fall through.
+          sink.mountIdle(ax, ay, az, e.mountKey, false, e.id); // moving: hum off
           if (sink.mountEngine(ax, ay, az, e.mountKey, true, e.id)) {
             // handled entirely by mountEngine
           } else if (loco.speed >= FOOT_RUN_SPEED) {
-            v.stepAccum += loco.speed * dt;
-            if (v.stepAccum >= MOUNT_STRIDE_RUN) {
-              v.stepAccum = 0;
-              sink.mountRun(ax, ay, az, e.mountKey, isSelf);
-            }
+            if (strideHit(v, loco.speed, dt, MOUNT_STRIDE_RUN))
+              sink.mountRun(ax, ay, az, e.mountKey, this.surfaceAt(ax, az, ay), isSelf);
           } else {
             v.stepAccum = MOUNT_STRIDE_RUN * 0.6;
           }
@@ -11336,20 +11341,11 @@ export class Renderer {
           // engine mount every frame so the winddown fires on the stop edge;
           // a non-engine mount has nothing to do here (mountEngine no-ops).
           sink.mountEngine(ax, ay, az, e.mountKey, false, e.id);
+          sink.mountIdle(ax, ay, az, e.mountKey, true, e.id); // stopped: hum on
         } else if (moving && !airborne) {
-          v.stepAccum += loco.speed * dt;
-          const stride = loco.speed >= FOOT_RUN_SPEED ? FOOT_STRIDE_RUN : FOOT_STRIDE_WALK;
-          if (v.stepAccum >= stride) {
-            v.stepAccum = 0;
-            sink.footstep(
-              ax,
-              ay,
-              az,
-              this.surfaceAt(ax, az, ay),
-              loco.speed >= FOOT_RUN_SPEED,
-              isSelf,
-            );
-          }
+          const running = loco.speed >= FOOT_RUN_SPEED;
+          if (strideHit(v, loco.speed, dt, running ? FOOT_STRIDE_RUN : FOOT_STRIDE_WALK))
+            sink.footstep(ax, ay, az, this.surfaceAt(ax, az, ay), running, isSelf);
         } else {
           // standing still, prime the accumulator so the first step after moving
           // lands promptly rather than after a full stride of travel.
@@ -11593,6 +11589,10 @@ export class Renderer {
           // the wheels should agree with anyway: if the cart did not move this
           // frame, the wheels must not turn this frame.
           spinMountWheels(v, dt > 0 ? Math.hypot(vx, vz) / dt : 0, st.backwards, dt);
+          // The attitude pass carries the rider WITH the procedural bob (the
+          // hover cycle's idle float) and through any jump tip. A mount whose
+          // seat MOVES (the troll's throne, the tortoise's shell) then re-seats
+          // him on its seat bone, which wins over the fixed-lift placement.
           applyMountJumpAttitude(
             v,
             v.mountVisual.root,
@@ -11604,6 +11604,7 @@ export class Renderer {
             dt > 1e-4 ? dyRaw / dt : 0,
             dt,
           );
+          seatRiderOnBone(v.group, v.visual.root, v.mountVisual.root, mountSpec, v);
           // ambient mount particles: the snail paints its slime path while
           // gliding, the hover cycle streams aether exhaust off its tail
           if (mountSpec.fx === 'slime') {
@@ -11611,6 +11612,10 @@ export class Renderer {
           } else if (mountSpec.fx === 'exhaust') {
             this.vfx.mountExhaust(v.group.position, facing, dt, moving);
           }
+          // Carried lamps are DYNAMIC budget lights: the pass only ever zeroes
+          // them, so the flame level has to be re-driven here, ahead of it.
+          if (v.mountLamps) updateMountLamps(v.mountLamps, this.time);
+          if (v.mountGlows) updateMountGlows(v.mountGlows, this.time);
         } else {
           v.mountVisual.advanceOffscreen(dt);
         }
@@ -11631,57 +11636,20 @@ export class Renderer {
         }
       }
 
-      // Mount summon/dismount transition FX (render-only; the wire fields carry
-      // the state to every client, so no SimEvent is needed). The rider throws up
-      // a call pose the instant a summon begins, and a yellow-orange shimmer rings
-      // them when the mount actually appears, swaps, or clears.
       if (e.kind === 'player') {
-        const mountCasting = e.mountCastRemaining > 0;
-        // idle -> summoning edge (mountCastKey set): play the arm-raise call pose
-        // for ~the transition window. A dismount (mountCastKey === '') gets no
-        // pose; its effect is the completion glow below. Gated like the emote path
-        // (the sim roots the player, so moving/airborne is unlikely regardless).
-        if (
-          mountCasting &&
-          !v.wasMountCasting &&
-          e.mountCastKey !== '' &&
-          !visuallyDead &&
-          !swimming &&
-          runCharacterPresentation
-        ) {
-          active.playCallPose(e.mountCastRemaining);
-        }
-        v.wasMountCasting = mountCasting;
-        // mountKey change = summon completed, dismount completed, or a live swap:
-        // fire the shimmer at the rider. Tracked separately from mountVisualKey,
-        // which lags async asset loading.
-        if (e.mountKey !== v.lastMountKey) {
-          v.lastMountKey = e.mountKey;
-          if (runCharacterPresentation) this.vfx.mountSummonGlow(e.id);
-          // The mount's own call, on the same edge as the glow but only when a
-          // mount actually APPEARED: e.mountKey === '' is a dismount, which
-          // keeps the glow and gets no call. A live swap is a genuine
-          // appearance and does play the new mount's call. lastMountKey is
-          // seeded from the entity's current state at view creation, so a rider
-          // already mounted when they enter interest range (or at login) never
-          // reaches this edge and stays silent.
-          if (e.mountKey !== '') this.audioSink?.mountSummon(ax, ay, az, e.mountKey, isSelf);
-          // A mountKey change (dismount, a live mount swap, or a fresh summon
-          // reusing this entity id) must drop any engine mount's windup/loop
-          // state; otherwise the old loop node stays connected forever once
-          // logicallyMounted goes false (the entity/view-removal reset at
-          // removeView() never fires for a live swap or dismount), and a swap
-          // would carry the old moving state into the new mount, skipping its
-          // windup.
-          this.audioSink?.mountEngineReset(e.id);
-          // Warm the new mount's engine clips right away (not e.g. lazily on
-          // the first movement frame): a cold first ride otherwise plays the
-          // windup through playAt's cold path (silently dropped past a 0.12s
-          // fetch/decode window) and the loop's cold path (a fallback fade-in
-          // instead of the immediate splice), reading as ~0.9s of silence
-          // then a swell. A no-op for an ordinary (non-engine) mount.
-          if (e.mountKey !== '') this.audioSink?.preloadMountEngine(e.mountKey);
-        }
+        v.wasMountCasting = syncMountTransitionFx(v, {
+          mountCasting: e.mountCastRemaining > 0,
+          mountCastKey: e.mountCastKey,
+          mountCastRemaining: e.mountCastRemaining,
+          mountKey: e.mountKey,
+          poseAllowed: !visuallyDead && !swimming && runCharacterPresentation,
+          present: runCharacterPresentation,
+          playCallPose: (secs: number) => active.playCallPose(secs),
+          summonGlow: () => this.vfx.mountSummonGlow(e.id),
+          engineReset: () => this.audioSink?.mountEngineReset(e.id),
+          preloadEngine: (key: string) => this.audioSink?.preloadMountEngine(key),
+          summonCall: () => this.audioSink?.mountSummon(ax, ay, az, e.mountKey, isSelf),
+        });
       }
 
       // per-ability windup orb + buff-orbit bands (spec-driven; no-op for

@@ -6,6 +6,8 @@ import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { FINDER_ACTIVITIES } from '../src/sim/content/dungeon_finder';
+import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
+import { ITEMS, MOBS } from '../src/sim/data';
 import {
   buildDungeonFinderView,
   buildFinderProposalPopupView,
@@ -170,7 +172,41 @@ describe('dungeon finder view core', () => {
     // The heroic finale preview advertises the raised heroicCopper base the
     // kill actually pays; a non-finale encounter keeps its normal copper.
     expect(boss?.copper).toBe(100000);
-    expect(view.detail?.encounters.find((e) => e.mobId === 'sexton_marrow')?.copper).toBe(400);
+    const sexton = view.detail?.encounters.find((e) => e.mobId === 'sexton_marrow');
+    expect(sexton?.copper).toBe(400);
+    // The heroic-slot gate mirrors the roller: keyed on the encounter having a
+    // HEROIC_BOSS_LOOT table, not on it being the finale, so a non-finale
+    // encounter without a table previews no heroic slot.
+    expect(HEROIC_BOSS_LOOT.sexton_marrow).toBeUndefined();
+    expect(sexton?.heroicGroups).toEqual([]);
+  });
+
+  it('previews a NON-finale encounter heroic table on Heroic only (the roller gate, not enc.final)', () => {
+    // The positive arm of the gate above: inject a heroic table for a
+    // catalogued non-finale encounter and the Heroic preview must show it
+    // while the Normal preview must not. With the old `enc.final` gate this
+    // assertion fails, which is exactly the regression it protects against
+    // (no live catalogue row exercises the branch yet).
+    expect(HEROIC_BOSS_LOOT.sexton_marrow).toBeUndefined();
+    HEROIC_BOSS_LOOT.sexton_marrow = [
+      { itemId: 'mistveil_cord', chance: 1, rollGroup: 'finder_test_nonfinal_heroic' },
+    ];
+    try {
+      const sextonOn = (activityId: string) =>
+        live(
+          buildDungeonFinderView(
+            input({ playerLevel: 20, specRole: 'tank', selectedActivityId: activityId }),
+          ),
+        ).detail?.encounters.find((e) => e.mobId === 'sexton_marrow');
+      const heroic = sextonOn('hollow_crypt_heroic');
+      expect(heroic?.final).toBe(false);
+      expect(heroic?.heroicGroups).toMatchObject([
+        { guaranteed: true, items: [{ itemId: 'mistveil_cord', chance: 1 }] },
+      ]);
+      expect(sextonOn('hollow_crypt_normal')?.heroicGroups).toEqual([]);
+    } finally {
+      delete HEROIC_BOSS_LOOT.sexton_marrow;
+    }
   });
 
   it('maps raid entrances to the Abandoned Crypt door with its zone', () => {
@@ -659,5 +695,44 @@ describe('every catalogued encounter has a committed portrait', () => {
     expect(missing, `catalogued encounters with no portrait webp:\n${missing.join('\n')}`).toEqual(
       [],
     );
+  });
+});
+
+describe('dungeon finder view: Normal-only loot rows', () => {
+  // The preview mirrors the roller's difficulty gate (loot_difficulty_gate.ts):
+  // a normalOnly row is listed on the Normal activity and NEVER on the Heroic
+  // one, because the heroic kill never rolls it. Substitutes one extra row on
+  // a real boss table, restored after, so the real activity catalogue drives
+  // the view.
+  it('previews a normalOnly group on Normal and hides it from the Heroic preview', () => {
+    expect(ITEMS.mistveil_cord).toBeTruthy();
+    const original = MOBS.morthen.loot;
+    MOBS.morthen.loot = [
+      ...original,
+      {
+        itemId: 'mistveil_cord',
+        chance: 1,
+        rollGroup: 'finder_test_normal_only',
+        normalOnly: true,
+      },
+    ];
+    try {
+      const listsCord = (view: ReturnType<typeof buildDungeonFinderView>) =>
+        live(view)
+          .detail?.encounters.find((e) => e.final)
+          ?.groups.some((g) => g.items.some((i) => i.itemId === 'mistveil_cord'));
+      expect(
+        listsCord(buildDungeonFinderView(input({ selectedActivityId: 'hollow_crypt_normal' }))),
+      ).toBe(true);
+      expect(
+        listsCord(
+          buildDungeonFinderView(
+            input({ playerLevel: 20, specRole: 'tank', selectedActivityId: 'hollow_crypt_heroic' }),
+          ),
+        ),
+      ).toBe(false);
+    } finally {
+      MOBS.morthen.loot = original;
+    }
   });
 });

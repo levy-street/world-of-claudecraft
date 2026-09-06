@@ -1916,7 +1916,7 @@ export const guideStrings = {
     // Spoiler-safe: the rank letters, the level gate, the shape of a run, and the race
     // rule are all broadcast to the whole realm in chat, so they are public. NO rank
     // multipliers, mob levels, drop rates, coin amounts, or boss scripts. The "Rift
-    // Forge" is deliberately unnamed: the upgrade/enchant/socket seam has no client
+    // Forge" is deliberately unnamed: the upgrade/socket seam has no client
     // caller and the server refuses its wire commands until the feature ships
     // (server/rift_forge_gate.ts).
     heading: 'Rifts',
@@ -1952,6 +1952,13 @@ export const guideStrings = {
     rewardsHeading: 'What you carry out',
     rewardsBody:
       "Sealing a rift, not merely surviving one, is what pays. Bring the rift down first and it pays like the instanced content its rank stands beside, so the harder ranks are worth the harder run. Sealing also puts a Riftbound band in the hands of everyone who was there, cut to your class's role and personal to you, and leaves Rift Essence in your bags besides, with rift gems on top of it at the harder ranks. Beside the way home, the thing at the bottom leaves a sealed cache your group can pick open for extra spoils, using the same Tumbler's Path lockpicking you know from delve chests, so a clean, patient job pays better than a rushed one. None of that reaches a group that came second: a lost race leaves you only what dropped off the mobs on the way down. The Book of Deeds is the exception, and it counts your clear either way, with a deed for closing your first rift and another for taking down an S-rank one.",
+    // The Rift Forge (src/ui/hud/rift_forge/, the Riftwright in Gullhaven):
+    // spoiler-safe by the same rule as the rest of this page: the service, the
+    // currency it takes, and where to find it, never the cost ladder or the
+    // stat numbers a forge step adds.
+    forgeHeading: 'The Rift Forge',
+    forgeBody:
+      'The band a ranked first clear mints is not finished when you receive it. Riftwright Maelis, who keeps a forge in the Watch Meadow on the Farshore, up the shore from Gullhaven beside the Breach Scholar, will raise its item level one step at a time and set the coloured gems the rifts drop into its sockets, each colour one combat rating. A full band takes a new gem in place of its oldest, so you can retune it later. All of that is paid in Rift Essence and Rift gems, the forge currency that falls from rift bosses and trades freely, so a friend can hand you the essence you are short. Take the band off before you bring it to her: she works on what is in your bags, and she does nothing at all unless you are standing at her forge.',
     trackerHeading: 'The tracker on your screen',
     trackerBody:
       'While you are inside, a small strip on your screen keeps you oriented: which floor you are on out of how many, and a live countdown. Read that countdown carefully, because it is not your run running out. It is the entrance back in the world closing. Once you are through, your group plays the rift out at its own pace, however long that takes, but when that clock reaches zero the way in is gone for everybody, so think twice about stepping outside near the end of it.',

@@ -12,6 +12,11 @@ import {
   NameplateCanvasSurface,
 } from '../src/render/nameplate_canvas';
 import {
+  NAMEPLATE_DOT_SIZE,
+  nameplateDotRowHeight,
+  newNameplateDotsPlan,
+} from '../src/render/nameplate_dots_core';
+import {
   NAMEPLATE_HERALDRY_EXTRA_LIFT,
   NAMEPLATE_HERALDRY_PLAQUE_PAD_X,
   NAMEPLATE_HERALDRY_WELL_ALPHA,
@@ -1460,5 +1465,133 @@ describe('nameplate canvas surface', () => {
       if (previousFonts) Object.defineProperty(document, 'fonts', previousFonts);
       else Reflect.deleteProperty(document, 'fonts');
     }
+  });
+});
+
+describe('the player dot row on a plate', () => {
+  // The plate half of the dot surfaces had NO pin at all: every nameplate
+  // harness injects nameplateDotScale: () => 0, so resolveDots, the extraLift
+  // row-height term and both draw walks were dead in test and deleting any of
+  // them stayed green. These drive the surface directly, at a filled plan.
+
+  function planWith(count: number, scale: number, fraction = 0.25) {
+    const plan = newNameplateDotsPlan();
+    plan.scale = scale;
+    for (let i = 0; i < count; i++) {
+      const slot = plan.slots[i] ?? {
+        iconKey: '',
+        school: '',
+        fraction: 1,
+        remaining: 0,
+        duration: 0,
+        decimals: 0 as 0 | 1,
+        iconUrl: '',
+        timeText: '',
+        timeValue: Number.NaN,
+      };
+      plan.slots[i] = slot;
+      slot.iconKey = `dot_${i}`;
+      slot.school = 'shadow';
+      slot.fraction = fraction;
+      slot.remaining = 12;
+      slot.duration = 18;
+      slot.decimals = 0;
+      slot.iconUrl = '';
+      slot.timeText = '12';
+      slot.timeValue = 12;
+    }
+    plan.count = count;
+    return plan;
+  }
+
+  function nameBaselineOf(
+    surface: NameplateCanvasSurface,
+    state: ReturnType<typeof createNameplateCanvasState>,
+  ) {
+    const drawSpy = vi.spyOn(textOf(surface), 'draw');
+    surface.beginFrame(640, 360, 1);
+    surface.drawBase(state, 320, 260);
+    const baseline = drawSpy.mock.calls.find((call) => call[1] === 'Gilded One')?.[3];
+    drawSpy.mockRestore();
+    return baseline as number;
+  }
+
+  it('lifts the name row by exactly the row height the core reserves', () => {
+    // drawBase subtracts nameplateDotRowHeight; if the step were dropped the
+    // name row would sit where it does with no dots at all.
+    const surface = new NameplateCanvasSurface(document.createElement('div'));
+    const state = createNameplateCanvasState();
+    Object.assign(state, { initialized: true, name: 'Gilded One', level: '20', hpVisible: true });
+
+    const withoutDots = nameBaselineOf(surface, state);
+    state.dots = planWith(2, 1);
+    const withDots = nameBaselineOf(surface, state);
+    expect(withoutDots - withDots).toBeCloseTo(nameplateDotRowHeight(2, 1), 5);
+  });
+
+  it('mirrors that same step in drawEmote, so the bubble cannot drift', () => {
+    // E44's rule for the heraldry lift, applied to the dot row: the two walks
+    // consume one height function or the emote bubble detaches from its plate.
+    vi.spyOn(HTMLImageElement.prototype, 'complete', 'get').mockReturnValue(true);
+    vi.spyOn(HTMLImageElement.prototype, 'naturalWidth', 'get').mockReturnValue(32);
+    const surface = new NameplateCanvasSurface(document.createElement('div'));
+    const state = createNameplateCanvasState();
+    Object.assign(state, {
+      initialized: true,
+      name: 'Gilded One',
+      level: '20',
+      hpVisible: true,
+      emoteIconUrl: 'data:image/svg+xml,emote',
+      emoteLabel: 'Cheers',
+    });
+    const emoteY = (): number => {
+      surface.beginFrame(640, 360, 1);
+      surface.drawBase(state, 320, 260);
+      surface.drawEmote(state, 320, 260);
+      const blits = traces[0].drawImage.mock.calls.filter(
+        ([source]) => source instanceof HTMLImageElement,
+      );
+      return blits.at(-1)?.[2] as number;
+    };
+
+    const without = emoteY();
+    state.dots = planWith(3, 1);
+    const with3 = emoteY();
+    expect(without - with3).toBeCloseTo(nameplateDotRowHeight(3, 1), 5);
+  });
+
+  it('scales the cooldown swipe with the row, not just the tile', () => {
+    // The swipe's clip, centre and arc radius all have to be the SCALED ones.
+    // At 300% a raw-size swipe darkens the top-left 13x13 of a 39x39 icon and
+    // reads as the wrong amount of time left, which is what shipped before.
+    const surface = new NameplateCanvasSurface(document.createElement('div'));
+    const state = createNameplateCanvasState();
+    Object.assign(state, { initialized: true, name: 'Gilded One', level: '20', hpVisible: true });
+
+    const swipeRadii = (scale: number): number[] => {
+      traces[0].arc.mockClear();
+      state.dots = planWith(1, scale);
+      surface.beginFrame(640, 360, 1);
+      surface.drawBase(state, 320, 260);
+      // The swipe is the only arc the row draws with a radius equal to the icon
+      // edge; the tile corners go through quadraticCurveTo.
+      return traces[0].arc.mock.calls.map((call) => call[2] as number);
+    };
+
+    const atOne = swipeRadii(1);
+    const atThree = swipeRadii(3);
+    expect(atOne).toContain(NAMEPLATE_DOT_SIZE);
+    expect(atThree).toContain(NAMEPLATE_DOT_SIZE * 3);
+    expect(atThree).not.toContain(NAMEPLATE_DOT_SIZE);
+  });
+
+  it('draws no row, and reserves no height, at an empty plan', () => {
+    const surface = new NameplateCanvasSurface(document.createElement('div'));
+    const state = createNameplateCanvasState();
+    Object.assign(state, { initialized: true, name: 'Gilded One', level: '20', hpVisible: true });
+    const empty = nameBaselineOf(surface, state);
+    state.dots = planWith(0, 3);
+    expect(nameBaselineOf(surface, state)).toBe(empty);
+    expect(nameplateDotRowHeight(0, 3)).toBe(0);
   });
 });

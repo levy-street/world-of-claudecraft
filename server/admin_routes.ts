@@ -291,6 +291,17 @@ export const ADMIN_ROUTE_PERMISSIONS: readonly AdminRouteRule[] = [
     pattern: /^\/admin\/api\/user-assets\/(\d+)\/(block|unblock)$/,
     permission: 'content.moderate',
   },
+
+  // The Realm Builder of the Month roll (server/realm_builder.ts). Same grant
+  // as the other public-content surfaces above: this decides what the realm
+  // shows the world, on a monument every player walks past.
+  { method: 'GET', pattern: '/admin/api/realm-builders', permission: 'content.moderate' },
+  { method: 'POST', pattern: '/admin/api/realm-builders', permission: 'content.moderate' },
+  {
+    method: 'POST',
+    pattern: '/admin/api/realm-builders/delete',
+    permission: 'content.moderate',
+  },
 ];
 
 function matches(pattern: string | RegExp, path: string): boolean {

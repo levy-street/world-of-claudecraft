@@ -586,6 +586,11 @@ const COMBAT_KEYS = [
   'walkByAutoloot',
   'groundReticle',
   'stickyTarget',
+  // The two dot-tracking surfaces, with the nameplate row's size slider pinned
+  // directly under the toggle it sizes.
+  'showNameplateDots',
+  'nameplateDotScale',
+  'showTargetDots',
   'fctScale',
 ];
 const INTERFACE_KEYS_BY_TAB: Record<InterfaceTab, string[]> = {

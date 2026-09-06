@@ -25,6 +25,7 @@ import type {
   DungeonSpawn,
   DungeonSpawnMinibossTuning,
   ItemDef,
+  LootEntry,
   MobTemplate,
 } from '../types';
 import { HEROIC_FINALE_COPPER, NYTHRAXIS_HEROIC_COPPER } from './dungeon_difficulty';
@@ -51,6 +52,16 @@ export const DUNGEON_KEEPSAKE_ITEMS: Record<string, ItemDef> = {
     sellValue: 25,
   },
 };
+
+// A Normal-only exclusive-group row (LootEntry.normalOnly): a heroic claim
+// skips the whole group and the boss's HEROIC_BOSS_LOOT slot pays instead, so
+// Heroic REPLACES the slot rather than stacking on it (loot_difficulty_gate.ts).
+const normalOnlyRow = (rollGroup: string, itemId: string, chance: number): LootEntry => ({
+  itemId,
+  chance,
+  rollGroup,
+  normalOnly: true,
+});
 
 export const DUNGEON_MOBS: Record<string, MobTemplate> = {
   // WIP forge mech enemy: a downed automaton that lies still on the ground until
@@ -105,41 +116,55 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 46,
     moveSpeed: 6.8,
     aggroRadius: 30,
-    // Ilvl-35 loot per docs/prd/ignivar-raid-loot.md "Boss loot tables": two
-    // guaranteed sigil groups, the feet-and-held off-set group, a guaranteed
-    // ring, copper (the raid-finale base on the Ignivar wiring). Heroic-only
-    // appends (Robe sigils, shields) live in HEROIC_BOSS_LOOT; the weapon
-    // groups join at the end with the weapon wave. APPEND-only, never reorder.
+    // Ilvl-35 loot per docs/prd/ignivar-raid-loot.md "Boss loot tables": ONE
+    // item per five raiders per kill (two on the 10-player raid). Slot one is
+    // the merged sigil partition (legging + helm), slot two the Normal-only
+    // feet / held / ring partition; a heroic claim skips slot two
+    // (LootEntry.normalOnly) and the HEROIC_BOSS_LOOT exclusive slot pays in
+    // its place, so Heroic pays the same count at the same ilvl 35 (this raid
+    // has NO heroic item-level layer) and differs only in WHICH items drop.
+    // Copper rides the raid-finale base on the Ignivar wiring. Re-cut
+    // 2026-09-02 from the launch tables' four groups; draw order is
+    // parity-sensitive from here: entries APPEND, never reorder.
     loot: [
       // Varkhul is the Inner Crucible's registered heroic finale boss
       // (dungeon_difficulty.ts), so his money entry carries the shared raid
       // heroic base like Ignivar's (tests/heroic_finale_gold.test.ts).
       { copper: 200000, heroicCopper: NYTHRAXIS_HEROIC_COPPER, chance: 1 },
-      { itemId: 'sigil_anvil_legs', chance: 0.34, rollGroup: 'varkhul_sigil_legging' },
-      { itemId: 'sigil_ember_legs', chance: 0.33, rollGroup: 'varkhul_sigil_legging' },
-      { itemId: 'sigil_tempest_legs', chance: 0.33, rollGroup: 'varkhul_sigil_legging' },
-      { itemId: 'sigil_anvil_helmet', chance: 0.34, rollGroup: 'varkhul_sigil_helm' },
-      { itemId: 'sigil_ember_helmet', chance: 0.33, rollGroup: 'varkhul_sigil_helm' },
-      { itemId: 'sigil_tempest_helmet', chance: 0.33, rollGroup: 'varkhul_sigil_helm' },
-      { itemId: 'cindersoaked_slippers', chance: 0.07, rollGroup: 'varkhul_offset' },
-      { itemId: 'steps_of_quiet_water', chance: 0.07, rollGroup: 'varkhul_offset' },
-      { itemId: 'ashenbark_treads', chance: 0.07, rollGroup: 'varkhul_offset' },
-      { itemId: 'ashrunner_boots', chance: 0.07, rollGroup: 'varkhul_offset' },
-      { itemId: 'scorchgrove_striders', chance: 0.07, rollGroup: 'varkhul_offset' },
-      { itemId: 'dewfall_moccasins', chance: 0.07, rollGroup: 'varkhul_offset' },
-      { itemId: 'anvilstance_sabatons', chance: 0.07, rollGroup: 'varkhul_offset' },
-      { itemId: 'furnace_march_greaves', chance: 0.07, rollGroup: 'varkhul_offset' },
-      { itemId: 'thundershock_treads', chance: 0.07, rollGroup: 'varkhul_offset' },
-      { itemId: 'springwarden_sabatons', chance: 0.07, rollGroup: 'varkhul_offset' },
-      { itemId: 'orb_of_the_last_spring', chance: 0.15, rollGroup: 'varkhul_offset' },
-      { itemId: 'cinder_of_the_first_design', chance: 0.15, rollGroup: 'varkhul_offset' },
+      // Both axes of the sigil partition stay balanced: leggings 0.50 / helms
+      // 0.50, Anvil 0.34 / Ember 0.33 / Tempest 0.33 (the old per-group thirds).
+      { itemId: 'sigil_anvil_legs', chance: 0.17, rollGroup: 'varkhul_sigils' },
+      { itemId: 'sigil_ember_legs', chance: 0.17, rollGroup: 'varkhul_sigils' },
+      { itemId: 'sigil_tempest_legs', chance: 0.16, rollGroup: 'varkhul_sigils' },
+      { itemId: 'sigil_anvil_helmet', chance: 0.17, rollGroup: 'varkhul_sigils' },
+      { itemId: 'sigil_ember_helmet', chance: 0.16, rollGroup: 'varkhul_sigils' },
+      { itemId: 'sigil_tempest_helmet', chance: 0.17, rollGroup: 'varkhul_sigils' },
+      // The rings keep the half of this slot their own group used to own
+      // outright (0.50); the feet and held offhands split the other half
+      // 0.3125 / 0.1875. Every weight is a binary fraction (1/8, 1/32, 3/32)
+      // so the partition sums to EXACTLY 1.00 in floating point: the roller's
+      // `roll < cumulative` walk and the at-or-below-100% guard in
+      // tests/loot_roll.test.ts both read the float sum, and decimal weights
+      // like 0.035 drift past 1 by an ulp.
+      normalOnlyRow('varkhul_offset', 'cindersoaked_slippers', 0.03125),
+      normalOnlyRow('varkhul_offset', 'steps_of_quiet_water', 0.03125),
+      normalOnlyRow('varkhul_offset', 'ashenbark_treads', 0.03125),
+      normalOnlyRow('varkhul_offset', 'ashrunner_boots', 0.03125),
+      normalOnlyRow('varkhul_offset', 'scorchgrove_striders', 0.03125),
+      normalOnlyRow('varkhul_offset', 'dewfall_moccasins', 0.03125),
+      normalOnlyRow('varkhul_offset', 'anvilstance_sabatons', 0.03125),
+      normalOnlyRow('varkhul_offset', 'furnace_march_greaves', 0.03125),
+      normalOnlyRow('varkhul_offset', 'thundershock_treads', 0.03125),
+      normalOnlyRow('varkhul_offset', 'springwarden_sabatons', 0.03125),
+      normalOnlyRow('varkhul_offset', 'orb_of_the_last_spring', 0.09375),
+      normalOnlyRow('varkhul_offset', 'cinder_of_the_first_design', 0.09375),
       // Neither legendary drops on Normal. Emberward's 3 percent roll lives
-      // in Varkhul's heroic-only shield group; Forgebreaker remains reserved
+      // in Varkhul's heroic-only exclusive group; Forgebreaker remains reserved
       // for the crafting professions until its recipe chain lands.
-      { itemId: 'seal_of_the_forgewall', chance: 0.25, rollGroup: 'varkhul_rings' },
-      { itemId: 'band_of_marked_strikes', chance: 0.25, rollGroup: 'varkhul_rings' },
-      { itemId: 'circle_of_cinders', chance: 0.25, rollGroup: 'varkhul_rings' },
-      { itemId: 'loop_of_quiet_springs', chance: 0.25, rollGroup: 'varkhul_rings' },
+      normalOnlyRow('varkhul_offset', 'seal_of_the_forgewall', 0.125),
+      normalOnlyRow('varkhul_offset', 'band_of_marked_strikes', 0.125),
+      normalOnlyRow('varkhul_offset', 'circle_of_cinders', 0.125),
+      normalOnlyRow('varkhul_offset', 'loop_of_quiet_springs', 0.125),
       // The professions fast-follow's core reagent starts dropping AHEAD of
       // its recipes (maintainer staging call): the classic molten-core band,
       // one guaranteed plus a 50 percent second, so crafters bank cores
@@ -279,37 +304,49 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     // base, and a heroic-claim kill substitutes the shared 20g raid base on
     // the same single draw (tests/heroic_finale_gold.test.ts). Item drops are
     // still to be authored for the development raid tier.
-    // Ilvl-35 loot per docs/prd/ignivar-raid-loot.md "Boss loot tables": two
-    // guaranteed sigil groups, a guaranteed neck, copper. Same table on both
-    // difficulties (this raid has NO heroic item-level layer); the heroic-only
-    // appends (Robe sigils) live in HEROIC_BOSS_LOOT. Draw order is
-    // parity-sensitive: entries APPEND, never reorder; the off-set group joins
-    // at the end with the weapon wave.
+    // Ilvl-35 loot per docs/prd/ignivar-raid-loot.md "Boss loot tables": ONE
+    // item per five raiders per kill (two on the 10-player raid). Slot one is
+    // the merged sigil partition (mantle + grip), slot two the Normal-only
+    // neck / waist / smaller-weapon partition; a heroic claim skips slot two
+    // (LootEntry.normalOnly) and the HEROIC_BOSS_LOOT exclusive slot pays in
+    // its place, so Heroic pays the same count at the same ilvl 35 (this raid
+    // has NO heroic item-level layer) and differs only in WHICH items drop.
+    // Re-cut 2026-09-02 from the launch tables' four groups; draw order is
+    // parity-sensitive from here: entries APPEND, never reorder.
     loot: [
       { copper: 150000, heroicCopper: NYTHRAXIS_HEROIC_COPPER, chance: 1 },
-      { itemId: 'sigil_anvil_shoulder', chance: 0.34, rollGroup: 'ignivar_sigil_mantle' },
-      { itemId: 'sigil_ember_shoulder', chance: 0.33, rollGroup: 'ignivar_sigil_mantle' },
-      { itemId: 'sigil_tempest_shoulder', chance: 0.33, rollGroup: 'ignivar_sigil_mantle' },
-      { itemId: 'sigil_anvil_gloves', chance: 0.34, rollGroup: 'ignivar_sigil_grip' },
-      { itemId: 'sigil_ember_gloves', chance: 0.33, rollGroup: 'ignivar_sigil_grip' },
-      { itemId: 'sigil_tempest_gloves', chance: 0.33, rollGroup: 'ignivar_sigil_grip' },
-      { itemId: 'pendant_of_the_first_tempering', chance: 0.25, rollGroup: 'ignivar_jewelry' },
-      { itemId: 'ignivars_ember_choker', chance: 0.25, rollGroup: 'ignivar_jewelry' },
-      { itemId: 'locket_of_the_last_flame', chance: 0.25, rollGroup: 'ignivar_jewelry' },
-      { itemId: 'heartspring_amulet', chance: 0.25, rollGroup: 'ignivar_jewelry' },
-      { itemId: 'cord_of_the_last_flame', chance: 0.07, rollGroup: 'ignivar_offset' },
-      { itemId: 'springbinder_sash', chance: 0.07, rollGroup: 'ignivar_offset' },
-      { itemId: 'cinderbark_cinch', chance: 0.07, rollGroup: 'ignivar_offset' },
-      { itemId: 'slagstalker_belt', chance: 0.07, rollGroup: 'ignivar_offset' },
-      { itemId: 'moonscorch_waistwrap', chance: 0.07, rollGroup: 'ignivar_offset' },
-      { itemId: 'grovetender_belt', chance: 0.07, rollGroup: 'ignivar_offset' },
-      { itemId: 'forgewall_girdle', chance: 0.07, rollGroup: 'ignivar_offset' },
-      { itemId: 'warforged_waistguard', chance: 0.07, rollGroup: 'ignivar_offset' },
-      { itemId: 'stormkindled_chain', chance: 0.07, rollGroup: 'ignivar_offset' },
-      { itemId: 'tidebinder_links', chance: 0.07, rollGroup: 'ignivar_offset' },
-      { itemId: 'cinderfang_kris', chance: 0.1, rollGroup: 'ignivar_offset' },
-      { itemId: 'slagrender_cleaver', chance: 0.1, rollGroup: 'ignivar_offset' },
-      { itemId: 'wand_of_quenched_sparks', chance: 0.1, rollGroup: 'ignivar_offset' },
+      // Both axes of the sigil partition stay balanced: shoulders 0.50 / gloves
+      // 0.50, Anvil 0.34 / Ember 0.33 / Tempest 0.33 (the old per-group thirds).
+      { itemId: 'sigil_anvil_shoulder', chance: 0.17, rollGroup: 'ignivar_sigils' },
+      { itemId: 'sigil_ember_shoulder', chance: 0.17, rollGroup: 'ignivar_sigils' },
+      { itemId: 'sigil_tempest_shoulder', chance: 0.16, rollGroup: 'ignivar_sigils' },
+      { itemId: 'sigil_anvil_gloves', chance: 0.17, rollGroup: 'ignivar_sigils' },
+      { itemId: 'sigil_ember_gloves', chance: 0.16, rollGroup: 'ignivar_sigils' },
+      { itemId: 'sigil_tempest_gloves', chance: 0.17, rollGroup: 'ignivar_sigils' },
+      // The necks keep the half of this slot their own group used to own
+      // outright (0.50); the waists and the three smaller weapons split the
+      // other half 0.3125 / 0.1875. Every weight is a binary fraction (1/8,
+      // 1/32, 1/16) so the partition sums to EXACTLY 1.00 in floating point:
+      // the roller's `roll < cumulative` walk and the at-or-below-100% guard in
+      // tests/loot_roll.test.ts both read the float sum, and decimal weights
+      // like 0.035 drift past 1 by an ulp.
+      normalOnlyRow('ignivar_offset', 'pendant_of_the_first_tempering', 0.125),
+      normalOnlyRow('ignivar_offset', 'ignivars_ember_choker', 0.125),
+      normalOnlyRow('ignivar_offset', 'locket_of_the_last_flame', 0.125),
+      normalOnlyRow('ignivar_offset', 'heartspring_amulet', 0.125),
+      normalOnlyRow('ignivar_offset', 'cord_of_the_last_flame', 0.03125),
+      normalOnlyRow('ignivar_offset', 'springbinder_sash', 0.03125),
+      normalOnlyRow('ignivar_offset', 'cinderbark_cinch', 0.03125),
+      normalOnlyRow('ignivar_offset', 'slagstalker_belt', 0.03125),
+      normalOnlyRow('ignivar_offset', 'moonscorch_waistwrap', 0.03125),
+      normalOnlyRow('ignivar_offset', 'grovetender_belt', 0.03125),
+      normalOnlyRow('ignivar_offset', 'forgewall_girdle', 0.03125),
+      normalOnlyRow('ignivar_offset', 'warforged_waistguard', 0.03125),
+      normalOnlyRow('ignivar_offset', 'stormkindled_chain', 0.03125),
+      normalOnlyRow('ignivar_offset', 'tidebinder_links', 0.03125),
+      normalOnlyRow('ignivar_offset', 'cinderfang_kris', 0.0625),
+      normalOnlyRow('ignivar_offset', 'slagrender_cleaver', 0.0625),
+      normalOnlyRow('ignivar_offset', 'wand_of_quenched_sparks', 0.0625),
       // The professions fast-follow's core reagent starts dropping AHEAD of
       // its recipes (maintainer staging call): the classic molten-core band,
       // one guaranteed plus a 50 percent second, so crafters bank cores

@@ -36,9 +36,12 @@ export { isTransferLockedInstance };
 
 /** The public display projection of a payload, for wire surfaces other players
  *  see (market browse rows, letter attachment chips). The allowlist is the eqi
- *  wire's (server/game.ts identityFields): signer, enchant, rolled, and nothing
- *  else, so boundTo / bindOnTrade / charges are excluded BY CONSTRUCTION, as is
- *  any future non-cosmetic field. Deep-copies the mutable rolled maps so a
+ *  wire's (server/game.ts identityFields): signer, enchant, rolled, and a
+ *  Riftbound band's rift record (rank, upgrades, gems: what its tooltip's item
+ *  level and rank lines read; bands never reach these pipes, but the two
+ *  allowlists are pinned to each other), and nothing else, so boundTo /
+ *  bindOnTrade / charges are excluded BY CONSTRUCTION, as is any future
+ *  non-cosmetic field. Deep-copies the mutable rolled and rift maps so a
  *  projection never aliases the live escrowed payload. */
 export function publicInstanceView(instance: ItemInstancePayload): ItemInstancePayload {
   const pub: ItemInstancePayload = {};
@@ -48,6 +51,12 @@ export function publicInstanceView(instance: ItemInstancePayload): ItemInstanceP
     pub.rolled = {
       ...instance.rolled,
       ...(instance.rolled.stats && { stats: { ...instance.rolled.stats } }),
+    };
+  }
+  if (instance.rift !== undefined) {
+    pub.rift = {
+      ...instance.rift,
+      gems: Array.isArray(instance.rift.gems) ? [...instance.rift.gems] : [],
     };
   }
   return pub;

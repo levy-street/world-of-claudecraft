@@ -2730,6 +2730,39 @@
       }
     ]
   },
+  "mount_idle_mech_bird": {
+    "ceilingDb": 9.5,
+    "tracks": [
+      {
+        "filename": "mount_idle_mech_bird.mp3",
+        "sha256": "95b62ab97f76cf832a15eed0d4fa9f9c6750e9bc350efde691ae1ff86963e994",
+        "size": 235772,
+        "peakDb": -10.5
+      }
+    ]
+  },
+  "mount_jump_mech_bird": {
+    "ceilingDb": 9.3,
+    "tracks": [
+      {
+        "filename": "mount_jump_mech_bird.mp3",
+        "sha256": "440a40bb3fbb7c0fb8e9600f95b29e69531af96c7d077f6ac1be0313034d81b3",
+        "size": 17597,
+        "peakDb": -10.3
+      }
+    ]
+  },
+  "mount_land_mech_bird": {
+    "ceilingDb": 9.3,
+    "tracks": [
+      {
+        "filename": "mount_land_mech_bird.mp3",
+        "sha256": "440a40bb3fbb7c0fb8e9600f95b29e69531af96c7d077f6ac1be0313034d81b3",
+        "size": 17597,
+        "peakDb": -10.3
+      }
+    ]
+  },
   "mount_loop_rickshaw_mount": {
     "ceilingDb": 5,
     "tracks": [
@@ -2771,6 +2804,17 @@
         "sha256": "eba127f1f8219e5d6a7512c4797735399e154e9f129bfc8c67a187941cb59fe7",
         "size": 18224,
         "peakDb": -6.3
+      }
+    ]
+  },
+  "mount_run_mech_bird": {
+    "ceilingDb": 7.2,
+    "tracks": [
+      {
+        "filename": "mount_run_mech_bird.mp3",
+        "sha256": "b341e1f75de88e3ed330390c84ddc84171fcb3e65c11a96e51da87b8f60e9091",
+        "size": 13835,
+        "peakDb": -8.2
       }
     ]
   },

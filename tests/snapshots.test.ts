@@ -5256,11 +5256,17 @@ function dirtyEveryDeltaField(): {
     weaponSkinLoadout: {},
   };
   // Session-scoped stored action-bar layout (`hbl`, self-only): set the frozen
-  // join-time copy so the heavy self block wires it once.
-  leader.initialHotbarLayout = {
-    v: 1,
-    forms: { normal: { bar: [{ type: 'ability', id: 'heroic_strike' }], attack: null } },
+  // join-time wire view (the per-profile document plus the desktop `forms`
+  // mirror), pre-serialized as the session holds it, so the heavy self block
+  // wires it once.
+  const hotbarForms = {
+    normal: { bar: [{ type: 'ability' as const, id: 'heroic_strike' }], attack: null },
   };
+  leader.initialHotbarLayoutJson = JSON.stringify({
+    v: 2,
+    forms: hotbarForms,
+    profiles: { desktop: { v: 1, forms: hotbarForms } },
+  });
 
   // Player Entity fields.
   p.cooldowns.set('heroic_strike', 5);
@@ -5729,13 +5735,20 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.loadouts).toEqual([{ name: 'PvP', alloc: { spec: 'arms', rows: {} }, bar: [] }]);
     expect(client.activeLoadout).toBe(0);
     // hbl -> the login action-bar restore (self-only, resolved once on the first
-    // self payload). A stored server layout arrives as a 'server' win; like tal
-    // it is asserted directly (no TERSE_TO_IWORLD rename entry).
+    // self payload). A stored server document arrives as a 'server' restore
+    // carrying every profile (the `forms` mirror is for pre-profile bundles and
+    // is not mirrored); like tal it is asserted directly (no TERSE_TO_IWORLD
+    // rename entry).
     expect(client.takeActionBarLayoutRestore()).toEqual({
       source: 'server',
-      layout: {
-        v: 1,
-        forms: { normal: { bar: [{ type: 'ability', id: 'heroic_strike' }], attack: null } },
+      profiles: {
+        v: 2,
+        profiles: {
+          desktop: {
+            v: 1,
+            forms: { normal: { bar: [{ type: 'ability', id: 'heroic_strike' }], attack: null } },
+          },
+        },
       },
     });
   });

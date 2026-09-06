@@ -347,6 +347,7 @@ const NPC_IDS = [
   'mender_saul',
   'bellkeeper_tam',
   'fisher_nell',
+  'riftwright_maelis', // the Rift Forge (Gullhaven, Farshore)
   'forgemistress_darva', // crafting-station master: forge (Eastbrook, zone 1)
   'cook_marlow', // crafting-station master: kitchens (Eastbrook, zone 1)
   'weaver_ottilie', // crafting-station master: loom (Eastbrook, zone 1)
@@ -720,6 +721,7 @@ type WorldEntityTranslations = {
     delveRiteShrineSkullInteract: string;
     mailboxName: string;
     noticeboardName: string;
+    realmBuilderMonumentName: string;
   };
   entities: {
     mobs: MobTranslations;
@@ -845,6 +847,7 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
       delveRiteShrineSkullInteract: 'Skull Shrine: Press F to touch it',
       mailboxName: 'Mailbox',
       noticeboardName: 'Notice Board',
+      realmBuilderMonumentName: 'Realm Builder Monument',
     },
     entities: { mobs, npcs, quests, zones, dungeons, delves, letters },
   };

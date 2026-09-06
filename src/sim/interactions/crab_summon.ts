@@ -80,6 +80,8 @@ export function useBrinyLure(ctx: SimContext, player: Entity, meta: PlayerMeta):
     CRAB_MOB_ID,
     { x: CRAB_SUMMON_SITE.x, y: 0, z: CRAB_SUMMON_SITE.z },
     meta.entityId,
-    { perOwner: true, hardDespawnSeconds: CRAB_DESPAWN_SECONDS },
+    // announceOwnerOnly: each summon is a private quest beat on a shared
+    // island, so the awaken line and the yell reach only the summoner.
+    { perOwner: true, hardDespawnSeconds: CRAB_DESPAWN_SECONDS, announceOwnerOnly: true },
   );
 }

@@ -1,6 +1,12 @@
 import { ABILITIES, ITEMS } from '../../../sim/data';
 import type { PlayerClass } from '../../../sim/types';
-import type { ActionBarLayout } from '../../../world_api/action_bar';
+import {
+  ACTION_BAR_LAYOUT_LEGACY_PROFILE,
+  type ActionBarLayout,
+  type ActionBarLayoutProfile,
+  type ActionBarLayoutRestore,
+  actionBarLayoutIsEmpty,
+} from '../../../world_api/action_bar';
 import { knownItemDef } from '../../known_item';
 import { isStanceBarAbilityGroup } from '../../stance_bar_view';
 import { ACTION_BAR_ABILITY_SLOTS } from './action_bar_layout_core';
@@ -8,7 +14,9 @@ import {
   actionBarFormSeededKey,
   actionBarSlotMapKey,
   actionBarStealthInitializedKey,
+  applyActionBarLayout,
   captureActionBarLayout,
+  planActionBarRestore,
 } from './action_bar_layout_sync';
 import {
   actionForAttackSlot,
@@ -49,12 +57,19 @@ export interface ActionBarControllerDeps {
   knownAbilityIds(): readonly string[];
   hasAura(kind: string): boolean;
   showAttackButton(): boolean;
+  // The input-surface profile this controller arranges (the desktop keyboard
+  // row or the touch ring), read LIVE like every sibling dep because the
+  // Interface Mode setting can flip the surface mid-session (syncProfile follows
+  // it). It scopes every localStorage key and every upload, so a phone's
+  // arrangement never overwrites a PC's. Absent means the legacy (desktop) keys,
+  // which is what every pre-profile device already holds.
+  profile?(): ActionBarLayoutProfile;
   // The persistence seam: called after a user-driven layout change (never during
-  // initial load) with the FULL captured layout. Offline it is a no-op
-  // (localStorage is the store); online the ClientWorld debounces a wire save.
-  // Optional so an offline/test controller with no server persistence just skips
-  // it and keeps its byte-identical localStorage behavior.
-  persistLayout?(layout: ActionBarLayout): void;
+  // initial load) with the profile and its FULL captured layout. Offline it is a
+  // no-op (localStorage is the store); online the ClientWorld debounces a wire
+  // save. Optional so an offline/test controller with no server persistence just
+  // skips it and keeps its byte-identical localStorage behavior.
+  persistLayout?(profile: ActionBarLayoutProfile, layout: ActionBarLayout): void;
 }
 
 /** Owns action-bar pages, migrations, persistence, and attack-slot assignment. */
@@ -74,8 +89,26 @@ export class ActionBarController {
   // storage: only user-driven changes after init should upload. Flipped true at
   // the end of init()/reload().
   private ready = false;
+  // The profile whose keys are loaded; every key and upload uses it, and
+  // syncProfile moves it when the live surface changes.
+  private activeProfile: ActionBarLayoutProfile;
+  // The world-entry restore signal, kept so a profile activated for the first
+  // time mid-session reconciles against the same login document.
+  private loginRestore: ActionBarLayoutRestore | null = null;
+  // Profiles already reconciled with the login document this session. The
+  // FIRST activation of a profile reconciles it (its server copy as of login
+  // beats stale local keys from an older session); later activations keep local
+  // precedence, since only this device edits the character during the session.
+  private readonly reconciledProfiles = new Set<ActionBarLayoutProfile>();
+  // True while the in-memory bar or attack slot differs from storage (a
+  // replace* call not yet followed by a save). A surface switch uploads the
+  // outgoing profile only then, so an untouched fallback never becomes a server
+  // profile of its own (every ordinary edit already uploaded when it saved).
+  private unsavedChanges = false;
 
-  constructor(private readonly deps: ActionBarControllerDeps) {}
+  constructor(private readonly deps: ActionBarControllerDeps) {
+    this.activeProfile = this.resolveProfile();
+  }
 
   init(): void {
     this.loadActions();
@@ -90,14 +123,116 @@ export class ActionBarController {
     this.ready = false;
     this.loadActions();
     this.loadAttackAction();
+    this.unsavedChanges = false;
     this.ready = true;
+  }
+
+  /** World-entry reconciliation of this profile's local mirror with the server
+   *  restore signal (planActionBarRestore owns the rule). A server copy or a
+   *  fallback seed is written into the mirror and the bars re-seed from it;
+   *  a first server copy is uploaded through the persistence seam. Returns true
+   *  when the bars were re-seeded, so the caller can refresh any slot views. */
+  restoreLayout(restore: ActionBarLayoutRestore): boolean {
+    this.loginRestore = restore;
+    this.reconciledProfiles.add(this.profile);
+    if (!this.reconcile(this.profile, null)) return false;
+    this.reload();
+    return true;
+  }
+
+  /** Reconcile `profile`'s local keys with the login document
+   *  (planActionBarRestore owns the rule) and write the outcome into storage.
+   *  `inView` is the bar the player is looking at during a surface flip: a
+   *  fallback seed then copies it (it is at least as new as the login copy of
+   *  that profile) and is never uploaded, since a flip is not an edit. Returns
+   *  true when the keys were written, so the caller reloads the bars. */
+  private reconcile(profile: ActionBarLayoutProfile, inView: ActionBarLayout | null): boolean {
+    const plan = planActionBarRestore(this.loginRestore ?? undefined, profile, (target) =>
+      this.captureLayout(target),
+    );
+    if (plan.action === 'none') {
+      // No server copy, no local keys, no legacy seed: the profile would load
+      // empty and the next ability sync would generate defaults. On a surface
+      // flip the bar in view is still the right seed (a phone-first character
+      // reaching a keyboard for the first time), so copy it, never uploaded.
+      if (inView === null || actionBarLayoutIsEmpty(inView)) return false;
+      if (!actionBarLayoutIsEmpty(this.captureLayout(profile))) return false;
+      applyActionBarLayout(
+        this.deps.storage,
+        this.deps.playerClass,
+        this.deps.playerName,
+        profile,
+        inView,
+      );
+      return true;
+    }
+    if (plan.action === 'seed-local') {
+      // persist() re-captures the same keys the plan just read, so it uploads
+      // exactly plan.layout under this profile.
+      this.persist();
+      return false;
+    }
+    const fromView =
+      plan.action === 'seed-profile' && inView !== null && !actionBarLayoutIsEmpty(inView);
+    applyActionBarLayout(
+      this.deps.storage,
+      this.deps.playerClass,
+      this.deps.playerName,
+      profile,
+      fromView ? inView : plan.layout,
+    );
+    if (plan.action === 'seed-profile' && plan.upload && !fromView) this.persist();
+    return true;
+  }
+
+  get profile(): ActionBarLayoutProfile {
+    return this.activeProfile;
+  }
+
+  /** Per-frame: follow a mid-session surface flip (the Interface Mode setting)
+   *  onto that profile's keys. The outgoing profile is written to storage first
+   *  (and uploaded only if it holds unsaved in-memory changes). The first
+   *  activation of a profile this session reconciles it with the login
+   *  document: its server copy as of login wins, else it starts as a copy of
+   *  the bar in view, never uploaded (the "follow until edited" rule). Later
+   *  activations reload the profile's own keys. Returns true on a switch. */
+  syncProfile(): boolean {
+    const next = this.resolveProfile();
+    if (next === this.activeProfile) return false;
+    // Flush the outgoing profile to storage, as a form swap does, so an
+    // in-memory bar (a loadout swap resolved this frame) is never stranded.
+    this.writeActions();
+    this.writeAttackAction();
+    if (this.unsavedChanges) {
+      this.persist();
+      this.unsavedChanges = false;
+    }
+    const previous = this.activeProfile;
+    this.activeProfile = next;
+    if (!this.reconciledProfiles.has(next)) {
+      this.reconciledProfiles.add(next);
+      this.reconcile(next, this.captureLayout(previous));
+    }
+    this.reload();
+    return true;
+  }
+
+  private resolveProfile(): ActionBarLayoutProfile {
+    return this.deps.profile?.() ?? ACTION_BAR_LAYOUT_LEGACY_PROFILE;
+  }
+
+  private captureLayout(profile: ActionBarLayoutProfile): ActionBarLayout {
+    return captureActionBarLayout(
+      this.deps.storage,
+      this.deps.playerClass,
+      this.deps.playerName,
+      profile,
+    );
   }
 
   private persist(): void {
     if (!this.ready || !this.deps.persistLayout) return;
-    this.deps.persistLayout(
-      captureActionBarLayout(this.deps.storage, this.deps.playerClass, this.deps.playerName),
-    );
+    this.deps.persistLayout(this.profile, this.captureLayout(this.profile));
   }
 
   get activeForm(): HotbarForm {
@@ -110,6 +245,7 @@ export class ActionBarController {
 
   replaceActions(actions: HotbarAction[]): void {
     this.actionState = sanitizeHotbarActions(actions, (id) => this.isAbilityPlacementAllowed(id));
+    this.unsavedChanges = true;
   }
 
   replaceActionsForLoadout(
@@ -117,6 +253,7 @@ export class ActionBarController {
     targetKnownAbilityIds: ReadonlySet<string>,
   ): void {
     this.actionState = sanitizeHotbarActions(actions, (id) => this.isAbilityPlacementAllowed(id));
+    this.unsavedChanges = true;
     this.pendingLoadoutKnownAbilityIds = new Set(targetKnownAbilityIds);
     this.knownAbilityIdsAtLastSync = new Set([
       ...this.deps.knownAbilityIds(),
@@ -132,6 +269,7 @@ export class ActionBarController {
     this.attackActionState = sanitizeHotbarAction(action, (id) =>
       this.isAbilityPlacementAllowed(id),
     );
+    this.unsavedChanges = true;
   }
 
   resolveActiveForm(): HotbarForm {
@@ -371,15 +509,26 @@ export class ActionBarController {
   }
 
   saveActions(): void {
+    this.writeActions();
+    this.persist();
+    this.unsavedChanges = false;
+  }
+
+  saveAttackAction(): void {
+    this.writeAttackAction();
+    this.persist();
+    this.unsavedChanges = false;
+  }
+
+  private writeActions(): void {
     try {
       this.deps.storage.setItem(this.slotMapKey(), JSON.stringify(this.actionState));
     } catch {
       // Storage can be unavailable in private browsing modes.
     }
-    this.persist();
   }
 
-  saveAttackAction(): void {
+  private writeAttackAction(): void {
     try {
       writeAttackSlotAction(
         this.deps.storage,
@@ -389,11 +538,10 @@ export class ActionBarController {
     } catch {
       // Storage can be unavailable in private browsing modes.
     }
-    this.persist();
   }
 
   private slotMapKey(form: HotbarForm = this.activeFormState): string {
-    return actionBarSlotMapKey(this.deps.playerClass, this.deps.playerName, form);
+    return actionBarSlotMapKey(this.deps.playerClass, this.deps.playerName, this.profile, form);
   }
 
   private shouldAutoPlaceOnForm(id: string, form: HotbarForm): boolean {

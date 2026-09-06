@@ -164,15 +164,27 @@ describe('buildManifest', () => {
     expect(manifest).toContain('cast_lightning_bolt');
   });
 
-  it('keeps the release catalog, all 13 mount cues, and all 62 UI cues in one 268-key inventory', () => {
+  // 17 mount cues across the 13 catalog mounts, not one per mount: the
+  // rickshaw carries a summon and a loop cue and no stride, while the
+  // Lanternback Troll and the Chimeglass Tortoise deliberately have no stride
+  // cue at all and borrow the player's surface footfall instead (see
+  // Sfx.mountRun's fallback branch, and the coverage tests in sfx.test.ts).
+  it('keeps the release catalog, 17 mount cues, and all 62 UI cues in one 272-key inventory', () => {
     const keys = new Set(SFX.map((entry) => entry.key));
     // 268 = the release catalog plus the two gendered player-voice keys from
     // PR #2320 and the rickshaw mount's summon/loop cues.
-    expect(keys.size).toBe(268);
+    // 272 = the 268 above plus the Mech Bird's run/idle/jump/land take set.
+    expect(keys.size).toBe(272);
     expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(62);
     expect(keys.has('ui_craft_cast')).toBe(true);
     for (const key of [
       'cast_lightning_bolt',
+      // the Mech Bird, the store mount: the 1-2-1 gait beat plus the game's
+      // first standstill idle hum and mount-specific jump/land takes
+      'mount_run_mech_bird',
+      'mount_idle_mech_bird',
+      'mount_jump_mech_bird',
+      'mount_land_mech_bird',
       'mob_mudfin_attack',
       'mob_burrower_attack',
       'mob_reptile_attack',
@@ -246,7 +258,7 @@ describe('buildManifest', () => {
     // purely filesystem-discovered.
     const mobFamilyKeys = [...keys].filter((key) => key.startsWith('mob_'));
     expect(mobFamilyKeys).toHaveLength(65); // 13 families x 5 actions
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(268);
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(272);
   });
 });
 

@@ -98,12 +98,40 @@ rule that no untrusted remote URL enters entity wire data.
 
 ## Progression
 
-First-clear loot includes class-appropriate non-fungible Rift gear, Rift Essence,
-and rank-dependent gems. Item payloads track source event, tier, power, upgrades,
-enchantment, sockets, and gems. Their rolled stats apply while equipped, survive
-save/load and wire round-trips, and are rebuilt from bounded inputs at load rather
-than trusted from JSONB. Gear can be upgraded, enchanted, socketed, unequipped
-without losing its payload, or salvaged back into power-scaled Rift Essence.
+First-clear loot includes a class-appropriate non-fungible Riftbound band, Rift
+Essence, and (on A and S clears) one Rift gem per winner. The band's static
+ItemDef is a stat-free shell; the copy's `rift` payload records the clear's
+rank, its essence upgrades, and its socketed gems, and `src/sim/rift/band_ladder.ts`
+prices the whole ring from those three inputs:
+
+- **Item level.** The rank sets the base (`RIFT_BAND_TIER_BASE_ILVL`), every
+  essence upgrade raises it by one (`RIFT_BAND_MAX_UPGRADE` steps, essence cost
+  2, 4, 6, 8, 10), and `RIFT_BAND_ILVL_CAP` holds the ladder one step under the
+  current raid ring line, so a maxed band is the best ring outside the raid and
+  never the best ring in the game. The tooltip's item-level line reads the copy
+  (`src/ui/rift_band_tooltip.ts`), since `item_level.ts` has no drop source to
+  derive it from.
+- **Primary stats.** The epic-ring budget at that item level
+  (`item_budget.ts` `primaryStatBudget`), split 3:2 on the class shell's
+  primary and secondary stat. A band at level N carries exactly what an authored
+  epic ring at level N would.
+- **Gems.** Sockets never touch the item level or the primary budget. A gem is
+  one combat rating line keyed by colour (`RIFT_GEM_RATING_STAT`: crimson is
+  crit, azure is haste, verdant is hit), `RIFT_GEM_RATING` each, sized so a
+  full S band (two sockets) stays under the single rating line the raid rings
+  carry. Sockets are replaceable: a full band takes a new gem in place of its
+  oldest one, which is destroyed, so a player retunes hit against crit or haste
+  without discarding the band. There is no forge enchant (the original third
+  forge command retired with the ladder; its wire token survives as a
+  dispatch-only no-op because the vocabulary is append-only).
+
+The rolled aggregate applies while equipped, survives save/load and wire
+round-trips, and is rebuilt from the bounded inputs at every load rather than
+trusted from JSONB (`sanitizeRiftGearInstance`): a ladder retune resizes every
+existing band at its next load, and the pre-ladder payload fields (`baseStats`,
+`enchant`) are dropped there. Bands are forge-only: the enchanting profession
+refuses them by id. Salvage returns rank-and-upgrade-scaled Rift Essence.
+Pinned by `tests/rift_band_ladder.test.ts` and `tests/rift_progression.test.ts`.
 
 Rift Essence and the rank-dependent gems are plain, freely tradeable forge
 currency: tradeable in person, mailable, and listable on the World Market and the
@@ -114,17 +142,33 @@ ranked portal spawn cadence, never a re-grantable faucet, so closing its market
 and mail routes (the way a re-grantable faucet or a store SKU is closed
 elsewhere in the item catalog) has no exploit to guard against.
 
-The forge (upgrade, enchant, socket) has no shipped client UI yet, so the
-authoritative server refuses its three wire commands unless the realm opts in
-with RIFT_FORGE_ENABLED=1 (server/rift_forge_gate.ts, pinned by
-tests/rift_forge_gate.test.ts). Absent UI is not a gate: a crafted frame
-reaches the wire regardless, and players used exactly that path for premature
-progression before the gate landed. The sim methods stay live offline and in
-tests; only the online dispatch arms are closed. Each refused attempt books
-the woc_rift_forge_refused_total counter, the ops signal that probing
-continues (or that a realm forgot the flag once the UI ships).
+The forge (upgrade, socket) is an NPC service: Riftwright Maelis
+(`riftForge: true` in `content/farshore.ts`, Gullhaven's Watch Meadow) opens the
+Rift Forge window (`src/ui/hud/rift_forge/`, a pure view-core plus a thin
+window on the guild-board shape) through the structured `riftForge` interact
+event, the bank precedent. The place rule lives in the sim
+(`rift/forge_gate.ts`, `nearRiftForge`): both forge operations refuse away
+from a riftForge NPC with the shared "too far from the Rift Forge" error line
+(returned as reason `too_far`, never emitted as a `riftForgeResult`, the `dead`
+contract), so the offline world, the headless env, and the authoritative server
+enforce it identically. Only bagged bands are forgeable (the sim resolves the
+target through the inventory); the window lists a worn band with an unequip
+hint. The forge currency ladder is the sim's own (`riftUpgradeCost`, 2 essence
+at the first step rising by 2 per step to the fifth; one gem per socket, a
+full band replacing its oldest gem), quoted by the window from those exports
+rather than re-derived. The window also quotes the item level each essence
+step buys (`rift/band_ladder.ts` `riftBandItemLevel`).
 
-Note for whoever ships the forge UI: send the three commands through
-ClientWorld's cmdWithOutcome (not the fire-and-forget cmd sender), because a
-realm with the flag still off refuses with only a commandOutcome ok:false
-ack, and a rid-less sender would surface that as pure silence to the player.
+The server's `RIFT_FORGE_ENABLED` gate (`server/rift_forge_gate.ts`, pinned by
+`tests/rift_forge_gate.test.ts`) is an ops kill switch rather than an
+opt-in: `0` (or `false`, `off`, `no`) closes the two wire commands, unset
+and anything else keeps them open. The dispatch arms (`server/rift_forge_dispatch.ts`)
+answer the `commandOutcome` ack with the sim verdict, and the client sends
+them through `cmdWithOutcome`, so a closed realm or a sim refusal always
+surfaces as a visible status line in the window, never as silence. Each
+refused-while-closed attempt still books the `woc_rift_forge_refused_total`
+counter. The retired third token, rift_enchant_item, is outside the switch on
+purpose: its arm is a no-op that can spend nothing, so a crafted frame
+carrying it books no refusal and is a deliberate blind spot, not a leak. The
+switch only works where the server sees the variable: `docker-compose.yml`
+forwards it, and a deploy template that renders its own compose must too.

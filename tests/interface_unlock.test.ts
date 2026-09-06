@@ -12,6 +12,7 @@ import {
   INTERFACE_UNLOCKED_BODY_CLASS,
   InterfaceUnlock,
   makeUiRootDetacher,
+  restoreFrameHome,
 } from '../src/ui/interface_unlock';
 import type { HudFrameSpec } from '../src/ui/interface_unlock_core';
 import type { MovableFrame } from '../src/ui/movable_frame';
@@ -520,7 +521,13 @@ describe('InterfaceUnlock frames menu', () => {
 });
 
 // A minimal element/parent graph: enough to prove the reparent goes to #ui and
-// comes back to the exact original slot.
+// comes back to the exact original slot. insertBefore keeps the DOM's contract
+// that the reference node must be a CURRENT child (a real browser throws
+// NotFoundError otherwise): the two-rows-detached regression below is decisive
+// only because a remembered sibling that has since left the parent throws here
+// exactly as it does in play, instead of quietly appending. It carries no text
+// nodes, so `firstChild` is always an element here; in the shipped markup it is
+// the indentation text node, which the `first` slot inserts before just as well.
 class FakeNode {
   children: FakeNode[] = [];
   parentNode: FakeNode | null = null;
@@ -533,6 +540,7 @@ class FakeNode {
       else this.classes.delete(name);
       return on;
     },
+    contains: (name: string) => this.classes.has(name),
   };
   appendChild(child: FakeNode): void {
     child.parentNode?.remove(child);
@@ -540,15 +548,19 @@ class FakeNode {
     this.children.push(child);
   }
   insertBefore(child: FakeNode, next: FakeNode | null): void {
+    const at = next ? this.children.indexOf(next) : -1;
+    if (next && at < 0) throw new Error('NotFoundError: reference node is not a child');
     child.parentNode?.remove(child);
     child.parentNode = this;
-    const at = next ? this.children.indexOf(next) : -1;
     if (at < 0) this.children.push(child);
-    else this.children.splice(at, 0, child);
+    else this.children.splice(this.children.indexOf(next as FakeNode), 0, child);
   }
   remove(child: FakeNode): void {
     const at = this.children.indexOf(child);
     if (at >= 0) this.children.splice(at, 1);
+  }
+  get firstChild(): FakeNode | null {
+    return this.children[0] ?? null;
   }
   get nextSibling(): FakeNode | null {
     const siblings = this.parentNode?.children ?? [];
@@ -610,5 +622,167 @@ describe('makeUiRootDetacher', () => {
     detach(false);
     expect(stack.children.indexOf(frame)).toBe(1);
     expect(frame.nextSibling).toBe(after);
+  });
+});
+
+// The two player aura rows share one stock parent (#aura-stack) and both
+// detach, which is the shape the captured-sibling detacher cannot serve: the
+// buff row's remembered `next` is the debuff row, and it may have left the
+// column too by the time the buff row comes back.
+const el = (id: string): FakeNode => Object.assign(new FakeNode(), { id });
+
+const rowSpec = (id: 'buffBar' | 'debuffBar', slot: 'first' | 'last'): HudFrameSpec => ({
+  ...spec(true),
+  id,
+  elementId: id === 'buffBar' ? 'buff-bar' : 'debuff-bar',
+  stockHome: { parentId: 'aura-stack', slot },
+});
+
+function auraScene() {
+  const uiRoot = el('ui');
+  const stack = el('aura-stack');
+  const buffBar = el('buff-bar');
+  const debuffBar = el('debuff-bar');
+  const playerFrame = el('player-frame');
+  stack.appendChild(buffBar);
+  stack.appendChild(debuffBar);
+  uiRoot.appendChild(stack);
+  uiRoot.appendChild(playerFrame);
+  const byId: Record<string, FakeNode> = {
+    ui: uiRoot,
+    'aura-stack': stack,
+    'buff-bar': buffBar,
+    'debuff-bar': debuffBar,
+  };
+  const doc = { getElementById: (id: string) => byId[id] ?? null } as unknown as Document;
+  const asEl = (n: FakeNode) => n as unknown as HTMLElement;
+  return { uiRoot, stack, buffBar, debuffBar, playerFrame, doc, asEl };
+}
+
+describe('makeUiRootDetacher with a declared stock home', () => {
+  it('brings two detached rows back in column order, released in registration order', () => {
+    const { uiRoot, stack, buffBar, debuffBar, doc, asEl } = auraScene();
+    const detachBuffs = makeUiRootDetacher(doc, rowSpec('buffBar', 'first'), asEl(buffBar));
+    const detachDebuffs = makeUiRootDetacher(doc, rowSpec('debuffBar', 'last'), asEl(debuffBar));
+
+    // Both rows carry a saved position at boot: both lift onto #ui.
+    detachBuffs(true);
+    detachDebuffs(true);
+    expect(buffBar.parentNode).toBe(uiRoot);
+    expect(debuffBar.parentNode).toBe(uiRoot);
+    expect(stack.children).toEqual([]);
+
+    // "Reset Frame Positions" releases them in HUD_FRAME_SPECS order, buff row
+    // first, while its remembered sibling is still out on #ui. A captured
+    // `next` throws here; the declared slot does not.
+    expect(() => detachBuffs(false)).not.toThrow();
+    detachDebuffs(false);
+    expect(stack.children).toEqual([buffBar, debuffBar]);
+  });
+
+  it('keeps the column order whichever row comes back first', () => {
+    const { stack, buffBar, debuffBar, doc, asEl } = auraScene();
+    const detachBuffs = makeUiRootDetacher(doc, rowSpec('buffBar', 'first'), asEl(buffBar));
+    const detachDebuffs = makeUiRootDetacher(doc, rowSpec('debuffBar', 'last'), asEl(debuffBar));
+    detachBuffs(true);
+    detachDebuffs(true);
+    detachDebuffs(false);
+    detachBuffs(false);
+    expect(stack.children).toEqual([buffBar, debuffBar]);
+  });
+
+  it('only puts back what it took: a row another owner holds stays put on release', () => {
+    const { uiRoot, buffBar, playerFrame, doc, asEl } = auraScene();
+    const detach = makeUiRootDetacher(doc, rowSpec('buffBar', 'first'), asEl(buffBar));
+    detach(true);
+    expect(buffBar.parentNode).toBe(uiRoot);
+    // The auras-on-frame option docks the row on the player frame; a reset
+    // while it sits there must not yank it off (the option is still on).
+    playerFrame.appendChild(buffBar);
+    detach(false);
+    expect(buffBar.parentNode).toBe(playerFrame);
+    expect(buffBar.classes.has('hud-frame-detached')).toBe(false);
+  });
+
+  it('a row without a declared stock home still returns to its captured slot', () => {
+    const { stack, buffBar, debuffBar, doc, asEl } = auraScene();
+    const detach = makeUiRootDetacher(doc, { ...spec(true), id: 'buffBar' }, asEl(buffBar));
+    detach(true);
+    detach(false);
+    expect(stack.children).toEqual([buffBar, debuffBar]);
+  });
+
+  it('a declared parent missing from the tree leaves the row on #ui rather than guessing', () => {
+    // No captured-slot fallback here: the captured slot is exactly the stale
+    // answer the declaration exists to replace, so the row stays where the
+    // detacher can still find it.
+    const { uiRoot, buffBar, asEl } = auraScene();
+    const doc = { getElementById: (id: string) => (id === 'ui' ? uiRoot : null) };
+    const detach = makeUiRootDetacher(
+      doc as unknown as Document,
+      rowSpec('buffBar', 'first'),
+      asEl(buffBar),
+    );
+    detach(true);
+    detach(false);
+    expect(buffBar.parentNode).toBe(uiRoot);
+  });
+});
+
+describe('restoreFrameHome', () => {
+  // The blocker sequence from review: a saved position applies at boot (the row
+  // is on #ui before the auras-on-frame option ever looks), the option goes on
+  // (row onto the player frame), then off. A home remembered at the first look
+  // was { parent: #ui, next: #debuff-bar } and threw on the way back; the class
+  // decides now.
+  it('returns a row that still carries a custom position to #ui, never into the column', () => {
+    const { uiRoot, stack, buffBar, debuffBar, playerFrame, doc, asEl } = auraScene();
+    const detach = makeUiRootDetacher(doc, rowSpec('buffBar', 'first'), asEl(buffBar));
+    detach(true);
+    playerFrame.appendChild(buffBar);
+
+    expect(() => restoreFrameHome(doc, 'buffBar')).not.toThrow();
+    expect(buffBar.parentNode).toBe(uiRoot);
+    expect(stack.children).toEqual([debuffBar]);
+
+    // Idempotent: a second call must not re-append the row to the end of #ui,
+    // which would reorder it among its absolutely positioned siblings.
+    const order = [...uiRoot.children];
+    restoreFrameHome(doc, 'buffBar');
+    expect(uiRoot.children).toEqual(order);
+  });
+
+  // The other order: no saved position at boot, the row is dragged later (onto
+  // #ui), then the option goes on and off. The old code put the detached row
+  // back INSIDE the column, where its saved left/top resolved against the
+  // column's box.
+  it('the drag-after-boot order lands on #ui too', () => {
+    const { uiRoot, stack, buffBar, debuffBar, playerFrame, doc, asEl } = auraScene();
+    const detach = makeUiRootDetacher(doc, rowSpec('buffBar', 'first'), asEl(buffBar));
+    playerFrame.appendChild(buffBar);
+    restoreFrameHome(doc, 'buffBar');
+    expect(stack.children).toEqual([buffBar, debuffBar]);
+
+    detach(true);
+    playerFrame.appendChild(buffBar);
+    restoreFrameHome(doc, 'buffBar');
+    expect(buffBar.parentNode).toBe(uiRoot);
+    expect(stack.children).toEqual([debuffBar]);
+  });
+
+  it('seats a row with no custom position at the head of the column, ahead of the debuff row', () => {
+    const { stack, buffBar, debuffBar, playerFrame, doc } = auraScene();
+    playerFrame.appendChild(buffBar);
+    restoreFrameHome(doc, 'buffBar');
+    expect(stack.children).toEqual([buffBar, debuffBar]);
+    expect(buffBar.nextSibling).toBe(debuffBar);
+  });
+
+  it('is a no-op for a row already home, and for an id the table does not know', () => {
+    const { stack, buffBar, debuffBar, doc } = auraScene();
+    restoreFrameHome(doc, 'buffBar');
+    expect(stack.children).toEqual([buffBar, debuffBar]);
+    restoreFrameHome(doc, 'noSuchFrame');
+    expect(stack.children).toEqual([buffBar, debuffBar]);
   });
 });

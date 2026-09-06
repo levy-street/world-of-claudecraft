@@ -113,9 +113,9 @@ describe('hud.itemTooltip composition (source pins)', () => {
   it('composes the affix lines exactly once, after the stat lines and before the combat ratings', () => {
     const affix = hud.indexOf('itemAffixTooltipLines(item)');
     const bonusStats = hud.indexOf('instanceBonusStatLines(instance)');
-    const ratings = hud.indexOf(
-      "for (const ratingStat of ['hitRating', 'critRating', 'hasteRating'] as const)",
-    );
+    // The hit/crit/haste loop moved into item_affix_tooltip.ts (itemRatingTooltipLines);
+    // its composition site is what the column order is pinned against now.
+    const ratings = hud.indexOf('itemRatingTooltipLines(item)');
     expect(bonusStats).toBeGreaterThan(-1);
     // After the def's own stat lines and the baked instance bonus stats
     // (which themselves follow the item.stats loop), matching the module

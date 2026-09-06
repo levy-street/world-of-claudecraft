@@ -1164,6 +1164,20 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: 'publicReadRateLimited',
     requireOwnedExpected: null,
   },
+  // Realm Builder of the Month: the public roll the Eastbrook Vale monument
+  // reads while a client loads the world. Registry-only RouteDef born after the
+  // migration (server/http/CLAUDE.md), so no legacy ladder arm. Anonymous and
+  // db-backed, so it takes the shared per-IP public-read budget in-handler.
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'GET',
+    path: '/api/realm-builder',
+    handler: 'server/realm_builder.ts publicRollHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.public,
+    limiter: 'publicReadRateLimited',
+    requireOwnedExpected: null,
+  },
   // The signpost guild board's roster drill-in: registry-only RouteDef born
   // after the migration, no legacy ladder arm (server/http/CLAUDE.md).
   {
@@ -2168,6 +2182,40 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     method: 'POST',
     path: '/admin/api/ad-spend/delete',
     handler: 'server/ad_spend.ts deleteHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  // Realm Builder of the Month roll: registry-only RouteDefs born AFTER the
+  // migration (the new-route rule, server/http/CLAUDE.md), so no legacy ladder
+  // arm and the legacy rollback answers 404 for them by design. Both arms carry
+  // content.moderate (server/admin_routes.ts).
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'GET',
+    path: '/admin/api/realm-builders',
+    handler: 'server/realm_builder.ts adminListHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'POST',
+    path: '/admin/api/realm-builders',
+    handler: 'server/realm_builder.ts adminUpsertHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'POST',
+    path: '/admin/api/realm-builders/delete',
+    handler: 'server/realm_builder.ts adminDeleteHandler (registry-only RouteDef)',
     contentType: PROBLEM_JSON,
     authScope: AUTH_SCOPE.admin,
     limiter: null,
