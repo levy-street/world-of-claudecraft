@@ -4507,6 +4507,7 @@ export const en_XA: EnTranslations = {
       "walletLinkedConnected": "[Ýóúŕ ļíñķéð ŵáļļéţ áþþ íš çóññéçţéð áñð ŕéáðý ƒóŕ $ŴÓÇ þúŕçĥášéš.]",
       "walletUsdBalance": "[{amount} ÚŠÐ]",
       "walletUsdUnknown": "[Úñķñóŵñ]",
+      "walletCardDismiss": "[Ĥíðé ŵáļļéţ çáŕð]",
       "rateNote": "[Ŕáţé: áƀóúţ {tokens} $ŴÓÇ þéŕ $1.00 ÚŠÐ áš óƒ {time}.]",
       "rateNotePaused": "[Ļášţ ķñóŵñ ŕáţé: áƀóúţ {tokens} $ŴÓÇ þéŕ $1.00 ÚŠÐ áš óƒ {time}.]",
       "estimateNote": "[Áƀóúţ {tokens} $ŴÓÇ ƒóŕ {usd} áţ ţĥé çúŕŕéñţ ŕáţé.]",

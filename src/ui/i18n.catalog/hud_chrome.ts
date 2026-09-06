@@ -6449,6 +6449,9 @@ export const hudChromeStrings = {
     walletLinkedConnected: 'Your linked wallet app is connected and ready for $WOC purchases.',
     walletUsdBalance: '{amount} USD',
     walletUsdUnknown: 'Unknown',
+    // The card's dismiss button (accessible name). Only the two linked states
+    // offer it (woc_wallet_card_dismiss.ts); the card returns when the state changes.
+    walletCardDismiss: 'Hide wallet card',
     // The rate is per ONE dollar, said outright: 'per USD' read as a unit
     // label and players asked per how many.
     rateNote: 'Rate: about {tokens} $WOC per $1.00 USD as of {time}.',

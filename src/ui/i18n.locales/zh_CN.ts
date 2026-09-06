@@ -9240,6 +9240,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '您的公开地址已关联。需要使用 $WOC 付款时，请重新连接该钱包应用。',
   'hudChrome.wocMarket.walletLinkedConnected': '已关联的钱包应用已连接，可用于 $WOC 付款。',
   'hudChrome.wocMarket.walletUsdUnknown': '未知',
+  'hudChrome.wocMarket.walletCardDismiss': '隐藏钱包卡片',
   'hudChrome.wocMarket.walletUsdBalance': '{amount} USD',
   'hudChrome.wocMarket.rateNote': '汇率：截至 {time}，约每美元 {tokens} $WOC。',
   'hudChrome.wocMarket.estimateNote': '{usd} 按当前汇率约合 {tokens} $WOC。',

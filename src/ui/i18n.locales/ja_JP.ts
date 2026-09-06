@@ -9700,6 +9700,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.walletLinkedConnected':
     'リンク済みのウォレットアプリに接続され、$WOC で支払う準備ができています。',
   'hudChrome.wocMarket.walletUsdUnknown': '不明',
+  'hudChrome.wocMarket.walletCardDismiss': 'ウォレットカードを隠す',
   'hudChrome.wocMarket.walletUsdBalance': '{amount} USD',
   'hudChrome.wocMarket.rateNote': 'レート: {time} 時点で 1 USD あたり約 {tokens} $WOC。',
   'hudChrome.wocMarket.estimateNote': '{usd} は現在のレートで約 {tokens} $WOC です。',

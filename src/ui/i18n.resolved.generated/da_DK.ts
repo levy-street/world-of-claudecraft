@@ -4507,6 +4507,7 @@ export const da_DK: EnTranslations = {
       "walletLinkedConnected": "Din tilknyttede wallet-app er forbundet og klar til $WOC-køb.",
       "walletUsdBalance": "{amount} USD",
       "walletUsdUnknown": "Ukendt",
+      "walletCardDismiss": "Hide wallet card",
       "rateNote": "Kurs: omkring {tokens} $WOC for 1,00 USD, pr. {time}.",
       "rateNotePaused": "Sidst kendte kurs: omkring {tokens} $WOC for 1,00 USD, pr. {time}.",
       "estimateNote": "Omkring {tokens} $WOC for {usd} til den aktuelle kurs.",

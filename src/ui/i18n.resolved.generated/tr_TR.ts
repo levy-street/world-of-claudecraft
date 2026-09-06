@@ -4507,6 +4507,7 @@ export const tr_TR: EnTranslations = {
       "walletLinkedConnected": "Bağlı cüzdan uygulaman bağlı ve $WOC satın alımları için hazır.",
       "walletUsdBalance": "{amount} USD",
       "walletUsdUnknown": "Bilinmiyor",
+      "walletCardDismiss": "Hide wallet card",
       "rateNote": "Kur: {time} itibarıyla 1,00 USD başına yaklaşık {tokens} $WOC.",
       "rateNotePaused": "Son bilinen kur: {time} itibarıyla 1,00 USD başına yaklaşık {tokens} $WOC.",
       "estimateNote": "Güncel kura göre {usd} karşılığında yaklaşık {tokens} $WOC.",

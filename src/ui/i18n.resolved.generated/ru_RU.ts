@@ -4507,6 +4507,7 @@ export const ru_RU: EnTranslations = {
       "walletLinkedConnected": "Привязанное приложение-кошелёк подключено и готово к платежам в $WOC.",
       "walletUsdBalance": "{amount} USD",
       "walletUsdUnknown": "Неизвестно",
+      "walletCardDismiss": "Скрыть карточку кошелька",
       "rateNote": "Курс: около {tokens} $WOC за доллар США по состоянию на {time}.",
       "rateNotePaused": "Последний известный курс: около {tokens} $WOC за доллар США по состоянию на {time}.",
       "estimateNote": "{usd} по текущему курсу составляет около {tokens} $WOC.",

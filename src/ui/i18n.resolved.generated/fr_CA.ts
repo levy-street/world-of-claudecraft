@@ -4507,6 +4507,7 @@ export const fr_CA: EnTranslations = {
       "walletLinkedConnected": "Votre application de portefeuille liée est connectée et prête pour les achats en $WOC.",
       "walletUsdBalance": "{amount} USD",
       "walletUsdUnknown": "Inconnu",
+      "walletCardDismiss": "Hide wallet card",
       "rateNote": "Taux : environ {tokens} $WOC pour 1,00 $ US au {time}.",
       "rateNotePaused": "Dernier taux connu : environ {tokens} $WOC pour 1,00 $ US au {time}.",
       "estimateNote": "Environ {tokens} $WOC pour {usd} au taux actuel.",

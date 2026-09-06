@@ -59,7 +59,6 @@ import {
   wocLoadingStatusHtml,
   wocMarketBannersHtml,
   wocMarketFootHtml,
-  wocQuoteFaceHtml,
   wocSalesHistoryHtml,
   wocSellEmptyHtml,
   wocSellerPaneHtml,
@@ -68,6 +67,7 @@ import {
 } from './woc_market_chrome';
 import type { WocMarketHooks } from './woc_market_hooks';
 import { anyBondAwaitingChain, shouldPollWocMarket } from './woc_market_poll_core';
+import { type PendingQuote, wocQuoteHtml } from './woc_market_quote_html';
 import {
   wocBondPendingText,
   wocPaymentPendingText,
@@ -85,6 +85,12 @@ import {
   wocQuoteCountdownSig,
 } from './woc_market_view';
 import { wocTokensText } from './woc_tokens_text';
+import {
+  loadWalletCardDismissal,
+  saveWalletCardDismissal,
+  walletCardDismissible,
+  walletCardHidden,
+} from './woc_wallet_card_dismiss';
 
 // The hooks contract lives in its own leaf module (wiring, window, and the
 // trade arm all consume it); re-exported here so importers keep one home.
@@ -142,31 +148,6 @@ interface WocMarketScrollKeys {
  *  from it and paintSellActive points aria-activedescendant at them, so two
  *  literals would let the two drift apart silently. */
 const SELL_LISTBOX_ID = 'wm-sell-listbox';
-
-// usdCents is NULLABLE on purpose: it is only a display label sourced from the
-// cached activity row, and a missing row must render no amount rather than a
-// fabricated $0.00 next to a real charge. The quote's token legs are the
-// authoritative figures either way.
-type PendingQuote =
-  | {
-      kind: 'bond';
-      bidId: number;
-      /** The listing's item when the painter knows it ('' otherwise): the
-       *  quote face names which auction the bond is for. Display only. */
-      itemId: string;
-      usdCents: number | null;
-      quote: WocQuoteView;
-    }
-  | {
-      kind: 'settlement';
-      settlementId: number;
-      itemId: string;
-      usdCents: number | null;
-      /** The claim's own payment deadline (the wire's deadlineAtMs), or null:
-       *  the quote face shows it beside the quote expiry. Display only. */
-      deadlineAtMs: number | null;
-      quote: WocQuoteView;
-    };
 
 const PAGE_SIZE = 25;
 
@@ -260,7 +241,7 @@ export class WocMarketWindow {
    *  state: the poll-band rebuild would silently re-collapse an open well
    *  held only in the DOM. Reset on close so every visit starts compact. */
   private bidTermsOpen = false;
-  private pendingQuote: PendingQuote | null = null;
+  private pendingQuote: PendingQuote<WocQuoteView> | null = null;
   /** The bid preview's timer-free coalescing (see onBidPriceInput): the price
    *  still awaiting an estimate, and whether one is already out. */
   private bidEstimateWanted: number | null = null;
@@ -276,6 +257,10 @@ export class WocMarketWindow {
     return verifiedWocBalance();
   }
   private paintedWalletSig = '';
+  /** The wallet-card kind the player hid (woc_wallet_card_dismiss.ts), read
+   *  from storage once per window; the card repaints as soon as the live kind
+   *  differs, so this never hides a state that asks for action. */
+  private walletCardDismissed = loadWalletCardDismissal();
   private busy = false;
   private busyLabel: TranslationKey | null = null;
   /** Bumped every time a mutation starts AND every time the window closes. A
@@ -675,10 +660,14 @@ export class WocMarketWindow {
       // rebuilds its own button disabled, so focus falls to prev, not to body.
       const byKey = (key: string) =>
         root.querySelector<HTMLElement>(`[data-focus-key="${key.replace(/["\\]/g, '\\$&')}"]`);
+      // The wallet card's dismiss glyph removes itself: focus falls to the
+      // selected tab, the nearest control that survives the rebuild.
       const ladder =
         focusKey === 'wm-page-next' || focusKey === 'wm-page-prev'
           ? [byKey(focusKey), byKey('wm-page-next'), byKey('wm-page-prev')]
-          : [byKey(focusKey)];
+          : focusKey === 'wm-wallet-dismiss'
+            ? [byKey(focusKey), root.querySelector<HTMLElement>('.wm-tab-selected')]
+            : [byKey(focusKey)];
       restoreFirstEnabled(ladder);
     }
   }
@@ -825,7 +814,7 @@ export class WocMarketWindow {
     this.paintedWalletSig = wocWalletCardSig(wallet);
     const bannerStrip = wocMarketBannersHtml({
       paused: model.paused,
-      wallet,
+      wallet: walletCardHidden(wallet.kind, this.walletCardDismissed) ? null : wallet,
       tokensPerUsd: model.tokensPerUsd,
     });
     const foot = wocMarketFootHtml({
@@ -1355,43 +1344,20 @@ export class WocMarketWindow {
   }
 
   private quoteHtml(model: Extract<WocMarketViewModel, { kind: 'ready' }>): string {
-    const pending = this.pendingQuote;
-    if (!pending) return '';
+    if (!this.pendingQuote) return '';
     void model;
-    const q = pending.quote;
-    const remainingMs = q.expiresAtMs === null ? 0 : Math.max(0, q.expiresAtMs - Date.now());
-    // With no cached USD label, the token legs below carry the amount rather
-    // than a fabricated $0.00. A bond names its listing's item when the
-    // painter knows it (a retry face after a declined wallet still says which
-    // auction it is for).
-    const title =
-      pending.usdCents === null
-        ? t('hudChrome.wocMarket.quoteTitle')
-        : pending.kind === 'bond'
-          ? pending.itemId === ''
-            ? t('hudChrome.wocMarket.quoteBondFor', { usd: this.usd(pending.usdCents) })
-            : t('hudChrome.wocMarket.quoteBondForItem', {
-                item: this.itemName(pending.itemId),
-                usd: this.usd(pending.usdCents),
-              })
-          : t('hudChrome.wocMarket.quoteSettlementFor', {
-              item: this.itemName(pending.itemId),
-              usd: this.usd(pending.usdCents),
-            });
-    // The face itself is the chrome builder's; this painter resolves the
-    // title, the token legs and the clock (chrome holds none of them).
-    return wocQuoteFaceHtml({
-      title,
-      amountTokens: q.amount ? this.tokens(q.amount.tokens) : null,
-      sellerTokens: q.seller ? this.tokens(q.seller.tokens) : null,
-      burnTokens: q.burn ? this.tokens(q.burn.tokens) : null,
-      treasuryTokens: q.treasury ? this.tokens(q.treasury.tokens) : null,
-      remainingMs,
-      // The claim's own payment deadline on a settlement quote (the trade
-      // arm's quote face shows its twin): 'Not now' keeps it running.
-      dueAtMs: pending.kind === 'settlement' ? pending.deadlineAtMs : null,
-      busy: this.busy,
-    });
+    // The face is the sibling builder's (woc_market_quote_html.ts): this painter
+    // hands it the pending quote, its formatters and the busy flag.
+    return wocQuoteHtml(
+      this.pendingQuote,
+      {
+        busy: this.busy,
+        usd: (c) => this.usd(c),
+        tokens: (v) => this.tokens(v),
+        itemName: (id) => this.itemName(id),
+      },
+      Date.now(),
+    );
   }
 
   /** Open the seller click-through pane and fetch their recent trades. The
@@ -1945,6 +1911,16 @@ export class WocMarketWindow {
         this.bidTermsOpen = !this.bidTermsOpen;
         this.render();
         break;
+      case 'dismiss-wallet-card': {
+        // Remember the KIND, not a flag: the card comes back the moment the
+        // wallet state moves (a reconnect, a mismatch), never on a reopen.
+        const kind = walletConnectionView().kind;
+        if (!walletCardDismissible(kind)) break;
+        this.walletCardDismissed = kind;
+        saveWalletCardDismissal(kind);
+        this.render();
+        break;
+      }
       case 'connect-wallet':
         // The shared connect flow owns everything from here (connect, verify,
         // link); the poll picks the linked state up and retires the banner.
