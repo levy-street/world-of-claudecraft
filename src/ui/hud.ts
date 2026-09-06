@@ -14489,15 +14489,6 @@ export class Hud {
     this.log(zoneWelcome(zone.id), '#ffd100');
   }
 
-  private ensureChatFollow(): ChatScrollFollow {
-    if (this.chatFollow) return this.chatFollow;
-    const targets = [this.chatLogEl, this.combatLogEl].filter(
-      (el): el is HTMLElement => el !== undefined && el !== null,
-    );
-    this.chatFollow = new ChatScrollFollow(targets);
-    return this.chatFollow;
-  }
-
   private chatLogFrom(
     name: string,
     text: string,
@@ -14508,8 +14499,8 @@ export class Hud {
     fromTitle?: string,
     classId?: PlayerClass,
   ): void {
-    const chatFollow = this.ensureChatFollow();
-    const wasNearBottom = chatFollow.shouldFollow(this.chatLogEl);
+    this.chatFollow ||= new ChatScrollFollow([this.chatLogEl, this.combatLogEl]);
+    const wasNearBottom = this.chatFollow.shouldFollow(this.chatLogEl);
     const div = document.createElement('div');
     // The line color is a pure function of its channel (the single source of truth
     // shared with the chat input tint), so it is derived here rather than passed in.
@@ -14590,12 +14581,11 @@ export class Hud {
       if (!first) break;
       this.chatLogEl.removeChild(first);
     }
-    if (wasNearBottom) chatFollow.scrollToBottom(this.chatLogEl);
+    if (wasNearBottom) this.chatFollow.scrollToBottom(this.chatLogEl);
   }
 
-  // Append a chat message body, rendering [[q:id]] tokens as clickable quest links
-  // and masking only the plain-text segments. Links bind the message author (fromPid)
-  // so a click can offer accept to the author's party members.
+  // Append a chat message body, rendering [[q:id]] links and masking only text.
+  // Links bind the author so party members can accept shared quests.
   private appendChatMessageBody(parent: HTMLElement, text: string, fromPid?: number): void {
     for (const seg of parseChatSegments(text)) {
       if (seg.kind === 'text') {
@@ -14937,10 +14927,9 @@ export class Hud {
     this.combatAnnouncer.push(text, performance.now());
   }
 
-  // Announce a chat line that reached the visible #chatlog pane through the tab-independent
-  // #chat-live region, mirroring what the old #chatlog aria-live spoke: a
-  // channel-filtered line is .chat-hidden (display:none) and stays silent, exactly as a
-  // display:none live-region child did. The relayed text is the rendered line text the
+  // Announce visible #chatlog lines through #chat-live, mirroring the old aria-live:
+  // channel-filtered .chat-hidden lines stay silent, matching display:none live-region children.
+  // The relayed text is the rendered line text the
   // screen reader read off the div (sender + message, already localized); ChatAnnouncer
   // coalesces + throttles a burst. Both chat append paths (appendLog's chat case and
   // chatLogFrom) call this so player chat and system chat announce alike, as #chatlog's
@@ -14969,8 +14958,8 @@ export class Hud {
     // region when its durable channel line is filtered by another active tab.
     announceWhenFiltered = false,
   ): void {
-    const chatFollow = this.ensureChatFollow();
-    const wasNearBottom = chatFollow.shouldFollow(el);
+    this.chatFollow ||= new ChatScrollFollow([this.chatLogEl, this.combatLogEl]);
+    const wasNearBottom = this.chatFollow.shouldFollow(el);
     const div = document.createElement('div');
     div.style.color = color;
     if (timestamp) this.prependTimestamp(div);
@@ -15009,7 +14998,7 @@ export class Hud {
       if (!first) break;
       el.removeChild(first);
     }
-    if (wasNearBottom) chatFollow.scrollToBottom(el);
+    if (wasNearBottom) this.chatFollow.scrollToBottom(el);
   }
 
   // A floating note over the local player (e.g. "Can't move!" when a movement command

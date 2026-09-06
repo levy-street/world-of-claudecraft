@@ -28,8 +28,10 @@ export class ChatScrollFollow {
   private readonly pinned = new WeakMap<ScrollFollowTarget, boolean>();
   private readonly last = new WeakMap<ScrollFollowTarget, ScrollMetrics>();
 
-  constructor(targets: readonly ScrollFollowTarget[] = []) {
-    for (const el of targets) this.attach(el);
+  constructor(targets: readonly (ScrollFollowTarget | null | undefined)[] = []) {
+    for (const el of targets) {
+      if (el) this.attach(el);
+    }
   }
 
   /** Track one pane: every scroll re-evaluates the pin unless only layout changed. */
