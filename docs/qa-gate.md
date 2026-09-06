@@ -521,7 +521,7 @@ before reporting readiness.
 | Cross-host parity | `cross-platform-sync` | `woc_cross_platform` |
 | Persistence and migrations | `migration-safety` | `woc_persistence` |
 | Database performance | `database-performance-reviewer` | `woc_database_performance` |
-| Server hot-path performance | `server-hot-path-reviewer` | (not yet mirrored) |
+| Server hot-path performance | `server-hot-path-reviewer` | `woc_server_hot_path` |
 | Privacy and security | `privacy-security-review` | `woc_security` |
 | Decisive tests | `test-coverage-auditor` | `woc_test_coverage` |
 | Frontend and graphics | `frontend-seam-reviewer` | `woc_frontend` |
@@ -541,8 +541,12 @@ compatibility, save/load shape, and rollback safety. Database-performance review
 indexes, pool pressure, locks, timeout scope, write amplification, driver/dependency upgrades,
 PostgreSQL engine/resource/configuration/topology changes, and production-scale observability.
 Server-hot-path review owns the non-SQL server budget: tick CPU, broadcast fan-out and
-serialization, cache seams, and retention for anything that grows (the seams in
-`server/CLAUDE.md` "Hot paths"). GPU-preparation review owns what the client asks the GPU to
+serialization, cache seams, retention for anything that grows, the per-tick self path
+against realm collections that grow with age (the revision plus cadence gate and the
+named-bound rule), recurring main-thread jobs (autosave, sweeps) that must cost O(what
+changed) rather than O(the book), whole-book persistence writes, and the grown-collection
+evidence a "cheap" claim needs (the seams and rules in `server/CLAUDE.md` "Hot paths").
+GPU-preparation review owns what the client asks the GPU to
 prepare and when: prewarm homes and twins, compile and reveal gates, program-key moves,
 post-boot lights, secondary GL contexts, the background queue and its admission budget, and
 the stand-in registry (the contract in `src/render/CLAUDE.md` "GPU work: every new producer is

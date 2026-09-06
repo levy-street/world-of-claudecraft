@@ -58,8 +58,8 @@ Repository skills live in `.agents/skills/` and are invoked as `$skill-name`:
 
 Read-only specialist agents live in `.codex/agents/`. Use only the roles matching the
 changed surface: sim architecture, cross-platform parity, persistence, database
-performance, security, test coverage, frontend, release malware, and official
-documentation research. The parent runs deterministic commands once; reviewers inspect
+performance, server hot-path performance, security, test coverage, frontend, release
+malware, and official documentation research. The parent runs deterministic commands once; reviewers inspect
 evidence instead of duplicating the full gate.
 
 For SQL, database call sites, schema or indexes, query cadence/cardinality, pool or lock
@@ -67,6 +67,12 @@ behavior, timeout policy, background work, database driver/dependency versions, 
 or resource/configuration/topology changes, or stored-data growth, invoke
 `woc_database_performance` before implementation decisions and again on the finished diff.
 Pair it with persistence or security review when those concerns also apply.
+
+For server work that runs per tick, per request, per broadcast, per session, or on a
+recurring main-thread job (a shared read or cache, a growing collection, a snapshot or event
+payload, a `selfWireJson` key or the `src/sim/` read it calls, an autosave or sweep job, a
+`world_state` blob write), invoke `woc_server_hot_path`; it owns the non-SQL server budget
+and the grown-collection rules in `server/CLAUDE.md` "Hot paths".
 
 ## Completion contract
 
