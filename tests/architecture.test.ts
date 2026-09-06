@@ -704,6 +704,7 @@ const RENDER_PURE_CORES = [
   'src/render/post_plan_core.ts',
   'src/render/post_pixel_budget_core.ts',
   'src/render/resize_coalesce_core.ts',
+  'src/render/post_shed_core.ts',
   'src/render/nameplate_view.ts',
   'src/render/nameplate_pick_core.ts',
   'src/render/nameplate_paint_gate_core.ts',

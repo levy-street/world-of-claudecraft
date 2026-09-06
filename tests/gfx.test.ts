@@ -206,6 +206,7 @@ describe('graphics tier resolution', () => {
           'grass',
           'lighting',
           'materials',
+          'post',
           'props',
           'resolution',
           'ui',
@@ -253,6 +254,32 @@ describe('graphics tier resolution', () => {
       expect(band.max).toBe(1);
       expect(band.cost).toBe('gpu');
       expect(band.roi).toBe(0.92);
+    }
+
+    // Post shed (post_shed_core.ts): the full chain is always the baseline
+    // (the static preset itself never changes). The composer tiers, which
+    // build the sheddable passes (SMAA, bloom, N8AO), are governable down to
+    // the last rung (min 0); the grade-only and direct tiers build none, so
+    // their band is pinned non-governable with no range at all.
+    for (const tier of ['low', 'medium'] as const) {
+      expect(GFX_BUCKET_BANDS[tier].post).toEqual({
+        min: 1,
+        baseline: 1,
+        max: 1,
+        roi: 0,
+        cost: 'gpu',
+        governable: false,
+      });
+    }
+    for (const tier of ['high', 'ultra', 'insane'] as const) {
+      expect(GFX_BUCKET_BANDS[tier].post).toEqual({
+        min: 0,
+        baseline: 1,
+        max: 1,
+        roi: 0.9,
+        cost: 'gpu',
+        governable: true,
+      });
     }
   });
 

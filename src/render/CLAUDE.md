@@ -738,4 +738,10 @@ collision/movement.
 - **`render_budget.ts` is the renderer's adaptive-budget core** (tier-driven frame
   budget + telemetry, keyed off `gfx.ts` quality bands). `renderer.ts` owns it,
   degrades against it, and pushes the resulting grass/foliage/vfx quality levels into
-  those subsystems. Consult it rather than reinventing a frame-level budget.
+  those subsystems. Consult it rather than reinventing a frame-level budget. Its `post`
+  level is the post chain's shed (`post_shed_core.ts` pure rungs, `post_shed.ts` painter
+  over the passes `post.ts` built): pass toggles and one-time target clears only, the
+  FXAA grade twin compiled under `post.initial-frame`, `?postshed=off|<0..1>` for a bench.
+  The shed's rungs are the reason the composer tiers now have a lever below the density
+  floors; when a chain sheds its full-frame passes, `post_plan_core.ts`'s region contract
+  is where dynamic resolution could re-open for it (not done).

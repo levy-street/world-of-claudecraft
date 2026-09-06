@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { GFX_BUCKET_BANDS, GFX_BUDGETS } from '../src/render/gfx';
-import { RenderBudgetGovernor, type RenderBudgetSample } from '../src/render/render_budget';
+import {
+  RenderBudgetGovernor,
+  type RenderBudgetSample,
+  renderBudgetShaderPrewarmLevels,
+} from '../src/render/render_budget';
 
 function sample(overrides: Partial<RenderBudgetSample> = {}): RenderBudgetSample {
   return {
@@ -48,6 +52,7 @@ describe('render budget governor', () => {
       lighting: 1,
       resolution: 1,
       detail: 1,
+      post: 1,
     });
   });
 
@@ -167,6 +172,7 @@ describe('render budget governor', () => {
       lighting: 0.68,
       resolution: 1,
       detail: 1,
+      post: 1,
     });
   });
 
@@ -205,6 +211,7 @@ describe('render budget governor', () => {
       lighting: 0.68,
       resolution: 1,
       detail: 1,
+      post: 1,
     });
   });
 
@@ -301,6 +308,7 @@ describe('render budget governor', () => {
       lighting: 0.68,
       resolution: 1,
       detail: 1,
+      post: 1,
     });
   });
 
@@ -341,6 +349,7 @@ describe('render budget governor', () => {
       lighting: 0.78,
       resolution: 1,
       detail: 1,
+      post: 1,
     });
   });
 
@@ -372,6 +381,7 @@ describe('render budget governor', () => {
       lighting: 0.9,
       resolution: 1,
       detail: 1,
+      post: 1,
     });
   });
 
@@ -667,5 +677,226 @@ describe('render budget governor', () => {
       expect(state.mode).toBe('disabled');
       expect(state.levels.detail).toBe(0.32);
     });
+  });
+});
+
+describe('render budget governor: the post shed level', () => {
+  const FULL_CHAIN = { smaa: true, bloom: true, ao: true } as const;
+  // Over every composer tier's drop line on frame cost alone (no submit
+  // stall, whose hold would outlive the calm phase below).
+  const heavy = () => sample({ dt: 0.5, frameMs: 90, totalMs: 90, submitMs: 12 });
+  const calm = () => sample({ dt: 0.5, frameMs: 5, totalMs: 5, submitMs: 2 });
+
+  function governorFor(tier: 'low' | 'medium' | 'high' | 'ultra' | 'insane', extra = {}) {
+    const governor = new RenderBudgetGovernor({
+      tier,
+      budget: GFX_BUDGETS[tier],
+      enabled: true,
+      postShed: FULL_CHAIN,
+      ...extra,
+    });
+    governor.reset(1, 0.65, 1);
+    governor.update(sample({ dt: 1 }));
+    return governor;
+  }
+
+  it('starts every tier at 1, the full chain', () => {
+    for (const tier of ['low', 'medium', 'high', 'ultra', 'insane'] as const) {
+      expect(governorFor(tier).state().levels.post).toBe(1);
+    }
+  });
+
+  it('sheds ONE rung per over-budget step, and only once the density buckets are floored', () => {
+    const governor = governorFor('ultra');
+    let state = governor.state();
+    const seen: number[] = [state.levels.post];
+    for (let i = 0; i < 60; i++) {
+      state = governor.update(heavy());
+      if (seen[seen.length - 1] !== state.levels.post) seen.push(state.levels.post);
+    }
+    expect(seen).toEqual([1, 0.75, 0.5, 0.25, 0]);
+    expect(state.levels.post).toBe(0);
+    expect(state.levels.grass).toBe(state.caps.minGrassLevel);
+    expect(state.levels.foliage).toBe(state.caps.minFoliageLevel);
+    expect(state.levels.lighting).toBe(state.caps.minLightingLevel);
+    expect(state.levels.vfx).toBe(state.caps.minVfxLevel);
+  });
+
+  it('walks the rungs in the pinned order: 1, 0.75, 0.5, 0.25, 0 and never skips one', () => {
+    const governor = governorFor('high');
+    let previous = 1;
+    for (let i = 0; i < 80; i++) {
+      const level = governor.update(heavy()).levels.post;
+      expect(previous - level).toBeLessThanOrEqual(0.25 + 1e-9);
+      expect(level).toBeLessThanOrEqual(previous);
+      previous = level;
+    }
+    expect(previous).toBe(0);
+  });
+
+  it('sheds a rung before the buckets are floored only under SEVERE frame pressure', () => {
+    // 1.33x the drop line but not urgent: the severe arm steps post and
+    // resolution alongside vfx from the first over-budget step, while the
+    // density buckets (keyed to draw pressure) still stand at baseline.
+    const governor = governorFor('ultra');
+    const severe = () => sample({ dt: 0.5, frameMs: 40, totalMs: 40, submitMs: 4 });
+    const state = governor.update(severe());
+    expect(state.levels.post).toBe(0.75);
+    expect(state.levels.grass).toBe(1);
+    expect(state.levels.foliage).toBe(1);
+    expect(state.levels.lighting).toBe(1);
+  });
+
+  it('under ordinary pressure holds the chain until every density bucket sits at its floor', () => {
+    // 1.1x the drop line on frame AND draw pressure, never urgent: the ladder
+    // walks foliage, grass, lighting and vfx to their floors first, and only
+    // then takes the first post rung.
+    const governor = governorFor('ultra');
+    const mild = () =>
+      sample({ dt: 0.5, frameMs: 33, totalMs: 33, submitMs: 4, calls: 960, triangles: 7_000_000 });
+    let state = governor.state();
+    let firstShedAt = -1;
+    for (let i = 0; i < 400; i++) {
+      state = governor.update(mild());
+      const bucketsFloored =
+        state.levels.grass <= state.caps.minGrassLevel + 0.001 &&
+        state.levels.foliage <= state.caps.minFoliageLevel + 0.001 &&
+        state.levels.lighting <= state.caps.minLightingLevel + 0.001 &&
+        state.levels.vfx <= state.caps.minVfxLevel + 0.001;
+      if (!bucketsFloored) expect(state.levels.post, `step ${i}`).toBe(1);
+      if (firstShedAt < 0 && state.levels.post < 1) firstShedAt = i;
+    }
+    expect(firstShedAt).toBeGreaterThan(0);
+    expect(state.levels.post).toBe(0);
+  });
+
+  it('restores one rung per sustained-calm step, after the density buckets and before resolution', () => {
+    const governor = governorFor('high');
+    let state = governor.state();
+    for (let i = 0; i < 60; i++) state = governor.update(heavy());
+    expect(state.levels.post).toBe(0);
+    const order: string[] = [];
+    let previous = state.levels;
+    for (let i = 0; i < 400; i++) {
+      state = governor.update(calm());
+      for (const key of ['grass', 'lighting', 'vfx', 'foliage', 'post', 'resolution'] as const) {
+        if (state.levels[key] > previous[key] && order[order.length - 1] !== key) order.push(key);
+      }
+      previous = { ...state.levels };
+    }
+    expect(state.levels.post).toBe(1);
+    // Phase A restores the four density buckets, then the post rungs, then
+    // render scale; the phase B climb above baseline follows resolution.
+    const firstPost = order.indexOf('post');
+    expect(firstPost).toBeGreaterThan(0);
+    expect([...order.slice(0, firstPost)].sort()).toEqual(['foliage', 'grass', 'lighting', 'vfx']);
+    expect(order[firstPost + 1]).toBe('resolution');
+  });
+
+  it('holds 1 on the grade-only tiers whose band is not governable, whatever the pressure', () => {
+    for (const tier of ['low', 'medium'] as const) {
+      const governor = governorFor(tier);
+      let state = governor.state();
+      for (let i = 0; i < 200; i++) state = governor.update(heavy());
+      expect(state.levels.post).toBe(1);
+    }
+  });
+
+  it('floors at the deepest rung the session OWN chain carries, beside the tier band', () => {
+    const smaaOnly = governorFor('high', { postShed: { smaa: true, bloom: false, ao: false } });
+    let state = smaaOnly.state();
+    for (let i = 0; i < 200; i++) state = smaaOnly.update(heavy());
+    expect(state.levels.post).toBe(0.75);
+
+    const bloomAndAo = governorFor('ultra', { postShed: { smaa: false, bloom: true, ao: true } });
+    state = bloomAndAo.state();
+    for (let i = 0; i < 200; i++) state = bloomAndAo.update(heavy());
+    expect(state.levels.post).toBe(0);
+
+    const empty = governorFor('ultra', { postShed: { smaa: false, bloom: false, ao: false } });
+    state = empty.state();
+    for (let i = 0; i < 200; i++) state = empty.update(heavy());
+    expect(state.levels.post).toBe(1);
+  });
+
+  it('a chain carrying only AO ladders 1 to 0 in ONE step: no cooldown is spent on a dead rung', () => {
+    const governor = governorFor('ultra', { postShed: { smaa: false, bloom: false, ao: true } });
+    const seen: number[] = [governor.state().levels.post];
+    let state = governor.state();
+    for (let i = 0; i < 60; i++) {
+      state = governor.update(heavy());
+      if (seen[seen.length - 1] !== state.levels.post) seen.push(state.levels.post);
+    }
+    expect(seen).toEqual([1, 0]);
+    for (let i = 0; i < 400; i++) state = governor.update(calm());
+    expect(state.levels.post).toBe(1);
+  });
+
+  it('a governor handed no chain at all holds 1: the shed is admitted only by the built pipeline', () => {
+    const governor = new RenderBudgetGovernor({
+      tier: 'ultra',
+      budget: GFX_BUDGETS.ultra,
+      enabled: true,
+    });
+    governor.reset(1, 0.65, 1);
+    let state = governor.update(sample({ dt: 1 }));
+    for (let i = 0; i < 100; i++) state = governor.update(heavy());
+    expect(state.levels.post).toBe(1);
+    // The renderer hands the chain over once the composer exists.
+    governor.setPostShedChain({ smaa: true, bloom: true, ao: true });
+    for (let i = 0; i < 60; i++) state = governor.update(heavy());
+    expect(state.levels.post).toBe(0);
+  });
+
+  it('the ?postshed=off kill switch (a null chain) pins the level at 1 on every tier', () => {
+    for (const tier of ['high', 'ultra', 'insane'] as const) {
+      const governor = governorFor(tier, { postShed: null });
+      let state = governor.state();
+      for (let i = 0; i < 200; i++) state = governor.update(heavy());
+      expect(state.levels.post).toBe(1);
+    }
+  });
+
+  it('the ?postshed=<level> pin holds the level exactly, governor on or off, under any pressure', () => {
+    const pinnedOn = governorFor('ultra', { pinnedPostLevel: 0.5 });
+    let state = pinnedOn.state();
+    expect(state.levels.post).toBe(0.5);
+    for (let i = 0; i < 200; i++) state = pinnedOn.update(heavy());
+    expect(state.levels.post).toBe(0.5);
+    for (let i = 0; i < 400; i++) state = pinnedOn.update(calm());
+    expect(state.levels.post).toBe(0.5);
+
+    const pinnedOff = new RenderBudgetGovernor({
+      tier: 'ultra',
+      budget: GFX_BUDGETS.ultra,
+      enabled: false,
+      postShed: FULL_CHAIN,
+      pinnedPostLevel: 0,
+    });
+    expect(pinnedOff.reset(1, 0.65, 1).levels.post).toBe(0);
+    expect(pinnedOff.update(heavy()).levels.post).toBe(0);
+  });
+
+  it('a disabled governor without a pin holds 1', () => {
+    const governor = new RenderBudgetGovernor({
+      tier: 'ultra',
+      budget: GFX_BUDGETS.ultra,
+      enabled: false,
+      postShed: FULL_CHAIN,
+    });
+    governor.reset(1, 0.65, 1);
+    let state = governor.state();
+    for (let i = 0; i < 100; i++) state = governor.update(heavy());
+    expect(state.levels.post).toBe(1);
+  });
+
+  it('the shader prewarm walk leaves the level where it stands: no rung selects a scene program', () => {
+    const governor = governorFor('ultra');
+    let state = governor.state();
+    for (let i = 0; i < 20; i++) state = governor.update(heavy());
+    expect(state.levels.post).toBeLessThan(1);
+    for (const step of renderBudgetShaderPrewarmLevels(state)) {
+      expect(step.post).toBe(state.levels.post);
+    }
   });
 });

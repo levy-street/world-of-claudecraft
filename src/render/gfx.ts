@@ -88,6 +88,7 @@ export const GFX_BUCKET_IDS = [
   'worldStreaming',
   'ui',
   'detail',
+  'post',
 ] as const;
 
 export type GfxBucketId = (typeof GFX_BUCKET_IDS)[number];
@@ -555,6 +556,16 @@ export const GFX_BUCKET_BANDS: Record<GfxTier, GfxBucketBands> = {
       cost: 'gpu',
       governable: false,
     },
+    // Post shed (post_shed_core.ts): this tier builds no sheddable post pass
+    // (no SMAA, bloom or AO), so the level has no rung to walk.
+    post: {
+      min: 1.0,
+      baseline: 1.0,
+      max: 1.0,
+      roi: 0,
+      cost: 'gpu',
+      governable: false,
+    },
   },
   medium: {
     resolution: {
@@ -654,6 +665,16 @@ export const GFX_BUCKET_BANDS: Record<GfxTier, GfxBucketBands> = {
       governable: false,
     },
     detail: {
+      min: 1.0,
+      baseline: 1.0,
+      max: 1.0,
+      roi: 0,
+      cost: 'gpu',
+      governable: false,
+    },
+    // Post shed (post_shed_core.ts): this tier builds no sheddable post pass
+    // (no SMAA, bloom or AO), so the level has no rung to walk.
+    post: {
       min: 1.0,
       baseline: 1.0,
       max: 1.0,
@@ -772,6 +793,20 @@ export const GFX_BUCKET_BANDS: Record<GfxTier, GfxBucketBands> = {
       cost: 'gpu',
       governable: false,
     },
+    // Post shed (post_shed_core.ts): the composer chain's four rungs (SMAA to
+    // the fused FXAA grade, bloom tail mips, bloom off, AO passthrough). The
+    // band floor is the tier's; the governor ladders only over the rungs the
+    // session's OWN built chain carries (RenderBudgetGovernor.setPostShedChain,
+    // fed from PostPipeline.shedChain), so an Advanced mix with bloom or AO
+    // dialed off never walks a rung that can change nothing.
+    post: {
+      min: 0,
+      baseline: 1.0,
+      max: 1.0,
+      roi: 0.9,
+      cost: 'gpu',
+      governable: true,
+    },
   },
   ultra: {
     resolution: {
@@ -875,6 +910,20 @@ export const GFX_BUCKET_BANDS: Record<GfxTier, GfxBucketBands> = {
       baseline: 1.0,
       max: 1.0,
       roi: 0.92,
+      cost: 'gpu',
+      governable: true,
+    },
+    // Post shed (post_shed_core.ts): the composer chain's four rungs (SMAA to
+    // the fused FXAA grade, bloom tail mips, bloom off, AO passthrough). The
+    // band floor is the tier's; the governor ladders only over the rungs the
+    // session's OWN built chain carries (RenderBudgetGovernor.setPostShedChain,
+    // fed from PostPipeline.shedChain), so an Advanced mix with bloom or AO
+    // dialed off never walks a rung that can change nothing.
+    post: {
+      min: 0,
+      baseline: 1.0,
+      max: 1.0,
+      roi: 0.9,
       cost: 'gpu',
       governable: true,
     },
@@ -988,6 +1037,20 @@ export const GFX_BUCKET_BANDS: Record<GfxTier, GfxBucketBands> = {
       cost: 'gpu',
       governable: true,
     },
+    // Post shed (post_shed_core.ts): the composer chain's four rungs (SMAA to
+    // the fused FXAA grade, bloom tail mips, bloom off, AO passthrough). The
+    // band floor is the tier's; the governor ladders only over the rungs the
+    // session's OWN built chain carries (RenderBudgetGovernor.setPostShedChain,
+    // fed from PostPipeline.shedChain), so an Advanced mix with bloom or AO
+    // dialed off never walks a rung that can change nothing.
+    post: {
+      min: 0,
+      baseline: 1.0,
+      max: 1.0,
+      roi: 0.9,
+      cost: 'gpu',
+      governable: true,
+    },
   },
 };
 
@@ -1006,6 +1069,7 @@ function bucketBaselines(bands: GfxBucketBands): GfxBucketLevels {
     worldStreaming: bands.worldStreaming.baseline,
     ui: bands.ui.baseline,
     detail: bands.detail.baseline,
+    post: bands.post.baseline,
   };
 }
 

@@ -44,9 +44,16 @@ interface BloomPassInternals {
  */
 export class PreparedBloomPass extends UnrealBloomPass {
   readonly bloomTexture: Texture;
+  /** Blur mips rendered per frame, the post shed's `bloom-mips` rung
+   *  (post_shed_core.ts). The chain is sequential, so only the tail can be
+   *  skipped; post_shed.ts clears the skipped vertical targets once so the
+   *  composite (which still reads all five) adds nothing from them. Written
+   *  by post_shed.ts only; defaults to every mip. */
+  activeMips: number;
 
   constructor(resolution: Vector2, strength: number, radius: number, threshold: number) {
     super(resolution, strength, radius, threshold);
+    this.activeMips = this.nMips;
     // Keep the high-pass output distinct from v0. Aliasing them adds a write,
     // read, write transition that can force synchronization on ANGLE and Metal.
     this.bloomTexture = this.renderTargetsHorizontal[0].texture;
@@ -110,7 +117,8 @@ export class PreparedBloomPass extends UnrealBloomPass {
     fsQuad.render(renderer);
 
     let inputRenderTarget = this.renderTargetBright;
-    for (let mip = 0; mip < this.nMips; mip++) {
+    const mips = Math.min(this.nMips, Math.max(0, this.activeMips));
+    for (let mip = 0; mip < mips; mip++) {
       const material = this.separableBlurMaterials[mip];
       fsQuad.material = material;
       material.uniforms.colorTexture.value = inputRenderTarget.texture;
