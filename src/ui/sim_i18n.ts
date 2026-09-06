@@ -455,6 +455,9 @@ const baseEnTable = {
   'log.questItemRecovered': 'You recover a quest item you were missing.',
   'loot.rollWin': '{winner} wins {item} ({roll})',
   'loot.rollWinnerOffline': '{winner} was offline; {item} returned to the corpse.',
+  // The awarded-loot hold (src/sim/loot/awarded_loot_hold.ts): a full-bags
+  // winner's award stays on the corpse as a winner-only slot.
+  'loot.awardHeldOnCorpse': 'Your bags are full; {item} is waiting on the corpse for you.',
   'loot.rollNeed': 'Need Roll - {roll} for {item} by {name}',
   'loot.rollGreed': 'Greed Roll - {roll} for {item} by {name}',
   'loot.marketSellerBought':
@@ -4627,6 +4630,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.nothingToConsume': '没有可吞噬的效果。',
     'error.nothingToDevour': '没有可吞噬的法术效果。',
     'loot.rollWinnerOffline': '{winner}处于离线状态；{item}已放回尸体。',
+    'loot.awardHeldOnCorpse': '你的背包已满；{item}正在尸体上等你来取。',
     'log.channelInterrupted': '{mechanic}被打断了！',
     'error.merchantUnavailable': '该商人无法提供服务。',
     'error.notForSale': '该物品不出售。',
@@ -5094,6 +5098,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.nothingToConsume': '沒有可吞噬的效果。',
     'error.nothingToDevour': '沒有可吞噬的法術效果。',
     'loot.rollWinnerOffline': '{winner}處於離線狀態；{item}已放回屍體。',
+    'loot.awardHeldOnCorpse': '你的背包已滿；{item}正在屍體上等你來取。',
     'log.channelInterrupted': '{mechanic}被打斷了！',
     'error.merchantUnavailable': '那名商人無法使用。',
     'error.notForSale': '那件物品非賣品。',
@@ -5569,6 +5574,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.nothingToConsume': '소모할 효과가 없습니다.',
     'error.nothingToDevour': '삼킬 효과가 없습니다.',
     'loot.rollWinnerOffline': '{winner} 님이 오프라인 상태라 {item} 아이템이 시체로 돌아갔습니다.',
+    'loot.awardHeldOnCorpse':
+      '가방이 가득 찼습니다. {item} 아이템이 시체에서 당신을 기다리고 있습니다.',
     'log.channelInterrupted': '{mechanic} 시전이 중단되었습니다!',
     'error.merchantUnavailable': '그 상인은 지금 이용할 수 없습니다.',
     'error.notForSale': '그 아이템은 판매하지 않습니다.',
@@ -6058,6 +6065,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.nothingToConsume': '消費できる効果がありません。',
     'error.nothingToDevour': '喰らう効果がありません。',
     'loot.rollWinnerOffline': '{winner}がオフラインだったため、{item}は死体に戻されました。',
+    'loot.awardHeldOnCorpse': 'バッグがいっぱいです。{item}は死体の上であなたを待っています。',
     'log.channelInterrupted': '{mechanic}が中断されました！',
     'error.merchantUnavailable': 'その商人は利用できません。',
     'error.notForSale': 'そのアイテムは売り物ではありません。',
@@ -7032,6 +7040,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.nothingToConsume': 'Поглощать нечего.',
     'error.nothingToDevour': 'Пожирать нечего.',
     'loot.rollWinnerOffline': '{winner} не в сети; предмет {item} возвращён к трупу.',
+    'loot.awardHeldOnCorpse': 'Ваши сумки полны; предмет {item} ждёт вас на трупе.',
     'log.channelInterrupted': 'Действие «{mechanic}» прервано!',
     'error.merchantUnavailable': 'Этот торговец недоступен.',
     'error.notForSale': 'Этот предмет не продаётся.',
@@ -12305,6 +12314,10 @@ const RULES: Rule[] = [
   {
     re: /^(.+) was offline; (.+) returned to the corpse\.$/,
     build: (m) => tSim('loot.rollWinnerOffline', { winner: m[1], item: m[2] }),
+  },
+  {
+    re: /^Your bags are full; (.+) is waiting on the corpse for you\.$/,
+    build: (m) => tSim('loot.awardHeldOnCorpse', { item: m[1] }),
   },
   {
     re: /^(.+) bought your (.+) for (.+) [—-] collect (.+) from the Merchant\.$/,
