@@ -360,8 +360,18 @@ interface AttributionTargetFixture {
 // moved with the shipped renderer tree. No capture was retaken.
 // Re-minted for the release/v0.42.0 reconcile with the Realm Builder and
 // store-mount renderer leaves. No capture was retaken.
+// Re-minted for the post-chain pixel budget: the renderer's coalesced
+// viewport-resize pass moves the runtimeRender.renderer leaf. No capture
+// was retaken.
+// Re-minted again for the review answers on the same branch (the viewport
+// poll now books the coalesced pass). No capture was retaken.
+// Re-minted for the coalesced-resize flush point (the frame drains the gate
+// before it draws). No capture was retaken.
+// Re-minted for the PR #3834 merge after PR #3833: runtimeRender.renderer
+// now carries pooled VFX material cleanup beside the coalesced viewport-resize
+// pass, so the composite matches neither parent. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'e6771b3099603671f4772f4a8650cd7f0f5a2322a08f5f22a9e8ccca69dfeaeb';
+  '66b3cee9b14ac3e21b02bd451ab925f0baf9596b6ebadbe8169bc2b38982819c';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

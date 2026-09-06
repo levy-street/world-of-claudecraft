@@ -629,6 +629,7 @@ import {
   disposeRendererPrewarmAndGroundFx,
   disposeRendererWorldViews,
 } from './renderer_resource_lifecycle';
+import { createResizeCoalescer } from './resize_coalesce_core';
 import { createRevealCompileHost, REVEAL_GATE_PREP_KIND } from './reveal_compile_host';
 import { createRevealGate } from './reveal_gate';
 import type { RevealGateCore } from './reveal_gate_core';
@@ -1959,9 +1960,8 @@ export class Renderer {
     if (this.drawStats) this.drawStats = createLogicalFrameDrawStats(this.webgl.info);
     this.vfx?.onContextRestored();
   };
-  private readonly onViewportResize = (): void => {
-    if (!this.shutdownStarted) this.resizeViewport();
-  };
+  private readonly resizeGate = createResizeCoalescer(() => this.resizeViewport());
+  private readonly onViewportResize = (): void => this.resizeGate.request();
   private readonly onOrientationChange = (): void => {
     this.onViewportResize();
     this.resizeTimers.push(window.setTimeout(this.onViewportResize, 250));
@@ -3165,9 +3165,7 @@ export class Renderer {
     // Moving the window to a display with a different scale factor fires no
     // resize event of its own when the CSS viewport size is unchanged, so the
     // backing store would keep the old ratio until something else resized.
-    this.dprUnwatch = watchDevicePixelRatio(() => {
-      if (!this.shutdownStarted) this.resizeViewport();
-    });
+    this.dprUnwatch = watchDevicePixelRatio(this.onViewportResize);
     this.unsubscribeCharacterAssetReady = onCharacterAssetReady(this.onCharacterAssetReady);
     } catch (error) {
       this.beginRendererShutdown();
@@ -3406,6 +3404,7 @@ export class Renderer {
   }
 
   private resizeViewport(measured = this.measureViewport()): void {
+    if (this.shutdownStarted) return;
     this.viewport = measured;
     this.camera.aspect = this.viewport.width / this.viewport.height;
     this.camera.updateProjectionMatrix();
@@ -3438,12 +3437,12 @@ export class Renderer {
 
   /**
    * A display change the page cannot observe on its own (the window moved to
-   * another monitor, or its scale factor changed). resizeViewport re-measures
-   * and applyResolution re-reads window.devicePixelRatio live, so this is the
-   * whole fix.
+   * another monitor, or its scale factor changed). The coalesced pass re-reads
+   * window.devicePixelRatio live, and the new ratio moves the drawing-buffer
+   * extent, so this reallocates even though the CSS size never changed.
    */
   noteDisplayChanged(): void {
-    if (!this.shutdownStarted) this.resizeViewport();
+    this.onViewportResize();
   }
 
   // Allocate at the manual resolution ceiling. Automatic changes on the supported
@@ -3456,10 +3455,10 @@ export class Renderer {
       this.effectiveRenderScale,
     );
     const ratio = basePixelRatio * allocationScale;
-    this.webgl.setPixelRatio(ratio);
-    this.webgl.setSize(this.viewport.width, this.viewport.height, false);
-    if (this.post) {
-      this.post.setSize(this.viewport.width, this.viewport.height, ratio);
+    if (this.resizeGate.shouldAllocate(this.viewport.width, this.viewport.height, ratio)) {
+      this.webgl.setPixelRatio(ratio);
+      this.webgl.setSize(this.viewport.width, this.viewport.height, false);
+      this.post?.setSize(this.viewport.width, this.viewport.height, ratio);
     }
     this.applyRenderRegion();
   }
@@ -10170,6 +10169,7 @@ export class Renderer {
   ): void {
     if (this.shutdownStarted) return;
     const totalStart = performance.now();
+    this.resizeGate.flush(); // before anything draws: see resize_coalesce_core.ts
     // The hitch sample's start reading, before any view creation, then a new
     // ledger frame: what the ledger holds here is the previous callback plus
     // the gap before this one, the span this callback's dt measures.
@@ -10215,7 +10215,7 @@ export class Renderer {
       this.viewportPollTimer = 0;
       const measured = this.measureViewport();
       if (measured.width !== this.viewport.width || measured.height !== this.viewport.height) {
-        this.resizeViewport(measured);
+        this.onViewportResize();
       }
     }
     this.time += dt;

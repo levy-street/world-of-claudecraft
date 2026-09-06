@@ -1046,10 +1046,20 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // moved with the shipped renderer tree. No capture was retaken.
 // Re-minted for the release/v0.42.0 reconcile with the Realm Builder and
 // store-mount renderer leaves. No capture was retaken.
+// Re-minted for the post-chain pixel budget: the renderer's coalesced
+// viewport-resize pass moves the runtimeRender.renderer leaf. No capture
+// was retaken.
+// Re-minted again for the review answers on the same branch (the viewport
+// poll now books the coalesced pass). No capture was retaken.
+// Re-minted for the coalesced-resize flush point (the frame drains the gate
+// before it draws). No capture was retaken.
+// Re-minted for the PR #3834 merge after PR #3833: runtimeRender.renderer
+// now carries pooled VFX material cleanup beside the coalesced viewport-resize
+// pass, so the composite matches neither parent. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '9002f01645226993b4a9ea6aa3160750142817bdb9cbdf3d236536337ce816b7';
+  'dd0060b00a3b7dc0b7aed5aeae4243174a5291ca79ddddddecf0cdc59937194f';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'e6771b3099603671f4772f4a8650cd7f0f5a2322a08f5f22a9e8ccca69dfeaeb';
+  '66b3cee9b14ac3e21b02bd451ab925f0baf9596b6ebadbe8169bc2b38982819c';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2212,7 +2222,13 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('e18babc5ea7fde2e9f73f2c48b854a330d5ef74984df654d4ba61cf6b71a6f94');
+      // Re-minted for the Drakelands entrance merge into the raid branch: the
+      // composite first, then this seal. No capture was retaken.
+      // Re-minted for the post-chain pixel budget: the composite first, then
+      // this seal. No capture was retaken.
+      // Re-minted for the PR #3834 merge after PR #3833: the composite first,
+      // then this seal. No capture was retaken.
+    ).toBe('3b4f7490a00174f0bd40d82297371cbb6171da8bc4b269adcb5f85ef35110716');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

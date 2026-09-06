@@ -24,10 +24,10 @@ vi.mock('../src/render/render_dev_flags', () => ({
   renderLayerDisabled: (name: string) => disabledLayers.has(name),
 }));
 
-function rendererStub(): THREE.WebGLRenderer {
+function rendererStub(width = 1280, height = 720): THREE.WebGLRenderer {
   return {
     capabilities: { isWebGL2: true },
-    getDrawingBufferSize: (out: THREE.Vector2) => out.set(1280, 720),
+    getDrawingBufferSize: (out: THREE.Vector2) => out.set(width, height),
     getPixelRatio: () => 1,
   } as unknown as THREE.WebGLRenderer;
 }
@@ -85,7 +85,7 @@ describe('live post pipeline', () => {
       // The ability-VFX screen-fx pass (ripple / flash) sits between the grade
       // and the tail SMAA, so SMAA keeps anti-aliasing the final image.
       'ShaderPass',
-      'SMAAPass',
+      'ByteTargetSMAAPass',
     ]);
     expect(post.grade.fxaa).toBe(false);
     expect(post.composer.renderTarget1).not.toBe(post.composer.renderTarget2);
@@ -254,6 +254,129 @@ describe('live post pipeline', () => {
 
     expect(post.grade.fxaa).toBe(false);
     expect(post.supportsDynamicResolution).toBe(true);
+  });
+
+  it('gives SMAA 8-bit edges and weights, the reference storage', async () => {
+    vi.stubGlobal('Image', class {});
+    const { buildComposer } = await import('../src/render/post');
+    const { smaaIntermediateTargets } = await import('../src/render/post_smaa');
+    const post = buildComposer(
+      rendererStub(),
+      new THREE.Scene(),
+      new THREE.PerspectiveCamera(),
+      1280,
+      720,
+    );
+    const smaa = post.composer.passes.at(-1) as unknown as Parameters<
+      typeof smaaIntermediateTargets
+    >[0];
+    const targets = smaaIntermediateTargets(smaa);
+    expect(targets).toHaveLength(2);
+    // Both are [0,1] masks the reference implementation stores 8-bit; three
+    // ships them HalfFloat, which is twice the bytes for precision no shader
+    // in the SMAA chain reads.
+    for (const target of targets) expect(target.texture.type).toBe(THREE.UnsignedByteType);
+  });
+
+  it('keeps ultra AO full-res at 1080p and drops it to half-res from 1440p up', async () => {
+    vi.stubGlobal('Image', class {});
+    const { buildComposer } = await import('../src/render/post');
+    const { AO_FULL_RES_MAX_PIXELS } = await import('../src/render/post_pixel_budget_core');
+    expect(1920 * 1080).toBeLessThanOrEqual(AO_FULL_RES_MAX_PIXELS);
+    expect(2560 * 1440).toBeGreaterThan(AO_FULL_RES_MAX_PIXELS);
+    expect(3840 * 2160).toBeGreaterThan(AO_FULL_RES_MAX_PIXELS);
+
+    const readHalfRes = (width: number, height: number): boolean => {
+      const post = buildComposer(
+        rendererStub(width, height),
+        new THREE.Scene(),
+        new THREE.PerspectiveCamera(),
+        width,
+        height,
+      );
+      const ao = post.ao as unknown as { configuration: { halfRes: boolean; aoSamples: number } };
+      return ao.configuration.halfRes;
+    };
+
+    // The tier request is unchanged in both cases; only the resolved value moves.
+    expect(gfxSettings.aoFullRes).toBe(true);
+    expect(readHalfRes(1920, 1080)).toBe(false);
+    expect(readHalfRes(2560, 1440)).toBe(true);
+    expect(readHalfRes(3440, 1440)).toBe(true);
+    expect(readHalfRes(3840, 2160)).toBe(true);
+    expect(gfxSettings.aoFullRes).toBe(true);
+  });
+
+  it('leaves the high tier half-res whatever the panel is', async () => {
+    gfxSettings.aoFullRes = false;
+    vi.stubGlobal('Image', class {});
+    const { buildComposer } = await import('../src/render/post');
+    for (const [width, height] of [
+      [1920, 1080],
+      [3840, 2160],
+    ]) {
+      const post = buildComposer(
+        rendererStub(width, height),
+        new THREE.Scene(),
+        new THREE.PerspectiveCamera(),
+        width,
+        height,
+      );
+      const ao = post.ao as unknown as { configuration: { halfRes: boolean } };
+      expect(ao.configuration.halfRes).toBe(true);
+    }
+  });
+
+  it('re-resolves the AO arm when a resize crosses the pixel budget', async () => {
+    vi.stubGlobal('Image', class {});
+    const { buildComposer } = await import('../src/render/post');
+    const { postPipelinePlan } = await import('../src/render/post_plan_core');
+    const planInput = {
+      gradeOnly: false,
+      ao: true,
+      aoFullRes: true,
+      bloom: true,
+      smaa: true,
+      fxaa: false,
+      n8aoDisabled: false,
+      smaaDisabled: false,
+      fxaaDisabled: false,
+      isWebGL2: true,
+      msaaSamples: 0,
+    };
+    const post = buildComposer(
+      rendererStub(1920, 1080),
+      new THREE.Scene(),
+      new THREE.PerspectiveCamera(),
+      1920,
+      1080,
+    );
+    const ao = post.ao as unknown as { configuration: { halfRes: boolean } };
+    expect(ao.configuration.halfRes).toBe(false);
+
+    post.setSize(2560, 1440, 1);
+    expect(ao.configuration.halfRes).toBe(true);
+
+    // The live chain after the flip must match the plan for the arm it flipped
+    // to, or the plan stops describing the storage it claims to describe.
+    const halfResPlan = postPipelinePlan({ ...planInput, aoFullRes: false });
+    const aoInternals = post.ao as unknown as {
+      depthDownsampleTarget?: THREE.WebGLRenderTarget | null;
+      writeTargetInternal: THREE.WebGLRenderTarget;
+    };
+    expect(halfResPlan.renderTargets.map((target) => target.id)).toContain('n8ao-depth-downsample');
+    expect(aoInternals.depthDownsampleTarget).toBeTruthy();
+    expect(halfResPlan.renderTargets.find((target) => target.id === 'n8ao-ao-a')?.scale).toBe(0.5);
+    expect(aoInternals.writeTargetInternal.width).toBe(2560 / 2);
+    expect(aoInternals.writeTargetInternal.height).toBe(1440 / 2);
+
+    post.setSize(1920, 1080, 1);
+    expect(ao.configuration.halfRes).toBe(false);
+
+    // The pixel count, not the CSS size, is what the budget reads: a 1080p
+    // window on a 2x display is a 4K drawing buffer, well past the cut.
+    post.setSize(1920, 1080, 2);
+    expect(ao.configuration.halfRes).toBe(true);
   });
 
   it('keeps high half-resolution AO depth available to every AO stage', async () => {
