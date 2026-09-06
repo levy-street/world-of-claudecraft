@@ -23,6 +23,8 @@ const settings = {
   surfaceDetail: true,
   surfaceDetailTaps: 4,
   surfaceDetailClampK: 1,
+  anisotropy: 8,
+  normalAnisotropy: 4,
   terrainRelief: 3,
   bladeCarpetRadius: 34,
   cliffScree: true,
@@ -56,6 +58,8 @@ describe('gfx override parsing', () => {
           'surfaceDetail:0',
           'surfaceDetailTaps:0',
           'surfaceDetailClampK:0.65',
+          'anisotropy:2',
+          'normalAnisotropy:1',
           'terrainRelief:2',
           'bladeCarpetRadius:24',
           'cliffScree:0',
@@ -85,6 +89,8 @@ describe('gfx override parsing', () => {
       surfaceDetail: false,
       surfaceDetailTaps: 0,
       surfaceDetailClampK: 0.65,
+      anisotropy: 2,
+      normalAnisotropy: 1,
       terrainRelief: 2,
       bladeCarpetRadius: 24,
       cliffScree: false,
@@ -171,13 +177,17 @@ describe('gfx override application', () => {
     // this one moves a VALUE too: medium and the Advanced grade-only mix are
     // the profiles the new AA policy grants it to, and low/high/ultra/insane
     // move only by the serialized key name.
+    // Regenerated across the board again for the anisotropy/normalAnisotropy
+    // ladder (texture_anisotropy.ts reads it; the per-tier values are pinned
+    // by tests/gfx.test.ts). Every profile moves by a VALUE here, since the
+    // ladder differs on every rung of the tier ladder.
     expect(hashes).toEqual({
-      low: '49e537a97a367badeb8f9cbeb408bbb0832e886e164349eb682a0b3a128f2dcb',
-      medium: '7f724620474ca3dc4f4ffc18653a5b07ed02de35984fb65375bbd38b7d79644e',
-      high: 'eb82ae69bed246784b6db51df29edfcb928931d8174ed633c2a3eda5706bb9d1',
-      ultra: '08c271575220f6f332b4730a04a9e77be13ee1b9624eda37056f8d2660ea6c0f',
-      insane: 'f3399ea1e9439ea52e873be3decb7dc8ccbb77f04dcb28db2da2359c885d5ca0',
-      advanced: '5674b855481ede62fb55fbe0f8074d991227487bc152f6f0e8676ff94b0947e6',
+      low: '0f0c7d258fad67490c6e9d592dba57a5d8868d71862d3f0df0f37ea6f7b05642',
+      medium: '2e70a89b69d8c103b97f8dd9d66ae470937d28d7b9a4196385880e4e10bcf08b',
+      high: '9862dec237851116a4bf4514410f87d84a8916b4393e33b428390cb89a60dd74',
+      ultra: 'cc96b8b4a80bd2df44db2ba5b7757c667c19afbb60ffdc624c7fe23b46d384cb',
+      insane: '44f9e0177cc7cd979163fd0375c0a2c16c61d50af8e4c3df2eb9289464f49309',
+      advanced: '100752b52440b59c9c35ff11a3d356fc9d4798215a9eea5fe5a540da1034935c',
     });
   });
 

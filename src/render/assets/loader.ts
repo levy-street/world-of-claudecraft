@@ -10,6 +10,7 @@ import * as THREE from 'three';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { type GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { GFX } from '../gfx';
+import { applyTextureAnisotropy } from '../texture_anisotropy';
 import { classifyGltfKtx2Textures, dismissKtx2Source } from './ktx2_mip_release';
 import { ktx2Loader } from './ktx2_support';
 import { MAX_LOAD_ATTEMPTS, retryDelayMs } from './load_retry';
@@ -100,24 +101,23 @@ function loader(): GLTFLoader {
   return gltfLoader;
 }
 
-// Central GLB texture polish: 4-tap anisotropic filtering on every color and
-// normal map sharpens ground-adjacent props and walls at oblique camera angles
-// for free (mip selection alone smears them). Runs once per parsed GLB, right
-// after parse and before first upload, so no texture ever needs a re-upload;
-// three clamps the value to the device's max anisotropy at bind time. Terrain
-// splats keep their own higher-tap setting (terrain.ts loads via loadTexture,
-// not through here).
-const GLB_TEXTURE_ANISOTROPY = 4;
-
+// Central GLB texture polish: anisotropic filtering on every color and normal
+// map sharpens ground-adjacent props and walls at oblique camera angles (mip
+// selection alone smears them). The tap count is the tier budget, not a
+// constant: it is bandwidth on the integrated GPUs that carry the low tiers.
+// Runs once per parsed GLB, right after parse and before first upload, so no
+// texture ever needs a re-upload. This lane can run BEFORE initGfxTier resolves
+// the tier, which is why the stamp goes through texture_anisotropy.ts (it
+// re-applies the resolved budget before the world renderer's first upload).
 function polishGltfTextures(gltf: GLTF): void {
   // Fail soft on partial GLTF shapes (test doubles, exotic parses): the polish
   // is cosmetic and must never sink an otherwise successful load.
   if (typeof gltf.scene?.traverse !== 'function') return;
   const seen = new Set<THREE.Texture>();
-  const lift = (tex: THREE.Texture | null): void => {
+  const lift = (tex: THREE.Texture | null, map: 'colour' | 'normal'): void => {
     if (!tex || seen.has(tex)) return;
     seen.add(tex);
-    tex.anisotropy = Math.max(tex.anisotropy, GLB_TEXTURE_ANISOTROPY);
+    applyTextureAnisotropy(tex, map);
   };
   gltf.scene.traverse((o) => {
     const mesh = o as THREE.Mesh;
@@ -125,8 +125,8 @@ function polishGltfTextures(gltf: GLTF): void {
     const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
     for (const m of mats) {
       const std = m as THREE.MeshStandardMaterial;
-      lift(std.map ?? null);
-      lift(std.normalMap ?? null);
+      lift(std.map ?? null, 'colour');
+      lift(std.normalMap ?? null, 'normal');
     }
   });
 }
