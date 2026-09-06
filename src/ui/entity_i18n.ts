@@ -263,7 +263,13 @@ function interpolateSource(source: string, values?: InterpolationValues): string
     .replace(/\$p/g, String(values.hostilePvpDuration ?? '$p'))
     .replace(/\$g/g, String(values.groundDuration ?? '$g'))
     .replace(/\$s/g, String(values.selfCooldownRecovery ?? '$s'))
-    .replace(/\$a/g, String(values.allyCooldownRecovery ?? '$a'));
+    .replace(/\$a/g, String(values.allyCooldownRecovery ?? '$a'))
+    // Temporal Echo's resolved base, area, and offensive-driver conversion
+    // percentages. The x/y/z names keep the legacy sim-source placeholder
+    // alphabet compact; translated catalogs use the descriptive brace names.
+    .replace(/\$x/g, String(values.echoSinglePct ?? '$x'))
+    .replace(/\$y/g, String(values.echoAreaPct ?? '$y'))
+    .replace(/\$z/g, String(values.echoDriverPct ?? '$z'));
   return legacy.replace(/\{([A-Za-z0-9_]+)\}/g, (match, name: string) => {
     const value = values[name];
     return value === undefined ? match : String(value);

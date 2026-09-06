@@ -2655,10 +2655,10 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Przesuwa cel o chwilę poza teraźniejszość, tworząc temporalną powłokę pochłaniającą {damage} obrażeń przez 10 sek., po czym oś czasu powraca do normy.',
   'entities.abilities.temporal_barrier.name': 'Czasowa bariera',
   'entities.abilities.temporal_cascade.description':
-    'Wysyła echo kaskadą przez twoją grupę: cel i do czterech najbliższych sojuszników zostają natychmiast uleczeni i naznaczeni przez {duration} sek., przekierowując część zadawanych przez ciebie obrażeń Arkanów z powrotem przez ich echa, aby ich leczyć. (Chronomancja)',
+    'Wysyła echo kaskadą przez twoją grupę: cel i do czterech najbliższych sojuszników zostają natychmiast uleczeni i naznaczeni przez {duration} sek., przekierowując część zadawanych przez ciebie obrażeń Arkanów z powrotem przez ich echa, aby ich leczyć. Przypływ Eteru i Eteryczne Pociski tworzą z każdego grupowego Echa równą rezerwę leczenia, rozdzielaną według brakującego zdrowia między naznaczonych sojuszników poniżej 60% zdrowia. (Chronomancja)',
   'entities.abilities.temporal_cascade.name': 'Czasowa kaskada',
   'entities.abilities.temporal_echo.description':
-    'Naznacza sojusznika echem zdrowszej chwili, natychmiast lecząc {damage} punktów zdrowia. Przez {duration} sek. część zadawanych przez ciebie obrażeń Arkanów jest przekierowywana przez echo, aby go leczyć.',
+    'Naznacza sojusznika echem zdrowszej chwili, natychmiast lecząc {damage} punktów zdrowia. Przez {duration} sek. leczy go {echoSinglePct}% twoich pozostałych obrażeń Arkanów przeciw jednemu celowi oraz {echoAreaPct}% obszarowych obrażeń Arkanów. Przypływ Eteru i Eteryczne Pociski leczą go zamiast tego za {echoDriverPct}% zadanych obrażeń.',
   'entities.abilities.temporal_echo.name': 'Czasowe echo',
   'entities.abilities.temporal_hourglass.description':
     'Umieszcza temporalną klepsydrę w wybranym miejscu. Pod wrogiem zawiesza go na {hostilePveDuration} sek. w PvE lub {hostilePvpDuration} sek. w PvP, uniemożliwiając wszelkie działania; obrażenia przerywają efekt. U twoich stóp lub pod sojusznikiem z grupy nadaje stazę na {duration} sek., zapobiega obrażeniom i działaniom, przywraca {healing}% maksymalnego zdrowia i przyspiesza regenerację czasu odnowienia o {selfCooldownRecovery}% dla ciebie lub {allyCooldownRecovery}% dla sojusznika. Na pustej ziemi klepsydra czeka {groundDuration} sek. i działa na pierwszą prawidłową postać, która na nią wejdzie. Korzystną aurę można zdjąć ręcznie.',
@@ -13492,7 +13492,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.sweepingStrikes':
     'Ciosy jednocelowe trafiają też {targets} pobliskiego wroga za {pct}% obrażeń',
   'hudChrome.auraEffect.temporalEcho':
-    'Obrażenia od Arkanów rzucającego leczą cię za {singlePct}% obrażeń jednocelowych lub {areaPct}% obrażeń obszarowych',
+    'Obrażenia od Arkanów rzucającego leczą cię za {singlePct}% obrażeń jednocelowych lub {areaPct}% obrażeń obszarowych. Przypływ Eteru i Eteryczne Pociski otrzymują premię x4 przy indywidualnym Echu Czasu. Grupowe Echa tworzą równą rezerwę leczenia, rozdzielaną według brakującego zdrowia między naznaczonych sojuszników poniżej 60% zdrowia',
   'hudChrome.auraEffect.warlockAnchor':
     'Rzuć ponownie w promieniu {range} m, aby tu wrócić i zużyć kotwicę',
   'hudChrome.auraEffect.wintersChill':
@@ -14245,8 +14245,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.benison_dawnweave.bonus2': 'Ratunek Seraficznej Warty leczy za 270 zamiast 180. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.benison_dawnweave.bonus4': 'Po aktywowaniu Seraficznej Warty jej sojusznik zostaje uleczony o 15 procent maksymalnego zdrowia w ciągu 10 sek.',
   'entities.itemSets.benison_dawnweave.name': 'Błogosławiona Tkanina Świtu',
-  'entities.itemSets.chronoweave.bonus2': 'Echo Czasu zamienia 50 procent twoich obrażeń tajemnych przeciw jednemu celowi w leczenie. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
-  'entities.itemSets.chronoweave.bonus4': 'Czas odnowienia Czasowej Kaskady skraca się o 5 sek.',
+  'entities.itemSets.chronoweave.bonus2': 'Echo Czasu zamienia 50% twoich pozostałych obrażeń Arkanów przeciw jednemu celowi w leczenie. Przypływ Eteru i Eteryczne Pociski zamieniają zamiast tego 200% zadanych obrażeń. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
+  'entities.itemSets.chronoweave.bonus4': 'Czas odnowienia Czasowej Kaskady skraca się o 5 sek., a jej koszt many maleje o 30%.',
   'entities.itemSets.chronoweave.name': 'Szaty Eterowej Tkaniny',
   'entities.itemSets.cinderbark.bonus2': 'Zamiatające Szpony mają 30 procent szans na zgromadzenie dodatkowej Starej Krwi.',
   'entities.itemSets.cinderbark.bonus4': 'Łamanie Szpiku zadaje o 30 procent większe obrażenia, a jego awaryjna osłona nie zastępuje już ciosu.',

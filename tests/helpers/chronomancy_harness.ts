@@ -80,8 +80,19 @@ export interface RunResult {
   oom: number; // seconds to OOM (Infinity if it survived the cap)
   dps: number; // dummy damage / active time
   echoHps: number; // effective Temporal Echo healing on the ally / active time
+  healingHps: number; // all effective direct healing on the ally / active time
   netManaPerSec: number;
   seconds: number;
+}
+
+export interface PressureRunResult {
+  survived: boolean;
+  seconds: number;
+  dps: number;
+  echoHps: number;
+  healingHps: number;
+  remainingMana: number;
+  offensiveHits: number;
 }
 
 // Drive a policy from full mana until it cannot afford its next intended cast
@@ -101,6 +112,7 @@ export function runRotation(
   const gearHitBonus = p.hitBonus;
   let damage = 0;
   let echoHeal = 0;
+  let totalHeal = 0;
   let oomTick = -1;
   const ticks = Math.round(capSec * 20);
   for (let i = 0; i < ticks; i++) {
@@ -127,13 +139,10 @@ export function runRotation(
     const evs: SimEvent[] = sim.tick();
     for (const e of evs) {
       if (e.type === 'damage' && e.sourceId === p.id && e.targetId === dummy.id) damage += e.amount;
-      if (
-        e.type === 'heal2' &&
-        e.sourceId === p.id &&
-        e.targetId === ally.id &&
-        e.ability === 'Temporal Echo'
-      )
-        echoHeal += e.amount;
+      if (e.type === 'heal2' && e.sourceId === p.id && e.targetId === ally.id) {
+        totalHeal += e.amount;
+        if (e.ability === 'Temporal Echo') echoHeal += e.amount;
+      }
     }
   }
   const oom = oomTick < 0 ? Infinity : oomTick / 20;
@@ -142,8 +151,82 @@ export function runRotation(
     oom,
     dps: damage / active,
     echoHps: echoHeal / active,
+    healingHps: totalHeal / active,
     netManaPerSec: (mana0 - p.resource) / active,
     seconds: active,
+  };
+}
+
+// Drive the mixed healer policy while the marked ally takes one deterministic,
+// post-mitigation raid hit per second. Unlike runRotation's throughput probe,
+// this never pins health low: overheal, absorbs, death, mana, and offensive
+// globals all coexist in one real combat timeline.
+export function runPressureRotation(capSec = 40, maxHpPerSecond = 0.08): PressureRunResult {
+  const { sim, p } = makeMage('arcane', 20, 2);
+  const dummy = addDummy(sim);
+  const ally = addAlly(sim);
+  const gearHitBonus = p.hitBonus;
+  sim.setPlayerLevel(20, ally.id);
+  sim.tick();
+  ally.hp = ally.maxHp;
+  const policy = conservativeReactive();
+  let damage = 0;
+  let echoHeal = 0;
+  let totalHeal = 0;
+  let offensiveHits = 0;
+  let elapsedTicks = 0;
+  const ticks = Math.round(capSec * 20);
+
+  for (let i = 0; i < ticks; i++) {
+    if (i > 0 && i % 20 === 0) {
+      sim.ctx.dealDamage(
+        null,
+        ally,
+        Math.round(ally.maxHp * maxHpPerSecond),
+        false,
+        'shadow',
+        'Raid Pressure',
+        'hit',
+      );
+      if (ally.dead) {
+        elapsedTicks = i;
+        break;
+      }
+    }
+    if (free(p)) {
+      const next = policy(p, dummy, ally, i / 20);
+      if (next) {
+        const cost = hasFreeCostFor(p, next.id) ? 0 : (sim.resolvedAbility(next.id)?.cost ?? 0);
+        if (p.resource >= cost) {
+          p.hitBonus = sim.resolvedAbility(next.id)?.def.projectile === false ? 1 : gearHitBonus;
+          sim.targetEntity(next.targetId);
+          sim.castAbility(next.id);
+        }
+      }
+    }
+    const evs: SimEvent[] = sim.tick();
+    elapsedTicks = i + 1;
+    for (const e of evs) {
+      if (e.type === 'damage' && e.sourceId === p.id && e.targetId === dummy.id) {
+        damage += e.amount;
+        if (e.abilityId === 'arcane_surge' || e.abilityId === 'arcane_missiles') offensiveHits++;
+      }
+      if (e.type === 'heal2' && e.sourceId === p.id && e.targetId === ally.id) {
+        totalHeal += e.amount;
+        if (e.ability === 'Temporal Echo') echoHeal += e.amount;
+      }
+    }
+  }
+
+  const seconds = elapsedTicks / 20;
+  return {
+    survived: !ally.dead && seconds === capSec,
+    seconds,
+    dps: damage / seconds,
+    echoHps: echoHeal / seconds,
+    healingHps: totalHeal / seconds,
+    remainingMana: p.resource,
+    offensiveHits,
   };
 }
 
@@ -170,7 +253,7 @@ export const conservativeEcho: Policy = (p, dummy, ally) =>
   needsEcho(ally) ? { id: 'temporal_echo', targetId: ally.id } : spender(p, dummy);
 
 // Conservative WITH occasional reactive heals: Echo up plus a Temporal Mend or
-// Barrier roughly every 10s (alternating), on top of the damage loop.
+// Barrier roughly every 18s (alternating), on top of the damage loop.
 export function conservativeReactive(): Policy {
   let lastHealAt = -100;
   return (p, dummy, ally, t) => {

@@ -56,10 +56,10 @@ const EXPECTED: Record<string, Row[]> = {
     { level: 20, cost: 110, effects: 'heal 218-258' }, // NEW cap rank
   ],
   temporal_echo: [
-    { level: 8, cost: 40, effects: 'heal 24-30 + temporalEcho 15' },
-    { level: 12, cost: 60, effects: 'heal 40-50 + temporalEcho 15' },
-    { level: 18, cost: 85, effects: 'heal 58-70 + temporalEcho 15' },
-    { level: 20, cost: 90, effects: 'heal 84-102 + temporalEcho 15' }, // NEW cap rank
+    { level: 8, cost: 40, effects: 'heal 24-30 + temporalEcho 22.5' },
+    { level: 12, cost: 60, effects: 'heal 40-50 + temporalEcho 22.5' },
+    { level: 18, cost: 85, effects: 'heal 58-70 + temporalEcho 22.5' },
+    { level: 20, cost: 90, effects: 'heal 84-102 + temporalEcho 22.5' }, // NEW cap rank
   ],
   temporal_barrier: [
     { level: 5, cost: 50, effects: 'absorb 55/10' },

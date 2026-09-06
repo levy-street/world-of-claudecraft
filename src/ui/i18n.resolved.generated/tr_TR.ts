@@ -2744,7 +2744,7 @@ export const tr_TR: EnTranslations = {
       "suddenDeath": "Bir sonraki Erken Mezar'ın hiç Öfkeye mal olmaz ve can şartını yok sayar",
       "aoeEcho": "{charges} yankı kaldı: tek hedefli yetenekler yakındaki en fazla {targets} düşmana {pct}% hasar verir",
       "sureCrit": "{charges} hasar veren yetenek kullanımı garanti kritik vuruş olur",
-      "temporalEcho": "Büyücünün Gizemli hasarı seni tek hedef hasarının {singlePct}%'i ya da alan hasarının {areaPct}%'i kadar iyileştirir",
+      "temporalEcho": "Büyücünün Gizemli hasarı seni tek hedef hasarının %{singlePct}’i ya da alan hasarının %{areaPct}’i kadar iyileştirir. Eter Dalgası ve Eter Dartları bireysel Zamansal Yankı üzerinde x4 bonus kazanır. Grup Yankıları eşit bir iyileştirme rezervi oluşturur ve bu rezerv, canı %60’ın altındaki işaretli müttefikler arasında eksik canlarına göre paylaştırılır",
       "arcaneCharge": "{stacks} Gizemli Yük: Aether Dalgası {damagePct}% daha fazla hasar verir, {castPct}% daha hızlı okunur ve {costMult}x mana harcar",
       "physicalReduction": "Alınan Fiziksel hasarı {pct}% azaltır",
       "temporalHourglass": "Bağışık ve eylem yapamaz; canı yeniler ve bekleme süresi iyileşmesini hızlandırır. İptal etmek için sağ tıkla.",
@@ -11589,11 +11589,11 @@ export const tr_TR: EnTranslations = {
       },
       "temporal_echo": {
         "name": "Zamansal Yankı",
-        "description": "Bir müttefiki daha sağlıklı bir anın yankısıyla işaretleyerek {damage} canı anında iyileştirir. {duration} saniye boyunca verdiğin Gizemli hasar kısmen yankı aracılığıyla geri döner ve onları iyileştirir."
+        "description": "Bir müttefiki daha sağlıklı bir anın yankısıyla işaretleyerek {damage} canı anında iyileştirir. {duration} saniye boyunca diğer tek hedefli Gizemli hasarının %{echoSinglePct}’i ve alan etkili Gizemli hasarının %{echoAreaPct}’i onu iyileştirir. Eter Dalgası ve Eter Dartları bunun yerine verdikleri hasarın %{echoDriverPct}’i kadar iyileştirir."
       },
       "temporal_cascade": {
         "name": "Zamansal Çağlayan",
-        "description": "Grubunuza bir yankı dalgası gönderir: hedef ve dört yakın müttefiki aynı anda iyileştirilir ve her biri {duration} saniye işaretlenir; bu süre içinde verdiğin Gizemli hasar kısmen onların yankıları aracılığıyla geri dönerek onları iyileştirir. (Kronomansi)"
+        "description": "Grubunuza bir yankı dalgası gönderir: hedef ve dört yakın müttefiki aynı anda iyileştirilir ve her biri {duration} saniye işaretlenir; bu süre içinde verdiğin Gizemli hasar kısmen onların yankıları aracılığıyla geri dönerek onları iyileştirir. Eter Dalgası ve Eter Dartları her grup Yankısından eşit bir iyileştirme rezervi oluşturur ve bu rezerv, canı %60’ın altındaki işaretli müttefikler arasında eksik canlarına göre paylaştırılır. (Kronomansi)"
       },
       "temporal_reversal": {
         "name": "Zamansal Tersine Çevirme",
@@ -18985,8 +18985,8 @@ export const tr_TR: EnTranslations = {
       },
       "chronoweave": {
         "name": "Aether Dokuması Giysileri",
-        "bonus2": "Zamansal Yankı, tek hedefli Gizemli hasarının %50’sini iyileştirmeye dönüştürür. Alınan hasar artık büyü yapmanı geciktirmez.",
-        "bonus4": "Zamansal Çağlayanın bekleme süresi 5 saniye azalır."
+        "bonus2": "Zamansal Yankı, diğer tek hedefli Gizemli hasarının %50’sini iyileştirmeye dönüştürür. Eter Dalgası ve Eter Dartları bunun yerine verdikleri hasarın %200’ünü dönüştürür. Alınan hasar artık büyü yapmanı geciktirmez.",
+        "bonus4": "Zamansal Çağlayanın bekleme süresi 5 saniye, mana bedeli ise %30 azalır."
       },
       "cinderbark": {
         "name": "Kül Kabuğu Muhafızı",

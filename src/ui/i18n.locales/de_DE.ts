@@ -2688,10 +2688,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Versetzt das Ziel um einen Herzschlag aus der Gegenwart; eine zeitliche Hülle absorbiert 10 Sek. lang {damage} Schaden, bevor der Zeitstrang zurückschnappt.',
   'entities.abilities.temporal_barrier.name': 'Temporale Barriere',
   'entities.abilities.temporal_cascade.description':
-    'Sendet ein Echo durch deine Gruppe: Das Ziel und bis zu vier seiner nächsten Verbündeten werden sofort geheilt und jeweils {duration} Sek. lang markiert, wodurch ein Teil des Arkanen Schadens, den du verursachst, durch ihre Echos zurückgeleitet wird und sie heilt. (Chronomantie)',
+    'Sendet ein Echo durch deine Gruppe: Das Ziel und bis zu vier seiner nächsten Verbündeten werden sofort geheilt und jeweils {duration} Sek. lang markiert, wodurch ein Teil des Arkanen Schadens, den du verursachst, durch ihre Echos zurückgeleitet wird und sie heilt. Ätherwoge und Äthergeschosse erzeugen aus jedem Gruppenecho eine gleich große Heilreserve, die nach fehlender Gesundheit unter markierten Verbündeten mit weniger als 60% Gesundheit verteilt wird. (Chronomantie)',
   'entities.abilities.temporal_cascade.name': 'Temporale Kaskade',
   'entities.abilities.temporal_echo.description':
-    'Markiert einen Verbündeten mit dem Echo eines gesünderen Augenblicks und heilt sofort {damage} Gesundheit. Für {duration} Sek. wird ein Teil des Arkanen Schadens, den du verursachst, durch das Echo zurückgeleitet und heilt ihn.',
+    'Markiert einen Verbündeten mit dem Echo eines gesünderen Augenblicks und heilt sofort {damage} Gesundheit. Für {duration} Sek. heilen ihn {echoSinglePct}% deines sonstigen Arkanen Einzelzielschadens und {echoAreaPct}% deines Arkanen Flächenschadens. Ätherwoge und Äthergeschosse heilen ihn stattdessen um {echoDriverPct}% ihres verursachten Schadens.',
   'entities.abilities.temporal_echo.name': 'Temporales Echo',
   'entities.abilities.temporal_hourglass.description':
     'Platziert eine temporale Sanduhr am gewählten Ort. Unter einem Feind suspendiert sie diesen im PvE für {hostilePveDuration} Sek. oder im PvP für {hostilePvpDuration} Sek. und verhindert alle Aktionen; Schaden bricht den Effekt. Unter deinen Füßen oder unter einem Gruppenverbündeten gewährt sie {duration} Sek. lang Stasis, verhindert Schaden und Aktionen, stellt {healing}% der maximalen Gesundheit wieder her und lässt Abklingzeiten {selfCooldownRecovery}% schneller für dich oder {allyCooldownRecovery}% schneller für einen Verbündeten regenerieren. Auf leerem Boden wartet die Sanduhr {groundDuration} Sek. und wirkt auf die erste gültige Einheit, die sie betritt. Der vorteilhafte Effekt kann manuell entfernt werden.',
@@ -13734,7 +13734,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.sweepingStrikes':
     'Einzelzielschläge treffen zusätzlich {targets} nahen Gegner für {pct}% Schaden',
   'hudChrome.auraEffect.temporalEcho':
-    'Der Arkanschaden des Wirkers heilt Euch um {singlePct}% bei Einzelziel- oder {areaPct}% bei Flächenschaden',
+    'Der Arkanschaden des Wirkers heilt Euch um {singlePct}% bei Einzelziel- oder {areaPct}% bei Flächenschaden. Ätherwoge und Äthergeschosse erhalten bei einem individuellen Zeitlichen Echo einen 4-fachen Bonus. Gruppenechos erzeugen eine gleich große Heilreserve, die nach fehlender Gesundheit unter markierten Verbündeten mit weniger als 60% Gesundheit verteilt wird',
   'hudChrome.auraEffect.varkhulCrucibleExposure': 'Das Blocken eines Schmelztiegelstrahls verursacht jede Sekunde steigenden Schaden an der maximalen Gesundheit. Die Stapel setzen sich in Normal 10 Sekunden und in Heroisch 60 Sekunden nach dem Verlassen eines Strahls zurück.',
   'hudChrome.auraEffect.varkhulForgeLink': 'Fange einen aktiven Pfeilerstrahl ab, bevor er die Schmiede erreicht. Offene Strahlen fügen pro Sekunde 6% Hitze hinzu. In Normal kühlen geblockte Strahlen und inaktive Pfeiler die Schmiede ab; in Heroisch sinkt die Hitze nie. Bei 100% erleidet die Schmiede eine tödliche Kernschmelze.',
   'hudChrome.auraEffect.varkhulMoltenCore': 'Trage diesen Kern zur Schmiede. Glühende Last verursacht alle {interval} Sek. steigenden Schaden, von {min}% bis {max}% der maximalen Gesundheit.',
@@ -14345,8 +14345,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.benison_dawnweave.bonus2': 'Die Rettungsheilung von Seraphischer Wacht steigt von 180 auf 270. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
   'entities.itemSets.benison_dawnweave.bonus4': 'Wenn Seraphische Wacht ausgelöst wird, wird der Verbündete zusätzlich 10 Sek. lang um 15 Prozent seiner maximalen Gesundheit geheilt.',
   'entities.itemSets.benison_dawnweave.name': 'Gewand der Morgengewebten Gunst',
-  'entities.itemSets.chronoweave.bonus2': 'Zeitliches Echo wandelt 50 Prozent deines arkanen Einzelzielschadens in Heilung um. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
-  'entities.itemSets.chronoweave.bonus4': 'Die Abklingzeit von Zeitliche Kaskade wird um 5 Sek. verkürzt.',
+  'entities.itemSets.chronoweave.bonus2': 'Zeitliches Echo wandelt 50% deines sonstigen Arkanen Einzelzielschadens in Heilung um. Ätherwoge und Äthergeschosse wandeln stattdessen 200% ihres verursachten Schadens um. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
+  'entities.itemSets.chronoweave.bonus4': 'Die Abklingzeit von Zeitliche Kaskade wird um 5 Sek. und ihre Manakosten werden um 30% verringert.',
   'entities.itemSets.chronoweave.name': 'Gewänder des Äthergewebes',
   'entities.itemSets.cinderbark.bonus2': 'Weitreichende Klauen haben eine Chance von 30 Prozent, zusätzliches Altes Blut zu speichern.',
   'entities.itemSets.cinderbark.bonus4': 'Markbruch trifft 30 Prozent härter, und seine Notfallwache ersetzt den Schlag nicht mehr.',

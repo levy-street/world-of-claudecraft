@@ -2675,10 +2675,10 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Desloca o alvo um instante para fora do presente, uma concha temporal absorvendo {damage} de dano por 10 s antes que a linha do tempo se restabeleça.',
   'entities.abilities.temporal_barrier.name': 'Barreira Temporal',
   'entities.abilities.temporal_cascade.description':
-    'Envia um eco em cascata pelo seu grupo: o alvo e até quatro dos aliados mais próximos são curados de uma vez, e cada um fica marcado por {duration} s, canalizando parte do dano Arcano que você causar de volta pelos seus ecos para curá-los. (Cronomancia)',
+    'Envia um eco em cascata pelo seu grupo: o alvo e até quatro dos aliados mais próximos são curados de uma vez, e cada um fica marcado por {duration} s, canalizando parte do dano Arcano que você causar de volta pelos seus ecos para curá-los. Surto de Éter e Dardos de Éter criam uma reserva de cura equivalente para cada Eco de grupo, distribuída conforme a vida perdida entre aliados marcados com menos de 60% de vida. (Cronomancia)',
   'entities.abilities.temporal_cascade.name': 'Cascata Temporal',
   'entities.abilities.temporal_echo.description':
-    'Marca um aliado com o eco de um momento mais saudável, restaurando {damage} de vida imediatamente. Por {duration} s, parte do dano Arcano que você causar é revertida pelo eco para curá-lo.',
+    'Marca um aliado com o eco de um momento mais saudável, restaurando {damage} de vida imediatamente. Por {duration} s, {echoSinglePct}% do seu outro dano Arcano de alvo único e {echoAreaPct}% do seu dano Arcano em área o curam. Surto de Éter e Dardos de Éter curam em vez disso {echoDriverPct}% do dano que causam.',
   'entities.abilities.temporal_echo.name': 'Eco Temporal',
   'entities.abilities.temporal_hourglass.description':
     'Coloca uma ampulheta temporal no local selecionado. Sob um inimigo, suspende-o por {hostilePveDuration} s no PvE ou {hostilePvpDuration} s no PvP, impedindo qualquer ação; o dano quebra o efeito. Aos seus pés ou sob um aliado do grupo, concede estase por {duration} s, impede dano e ações, restaura {healing}% da vida máxima e faz as recargas recuperarem {selfCooldownRecovery}% mais rápido para você ou {allyCooldownRecovery}% mais rápido para um aliado. Em terreno vazio, a ampulheta aguarda por {groundDuration} s e afeta a primeira unidade válida que pisar nela. O efeito benéfico pode ser removido manualmente.',
@@ -13558,7 +13558,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.sweepingStrikes':
     'Golpes de alvo único também atingem {targets} inimigo próximo por {pct}% de dano',
   'hudChrome.auraEffect.temporalEcho':
-    'O dano Arcano do conjurador cura você em {singlePct}% do dano de alvo único ou {areaPct}% do dano em área',
+    'O dano Arcano do conjurador cura você em {singlePct}% do dano de alvo único ou {areaPct}% do dano em área. Surto de Éter e Dardos de Éter recebem um bônus de x4 com um Eco Temporal individual. Ecos de grupo criam uma reserva de cura equivalente, distribuída conforme a vida perdida entre aliados marcados com menos de 60% de vida',
   'hudChrome.auraEffect.warlockAnchor':
     'Lance novamente num raio de {range} m para retornar aqui e consumir a âncora',
   'hudChrome.auraEffect.wintersChill':
@@ -14266,8 +14266,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.benison_dawnweave.bonus2': 'A cura de resgate da Vigilância Seráfica sobe para 270, em vez de 180. Dano sofrido não atrasa mais suas conjurações.',
   'entities.itemSets.benison_dawnweave.bonus4': 'Quando a Vigilância Seráfica é ativada, seu aliado também é curado em 15% da vida máxima dele ao longo de 10 s.',
   'entities.itemSets.benison_dawnweave.name': 'Trama do Alvorecer Benévolo',
-  'entities.itemSets.chronoweave.bonus2': 'Eco Temporal converte 50% do seu dano Arcano de alvo único em cura. Dano sofrido não atrasa mais suas conjurações.',
-  'entities.itemSets.chronoweave.bonus4': 'O tempo de recarga da Cascata Temporal é reduzido em 5 s.',
+  'entities.itemSets.chronoweave.bonus2': 'Eco Temporal converte 50% do seu outro dano Arcano de alvo único em cura. Surto de Éter e Dardos de Éter convertem em vez disso 200% do dano que causam. Dano sofrido não atrasa mais suas conjurações.',
+  'entities.itemSets.chronoweave.bonus4': 'O tempo de recarga da Cascata Temporal é reduzido em 5 s e seu custo de mana em 30%.',
   'entities.itemSets.chronoweave.name': 'Vestes da Trama Etérea',
   'entities.itemSets.cinderbark.bonus2': 'Garras Varredoras têm 30% de chance de armazenar um Sangue Antigo adicional.',
   'entities.itemSets.cinderbark.bonus4': 'Rompemedula causa 30% mais dano, e sua guarda emergencial não substitui mais o golpe.',

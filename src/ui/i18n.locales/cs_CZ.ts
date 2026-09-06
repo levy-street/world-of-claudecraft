@@ -2650,10 +2650,10 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Posuneš cíl o okamžik mimo přítomnost; časová schránka pohltí {damage} poškození po dobu 10 s, než se časová linka zacvakne zpět.',
   'entities.abilities.temporal_barrier.name': 'Časová bariéra',
   'entities.abilities.temporal_cascade.description':
-    'Sešle ozvěnu přes tvou skupinu: cíl a až čtyři nejbližší spojenci jsou okamžitě zaceleni a každý je označen na {duration} s; část arcanového poškození, které způsobuješ, se přes jejich ozvěny vrátí a vyléčí je. (Chronomagie)',
+    'Sešle ozvěnu přes tvou skupinu: cíl a až čtyři nejbližší spojenci jsou okamžitě zaceleni a každý je označen na {duration} s; část arkánního poškození, které způsobuješ, se přes jejich ozvěny vrátí a vyléčí je. Éterová vlna a Éterové šipky vytvoří z každé skupinové ozvěny stejnou rezervu léčení, která se rozdělí podle chybějícího zdraví mezi označené spojence pod 60% zdraví. (Chronomagie)',
   'entities.abilities.temporal_cascade.name': 'Časová kaskáda',
   'entities.abilities.temporal_echo.description':
-    'Označíš spojence ozvěnou zdravějšího okamžiku a okamžitě zacelíš {damage} zdraví. Po dobu {duration} s část arcanového poškození, které způsobuješ, se přes tuto ozvěnu vrátí a léčí je.',
+    'Označíš spojence ozvěnou zdravějšího okamžiku a okamžitě zacelíš {damage} zdraví. Po dobu {duration} s ho léčí {echoSinglePct}% tvého ostatního arkánního poškození na jeden cíl a {echoAreaPct}% plošného arkánního poškození. Éterová vlna a Éterové šipky ho místo toho léčí za {echoDriverPct}% způsobeného poškození.',
   'entities.abilities.temporal_echo.name': 'Časová ozvěna',
   'entities.abilities.temporal_hourglass.description':
     'Umístíš časové přesýpací hodiny na zvolené místo. Pod nepřítelem ho pozastaví na {hostilePveDuration} s v PvE nebo {hostilePvpDuration} s v PvP a zabrání veškerým akcím; poškození efekt přeruší. Pod tvýma nohama nebo pod spojencem ze skupiny udělí stázi na {duration} s, zabrání poškození a akcím, obnoví {healing} % maximálního zdraví a urychlí obnovu cooldownu o {selfCooldownRecovery} % pro tebe nebo o {allyCooldownRecovery} % pro spojence. Na prázdné zemi přesýpací hodiny čekají {groundDuration} s a ovlivní první platnou jednotku, která na ně vstoupí. Prospěšnou auru lze ručně zrušit.',
@@ -13356,7 +13356,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.sweepingStrikes':
     'Útoky na jeden cíl zasáhnou i {targets} blízké nepřátele za {pct} % poškození',
   'hudChrome.auraEffect.temporalEcho':
-    'Seslatelovo arkánní poškození tě léčí za {singlePct} % poškození na jeden cíl nebo {areaPct} % plošného poškození',
+    'Seslatelovo arkánní poškození tě léčí za {singlePct}% poškození na jeden cíl nebo {areaPct}% plošného poškození. Éterová vlna a Éterové šipky získávají u individuální Časové ozvěny čtyřnásobný bonus. Skupinové ozvěny vytvářejí stejnou rezervu léčení, která se rozdělí podle chybějícího zdraví mezi označené spojence pod 60% zdraví',
   'hudChrome.auraEffect.warlockAnchor':
     'Seslej znovu do {range} yardů: vrátíš se sem a spotřebuješ kotvu',
   'hudChrome.auraEffect.wintersChill':
@@ -14183,8 +14183,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.benison_dawnweave.bonus2': 'Záchrana Serafínské bdělosti léčí za 270 místo 180. Utržené poškození již nezpožďuje sesílání kouzel.',
   'entities.itemSets.benison_dawnweave.bonus4': 'Po spuštění Serafínské bdělosti je její spojenec po dobu 10 s léčen za 15 procent svého maximálního zdraví.',
   'entities.itemSets.benison_dawnweave.name': 'Požehnaná úsvitová tkanina',
-  'entities.itemSets.chronoweave.bonus2': 'Časová ozvěna převádí 50 procent tvého arkánního poškození jediného cíle na léčení. Utržené poškození již nezpožďuje sesílání kouzel.',
-  'entities.itemSets.chronoweave.bonus4': 'Doba obnovy Časové kaskády se zkracuje o 5 s.',
+  'entities.itemSets.chronoweave.bonus2': 'Časová ozvěna převádí 50% tvého ostatního arkánního poškození na jeden cíl na léčení. Éterová vlna a Éterové šipky místo toho převádějí 200% způsobeného poškození. Utržené poškození již nezpožďuje sesílání kouzel.',
+  'entities.itemSets.chronoweave.bonus4': 'Doba obnovy Časové kaskády se zkracuje o 5 s a její cena many se snižuje o 30%.',
   'entities.itemSets.chronoweave.name': 'Roucha Éterové tkaniny',
   'entities.itemSets.cinderbark.bonus2': 'Široké drápy mají 30procentní šanci uložit další Starou krev.',
   'entities.itemSets.cinderbark.bonus4': 'Rozbíječ morku způsobuje o 30 procent vyšší poškození a jeho nouzová ochrana již nenahrazuje úder.',
