@@ -944,7 +944,7 @@ export const hudChromeStrings = {
     // are and who to talk to; the coach card, the golden trail and the
     // floating bubble carry the rest, in place, as they need it.
     islandArrivalNote:
-      'Welcome to the Proving Shore. Warden Tam is waiting just up the strand: go and see him.',
+      'Welcome to the Proving Shore. Warden Tam is waiting just up the strand: go and see him. When you would rather be off, ring the bell beside my pier and it will carry you across to the vale at any time.',
     noteClose: 'Understood',
   },
   // New-adventurer tutorial copy for the touch interface. The default tutorial

@@ -170,3 +170,17 @@ describe('tutorialSlayHintPlan', () => {
     expect(en).not.toMatch(/\bkeyboard\b|\bmouse\b|\{targetKey\}/i);
   });
 });
+
+describe('the island arrival note', () => {
+  // Ferryman Odo's first-arrival welcome is the only dialog a newcomer sees
+  // on the Proving Shore, so it is also the one place the way OUT is stated:
+  // the bell beside his pier is clickable from the moment they land, not a
+  // reward for finishing the rail (playtester feedback: players who wanted to
+  // leave early could not tell that they could).
+  it('names Warden Tam and the bell that leaves the shore at any time', () => {
+    const en = hudChromeStrings.tutorialGreeting.islandArrivalNote;
+    expect(en).toMatch(/Warden Tam/);
+    expect(en).toMatch(/\bbell\b/);
+    expect(en).toMatch(/any time/i);
+  });
+});
