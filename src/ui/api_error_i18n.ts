@@ -31,6 +31,14 @@ import { tServer } from './server_i18n';
 // catalog so a new server code without a client key (or vice versa) fails the gate.
 // `satisfies Record<string, TranslationKey>` keeps every value a real, typed
 // translation key (a typo or a key missing from the catalog is a tsc error).
+/**
+ * The admin-panel kick's disconnect prefix, a byte-exact copy of
+ * server/admin_kick_api.ts ADMIN_KICK_MESSAGE_PREFIX (the client never imports
+ * server code; tests/main_api_error.test.ts pins the two equal). The reason the
+ * operator typed follows it on the wire.
+ */
+export const ADMIN_KICK_MESSAGE_PREFIX = 'A moderator has disconnected you: ';
+
 export const API_ERROR_KEYS = {
   // Structural pipeline primitives.
   'validation.failed': 'apiError.validation.failed',
@@ -153,6 +161,10 @@ export const API_ERROR_KEYS = {
   'cheater_mark.reason_required': 'apiError.cheater_mark.reason_required',
   'cheater_mark.invalid_duration': 'apiError.cheater_mark.invalid_duration',
   'cheater_mark.not_marked': 'apiError.cheater_mark.not_marked',
+  // kick: the admin-panel kick of a live player (server/admin_kick_api.ts).
+  'kick.reason_required': 'apiError.kick.reason_required',
+  'kick.admin_target': 'apiError.kick.admin_target',
+  'kick.target_offline': 'apiError.kick.target_offline',
 
   // woc_market: the config-gated $WOC Exchange family (server/woc_market_routes.ts).
   'woc_market.invalid_input': 'apiError.woc_market.invalid_input',
@@ -446,6 +458,15 @@ export function userFacingApiError(err: unknown): string {
   if (normalized === 'this account is suspended.') return tServer('moderation.suspended');
   if (normalized === 'a moderator requires one of your characters to be renamed.')
     return tServer('moderation.forceRename');
+  // The admin-panel kick (server/admin_kick_api.ts adminKickMessage). The prefix
+  // is the byte-exact wire contract; the operator's free-text reason rides after
+  // it and is interpolated into the localized line, never translated. Matched on
+  // the ORIGINAL text so the reason keeps its case.
+  if (text.startsWith(ADMIN_KICK_MESSAGE_PREFIX)) {
+    return t('loading.kickedByModerator', {
+      reason: text.slice(ADMIN_KICK_MESSAGE_PREFIX.length),
+    });
+  }
   if (normalized.startsWith('too many failed attempts')) return tServer('moderation.tooManyFailed');
   // Transport/runtime failures are diagnostic code errors. Preserve their
   // English source text so browser logs and support reports match exactly.

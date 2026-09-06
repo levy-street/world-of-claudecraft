@@ -4884,6 +4884,11 @@ export const zh_CN: EnTranslations = {
       "invalid_duration": "标记时长至少需为 1 秒。",
       "not_marked": "该账号未被标记。"
     },
+    "kick": {
+      "reason_required": "必须填写原因。",
+      "admin_target": "管理员账号无法被踢出。",
+      "target_offline": "该玩家已不在此服务器在线。"
+    },
     "woc_market": {
       "invalid_input": "输入无效。",
       "disabled": "本服务器未开放 $WOC 交易所。",
@@ -8727,6 +8732,7 @@ export const zh_CN: EnTranslations = {
     "realmFull": "当前服务器已满，请稍后几分钟再试。",
     "tooManyConnections": "您的网络向该服务器发起的连接过多。请关闭多余的游戏窗口，或稍后几分钟再试。",
     "messageRateExceeded": "由于发送操作过快，您已断开连接。请稍等片刻后重新登录。",
+    "kickedByModerator": "管理员已将您断开连接：{reason}",
     "tips": {
       "classes": "提示：9 个职业玩法各不相同，投入之前不妨都试一试。",
       "talents": "提示：你可以在任意脱离战斗的时候重置天赋，因此早期的选择永远不会成为陷阱。",

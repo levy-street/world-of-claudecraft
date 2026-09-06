@@ -2016,6 +2016,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'loading.tooManyConnections':
     '您的网络向该服务器发起的连接过多。请关闭多余的游戏窗口，或稍后几分钟再试。',
   'loading.messageRateExceeded': '由于发送操作过快，您已断开连接。请稍等片刻后重新登录。',
+  'loading.kickedByModerator': '管理员已将您断开连接：{reason}',
   'errors.nothingInteract': '附近没有可互动目标。',
   'errors.noEnemyNearby': '附近没有敌人。',
   'errors.characterNameRequired': '请输入角色名称。',
@@ -8963,6 +8964,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'apiError.cheater_mark.reason_required': '必须填写原因。',
   'apiError.cheater_mark.invalid_duration': '标记时长至少需为 1 秒。',
   'apiError.cheater_mark.not_marked': '该账号未被标记。',
+  'apiError.kick.reason_required': '必须填写原因。',
+  'apiError.kick.admin_target': '管理员账号无法被踢出。',
+  'apiError.kick.target_offline': '该玩家已不在此服务器在线。',
   'apiError.steam.invalid_ticket': 'Steam 无法验证此关联请求。请在桌面客户端中重试。',
   'apiError.steam.banned': '该 Steam 账号无法关联。',
   'apiError.steam.already_linked': '你的账号已关联一个 Steam 账号。',

@@ -10,6 +10,9 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "apiError.kick.admin_target",
+    "apiError.kick.reason_required",
+    "apiError.kick.target_offline",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "entities.npcs.riftwright_maelis.greeting",
@@ -124,10 +127,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle",
+    "loading.kickedByModerator",
     "sim.rift.forgeGemReplaced",
     "worldContent.realmBuilderMonumentName"
   ],
   "es_ES": [
+    "apiError.kick.admin_target",
+    "apiError.kick.reason_required",
+    "apiError.kick.target_offline",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "entities.npcs.riftwright_maelis.greeting",
@@ -242,10 +249,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle",
+    "loading.kickedByModerator",
     "sim.rift.forgeGemReplaced",
     "worldContent.realmBuilderMonumentName"
   ],
   "fr_FR": [
+    "apiError.kick.admin_target",
+    "apiError.kick.reason_required",
+    "apiError.kick.target_offline",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "entities.npcs.riftwright_maelis.greeting",
@@ -360,10 +371,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle",
+    "loading.kickedByModerator",
     "sim.rift.forgeGemReplaced",
     "worldContent.realmBuilderMonumentName"
   ],
   "fr_CA": [
+    "apiError.kick.admin_target",
+    "apiError.kick.reason_required",
+    "apiError.kick.target_offline",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "entities.npcs.riftwright_maelis.greeting",
@@ -478,11 +493,15 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle",
+    "loading.kickedByModerator",
     "sim.rift.forgeGemReplaced",
     "worldContent.realmBuilderMonumentName"
   ],
   "en_CA": [],
   "it_IT": [
+    "apiError.kick.admin_target",
+    "apiError.kick.reason_required",
+    "apiError.kick.target_offline",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "entities.npcs.riftwright_maelis.greeting",
@@ -597,10 +616,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle",
+    "loading.kickedByModerator",
     "sim.rift.forgeGemReplaced",
     "worldContent.realmBuilderMonumentName"
   ],
   "de_DE": [
+    "apiError.kick.admin_target",
+    "apiError.kick.reason_required",
+    "apiError.kick.target_offline",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "entities.npcs.riftwright_maelis.greeting",
@@ -715,6 +738,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle",
+    "loading.kickedByModerator",
     "sim.rift.forgeGemReplaced",
     "worldContent.realmBuilderMonumentName"
   ],
@@ -771,6 +795,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.targetDots.row"
   ],
   "pt_BR": [
+    "apiError.kick.admin_target",
+    "apiError.kick.reason_required",
+    "apiError.kick.target_offline",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "entities.npcs.riftwright_maelis.greeting",
@@ -885,6 +912,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle",
+    "loading.kickedByModerator",
     "sim.rift.forgeGemReplaced",
     "worldContent.realmBuilderMonumentName"
   ],
@@ -902,6 +930,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.targetDots.row"
   ],
   "cs_CZ": [
+    "apiError.kick.admin_target",
+    "apiError.kick.reason_required",
+    "apiError.kick.target_offline",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "entities.npcs.riftwright_maelis.greeting",
@@ -1016,10 +1047,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle",
+    "loading.kickedByModerator",
     "sim.rift.forgeGemReplaced",
     "worldContent.realmBuilderMonumentName"
   ],
   "nl_NL": [
+    "apiError.kick.admin_target",
+    "apiError.kick.reason_required",
+    "apiError.kick.target_offline",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "entities.npcs.riftwright_maelis.greeting",
@@ -1134,10 +1169,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle",
+    "loading.kickedByModerator",
     "sim.rift.forgeGemReplaced",
     "worldContent.realmBuilderMonumentName"
   ],
   "pl_PL": [
+    "apiError.kick.admin_target",
+    "apiError.kick.reason_required",
+    "apiError.kick.target_offline",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "entities.npcs.riftwright_maelis.greeting",
@@ -1252,10 +1291,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle",
+    "loading.kickedByModerator",
     "sim.rift.forgeGemReplaced",
     "worldContent.realmBuilderMonumentName"
   ],
   "id_ID": [
+    "apiError.kick.admin_target",
+    "apiError.kick.reason_required",
+    "apiError.kick.target_offline",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "entities.npcs.riftwright_maelis.greeting",
@@ -1370,10 +1413,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle",
+    "loading.kickedByModerator",
     "sim.rift.forgeGemReplaced",
     "worldContent.realmBuilderMonumentName"
   ],
   "tr_TR": [
+    "apiError.kick.admin_target",
+    "apiError.kick.reason_required",
+    "apiError.kick.target_offline",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "entities.npcs.riftwright_maelis.greeting",
@@ -1488,10 +1535,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle",
+    "loading.kickedByModerator",
     "sim.rift.forgeGemReplaced",
     "worldContent.realmBuilderMonumentName"
   ],
   "sv_SE": [
+    "apiError.kick.admin_target",
+    "apiError.kick.reason_required",
+    "apiError.kick.target_offline",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "entities.npcs.riftwright_maelis.greeting",
@@ -1606,10 +1657,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle",
+    "loading.kickedByModerator",
     "sim.rift.forgeGemReplaced",
     "worldContent.realmBuilderMonumentName"
   ],
   "vi_VN": [
+    "apiError.kick.admin_target",
+    "apiError.kick.reason_required",
+    "apiError.kick.target_offline",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "entities.npcs.riftwright_maelis.greeting",
@@ -1724,10 +1779,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle",
+    "loading.kickedByModerator",
     "sim.rift.forgeGemReplaced",
     "worldContent.realmBuilderMonumentName"
   ],
   "da_DK": [
+    "apiError.kick.admin_target",
+    "apiError.kick.reason_required",
+    "apiError.kick.target_offline",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "entities.npcs.riftwright_maelis.greeting",
@@ -1842,6 +1901,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle",
+    "loading.kickedByModerator",
     "sim.rift.forgeGemReplaced",
     "worldContent.realmBuilderMonumentName"
   ]

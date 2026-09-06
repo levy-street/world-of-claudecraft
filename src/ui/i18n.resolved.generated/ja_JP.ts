@@ -4884,6 +4884,11 @@ export const ja_JP: EnTranslations = {
       "invalid_duration": "マークの期間は1秒以上で入力してください。",
       "not_marked": "そのアカウントはマークされていません。"
     },
+    "kick": {
+      "reason_required": "理由の入力が必要です。",
+      "admin_target": "管理者アカウントはキックできません。",
+      "target_offline": "そのプレイヤーはもうこのレルムにオンラインではありません。"
+    },
     "woc_market": {
       "invalid_input": "入力が無効です。",
       "disabled": "このレルムでは $WOC 取引所を利用できません。",
@@ -8727,6 +8732,7 @@ export const ja_JP: EnTranslations = {
     "realmFull": "このワールドは現在満員です。数分後にもう一度お試しください。",
     "tooManyConnections": "お使いのネットワークからこのワールドへの接続が多すぎます。余分なゲームウィンドウを閉じるか、数分後にもう一度お試しください。",
     "messageRateExceeded": "操作の送信が速すぎたため、切断されました。しばらく待ってから再度ログインしてください。",
+    "kickedByModerator": "モデレーターによって切断されました：{reason}",
     "tips": {
       "classes": "ヒント：9つのクラスはそれぞれ遊び方が異なります。決める前にいくつか試してみましょう。",
       "talents": "ヒント：非戦闘中ならいつでも特性をリセットできるので、最初の選択が失敗になることはありません。",

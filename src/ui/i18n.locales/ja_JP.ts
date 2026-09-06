@@ -2116,6 +2116,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'お使いのネットワークからこのワールドへの接続が多すぎます。余分なゲームウィンドウを閉じるか、数分後にもう一度お試しください。',
   'loading.messageRateExceeded':
     '操作の送信が速すぎたため、切断されました。しばらく待ってから再度ログインしてください。',
+  'loading.kickedByModerator': 'モデレーターによって切断されました：{reason}',
   'errors.nothingInteract': '操作できるものがありません。',
   'errors.noEnemyNearby': '近くに敵がいません。',
   'errors.characterNameRequired': 'キャラクター名を入力してください。',
@@ -9376,6 +9377,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.cheater_mark.reason_required': '理由の入力が必要です。',
   'apiError.cheater_mark.invalid_duration': 'マークの期間は1秒以上で入力してください。',
   'apiError.cheater_mark.not_marked': 'そのアカウントはマークされていません。',
+  'apiError.kick.reason_required': '理由の入力が必要です。',
+  'apiError.kick.admin_target': '管理者アカウントはキックできません。',
+  'apiError.kick.target_offline': 'そのプレイヤーはもうこのレルムにオンラインではありません。',
   'apiError.steam.invalid_ticket':
     'Steamがこの連携リクエストを確認できませんでした。デスクトップアプリからもう一度お試しください。',
   'apiError.steam.banned': 'そのSteamアカウントは連携できません。',

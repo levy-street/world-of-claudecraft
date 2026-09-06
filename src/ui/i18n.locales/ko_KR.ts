@@ -2096,6 +2096,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '사용 중인 네트워크에서 이 월드로 연결이 너무 많습니다. 추가 게임 창을 닫거나 몇 분 후에 다시 시도해 주세요.',
   'loading.messageRateExceeded':
     '행동을 너무 빠르게 전송하여 연결이 끊어졌습니다. 잠시 기다렸다가 다시 로그인해 주세요.',
+  'loading.kickedByModerator': '운영자가 연결을 끊었습니다: {reason}',
   'errors.nothingInteract': '상호작용할 대상이 없습니다.',
   'errors.noEnemyNearby': '근처에 적이 없습니다.',
   'errors.characterNameRequired': '캐릭터 이름을 입력하세요.',
@@ -9348,6 +9349,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.cheater_mark.reason_required': '사유를 입력해야 합니다.',
   'apiError.cheater_mark.invalid_duration': '표식 기간은 최소 1초 이상이어야 합니다.',
   'apiError.cheater_mark.not_marked': '해당 계정에는 표식이 없습니다.',
+  'apiError.kick.reason_required': '사유를 입력해야 합니다.',
+  'apiError.kick.admin_target': '운영자 계정은 추방할 수 없습니다.',
+  'apiError.kick.target_offline': '해당 플레이어는 더 이상 이 서버에 접속해 있지 않습니다.',
   'apiError.steam.invalid_ticket':
     'Steam이 이 연동 요청을 확인하지 못했습니다. 데스크톱 앱에서 다시 시도해 주세요.',
   'apiError.steam.banned': '해당 Steam 계정은 연동할 수 없습니다.',

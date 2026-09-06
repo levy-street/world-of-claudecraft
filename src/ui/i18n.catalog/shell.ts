@@ -58,6 +58,8 @@ export const shellStrings = {
         'Too many connections to this world are coming from your network. Please close extra game windows or try again in a few minutes.',
       messageRateExceeded:
         'You were disconnected for sending actions too quickly. Please wait a moment and log back in.',
+      // The admin-panel kick: {reason} is the operator's free text, interpolated verbatim.
+      kickedByModerator: 'A moderator has disconnected you: {reason}',
       tips: {
         classes:
           'Tip: each of the 9 classes plays differently. Try a few before committing to one.',
