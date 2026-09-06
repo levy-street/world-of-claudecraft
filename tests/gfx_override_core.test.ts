@@ -203,13 +203,17 @@ describe('gfx override application', () => {
     // ladder (texture_anisotropy.ts reads it; the per-tier values are pinned
     // by tests/gfx.test.ts). Every profile moves by a VALUE here, since the
     // ladder differs on every rung of the tier ladder.
+    // Regenerated across the board for the `detail` bucket band and baseline
+    // (the terrain-detail shed, terrain_detail_shed_core.ts): every profile
+    // gains the band record in bucketBands and its baseline of 1 in
+    // bucketBaselines; no pre-existing value moves.
     expect(hashes).toEqual({
-      low: '9204c503248f42e93a8a4c5fff97df43e32bc859a51d20480f0e9a96ffd91d70',
-      medium: '63cf76bd0e6fb1958e4cde6d8522944390b6931af13bd279a99ae7f5e4142ff4',
-      high: '487858152c65488c4a5a62963d0fc55c7d6d55083f2a5d523ec55121ed37ffa8',
-      ultra: '5614cf82beac1c13130b00c862c2bda2c375b3b696554d00f48a9dacb6278335',
-      insane: '16e8959af509aad0f37cdefd3cfd8bb6f362ef5cc4f283611d40addaaf64176a',
-      advanced: '372c473a449ab58d3eea024175e20274f829c942ed30a6339997426e5d40cf21',
+      low: '11b90fefb6fea6b558be4fff4fd113b971ef39dd8942af990b6f991ed2549b3c',
+      medium: '0b75bb7f5d53f85eb8e5a2fc78d915f2aa94f8887552a666af65477730860751',
+      high: 'e82c3c7ed2c386dd48fecaffa3554fb82659b467eead5ab230d9c8f258665413',
+      ultra: '7e0533fad8008ae80d8bc756caa19db5365183f5ff2c0ea75f1da562a7e7262e',
+      insane: '28e324d06fc98ff4ab4371723786863a0a157773b731a0a5b075526316cbfe07',
+      advanced: '5b4940ca97a4d6e4ae45456925a68a35f570255ac60105c1b5c854fb517ae481',
     });
   });
 

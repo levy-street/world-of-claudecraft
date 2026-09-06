@@ -41,7 +41,14 @@ describe('render budget governor', () => {
     );
 
     expect(state.mode).toBe('disabled');
-    expect(state.levels).toEqual({ grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 1 });
+    expect(state.levels).toEqual({
+      grass: 1,
+      foliage: 1,
+      vfx: 1,
+      lighting: 1,
+      resolution: 1,
+      detail: 1,
+    });
   });
 
   it('reduces model foliage before grass for non-urgent draw pressure', () => {
@@ -159,6 +166,7 @@ describe('render budget governor', () => {
       vfx: 0.76,
       lighting: 0.68,
       resolution: 1,
+      detail: 1,
     });
   });
 
@@ -196,6 +204,7 @@ describe('render budget governor', () => {
       vfx: 0.76,
       lighting: 0.68,
       resolution: 1,
+      detail: 1,
     });
   });
 
@@ -291,6 +300,7 @@ describe('render budget governor', () => {
       vfx: 0.76,
       lighting: 0.68,
       resolution: 1,
+      detail: 1,
     });
   });
 
@@ -330,6 +340,7 @@ describe('render budget governor', () => {
       vfx: 0.86,
       lighting: 0.78,
       resolution: 1,
+      detail: 1,
     });
   });
 
@@ -360,6 +371,7 @@ describe('render budget governor', () => {
       vfx: 0.92,
       lighting: 0.9,
       resolution: 1,
+      detail: 1,
     });
   });
 
@@ -519,5 +531,141 @@ describe('render budget governor', () => {
     // The band max is the real ceiling (1 was constant-true: low's grass band
     // tops out below it, so nothing reachable could ever fail that bound).
     expect(state.levels.grass).toBeLessThanOrEqual(GFX_BUCKET_BANDS.low.grass.max);
+  });
+
+  describe('terrain-detail shed', () => {
+    it('starts every tier at level 1 (the tier own request)', () => {
+      for (const tier of ['low', 'medium', 'high', 'ultra', 'insane'] as const) {
+        const governor = new RenderBudgetGovernor({
+          tier,
+          budget: GFX_BUDGETS[tier],
+          enabled: true,
+        });
+        const state = governor.reset(1, 0.65, 1);
+        expect(state.levels.detail).toBe(1);
+      }
+    });
+
+    // Over ultra's 30 ms drop line on frame cost alone: a submit stall would
+    // add a 12 s stall-pressure tail that outlives the calm phase below.
+    const heavy = () => sample({ dt: 1 / 60, frameMs: 200, totalMs: 200, submitMs: 20 });
+    const calm = () => sample({ dt: 1 / 60, frameMs: 5, totalMs: 5, submitMs: 2 });
+
+    it('sheds on ultra under sustained heavy pressure, one dwell step at a time, to the floor', () => {
+      const governor = new RenderBudgetGovernor({
+        tier: 'ultra',
+        budget: GFX_BUDGETS.ultra,
+        enabled: true,
+      });
+      governor.reset(1, 0.65, 1);
+      let state = governor.update(sample({ dt: 1 }));
+      expect(state.levels.detail).toBe(1);
+      // 200 ms frames sit far over ultra's 30 ms drop line from the first
+      // sample. One step per 2.5 s dwell plus the 0.5/s slew: the plan steps
+      // to 0.32 at 2.5 s and the applied level settles there by 3.9 s, so at
+      // 4.17 s the session sits on the middle rung, not the floor.
+      for (let i = 0; i < 250; i++) state = governor.update(heavy());
+      expect(state.levels.detail).toBeCloseTo(0.32, 2);
+      // The second dwell (5 s) reaches the floor by 5.7 s.
+      for (let i = 0; i < 150; i++) state = governor.update(heavy());
+      expect(state.levels.detail).toBe(0);
+    });
+
+    it('restores one step per sustained-calm dwell through the governor, back to 1', () => {
+      const governor = new RenderBudgetGovernor({
+        tier: 'ultra',
+        budget: GFX_BUDGETS.ultra,
+        enabled: true,
+      });
+      governor.reset(1, 0.65, 1);
+      let state = governor.update(sample({ dt: 1 }));
+      for (let i = 0; i < 400; i++) state = governor.update(heavy());
+      expect(state.levels.detail).toBe(0);
+      // The frame EMA needs about 25 calm frames to fall under the 0.85 exit
+      // line, then 6 s of calm restores one step: 0.32 well before 8.3 s.
+      for (let i = 0; i < 500; i++) state = governor.update(calm());
+      expect(state.levels.detail).toBeCloseTo(0.32, 2);
+      for (let i = 0; i < 500; i++) state = governor.update(calm());
+      expect(state.levels.detail).toBe(1);
+    });
+
+    it('a high TABLE session is untouched: its band is not governable and its request is the floor', () => {
+      for (const terrainDetail of [
+        undefined,
+        { terrainRelief: 1, surfaceDetailTaps: 0, surfaceDetailClampK: 0 },
+      ]) {
+        const governor = new RenderBudgetGovernor({
+          tier: 'high',
+          budget: GFX_BUDGETS.high,
+          enabled: true,
+          terrainDetail,
+        });
+        governor.reset(1, 0.65, 1);
+        let state = governor.update(sample({ dt: 1 }));
+        for (let i = 0; i < 600; i++) state = governor.update(heavy());
+        expect(state.levels.detail).toBe(1);
+      }
+    });
+
+    it('an Advanced session on tier high whose dials sit above the floor is admitted by its own request', () => {
+      const governor = new RenderBudgetGovernor({
+        tier: 'high',
+        budget: GFX_BUDGETS.high,
+        enabled: true,
+        terrainDetail: { terrainRelief: 3, surfaceDetailTaps: 4, surfaceDetailClampK: 1 },
+      });
+      governor.reset(1, 0.65, 1);
+      let state = governor.update(sample({ dt: 1 }));
+      for (let i = 0; i < 250; i++) state = governor.update(heavy());
+      expect(state.levels.detail).toBeCloseTo(0.32, 2);
+    });
+
+    it('the pinned dev-flag level overrides live pressure and never moves', () => {
+      const governor = new RenderBudgetGovernor({
+        tier: 'ultra',
+        budget: GFX_BUDGETS.ultra,
+        enabled: true,
+        pinnedDetailLevel: 0.5,
+      });
+      governor.reset(1, 0.65, 1);
+      let state = governor.update(sample({ dt: 1 }));
+      expect(state.levels.detail).toBe(0.5);
+      for (let i = 0; i < 400; i++) {
+        state = governor.update(sample({ dt: 1 / 60, frameMs: 200, totalMs: 200, submitMs: 150 }));
+      }
+      expect(state.levels.detail).toBe(0.5);
+      // Calm forever does not move it either: the pin is absolute.
+      for (let i = 0; i < 400; i++) {
+        state = governor.update(sample({ dt: 1 / 60, frameMs: 5, totalMs: 5, submitMs: 2 }));
+      }
+      expect(state.levels.detail).toBe(0.5);
+    });
+
+    it('a disabled governor holds level 1 regardless of tier or pressure', () => {
+      const governor = new RenderBudgetGovernor({
+        tier: 'ultra',
+        budget: GFX_BUDGETS.ultra,
+        enabled: false,
+      });
+      governor.reset(1, 0.65, 1);
+      let state = governor.update(sample({ dt: 1 }));
+      for (let i = 0; i < 100; i++) state = governor.update(heavy());
+      expect(state.levels.detail).toBe(1);
+    });
+
+    it('the pin holds with the governor DISABLED too (the A/B arm a bench run wants)', () => {
+      const governor = new RenderBudgetGovernor({
+        tier: 'ultra',
+        budget: GFX_BUDGETS.ultra,
+        enabled: false,
+        pinnedDetailLevel: 0.32,
+      });
+      governor.reset(1, 0.65, 1);
+      let state = governor.update(sample({ dt: 1 }));
+      expect(state.levels.detail).toBe(0.32);
+      for (let i = 0; i < 100; i++) state = governor.update(heavy());
+      expect(state.mode).toBe('disabled');
+      expect(state.levels.detail).toBe(0.32);
+    });
   });
 });

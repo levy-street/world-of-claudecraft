@@ -138,3 +138,35 @@ describe('render dev flags: the blade-grass sector split', () => {
     }
   });
 });
+
+describe('render dev flags: the ?terraindetail= level pin', () => {
+  it('is absent (null) by default and in a headless host', async () => {
+    expect((await loadFlags('')).terrainDetailLevelPin()).toBeNull();
+    expect((await loadFlags(null)).terrainDetailLevelPin()).toBeNull();
+  });
+
+  it('pins the parsed 0..1 level', async () => {
+    expect((await loadFlags('?terraindetail=1')).terrainDetailLevelPin()).toBe(1);
+    expect((await loadFlags('?terraindetail=0.5')).terrainDetailLevelPin()).toBe(0.5);
+    expect((await loadFlags('?terraindetail=0')).terrainDetailLevelPin()).toBe(0);
+  });
+
+  it('clamps an out-of-range value into 0..1', async () => {
+    expect((await loadFlags('?terraindetail=7')).terrainDetailLevelPin()).toBe(1);
+    expect((await loadFlags('?terraindetail=-2')).terrainDetailLevelPin()).toBe(0);
+  });
+
+  it('ignores a non-numeric or empty value, so a typo cannot pin the floor', async () => {
+    for (const search of ['?terraindetail=', '?terraindetail=off', '?terraindetail=low']) {
+      expect((await loadFlags(search)).terrainDetailLevelPin(), search).toBeNull();
+    }
+  });
+
+  it('is independent of the =off layer switches and the prep mode', async () => {
+    const flags = await loadFlags('?terraindetail=0&n8ao=off&prep=legacy');
+    expect(flags.terrainDetailLevelPin()).toBe(0);
+    expect(flags.renderLayerDisabled('terraindetail')).toBe(false);
+    expect(flags.renderLayerDisabled('n8ao')).toBe(true);
+    expect(flags.gpuPrepMode()).toBe('legacy');
+  });
+});

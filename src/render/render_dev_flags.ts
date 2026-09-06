@@ -51,6 +51,12 @@
 //                     the translucent surface every build before this shipped).
 //                     The world canvas is opaque by default now; this is the A/B
 //                     arm for measuring the compositor difference on one build.
+//   ?terraindetail=<0..1> - pins the live terrain-detail shed level
+//                  (render_budget.ts's `detail` bucket, terrain_detail_shed_core.ts)
+//                  for the whole session, ignoring live governor pressure, so an
+//                  A/B run compares the floor and the tier's own request at a
+//                  known, stable level instead of racing the governor's dwell
+//                  timers.
 
 /**
  * Sectors per axis each blade-grass pool splits its slot grid into. Four is
@@ -110,4 +116,18 @@ const canvasAlpha = ((): boolean => {
 /** True under `?canvasalpha=on`: keep the legacy TRANSLUCENT world context. */
 export function worldCanvasAlphaRequested(): boolean {
   return canvasAlpha;
+}
+
+const terrainDetailPin = ((): number | null => {
+  if (typeof location === 'undefined') return null;
+  const raw = new URLSearchParams(location.search).get('terraindetail');
+  if (raw === null || raw.trim() === '') return null;
+  const parsed = Number(raw);
+  if (!Number.isFinite(parsed)) return null;
+  return Math.min(1, Math.max(0, parsed));
+})();
+
+/** The `?terraindetail=<0..1>` dev pin, clamped, or null when absent/invalid. */
+export function terrainDetailLevelPin(): number | null {
+  return terrainDetailPin;
 }
