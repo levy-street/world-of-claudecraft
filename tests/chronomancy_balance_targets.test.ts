@@ -14,10 +14,10 @@
 // act), landing at 112.7s here. The reactive and emergency windows stay inside
 // their original bands (their heavier spend outpaces the added trickle), so
 // only the offensive band moved.
-//   - conservative offensive rotation: ~100-110s to OOM (median over the seed trio),
+//   - conservative offensive rotation: ~92-108s to OOM (median over the seed trio),
 //   - conservative + occasional Temporal Mend/Barrier: ~55-72s,
 //   - emergency (hold 4 charges): 15-25s,
-//   - conservative healing rotation at 50-65% of Piro and Cryo DPS over the same window.
+//   - conservative healing rotation at 50-70% of Piro and Cryo DPS over the same window.
 //
 // Fixtures and the policy runner live in tests/helpers/chronomancy_harness.ts
 // (shared with the heal-parity and Cascada suites this file split from).
@@ -30,6 +30,7 @@ import {
   fireRotation,
   nukeSpam,
   type RunResult,
+  runPressureRotation,
   runRotation,
 } from './helpers/chronomancy_harness';
 
@@ -156,11 +157,12 @@ describe('Chronomancy Phase 3 balance targets', () => {
     );
     // This is the complete conservative HEALER loop: Echo upkeep and periodic
     // Mend/Barrier casts share the same 40-second combat window as the pure-DPS
-    // baselines. Keep the result inside the PRD's 50-65% contribution band;
+    // baselines. The longer Echo windows deliberately free offensive globals,
+    // so keep the result inside the revised PRD 50-70% contribution band;
     // do not widen the product contract to fit a sampled reading.
     for (const pureDps of [totals.piro / 3, totals.cryo / 3]) {
       expect(chronoDps).toBeGreaterThanOrEqual(pureDps * 0.5);
-      expect(chronoDps).toBeLessThanOrEqual(pureDps * 0.65);
+      expect(chronoDps).toBeLessThanOrEqual(pureDps * 0.7);
     }
   });
 
@@ -211,10 +213,35 @@ describe('Chronomancy Phase 3 balance targets', () => {
   });
 
   it('the offensive rotation heals through Echo (maintenance HPS, below Temporal Mend)', () => {
-    expect(consEcho.echoHps).toBeGreaterThan(0);
+    // Temporal Mend measures ~169 HPS in the paired level-20 comparison. The
+    // offensive identity must contribute meaningful maintenance healing, not
+    // merely prove that the conversion hook fired. Fifty HPS is still well
+    // below the spot-heal button, but makes attacking worth a healer's globals.
+    expect(consEcho.echoHps).toBeGreaterThanOrEqual(50);
     // Echo is maintenance, not a spot heal: well under Temporal Mend's measured
     // ~175 HPS in the level-20 direct-heal comparison
     // (tests/chronomancy_heal_parity.test.ts).
     expect(consEcho.echoHps).toBeLessThan(80);
+  });
+
+  it('the mixed damage and healing loop provides useful sustain before Barrier absorbs', () => {
+    // This includes Echo plus the occasional Temporal Mend from the real mixed
+    // policy. Temporal Barrier is deliberately absent from the number because
+    // absorbs do not emit heal2; the contract therefore cannot pass on shielding.
+    // x4 conversion measures 49.6 HPS on this fixed seed. Pin a floor below that
+    // observed value while still requiring meaningful healing from attacking.
+    expect(consReact.healingHps).toBeGreaterThanOrEqual(45);
+    expect(consReact.healingHps).toBeLessThan(100);
+  });
+
+  it('keeps an ally alive under sustained pressure while still attacking', () => {
+    const pressure = runPressureRotation();
+    expect(pressure.survived, JSON.stringify(pressure)).toBe(true);
+    expect(pressure.seconds).toBe(40);
+    expect(pressure.offensiveHits).toBeGreaterThan(10);
+    expect(pressure.dps).toBeGreaterThanOrEqual(20);
+    expect(pressure.echoHps).toBeGreaterThanOrEqual(35);
+    expect(pressure.healingHps).toBeGreaterThanOrEqual(45);
+    expect(pressure.remainingMana).toBeGreaterThan(0);
   });
 });

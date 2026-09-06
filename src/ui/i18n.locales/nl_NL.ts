@@ -3364,10 +3364,10 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Verschuift het doelwit een hartslag buiten het heden: een tijdschild absorbeert {damage} schade gedurende 10 sec voordat de tijdlijn terugknalt.',
   'entities.abilities.temporal_barrier.name': 'Temporele Barrière',
   'entities.abilities.temporal_cascade.description':
-    'Stuurt een echo door je groep: het doelwit en tot vier van hun naaste bondgenoten worden tegelijk hersteld en elk gedurende {duration} sec gemarkeerd, waarbij een deel van de Arcaneschade die je aanricht terugstroomt door hun echo om hen te genezen. (Chronomantie)',
+    'Stuurt een echo door je groep: het doelwit en tot vier van hun naaste bondgenoten worden tegelijk hersteld en elk gedurende {duration} sec gemarkeerd, waarbij een deel van de Arcaneschade die je aanricht terugstroomt door hun echo om hen te genezen. Aethergolf en Aetherpijlen maken uit elke groepsecho een even grote genezingsreserve, verdeeld naar ontbrekende gezondheid onder gemarkeerde bondgenoten met minder dan 60% gezondheid. (Chronomantie)',
   'entities.abilities.temporal_cascade.name': 'Temporele Cascade',
   'entities.abilities.temporal_echo.description':
-    'Markeert een bondgenoot met de echo van een gezonder moment, en herstelt direct {damage} gezondheid. Gedurende {duration} sec stroomt een deel van de Arcaneschade die je aanricht terug door de echo om hen te genezen.',
+    'Markeert een bondgenoot met de echo van een gezonder moment, en herstelt direct {damage} gezondheid. Gedurende {duration} sec geneest {echoSinglePct}% van je overige Arcaneschade tegen één doel en {echoAreaPct}% van je Arcane gebiedsschade die bondgenoot. Aethergolf en Aetherpijlen genezen in plaats daarvan voor {echoDriverPct}% van de schade die ze aanrichten.',
   'entities.abilities.temporal_echo.name': 'Temporele Echo',
   'entities.abilities.temporal_hourglass.description':
     'Plaatst een tijdzandloper op de geselecteerde locatie. Onder een vijand schorst het hen {hostilePveDuration} sec in PvE of {hostilePvpDuration} sec in PvP en verhindert alle acties; schade verbreekt het effect. Aan je voeten of onder een groepsbondgenoot verleent het {duration} sec stasis, verhindert schade en acties, herstelt {healing}% van maximale gezondheid, en laat afkoeltijden {selfCooldownRecovery}% sneller herstellen voor jezelf of {allyCooldownRecovery}% sneller voor een bondgenoot. Op leeg terrein wacht de zandloper {groundDuration} sec en treft de eerste geldige eenheid die erop stapt. De heilzame aura kan handmatig worden verwijderd.',
@@ -14392,7 +14392,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.sweepingStrikes':
     'Slagen voor één doelwit treffen ook {targets} nabije vijand voor {pct}% schade',
   'hudChrome.auraEffect.temporalEcho':
-    'De Arcaneschade van de werper geneest je voor {singlePct}% van schade voor één doelwit of {areaPct}% van gebiedsschade',
+    'De Arcaneschade van de werper geneest je voor {singlePct}% van schade voor één doelwit of {areaPct}% van gebiedsschade. Aethergolf en Aetherpijlen krijgen een x4-bonus op een individuele Temporal Echo. Groepsecho’s maken een even grote genezingsreserve, verdeeld naar ontbrekende gezondheid onder gemarkeerde bondgenoten met minder dan 60% gezondheid',
   'hudChrome.auraEffect.warlockAnchor':
     'Spreuk opnieuw binnen {range} m om hierheen terug te keren en het anker te verbruiken',
   'hudChrome.auraEffect.wintersChill':
@@ -15293,10 +15293,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.benison_dawnweave.bonus4':
     'Wanneer Seraphic Vigil wordt geactiveerd, wordt zijn bondgenoot ook gedurende 10 sec. genezen voor 15 procent van diens maximale gezondheid.',
   'entities.itemSets.benison_dawnweave.name': 'Benison Dageraadweefsel',
-  'entities.itemSets.chronoweave.bonus2':
-    'Temporal Echo zet 50 procent van je Arcane-schade tegen één doel om in genezing. Opgelopen schade vertraagt het uitspreken van je spreuken niet meer.',
-  'entities.itemSets.chronoweave.bonus4':
-    'De afkoeltijd van Temporal Cascade wordt met 5 sec. verkort.',
+  'entities.itemSets.chronoweave.bonus2': 'Temporal Echo zet 50% van je overige Arcaneschade tegen één doel om in genezing. Aethergolf en Aetherpijlen zetten in plaats daarvan 200% van hun aangerichte schade om. Opgelopen schade vertraagt het uitspreken van je spreuken niet meer.',
+  'entities.itemSets.chronoweave.bonus4': 'De afkoeltijd van Temporal Cascade wordt met 5 sec. en de manakosten met 30% verlaagd.',
   'entities.itemSets.chronoweave.name': 'Aetherweefsel-Gewaden',
   'entities.itemSets.cinderbark.bonus2':
     'Sweeping Claws heeft 30 procent kans om een extra Old Blood op te slaan.',

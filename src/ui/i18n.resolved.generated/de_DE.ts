@@ -2757,7 +2757,7 @@ export const de_DE: EnTranslations = {
       "suddenDeath": "Euer nächstes Frühes Grab kostet keine Wut und ignoriert seine Gesundheitsvoraussetzung",
       "aoeEcho": "{charges} Echos verbleiben: Fähigkeiten mit einem Ziel verursachen {pct}% Schaden an bis zu {targets} nahen Gegnern",
       "sureCrit": "{charges} schadensverursachende Fähigkeitseinsätze sind garantiert kritische Treffer",
-      "temporalEcho": "Der Arkanschaden des Wirkers heilt Euch um {singlePct}% bei Einzelziel- oder {areaPct}% bei Flächenschaden",
+      "temporalEcho": "Der Arkanschaden des Wirkers heilt Euch um {singlePct}% bei Einzelziel- oder {areaPct}% bei Flächenschaden. Ätherwoge und Äthergeschosse erhalten bei einem individuellen Zeitlichen Echo einen 4-fachen Bonus. Gruppenechos erzeugen eine gleich große Heilreserve, die nach fehlender Gesundheit unter markierten Verbündeten mit weniger als 60% Gesundheit verteilt wird",
       "arcaneCharge": "{stacks} Arkane Ladungen: Ätherschwall verursacht {damagePct}% mehr Schaden, wirkt {castPct}% schneller und kostet {costMult}x Mana",
       "physicalReduction": "Verringert erlittenen physischen Schaden um {pct}%",
       "temporalHourglass": "Immun und handlungsunfähig; stellt Gesundheit wieder her und beschleunigt die Abklingzeit-Regeneration. Rechtsklick zum Abbrechen.",
@@ -11670,11 +11670,11 @@ export const de_DE: EnTranslations = {
       },
       "temporal_echo": {
         "name": "Temporales Echo",
-        "description": "Markiert einen Verbündeten mit dem Echo eines gesünderen Augenblicks und heilt sofort {damage} Gesundheit. Für {duration} Sek. wird ein Teil des Arkanen Schadens, den du verursachst, durch das Echo zurückgeleitet und heilt ihn."
+        "description": "Markiert einen Verbündeten mit dem Echo eines gesünderen Augenblicks und heilt sofort {damage} Gesundheit. Für {duration} Sek. heilen ihn {echoSinglePct}% deines sonstigen Arkanen Einzelzielschadens und {echoAreaPct}% deines Arkanen Flächenschadens. Ätherwoge und Äthergeschosse heilen ihn stattdessen um {echoDriverPct}% ihres verursachten Schadens."
       },
       "temporal_cascade": {
         "name": "Temporale Kaskade",
-        "description": "Sendet ein Echo durch deine Gruppe: Das Ziel und bis zu vier seiner nächsten Verbündeten werden sofort geheilt und jeweils {duration} Sek. lang markiert, wodurch ein Teil des Arkanen Schadens, den du verursachst, durch ihre Echos zurückgeleitet wird und sie heilt. (Chronomantie)"
+        "description": "Sendet ein Echo durch deine Gruppe: Das Ziel und bis zu vier seiner nächsten Verbündeten werden sofort geheilt und jeweils {duration} Sek. lang markiert, wodurch ein Teil des Arkanen Schadens, den du verursachst, durch ihre Echos zurückgeleitet wird und sie heilt. Ätherwoge und Äthergeschosse erzeugen aus jedem Gruppenecho eine gleich große Heilreserve, die nach fehlender Gesundheit unter markierten Verbündeten mit weniger als 60% Gesundheit verteilt wird. (Chronomantie)"
       },
       "temporal_reversal": {
         "name": "Temporale Umkehr",
@@ -19072,8 +19072,8 @@ export const de_DE: EnTranslations = {
       },
       "chronoweave": {
         "name": "Gewänder des Äthergewebes",
-        "bonus2": "Zeitliches Echo wandelt 50 Prozent deines arkanen Einzelzielschadens in Heilung um. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
-        "bonus4": "Die Abklingzeit von Zeitliche Kaskade wird um 5 Sek. verkürzt."
+        "bonus2": "Zeitliches Echo wandelt 50% deines sonstigen Arkanen Einzelzielschadens in Heilung um. Ätherwoge und Äthergeschosse wandeln stattdessen 200% ihres verursachten Schadens um. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
+        "bonus4": "Die Abklingzeit von Zeitliche Kaskade wird um 5 Sek. und ihre Manakosten werden um 30% verringert."
       },
       "cinderbark": {
         "name": "Wacht der Aschenrinde",

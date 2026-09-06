@@ -2757,7 +2757,7 @@ export const it_IT: EnTranslations = {
       "suddenDeath": "La tua prossima Tomba Prematura non costa rabbia e ignora il suo requisito di salute",
       "aoeEcho": "Restano {charges} echi: le abilità a bersaglio singolo infliggono il {pct}% dei danni fino a {targets} nemici vicini",
       "sureCrit": "{charges} lanci di abilità dannose sono colpi critici garantiti",
-      "temporalEcho": "I danni Arcani del lanciatore ti curano per il {singlePct}% dei danni a bersaglio singolo o il {areaPct}% dei danni ad area",
+      "temporalEcho": "I danni Arcani del lanciatore ti curano per il {singlePct}% dei danni a bersaglio singolo o il {areaPct}% dei danni ad area. Impeto Etereo e Dardi Eterei ricevono un bonus x4 con un Eco Temporale individuale. Gli Echi di gruppo creano una riserva di cure equivalente, distribuita in base alla salute mancante tra gli alleati marchiati con meno del 60% di salute",
       "arcaneCharge": "{stacks} Cariche Arcane: Potere d'Etere infligge il {damagePct}% di danni in più, si lancia il {castPct}% più veloce e costa {costMult}x mana",
       "physicalReduction": "Riduce i danni Fisici subiti del {pct}%",
       "temporalHourglass": "Immune e impossibilitato ad agire; ripristina la salute e accelera il recupero dei tempi di recupero. Clic destro per annullare.",
@@ -11670,11 +11670,11 @@ export const it_IT: EnTranslations = {
       },
       "temporal_echo": {
         "name": "Eco Temporale",
-        "description": "Contrassegna un alleato con l'eco di un momento più sano, curandolo di {damage} salute immediatamente. Per {duration} secondi, parte dei danni Arcani che infliggi viene convogliata attraverso l'eco per curarli."
+        "description": "Contrassegna un alleato con l'eco di un momento più sano, curandolo di {damage} salute immediatamente. Per {duration} secondi, il {echoSinglePct}% degli altri danni Arcani a bersaglio singolo e il {echoAreaPct}% dei danni Arcani ad area lo curano. Impeto Etereo e Dardi Eterei lo curano invece per il {echoDriverPct}% dei danni che infliggono."
       },
       "temporal_cascade": {
         "name": "Cascata Temporale",
-        "description": "Invia un'eco in cascata attraverso il tuo gruppo: il bersaglio è fino a quattro alleati più vicini vengono curati contemporaneamente e ciascuno viene contrassegnato per {duration} secondi, convogliando parte dei danni Arcani che infliggi attraverso le loro echi per curarli. (Cronomanzia)"
+        "description": "Invia un'eco in cascata attraverso il tuo gruppo: il bersaglio e fino a quattro alleati più vicini vengono curati contemporaneamente e ciascuno viene contrassegnato per {duration} secondi, convogliando parte dei danni Arcani che infliggi attraverso i loro echi per curarli. Impeto Etereo e Dardi Eterei creano una riserva di cure equivalente da ogni Eco di gruppo, distribuita in base alla salute mancante tra gli alleati marchiati con meno del 60% di salute. (Cronomanzia)"
       },
       "temporal_reversal": {
         "name": "Inversione Temporale",
@@ -19072,8 +19072,8 @@ export const it_IT: EnTranslations = {
       },
       "chronoweave": {
         "name": "Vesti della Tessitura Eterea",
-        "bonus2": "L’Eco Temporale converte il 50 percento dei danni arcani a bersaglio singolo in cure. I danni subiti non ritardano più il lancio degli incantesimi.",
-        "bonus4": "Il tempo di recupero della Cascata Temporale è ridotto di 5 s."
+        "bonus2": "L’Eco Temporale converte il 50% degli altri danni Arcani a bersaglio singolo in cure. Impeto Etereo e Dardi Eterei convertono invece il 200% dei danni che infliggono. I danni subiti non ritardano più il lancio degli incantesimi.",
+        "bonus4": "Il tempo di recupero della Cascata Temporale è ridotto di 5 s e il suo costo in mana del 30%."
       },
       "cinderbark": {
         "name": "Protezione di Corteccia Cinerea",

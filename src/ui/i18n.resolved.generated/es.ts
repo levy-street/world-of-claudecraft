@@ -2757,7 +2757,7 @@ export const es: EnTranslations = {
       "suddenDeath": "Tu próximo Ejecutar no cuesta ira e ignora el requisito de salud",
       "aoeEcho": "Quedan {charges} ecos: las facultades de un objetivo infligen un {pct}% de daño a hasta {targets} enemigos cercanos",
       "sureCrit": "Tus próximas {charges} facultades dañinas tienen golpe crítico garantizado",
-      "temporalEcho": "El daño Arcano del taumaturgo te sana un {singlePct}% del daño a un objetivo o un {areaPct}% del daño de área",
+      "temporalEcho": "El daño Arcano del taumaturgo te sana un {singlePct}% del daño a un objetivo o un {areaPct}% del daño de área. Oleada de éter y Dardos de éter obtienen una bonificación de x4 con un Eco Temporal individual. Los Ecos grupales generan una reserva de sanación equivalente que se reparte entre los aliados marcados con menos del 60% de salud según la salud que les falte",
       "arcaneCharge": "{stacks} cargas Arcanas: Oleada de éter inflige un {damagePct}% más, se lanza un {castPct}% más rápido y cuesta {costMult} veces más maná",
       "physicalReduction": "Reduce el daño Físico recibido un {pct}%",
       "temporalHourglass": "Inmune e incapaz de actuar; recupera salud y acelera los tiempos de reutilización. Haz clic derecho para cancelar.",
@@ -11670,11 +11670,11 @@ export const es: EnTranslations = {
       },
       "temporal_echo": {
         "name": "Eco temporal",
-        "description": "Marca a un aliado con el eco de un momento más sano y repara {damage} de salud al instante. Durante {duration} s, parte del daño Arcano que infliges se canaliza de vuelta a través del eco para curarlo."
+        "description": "Marca a un aliado con el eco de un momento más sano y repara {damage} de salud al instante. Durante {duration} s, lo sana un {echoSinglePct}% de tu otro daño Arcano a un objetivo y un {echoAreaPct}% de tu daño Arcano de área. Oleada de éter y Dardos de éter lo sanan en su lugar un {echoDriverPct}% del daño que infligen."
       },
       "temporal_cascade": {
         "name": "Cascada Temporal",
-        "description": "Envía un eco en cascada por tu grupo: el objetivo y hasta cuatro de sus aliados más cercanos son sanados a la vez y quedan marcados durante {duration} s, convirtiendo parte del daño Arcano que causas en sanación a través de sus ecos. (Cronomancia)"
+        "description": "Envía un eco en cascada por tu grupo: el objetivo y hasta cuatro de sus aliados más cercanos son sanados a la vez y quedan marcados durante {duration} s, convirtiendo parte del daño Arcano que causas en sanación a través de sus ecos. Oleada de éter y Dardos de éter generan una reserva de sanación equivalente por cada Eco grupal, repartida entre los aliados marcados con menos del 60% de salud según la salud que les falte. (Cronomancia)"
       },
       "temporal_reversal": {
         "name": "Inversión Temporal",
@@ -19072,8 +19072,8 @@ export const es: EnTranslations = {
       },
       "chronoweave": {
         "name": "Vestimentas de Trama Etérea",
-        "bonus2": "Eco Temporal convierte un 50% de tu daño Arcano a un solo objetivo en sanación. El daño recibido ya no retrasa tus hechizos.",
-        "bonus4": "El tiempo de reutilización de Cascada Temporal se reduce 5 s."
+        "bonus2": "Eco Temporal convierte un 50% de tu otro daño Arcano a un solo objetivo en sanación. Oleada de éter y Dardos de éter convierten en su lugar un 200% del daño que infligen. El daño recibido ya no retrasa tus hechizos.",
+        "bonus4": "El tiempo de reutilización de Cascada Temporal se reduce 5 s y su coste de maná se reduce un 30%."
       },
       "cinderbark": {
         "name": "Guardia de Corteza de Brasa",

@@ -13,6 +13,7 @@ import {
   aetherSurgeDamageMult,
   aetherSurgeStacks,
   armAetherSurgeFree,
+  ECHO_ROTATION_CONVERSION_MULT,
 } from '../src/sim/combat/chronomancy';
 import { ABILITIES } from '../src/sim/content/classes';
 import { MOBS } from '../src/sim/data';
@@ -164,8 +165,8 @@ describe('Aether Surge charge sequence (use previous, then +1)', () => {
   });
 });
 
-describe('Aether Surge feeds Temporal Echo (no hidden heal bonus)', () => {
-  it('the marked ally is healed for the Echo fraction of the Aether Surge damage', () => {
+describe('Aether Surge feeds the individual Temporal Echo', () => {
+  it('the marked ally receives the offensive-rotation conversion weight', () => {
     const { sim, p } = chronoMage();
     const mob = addHostile(sim);
     const allyId = sim.addPlayer('warrior', 'Marcado');
@@ -183,7 +184,10 @@ describe('Aether Surge feeds Temporal Echo (no hidden heal bonus)', () => {
     const dmg = evs
       .filter(
         (e): e is Extract<SimEvent, { type: 'damage' }> =>
-          e.type === 'damage' && e.sourceId === p.id && e.targetId === mob.id,
+          e.type === 'damage' &&
+          e.sourceId === p.id &&
+          e.targetId === mob.id &&
+          e.abilityId === 'arcane_surge',
       )
       .reduce((a, e) => a + e.amount, 0);
     const echo = evs
@@ -193,10 +197,7 @@ describe('Aether Surge feeds Temporal Echo (no hidden heal bonus)', () => {
       )
       .reduce((a, e) => a + e.amount, 0);
     expect(dmg).toBeGreaterThan(0);
-    // Echo heals 40% of the single-target Arcane damage: purely the damage, no
-    // hidden heal bonus (allow +/-1 for per-hit rounding).
-    expect(echo).toBeGreaterThan(0);
-    expect(Math.abs(echo - Math.round(dmg * 0.4))).toBeLessThanOrEqual(1);
+    expect(echo, `surge damage=${dmg}, echo heal=${echo}`).toBe(Math.round(dmg * 1.6));
   });
 });
 
@@ -212,6 +213,102 @@ describe('Aether Surge charge window expires', () => {
 });
 
 describe('Aether Darts consumes the charges', () => {
+  it('forwards its live stable id and converts every missile through the weighted Echo', () => {
+    const { sim, p } = chronoMage();
+    const mob = addHostile(sim);
+    const allyId = sim.addPlayer('warrior', 'DartsEcho');
+    const ally = expectDefined(sim.entities.get(allyId));
+    ally.pos.x = p.pos.x + 4;
+    ally.pos.z = p.pos.z;
+    ally.maxHp = 1_000_000;
+    ally.hp = 1;
+    castResolve(sim, p, 'temporal_echo', allyId, 0.2);
+    ally.maxHp = 1_000_000;
+    ally.hp = 1;
+
+    const evs = castResolve(sim, p, 'arcane_missiles', mob.id, 3.5);
+    const darts = evs.filter(
+      (e): e is Extract<SimEvent, { type: 'damage' }> =>
+        e.type === 'damage' && e.sourceId === p.id && e.abilityId === 'arcane_missiles',
+    );
+    const echo = evs
+      .filter(
+        (e): e is Extract<SimEvent, { type: 'heal2' }> =>
+          e.type === 'heal2' && e.targetId === allyId && e.ability === 'Temporal Echo',
+      )
+      .reduce((sum, e) => sum + e.amount, 0);
+    expect(ECHO_ROTATION_CONVERSION_MULT).toBe(4);
+    expect(darts).toHaveLength(3);
+    expect(
+      echo,
+      JSON.stringify({
+        darts,
+        heals: evs.filter((e) => e.type === 'heal2' && e.targetId === allyId),
+      }),
+    ).toBe(darts.reduce((sum, e) => sum + Math.round(e.amount * 1.6), 0));
+  });
+
+  it('replays the live weighted Darts channel identically from the same seed', () => {
+    const run = () => {
+      const { sim, p } = chronoMage();
+      const mob = addHostile(sim);
+      const allyId = sim.addPlayer('warrior', 'DartsReplay');
+      const ally = expectDefined(sim.entities.get(allyId));
+      ally.pos.x = p.pos.x + 4;
+      ally.pos.z = p.pos.z;
+      ally.maxHp = 1_000_000;
+      ally.hp = 1;
+      castResolve(sim, p, 'temporal_echo', allyId, 0.2);
+      ally.maxHp = 1_000_000;
+      ally.hp = 1;
+      const draws: number[] = [];
+      sim.ctx.rng.setObserver((value) => draws.push(value));
+      const events = castResolve(sim, p, 'arcane_missiles', mob.id, 3.5).filter(
+        (e) =>
+          (e.type === 'damage' && e.abilityId === 'arcane_missiles') ||
+          (e.type === 'heal2' && e.ability === 'Temporal Echo'),
+      );
+      sim.ctx.rng.setObserver(null);
+      return { draws, events, allyHp: ally.hp, mobHp: mob.hp, mana: p.resource };
+    };
+
+    expect(run()).toEqual(run());
+  });
+
+  it.each(['arcane_surge', 'arcane_missiles'])(
+    '%s keeps identical damage and mana with Echo marked',
+    (id) => {
+      const run = (marked: boolean) => {
+        const { sim, p } = chronoMage();
+        const mob = addHostile(sim);
+        const allyId = sim.addPlayer('warrior', 'Preservation');
+        const ally = expectDefined(sim.entities.get(allyId));
+        ally.pos.x = p.pos.x + 4;
+        ally.pos.z = p.pos.z;
+        ally.maxHp = 1_000_000;
+        ally.hp = 1;
+        castResolve(sim, p, 'temporal_echo', allyId, 0.2);
+        if (!marked) ally.auras = ally.auras.filter((a) => a.kind !== 'temporal_echo');
+        ally.maxHp = 1_000_000;
+        ally.hp = 1;
+        p.resource = p.maxResource;
+        const manaBefore = p.resource;
+        const evs = castResolve(sim, p, id, mob.id, id === 'arcane_missiles' ? 3.5 : 2.3);
+        return {
+          damage: evs
+            .filter(
+              (e): e is Extract<SimEvent, { type: 'damage' }> =>
+                e.type === 'damage' && e.sourceId === p.id && e.targetId === mob.id,
+            )
+            .reduce((sum, e) => sum + e.amount, 0),
+          manaSpent: manaBefore - p.resource,
+        };
+      };
+
+      expect(run(true)).toEqual(run(false));
+    },
+  );
+
   it('spends every charge on the first landed missile and hits harder for it', () => {
     // Baseline Aether Darts with no charges.
     const base = chronoMage();

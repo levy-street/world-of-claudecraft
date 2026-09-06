@@ -948,7 +948,7 @@ export function dealDamage(
   // and non-player sources are filtered inside. The PvP-context early returns
   // above (duel/fiesta/arena) intentionally skip conversion (PRD 13.9 defers PvP
   // tuning to a later phase).
-  chronomancyConvertArcaneDamage(ctx, source, preHp - target.hp, school, aoe);
+  chronomancyConvertArcaneDamage(ctx, source, preHp - target.hp, school, aoe, abilityId);
   doctrineConvertDamage(ctx, source, preHp - target.hp, school, abilityId ?? null);
   vespersEchoDamage(ctx, source, target, preHp - target.hp, abilityId ?? null);
   onAfflictionDamage(ctx, source, target, preHp - target.hp);

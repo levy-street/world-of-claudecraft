@@ -2303,8 +2303,8 @@ function applyChannelTick(
     // Aether Darts: the FIRST landed missile consumes the caster's Arcane Charges
     // and locks a flat per-missile Arcane bonus (combat/chronomancy.ts); later
     // missiles reuse it. It is plain Arcane damage, so Temporal Echo heals from it
-    // at the normal rate. Draws no rng; a no-op (0) for any other channel and with
-    // no charges held.
+    // through the individual-mark rotation weight. Draws no rng; a no-op (0) for
+    // any other channel and with no charges held.
     const surgeBonus =
       res.def.id === 'arcane_missiles'
         ? aetherDartsBoltBonus(ctx, src, res.def.channel?.ticks ?? 1)
@@ -2318,7 +2318,21 @@ function applyChannelTick(
         // spell crit-damage channel of the mastery (plus the generic bonus) like
         // every other spell crit.
         if (crit) dmg *= 1.5 + src.critDmgSpellBonus;
-        ctx.dealDamage(src, tgt, Math.round(dmg), crit, res.def.school, res.def.name, 'hit');
+        ctx.dealDamage(
+          src,
+          tgt,
+          Math.round(dmg),
+          crit,
+          res.def.school,
+          res.def.name,
+          'hit',
+          false,
+          undefined,
+          true,
+          false,
+          false,
+          res.def.id === 'arcane_missiles' ? res.def.id : null,
+        );
         noteSpellHit(ctx, src, crit, res.def.id);
       } else if (eff.type === 'drainTick') {
         const doom = afflictionDrainTickDoom(ctx, src, tgt, consumeThreadDoomBonus);

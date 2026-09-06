@@ -259,7 +259,7 @@ design targets for the tuning pass.
 
 ### Mage
 
-**Aetherweave Vestments** (`chronoweave`), arcane (Chronomancy), cloth. 2 pieces: Temporal Echo converts 50 percent of your single-target Arcane damage into healing. Damage taken no longer delays your spellcasting. 4 pieces: Temporal Cascade's cooldown is reduced by 5 sec.
+**Aetherweave Vestments** (`chronoweave`), arcane (Chronomancy), cloth. 2 pieces: Temporal Echo converts 50 percent of your other single-target Arcane damage into healing. Aether Surge and Aether Darts instead convert 200 percent of their damage. Damage taken no longer delays your spellcasting. 4 pieces: Temporal Cascade's cooldown is reduced by 5 sec and its mana cost is reduced by 30 percent.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|

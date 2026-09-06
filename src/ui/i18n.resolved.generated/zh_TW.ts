@@ -2757,7 +2757,7 @@ export const zh_TW: EnTranslations = {
       "suddenDeath": "下一次斬殺不消耗怒氣並無視生命值要求",
       "aoeEcho": "剩餘 {charges} 次迴響：單體技能對附近最多 {targets} 個敵人造成 {pct}% 傷害",
       "sureCrit": "接下來 {charges} 個傷害技能必定造成致命一擊",
-      "temporalEcho": "施法者的秘法傷害會治療你，單體傷害轉化 {singlePct}%，範圍傷害轉化 {areaPct}%",
+      "temporalEcho": "施法者的秘法傷害會治療你，單體傷害轉化 {singlePct}%，範圍傷害轉化 {areaPct}%。以太湧動和乙太飛鏢對單體時光迴響獲得 4 倍加成。群體回音會產生等量的治療儲備，並依照已損失的生命值分配給生命值低於 60% 的受印記盟友",
       "arcaneCharge": "{stacks} 層秘法充能：乙太湧動傷害提高 {damagePct}%，施法加快 {castPct}%，法力消耗變為 {costMult} 倍",
       "physicalReduction": "受到的物理傷害降低 {pct}%",
       "temporalHourglass": "免疫傷害且無法行動；恢復生命並加速冷卻。按右鍵可取消。",
@@ -11670,11 +11670,11 @@ export const zh_TW: EnTranslations = {
       },
       "temporal_echo": {
         "name": "時光迴響",
-        "description": "以更健康時刻的迴響標記一名盟友，立即恢復{damage}點生命值。{duration}秒內，你造成的秘法傷害有一部分會透過迴響轉化為對其的治療。"
+        "description": "以更健康時刻的迴響標記一名盟友，立即恢復{damage}點生命值。{duration}秒內，你其他單體秘法傷害的 {echoSinglePct}% 和範圍秘法傷害的 {echoAreaPct}% 會治療該盟友。以太湧動和乙太飛鏢則會以其造成傷害的 {echoDriverPct}% 治療該盟友。"
       },
       "temporal_cascade": {
         "name": "時光奔流",
-        "description": "讓一道回音在隊伍中奔流：立即治療目標及其至多四名最近的盟友，並為每人施加持續 {duration} 秒的印記；你造成的部分秘法傷害會透過回音轉化為對他們的治療。（時光術）"
+        "description": "讓一道回音在隊伍中奔流：立即治療目標及其至多四名最近的盟友，並為每人施加持續 {duration} 秒的印記；你造成的部分秘法傷害會透過回音轉化為對他們的治療。以太湧動和乙太飛鏢會從每個群體回音中產生等量的治療儲備，並依照已損失的生命值分配給生命值低於 60% 的受印記盟友。（時光術）"
       },
       "temporal_reversal": {
         "name": "時光逆轉",
@@ -19072,8 +19072,8 @@ export const zh_TW: EnTranslations = {
       },
       "chronoweave": {
         "name": "以太織法衣",
-        "bonus2": "時光迴響將你 50% 的單體秘法傷害轉化為治療。受到傷害不再延遲你的施法。",
-        "bonus4": "時光奔流的冷卻時間縮短 5 秒。"
+        "bonus2": "時光迴響將你其他單體秘法傷害的 50% 轉化為治療。以太湧動和乙太飛鏢則轉化其傷害的 200%。受到傷害不再延遲你的施法。",
+        "bonus4": "時光奔流的冷卻時間縮短 5 秒，法力消耗降低 30%。"
       },
       "cinderbark": {
         "name": "燼皮守禦甲",

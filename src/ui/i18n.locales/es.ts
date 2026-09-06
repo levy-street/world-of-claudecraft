@@ -3457,7 +3457,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Acelera el flujo del tiempo para tu grupo o banda, aumentando la velocidad de ataque, lanzamiento y canalización un 30% durante 15 s. Los aliados afectados recientemente por Aceleración Temporal o Tambores de Guerra están demasiado agotados para beneficiarse. (Cronomancia)',
   'entities.abilities.temporal_acceleration.name': 'Aceleración Temporal',
   'entities.abilities.temporal_cascade.description':
-    'Envía un eco en cascada por tu grupo: el objetivo y hasta cuatro de sus aliados más cercanos son sanados a la vez y quedan marcados durante {duration} s, convirtiendo parte del daño Arcano que causas en sanación a través de sus ecos. (Cronomancia)',
+    'Envía un eco en cascada por tu grupo: el objetivo y hasta cuatro de sus aliados más cercanos son sanados a la vez y quedan marcados durante {duration} s, convirtiendo parte del daño Arcano que causas en sanación a través de sus ecos. Oleada de éter y Dardos de éter generan una reserva de sanación equivalente por cada Eco grupal, repartida entre los aliados marcados con menos del 60% de salud según la salud que les falte. (Cronomancia)',
   'entities.abilities.temporal_cascade.name': 'Cascada Temporal',
   'entities.abilities.temporal_reversal.description':
     'Rebobina la línea temporal de un aliado caído, devolviéndolo a la vida junto a su cuerpo con una parte de su salud y maná, incluso en pleno combate. (Cronomancia)',
@@ -3575,7 +3575,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.sureCrit':
     'Tus próximas {charges} facultades dañinas tienen golpe crítico garantizado',
   'hudChrome.auraEffect.temporalEcho':
-    'El daño Arcano del taumaturgo te sana un {singlePct}% del daño a un objetivo o un {areaPct}% del daño de área',
+    'El daño Arcano del taumaturgo te sana un {singlePct}% del daño a un objetivo o un {areaPct}% del daño de área. Oleada de éter y Dardos de éter obtienen una bonificación de x4 con un Eco Temporal individual. Los Ecos grupales generan una reserva de sanación equivalente que se reparte entre los aliados marcados con menos del 60% de salud según la salud que les falte',
   'hudChrome.auraEffect.arcaneCharge':
     '{stacks} cargas Arcanas: Oleada de éter inflige un {damagePct}% más, se lanza un {castPct}% más rápido y cuesta {costMult} veces más maná',
   'hudChrome.auraEffect.physicalReduction': 'Reduce el daño Físico recibido un {pct}%',
@@ -12705,7 +12705,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Desplaza al objetivo un latido fuera del presente: un caparazón temporal absorbe {damage} de daño durante 10 s antes de que la línea temporal vuelva a encajar.',
   'entities.abilities.temporal_echo.name': 'Eco temporal',
   'entities.abilities.temporal_echo.description':
-    'Marca a un aliado con el eco de un momento más sano y repara {damage} de salud al instante. Durante {duration} s, parte del daño Arcano que infliges se canaliza de vuelta a través del eco para curarlo.',
+    'Marca a un aliado con el eco de un momento más sano y repara {damage} de salud al instante. Durante {duration} s, lo sana un {echoSinglePct}% de tu otro daño Arcano a un objetivo y un {echoAreaPct}% de tu daño Arcano de área. Oleada de éter y Dardos de éter lo sanan en su lugar un {echoDriverPct}% del daño que infligen.',
   'entities.abilities.perfect_moment.name': 'Momento perfecto',
   'entities.abilities.perfect_moment.description':
     'Obtienes al instante 4 cargas Arcanas y durante 10 s los Dardos de éter no las consumen. (Cronomancia)',
@@ -15367,10 +15367,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.benison_dawnweave.bonus4':
     'Cuando se activa Vigilancia Seráfica, su aliado también recupera un 15% de su salud máxima durante 10 s.',
   'entities.itemSets.benison_dawnweave.name': 'Trama del Alba Benévola',
-  'entities.itemSets.chronoweave.bonus2':
-    'Eco Temporal convierte un 50% de tu daño Arcano a un solo objetivo en sanación. El daño recibido ya no retrasa tus hechizos.',
-  'entities.itemSets.chronoweave.bonus4':
-    'El tiempo de reutilización de Cascada Temporal se reduce 5 s.',
+  'entities.itemSets.chronoweave.bonus2': 'Eco Temporal convierte un 50% de tu otro daño Arcano a un solo objetivo en sanación. Oleada de éter y Dardos de éter convierten en su lugar un 200% del daño que infligen. El daño recibido ya no retrasa tus hechizos.',
+  'entities.itemSets.chronoweave.bonus4': 'El tiempo de reutilización de Cascada Temporal se reduce 5 s y su coste de maná se reduce un 30%.',
   'entities.itemSets.chronoweave.name': 'Vestimentas de Trama Etérea',
   'entities.itemSets.cinderbark.bonus2':
     'Garras Barredoras tienen un 30% de probabilidad de almacenar Sangre Antigua adicional.',

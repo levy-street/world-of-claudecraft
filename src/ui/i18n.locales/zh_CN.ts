@@ -8001,8 +8001,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '层叠治愈可跳跃至第四名盟友，消耗的治愈湍流按 150% 治疗。',
   'entities.itemSets.chronoweave.name': '以太织法衣',
   'entities.itemSets.chronoweave.bonus2':
-    '时光回响将你 50% 的单体奥术伤害转化为治疗。受到伤害不再延迟你的施法。',
-  'entities.itemSets.chronoweave.bonus4': '时光奔流的冷却时间缩短 5 秒。',
+    '时光回响将你其他单体奥术伤害的 50% 转化为治疗。以太涌动和以太飞镖则转化其伤害的 200%。受到伤害不再延迟你的施法。',
+  'entities.itemSets.chronoweave.bonus4': '时光奔流的冷却时间缩短 5 秒，法力消耗降低 30%。',
   'entities.itemSets.pyroclast.name': '火砾礼装',
   'entities.itemSets.pyroclast.bonus2':
     '灼烫对生命值不高于 35% 的目标必定造成致命一击。受到伤害不再延迟你的施法。',
@@ -10479,7 +10479,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '将目标移出当下一瞬：时光之壳在10秒内吸收{damage}点伤害，随后时间线弹回原位。',
   'entities.abilities.temporal_echo.name': '时光回响',
   'entities.abilities.temporal_echo.description':
-    '以更健康时刻的回响标记一名盟友，立即恢复{damage}点生命值。{duration}秒内，你造成的奥术伤害有一部分会通过回响转化为对其的治疗。',
+    '以更健康时刻的回响标记一名盟友，立即恢复{damage}点生命值。{duration}秒内，你其他单体奥术伤害的 {echoSinglePct}% 和范围奥术伤害的 {echoAreaPct}% 会治疗该盟友。以太涌动和以太飞镖则会以其造成伤害的 {echoDriverPct}% 治疗该盟友。',
   'entities.abilities.aspect_of_the_wild.description':
     '以野性力量激励30码内的盟友，使其攻击强度提高45、攻击速度提高5%，持续5分钟。（猎人天赋）',
   'entities.abilities.avenging_wrath.description':
@@ -10602,7 +10602,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '你的法术对冻结目标的暴击几率提高 50%。寒冰指和凛冬之寒会将目标视为已冻结。（冰霜）',
   'entities.abilities.temporal_cascade.name': '时光奔流',
   'entities.abilities.temporal_cascade.description':
-    '让一道回响在队伍中奔流：立即治疗目标及其至多四名最近的盟友，并为每人施加持续 {duration} 秒的印记；你造成的部分奥术伤害会通过回响转化为对他们的治疗。（时光术）',
+    '让一道回响在队伍中奔流：立即治疗目标及其至多四名最近的盟友，并为每人施加持续 {duration} 秒的印记；你造成的部分奥术伤害会通过回响转化为对他们的治疗。以太涌动和以太飞镖会从每个群体回响中产生等量的治疗储备，并根据缺失生命值在生命值低于 60% 的标记盟友之间分配。（时光术）',
   'entities.abilities.temporal_reversal.name': '时光逆转',
   'entities.abilities.temporal_reversal.description':
     '倒转一名阵亡盟友的时间线，使其在遗体处以部分生命值和法力值复活，即使正在激烈战斗中也可使用。（时光术）',
@@ -13766,7 +13766,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.sureCrit': '接下来 {charges} 个伤害技能必定暴击',
   'hudChrome.auraEffect.sweepingStrikes': '单体攻击还会对附近 {targets} 个敌人造成 {pct}% 伤害',
   'hudChrome.auraEffect.temporalEcho':
-    '施法者的奥术伤害会治疗你，单体伤害转化 {singlePct}%，范围伤害转化 {areaPct}%',
+    '施法者的奥术伤害会治疗你，单体伤害转化 {singlePct}%，范围伤害转化 {areaPct}%。以太涌动和以太飞镖对单体时光回响获得 4 倍加成。群体回响会产生等量的治疗储备，并根据缺失生命值在生命值低于 60% 的标记盟友之间分配',
   'hudChrome.auraEffect.veiledEdge': '你的下一次潜伏突袭造成双倍伤害',
   'hudChrome.auraEffect.veilstrikeWindow':
     '暗影缠身：你的暮帷先制技可在明处以任意角度使用，造成的伤害提高{pct}%',

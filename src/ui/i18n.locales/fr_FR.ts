@@ -3411,10 +3411,10 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Décale la cible d'un battement de coeur hors du présent, une coquille temporelle absorbant {damage} points de dégâts pendant 10 s avant que la chronologie ne se rétablisse.",
   'entities.abilities.temporal_barrier.name': 'Barrière temporelle',
   'entities.abilities.temporal_cascade.description':
-    "Envoie un écho en cascade à travers votre groupe : la cible et jusqu'à quatre de ses alliés les plus proches sont soignés simultanément et chacun est marqué pendant {duration} s, canalisant une partie des dégâts d'Arcane que vous infligez de retour à travers leurs échos pour les soigner. (Chromancie)",
+    "Envoie un écho en cascade à travers votre groupe : la cible et jusqu'à quatre de ses alliés les plus proches sont soignés simultanément et chacun est marqué pendant {duration} s, canalisant une partie des dégâts d'Arcane que vous infligez de retour à travers leurs échos pour les soigner. Déferlante d'éther et Fléchettes d'éther créent une réserve de soins équivalente pour chaque Écho de groupe, répartie selon les points de vie manquants entre les alliés marqués à moins de 60% de leurs points de vie. (Chromancie)",
   'entities.abilities.temporal_cascade.name': 'Cascade temporelle',
   'entities.abilities.temporal_echo.description':
-    "Marque un allié de l'écho d'un moment plus sain, soignant immédiatement {damage} points de vie. Pendant {duration} s, une partie des dégâts d'Arcane que vous infligez est canalisée de retour à travers l'écho pour le soigner.",
+    "Marque un allié de l'écho d'un moment plus sain, soignant immédiatement {damage} points de vie. Pendant {duration} s, {echoSinglePct}% de vos autres dégâts d'Arcane à cible unique et {echoAreaPct}% de vos dégâts d'Arcane de zone le soignent. Déferlante d'éther et Fléchettes d'éther le soignent à la place à hauteur de {echoDriverPct}% des dégâts qu'elles infligent.",
   'entities.abilities.temporal_echo.name': 'Écho temporel',
   'entities.abilities.temporal_hourglass.description':
     "Placez un sablier temporel à l'emplacement sélectionné. Sous un ennemi, il le suspend pendant {hostilePveDuration} s en JcE ou {hostilePvpDuration} s en JcJ et empêche toutes ses actions ; les dégâts brisent l'effet. À vos pieds ou sous un allié de groupe, il accorde une stase pendant {duration} s, empêche les dégâts et les actions, restaure {healing} % de la vie maximale, et accélère la récupération des temps de recharge de {selfCooldownRecovery} % pour vous ou de {allyCooldownRecovery} % pour un allié. Sur un sol vide, le sablier attend {groundDuration} s et affecte la première unité valide qui le traverse. L'aura bénéfique peut être annulée manuellement.",
@@ -14688,32 +14688,19 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.spellDamage': 'Augmente les dégâts des sorts de {pct}%',
   'hudChrome.auraEffect.spellHaste': "Augmente la vitesse d'incantation de {pct}%",
   'hudChrome.auraEffect.stasis': "Immunisé : impossible d'agir",
-  'hudChrome.auraEffect.suddenDeath':
-    'Votre prochaine Tombe précoce ne coûte aucune Rage et ignore sa condition de vie',
-  'hudChrome.auraEffect.sureCrit':
-    '{charges} incantations de capacités offensives sont des coups critiques garantis',
-  'hudChrome.auraEffect.sweepingStrikes':
-    'Les frappes ciblées touchent aussi {targets} ennemi proche pour {pct}% de dégâts',
-  'hudChrome.auraEffect.temporalEcho':
-    "Les dégâts d'Arcanes du lanceur vous soignent de {singlePct}% en cas de dégâts ciblés ou de {areaPct}% en cas de dégâts de zone",
-  'hudChrome.auraEffect.warlockAnchor':
-    "Relancez à moins de {range} m pour revenir ici et consommer l'ancre",
-  'hudChrome.auraEffect.wintersChill':
-    '{charges} charges : les sorts compatibles traitent cette cible comme gelée',
-  'hudChrome.auraEffect.makersBrand':
-    "Pendant {duration} s, chaque cumul augmente les dégâts subis de la part de Varkhul de {pct}%. Cumul jusqu'à {max} fois. Les tanks doivent échanger à {swap} cumuls.",
-  'hudChrome.auraEffect.sharedPyre':
-    "Inflige {total}% des points de vie maximum de chaque joueur, divisé par le nombre de joueurs à l'intérieur du cercle ({perPlayer}% chacun avec {players} joueurs).",
-  'hudChrome.auraEffect.varkhulCrucibleExposure':
-    'Bloquer un Rayon du creuset inflige des dégâts croissants en pourcentage des points de vie maximum chaque seconde. Les cumuls se réinitialisent 10 secondes après avoir quitté un rayon en Normal, et après 60 secondes en Héroïque.',
-  'hudChrome.auraEffect.varkhulForgeLink':
-    "Interceptez un rayon de pilier actif avant qu'il n'atteigne la forge. Les rayons ouverts ajoutent 6% de chaleur par seconde. En Normal, les rayons bloqués et les piliers inactifs refroidissent la forge ; en Héroïque, la chaleur ne diminue jamais. À 100%, la forge subit une Fusion de la forge mortelle.",
-  'hudChrome.auraEffect.varkhulMoltenCore':
-    "Portez ce noyau jusqu'à la forge. Le Fardeau en fusion inflige des dégâts croissants toutes les {interval} s, de {min}% à {max}% des points de vie maximum.",
-  'hudChrome.auraEffect.varkhulSentinelsGaze':
-    "La Sentinelle de braise vous poursuit. Éloignez-la du raid jusqu'à ce qu'elle soit détruite.",
-  'hudChrome.auraEffect.varkhulSharedPyre':
-    "Inflige {total}% des points de vie maximum de chaque joueur, réparti entre les joueurs à l'intérieur du cercle ({perPlayer}% chacun avec {players} joueurs). Chaque joueur manquant inflige aussi {missingPenalty}% des points de vie maximum à tout le raid, y compris les joueurs à l'intérieur du cercle.",
+  'hudChrome.auraEffect.suddenDeath': 'Votre prochaine Tombe précoce ne coûte aucune Rage et ignore sa condition de vie',
+  'hudChrome.auraEffect.sureCrit': '{charges} incantations de capacités offensives sont des coups critiques garantis',
+  'hudChrome.auraEffect.sweepingStrikes': 'Les frappes ciblées touchent aussi {targets} ennemi proche pour {pct}% de dégâts',
+  'hudChrome.auraEffect.temporalEcho': "Les dégâts d'Arcanes du lanceur vous soignent de {singlePct}% en cas de dégâts ciblés ou de {areaPct}% en cas de dégâts de zone. Déferlante d'éther et Fléchettes d'éther bénéficient d'un bonus x4 avec un Écho temporel individuel. Les Échos de groupe créent une réserve de soins équivalente, répartie selon les points de vie manquants entre les alliés marqués à moins de 60% de leurs points de vie",
+  'hudChrome.auraEffect.warlockAnchor': "Relancez à moins de {range} m pour revenir ici et consommer l'ancre",
+  'hudChrome.auraEffect.wintersChill': '{charges} charges : les sorts compatibles traitent cette cible comme gelée',
+  'hudChrome.auraEffect.makersBrand': "Pendant {duration} s, chaque cumul augmente les dégâts subis de la part de Varkhul de {pct}%. Cumul jusqu'à {max} fois. Les tanks doivent échanger à {swap} cumuls.",
+  'hudChrome.auraEffect.sharedPyre': "Inflige {total}% des points de vie maximum de chaque joueur, divisé par le nombre de joueurs à l'intérieur du cercle ({perPlayer}% chacun avec {players} joueurs).",
+  'hudChrome.auraEffect.varkhulCrucibleExposure': 'Bloquer un Rayon du creuset inflige des dégâts croissants en pourcentage des points de vie maximum chaque seconde. Les cumuls se réinitialisent 10 secondes après avoir quitté un rayon en Normal, et après 60 secondes en Héroïque.',
+  'hudChrome.auraEffect.varkhulForgeLink': "Interceptez un rayon de pilier actif avant qu'il n'atteigne la forge. Les rayons ouverts ajoutent 6% de chaleur par seconde. En Normal, les rayons bloqués et les piliers inactifs refroidissent la forge ; en Héroïque, la chaleur ne diminue jamais. À 100%, la forge subit une Fusion de la forge mortelle.",
+  'hudChrome.auraEffect.varkhulMoltenCore': "Portez ce noyau jusqu'à la forge. Le Fardeau en fusion inflige des dégâts croissants toutes les {interval} s, de {min}% à {max}% des points de vie maximum.",
+  'hudChrome.auraEffect.varkhulSentinelsGaze': "La Sentinelle de braise vous poursuit. Éloignez-la du raid jusqu'à ce qu'elle soit détruite.",
+  'hudChrome.auraEffect.varkhulSharedPyre': "Inflige {total}% des points de vie maximum de chaque joueur, réparti entre les joueurs à l'intérieur du cercle ({perPlayer}% chacun avec {players} joueurs). Chaque joueur manquant inflige aussi {missingPenalty}% des points de vie maximum à tout le raid, y compris les joueurs à l'intérieur du cercle.",
   'hudChrome.procOverlay.ruinMeter': 'Ruine',
   'hudChrome.procOverlay.ruinStatus': '{value} sur {max} Ruine',
   'hudChrome.procOverlay.soulFragmentsMeter': "Fragments d'âme",
@@ -15473,10 +15460,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.benison_dawnweave.bonus4':
     'Quand Vigilance séraphique se déclenche, son allié récupère aussi 15 % de ses points de vie maximum en 10 s.',
   'entities.itemSets.benison_dawnweave.name': 'Bénédiction tissée d’aurore',
-  'entities.itemSets.chronoweave.bonus2':
-    'Écho temporel convertit 50 % de vos dégâts des Arcanes à cible unique en soins. Les dégâts subis ne retardent plus vos incantations.',
-  'entities.itemSets.chronoweave.bonus4':
-    'Le temps de recharge de Cascade temporelle est réduit de 5 s.',
+  'entities.itemSets.chronoweave.bonus2': "Écho temporel convertit 50% de vos autres dégâts d'Arcane à cible unique en soins. Déferlante d'éther et Fléchettes d'éther convertissent à la place 200% des dégâts qu'elles infligent. Les dégâts subis ne retardent plus vos incantations.",
+  'entities.itemSets.chronoweave.bonus4': 'Le temps de recharge de Cascade temporelle est réduit de 5 s et son coût en mana de 30%.',
   'entities.itemSets.chronoweave.name': 'Vêtements tissés d’éther',
   'entities.itemSets.cinderbark.bonus2':
     'Griffes balayantes a 30 % de chances d’emmagasiner un Sang ancien supplémentaire.',

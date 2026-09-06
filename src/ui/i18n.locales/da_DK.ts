@@ -3295,10 +3295,10 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Forskydes målet et hjerteslag ud af nutiden, og et tidsskjold absorberer {damage} skade i 10 sek. inden tidslinjen snapper tilbage.',
   'entities.abilities.temporal_barrier.name': 'Tidsbarriere',
   'entities.abilities.temporal_cascade.description':
-    'Sender et ekko kaskadevejende gennem din gruppe: målet og op til fire af deres nærmeste allierede helbredes øjeblikkeligt og markeres hver i {duration} sek., og trækker en del af den Arkane skade du gør tilbage gennem deres ekkooer for at helbrede dem. (Kronomantik)',
+    'Sender et ekko kaskadevejende gennem din gruppe: målet og op til fire af deres nærmeste allierede helbredes øjeblikkeligt og markeres hver i {duration} sek., og trækker en del af den Arkane skade du gør tilbage gennem deres ekkoer for at helbrede dem. Æterbølge og Æterpile skaber en tilsvarende helingsreserve fra hvert gruppeekko, fordelt efter manglende helbred blandt markerede allierede under 60% helbred. (Kronomantik)',
   'entities.abilities.temporal_cascade.name': 'Tidskaskade',
   'entities.abilities.temporal_echo.description':
-    'Mærker en alliert med et ekko af et sundere øjeblik og gendanner {damage} helbred øjeblikkeligt. I {duration} sek. trækkes en del af den Arkane skade du gør tilbage gennem ekkoet for at helbrede dem.',
+    'Mærker en allieret med et ekko af et sundere øjeblik og gendanner {damage} helbred øjeblikkeligt. I {duration} sek. helbreder {echoSinglePct}% af din øvrige Arkane enkeltmålsskade og {echoAreaPct}% af din Arkane områdeskade dem. Æterbølge og Æterpile helbreder dem i stedet for {echoDriverPct}% af den skade, de gør.',
   'entities.abilities.temporal_echo.name': 'Tidsekko',
   'entities.abilities.temporal_hourglass.description':
     'Placer et tidssandur på det valgte sted. Under en fjende suspenderer det dem i {hostilePveDuration} sek. i PvE eller {hostilePvpDuration} sek. i PvP og forhindrer alle handlinger; skade bryder effekten. Ved dine fødder eller under en gruppealliert giver det stasis i {duration} sek., forhindrer skade og handlinger, gendanner {healing}% af maksimalt helbred og får nedkølingerne til at gendannes {selfCooldownRecovery}% hurtigere for dig eller {allyCooldownRecovery}% hurtigere for en alliert. På tomt terræn venter sandurret i {groundDuration} sek. og påvirker den første gyldige enhed, der træder på det. Den gavnlige aura kan fjernes manuelt.',
@@ -14209,7 +14209,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.sweepingStrikes':
     'Enkeltmålsslag rammer også {targets} nærliggende fjende for {pct}% skade',
   'hudChrome.auraEffect.temporalEcho':
-    'Kasterens Arkane skade helbreder dig for {singlePct}% af enkeltmåls- eller {areaPct}% af områdeskade',
+    'Kasterens Arkane skade helbreder dig for {singlePct}% af enkeltmåls- eller {areaPct}% af områdeskade. Æterbølge og Æterpile får en x4-bonus på et individuelt Temporal Echo. Gruppeekkoer skaber en tilsvarende helingsreserve, fordelt efter manglende helbred blandt markerede allierede under 60% helbred',
   'hudChrome.auraEffect.warlockAnchor':
     'Kast igen inden for {range} m for at vende tilbage hertil og forbruge ankeret',
   'hudChrome.auraEffect.wintersChill':
@@ -15090,9 +15090,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.benison_dawnweave.bonus4':
     'Når Seraphic Vigil udløses, helbredes dens allierede også for 15 procent af deres maksimale helbred over 10 sek.',
   'entities.itemSets.benison_dawnweave.name': 'Benison-daggryvæv',
-  'entities.itemSets.chronoweave.bonus2':
-    'Temporal Echo omdanner 50 procent af din Arcane-skade mod ét mål til heling. Modtaget skade forsinker ikke længere din besværgelse.',
-  'entities.itemSets.chronoweave.bonus4': 'Temporal Cascades nedkøling reduceres med 5 sek.',
+  'entities.itemSets.chronoweave.bonus2': 'Temporal Echo omdanner 50% af din øvrige Arkane enkeltmålsskade til heling. Æterbølge og Æterpile omdanner i stedet 200% af den skade, de gør. Modtaget skade forsinker ikke længere din besværgelse.',
+  'entities.itemSets.chronoweave.bonus4': 'Temporal Cascades nedkøling reduceres med 5 sek., og dens manaomkostning reduceres med 30%.',
   'entities.itemSets.chronoweave.name': 'Aethervævede gevandter',
   'entities.itemSets.cinderbark.bonus2':
     'Sweeping Claws har 30 procents chance for at oplagre et ekstra Old Blood.',

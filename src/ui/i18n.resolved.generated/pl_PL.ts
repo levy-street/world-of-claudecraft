@@ -2757,7 +2757,7 @@ export const pl_PL: EnTranslations = {
       "suddenDeath": "Twój następny Przedwczesny grób nie kosztuje Wściekłości i ignoruje wymóg dotyczący zdrowia celu",
       "aoeEcho": "Pozostało {charges} ech; zdolności jednocelowe zadają {pct}% obrażeń jeszcze {targets} pobliskim wrogom",
       "sureCrit": "Kolejne {charges} rzucone zdolności zadające obrażenia to gwarantowane trafienia krytyczne",
-      "temporalEcho": "Obrażenia od Arkanów rzucającego leczą cię za {singlePct}% obrażeń jednocelowych lub {areaPct}% obrażeń obszarowych",
+      "temporalEcho": "Obrażenia od Arkanów rzucającego leczą cię za {singlePct}% obrażeń jednocelowych lub {areaPct}% obrażeń obszarowych. Przypływ Eteru i Eteryczne Pociski otrzymują premię x4 przy indywidualnym Echu Czasu. Grupowe Echa tworzą równą rezerwę leczenia, rozdzielaną według brakującego zdrowia między naznaczonych sojuszników poniżej 60% zdrowia",
       "arcaneCharge": "{stacks} Ładunków Eteru: Przypływ eteru zadaje o {damagePct}% więcej obrażeń, rzuca się o {castPct}% szybciej i kosztuje {costMult}x many",
       "physicalReduction": "Zmniejsza otrzymywane obrażenia fizyczne o {pct}%",
       "temporalHourglass": "Odporny i niezdolny do działania; przywraca zdrowie i przyspiesza regenerację czasu odnowienia. Kliknij prawym przyciskiem myszy, aby anulować.",
@@ -11670,11 +11670,11 @@ export const pl_PL: EnTranslations = {
       },
       "temporal_echo": {
         "name": "Czasowe echo",
-        "description": "Naznacza sojusznika echem zdrowszej chwili, natychmiast lecząc {damage} punktów zdrowia. Przez {duration} sek. część zadawanych przez ciebie obrażeń Arkanów jest przekierowywana przez echo, aby go leczyć."
+        "description": "Naznacza sojusznika echem zdrowszej chwili, natychmiast lecząc {damage} punktów zdrowia. Przez {duration} sek. leczy go {echoSinglePct}% twoich pozostałych obrażeń Arkanów przeciw jednemu celowi oraz {echoAreaPct}% obszarowych obrażeń Arkanów. Przypływ Eteru i Eteryczne Pociski leczą go zamiast tego za {echoDriverPct}% zadanych obrażeń."
       },
       "temporal_cascade": {
         "name": "Czasowa kaskada",
-        "description": "Wysyła echo kaskadą przez twoją grupę: cel i do czterech najbliższych sojuszników zostają natychmiast uleczeni i naznaczeni przez {duration} sek., przekierowując część zadawanych przez ciebie obrażeń Arkanów z powrotem przez ich echa, aby ich leczyć. (Chronomancja)"
+        "description": "Wysyła echo kaskadą przez twoją grupę: cel i do czterech najbliższych sojuszników zostają natychmiast uleczeni i naznaczeni przez {duration} sek., przekierowując część zadawanych przez ciebie obrażeń Arkanów z powrotem przez ich echa, aby ich leczyć. Przypływ Eteru i Eteryczne Pociski tworzą z każdego grupowego Echa równą rezerwę leczenia, rozdzielaną według brakującego zdrowia między naznaczonych sojuszników poniżej 60% zdrowia. (Chronomancja)"
       },
       "temporal_reversal": {
         "name": "Odwrócenie czasu",
@@ -19072,8 +19072,8 @@ export const pl_PL: EnTranslations = {
       },
       "chronoweave": {
         "name": "Szaty Eterowej Tkaniny",
-        "bonus2": "Echo Czasu zamienia 50 procent twoich obrażeń tajemnych przeciw jednemu celowi w leczenie. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
-        "bonus4": "Czas odnowienia Czasowej Kaskady skraca się o 5 sek."
+        "bonus2": "Echo Czasu zamienia 50% twoich pozostałych obrażeń Arkanów przeciw jednemu celowi w leczenie. Przypływ Eteru i Eteryczne Pociski zamieniają zamiast tego 200% zadanych obrażeń. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
+        "bonus4": "Czas odnowienia Czasowej Kaskady skraca się o 5 sek., a jej koszt many maleje o 30%."
       },
       "cinderbark": {
         "name": "Osłona Żarokory",

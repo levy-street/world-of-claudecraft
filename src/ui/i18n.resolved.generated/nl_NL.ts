@@ -2757,7 +2757,7 @@ export const nl_NL: EnTranslations = {
       "suddenDeath": "Je volgende Vroeg Graf kost geen woede en negeert de gezondheidsvereiste",
       "aoeEcho": "{charges} echo's resteren: vaardigheden voor één doelwit brengen {pct}% schade toe aan tot {targets} nabije vijanden",
       "sureCrit": "{charges} bezweringen van schadelijke vaardigheden zijn gegarandeerd kritieke treffers",
-      "temporalEcho": "De Arcaneschade van de werper geneest je voor {singlePct}% van schade voor één doelwit of {areaPct}% van gebiedsschade",
+      "temporalEcho": "De Arcaneschade van de werper geneest je voor {singlePct}% van schade voor één doelwit of {areaPct}% van gebiedsschade. Aethergolf en Aetherpijlen krijgen een x4-bonus op een individuele Temporal Echo. Groepsecho’s maken een even grote genezingsreserve, verdeeld naar ontbrekende gezondheid onder gemarkeerde bondgenoten met minder dan 60% gezondheid",
       "arcaneCharge": "{stacks} Arcaneladingen: Arcanekracht brengt {damagePct}% meer schade toe, wordt {castPct}% sneller gespreukt, en kost {costMult}x mana",
       "physicalReduction": "Vermindert opgelopen Fysieke schade met {pct}%",
       "temporalHourglass": "Immuun en niet in staat te handelen; herstelt gezondheid en versnelt afkoeltijdherstel. Klik met rechts om te annuleren.",
@@ -11670,11 +11670,11 @@ export const nl_NL: EnTranslations = {
       },
       "temporal_echo": {
         "name": "Temporele Echo",
-        "description": "Markeert een bondgenoot met de echo van een gezonder moment, en herstelt direct {damage} gezondheid. Gedurende {duration} sec stroomt een deel van de Arcaneschade die je aanricht terug door de echo om hen te genezen."
+        "description": "Markeert een bondgenoot met de echo van een gezonder moment, en herstelt direct {damage} gezondheid. Gedurende {duration} sec geneest {echoSinglePct}% van je overige Arcaneschade tegen één doel en {echoAreaPct}% van je Arcane gebiedsschade die bondgenoot. Aethergolf en Aetherpijlen genezen in plaats daarvan voor {echoDriverPct}% van de schade die ze aanrichten."
       },
       "temporal_cascade": {
         "name": "Temporele Cascade",
-        "description": "Stuurt een echo door je groep: het doelwit en tot vier van hun naaste bondgenoten worden tegelijk hersteld en elk gedurende {duration} sec gemarkeerd, waarbij een deel van de Arcaneschade die je aanricht terugstroomt door hun echo om hen te genezen. (Chronomantie)"
+        "description": "Stuurt een echo door je groep: het doelwit en tot vier van hun naaste bondgenoten worden tegelijk hersteld en elk gedurende {duration} sec gemarkeerd, waarbij een deel van de Arcaneschade die je aanricht terugstroomt door hun echo om hen te genezen. Aethergolf en Aetherpijlen maken uit elke groepsecho een even grote genezingsreserve, verdeeld naar ontbrekende gezondheid onder gemarkeerde bondgenoten met minder dan 60% gezondheid. (Chronomantie)"
       },
       "temporal_reversal": {
         "name": "Temporele Omkering",
@@ -19072,8 +19072,8 @@ export const nl_NL: EnTranslations = {
       },
       "chronoweave": {
         "name": "Aetherweefsel-Gewaden",
-        "bonus2": "Temporal Echo zet 50 procent van je Arcane-schade tegen één doel om in genezing. Opgelopen schade vertraagt het uitspreken van je spreuken niet meer.",
-        "bonus4": "De afkoeltijd van Temporal Cascade wordt met 5 sec. verkort."
+        "bonus2": "Temporal Echo zet 50% van je overige Arcaneschade tegen één doel om in genezing. Aethergolf en Aetherpijlen zetten in plaats daarvan 200% van hun aangerichte schade om. Opgelopen schade vertraagt het uitspreken van je spreuken niet meer.",
+        "bonus4": "De afkoeltijd van Temporal Cascade wordt met 5 sec. en de manakosten met 30% verlaagd."
       },
       "cinderbark": {
         "name": "Cinderbast-Bescherming",

@@ -2757,7 +2757,7 @@ export const zh_CN: EnTranslations = {
       "suddenDeath": "下一次斩杀不消耗怒气并无视生命值要求",
       "aoeEcho": "剩余 {charges} 次回响：单体技能对附近最多 {targets} 个敌人造成 {pct}% 伤害",
       "sureCrit": "接下来 {charges} 个伤害技能必定暴击",
-      "temporalEcho": "施法者的奥术伤害会治疗你，单体伤害转化 {singlePct}%，范围伤害转化 {areaPct}%",
+      "temporalEcho": "施法者的奥术伤害会治疗你，单体伤害转化 {singlePct}%，范围伤害转化 {areaPct}%。以太涌动和以太飞镖对单体时光回响获得 4 倍加成。群体回响会产生等量的治疗储备，并根据缺失生命值在生命值低于 60% 的标记盟友之间分配",
       "arcaneCharge": "{stacks} 层奥术充能：以太涌动伤害提高 {damagePct}%，施法加快 {castPct}%，法力消耗变为 {costMult} 倍",
       "physicalReduction": "受到的物理伤害降低 {pct}%",
       "temporalHourglass": "免疫伤害且无法行动；恢复生命并加速冷却。右键点击可取消。",
@@ -11670,11 +11670,11 @@ export const zh_CN: EnTranslations = {
       },
       "temporal_echo": {
         "name": "时光回响",
-        "description": "以更健康时刻的回响标记一名盟友，立即恢复{damage}点生命值。{duration}秒内，你造成的奥术伤害有一部分会通过回响转化为对其的治疗。"
+        "description": "以更健康时刻的回响标记一名盟友，立即恢复{damage}点生命值。{duration}秒内，你其他单体奥术伤害的 {echoSinglePct}% 和范围奥术伤害的 {echoAreaPct}% 会治疗该盟友。以太涌动和以太飞镖则会以其造成伤害的 {echoDriverPct}% 治疗该盟友。"
       },
       "temporal_cascade": {
         "name": "时光奔流",
-        "description": "让一道回响在队伍中奔流：立即治疗目标及其至多四名最近的盟友，并为每人施加持续 {duration} 秒的印记；你造成的部分奥术伤害会通过回响转化为对他们的治疗。（时光术）"
+        "description": "让一道回响在队伍中奔流：立即治疗目标及其至多四名最近的盟友，并为每人施加持续 {duration} 秒的印记；你造成的部分奥术伤害会通过回响转化为对他们的治疗。以太涌动和以太飞镖会从每个群体回响中产生等量的治疗储备，并根据缺失生命值在生命值低于 60% 的标记盟友之间分配。（时光术）"
       },
       "temporal_reversal": {
         "name": "时光逆转",
@@ -19072,8 +19072,8 @@ export const zh_CN: EnTranslations = {
       },
       "chronoweave": {
         "name": "以太织法衣",
-        "bonus2": "时光回响将你 50% 的单体奥术伤害转化为治疗。受到伤害不再延迟你的施法。",
-        "bonus4": "时光奔流的冷却时间缩短 5 秒。"
+        "bonus2": "时光回响将你其他单体奥术伤害的 50% 转化为治疗。以太涌动和以太飞镖则转化其伤害的 200%。受到伤害不再延迟你的施法。",
+        "bonus4": "时光奔流的冷却时间缩短 5 秒，法力消耗降低 30%。"
       },
       "cinderbark": {
         "name": "烬皮守御甲",

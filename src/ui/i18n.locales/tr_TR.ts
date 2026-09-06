@@ -3298,10 +3298,10 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Hedefi şimdiden bir kalp atışı uzaklaştırarak zamansal bir kabuk oluşturur ve zaman çizelgesi geri dökmeden önce 10 saniye boyunca {damage} hasarı emer.',
   'entities.abilities.temporal_barrier.name': 'Zamansal Bariyer',
   'entities.abilities.temporal_cascade.description':
-    'Grubunuza bir yankı dalgası gönderir: hedef ve dört yakın müttefiki aynı anda iyileştirilir ve her biri {duration} saniye işaretlenir; bu süre içinde verdiğin Gizemli hasar kısmen onların yankıları aracılığıyla geri dönerek onları iyileştirir. (Kronomansi)',
+    'Grubunuza bir yankı dalgası gönderir: hedef ve dört yakın müttefiki aynı anda iyileştirilir ve her biri {duration} saniye işaretlenir; bu süre içinde verdiğin Gizemli hasar kısmen onların yankıları aracılığıyla geri dönerek onları iyileştirir. Eter Dalgası ve Eter Dartları her grup Yankısından eşit bir iyileştirme rezervi oluşturur ve bu rezerv, canı %60’ın altındaki işaretli müttefikler arasında eksik canlarına göre paylaştırılır. (Kronomansi)',
   'entities.abilities.temporal_cascade.name': 'Zamansal Çağlayan',
   'entities.abilities.temporal_echo.description':
-    'Bir müttefiki daha sağlıklı bir anın yankısıyla işaretleyerek {damage} canı anında iyileştirir. {duration} saniye boyunca verdiğin Gizemli hasar kısmen yankı aracılığıyla geri döner ve onları iyileştirir.',
+    'Bir müttefiki daha sağlıklı bir anın yankısıyla işaretleyerek {damage} canı anında iyileştirir. {duration} saniye boyunca diğer tek hedefli Gizemli hasarının %{echoSinglePct}’i ve alan etkili Gizemli hasarının %{echoAreaPct}’i onu iyileştirir. Eter Dalgası ve Eter Dartları bunun yerine verdikleri hasarın %{echoDriverPct}’i kadar iyileştirir.',
   'entities.abilities.temporal_echo.name': 'Zamansal Yankı',
   'entities.abilities.temporal_hourglass.description':
     "Seçilen konuma zamansal bir kum saati yerleştir. Bir düşmanın altına yerleştirildiğinde, PvE'de {hostilePveDuration} saniye, PvP'de {hostilePvpDuration} saniye askıya alır ve tüm eylemleri engeller; hasar etkiyi bozar. Ayaklarının dibine veya bir grup müttefikinin altına yerleştirildiğinde, {duration} saniye donukluk verir, hasarı ve eylemleri engeller, azami canın {healing}%'ini geri kazandırır ve bekleme sürelerinin sende {selfCooldownRecovery}% daha hızlı, müttefikte {allyCooldownRecovery}% daha hızlı iyileşmesini sağlar. Boş zemine yerleştirildiğinde, kum saati {groundDuration} saniye bekler ve üzerine basan ilk geçerli birimi etkiler. Yararlı aura manuel olarak kaldırılabilir.",
@@ -14233,16 +14233,11 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.spellDamage': 'Büyü hasarını {pct}% artırır',
   'hudChrome.auraEffect.spellHaste': 'Büyü okuma hızını {pct}% artırır',
   'hudChrome.auraEffect.stasis': 'Bağışık ve hareket edemez',
-  'hudChrome.auraEffect.suddenDeath':
-    "Bir sonraki Erken Mezar'ın hiç Öfkeye mal olmaz ve can şartını yok sayar",
-  'hudChrome.auraEffect.sureCrit':
-    '{charges} hasar veren yetenek kullanımı garanti kritik vuruş olur',
-  'hudChrome.auraEffect.sweepingStrikes':
-    'Tek hedefli vuruşlar yakındaki {targets} düşmana da {pct}% hasarla vurur',
-  'hudChrome.auraEffect.temporalEcho':
-    "Büyücünün Gizemli hasarı seni tek hedef hasarının {singlePct}%'i ya da alan hasarının {areaPct}%'i kadar iyileştirir",
-  'hudChrome.auraEffect.warlockAnchor':
-    'Buraya dönmek ve çapayı tüketmek için {range} yarda içinde yeniden oku',
+  'hudChrome.auraEffect.suddenDeath': 'Bir sonraki Erken Mezar\'ın hiç Öfkeye mal olmaz ve can şartını yok sayar',
+  'hudChrome.auraEffect.sureCrit': '{charges} hasar veren yetenek kullanımı garanti kritik vuruş olur',
+  'hudChrome.auraEffect.sweepingStrikes': 'Tek hedefli vuruşlar yakındaki {targets} düşmana da {pct}% hasarla vurur',
+  'hudChrome.auraEffect.temporalEcho': 'Büyücünün Gizemli hasarı seni tek hedef hasarının %{singlePct}’i ya da alan hasarının %{areaPct}’i kadar iyileştirir. Eter Dalgası ve Eter Dartları bireysel Zamansal Yankı üzerinde x4 bonus kazanır. Grup Yankıları eşit bir iyileştirme rezervi oluşturur ve bu rezerv, canı %60’ın altındaki işaretli müttefikler arasında eksik canlarına göre paylaştırılır',
+  'hudChrome.auraEffect.warlockAnchor': 'Buraya dönmek ve çapayı tüketmek için {range} yarda içinde yeniden oku',
   'hudChrome.auraEffect.wintersChill': '{charges} yük: uyumlu büyüler bu hedefi donmuş sayar',
   'hudChrome.procOverlay.ruinMeter': 'Harabiyet',
   'hudChrome.procOverlay.ruinStatus': '{value} / {max} Harabiyet',
@@ -15162,9 +15157,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.benison_dawnweave.bonus4':
     'Serafik Nöbet tetiklendiğinde müttefiki de 10 saniye boyunca azami sağlığının %15’i kadar iyileştirilir.',
   'entities.itemSets.benison_dawnweave.name': 'Lütuflu Şafak Dokuması',
-  'entities.itemSets.chronoweave.bonus2':
-    'Zamansal Yankı, tek hedefli Gizemli hasarının %50’sini iyileştirmeye dönüştürür. Alınan hasar artık büyü yapmanı geciktirmez.',
-  'entities.itemSets.chronoweave.bonus4': 'Zamansal Çağlayanın bekleme süresi 5 saniye azalır.',
+  'entities.itemSets.chronoweave.bonus2': 'Zamansal Yankı, diğer tek hedefli Gizemli hasarının %50’sini iyileştirmeye dönüştürür. Eter Dalgası ve Eter Dartları bunun yerine verdikleri hasarın %200’ünü dönüştürür. Alınan hasar artık büyü yapmanı geciktirmez.',
+  'entities.itemSets.chronoweave.bonus4': 'Zamansal Çağlayanın bekleme süresi 5 saniye, mana bedeli ise %30 azalır.',
   'entities.itemSets.chronoweave.name': 'Aether Dokuması Giysileri',
   'entities.itemSets.cinderbark.bonus2':
     'Süpürücü Pençelerin ek Eski Kan biriktirme şansı %30’dur.',

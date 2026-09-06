@@ -2757,7 +2757,7 @@ export const fr_FR: EnTranslations = {
       "suddenDeath": "Votre prochaine Tombe précoce ne coûte aucune Rage et ignore sa condition de vie",
       "aoeEcho": "{charges} échos restants : les capacités ciblées infligent {pct}% de dégâts à {targets} ennemis proches au plus",
       "sureCrit": "{charges} incantations de capacités offensives sont des coups critiques garantis",
-      "temporalEcho": "Les dégâts d'Arcanes du lanceur vous soignent de {singlePct}% en cas de dégâts ciblés ou de {areaPct}% en cas de dégâts de zone",
+      "temporalEcho": "Les dégâts d'Arcanes du lanceur vous soignent de {singlePct}% en cas de dégâts ciblés ou de {areaPct}% en cas de dégâts de zone. Déferlante d'éther et Fléchettes d'éther bénéficient d'un bonus x4 avec un Écho temporel individuel. Les Échos de groupe créent une réserve de soins équivalente, répartie selon les points de vie manquants entre les alliés marqués à moins de 60% de leurs points de vie",
       "arcaneCharge": "{stacks} Charges des Arcanes : Déferlante d'Aether inflige {damagePct}% de dégâts en plus, s'incante {castPct}% plus vite, et coûte {costMult}x de mana",
       "physicalReduction": "Réduit les dégâts physiques subis de {pct}%",
       "temporalHourglass": "Immunisé et incapable d'agir ; restaure la vie et accélère la récupération des temps de recharge. Clic droit pour annuler.",
@@ -11670,11 +11670,11 @@ export const fr_FR: EnTranslations = {
       },
       "temporal_echo": {
         "name": "Écho temporel",
-        "description": "Marque un allié de l'écho d'un moment plus sain, soignant immédiatement {damage} points de vie. Pendant {duration} s, une partie des dégâts d'Arcane que vous infligez est canalisée de retour à travers l'écho pour le soigner."
+        "description": "Marque un allié de l'écho d'un moment plus sain, soignant immédiatement {damage} points de vie. Pendant {duration} s, {echoSinglePct}% de vos autres dégâts d'Arcane à cible unique et {echoAreaPct}% de vos dégâts d'Arcane de zone le soignent. Déferlante d'éther et Fléchettes d'éther le soignent à la place à hauteur de {echoDriverPct}% des dégâts qu'elles infligent."
       },
       "temporal_cascade": {
         "name": "Cascade temporelle",
-        "description": "Envoie un écho en cascade à travers votre groupe : la cible et jusqu'à quatre de ses alliés les plus proches sont soignés simultanément et chacun est marqué pendant {duration} s, canalisant une partie des dégâts d'Arcane que vous infligez de retour à travers leurs échos pour les soigner. (Chromancie)"
+        "description": "Envoie un écho en cascade à travers votre groupe : la cible et jusqu'à quatre de ses alliés les plus proches sont soignés simultanément et chacun est marqué pendant {duration} s, canalisant une partie des dégâts d'Arcane que vous infligez de retour à travers leurs échos pour les soigner. Déferlante d'éther et Fléchettes d'éther créent une réserve de soins équivalente pour chaque Écho de groupe, répartie selon les points de vie manquants entre les alliés marqués à moins de 60% de leurs points de vie. (Chromancie)"
       },
       "temporal_reversal": {
         "name": "Inversion temporelle",
@@ -19072,8 +19072,8 @@ export const fr_FR: EnTranslations = {
       },
       "chronoweave": {
         "name": "Vêtements tissés d’éther",
-        "bonus2": "Écho temporel convertit 50 % de vos dégâts des Arcanes à cible unique en soins. Les dégâts subis ne retardent plus vos incantations.",
-        "bonus4": "Le temps de recharge de Cascade temporelle est réduit de 5 s."
+        "bonus2": "Écho temporel convertit 50% de vos autres dégâts d'Arcane à cible unique en soins. Déferlante d'éther et Fléchettes d'éther convertissent à la place 200% des dégâts qu'elles infligent. Les dégâts subis ne retardent plus vos incantations.",
+        "bonus4": "Le temps de recharge de Cascade temporelle est réduit de 5 s et son coût en mana de 30%."
       },
       "cinderbark": {
         "name": "Égide d’écorce cendrée",

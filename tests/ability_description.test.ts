@@ -5,6 +5,7 @@ import {
   emptyAllocation,
   type TalentModifiers,
 } from '../src/sim/content/talents';
+import { computeCharacterModifiers } from '../src/sim/set_bonus_mods';
 import { MAX_LEVEL } from '../src/sim/types';
 import { abilityDisplayDescription } from '../src/ui/ability_description';
 
@@ -42,5 +43,26 @@ describe('abilityDisplayDescription buff value override', () => {
     expect(withoutOverride).toContain('80');
     expect(withOverride).toContain('160');
     expect(withOverride).not.toContain('80');
+  });
+});
+
+describe('abilityDisplayDescription Temporal Echo conversion', () => {
+  it('shows the resolved Chronoweave 2pc conversion instead of the base values', () => {
+    const allocation = { ...emptyAllocation(), spec: 'arcane' };
+    const equipment = {
+      head: 'chronoweave_helmet',
+      chest: 'chronoweave_chest',
+    };
+    const mods = computeCharacterModifiers('mage', allocation, MAX_LEVEL, equipment);
+    const echo = abilitiesKnownAt('mage', MAX_LEVEL, mods).find(
+      (ability) => ability.def.id === 'temporal_echo',
+    );
+    if (!echo) throw new Error('missing Temporal Echo');
+
+    const text = abilityDisplayDescription(echo, '84-102');
+    expect(text).toContain('50% of your other single-target Arcane damage');
+    expect(text).toContain('15% of your area Arcane damage');
+    expect(text).toContain('200% of the damage they deal');
+    expect(text).not.toContain('160%');
   });
 });

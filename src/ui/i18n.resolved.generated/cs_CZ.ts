@@ -2757,7 +2757,7 @@ export const cs_CZ: EnTranslations = {
       "suddenDeath": "Tvůj příští Předčasný hrob nestojí žádný vztek a ignoruje svůj požadavek na zdraví",
       "aoeEcho": "Zbývá {charges} ozvěn: schopnosti na jeden cíl zasáhnou i až {targets} blízké nepřátele za {pct} % poškození",
       "sureCrit": "{charges} seslání poškozujících schopností jsou zaručeně kritické zásahy",
-      "temporalEcho": "Seslatelovo arkánní poškození tě léčí za {singlePct} % poškození na jeden cíl nebo {areaPct} % plošného poškození",
+      "temporalEcho": "Seslatelovo arkánní poškození tě léčí za {singlePct}% poškození na jeden cíl nebo {areaPct}% plošného poškození. Éterová vlna a Éterové šipky získávají u individuální Časové ozvěny čtyřnásobný bonus. Skupinové ozvěny vytvářejí stejnou rezervu léčení, která se rozdělí podle chybějícího zdraví mezi označené spojence pod 60% zdraví",
       "arcaneCharge": "{stacks} Éterických nábojů: Aether Surge způsobuje o {damagePct} % více poškození, sesílá se o {castPct} % rychleji a stojí {costMult}x many",
       "physicalReduction": "Snižuje utrpěné fyzické poškození o {pct} %",
       "temporalHourglass": "Nezranitelný/á a neschopný/á jednat; obnovuje zdraví a urychluje obnovu cooldownu. Klikni pravým tlačítkem pro zrušení.",
@@ -11670,11 +11670,11 @@ export const cs_CZ: EnTranslations = {
       },
       "temporal_echo": {
         "name": "Časová ozvěna",
-        "description": "Označíš spojence ozvěnou zdravějšího okamžiku a okamžitě zacelíš {damage} zdraví. Po dobu {duration} s část arcanového poškození, které způsobuješ, se přes tuto ozvěnu vrátí a léčí je."
+        "description": "Označíš spojence ozvěnou zdravějšího okamžiku a okamžitě zacelíš {damage} zdraví. Po dobu {duration} s ho léčí {echoSinglePct}% tvého ostatního arkánního poškození na jeden cíl a {echoAreaPct}% plošného arkánního poškození. Éterová vlna a Éterové šipky ho místo toho léčí za {echoDriverPct}% způsobeného poškození."
       },
       "temporal_cascade": {
         "name": "Časová kaskáda",
-        "description": "Sešle ozvěnu přes tvou skupinu: cíl a až čtyři nejbližší spojenci jsou okamžitě zaceleni a každý je označen na {duration} s; část arcanového poškození, které způsobuješ, se přes jejich ozvěny vrátí a vyléčí je. (Chronomagie)"
+        "description": "Sešle ozvěnu přes tvou skupinu: cíl a až čtyři nejbližší spojenci jsou okamžitě zaceleni a každý je označen na {duration} s; část arkánního poškození, které způsobuješ, se přes jejich ozvěny vrátí a vyléčí je. Éterová vlna a Éterové šipky vytvoří z každé skupinové ozvěny stejnou rezervu léčení, která se rozdělí podle chybějícího zdraví mezi označené spojence pod 60% zdraví. (Chronomagie)"
       },
       "temporal_reversal": {
         "name": "Časový návrat",
@@ -19072,8 +19072,8 @@ export const cs_CZ: EnTranslations = {
       },
       "chronoweave": {
         "name": "Roucha Éterové tkaniny",
-        "bonus2": "Časová ozvěna převádí 50 procent tvého arkánního poškození jediného cíle na léčení. Utržené poškození již nezpožďuje sesílání kouzel.",
-        "bonus4": "Doba obnovy Časové kaskády se zkracuje o 5 s."
+        "bonus2": "Časová ozvěna převádí 50% tvého ostatního arkánního poškození na jeden cíl na léčení. Éterová vlna a Éterové šipky místo toho převádějí 200% způsobeného poškození. Utržené poškození již nezpožďuje sesílání kouzel.",
+        "bonus4": "Doba obnovy Časové kaskády se zkracuje o 5 s a její cena many se snižuje o 30%."
       },
       "cinderbark": {
         "name": "Ochrana Popelavé kůry",

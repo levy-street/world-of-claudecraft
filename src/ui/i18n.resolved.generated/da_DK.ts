@@ -2757,7 +2757,7 @@ export const da_DK: EnTranslations = {
       "suddenDeath": "Din næste Tidlig Grav koster intet Raseri og ignorerer sit helbredskrav",
       "aoeEcho": "{charges} ekkoer tilbage: enkeltmålsevner gør {pct}% skade til op til {targets} nærliggende fjender",
       "sureCrit": "{charges} skadevoldende evnekast er garanteret kritiske slag",
-      "temporalEcho": "Kasterens Arkane skade helbreder dig for {singlePct}% af enkeltmåls- eller {areaPct}% af områdeskade",
+      "temporalEcho": "Kasterens Arkane skade helbreder dig for {singlePct}% af enkeltmåls- eller {areaPct}% af områdeskade. Æterbølge og Æterpile får en x4-bonus på et individuelt Temporal Echo. Gruppeekkoer skaber en tilsvarende helingsreserve, fordelt efter manglende helbred blandt markerede allierede under 60% helbred",
       "arcaneCharge": "{stacks} Arkane Ladninger: Arkan kraft gør {damagePct}% mere skade, kastes {castPct}% hurtigere og koster {costMult}x mana",
       "physicalReduction": "Reducerer Fysisk skade modtaget med {pct}%",
       "temporalHourglass": "Immun og ude af stand til at handle; gendanner helbred og fremskynder nedkølingsgendannelse. Højreklik for at annullere.",
@@ -11670,11 +11670,11 @@ export const da_DK: EnTranslations = {
       },
       "temporal_echo": {
         "name": "Tidsekko",
-        "description": "Mærker en alliert med et ekko af et sundere øjeblik og gendanner {damage} helbred øjeblikkeligt. I {duration} sek. trækkes en del af den Arkane skade du gør tilbage gennem ekkoet for at helbrede dem."
+        "description": "Mærker en allieret med et ekko af et sundere øjeblik og gendanner {damage} helbred øjeblikkeligt. I {duration} sek. helbreder {echoSinglePct}% af din øvrige Arkane enkeltmålsskade og {echoAreaPct}% af din Arkane områdeskade dem. Æterbølge og Æterpile helbreder dem i stedet for {echoDriverPct}% af den skade, de gør."
       },
       "temporal_cascade": {
         "name": "Tidskaskade",
-        "description": "Sender et ekko kaskadevejende gennem din gruppe: målet og op til fire af deres nærmeste allierede helbredes øjeblikkeligt og markeres hver i {duration} sek., og trækker en del af den Arkane skade du gør tilbage gennem deres ekkooer for at helbrede dem. (Kronomantik)"
+        "description": "Sender et ekko kaskadevejende gennem din gruppe: målet og op til fire af deres nærmeste allierede helbredes øjeblikkeligt og markeres hver i {duration} sek., og trækker en del af den Arkane skade du gør tilbage gennem deres ekkoer for at helbrede dem. Æterbølge og Æterpile skaber en tilsvarende helingsreserve fra hvert gruppeekko, fordelt efter manglende helbred blandt markerede allierede under 60% helbred. (Kronomantik)"
       },
       "temporal_reversal": {
         "name": "Tidsvending",
@@ -19072,8 +19072,8 @@ export const da_DK: EnTranslations = {
       },
       "chronoweave": {
         "name": "Aethervævede gevandter",
-        "bonus2": "Temporal Echo omdanner 50 procent af din Arcane-skade mod ét mål til heling. Modtaget skade forsinker ikke længere din besværgelse.",
-        "bonus4": "Temporal Cascades nedkøling reduceres med 5 sek."
+        "bonus2": "Temporal Echo omdanner 50% af din øvrige Arkane enkeltmålsskade til heling. Æterbølge og Æterpile omdanner i stedet 200% af den skade, de gør. Modtaget skade forsinker ikke længere din besværgelse.",
+        "bonus4": "Temporal Cascades nedkøling reduceres med 5 sek., og dens manaomkostning reduceres med 30%."
       },
       "cinderbark": {
         "name": "Cinderbark-værn",

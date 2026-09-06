@@ -8001,8 +8001,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '層疊治癒可跳躍至第四名盟友，消耗的治癒湧流按 150% 治療。',
   'entities.itemSets.chronoweave.name': '以太織法衣',
   'entities.itemSets.chronoweave.bonus2':
-    '時光迴響將你 50% 的單體秘法傷害轉化為治療。受到傷害不再延遲你的施法。',
-  'entities.itemSets.chronoweave.bonus4': '時光奔流的冷卻時間縮短 5 秒。',
+    '時光迴響將你其他單體秘法傷害的 50% 轉化為治療。以太湧動和乙太飛鏢則轉化其傷害的 200%。受到傷害不再延遲你的施法。',
+  'entities.itemSets.chronoweave.bonus4': '時光奔流的冷卻時間縮短 5 秒，法力消耗降低 30%。',
   'entities.itemSets.pyroclast.name': '火礫禮裝',
   'entities.itemSets.pyroclast.bonus2':
     '沸燙對生命值不高於 35% 的目標必定造成致命一擊。受到傷害不再延遲你的施法。',
@@ -10478,7 +10478,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '將目標移出當下一瞬:時光之殼在10秒內吸收{damage}點傷害，隨後時間線彈回原位。',
   'entities.abilities.temporal_echo.name': '時光迴響',
   'entities.abilities.temporal_echo.description':
-    '以更健康時刻的迴響標記一名盟友，立即恢復{damage}點生命值。{duration}秒內，你造成的秘法傷害有一部分會透過迴響轉化為對其的治療。',
+    '以更健康時刻的迴響標記一名盟友，立即恢復{damage}點生命值。{duration}秒內，你其他單體秘法傷害的 {echoSinglePct}% 和範圍秘法傷害的 {echoAreaPct}% 會治療該盟友。以太湧動和乙太飛鏢則會以其造成傷害的 {echoDriverPct}% 治療該盟友。',
   'entities.abilities.aspect_of_the_wild.description':
     '以野性力量激勵30碼內的盟友，使其攻擊強度提高45、攻擊速度提高5%，持續5分鐘。（獵人天賦）',
   'entities.abilities.avenging_wrath.description':
@@ -10602,7 +10602,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '你的法術對凍結目標的致命一擊機率提高 50%。寒冰指和凜冬之寒會將目標視為已凍結。（冰霜）',
   'entities.abilities.temporal_cascade.name': '時光奔流',
   'entities.abilities.temporal_cascade.description':
-    '讓一道回音在隊伍中奔流：立即治療目標及其至多四名最近的盟友，並為每人施加持續 {duration} 秒的印記；你造成的部分秘法傷害會透過回音轉化為對他們的治療。（時光術）',
+    '讓一道回音在隊伍中奔流：立即治療目標及其至多四名最近的盟友，並為每人施加持續 {duration} 秒的印記；你造成的部分秘法傷害會透過回音轉化為對他們的治療。以太湧動和乙太飛鏢會從每個群體回音中產生等量的治療儲備，並依照已損失的生命值分配給生命值低於 60% 的受印記盟友。（時光術）',
   'entities.abilities.temporal_reversal.name': '時光逆轉',
   'entities.abilities.temporal_reversal.description':
     '倒轉一名陣亡盟友的時間線，使其在遺體處以部分生命值與法力值復活，即使正在激烈戰鬥中也能使用。（時光術）',
@@ -13771,7 +13771,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.sureCrit': '接下來 {charges} 個傷害技能必定造成致命一擊',
   'hudChrome.auraEffect.sweepingStrikes': '單體攻擊還會對附近 {targets} 個敵人造成 {pct}% 傷害',
   'hudChrome.auraEffect.temporalEcho':
-    '施法者的秘法傷害會治療你，單體傷害轉化 {singlePct}%，範圍傷害轉化 {areaPct}%',
+    '施法者的秘法傷害會治療你，單體傷害轉化 {singlePct}%，範圍傷害轉化 {areaPct}%。以太湧動和乙太飛鏢對單體時光迴響獲得 4 倍加成。群體回音會產生等量的治療儲備，並依照已損失的生命值分配給生命值低於 60% 的受印記盟友',
   'hudChrome.auraEffect.veiledEdge': '你的下一次潛伏者一擊造成雙倍傷害',
   'hudChrome.auraEffect.veilstrikeWindow':
     '暗影纏身：你的暮紗先制技可在明處以任意角度使用，造成的傷害提高{pct}%',

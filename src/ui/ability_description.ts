@@ -8,6 +8,11 @@
 // injector) go through abilityDisplayDescription, and the field CHOICE is a pure
 // core (abilityDescriptionField) a vitest drives directly.
 
+import {
+  TEMPORAL_ECHO_AREA_CONVERSION,
+  TEMPORAL_ECHO_ROTATION_CONVERSION_MULTIPLIER,
+  TEMPORAL_ECHO_SINGLE_CONVERSION,
+} from '../sim/content/chronomancy_tuning';
 import type { ResolvedAbility } from '../sim/sim';
 import {
   type AbilityEffect,
@@ -236,6 +241,7 @@ export function abilityDisplayDescription(
   // any bonusCharges rows), so Conflagrate's "Holds N charges" line reads 3
   // for Ruincaller 2pc wearers and the base 2 for everyone else.
   const charges = res.charges;
+  const echoSingle = res.echoConvertSingle ?? TEMPORAL_ECHO_SINGLE_CONVERSION;
   const values: InterpolationValues = {
     damage: damageText,
     overTime: abilityOverTimeText(res, scaling),
@@ -253,6 +259,11 @@ export function abilityDisplayDescription(
     absorbPerRage: absorbPerRage === undefined ? '' : formatAbilityNumber(absorbPerRage),
     needleDoom: needleDoom === undefined ? '' : formatAbilityNumber(needleDoom),
     charges: charges === undefined ? '' : formatAbilityNumber(charges),
+    echoSinglePct: formatAbilityNumber(echoSingle * 100),
+    echoAreaPct: formatAbilityNumber(TEMPORAL_ECHO_AREA_CONVERSION * 100),
+    echoDriverPct: formatAbilityNumber(
+      echoSingle * TEMPORAL_ECHO_ROTATION_CONVERSION_MULTIPLIER * 100,
+    ),
   };
   // Cheap Trick retires Gut Punch's stealth requirement. When the RESOLVED ability
   // has dropped it, prefer the stealth-free description variant so the prose stops

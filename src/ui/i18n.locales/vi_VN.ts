@@ -3326,10 +3326,10 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Dịch chuyển mục tiêu ra khỏi thực tại một nhịp tim, một lớp bọc thời gian hấp thụ {damage} sát thương trong 10 giây trước khi dòng thời gian bật trở lại.',
   'entities.abilities.temporal_barrier.name': 'Lá Chắn Thời Gian',
   'entities.abilities.temporal_cascade.description':
-    'Gửi một tiếng vang lan tỏa qua nhóm của bạn: mục tiêu và tối đa bốn đồng minh gần nhất của họ được chữa lành cùng lúc và mỗi người được đánh dấu trong {duration} giây, kéo một phần sát thương Bí Thuật bạn gây ra trở lại qua những tiếng vang của họ để chữa lành họ. (Thời Thuật)',
+    'Gửi một tiếng vang lan tỏa qua nhóm của bạn: mục tiêu và tối đa bốn đồng minh gần nhất của họ được chữa lành cùng lúc và mỗi người được đánh dấu trong {duration} giây, kéo một phần sát thương Bí Thuật bạn gây ra trở lại qua những tiếng vang của họ để chữa lành họ. Sóng Aether và Phi Tiêu Aether tạo một lượng hồi máu dự trữ tương đương từ mỗi Vọng Âm nhóm, được phân phối theo lượng máu đã mất giữa các đồng minh được đánh dấu còn dưới 60% máu. (Thời Thuật)',
   'entities.abilities.temporal_cascade.name': 'Thác Đổ Thời Gian',
   'entities.abilities.temporal_echo.description':
-    'Đánh dấu một đồng minh bằng tiếng vang của một khoảnh khắc khỏe mạnh hơn, hồi phục {damage} máu ngay lập tức. Trong {duration} giây, một phần sát thương Bí Thuật bạn gây ra sẽ được kéo trở lại qua tiếng vang để chữa lành họ.',
+    'Đánh dấu một đồng minh bằng tiếng vang của một khoảnh khắc khỏe mạnh hơn, hồi phục {damage} máu ngay lập tức. Trong {duration} giây, {echoSinglePct}% sát thương Bí Thuật đơn mục tiêu khác và {echoAreaPct}% sát thương Bí Thuật diện rộng của bạn sẽ hồi máu cho họ. Sóng Aether và Phi Tiêu Aether thay vào đó hồi máu bằng {echoDriverPct}% sát thương chúng gây ra.',
   'entities.abilities.temporal_echo.name': 'Vọng Âm Thời Gian',
   'entities.abilities.temporal_hourglass.description':
     'Đặt một đồng hồ cát thời gian tại vị trí đã chọn. Bên dưới kẻ thù, nó treo lơ lửng họ trong {hostilePveDuration} giây trong PvE hoặc {hostilePvpDuration} giây trong PvP và ngăn mọi hành động; sát thương phá vỡ hiệu ứng. Dưới chân bạn hoặc dưới đồng minh trong nhóm, nó ban trạng thái tĩnh lặng trong {duration} giây, ngăn sát thương và hành động, hồi phục {healing}% máu tối đa và giúp thời gian hồi chiêu phục hồi nhanh hơn {selfCooldownRecovery}% cho bạn hoặc {allyCooldownRecovery}% cho đồng minh. Trên nền đất trống, đồng hồ cát chờ trong {groundDuration} giây và ảnh hưởng đến đơn vị hợp lệ đầu tiên bước lên nó. Hào quang có lợi có thể bị hủy bỏ thủ công.',
@@ -14278,18 +14278,12 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.spellDamage': 'Tăng sát thương phép thêm {pct}%',
   'hudChrome.auraEffect.spellHaste': 'Tăng tốc độ thi triển phép thêm {pct}%',
   'hudChrome.auraEffect.stasis': 'Miễn nhiễm và không thể hành động',
-  'hudChrome.auraEffect.suddenDeath':
-    'Nấm Mồ Sớm tiếp theo của bạn không tốn Nộ Khí và bỏ qua yêu cầu về lượng máu',
-  'hudChrome.auraEffect.sureCrit':
-    'Còn lại {charges} lần thi triển kỹ năng gây sát thương chắc chắn chí mạng',
-  'hudChrome.auraEffect.sweepingStrikes':
-    'Đòn đánh đơn mục tiêu cũng trúng thêm {targets} kẻ địch gần đó với {pct}% sát thương',
-  'hudChrome.auraEffect.temporalEcho':
-    'Sát thương Bí Thuật của người thi triển hồi máu cho bạn bằng {singlePct}% sát thương đơn mục tiêu hoặc {areaPct}% sát thương diện rộng',
-  'hudChrome.auraEffect.warlockAnchor':
-    'Thi triển lại trong bán kính {range} thước để quay về đây và tiêu hao neo',
-  'hudChrome.auraEffect.wintersChill':
-    '{charges} tầng Giá Lạnh Mùa Đông: các phép tương thích xem mục tiêu này như đang bị đóng băng',
+  'hudChrome.auraEffect.suddenDeath': 'Nấm Mồ Sớm tiếp theo của bạn không tốn Nộ Khí và bỏ qua yêu cầu về lượng máu',
+  'hudChrome.auraEffect.sureCrit': 'Còn lại {charges} lần thi triển kỹ năng gây sát thương chắc chắn chí mạng',
+  'hudChrome.auraEffect.sweepingStrikes': 'Đòn đánh đơn mục tiêu cũng trúng thêm {targets} kẻ địch gần đó với {pct}% sát thương',
+  'hudChrome.auraEffect.temporalEcho': 'Sát thương Bí Thuật của người thi triển hồi máu cho bạn bằng {singlePct}% sát thương đơn mục tiêu hoặc {areaPct}% sát thương diện rộng. Sóng Aether và Phi Tiêu Aether nhận thưởng x4 với Vọng Âm Thời Gian cá nhân. Vọng Âm nhóm tạo một lượng hồi máu dự trữ tương đương, được phân phối theo lượng máu đã mất giữa các đồng minh được đánh dấu còn dưới 60% máu',
+  'hudChrome.auraEffect.warlockAnchor': 'Thi triển lại trong bán kính {range} thước để quay về đây và tiêu hao neo',
+  'hudChrome.auraEffect.wintersChill': '{charges} tầng Giá Lạnh Mùa Đông: các phép tương thích xem mục tiêu này như đang bị đóng băng',
   'hudChrome.procOverlay.ruinMeter': 'Wrack',
   'hudChrome.procOverlay.ruinStatus': '{value} trên {max} Wrack',
   'hudChrome.procOverlay.soulFragmentsMeter': 'Mảnh Linh Hồn',
@@ -15256,9 +15250,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.benison_dawnweave.bonus4':
     'Khi Cảnh Giác Seraph kích hoạt, đồng minh của bạn cũng được hồi 15% máu tối đa trong 10 giây.',
   'entities.itemSets.benison_dawnweave.name': 'Phúc Lành Dệt Bình Minh',
-  'entities.itemSets.chronoweave.bonus2':
-    'Vọng Âm Thời Gian chuyển 50% sát thương Arcane đơn mục tiêu của bạn thành hồi máu. Sát thương nhận vào không còn trì hoãn việc niệm phép.',
-  'entities.itemSets.chronoweave.bonus4': 'Thời gian hồi của Dòng Thác Thời Gian giảm 5 giây.',
+  'entities.itemSets.chronoweave.bonus2': 'Vọng Âm Thời Gian chuyển 50% sát thương Bí Thuật đơn mục tiêu khác của bạn thành hồi máu. Sóng Aether và Phi Tiêu Aether thay vào đó chuyển 200% sát thương chúng gây ra. Sát thương nhận vào không còn trì hoãn việc niệm phép.',
+  'entities.itemSets.chronoweave.bonus4': 'Thời gian hồi của Dòng Thác Thời Gian giảm 5 giây và tiêu hao mana giảm 30%.',
   'entities.itemSets.chronoweave.name': 'Lễ Phục Dệt Aether',
   'entities.itemSets.cinderbark.name': 'Hộ Vệ Vỏ Tro',
   'entities.itemSets.cinderbark.bonus2':

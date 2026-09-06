@@ -68,12 +68,12 @@ describe('Chronoweave mastery: healing + mana cushion', () => {
 });
 
 describe('Cascada echo window', () => {
-  it('lasts 10s on a 17s cooldown (a longer window, same ~7s gap)', () => {
+  it('lasts 15s on a 17s cooldown', () => {
     const cascade = ABILITIES.temporal_cascade;
     expect(cascade.cooldown).toBe(17);
     const rank3 = cascade.ranks?.at(-1) ?? cascade;
     const eff = rank3.effects.find((e) => e.type === 'massTemporalEcho');
-    expect(eff && 'duration' in eff ? eff.duration : 0).toBe(10);
+    expect(eff && 'duration' in eff ? eff.duration : 0).toBe(15);
   });
 });
 

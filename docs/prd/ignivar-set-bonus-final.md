@@ -235,18 +235,19 @@ rider "Damage taken no longer delays your spellcasting."; marked [rider].
 
 ## Mage
 
-- Chronoweave 2pc [rider]: "Temporal Echo converts 50 percent of your
-  single-target Arcane damage into healing." [Bake at placeTemporalEcho
+- Chronoweave 2pc [rider]: "Temporal Echo converts 50 percent of your other
+  single-target Arcane damage into healing. Aether Surge and Aether Darts instead
+  convert 200 percent of their damage." [Bake at placeTemporalEcho
   writing value + echoConvertRate + the echoRateFor fallback (three
   readers); classifier boundary safe at 0.5; echoHps<80 band re-signs.
   Same-change: dev playtest literal + comment.]
 - Chronoweave 4pc (final-round CONFIRMED; set renamed Aetherweave
   Vestments, the old name collided with the arcane mastery): "Temporal Cascade's cooldown is reduced
-  by 5 sec." [cd 17 to 12: more group-mark windows; touches no rate
-  constants, no classifier, no wire (replaces both killed shapes: the
-  Aether proc raise re-tuned a derived cost; the group-rate raise
-  needed a wire change). Verify: cascade cd literal site, any printed
-  cd, row overlap, probe reality.]
+  by 5 sec and its mana cost is reduced by 30 percent." [cd 17 to 12 and
+  cost 170 to 119: the faster group-mark cadence remains neutral in mana
+  per second (10.0 base versus 9.9 with 4pc). Touches no rate constants,
+  classifier, or wire. Verify both resolved fields, authored copy, row
+  overlap, and the raid probe.]
 - Pyroclast 2pc [rider]: "Scald always critically strikes targets at or
   below 50 percent health." [Sole functional reader; the reference
   rotation never presses Scald AND both fire harnesses fight a 1e9-HP

@@ -643,7 +643,7 @@ at least matching the retired flat-stat package it replaces.
 
 | Set | Spec | 2-piece | 4-piece |
 |---|---|---|---|
-| Aetherweave Vestments (chronoweave) | arcane, Chronomancy | Temporal Echo converts 50 percent of your single-target Arcane damage into healing. Damage taken no longer delays your spellcasting. | Temporal Cascade's cooldown is reduced by 5 sec. |
+| Aetherweave Vestments (chronoweave) | arcane, Chronomancy | Temporal Echo converts 50 percent of your other single-target Arcane damage into healing. Aether Surge and Aether Darts instead convert 200 percent of their damage. Damage taken no longer delays your spellcasting. | Temporal Cascade's cooldown is reduced by 5 sec and its mana cost is reduced by 30 percent. |
 | Pyroclast Regalia (pyroclast) | fire, Pyromancy | Scald always critically strikes targets at or below 50 percent health. Damage taken no longer delays your spellcasting. | Your Fire spells' critical strikes outside Phoenix Trance reduce its remaining cooldown by 2 sec. |
 | Frostquench Weave (frostquench) | frost, Cryomancy | Rimelance critical strikes bank a second Icicle, up to the maximum of 5. Damage taken no longer delays your spellcasting. | Winterlash plants 3 Winter's Chill charges, up from 2. |
 
