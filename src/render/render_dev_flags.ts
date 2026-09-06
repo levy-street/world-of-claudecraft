@@ -26,7 +26,15 @@
 //                 is the A/B that says whether a suspect distant surface is
 //                 this layer or the real splat terrain underneath it
 
-// Beside the ?<name>=off layer switches, one MODE flag with its own accessor:
+// Beside the ?<name>=off layer switches, two knobs with their own accessors:
+//   ?bladesectors=<n> - how many ways each blade-grass pool's slot grid is split
+//                  per axis, so three can frustum-cull the sectors behind the
+//                  camera (blade_grass_sector_pool.ts). 1 collapses each pool
+//                  back to ONE mesh, the A/B arm for pricing the split against
+//                  the extra draw calls on a given driver. It is not the
+//                  pre-split build: that one mesh still carries a measured
+//                  bounding sphere and the banded uploads, so a verdict about
+//                  those belongs to a real before/after build, not to this arm.
 //   ?prep=legacy - restores the pre-scheduler queue ADMISSION only: every unit
 //                  is admitted as its turn comes and the ledger keeps learning.
 //                  It does NOT revert the reveal-gate policy (piecewise reveal,
@@ -34,6 +42,28 @@
 //                  kill switch for pacing: if the budget regresses on a machine,
 //                  ?prep=legacy is the A/B that says so without a rebuild, and
 //                  the same flag is what a rollback ships as the default.
+
+/**
+ * Sectors per axis each blade-grass pool splits its slot grid into. Four is
+ * the default: it keeps the toroidal seam down to one sector column plus one
+ * sector row of the sixteen, so most of the pool stays cullable, while the
+ * sectors stay large enough that a crossing still touches only a few of them.
+ */
+export const BLADE_SECTOR_AXIS_DEFAULT = 4;
+
+const bladeSectors = ((): number => {
+  if (typeof location === 'undefined') return BLADE_SECTOR_AXIS_DEFAULT;
+  const raw = new URLSearchParams(location.search).get('bladesectors');
+  if (raw === null) return BLADE_SECTOR_AXIS_DEFAULT;
+  const n = Number.parseInt(raw, 10);
+  if (!Number.isFinite(n) || n < 1) return BLADE_SECTOR_AXIS_DEFAULT;
+  return Math.min(n, 16);
+})();
+
+/** Sectors per axis for this session's blade-grass pools (`?bladesectors=`). */
+export function bladeSectorAxis(): number {
+  return bladeSectors;
+}
 
 /** Which GPU-preparation behaviour this session runs. */
 export type GpuPrepMode = 'adaptive' | 'legacy';
