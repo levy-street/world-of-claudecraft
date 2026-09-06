@@ -340,6 +340,8 @@ export const BOOL_SETTINGS = {
   // Party/raid frame display profile. Health is always visible; these switches
   // choose the supporting information layered around it.
   partyFrameShowResource: { def: true },
+  // Also gates the player / target frame shield hatch (absorb_overlay_gate.ts);
+  // the key keeps its historical name so a saved preference survives.
   partyFrameShowAbsorbs: { def: true },
   partyFrameShowAuras: { def: true },
   // on by default: a thin pet health sliver on the row of any party member who has a

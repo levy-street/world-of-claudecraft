@@ -2219,6 +2219,8 @@ const COLOR_FUNC_RE = /\brgba?\s*\(/g;
 // updates the nodes of its own window. What the gate enforces is that one of them
 // is chosen on purpose.
 const UI_PAINTER_HELPERS = [
+  // The Show Absorb Shields root-class gate (one classList.toggle on an injected host).
+  'src/ui/absorb_overlay_gate.ts',
   'src/ui/continent_land_mask.ts',
   'src/ui/text_sprite_cache.ts',
   // Detached tt-desc / tt-sub line mint (createElement + textContent only).

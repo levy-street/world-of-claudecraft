@@ -2577,6 +2577,11 @@
     );
     box-shadow: inset 0 0 7px rgba(255, 225, 140, 0.6);
   }
+  /* The Show Absorb Shields option (absorb_overlay_gate.ts) hides every unit-frame
+     shield hatch through one root class; the painter keeps the segment current. */
+  .absorb-shields-hidden .bar-absorb {
+    display: none;
+  }
   /* Low-mana/energy warning: the resource fill pulses brighter and a short
      caption appears at the end of the bar. Driven by --lr-opacity / --lr-pulse
      set from the HUD (intensity scales as the bar nears empty). */

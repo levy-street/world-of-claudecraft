@@ -847,7 +847,76 @@ const dotsOffSeed = async (page) => {
   );
 };
 
+// Absorb-shield segment shots: the Show Absorb Shields option stated explicitly in
+// both directions (the harness profile's localStorage outlives page.close, so the
+// "-hidden" variant would otherwise leak its false into the next shot).
+const absorbShownSeed = async (page) => {
+  await lowGraphicsSeed(page);
+  await page.evaluateOnNewDocument(
+    `try { const k = 'woc_settings'; const s = JSON.parse(localStorage.getItem(k) || '{}'); s.partyFrameShowAbsorbs = true; localStorage.setItem(k, JSON.stringify(s)); } catch {}`,
+  );
+};
+const absorbHiddenSeed = async (page) => {
+  await lowGraphicsSeed(page);
+  await page.evaluateOnNewDocument(
+    `try { const k = 'woc_settings'; const s = JSON.parse(localStorage.getItem(k) || '{}'); s.partyFrameShowAbsorbs = false; localStorage.setItem(k, JSON.stringify(s)); } catch {}`,
+  );
+};
+
 export const TARGETS = [
+  {
+    key: 'absorb-shield-segment',
+    label: 'Absorb-shield hatch on the player and target health bars',
+    // Committed frames live in docs/screenshots/absorb-shield-segment/ (before- and
+    // after- player/target/hidden/mobile), the same naming contract as target-dots.
+    when: ['ui/absorb_bar', 'ui/absorb_overlay_gate', 'ui/unit_frame_painter', 'ui/unit_frame.ts'],
+    // A 10% shield on the player (a 300-of-3000 tank shape) and a targeted peer,
+    // staged directly as absorb auras: the frame reads the aura list, so no cast
+    // or dev command is needed. `hidden` is the same stage with the option off.
+    variants: [
+      { key: 'player', beforeLoad: absorbShownSeed },
+      { key: 'target', beforeLoad: absorbShownSeed },
+      { key: 'hidden', beforeLoad: absorbHiddenSeed },
+      { key: 'mobile', mobile: true, beforeLoad: absorbShownSeed },
+    ],
+    async capture(page, variant) {
+      const staged = await page.evaluate(`(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!game || !sim || !player) return { ok: false, reason: 'offline world is unavailable' };
+        const ward = (value) => ({
+          id: 'power_word_shield', name: 'Power Word: Shield', kind: 'absorb',
+          remaining: 600, duration: 600, value, sourceId: player.id, school: 'holy',
+        });
+        player.hp = Math.round(player.maxHp * 0.9);
+        player.auras.push(ward(Math.round(player.maxHp * 0.1)));
+        const peerId = sim.addPlayer('priest', 'Aldwin');
+        const peer = sim.entities.get(peerId);
+        if (!peer) return { ok: false, reason: 'peer spawn failed' };
+        peer.pos.x = player.pos.x + Math.sin(game.input.camYaw) * 4;
+        peer.pos.z = player.pos.z + Math.cos(game.input.camYaw) * 4;
+        peer.hp = Math.round(peer.maxHp * 0.6);
+        peer.auras.push(ward(Math.round(peer.maxHp * 0.25)));
+        sim.targetEntity(peerId);
+        return {
+          ok: true,
+          targeted: player.targetId === peerId,
+          hidden: document.documentElement.classList.contains('absorb-shields-hidden'),
+        };
+      })()`);
+      if (!staged.ok) throw new Error(staged.reason);
+      if (!staged.targeted) throw new Error('absorb shield staging: peer not targeted');
+      if (staged.hidden !== (variant.key === 'hidden')) {
+        throw new Error(`absorb shield staging: hidden=${staged.hidden} for ${variant.key}`);
+      }
+      await wait(1200);
+      return { clip: variant.key === 'target' ? '#target-frame' : '#player-frame' };
+    },
+  },
   {
     key: 'target-dots',
     label: 'Target dots: the player-only tracker frame and the nameplate dot row',
