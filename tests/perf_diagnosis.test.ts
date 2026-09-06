@@ -95,6 +95,13 @@ function baseSnapshot(): PerfSnapshot {
       pixelRatio: 1.5,
       width: 1440,
       height: 900,
+      drawingBuffer: {
+        width: 1728,
+        height: 1080,
+        cssWidth: 1440,
+        cssHeight: 900,
+        dynamicResolution: false,
+      },
       calls: 300,
       triangles: 1_000_000,
       geometries: 200,

@@ -4376,6 +4376,15 @@ export class Renderer {
       pixelRatio: this.webgl.getPixelRatio(),
       width: this.viewport.width,
       height: this.viewport.height,
+      // Attribute reads only, no layout: the 1 Hz sampler and the prewarm
+      // headroom poll both take this path (contract in DrawingBufferStats).
+      drawingBuffer: {
+        width: this.webgl.domElement.width,
+        height: this.webgl.domElement.height,
+        cssWidth: this.viewport.width,
+        cssHeight: this.viewport.height,
+        dynamicResolution: this.post?.supportsDynamicResolution === true,
+      },
       // Composer tiers serve the accumulated per-frame delta (the live counter is
       // monotonic there, so it already includes the off-screen water-simulation
       // passes); other profiles keep the live post-frame read, where three's
