@@ -762,9 +762,14 @@ const MONOLITHS: MonolithRow[] = [
     // its release/v0.42.0 base merge): the table and its SQL live in
     // server/realm_builder_db.ts; the residue here is the schema import and
     // the one ensureSchema() apply line with its ordering note, the same
-    // shape every other domain *_SCHEMA takes. Exact merged count, zero
-    // slack; maintainer-review item.
-    ceiling: 5151,
+    // shape every other domain *_SCHEMA takes.
+    // Lowered again at the 2026-09-06 release/v0.42.0 sync into this branch:
+    // the client_perf_reports DDL moved verbatim out of SCHEMA into
+    // client_perf_schema.ts (ensureSchema applies it after the core tables it
+    // FK-references); the insert and prune primitives stay here, so only the
+    // table definition left. Re-pinned to the exact merged line count measured
+    // with wc -l, never a sum of the two arms' deltas. Exact count, zero slack.
+    ceiling: 5097,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {
