@@ -10,51 +10,57 @@ import { swingReadyForQueuedCast } from '../src/sim/combat/queued_cast_swing_yie
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
-import type { AuraKind, Entity } from '../src/sim/types';
+import type { AuraKind, Entity, PlayerClass, SimEvent } from '../src/sim/types';
 import { DT } from '../src/sim/types';
 import { placePlayerInOpenField } from './helpers/open_field';
 
-type AnySim = Sim & Record<string, any>;
-type AnyEntity = Entity & Record<string, any>;
-type Ev = Record<string, any>;
+type CapturedEvent = SimEvent & { __tick?: number };
+type WandBoltEvent = Extract<SimEvent, { type: 'spellfx' }> & { wand: true; __tick?: number };
+type EmittingSim = Sim & {
+  emit(e: SimEvent): void;
+};
 
-function makeSim(seed = 7, cls = 'mage'): { sim: AnySim; p: AnyEntity } {
-  const sim = new Sim({ seed, playerClass: cls as any, autoEquip: true }) as AnySim;
+function makeSim(seed = 7, cls: PlayerClass = 'mage'): { sim: Sim; p: Entity } {
+  const sim = new Sim({ seed, playerClass: cls, autoEquip: true });
   sim.setPlayerLevel(20);
   placePlayerInOpenField(sim);
-  const p = sim.player as AnyEntity;
+  const p = sim.player;
   p.resource = p.maxResource;
   return { sim, p };
 }
 
-function spawnDummy(sim: AnySim, p: AnyEntity, dz: number): AnyEntity {
+function spawnDummy(sim: Sim, p: Entity, dz: number): Entity {
   // The practice dummy never swings back, so no pushback stretches the casts.
   const mob = createMob(sim.nextId++, MOBS.training_dummy, 20, {
     x: p.pos.x,
     y: p.pos.y,
     z: p.pos.z + dz,
-  }) as AnyEntity;
+  });
   sim.addEntity(mob);
   p.facing = Math.atan2(mob.pos.x - p.pos.x, mob.pos.z - p.pos.z);
   sim.targetEntity(mob.id, p.id);
   return mob;
 }
 
-function capture(sim: AnySim): Ev[] {
-  const events: Ev[] = [];
-  const orig = (sim as any).emit.bind(sim);
-  (sim as any).emit = (e: Ev) => {
+function capture(sim: Sim): CapturedEvent[] {
+  const events: CapturedEvent[] = [];
+  const emitting = sim as EmittingSim;
+  const orig = emitting.emit.bind(sim);
+  emitting.emit = (e: SimEvent) => {
     events.push(e);
     orig(e);
   };
   return events;
 }
 
-const isWandBolt = (e: Ev) => e.type === 'spellfx' && e.fx === 'projectile' && e.wand === true;
+const isWandBolt = (e: CapturedEvent): e is WandBoltEvent =>
+  e.type === 'spellfx' && e.fx === 'projectile' && e.wand === true;
+const isWandBoltAt = (e: CapturedEvent, targetId: number) =>
+  isWandBolt(e) && e.targetId === targetId;
 
 // Spam Cinderbolt for `ticks` ticks the way a player mashes the key: press
 // every tick, so each press lands inside the previous cast's queue window.
-function spamCasts(sim: AnySim, p: AnyEntity, ticks: number, abilityId = 'fireball'): void {
+function spamCasts(sim: Sim, p: Entity, ticks: number, abilityId = 'fireball'): void {
   for (let i = 0; i < ticks; i++) {
     p.resource = p.maxResource;
     sim.castAbility(abilityId);
@@ -63,10 +69,11 @@ function spamCasts(sim: AnySim, p: AnyEntity, ticks: number, abilityId = 'fireba
 }
 
 // Stamp every captured event with the tick it was emitted on.
-function captureTicked(sim: AnySim): Ev[] {
+function captureTicked(sim: Sim): CapturedEvent[] {
   const events = capture(sim);
   const push = events.push.bind(events);
-  events.push = (...items: Ev[]) => push(...items.map((e) => ({ ...e, __tick: sim.tickCount })));
+  events.push = (...items: CapturedEvent[]) =>
+    push(...items.map((e) => ({ ...e, __tick: sim.tickCount })));
   return events;
 }
 
@@ -75,7 +82,7 @@ describe('wand swings keep firing between spell-queued casts', () => {
     const { sim, p } = makeSim();
     spawnDummy(sim, p, 20);
     const events = capture(sim);
-    (sim as any).startAutoAttack(p.id);
+    sim.startAutoAttack(p.id);
     // 15 seconds of key mashing: five 3.0s Cinderbolts back to back, each one
     // queued in the tail of the last so castingAbility never reads null.
     spamCasts(sim, p, 300);
@@ -93,7 +100,7 @@ describe('wand swings keep firing between spell-queued casts', () => {
     const { sim, p } = makeSim();
     spawnDummy(sim, p, 20);
     const events = captureTicked(sim);
-    (sim as any).startAutoAttack(p.id);
+    sim.startAutoAttack(p.id);
     spamCasts(sim, p, 300);
     const stops = events.filter((e) => e.type === 'castStop' && e.success);
     expect(stops.length).toBeGreaterThanOrEqual(4);
@@ -116,7 +123,7 @@ describe('wand swings keep firing between spell-queued casts', () => {
     // would swing, so an off-by-one between the queue's pre-decay check and
     // the driver's post-decay check shows up as a doubled gap (the swing
     // waits a whole extra cast). The gaps must equal the pure auto-attack ones.
-    const gaps = (events: Ev[]) => {
+    const gaps = (events: CapturedEvent[]) => {
       const ticks = events
         .filter((e) => e.type === 'damage' && e.ability === null)
         .map((e) => e.__tick as number);
@@ -131,7 +138,7 @@ describe('wand swings keep firing between spell-queued casts', () => {
       return { sim, p, events: captureTicked(sim) };
     };
     const base = rig();
-    (base.sim as any).startAutoAttack(base.p.id);
+    base.sim.startAutoAttack(base.p.id);
     for (let i = 0; i < 400; i++) base.sim.tick();
     const baseGaps = gaps(base.events);
     expect(baseGaps.length).toBeGreaterThanOrEqual(5);
@@ -141,7 +148,7 @@ describe('wand swings keep firing between spell-queued casts', () => {
     // completion lands on the tick the next driver swing is due, then keep
     // chaining: the first gap crosses driver -> queue, the rest queue -> queue.
     const spam = rig();
-    (spam.sim as any).startAutoAttack(spam.p.id);
+    spam.sim.startAutoAttack(spam.p.id);
     const swung = () => spam.events.some((e) => e.type === 'damage' && e.ability === null);
     for (let i = 0; i < 100 && !swung(); i++) spam.sim.tick();
     expect(swung()).toBe(true);
@@ -168,7 +175,7 @@ describe('wand swings keep firing between spell-queued casts', () => {
     const { sim, p } = makeSim();
     spawnDummy(sim, p, 20);
     const events = captureTicked(sim);
-    (sim as any).startAutoAttack(p.id);
+    sim.startAutoAttack(p.id);
     // first cast under way, then knock the weapon away: spells keep casting
     // through a disarm, the auto-attack driver refuses the swing
     spamCasts(sim, p, 30);
@@ -196,7 +203,7 @@ describe('wand swings keep firing between spell-queued casts', () => {
     const { sim, p } = makeSim(7, 'shaman');
     spawnDummy(sim, p, 2);
     const events = captureTicked(sim);
-    (sim as any).startAutoAttack(p.id);
+    sim.startAutoAttack(p.id);
     spamCasts(sim, p, 300, 'lightning_bolt');
     const stops = events.filter((e) => e.type === 'castStop' && e.success);
     expect(stops.length).toBeGreaterThanOrEqual(4);
@@ -213,7 +220,7 @@ describe('wand swings keep firing between spell-queued casts', () => {
     sim.setSpec('fire');
     const mob = spawnDummy(sim, p, 2);
     const events = captureTicked(sim);
-    (sim as any).startAutoAttack(p.id);
+    sim.startAutoAttack(p.id);
     sim.castAbility('fireball');
     while (p.castRemaining > 0.06) sim.tick();
     p.queuedCastAbility = 'fire_blast';
@@ -225,7 +232,7 @@ describe('wand swings keep firing between spell-queued casts', () => {
     const lastTick = Math.max(...events.map((e) => e.__tick as number));
     const sameTick = events.filter((e) => e.__tick === lastTick);
     const blast = sameTick.findIndex((e) => e.type === 'damage' && e.abilityId === 'fire_blast');
-    const swing = sameTick.findIndex((e) => isWandBolt(e) && e.targetId === mob.id);
+    const swing = sameTick.findIndex((e) => isWandBoltAt(e, mob.id));
     expect(blast).toBeGreaterThan(-1);
     expect(swing).toBeGreaterThan(-1);
     expect(blast).toBeLessThan(swing);
