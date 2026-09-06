@@ -613,7 +613,10 @@ import type {
   RendererPhaseStats,
   RendererQualityChangeStats,
 } from './renderer_perf_stats';
-import { disposeRendererPrewarmAndGroundFx } from './renderer_resource_lifecycle';
+import {
+  disposeRendererPrewarmAndGroundFx,
+  disposeRendererWorldViews,
+} from './renderer_resource_lifecycle';
 import { createRevealCompileHost, REVEAL_GATE_PREP_KIND } from './reveal_compile_host';
 import { createRevealGate } from './reveal_gate';
 import type { RevealGateCore } from './reveal_gate_core';
@@ -3230,11 +3233,16 @@ export class Renderer {
     // Unbind this dome from the sky module's live-binding set, or a replaced
     // renderer's dome would pin its last biome pair against eviction forever.
     bestEffort(() => this.skyView?.dispose());
-    for (const target of this.envRTs.values()) {
-      bestEffort(() => target.dispose());
-    }
+    for (const target of this.envRTs.values()) bestEffort(() => target.dispose());
     this.envRTs.clear();
     disposeRendererPrewarmAndGroundFx(this, bestEffort);
+    disposeRendererWorldViews(
+      this.terrainView,
+      this.farTerrainView,
+      this.waterView,
+      this.underwaterView,
+      bestEffort,
+    );
     for (const bubble of this.chatBubbles.values()) bestEffort(() => bubble.el.remove());
     this.chatBubbles.clear();
     for (const id of [...this.views.keys()]) bestEffort(() => this.removeView(id, true));
@@ -12586,24 +12594,8 @@ export class Renderer {
       this.terrainView.rebuildRegion(region.minX, region.minZ, region.maxX, region.maxZ);
       return;
     }
-    this.terrainView.cancelStreaming();
-    const old = this.terrainView.group;
-    this.scene.remove(old);
-    const firstMesh = old.children.find((c) => (c as THREE.Mesh).isMesh) as THREE.Mesh | undefined;
-    const sharedMat = firstMesh?.material as THREE.Material | THREE.Material[] | undefined;
-    old.traverse((o) => {
-      const m = o as THREE.Mesh;
-      if (m.isMesh) m.geometry.dispose();
-    });
-    const disposeMat = (mat: THREE.Material): void => {
-      const withMap = mat as THREE.Material & {
-        normalMap?: THREE.Texture | null;
-      };
-      withMap.normalMap?.dispose();
-      mat.dispose();
-    };
-    if (Array.isArray(sharedMat)) sharedMat.forEach(disposeMat);
-    else if (sharedMat) disposeMat(sharedMat);
+    this.scene.remove(this.terrainView.group);
+    this.terrainView.dispose();
     this.terrainView = buildTerrain(this.sim.cfg.seed);
     setRenderCategory(this.terrainView.group, 'terrain');
     this.scene.add(this.terrainView.group);
