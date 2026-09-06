@@ -694,11 +694,13 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(refused.inventory).toHaveLength(17);
     expect(rows(refused).filter(([id]) => id === 'rusty_dagger')).toHaveLength(15);
     expect(refused.bank.inventory).toEqual([{ itemId: 'rusty_dagger', count: 1 }]);
-    // Exactly one refusal in the whole run: the step-5 withdrawal. A second one
-    // would mean an arm meant to succeed did not.
+    // Exactly one pool-honest refusal in the whole run: the step-5 withdrawal.
+    // A second one would mean an arm meant to succeed did not.
     const ev = rec.allEvents as Ev[];
-    const full = ev.filter((e) => e.type === 'error' && e.text === 'Your bags are full.');
-    expect(full).toHaveLength(1);
+    const onlyMaterials = ev.filter(
+      (e) => e.type === 'error' && e.text === 'Only materials fit in the space left in your bags.',
+    );
+    expect(onlyMaterials).toHaveLength(1);
 
     // Checkpoint 2, the allocation-order discriminator. 3 non-material slots
     // and 13 material slots is 16 carried, exactly the general budget, so a
