@@ -60,13 +60,22 @@ Pausing is the service pause the dashboard drives (`POST
 what actually stops trading: the game's own guard keys on price health, so
 quotes, bids and buy-nows refuse while paused. A paused refusal reports the
 LAST heartbeat reading and never polls the venue
-(`service/src/market/service.ts`, pausedAsOfMs).
+(`service/src/market/service.ts`, pausedAsOfMs). The game reads health
+through its price cache (`server/woc_market_price_cache.ts`), which keeps
+serving a healthy print for up to `WOC_PRICE_STALE_SERVE_MAX_MS` after it
+was read: a pause or breaker halt shorter than that bound never reaches
+players (the "trading is paused" flicker an auction winner saw while paying
+was the cache mirroring every single-print halt), and a longer one lands
+within the bound. Expect the banner within that many seconds of a pause;
+inside that window the game's guards still pass and a quote or payment is
+refused by the service's own answer rather than the paused copy.
 
 - While the price gate is unhealthy (paused or halted), buyNow refuses
   `market_paused` and ONLY THE PENALTY side of the default sweep pauses: the
   sweep still closes listings and returns items. An intra-window oracle blip
   striking a defaulter is an accepted residual (`server/woc_market.ts`,
-  strikeDefaultingBuyer).
+  strikeDefaultingBuyer); the strike probe reads the same cache, so the
+  residual is bounded by `WOC_PRICE_STALE_SERVE_MAX_MS`, not the price TTL.
 - HALT CONTROL DEPENDS ON THE OVERVIEW READ, deliberately: the dashboard
   renders the pause control only with the current state in hand, because a
   blind toggle is its own hazard. During an overview outage the fallback is

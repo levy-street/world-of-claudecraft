@@ -3105,7 +3105,9 @@ configureInternalWocMarketStuckRead(async () => ({
   storageRecovery: storagePurchaseRecoveryMetrics(),
   // The price cache's memo ages (null on the dev economy, which has no
   // cache): a stale-served or blanked price during a brownout is a NUMBER
-  // here, not an invisible state the module never logs.
+  // here, not an invisible state the module never logs. failureAgeMs also
+  // counts a reachable service answering unhealthy (a deliberate operator
+  // pause), so it is an outage-OR-pause number, never a brownout alarm alone.
   priceCache: wocMarketEconomy.priceCacheAges?.() ?? null,
   // Guard transactions the idle bound killed (25P03), each destroying its
   // pooled client: the retrofit's false-fire rate as a counter.
