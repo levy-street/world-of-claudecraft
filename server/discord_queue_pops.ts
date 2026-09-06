@@ -230,8 +230,17 @@ export function drainQueuePops(now: number): QueuedQueuePop[] {
  */
 export function requeueQueuePops(items: readonly QueuedQueuePop[]): void {
   if (items.length === 0) return;
-  QUEUE.unshift(...items);
-  for (const item of items) if (!pending.has(item.accountId)) pending.set(item.accountId, item);
+  const requeued: QueuedQueuePop[] = [];
+  for (const item of items) {
+    const open = pending.get(item.accountId);
+    if (open) {
+      Object.assign(open, item);
+    } else {
+      requeued.push(item);
+      pending.set(item.accountId, item);
+    }
+  }
+  QUEUE.unshift(...requeued);
   while (QUEUE.length > QUEUE_POP_MAX_QUEUE) {
     const dropped = QUEUE.shift();
     if (dropped && pending.get(dropped.accountId) === dropped) pending.delete(dropped.accountId);
@@ -378,10 +387,8 @@ export function observeQueuePops(
         // before it arrived; leave the entry empty so the next tick re-reads
         // it, and consume the bust mark.
         const busted = bustedAt.get(id);
-        if (busted !== undefined && busted > readStarted) {
-          bustedAt.delete(id);
-          continue;
-        }
+        if (busted !== undefined && busted > readStarted) continue;
+        if (busted !== undefined) bustedAt.delete(id);
         rememberOptIn(id, set.has(id), now);
       }
       for (const c of unanswered) if (set.has(c.accountId)) enqueueCandidate(c, deps.realm);

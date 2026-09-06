@@ -207,6 +207,29 @@ describe('wand swings keep firing between spell-queued casts', () => {
       expect(sameTick.some((e) => e.type === 'damage' && e.ability === null)).toBe(true);
     }
   });
+
+  it('does not pull a ready swing ahead of a queued instant spell', () => {
+    const { sim, p } = makeSim();
+    sim.setSpec('fire');
+    const mob = spawnDummy(sim, p, 2);
+    const events = captureTicked(sim);
+    (sim as any).startAutoAttack(p.id);
+    sim.castAbility('fireball');
+    while (p.castRemaining > 0.06) sim.tick();
+    p.queuedCastAbility = 'fire_blast';
+    p.queuedCastAim = null;
+    p.swingTimer = 0;
+    p.resource = p.maxResource;
+    sim.tick();
+
+    const lastTick = Math.max(...events.map((e) => e.__tick as number));
+    const sameTick = events.filter((e) => e.__tick === lastTick);
+    const blast = sameTick.findIndex((e) => e.type === 'damage' && e.abilityId === 'fire_blast');
+    const swing = sameTick.findIndex((e) => isWandBolt(e) && e.targetId === mob.id);
+    expect(blast).toBeGreaterThan(-1);
+    expect(swing).toBeGreaterThan(-1);
+    expect(blast).toBeLessThan(swing);
+  });
 });
 
 describe('swingReadyForQueuedCast (pure)', () => {

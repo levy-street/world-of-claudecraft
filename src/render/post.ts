@@ -414,6 +414,7 @@ export function buildComposer(
     },
     setSpiritGrade(amount: number): void {
       grade.uniforms.uSpirit.value = amount;
+      if (gradeFxaaTwin) gradeFxaaTwin.uniforms.uSpirit.value = amount;
     },
     updateScreenFx(dt: number): void {
       if (!screenFx) return;

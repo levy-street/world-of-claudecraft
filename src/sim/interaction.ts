@@ -183,7 +183,11 @@ export function lootCorpse(
       continue;
     }
     if (s.personalFor) {
-      if (!ctx.canAddItem(s.itemId, 1, meta.entityId)) {
+      if (
+        s.instance
+          ? !canGrantItemInstance(meta.inventory, bagPools(meta.bags), s.itemId, s.instance)
+          : !ctx.canAddItem(s.itemId, 1, meta.entityId)
+      ) {
         bagsFull = true;
         continue;
       }
@@ -200,7 +204,7 @@ export function lootCorpse(
     if (!rights.shared) continue;
     while (s.count > 0) {
       if (s.instance) {
-        if (!ctx.canAddItem(s.itemId, 1, meta.entityId)) break;
+        if (!canGrantItemInstance(meta.inventory, bagPools(meta.bags), s.itemId, s.instance)) break;
         ctx.addItemInstance(s.itemId, cloneItemInstancePayload(s.instance), meta.entityId);
         s.count--;
       } else if (awardSharedLootItem(ctx, s.itemId, mob, meta, ffaUnlocked)) {

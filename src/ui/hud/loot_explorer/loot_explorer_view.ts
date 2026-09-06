@@ -25,6 +25,7 @@ import {
   QUESTS,
   REWARD_ARCHETYPE,
 } from '../../../sim/data';
+import { FERRY_BELL_OBJECT_ID } from '../../../sim/interactions/ferry_bell';
 import { RAID_MIN_PLAYERS } from '../../../sim/item_level';
 import { riftHeroicClearPool, riftNormalClearPool } from '../../../sim/rift/loot_pools';
 import {
@@ -267,7 +268,15 @@ export function buildLootExplorerIndex(): LootExplorerIndex {
   }
 
   for (const obj of GROUND_OBJECTS) {
-    add(obj.itemId, { category: 'ground_object', sourceId: obj.itemId, chance: 1 });
+    if (obj.itemId === FERRY_BELL_OBJECT_ID) continue;
+    const item = ITEMS[obj.itemId];
+    if (!item) continue;
+    add(obj.itemId, {
+      category: 'ground_object',
+      sourceId: obj.itemId,
+      chance: 1,
+      ...(item.questId ? { gatedByQuestId: item.questId } : {}),
+    });
   }
 
   for (const [cls, def] of Object.entries(CLASSES) as [
@@ -344,10 +353,10 @@ export function filterLootExplorerItems(
       if (classGate && !classGate.includes(filters.requiredClass)) continue;
     }
     if (filters.statKey !== 'all' && !item.statKeys.includes(filters.statKey)) continue;
-    const sources =
-      filters.category === 'all'
-        ? item.sources
-        : item.sources.filter((s) => s.category === filters.category);
+    const sources = item.sources.filter((s) => {
+      if (filters.category !== 'all' && s.category !== filters.category) return false;
+      return filters.requiredClass === 'all' || !s.restrictedToClass || s.restrictedToClass === filters.requiredClass;
+    });
     if (sources.length === 0) continue;
     out.push({ ...item, sources });
   }

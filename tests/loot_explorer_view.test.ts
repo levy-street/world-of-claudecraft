@@ -17,6 +17,7 @@ import {
   QUESTS,
 } from '../src/sim/data';
 import { lootEntryRollsOnClaim } from '../src/sim/loot/loot_difficulty_gate';
+import { FERRY_BELL_OBJECT_ID } from '../src/sim/interactions/ferry_bell';
 import {
   buildDungeonKind,
   buildLootExplorerIndex,
@@ -161,12 +162,19 @@ describe('buildLootExplorerIndex', () => {
     }
     expect(GROUND_OBJECTS.length).toBeGreaterThan(0);
     for (const obj of GROUND_OBJECTS) {
+      if (obj.itemId === FERRY_BELL_OBJECT_ID) continue;
       if (!ITEMS[obj.itemId]) continue;
       const row = items
         .find((i) => i.itemId === obj.itemId)
         ?.sources.find((s) => s.category === 'ground_object');
       expect(row?.chance).toBe(1);
+      expect(row?.gatedByQuestId).toBe(ITEMS[obj.itemId].questId);
     }
+    expect(
+      items
+        .find((i) => i.itemId === FERRY_BELL_OBJECT_ID)
+        ?.sources.some((s) => s.category === 'ground_object') ?? false,
+    ).toBe(false);
   });
 });
 
@@ -202,11 +210,16 @@ describe('filterLootExplorerItems', () => {
       requiredClass: 'mage',
     });
     for (const item of mage) if (item.requiredClass) expect(item.requiredClass).toContain('mage');
+    for (const item of mage)
+      for (const source of item.sources)
+        if (source.restrictedToClass) expect(source.restrictedToClass).toBe('mage');
     const excluded = index().items.find(
       (i) => i.requiredClass && !i.requiredClass.includes('mage'),
     );
     expect(excluded).toBeDefined();
     expect(mage.some((i) => i.itemId === excluded?.itemId)).toBe(false);
+    const wornSword = mage.find((i) => i.itemId === 'worn_sword');
+    expect(wornSword?.sources.some((s) => s.restrictedToClass === 'warrior') ?? false).toBe(false);
 
     const int = filterLootExplorerItems(index(), {
       ...LOOT_EXPLORER_DEFAULT_FILTERS,

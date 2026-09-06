@@ -738,7 +738,10 @@ export function releaseEmpoweredAbility(ctx: SimContext, abilityId: string, pid?
 function fireQueuedCast(ctx: SimContext, p: Entity, onComplete = false): void {
   const queued = p.queuedCastAbility;
   if (!queued) return;
-  if (onComplete && swingReadyForQueuedCast(p)) {
+  const res = ctx.resolvedAbility(queued, p.id);
+  if (res && !res.def.offGcd && p.gcdRemaining > 0) return;
+  const queuedStartsCast = !!res && res.castTime > 0;
+  if (onComplete && queuedStartsCast && swingReadyForQueuedCast(p)) {
     const r = ctx.resolve(p.id);
     if (r) {
       // Run the driver's tick early, exactly: its decay first, so the timer
@@ -754,8 +757,6 @@ function fireQueuedCast(ctx: SimContext, p: Entity, onComplete = false): void {
       p.offhandSwingTimer += DT;
     }
   }
-  const res = ctx.resolvedAbility(queued, p.id);
-  if (res && !res.def.offGcd && p.gcdRemaining > 0) return;
   const aim = p.queuedCastAim;
   p.queuedCastAbility = null;
   p.queuedCastAim = null;

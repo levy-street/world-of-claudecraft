@@ -192,6 +192,19 @@ describe('the queue', () => {
     requeueQueuePops([]);
     expect(queuePopQueueDepth()).toBe(0);
   });
+
+  it('requeue merges with a newer pending item for that account instead of duplicating it', () => {
+    const old = pop(1, { characterName: 'old', seconds: 30 });
+    enqueueQueuePop(old);
+    const drained = drainQueuePops(NOW);
+    enqueueQueuePop(pop(1, { characterName: 'fresh', seconds: 20 }));
+
+    requeueQueuePops(drained);
+
+    expect(drainQueuePops(NOW).map((p) => [p.accountId, p.characterName, p.seconds])).toEqual([
+      [1, 'old', 30],
+    ]);
+  });
 });
 
 describe('observeQueuePops', () => {
@@ -265,6 +278,26 @@ describe('observeQueuePops', () => {
     const again = vi.fn(async () => [10]);
     await observeQueuePops([], [1], deps(again));
     expect(again).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps a mid-read bust until a post-bust read wins over every stale read', async () => {
+    let releaseFirst: (ids: number[]) => void = () => {};
+    let releaseSecond: (ids: number[]) => void = () => {};
+    const slow = vi
+      .fn()
+      .mockImplementationOnce(() => new Promise<number[]>((resolve) => (releaseFirst = resolve)))
+      .mockImplementationOnce(() => new Promise<number[]>((resolve) => (releaseSecond = resolve)));
+
+    const first = observeQueuePops([], [1], deps(slow));
+    const second = observeQueuePops([], [1], deps(slow));
+    bustQueuePingCache(10);
+    releaseFirst([10]);
+    await first;
+    releaseSecond([10]);
+    await second;
+
+    await observeQueuePops([], [1], deps(vi.fn(async () => [])));
+    expect(queuePopsWatching()).toBe(false);
   });
 
   it('swallows a failed read: the pop loses its DM and the tick loses nothing', async () => {

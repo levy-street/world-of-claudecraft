@@ -173,10 +173,15 @@ describe('post shed painter over the live chain', () => {
   it('rung 1 trades the SMAA tail for the FXAA grade twin with no clear', async () => {
     const clears: RecordedClear[] = [];
     const { post, grade, gradeFxaa, smaa, bloom, ao } = await insaneChain(clears);
+    post.setSpiritGrade(0.7);
     post.setShedLevel(0.75);
     expect(smaa.enabled).toBe(false);
     expect(grade.enabled).toBe(false);
     expect(gradeFxaa.enabled).toBe(true);
+    expect(
+      (gradeFxaa as unknown as { uniforms: { uSpirit: { value: number } } }).uniforms.uSpirit
+        .value,
+    ).toBe(0.7);
     expect((bloom as unknown as { enabled: boolean }).enabled).toBe(true);
     expect(bloom.activeMips).toBe(5);
     expect(ao.occlusionPassthrough).toBe(false);

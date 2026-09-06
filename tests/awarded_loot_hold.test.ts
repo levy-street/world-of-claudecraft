@@ -20,6 +20,7 @@ import { expectDefined } from './helpers/defined';
 
 const UNCOMMON = 'greyjaw_hide_boots'; // opens a need/greed roll under default strategies
 const SOULBOUND = 'slagbreaker_helmet'; // soulbound: the award carries the BoP trade window
+const STACKABLE_SOULBOUND = 'sigil_anvil_helmet';
 const COMMON = 'worn_sword'; // common: round-robin under default party strategies
 
 const makeSim = (seed = 42) => new Sim({ seed, playerClass: 'warrior', noPlayer: true });
@@ -186,6 +187,28 @@ describe('awarded loot hold: a roll winner with full bags', () => {
     const slot = expectDefined(playerMeta(sim, a).inventory.find((s) => s.itemId === SOULBOUND));
     expect(slot.instance?.partyTrade?.eligible).toEqual(['Aaa', 'Bbb', 'Ccc']);
     expect(slot.instance?.partyTrade?.untilMs).toBe(awardedAtMs + BOP_PARTY_TRADE_MS);
+  });
+
+  it('holds a stackable soulbound award when only a plain stack has room', () => {
+    const { sim, a, b, c } = partyOfThree();
+    fillBags(sim, a);
+    const meta = playerMeta(sim, a);
+    const last = meta.inventory[meta.inventory.length - 1];
+    sim.removeItem(last.itemId, last.count, a);
+    sim.addItem(STACKABLE_SOULBOUND, 19, a);
+    expect(meta.inventory.length).toBe(bagCapacity(meta.bags));
+    expect(sim.ctx.canAddItem(STACKABLE_SOULBOUND, 1, a)).toBe(true);
+    const mob = deadCorpse(sim, a, [a, b, c]);
+
+    winRoll(sim, mob, STACKABLE_SOULBOUND, a, [b, c]);
+
+    expect(sim.countItem(STACKABLE_SOULBOUND, a)).toBe(19);
+    expect(expectDefined(heldSlot(mob, STACKABLE_SOULBOUND)).personalFor).toEqual([a]);
+    const p = expectDefined(sim.entities.get(a));
+    p.pos = { ...mob.pos };
+    sim.lootCorpse(mob.id, a);
+    expect(sim.countItem(STACKABLE_SOULBOUND, a)).toBe(19);
+    expect(heldSlot(mob, STACKABLE_SOULBOUND)).toBeDefined();
   });
 
   it('decays with the corpse if the winner never makes room (no mailbox fallback)', () => {

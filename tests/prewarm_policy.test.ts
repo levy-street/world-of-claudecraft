@@ -1338,6 +1338,9 @@ describe('the keep-list is the minimal entry set', () => {
     expect([...CONSTRAINED_PREWARM_KEEP].sort()).toEqual(
       [
         'programs.compile',
+        // The post shed's SMAA -> FXAA rung depends on the FXAA grade twin
+        // linking before the live governor can lower the post level.
+        'post.initial-frame',
         'render.settle-passes',
         'textures.scene',
         'views.landmarks',

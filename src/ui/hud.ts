@@ -8328,7 +8328,7 @@ export class Hud {
     });
     const uiRoot = $('#ui');
     uiRoot.appendChild(banner.el);
-    placeActionBarBindBanner(banner.el, $('#actionbar'), uiRoot, getUiScale());
+    placeActionBarBindBanner(banner.el, this.actionBarGroupEl, uiRoot, getUiScale());
     this.actionBarBindBanner = banner;
     this.refreshActionBarBindBannerStatus();
   }
