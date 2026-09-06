@@ -10414,7 +10414,7 @@ export const en: EnTranslations = {
       },
       "gouge": {
         "name": "Eye Jab",
-        "description": "Strikes the target for {damage} damage, incapacitating it for 4 sec. Any damage breaks the effect. Awards 1 combo point."
+        "description": "Strikes the target for {damage} damage, incapacitating it for 4 sec, and resets your own weapon swing timer so your queued auto attack does not break it. Any damage breaks the effect. Awards 1 combo point."
       },
       "evasion": {
         "name": "Ghostfoot",

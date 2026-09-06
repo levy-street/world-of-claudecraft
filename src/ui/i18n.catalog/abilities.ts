@@ -988,7 +988,7 @@ const classAbilityNamesEn = {
       [
         'gouge',
         'Eye Jab',
-        'Strikes the target for {damage} damage, incapacitating it for 4 sec. Any damage breaks the effect. Awards 1 combo point.',
+        'Strikes the target for {damage} damage, incapacitating it for 4 sec, and resets your own weapon swing timer so your queued auto attack does not break it. Any damage breaks the effect. Awards 1 combo point.',
       ],
       ['evasion', 'Ghostfoot', 'Increases your dodge chance by 50% for 15 sec.'],
       [

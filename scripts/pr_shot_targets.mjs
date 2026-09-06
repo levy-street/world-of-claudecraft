@@ -7806,6 +7806,7 @@ export const TARGETS = [
       'ui/hud/action_bar/ability_requirement_keys',
       'sim/incapacitate_dr',
       'sim/combat/stealth_focus',
+      'sim/combat/auto_attack',
     ],
     variants: [
       // Every variant enters as the class that OWNS the ability: the standalone
@@ -7826,6 +7827,8 @@ export const TARGETS = [
       },
       // Reworded copy: Sap gained its no-fight clause.
       { key: 'sap', charClass: 'rogue', charName: 'Nightsliver', abilityId: 'sap' },
+      // Reworded copy: Eye Jab now resets the caster's own swing timer.
+      { key: 'eye-jab', charClass: 'rogue', charName: 'Nightsliver', abilityId: 'gouge' },
       // Shadeslip is a row-5 talent grant, so the recipe allocates before it
       // resolves. It carries the new "Enemy or friendly target" requirement line.
       {
