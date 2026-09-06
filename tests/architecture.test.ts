@@ -546,6 +546,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/woc_trade/woc_trade_offer_view.ts',
   'src/ui/hud/target_dots/target_dots_view.ts',
   'src/ui/safe_local_storage.ts',
+  'src/ui/mouseover_cast_core.ts',
 ].map((rel) => join(repoRoot, rel));
 
 // The one pure core allowed to trip DOM_GLOBAL_VALUE_RE: the shared safeLocalStorage()
