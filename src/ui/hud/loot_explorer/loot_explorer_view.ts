@@ -250,7 +250,11 @@ export function buildLootExplorerIndex(): LootExplorerIndex {
 
   for (const npc of Object.values(NPCS)) {
     for (const itemId of npc.vendorItems ?? []) {
-      add(itemId, { category: 'vendor', sourceId: npc.id });
+      add(itemId, {
+        category: 'vendor',
+        sourceId: npc.id,
+        gatedByQuestId: npc.vendorQuestGates?.[itemId],
+      });
     }
   }
 
@@ -259,10 +263,22 @@ export function buildLootExplorerIndex(): LootExplorerIndex {
       if (obj.type !== 'collect' || !obj.itemId) continue;
       add(obj.itemId, { category: 'quest_objective', sourceId: quest.id });
     }
+    const rewardClassesByItem = new Map<string, PlayerClass[]>();
     for (const cls of ALL_CLASSES) {
       const rewardItem = quest.itemRewards?.[cls] ?? quest.itemRewards?.[REWARD_ARCHETYPE[cls]];
       if (!rewardItem) continue;
-      add(rewardItem, { category: 'quest_reward', sourceId: quest.id, restrictedToClass: cls });
+      const classes = rewardClassesByItem.get(rewardItem) ?? [];
+      classes.push(cls);
+      rewardClassesByItem.set(rewardItem, classes);
+    }
+    for (const [rewardItem, classes] of rewardClassesByItem) {
+      if (classes.length === ALL_CLASSES.length) {
+        add(rewardItem, { category: 'quest_reward', sourceId: quest.id });
+        continue;
+      }
+      for (const cls of classes) {
+        add(rewardItem, { category: 'quest_reward', sourceId: quest.id, restrictedToClass: cls });
+      }
     }
   }
 
@@ -344,10 +360,17 @@ export function filterLootExplorerItems(
       if (classGate && !classGate.includes(filters.requiredClass)) continue;
     }
     if (filters.statKey !== 'all' && !item.statKeys.includes(filters.statKey)) continue;
-    const sources =
-      filters.category === 'all'
-        ? item.sources
-        : item.sources.filter((s) => s.category === filters.category);
+    const sources = item.sources.filter((s) => {
+      if (filters.category !== 'all' && s.category !== filters.category) return false;
+      if (
+        filters.requiredClass !== 'all' &&
+        s.restrictedToClass &&
+        s.restrictedToClass !== filters.requiredClass
+      ) {
+        return false;
+      }
+      return true;
+    });
     if (sources.length === 0) continue;
     out.push({ ...item, sources });
   }

@@ -168,6 +168,36 @@ describe('buildLootExplorerIndex', () => {
       expect(row?.chance).toBe(1);
     }
   });
+
+  it('deduplicates all-class quest rewards while preserving class-specific reward rows', () => {
+    const { items } = buildLootExplorerIndex();
+    const alienPlateRewards =
+      items
+        .find((i) => i.itemId === 'alien_armor_plate')
+        ?.sources.filter(
+          (s) => s.category === 'quest_reward' && s.sourceId === 'q_aldrics_fallen_star',
+        ) ?? [];
+    expect(alienPlateRewards).toHaveLength(1);
+    expect(alienPlateRewards[0]?.restrictedToClass).toBeUndefined();
+
+    const staffRewards =
+      items
+        .find((i) => i.itemId === 'apprentice_staff')
+        ?.sources.filter((s) => s.category === 'quest_reward' && s.sourceId === 'q_bandits') ?? [];
+    expect(staffRewards.map((s) => s.restrictedToClass).sort()).toEqual([
+      'druid',
+      'mage',
+      'priest',
+      'warlock',
+    ]);
+  });
+
+  it('carries quest gates on gated vendor stock', () => {
+    const source = buildLootExplorerIndex()
+      .items.find((i) => i.itemId === 'linen_pouch')
+      ?.sources.find((s) => s.category === 'vendor' && s.sourceId === 'quartermaster_finch');
+    expect(source?.gatedByQuestId).toBe('q_ps_pouch_and_purse');
+  });
 });
 
 describe('filterLootExplorerItems', () => {
@@ -202,6 +232,21 @@ describe('filterLootExplorerItems', () => {
       requiredClass: 'mage',
     });
     for (const item of mage) if (item.requiredClass) expect(item.requiredClass).toContain('mage');
+    for (const item of mage) {
+      for (const source of item.sources) {
+        if (source.restrictedToClass) expect(source.restrictedToClass).toBe('mage');
+      }
+    }
+    const allClassQuestReward = mage
+      .find((i) => i.itemId === 'alien_armor_plate')
+      ?.sources.find((s) => s.category === 'quest_reward');
+    expect(allClassQuestReward?.restrictedToClass).toBeUndefined();
+    const staffRewardClasses =
+      mage
+        .find((i) => i.itemId === 'apprentice_staff')
+        ?.sources.filter((s) => s.category === 'quest_reward' && s.sourceId === 'q_bandits')
+        .map((s) => s.restrictedToClass) ?? [];
+    expect(staffRewardClasses).toEqual(['mage']);
     const excluded = index().items.find(
       (i) => i.requiredClass && !i.requiredClass.includes('mage'),
     );
