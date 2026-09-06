@@ -3,6 +3,7 @@ import { bagCapacity } from '../src/sim/bags';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import { recipeById } from '../src/sim/content/recipes';
 import { ITEMS, NPCS, QUESTS, STATIONS } from '../src/sim/data';
+import { captureMaterialStackSelection } from '../src/sim/material_stack_selection';
 import { hasRecipeMaterials, resolveCraft } from '../src/sim/professions/crafting';
 import { stationsOfType } from '../src/sim/professions/stations';
 import { turnInQuestCore } from '../src/sim/quests/quest_commands';
@@ -374,8 +375,8 @@ describe('quest turn-in spends signed specimens last', () => {
     const meta = acceptOrder(sim, pid);
 
     grantItem(sim, 'copper_ore', 8, pid);
-    // The signed copy lands at the highest inventory index, the exact slot the
-    // old instance-blind walk consumed first.
+    // Signed and ordinary units now share a stack; the source-aware walk
+    // must still preserve the signed unit when ordinary units can pay.
     sim.addItemInstance('copper_ore', { signer: 'Prospector Wynn' }, pid);
     expect(sim.countItem('copper_ore', pid)).toBe(9);
 
@@ -388,7 +389,9 @@ describe('quest turn-in spends signed specimens last', () => {
     const survivor = meta.inventory.find(
       (s: { itemId: string; instance?: { signer?: string } }) => s.itemId === 'copper_ore',
     );
-    expect(survivor?.instance?.signer).toBe('Prospector Wynn');
+    expect(survivor?.materialSources).toEqual([
+      { source: { signer: 'Prospector Wynn' }, count: 1 },
+    ]);
   });
 
   it('a signed copy is still consumed when the plain copies fall short', () => {
@@ -497,6 +500,18 @@ describe('quest turn-in spends signed specimens last', () => {
 
       grantItem(sim, 'copper_ore', 8, pid);
       sim.addItemInstance('copper_ore', { signer: 'Prospector Wynn' }, pid, 8);
+      // Explicitly separate the ordinary units before filling the remaining
+      // cells. Without separation all 16 units share one cell, which cannot be
+      // freed by spending only eight; the deny-direction case covers that.
+      const slotIndex = meta.inventory.findIndex(
+        (slot: { itemId: string }) => slot.itemId === 'copper_ore',
+      );
+      const target = captureMaterialStackSelection(meta.inventory, 'copper_ore', slotIndex);
+      expect(target).not.toBeNull();
+      sim.separateMaterialStack('copper_ore', target!, [{ source: {}, count: 8 }], pid);
+      expect(
+        meta.inventory.filter((slot: { itemId: string }) => slot.itemId === 'copper_ore'),
+      ).toHaveLength(2);
       const capacity = bagCapacity(meta.bags);
       const fillerStack = ITEMS.bone_fragments.stackSize ?? 20;
       while (meta.inventory.length < capacity) sim.addItem('bone_fragments', fillerStack, pid);
@@ -510,10 +525,11 @@ describe('quest turn-in spends signed specimens last', () => {
       // The signed 8 survived; only the plain stack paid.
       expect(sim.countItem('copper_ore', pid)).toBe(8);
       const signedSlot = meta.inventory.find(
-        (s: { itemId: string; instance?: { signer?: string } }) =>
-          s.itemId === 'copper_ore' && s.instance?.signer === 'Prospector Wynn',
+        (slot: { itemId: string }) => slot.itemId === 'copper_ore',
       );
-      expect(signedSlot).toBeDefined();
+      expect(signedSlot?.materialSources).toEqual([
+        { source: { signer: 'Prospector Wynn' }, count: 8 },
+      ]);
       expect(meta.inventory.length).toBeLessThanOrEqual(capacity);
     } finally {
       if (original) QUESTS[TEST_ID] = original;

@@ -84,7 +84,12 @@ import type { QueryResult } from 'pg';
 
 import { sanitizeRemovedZone1Content } from '../src/sim/removed_zone1_content';
 import type { CharacterState } from '../src/sim/sim';
-import { characterUpdateStatement } from './character_save_statement';
+import { journalCharacterSaveSources } from './character_material_sources_db';
+import {
+  CHARACTER_SAVE_PREIMAGE_SELECT,
+  characterUpdateStatement,
+  readCharacterSavePreimage,
+} from './character_save_statement';
 import { REALM } from './realm';
 
 /** One row's UPDATE, not the heavy multi-statement tier (see the header). This
@@ -99,9 +104,13 @@ export const OFFLINE_CHARACTER_SAVE_IDLE_TX_TIMEOUT_MS = 10_000;
 
 /** Take the characters row lock BEFORE the fenced UPDATE evaluates its lease
  *  check (the header's "lock first, then check the lease"). Realm-pinned like
- *  the write it precedes, so a cross-realm id locks nothing. */
-const OFFLINE_CHARACTER_SAVE_ROW_LOCK_SQL =
-  'SELECT 1 FROM characters WHERE id = $1 AND realm = $2 FOR UPDATE';
+ *  the write it precedes, so a cross-realm id locks nothing.
+ *
+ *  Its projection is the material-source PRE-IMAGE (shared verbatim with the
+ *  live lock, so the two cannot drift): this writer REPLACES the whole blob, so
+ *  the state it overwrites is exactly the before-state its source journal
+ *  replays from, and it is already reading it under the strongest lock here. */
+const OFFLINE_CHARACTER_SAVE_ROW_LOCK_SQL = `SELECT ${CHARACTER_SAVE_PREIMAGE_SELECT} FROM characters WHERE id = $1 AND realm = $2 FOR UPDATE`;
 
 /** The shape of db.ts runWithStatementTimeout: run `fn` in ONE transaction on
  *  a dedicated pooled client whose statement_timeout is SET for the duration. */
@@ -183,8 +192,18 @@ export async function runOfflineCharacterSave(
   });
   const res = await runBounded(OFFLINE_CHARACTER_SAVE_STATEMENT_TIMEOUT_MS, async (query) => {
     await applyOfflineCharacterSaveBounds(query);
-    await query(OFFLINE_CHARACTER_SAVE_ROW_LOCK_SQL, [characterId, REALM]);
-    return query(stmt.text, stmt.values);
+    const locked = await query(OFFLINE_CHARACTER_SAVE_ROW_LOCK_SQL, [characterId, REALM]);
+    const saved = await query(stmt.text, stmt.values);
+    // Same transaction as the write, after it: a refused write (0 rows) journals
+    // nothing, and a refused journal aborts the write with it.
+    await journalCharacterSaveSources(
+      { query },
+      characterId,
+      readCharacterSavePreimage(locked.rows[0]),
+      saved,
+      cleanState,
+    );
+    return saved;
   });
   return (res.rowCount ?? 0) > 0;
 }

@@ -326,6 +326,7 @@ export const ru_RU: EnTranslations = {
     }
   },
   "hudChrome": {
+    "materialStackSelectionUnavailable": "Этот выбор материалов больше недоступен.",
     "warlock": {
       "doomLabel": "Осуждение",
       "fateThreadsLabel": "Нити судьбы",
@@ -3047,7 +3048,33 @@ export const ru_RU: EnTranslations = {
       "enchantedFallback": "Зачаровано",
       "partyTradeWindow": "Вы можете передать этот предмет игрокам, разделившим эту добычу, ещё в течение {time}. Надев предмет, вы завершите период обмена.",
       "perfectedBadge": "Доведён до совершенства",
-      "perfectingRank": "Совершенствование: ранг {rank} из {ranks}"
+      "perfectingRank": "Совершенствование: ранг {rank} из {ranks}",
+      "materialSourceGatherer": "{count} × Сборщик: {name}",
+      "materialSourceGathererSigned": "{count} × Сборщик: {name}, подпись: {signer}",
+      "materialSourceUnrecorded": "{count} × Сборщик не указан",
+      "materialSourceUnrecordedSigned": "{count} × Сборщик не указан, подпись: {name}",
+      "materialSourceMore": "Ещё источников: {sources}, единиц: {units}"
+    },
+    "materialSources": {
+      "detailsTitle": "Источники: {item}",
+      "pickerTitle": "Выберите источники для {item}",
+      "close": "Закрыть источники материалов",
+      "view": "Источники",
+      "choose": "Источники",
+      "viewAria": "Посмотреть все источники материала {item}",
+      "chooseAria": "Выбрать источники материала {item} для перемещения",
+      "cancel": "Отмена",
+      "confirm": "Переместить выбранное",
+      "listAria": "Список источников материала",
+      "total": "Единиц в этой стопке: {units}",
+      "row": "{count} ед.: {source}",
+      "gatherer": "Сборщик: {name}",
+      "gathererSigned": "Сборщик: {name}, подпись: {signer}",
+      "unrecorded": "Сборщик не указан",
+      "unrecordedSigned": "Сборщик не указан, подпись: {name}",
+      "quantityAria": "Количество из источника {source}, не более {count}",
+      "decreaseAria": "Уменьшить количество из источника {source}",
+      "increaseAria": "Увеличить количество из источника {source}"
     },
     "materialHint": {
       "fineGrade": "Отборный сорт. Добывается на жиле полного уровня инструментом выше самого материала и засчитывается вместо обычной версии везде, где она требуется.",
@@ -4058,7 +4085,11 @@ export const ru_RU: EnTranslations = {
       "applyEnchant": "Наложить чары",
       "sunder": "Расколоть",
       "sell": "Продать",
-      "sellAll": "Продать все ({count})"
+      "sellAll": "Продать все ({count})",
+      "viewSources": "Показать источники",
+      "separateByGatherer": "Разделить по сборщикам",
+      "takeChosenQuantity": "Взять выбранное количество",
+      "combine": "Объединить стопки материалов"
     },
     "enchanting": {
       "disenchantedLine": "Вы распыляете {item}.",

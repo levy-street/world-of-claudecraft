@@ -78,4 +78,30 @@ describe('collapseToLowestPerItem', () => {
     const solo = [{ id: 1, itemId: 'x', price: 10 }];
     expect(collapseToLowestPerItem(solo)).toEqual(solo);
   });
+  it('collapses recorded gatherers with plain stock while retaining signature rows', () => {
+    const rows = [
+      { id: 1, itemId: 'copper_ore', price: 20 },
+      {
+        id: 2,
+        itemId: 'copper_ore',
+        price: 10,
+        materialSources: [
+          { source: { gatherer: { kind: 'character' as const, id: 7, name: 'Ana' } }, count: 3 },
+        ],
+      },
+      {
+        id: 3,
+        itemId: 'copper_ore',
+        price: 12,
+        materialSources: [{ source: { signer: 'Ana' }, count: 1 }],
+      },
+      {
+        id: 4,
+        itemId: 'copper_ore',
+        price: 14,
+        materialSources: [{ source: { signer: '' }, count: 1 }],
+      },
+    ];
+    expect(collapseToLowestPerItem(rows)).toEqual(rows.slice(1));
+  });
 });

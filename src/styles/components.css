@@ -18651,3 +18651,168 @@
   line-height: 1.25;
   font-weight: 600;
 }
+
+@layer components {
+  /* ---------- material sources ---------- */
+  .material-source-item {
+    min-width: 0;
+  }
+  .material-source-item-cell {
+    display: grid;
+    grid-template-rows: auto auto;
+    gap: 4px;
+    align-items: stretch;
+  }
+  .material-source-item-cell > :is(.bag-item, .bank-item) {
+    width: 100%;
+    min-width: 40px;
+  }
+  .material-source-item-cell > .material-sources-action {
+    width: 100%;
+    padding-inline: 2px;
+    font-size: 10px;
+  }
+  .material-source-item-market,
+  .material-source-item-trade {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 4px;
+    align-items: stretch;
+  }
+  .material-source-item-market > .mkt-row,
+  .material-source-item-trade > .trade-item {
+    min-width: 0;
+    width: 100%;
+  }
+  .material-source-item-mail {
+    display: inline-flex;
+    align-items: stretch;
+    gap: 4px;
+    min-width: 0;
+  }
+  .material-sources-action {
+    overflow-wrap: anywhere;
+    margin: 0;
+    box-sizing: border-box;
+    min-width: 40px;
+    min-height: 40px;
+    padding: 3px 6px;
+    font-size: 10.5px;
+    line-height: 1.1;
+    white-space: normal;
+  }
+  .material-sources-action:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  .material-sources-dialog {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    width: min(460px, calc(100vw - 24px));
+    max-height: min(calc(66vh - 12px), 620px);
+    text-align: left;
+  }
+  .material-sources-dialog .panel-title {
+    flex: none;
+  }
+  .material-sources-summary {
+    margin: 2px 0 8px;
+    color: var(--color-text-muted);
+    font-size: 12px;
+  }
+  .material-sources-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .material-sources-row {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 4px 6px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--panel-base) 88%, var(--panel-edge));
+  }
+  .material-sources-label,
+  .material-sources-row-label {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .material-sources-label {
+    display: flex;
+    align-items: center;
+    min-height: 40px;
+  }
+  .material-sources-quantity {
+    display: grid;
+    grid-template-columns: 40px 64px 40px;
+    gap: 4px;
+    align-items: stretch;
+    flex: none;
+  }
+  .material-sources-step {
+    margin: 0;
+    box-sizing: border-box;
+    min-width: 40px;
+    min-height: 40px;
+    padding: 2px;
+    font-size: 18px;
+    line-height: 1;
+  }
+  .material-sources-row input {
+    box-sizing: border-box;
+    width: 64px;
+    min-height: 40px;
+    padding: 5px 7px;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-input);
+    color: var(--color-text-light);
+    font: 12px var(--ui-font);
+    text-align: center;
+  }
+  .material-sources-row input:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  .material-sources-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    flex: none;
+    padding-top: 10px;
+  }
+  .material-sources-footer .btn {
+    margin: 0;
+    min-height: 40px;
+  }
+  @media (pointer: coarse) {
+    .material-sources-action,
+    .material-sources-row,
+    .material-sources-row input,
+    .material-sources-step,
+    .material-sources-footer .btn {
+      min-height: 44px;
+    }
+    .material-sources-action,
+    .material-sources-step {
+      min-width: 44px;
+    }
+    .material-sources-quantity {
+      grid-template-columns: 44px 64px 44px;
+    }
+  }
+  @media (forced-colors: active) {
+    .material-sources-action:focus-visible,
+    .material-sources-row input:focus-visible {
+      outline-color: Highlight;
+    }
+  }
+}

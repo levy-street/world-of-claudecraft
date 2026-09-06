@@ -25,6 +25,7 @@ import { FISHING_RARE_ID, FISHING_TABLES_BY_BAND, isRawCookingCatch } from '../c
 import { DEEPFEN_SHALLOWS_LAKE } from '../content/zone2';
 import { ITEMS, zoneAt } from '../data';
 import { onFishCaughtForDeeds } from '../deeds';
+import { gatheredMaterialSources } from '../material_gatherer';
 import { forceDismount } from '../mounts';
 import { PLAYER_SWIM_DEPTH } from '../pathfind';
 import type { PlayerMeta } from '../sim';
@@ -583,6 +584,9 @@ export function completeFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): v
     // Deliberately NOT capacity-gated: this once-ever quest catch is guarded
     // to a single copy by shouldCatchCodfather, and losing it to full bags
     // could soft-lock the quest chain. Force-add (over-capacity tolerated).
+    // Deliberately UNATTRIBUTED: a scripted quest token is not a gathered
+    // material yield (it pays no proficiency and returns before the catch
+    // path below), so it carries no provenance.
     ctx.addItem(THE_CODFATHER_ITEM_ID, 1, meta.entityId);
     return;
   }
@@ -665,7 +669,14 @@ export function completeFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): v
   // with the bite line that made a catch three lines and two cues (#2430).
   // The Codfather quest grant above deliberately passes NEITHER: it returns
   // before the emit below, so the hub line and cue are its only feedback.
-  ctx.addItem(caught, 1, meta.entityId, { silent: true, callerLogs: true });
+  // The catch is an EARNED gather outcome (it pays gathering proficiency), so
+  // it records who landed it. No signature: fishing mints none, and a recorded
+  // gatherer is never one (material_gatherer.ts).
+  ctx.addItem(caught, 1, meta.entityId, {
+    silent: true,
+    callerLogs: true,
+    materialSources: gatheredMaterialSources(meta, 1),
+  });
   // Catch feedback event (Professions 2.0): personal (pid = the
   // angler), text-free on purpose (the gatherResult idiom): the client logs
   // its own localized reel-in line colored by the caught item's quality.

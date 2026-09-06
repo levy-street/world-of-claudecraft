@@ -1,15 +1,31 @@
-// Low-frequency observability for the database-wide bank-ledger growth
-// singleton. Enforcement remains entirely inside PostgreSQL; this monitor only
+// Low-frequency observability for the database-wide AGGREGATE audit growth
+// singleton (bank_ledger plus the material source journal, one row, one
+// ceiling). Enforcement remains entirely inside PostgreSQL; this monitor only
 // refreshes the process-local Prometheus projection before the hard ceiling is
 // reached. One indexed point read per minute is deliberately independent of
-// ledger writes and never queues on a saturated pool. Active SQL is aborted
+// audit writes and never queues on a saturated pool. Active SQL is aborted
 // and drained on shutdown; if an otherwise non-full pool was opening a brand
 // new socket, pg-pool may finish that attempt under its bounded connection
 // timeout and pool.end() remains the final teardown authority.
+//
+// The aggregate BYTE measure rides that same one read, as extra columns on the
+// existing point SELECT: no second statement, session or cadence. Rows bound
+// the ceiling; bytes are what an operator sizes disk against. It is NOT
+// lock-free: pg_total_relation_size opens each relation with AccessShareLock
+// (released at statement end) and reads file sizes, so it scans no heap but DOES
+// wait behind an ACCESS EXCLUSIVE holder, notably a boot transaction holding
+// bank_ledger. That wait is bounded by the statement timeout below and costs at
+// most one telemetry beat. A database without the source tables reports the
+// ones it has (to_regclass) rather than failing the refresh.
 
 import type { QueryResult, QueryResultRow } from 'pg';
+import { auditGrowthBytesSql } from './audit_growth_sources';
 import type { BackgroundDbPermit } from './background_db_gate';
-import { observeBankLedgerGrowthBudget } from './bank_ledger_growth_budget';
+import {
+  beginBankLedgerGrowthObservation,
+  observeBankLedgerGrowthBudget,
+  observeBankLedgerGrowthBytes,
+} from './bank_ledger_growth_budget';
 
 export const BANK_LEDGER_GROWTH_MONITOR_INTERVAL_MS = 60_000;
 export const BANK_LEDGER_GROWTH_MONITOR_WALL_TIMEOUT_MS = 1_500;
@@ -44,22 +60,26 @@ export function bankLedgerGrowthWarningActive(
 
 /** One console.warn per process CROSSING of the warn fraction: latched while
  * the condition holds, re-armed if the observation drops back below (a raised
- * limit after a restarted process, or a re-seeded singleton). The gauge arm
- * (limit_warning on woc_bank_ledger_growth_budget) is the alertable signal;
- * this line is the human breadcrumb in the realm log. */
+ * limit after a restarted process, a re-seeded singleton, or enough audit rows
+ * reaped by owner cascades to fall back under). The gauge arm (limit_warning on
+ * woc_bank_ledger_growth_budget) is the alertable signal; this line is the human
+ * breadcrumb in the realm log, and it carries the aggregate byte reading when
+ * one is available because capacity work needs both figures. */
 export function createBankLedgerGrowthWarnLatch(
   warn: (message: string) => void = (message) => console.warn(message),
-): (committedRows: unknown, hardLimitRows: unknown) => void {
+): (committedRows: unknown, hardLimitRows: unknown, totalBytes?: unknown) => void {
   let armed = true;
-  return (committedRows, hardLimitRows) => {
+  return (committedRows, hardLimitRows, totalBytes) => {
     if (!bankLedgerGrowthWarningActive(committedRows, hardLimitRows)) {
       armed = true;
       return;
     }
     if (!armed) return;
     armed = false;
+    const bytes = warnSafeCount(totalBytes);
+    const storage = bytes === null ? '' : `, ${bytes} bytes of audit storage`;
     warn(
-      `bank ledger growth budget crossed ${BANK_LEDGER_GROWTH_WARN_FRACTION} of the hard limit (${String(committedRows)} of ${String(hardLimitRows)} lifetime inserted rows): plan capacity work before the ceiling refuses ledger writes (woc_bank_ledger_growth_budget{measure="limit_warning"})`,
+      `bank ledger growth budget crossed ${BANK_LEDGER_GROWTH_WARN_FRACTION} of the hard limit (${String(committedRows)} of ${String(hardLimitRows)} accounted audit rows${storage}): plan capacity work before the ceiling refuses audit writes (woc_bank_ledger_growth_budget{measure="limit_warning"})`,
     );
   };
 }
@@ -87,7 +107,20 @@ export interface BankLedgerGrowthMonitorPool {
 export interface BankLedgerGrowthBudgetRow {
   readonly committedRows: unknown;
   readonly hardLimitRows: unknown;
+  /** Aggregate stored bytes across the audit surface. Undefined when the row
+   *  came from a source that does not carry the measure; null when PostgreSQL
+   *  resolved none of the audit tables. Never fails a refresh on its own: the
+   *  ceiling is a ROW budget, and bytes are the sizing companion to it. */
+  readonly totalBytes?: unknown;
 }
+
+/** The aggregate byte columns ride the singleton point read, never a second
+ *  statement or cadence. Built once: the expression is fixed text. */
+const AUDIT_GROWTH_BUDGET_READ_SQL = `SELECT committed_rows,
+       hard_limit_rows,
+       ${auditGrowthBytesSql()} AS total_bytes
+  FROM public.bank_ledger_growth_budget
+ WHERE singleton = TRUE`;
 
 export class BankLedgerGrowthMonitorAborted extends Error {
   readonly code = 'BANK_LEDGER_GROWTH_MONITOR_ABORTED' as const;
@@ -251,11 +284,7 @@ export async function readBankLedgerGrowthBudget(
 
     let result: QueryResult;
     try {
-      result = await client.query(
-        `SELECT committed_rows, hard_limit_rows
-           FROM public.bank_ledger_growth_budget
-          WHERE singleton = TRUE`,
-      );
+      result = await client.query(AUDIT_GROWTH_BUDGET_READ_SQL);
     } catch (error) {
       if (causalError) throw causalError;
       if (pgErrorCode(error) === undefined) {
@@ -287,6 +316,7 @@ export async function readBankLedgerGrowthBudget(
     return {
       committedRows: row.committed_rows,
       hardLimitRows: row.hard_limit_rows,
+      totalBytes: row.total_bytes,
     };
   } finally {
     clearTimeout(timeout);
@@ -304,8 +334,21 @@ export interface BankLedgerGrowthMonitorDeps {
     signal: AbortSignal,
   ) => Promise<BankLedgerGrowthBudgetRow>;
   /** False means the database row was malformed or disagreed with this
-   * process's configured durable limit, which is a monitor failure. */
-  readonly observe?: (committedRows: unknown, hardLimitRows: unknown) => boolean;
+   * process's configured durable limit, which is a monitor failure. Both extra
+   * arguments are claimed BEFORE the read: the timestamp so the exported age
+   * describes the snapshot, and the ordering ticket so a refusal that observed
+   * the database later cannot be overwritten by this poll's late answer. */
+  readonly observe?: (
+    committedRows: unknown,
+    hardLimitRows: unknown,
+    observedAtMs?: number,
+    generation?: number,
+  ) => boolean;
+  /** Best-effort: an absent or malformed byte reading leaves the last one in
+   * place and never fails the refresh. */
+  readonly observeBytes?: (totalBytes: unknown, generation?: number) => boolean;
+  /** Claims the ordering ticket; injected only so tests can observe it. */
+  readonly beginObservation?: () => number;
   readonly onError?: (error: unknown) => void;
   /** Sink for the latched warn-fraction crossing line (default console.warn). */
   readonly warn?: (message: string) => void;
@@ -323,6 +366,8 @@ export function createBankLedgerGrowthMonitor(
 ): BankLedgerGrowthMonitor {
   const read = deps.read ?? readBankLedgerGrowthBudget;
   const observe = deps.observe ?? observeBankLedgerGrowthBudget;
+  const observeBytes = deps.observeBytes ?? observeBankLedgerGrowthBytes;
+  const beginObservation = deps.beginObservation ?? beginBankLedgerGrowthObservation;
   const warnLatch = createBankLedgerGrowthWarnLatch(deps.warn);
   const intervalMs = deps.intervalMs ?? BANK_LEDGER_GROWTH_MONITOR_INTERVAL_MS;
   if (!Number.isSafeInteger(intervalMs) || intervalMs <= 0) {
@@ -360,15 +405,23 @@ export function createBankLedgerGrowthMonitor(
 
       const controller = new AbortController();
       activeAbort = controller;
+      // Claimed before the read, so a refusal observed mid-flight outranks
+      // whatever this poll eventually answers.
+      const generation = beginObservation();
+      const startedAtMs = Date.now();
       try {
         const row = await read(deps.pool, controller.signal);
         if (stopped || controller.signal.aborted) return;
-        if (!observe(row.committedRows, row.hardLimitRows)) {
+        if (!observe(row.committedRows, row.hardLimitRows, startedAtMs, generation)) {
           throw new Error('bank ledger growth monitor returned invalid durable budget values');
         }
+        // A sizing companion, not a ceiling input: a database without the
+        // source tables yet answers null, which leaves the last reading in
+        // place instead of failing an otherwise healthy poll.
+        observeBytes(row.totalBytes, generation);
         // Only an accepted observation drives the warn latch: the values were
         // just validated against this process's configured durable limit.
-        warnLatch(row.committedRows, row.hardLimitRows);
+        warnLatch(row.committedRows, row.hardLimitRows, row.totalBytes);
         failureStreak = false;
       } catch (error) {
         if (

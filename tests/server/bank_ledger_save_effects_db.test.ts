@@ -249,7 +249,17 @@ function clientStub(options: ClientOptions = {}) {
         : [Number(values?.[0])];
       return { rows: requested.map((id) => ({ id })), rowCount: requested.length };
     }
-    if (/UPDATE characters/i.test(sql)) return { rows: [], rowCount: characterRows };
+    // The material-source pre-image the character save reads under its lock (or
+    // returns from the single-statement form). A landed write answers with the
+    // row; a fenced-out one answers with none, as PostgreSQL would. A row that
+    // answered NOTHING is refused by the save rather than read as an empty bank.
+    if (/FOR NO KEY UPDATE/i.test(sql) && !/UPDATE characters/i.test(sql)) {
+      return { rows: [{ before_bank: null, before_vault: null }], rowCount: 1 };
+    }
+    if (/UPDATE characters/i.test(sql)) {
+      const rows = characterRows > 0 ? [{ before_bank: null, before_vault: null }] : [];
+      return { rows, rowCount: characterRows };
+    }
     if (/FROM storage_purchase_applied_receipts/i.test(sql)) {
       return { rows: [], rowCount: 0 };
     }

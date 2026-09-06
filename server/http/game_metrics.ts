@@ -214,10 +214,13 @@ export const WOC_GENERAL_CHAT_QUOTA_CACHE_ACCOUNTS = 'woc_general_chat_quota_cac
 /** Total characters successfully created. */
 export const WOC_CHARACTERS_CREATED_TOTAL = 'woc_characters_created_total';
 
-/** Last database-observed global bank-ledger budget, by fixed measure. */
+/** Last database-observed AGGREGATE audit-storage budget (bank_ledger plus the
+ *  material source journal), by fixed measure. The series keeps its historical
+ *  bank-ledger name: renaming it would break every deployed dashboard and alert
+ *  for no operational gain. */
 export const WOC_BANK_LEDGER_GROWTH_BUDGET = 'woc_bank_ledger_growth_budget';
 
-/** Database-wide bank-ledger hard-ceiling refusals in this process. */
+/** Database-wide audit hard-ceiling refusals in this process. */
 export const WOC_BANK_LEDGER_GROWTH_LIMIT_REFUSALS_TOTAL =
   'woc_bank_ledger_growth_limit_refusals_total';
 
@@ -953,14 +956,18 @@ export function registerGameStateMetrics(
 
   new Gauge({
     name: WOC_BANK_LEDGER_GROWTH_BUDGET,
-    help: 'Database-wide bank-ledger budget by fixed measure. lifetime_inserted_rows counts every insert the durable singleton ever accounted and is NEVER credited when ledger rows disappear via the characters/accounts ON DELETE CASCADE, so it can exceed a live count(*); it is refreshed at boot, once per minute, and on a hard-limit refusal. observation_age_seconds exposes a stalled refresh; limit_warning flips to 1 when the observation crosses the warn fraction of the hard limit.',
+    help: 'Database-wide AGGREGATE audit-storage budget by fixed measure, covering bank_ledger plus the material source journal against one ceiling. accounted_rows is the audit rows the durable singleton currently accounts for: it RISES on inserts and FALLS when an owner cascade reaps audit rows, so it is not a lifetime tally. lifetime_inserted_rows is a DEPRECATED alias carrying the same value for existing dashboards and alerts; it stopped being a lifetime count when the budget became aggregate and net, and it is scheduled for removal once those panels move to accounted_rows. total_bytes is the aggregate stored size of the audit tables (0 when no byte reading has landed; bytes_known says which). All are refreshed at boot, once per minute, and on a hard-limit refusal; observation_age_seconds exposes a stalled refresh, and limit_warning flips to 1 when the observation crosses the warn fraction of the hard limit.',
     labelNames: ['measure'],
     registers: [registry],
     collect() {
       const readout = bankLedgerGrowthBudgetReadout();
       this.set({ measure: 'hard_limit_rows' }, readout.hardLimitRows);
       this.set({ measure: 'initialized' }, readout.committedRows === null ? 0 : 1);
+      this.set({ measure: 'accounted_rows' }, readout.committedRows ?? 0);
+      // Compatibility alias, same value: see the help text.
       this.set({ measure: 'lifetime_inserted_rows' }, readout.committedRows ?? 0);
+      this.set({ measure: 'total_bytes' }, readout.observedBytes ?? 0);
+      this.set({ measure: 'bytes_known' }, readout.observedBytes === null ? 0 : 1);
       this.set(
         { measure: 'limit_warning' },
         bankLedgerGrowthWarningActive(readout.committedRows, readout.hardLimitRows) ? 1 : 0,

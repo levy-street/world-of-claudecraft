@@ -61,6 +61,15 @@ import { canStackInstancePayloads, itemInstancePayloadsEqual } from './item_inst
 import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
 import { isItemLocked } from './item_lock';
 import { withoutPartyTradeMarker } from './loot/bop_trade_window';
+import { isMaterialItemId } from './material_ids';
+import {
+  buybackCompositionAfter,
+  commitMaterialUnitWithdrawal,
+  consumeMaterialUnitPayloads,
+  planMaterialUnitWithdrawal,
+  takeMaterialUnits,
+} from './material_item_custody';
+import type { MaterialComposition } from './material_sources';
 import { mountOwned, summonMountItem } from './mounts';
 import { learnRiding } from './mounts_training';
 import { battlefieldExperienceTrickle } from './professions/battlefield_xp';
@@ -219,6 +228,13 @@ function desiredEquipSlot(meta: PlayerMeta, itemId: string): EquipSlot | null {
 // mirrors removeItem's highest-index-first order and clone-on-survival return
 // contract exactly, so a caller mutating a returned payload (the trade
 // bind-on-trade stamp) never aliases a surviving stack's shared payload.
+// A MATERIAL takes none of the walk below. Fungible-first is a payload-presence
+// priority, and a material's units rank by their SOURCE (unrecorded first,
+// premium last) across the whole eligible pool; `skip`/`deprioritize` are judged
+// on each unit's effective payload, since the signer they keyed on now lives in
+// the descriptor. The returned payloads stay the legacy consumed-effect shape,
+// so this arm is for consumption that DESTROYS the copies; a caller that
+// re-grants them needs the unit carriers (material_item_custody.ts).
 export function removePreferFungible(
   ctx: SimContext,
   itemId: string,
@@ -233,6 +249,16 @@ export function removePreferFungible(
   // beside it. Absent, the walk is byte-identical to before.
   deprioritize?: (instance: ItemInstancePayload) => boolean,
 ): ItemInstancePayload[] {
+  if (isMaterialItemId(itemId)) {
+    const held = ctx.resolve(pid);
+    if (!held) return [];
+    const payloads = consumeMaterialUnitPayloads(held.meta.inventory, itemId, count, {
+      skip,
+      deprioritize,
+    });
+    ctx.onInventoryChangedForQuests?.(held.meta);
+    return payloads;
+  }
   const fungibleAvailable = ctx.countFungibleItem(itemId, pid);
   const fungibleTake = Math.min(fungibleAvailable, count);
   if (fungibleTake > 0) ctx.removeFungibleItem(itemId, fungibleTake, pid);
@@ -322,6 +348,17 @@ export function removeSellUnitsFromInventory(
   // window-carrying instanced copies may ever ship.
   skipPlainStacks = false,
 ): VendorRemovedUnit[] {
+  // A MATERIAL ships as exact per-unit carriers: same signature, same
+  // predicates (read on each unit's effective payload), but the source rides
+  // along on every unit, so a sale, a trade preview and the real swap move the
+  // units they said they would. `skipPlainStacks` reads as payload-only here.
+  if (isMaterialItemId(itemId)) {
+    return takeMaterialUnits(inventory, itemId, count, {
+      skip,
+      deprioritize,
+      payloadOnly: skipPlainStacks,
+    });
+  }
   const consumed: VendorRemovedUnit[] = [];
   let left = count;
   for (let i = inventory.length - 1; i >= 0 && left > 0 && !skipPlainStacks; i--) {
@@ -1342,12 +1379,19 @@ function vendorInRange(ctx: SimContext, p: Entity): boolean {
 // can never pair the wrong count with the wrong payload. The stored payload
 // is a deep clone: the caller's instance is never aliased into the buyback
 // list.
+//
+// `materialSources` is the sold unit's EXACT one-unit composition. Merging a
+// row absorbs it through the source algebra, so a row that already held three
+// descriptors gains one unit rather than being rewritten, and the recency and
+// limit rules are untouched: the merged row still moves to the front and the
+// list still pops past VENDOR_BUYBACK_LIMIT.
 function recordVendorBuyback(
   meta: PlayerMeta,
   itemId: string,
   count: number,
   instance?: ItemInstancePayload,
   craftedRecipeId?: string,
+  materialSources?: MaterialComposition,
 ): void {
   const existingIndex = meta.vendorBuyback.findIndex(
     (s) =>
@@ -1358,6 +1402,8 @@ function recordVendorBuyback(
   if (existingIndex >= 0) {
     const [existing] = meta.vendorBuyback.splice(existingIndex, 1);
     existing.count += count;
+    const merged = buybackCompositionAfter(existing.materialSources, materialSources);
+    if (merged !== undefined) existing.materialSources = merged;
     meta.vendorBuyback.unshift(existing);
   } else {
     meta.vendorBuyback.unshift({
@@ -1365,6 +1411,10 @@ function recordVendorBuyback(
       count,
       ...(instance && { instance: cloneItemInstancePayload(instance) }),
       ...(craftedRecipeId === undefined ? {} : { craftedRecipeId }),
+      // Deep-copied by the algebra, so the row never aliases the sold unit.
+      ...(materialSources === undefined
+        ? {}
+        : { materialSources: buybackCompositionAfter(undefined, materialSources) }),
     });
   }
   while (meta.vendorBuyback.length > VENDOR_BUYBACK_LIMIT) meta.vendorBuyback.pop();
@@ -1497,7 +1547,7 @@ export function sellItem(
     );
   }
   for (const unit of consumedUnits) {
-    recordVendorBuyback(meta, itemId, 1, unit.instance, unit.craftedRecipeId);
+    recordVendorBuyback(meta, itemId, 1, unit.instance, unit.craftedRecipeId, unit.materialSources);
   }
   const payout = def.sellValue * sellableCount;
   meta.copper += payout;
@@ -1609,7 +1659,14 @@ export function sellAllJunk(ctx: SimContext, pid?: number): void {
       sellerSignedCharmDeprioritize(meta.name, itemId),
     );
     for (const unit of consumedUnits) {
-      recordVendorBuyback(meta, itemId, 1, unit.instance, unit.craftedRecipeId);
+      recordVendorBuyback(
+        meta,
+        itemId,
+        1,
+        unit.instance,
+        unit.craftedRecipeId,
+        unit.materialSources,
+      );
     }
     total += def.sellValue * count;
     soldCount += count;
@@ -1686,23 +1743,46 @@ export function buyBackItem(
   // merge rule addStacked itself uses below, #2139-class gap): preflight the
   // regrant with the row's own instance instead of always checking room for
   // a generic plain copy.
+  //
+  // A MATERIAL row is planned first and committed only after every refusal:
+  // the preflight must model the SAME single unit the regrant lands (a row
+  // holding three descriptors would never match a one-unit fit check), and a
+  // row that cannot give a unit reads as unavailable rather than half-spent.
+  const rowIndex = meta.vendorBuyback.indexOf(slot);
+  const withdrawal = planMaterialUnitWithdrawal(meta.vendorBuyback, itemId, rowIndex);
+  if (isMaterialItemId(itemId) && withdrawal === null) {
+    ctx.error(meta.entityId, 'That item is not available for buyback.');
+    return;
+  }
+  const unitSources = withdrawal?.unit.materialSources;
   const fits =
-    countFit(meta.inventory, bagPools(meta.bags), itemId, 1, slot.instance, slot.craftedRecipeId) >=
-    1;
+    countFit(
+      meta.inventory,
+      bagPools(meta.bags),
+      itemId,
+      1,
+      withdrawal ? withdrawal.unit.instance : slot.instance,
+      slot.craftedRecipeId,
+      unitSources,
+    ) >= 1;
   if (!fits) {
     bagsFullError(ctx, meta.entityId);
     return;
   }
   meta.copper -= def.sellValue;
-  const instance = slot.instance;
+  const instance = withdrawal ? withdrawal.unit.instance : slot.instance;
   const craftedRecipeId = slot.craftedRecipeId;
-  slot.count -= 1;
-  if (slot.count <= 0) meta.vendorBuyback = meta.vendorBuyback.filter((s) => s !== slot);
+  if (withdrawal) {
+    commitMaterialUnitWithdrawal(meta.vendorBuyback, withdrawal);
+  } else {
+    slot.count -= 1;
+    if (slot.count <= 0) meta.vendorBuyback = meta.vendorBuyback.filter((s) => s !== slot);
+  }
   // A row recorded with an instance payload (a masterwork/signed piece sold
   // unbound, #2207 sibling gap) re-grants that exact payload instead of a
   // generic plain copy; addStacked deep-clones it into the new/topped-up
   // inventory slot, so the buyback row's own copy is never aliased.
-  addItemSilent(itemId, 1, meta, instance, craftedRecipeId);
+  addItemSilent(itemId, 1, meta, instance, craftedRecipeId, unitSources);
   // The silent add bypasses the inventory hub, so credit the discovery
   // ledger here (an acquisition like any other; the mark is idempotent), and
   // carry the SAME movement provenance the hub would have carried.
@@ -1744,6 +1824,9 @@ function addItemSilent(
   meta: PlayerMeta,
   instance?: ItemInstancePayload,
   craftedRecipeId?: string,
+  // The silent regrant carries the exact composition the row gave up, so a
+  // buyback puts back the units it took rather than minting unrecorded stock.
+  materialSources?: MaterialComposition,
 ): void {
-  addStacked(meta.inventory, itemId, count, instance, craftedRecipeId);
+  addStacked(meta.inventory, itemId, count, instance, craftedRecipeId, materialSources);
 }

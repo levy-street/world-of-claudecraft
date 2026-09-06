@@ -17,6 +17,8 @@
 // not prices.
 
 import { bagPools, countFit } from '../sim/bags';
+import { cloneMaterialData } from '../sim/material_payload_identity';
+import type { MaterialComposition } from '../sim/material_sources';
 import { isVaultDepositableSlot, VAULT_BASE_CAP, VAULT_UPGRADE_STEP } from '../sim/materials_vault';
 import { baseMaterialFor } from '../sim/professions/material_grades';
 import { cloneItemInstancePayload, type InvSlot, type ItemInstancePayload } from '../sim/types';
@@ -80,6 +82,8 @@ export interface VaultPooledRowModel extends VaultRowBase {
 export interface VaultSpecialRowModel extends VaultRowBase {
   kind: 'special';
   specialRef: VaultSpecialRef;
+  /** Snapshot of the full composition shown by the source details action. */
+  materialSources?: MaterialComposition;
   instance?: ItemInstancePayload;
   craftedRecipeId?: string;
 }
@@ -136,7 +140,7 @@ export function vaultSpecialRef(index: number, slot: InvSlot): VaultSpecialRef {
 export function vaultSpecialContentKey(special: readonly InvSlot[]): readonly string[] {
   return special.map(
     (slot) =>
-      `${slot.itemId}\u0000${slot.count}\u0000${canonicalJson(slot.instance)}\u0000${slot.craftedRecipeId ?? ''}`,
+      `${slot.itemId}\u0000${slot.count}\u0000${canonicalJson(slot.instance)}\u0000${canonicalJson(slot.materialSources)}\u0000${slot.craftedRecipeId ?? ''}`,
   );
 }
 
@@ -190,6 +194,8 @@ export function buildVaultView(info: VaultInfo | null, lookup: BankItemLookup): 
     })),
     ...info.special.map((slot, index) => {
       const instance = slot.instance ? cloneItemInstancePayload(slot.instance) : undefined;
+      const materialSources =
+        slot.materialSources === undefined ? undefined : cloneMaterialData(slot.materialSources);
       const specialRef = vaultSpecialRef(index, slot);
       const row: VaultSpecialRowModel = {
         kind: 'special',
@@ -199,6 +205,7 @@ export function buildVaultView(info: VaultInfo | null, lookup: BankItemLookup): 
         canChooseQuantity: instance === undefined && slot.count > 1,
         partialMax: instance === undefined && slot.count > 1 ? slot.count : null,
         specialRef,
+        ...(materialSources === undefined ? {} : { materialSources }),
         ...(instance === undefined ? {} : { instance }),
         ...(slot.craftedRecipeId === undefined ? {} : { craftedRecipeId: slot.craftedRecipeId }),
       };

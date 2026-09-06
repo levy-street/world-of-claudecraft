@@ -16,6 +16,7 @@
 
 import type { WocQuoteView } from '../../../net/woc_market_sdk';
 import { ITEMS } from '../../../sim/data';
+import type { MaterialComposition } from '../../../sim/material_sources';
 import type { InvSlot, ItemDef, ItemInstancePayload } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
 import { userFacingApiError } from '../../api_error_i18n';
@@ -26,6 +27,12 @@ import { formatDateTime, formatMoney as formatLocalizedMoney, t } from '../../i1
 import type { TranslationKey } from '../../i18n.catalog';
 import { itemNameColor } from '../../item_name_color';
 import { knownItemDef } from '../../known_item';
+import {
+  appendMaterialSourcesActionAfter,
+  attachMaterialSourcesContextMenu,
+  closeMaterialSourcesDialogForOwner,
+  type MaterialSourcesDialogOpener,
+} from '../../material_sources_dialog';
 
 import { termsUrlFor } from '../../terms_link';
 import { buildTradeItemRow, tradeRowTooltipTarget } from '../../trade_view';
@@ -112,7 +119,13 @@ export interface WocTradeControllerDeps {
   log(text: string, color?: string): void;
   itemIcon(item: ItemDef, quality?: ItemDef['quality']): string;
   attachTooltip(el: HTMLElement, html: () => string): void;
-  itemTooltip(item: ItemDef, compare?: boolean, instance?: ItemInstancePayload): string;
+  openMaterialSources?: MaterialSourcesDialogOpener;
+  itemTooltip(
+    item: ItemDef,
+    compare?: boolean,
+    instance?: ItemInstancePayload,
+    materialSources?: MaterialComposition,
+  ): string;
   renderBags(): void;
 }
 
@@ -251,8 +264,13 @@ export class WocTradeController {
   private attachTooltip(el: HTMLElement, html: () => string): void {
     this.deps.attachTooltip(el, html);
   }
-  private itemTooltip(item: ItemDef, compare = true, instance?: ItemInstancePayload): string {
-    return this.deps.itemTooltip(item, compare, instance);
+  private itemTooltip(
+    item: ItemDef,
+    compare = true,
+    instance?: ItemInstancePayload,
+    materialSources?: MaterialComposition,
+  ): string {
+    return this.deps.itemTooltip(item, compare, instance, materialSources);
   }
   private renderBags(): void {
     this.deps.renderBags();
@@ -1216,6 +1234,7 @@ export class WocTradeController {
     const info = this.sim.tradeInfo;
     if (!info) {
       if (this.tradeWasOpen) {
+        closeMaterialSourcesDialogForOwner(el);
         el.style.display = 'none';
         this.tradeWasOpen = false;
         this.stagedTrade = { items: [], copper: 0 };
@@ -1545,8 +1564,22 @@ export class WocTradeController {
         rows.forEach((row, i) => {
           const target = tradeRowTooltipTarget(slots, i);
           if (!target) return;
-          this.attachTooltip(row as HTMLElement, () =>
-            this.itemTooltip(target.item, true, target.instance),
+          const rowElement = row as HTMLElement;
+          this.attachTooltip(rowElement, () =>
+            this.itemTooltip(target.item, true, target.instance, target.materialSources),
+          );
+          const itemName = itemDisplayName(target.item);
+          attachMaterialSourcesContextMenu(
+            rowElement,
+            itemName,
+            target.materialSources,
+            this.deps.openMaterialSources,
+          );
+          appendMaterialSourcesActionAfter(
+            rowElement,
+            itemName,
+            target.materialSources,
+            this.deps.openMaterialSources,
           );
         });
       };

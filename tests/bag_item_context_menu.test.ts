@@ -6,6 +6,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { ENCHANTS } from '../src/sim/content/enchants';
+import type { MaterialComposition } from '../src/sim/material_sources';
 import type { ItemDef, ItemInstancePayload } from '../src/sim/types';
 import {
   type BagCopy,
@@ -46,6 +47,27 @@ describe('bag_item_context_menu: enchant reagent detection', () => {
   it('rejects a non-reagent id', () => {
     expect(isEnchantReagentItem('bone_fragments')).toBe(false);
     expect(isEnchantReagentItem('not_a_real_item')).toBe(false);
+  });
+});
+
+describe('bag_item_context_menu: material source actions', () => {
+  it('adds source inspection and exact split actions only for an eligible material stack', () => {
+    const sources: MaterialComposition = [
+      { source: { gatherer: { kind: 'character', id: 1, name: 'Ada' } }, count: 2 },
+      { source: { gatherer: { kind: 'character', id: 2, name: 'Bea' } }, count: 1 },
+    ];
+    expect(bagItemNewActions(def('material'), 'copper_ore', undefined, sources, true)).toEqual([
+      'viewSources',
+      'separateByGatherer',
+      'takeChosenQuantity',
+      'combine',
+      'lock',
+    ]);
+    expect(bagItemNewActions(def('weapon', 'common'), 'sword', undefined, sources, true)).toEqual([
+      'disenchant',
+      'salvage',
+      'lock',
+    ]);
   });
 });
 

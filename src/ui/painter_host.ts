@@ -39,7 +39,9 @@
 // / `el.style.*`) on elements handed to them, but never reach for a browser global,
 // so the host itself imports cleanly under Vitest.
 
+import type { MaterialComposition } from '../sim/material_sources';
 import type { ItemDef, ItemInstancePayload } from '../sim/types';
+import type { MaterialSourcesDialogOptions } from './material_sources_dialog';
 
 /**
  * Facet 1: the presentation dep-bag. Exactly the icon / money / tooltip helpers a
@@ -58,10 +60,21 @@ export interface PainterHostPresentation {
   moneyHtml(copper: number): string;
   /** Full item tooltip markup (name, stats, compare). The optional per-copy
    *  instance payload adds the masterwork seal, enchanted marker, baked bonus
-   *  stats, and maker's mark lines (Professions 2.0). */
-  itemTooltip(item: ItemDef, instance?: ItemInstancePayload): string;
+   *  stats, and maker's mark lines (Professions 2.0). The optional
+   *  `materialSources` is the hovered STACK's per-unit provenance: a surface
+   *  that has the slot in hand passes it and the card gains one line per
+   *  contributor, and one that does not simply omits it. Every surface showing
+   *  OWNED stacks should pass it (the all-surfaces item-mark doctrine in
+   *  src/ui/CLAUDE.md: a fact about the item must not vanish between windows). */
+  itemTooltip(
+    item: ItemDef,
+    instance?: ItemInstancePayload,
+    materialSources?: MaterialComposition,
+  ): string;
   /** Attach a lazily-built tooltip to an element. */
   attachTooltip(el: HTMLElement, html: () => string): void;
+  /** Open the uncapped source details/picker surface when the host has mounted it. */
+  openMaterialSources?(options: MaterialSourcesDialogOptions): void;
 }
 
 /**

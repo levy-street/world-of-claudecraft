@@ -14,6 +14,7 @@
 import type { PoolCapacity } from '../sim/bag_pools';
 import { BANK_EXPANSION_SLOTS, moveBetweenContainers } from '../sim/bank';
 import { storageRungSkuForLadderIndex } from '../sim/content/storage_charters';
+import type { MaterialComposition } from '../sim/material_sources';
 import { isMaterialItem } from '../sim/material_taxonomy';
 import { cloneInvSlot, type InvSlot, type ItemInstancePayload } from '../sim/types';
 import type { BankInfo } from '../world_api';
@@ -45,6 +46,8 @@ export interface BankSlotModel {
   /** Per-copy payload passthrough for the tooltip's instance lines (seal,
    *  enchanted marker, bonus stats, maker's mark). */
   instance?: ItemInstancePayload;
+  /** Per-unit material provenance carried by the bank slot snapshot. */
+  materialSources?: MaterialComposition;
 }
 
 /** The header counter: occupied slots over the total budget, plus the two budget
@@ -296,6 +299,7 @@ export function buildBankView(
     showCount: slot.count > 1,
     qualityKey: bagQualityKey(lookup(slot.itemId) ?? {}, slot.instance),
     instance: slot.instance,
+    ...(slot.materialSources === undefined ? {} : { materialSources: slot.materialSources }),
   }));
   // The footer meter reads the WIRE pool four verbatim (the bankPoolsOf rule):
   // the server computes the split from the socket state, so the meter can

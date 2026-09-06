@@ -326,6 +326,7 @@ export const zh_CN: EnTranslations = {
     }
   },
   "hudChrome": {
+    "materialStackSelectionUnavailable": "该素材选择已失效。",
     "warlock": {
       "doomLabel": "谴罪",
       "fateThreadsLabel": "命运丝线",
@@ -3047,7 +3048,33 @@ export const zh_CN: EnTranslations = {
       "enchantedFallback": "已附魔",
       "partyTradeWindow": "在接下来的{time}内，你可以将此物品交易给共同获得该掉落的玩家。装备后交易期限即告结束。",
       "perfectedBadge": "臻至完美",
-      "perfectingRank": "完美化：第{rank}阶，共{ranks}阶"
+      "perfectingRank": "完美化：第{rank}阶，共{ranks}阶",
+      "materialSourceGatherer": "{count} × 由{name}采集",
+      "materialSourceGathererSigned": "{count} × 由{name}采集，由{signer}签名",
+      "materialSourceUnrecorded": "{count} × 未记录采集者",
+      "materialSourceUnrecordedSigned": "{count} × 未记录采集者，由{name}签名",
+      "materialSourceMore": "另有{sources}个来源，共{units}个单位"
+    },
+    "materialSources": {
+      "detailsTitle": "{item}的来源",
+      "pickerTitle": "从{item}中选择来源",
+      "close": "关闭素材来源",
+      "view": "来源",
+      "choose": "来源",
+      "viewAria": "查看{item}的所有素材来源",
+      "chooseAria": "选择要从{item}转移的素材来源",
+      "cancel": "取消",
+      "confirm": "转移所选单位",
+      "listAria": "素材来源列表",
+      "total": "此堆叠共{units}个单位",
+      "row": "{count}个单位：{source}",
+      "gatherer": "由{name}采集",
+      "gathererSigned": "由{name}采集，由{signer}签名",
+      "unrecorded": "未记录采集者",
+      "unrecordedSigned": "未记录采集者，由{name}签名",
+      "quantityAria": "来自{source}的单位，最多{count}个",
+      "decreaseAria": "减少来自{source}的单位",
+      "increaseAria": "增加来自{source}的单位"
     },
     "materialHint": {
       "fineGrade": "优质品级。以等级高于该材料的工具在满级矿脉采集所得，在任何需要普通版本的地方均可替代使用。",
@@ -4058,7 +4085,11 @@ export const zh_CN: EnTranslations = {
       "applyEnchant": "施加附魔",
       "sunder": "裂断",
       "sell": "出售",
-      "sellAll": "全部出售（{count}）"
+      "sellAll": "全部出售（{count}）",
+      "viewSources": "查看来源",
+      "separateByGatherer": "按采集者拆分",
+      "takeChosenQuantity": "取出指定数量",
+      "combine": "合并素材堆叠"
     },
     "enchanting": {
       "disenchantedLine": "你分解了{item}。",

@@ -278,10 +278,14 @@ describe('the four grant arms each report themselves (#2457)', () => {
       // makes the client's quantity key reachable on this arm at all.
       { itemId: 'wolf_fang', qty: 3, rarity: 'rare', kind: 'signed' },
     ]);
-    // The arm identity: a signed instance really did land, stamped with the
-    // harvester's name, so 'signed' is not just a label on a plain grant.
+    // The arm identity: the signature really did land, in the granted units'
+    // own source bucket (the signature rides materialSources, never an
+    // instance payload, since #1165's separate-slot model retired), so
+    // 'signed' is not just a label on a plain grant.
     const meta = metaOf(internals, a);
-    expect(meta.inventory.find((s) => s.itemId === 'wolf_fang')?.instance?.signer).toBe('Alpha');
+    const fangStack = meta.inventory.find((s) => s.itemId === 'wolf_fang');
+    expect(fangStack?.instance).toBeUndefined();
+    expect(fangStack?.materialSources).toEqual([{ source: { signer: 'Alpha' }, count: 3 }]);
   });
 
   it('specimen jackpot: the specimen is its OWN entry beside the plain component', () => {
@@ -294,10 +298,12 @@ describe('the four grant arms each report themselves (#2457)', () => {
       { itemId: 'wolf_fang', qty: 2, rarity: 'uncommon', kind: 'plain' },
       { itemId: 'pristine_hide', qty: 1, rarity: 'rare', kind: 'specimen' },
     ]);
+    // The specimen's signature also rides its own materialSources bucket,
+    // never an instance payload.
     const meta = metaOf(internals, a);
-    expect(meta.inventory.find((s) => s.itemId === 'pristine_hide')?.instance?.signer).toBe(
-      'Alpha',
-    );
+    const specimenStack = meta.inventory.find((s) => s.itemId === 'pristine_hide');
+    expect(specimenStack?.instance).toBeUndefined();
+    expect(specimenStack?.materialSources).toEqual([{ source: { signer: 'Alpha' }, count: 1 }]);
   });
 
   it('all three kinds can ride one command', () => {
@@ -314,10 +320,11 @@ describe('the four grant arms each report themselves (#2457)', () => {
     ]);
   });
 
-  it('full-bag mark loss: the entry reports the PLAIN top-up it actually became', () => {
-    // The ledger records what landed, not what was rolled. A 'signed' entry
-    // here would name an instance the player does not hold; the mark-lost
-    // toast is what tells them the signature is the thing that got away.
+  it('full-bag compatible top-up: the signed grant merges into the existing stack, mark intact', () => {
+    // The signature rides the granted units' own materialSources bucket now,
+    // never a separate instance slot (#1165's separate-slot model retired), so
+    // a signed top-up merges into the SAME stack as the pre-existing plain
+    // stock of the same item: a full bag never blocks it and nothing is lost.
     const { sim, internals, a, mob } = setup(15);
     fillBags(sim, internals, a);
     const m = metaOf(internals, a);
@@ -325,13 +332,20 @@ describe('the four grant arms each report themselves (#2457)', () => {
     expect(m.inventory.length).toBe(bagCapacity(m.bags));
     const { results, events } = harvest(sim, mob.id, ['fang'], a);
     expect(results[0].yields).toEqual([
-      { itemId: 'wolf_fang', qty: 6, rarity: 'rare', kind: 'plain' },
+      { itemId: 'wolf_fang', qty: 6, rarity: 'rare', kind: 'signed' },
     ]);
-    expect(m.inventory.some((s) => s.itemId === 'wolf_fang' && s.instance)).toBe(false);
-    // The pre-existing toast is unchanged, still exactly once.
-    expect(events.filter((e) => e.type === 'gatherDowngrade')).toEqual([
-      { type: 'gatherDowngrade', pid: a, surface: 'corpse', lost: 'mark' },
+    // One stack, count 7: the pre-existing unsigned unit beside Alpha's newly
+    // signed six, each in its own materialSources bucket, no instance at all.
+    const fangStack = m.inventory.find((s) => s.itemId === 'wolf_fang');
+    expect(fangStack?.count).toBe(7);
+    expect(fangStack?.instance).toBeUndefined();
+    expect(fangStack?.materialSources).toEqual([
+      { source: {}, count: 1 },
+      { source: { signer: 'Alpha' }, count: 6 },
     ]);
+    // The mark-lost downgrade retired with the separate-slot model it existed
+    // to manage: nothing was lost, so no gatherDowngrade fires at all.
+    expect(events.filter((e) => e.type === 'gatherDowngrade')).toEqual([]);
   });
 
   it('full-bag specimen truncation: the dropped jackpot contributes NO entry', () => {

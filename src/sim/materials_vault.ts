@@ -3,10 +3,35 @@
 // SLOTS over a list of item stacks, the vault gives every material id one
 // shared count ceiling: rung 0 unlocks it for 2 gold and every further rung
 // widens that ceiling by 40, so the ladder reads 40/80/120/160/200. Ordinary
-// auto-craftable material remains pooled in a compact id-to-count map.
-// Identity-bearing material lives beside it in a full InvSlot collection,
-// preserving instance glyphs and crafted provenance without flattening. Both
-// representations consume the same per-item headroom.
+// UNATTRIBUTED auto-craftable material remains pooled in a compact id-to-count
+// map. Identity-bearing material lives beside it in a full InvSlot collection,
+// preserving instance glyphs, crafted provenance AND per-unit source buckets
+// without flattening. Both representations consume the same per-item headroom.
+//
+// WHICH STORE. A count map has nowhere to put a gatherer, so a stack carrying
+// recorded provenance joins the identity collection for exactly the reason an
+// instanced one always did (`isVaultSpecialSlot`, over the shared rule in
+// vault_material_sources.ts). The two stores never show one material twice: a
+// deposit that opens or joins an identity block folds the compatible compact
+// row in as the unrecorded stock it is, changing no total.
+//
+// NO SEPARATION FEATURE HERE. Manual grouping (`materialSeparated`) is a BANK
+// and bags owner flag: this store never reads or persists it and its wire key
+// list does not carry it (src/net/vault_snapshot_wire.ts SPECIAL_KEY_LIST); a
+// deposit strips it with the rest of the owner's container metadata.
+//
+// The three per-slot BODIES (deposit, identity-row withdrawal, one loaded row)
+// live in vault_slot_ops.ts and return inert decisions; this module performs
+// every write, which keeps the cvault wire's "every stock mutation bumps
+// vaultWireRev" enumeration checkable over one file.
+//
+// AND THE CRAFT DRAW DID NOT WIDEN. No identity row was auto-drawable before,
+// because every one was premium, rolled, bound, locked or recipe-marked;
+// plainly gathered material is none of those, so it stays drawable now that its
+// representation moved, and a premium bucket stays undrawable inside a mixed
+// row rather than refusing the row whole. Recording a gatherer grants no
+// benefit and unlocks no unit. The read and the spend take their per-id total
+// from the same helper, so they agree by construction.
 //
 // Shape follows bank.ts exactly: free functions `fn(ctx, ...)` behind
 // SimContext, backing state on PlayerMeta.vault (persisted INSIDE the character
@@ -61,21 +86,26 @@ import type { VaultInfo, VaultSpecialRef } from '../world_api';
 
 export type { VaultSpecialRef } from '../world_api';
 
-import { addStacked, bagPools, bagsFullError, countFit, instancedCountCap } from './bags';
+import { addStacked, bagPools, bagsFullError, countFit } from './bags';
 import { nearBanker } from './bank';
-import { ITEMS } from './data';
-import {
-  boundCraftedRecipeIdOnLoad,
-  sanitizeItemInstancePayloadOnLoad,
-  warnDroppedInstanceKeys,
-} from './item_instance_load';
+import { warnDroppedInstanceKeys } from './item_instance_load';
 import { itemInstancePayloadsEqual } from './item_instance_merge';
 import { materialItemIds } from './material_ids';
-import { sanitizeRiftGearInstance } from './rift/progression';
+import { applyMaterialInventoryTake } from './material_inventory_take';
+import { resolveMaterialSourceTransferSelection } from './material_source_transfer_selection';
+import type { MaterialComposition, MaterialSourceCount } from './material_sources';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
-import { cloneInvSlot, type InvSlot, type ItemInstancePayload } from './types';
+import { cloneInvSlot, type InvSlot } from './types';
 import { vaultDrawBlocked, vaultDrawStock } from './vault_craft_gate';
+import {
+  drawableStockUnits,
+  type MaterialStackFacets,
+  needsSourceRow,
+  planVaultDraw,
+  sameMaterialComposition,
+} from './vault_material_sources';
+import { loadVaultSpecialRow, planVaultDeposit, planVaultRowWithdraw } from './vault_slot_ops';
 
 /** Per-material ceiling the first (unlocking) rung grants. */
 export const VAULT_BASE_CAP = 40;
@@ -112,6 +142,25 @@ export interface MaterialsVaultState extends SavedMaterialsVaultState {
   special: InvSlot[];
 }
 
+/** An explicit per-source withdrawal, the trailing optional half of the
+ *  identity-row selector.
+ *
+ *  NOT REACHABLE FROM THE WIRE YET: `VaultSpecialRef` is the public shape the
+ *  IWorld member and the server decoder both speak and it cannot carry buckets,
+ *  so the default whole-row and clamped-partial withdrawals keep their exact
+ *  behavior and this is the seam a later UI change plugs into rather than a
+ *  second selection model invented at the call site. Both fields are exact:
+ *  `sources` refuses instead of substituting another descriptor, and
+ *  `expectedSources` refuses instead of recovering a stale index onto a
+ *  differently sourced row. */
+export interface VaultWithdrawSelection {
+  /** Exactly these descriptors in exactly these counts; their total must equal
+   *  the withdrawal quantity. */
+  readonly sources?: readonly MaterialSourceCount[];
+  /** The row's full composition as the caller last saw it. */
+  readonly expectedSources?: MaterialComposition;
+}
+
 /** Sim delegate/server-host argument tuple. Keeping the overload fold here
  *  lets the monolithic Sim remain a two-line forwarding seam. */
 export type VaultWithdrawArgs = [
@@ -119,6 +168,7 @@ export type VaultWithdrawArgs = [
   count?: number,
   specialOrPid?: VaultSpecialRef | number,
   pid?: number,
+  selection?: VaultWithdrawSelection,
 ];
 
 /** Persistence boundary: deep-clone every special payload, strip its advisory
@@ -139,9 +189,16 @@ export function savedVaultState(state: MaterialsVaultState): SavedMaterialsVault
   };
 }
 
-/** True when a carried slot must retain its full identity in the vault. */
-export function isVaultSpecialSlot(slot: Pick<InvSlot, 'instance' | 'craftedRecipeId'>): boolean {
-  return slot.instance !== undefined || slot.craftedRecipeId !== undefined;
+/** True when a slot must retain its full identity in `special` rather than
+ *  pooling into the compact `stock` count map: THE ROUTING RULE, and not merely
+ *  "has a payload" any more, since a count map has nowhere to put a gatherer
+ *  either. The rule itself lives in vault_material_sources.ts, shared with the
+ *  eligibility reads so a stack cannot be routed by one definition and read by
+ *  another; answer it on the NORMALIZED stack wherever it decides a write (a
+ *  legacy signed slot carries its signer in the payload before normalization
+ *  and in a bucket after, and only the second is what gets stored). */
+export function isVaultSpecialSlot(slot: MaterialStackFacets): boolean {
+  return needsSourceRow(slot);
 }
 
 function safeStoredCount(value: unknown): number {
@@ -158,26 +215,52 @@ export function vaultStoredCount(state: MaterialsVaultState, itemId: string): nu
   return Math.min(Number.MAX_SAFE_INTEGER, total);
 }
 
-function specialRefMatches(slot: InvSlot, itemId: string, ref: VaultSpecialRef): boolean {
-  return (
-    slot.itemId === itemId &&
-    itemInstancePayloadsEqual(slot.instance, ref.instance) &&
-    slot.craftedRecipeId === ref.craftedRecipeId
-  );
+function specialRefMatches(
+  slot: InvSlot,
+  itemId: string,
+  ref: VaultSpecialRef,
+  sources: MaterialComposition | undefined,
+): boolean {
+  if (
+    slot.itemId !== itemId ||
+    !itemInstancePayloadsEqual(slot.instance, ref.instance) ||
+    slot.craftedRecipeId !== ref.craftedRecipeId
+  ) {
+    return false;
+  }
+  // The composition is NOT part of the fingerprint by default: it changes on
+  // every deposit and withdrawal, so requiring it would make every displayed
+  // selector stale the moment anything moved. Quoted, it becomes exact, which
+  // is the only way two blocks differing solely in their gatherers can be told
+  // apart.
+  return sources === undefined || sameMaterialComposition(slot.materialSources, sources);
 }
 
 /** Resolve an exact special-row selector. The advertised index is tried first;
  *  when it has gone stale, only a complete fingerprint match may recover it.
- *  There is deliberately no item-id-only fallback. */
+ *  There is deliberately no item-id-only fallback.
+ *
+ *  THE FINGERPRINT IS WHAT THE VIEWER SAW, which is the stored row: a stack
+ *  deposited with a legacy payload `signer` is STORED with that signer in a
+ *  source bucket and no payload at all, so the ref that matches it carries no
+ *  `instance` either. A pre-normalization ref simply misses and no-ops, and the
+ *  load-time wire-rev bump is what re-sends the owner the current shape.
+ *
+ *  `sources` is the optional exactness half (VaultWithdrawSelection
+ *  `expectedSources`): supplied, the row's FULL composition must match in the
+ *  indexed hit and the recovery scan alike. Omitted, the selector behaves
+ *  exactly as it always has. */
 export function resolveVaultSpecialIndex(
   special: readonly InvSlot[],
   itemId: string,
   ref: VaultSpecialRef,
+  sources?: MaterialComposition,
 ): number {
   if (!Number.isSafeInteger(ref.index) || ref.index < 0) return -1;
   const indexed = special[ref.index];
-  if (indexed && specialRefMatches(indexed, itemId, ref)) return ref.index;
-  return special.findIndex((slot) => specialRefMatches(slot, itemId, ref));
+  if (indexed && specialRefMatches(indexed, itemId, ref, sources)) return ref.index;
+  if (ref.selection !== undefined) return -1;
+  return special.findIndex((slot) => specialRefMatches(slot, itemId, ref, sources));
 }
 
 /** How many of ONE material the vault can hold: nothing while locked, then
@@ -200,18 +283,84 @@ function bumpVaultWireRev(meta: Pick<PlayerMeta, 'vaultWireRev'>): void {
   meta.vaultWireRev++;
 }
 
-/** Deposit a carried material into the vault. Ordinary fungible stacks join
- *  `stock`; identity-bearing stacks join `special` with their payload and
- *  provenance intact. Recipe-only stacks may partially fill the remaining
- *  headroom. An instanced stack moves whole or not at all, matching the bank's
+/**
+ * APPLY a decided deposit (`vault_slot_ops.ts planVaultDeposit` decides). The
+ * write half lives HERE so the store's mutations stay in one file: the cvault
+ * wire's "every stock mutation bumps vaultWireRev" premise is an enumeration
+ * over this module's writers, and tests/materials_vault.test.ts scans every
+ * other module to keep it checkable.
+ *
+ * Both deposit entry points share it, so the targeted op and the batched sweep
+ * cannot route one slot differently (the differential pin in
+ * tests/materials_vault.test.ts would catch it). Callers read the compact row
+ * themselves, keeping their own-property guards where a reader looks for them;
+ * false means the plan refused with nothing written.
+ */
+function applyVaultDeposit(
+  vault: MaterialsVaultState,
+  inventory: InvSlot[],
+  slotIndex: number,
+  moved: number,
+  pooled: number,
+  selectedSources?: MaterialComposition,
+): boolean {
+  const plan = planVaultDeposit(
+    vault.special,
+    inventory[slotIndex],
+    moved,
+    pooled,
+    vaultMaterialIds(),
+    selectedSources,
+  );
+  if (plan === null) return false;
+  const itemId = inventory[slotIndex].itemId;
+  // A plain assignment is safe here (unlike the load path's fromEntries)
+  // because the id passed the content-derived material set, which contains no
+  // '__proto__'.
+  if (plan.compactCount !== null) vault.stock[itemId] = plan.compactCount;
+  if (plan.clearsCompact) delete vault.stock[itemId];
+  // addStacked owns compatible-payload merging and deep-clones every fresh
+  // payload and composition, so the vault never aliases the removed row.
+  if (plan.foldUnits > 0) addStacked(vault.special, itemId, plan.foldUnits);
+  if (plan.grant !== null) {
+    addStacked(
+      vault.special,
+      itemId,
+      plan.grant.count,
+      plan.grant.instance,
+      plan.grant.craftedRecipeId,
+      plan.grant.materialSources,
+    );
+  }
+  // The exact take builds a FRESH remainder rather than decrementing the live
+  // slot: the surviving units carry their own buckets, which an in-place count
+  // edit could not express. A caller holding the old reference sees the stack it
+  // deposited from, not the one that stayed.
+  if (plan.remaining === null) inventory.splice(slotIndex, 1);
+  else inventory[slotIndex] = plan.remaining;
+  return true;
+}
+
+/** Deposit a carried material into the vault. Ordinary UNATTRIBUTED fungible
+ *  stacks join `stock`; anything carrying a payload, a crafted marker or
+ *  recorded per-unit sources joins `special` with all of it intact (see
+ *  `isVaultSpecialSlot` for the routing rule and `commitVaultDeposit` for what
+ *  the commit guarantees). Recipe-only and source-bearing stacks may partially
+ *  fill the remaining headroom, taking the buckets the shared spend order
+ *  spends. An instanced stack moves whole or not at all, matching the bank's
  *  per-copy transfer rule. */
 export function vaultDeposit(
   ctx: SimContext,
   slotIndex: number,
   count?: number,
+  pidOrSelection?:
+    | number
+    | import('./material_source_transfer_selection').MaterialSourceTransferSelection,
   pid?: number,
 ): void {
-  const r = ctx.resolve(pid);
+  const selection = typeof pidOrSelection === 'number' ? undefined : pidOrSelection;
+  const resolvedPid = typeof pidOrSelection === 'number' ? pidOrSelection : pid;
+  const r = ctx.resolve(resolvedPid);
   if (!r) return;
   const { meta, e: p } = r;
   if (p.dead) return; // the market/mail town-service idiom: dead players bank nothing
@@ -224,6 +373,14 @@ export function vaultDeposit(
   if (!vaultMaterialIds().has(slot.itemId)) {
     ctx.error(meta.entityId, 'Only materials can be stored in the Materials Vault.');
     return;
+  }
+  let selectedSources: MaterialComposition | undefined;
+  if (selection !== undefined) {
+    if (selection.itemId !== slot.itemId || selection.target.slotIndex !== slotIndex) return;
+    const resolved = resolveMaterialSourceTransferSelection(meta.inventory, selection);
+    if (!resolved.ok || (count ?? resolved.value.count) !== resolved.value.count) return;
+    selectedSources = resolved.value.sources;
+    count = resolved.value.count;
   }
   // moveBetweenContainers' count normalization: undefined takes the whole stack,
   // and an out-of-range count is malformed input (cheat/desync), refused
@@ -248,7 +405,6 @@ export function vaultDeposit(
     return;
   const want = count === undefined ? slot.count : Math.floor(count);
   if (!(want > 0) || want > slot.count) return;
-  const special = isVaultSpecialSlot(slot);
   // One instance payload describes the whole counted stack. Splitting it would
   // manufacture two independently mutable copies of that identity, so only the
   // exact whole-stack request is valid. Recipe-only provenance is immutable and
@@ -271,25 +427,20 @@ export function vaultDeposit(
     ctx.error(meta.entityId, 'Your vault cannot hold any more of that material.');
     return;
   }
-  if (slot.instance !== undefined && headroom < want) {
+  if ((slot.instance !== undefined || selection !== undefined) && headroom < want) {
     ctx.error(meta.entityId, 'Your vault cannot hold any more of that material.');
     return;
   }
   const moved = Math.min(want, headroom);
+  // The compact row is read HERE, behind the same hasOwn guard as ever, rather
+  // than inside the shared commit body: the guard belongs where a reviewer of
+  // this function looks for it.
+  const pooled = Object.hasOwn(vault.stock, slot.itemId) ? vault.stock[slot.itemId] : 0;
   // Atomic: the outcome above is fully decided, so the take and the grant commit
-  // together and the item count is conserved exactly.
-  if (moved >= slot.count) meta.inventory.splice(slotIndex, 1);
-  else slot.count -= moved;
-  if (special) {
-    // addStacked owns compatible-payload merging and deep-clones every fresh
-    // instance, so the vault never aliases the removed carried row.
-    addStacked(vault.special, slot.itemId, moved, slot.instance, slot.craftedRecipeId);
-  } else {
-    const pooled = Object.hasOwn(vault.stock, slot.itemId) ? vault.stock[slot.itemId] : 0;
-    // A plain assignment is safe here (unlike the load path's fromEntries): the
-    // id passed the content-derived material set, which contains no '__proto__'.
-    vault.stock[slot.itemId] = pooled + moved;
-  }
+  // together and the item count is conserved exactly. A slot (or an existing row
+  // of the same material) whose provenance the shared model cannot read refuses
+  // silently and writes nothing, the malformed-input idiom above.
+  if (!applyVaultDeposit(vault, meta.inventory, slotIndex, moved, pooled, selectedSources)) return;
   bumpVaultWireRev(meta);
   ctx.onInventoryChangedForQuests(meta);
 }
@@ -384,23 +535,20 @@ export function vaultDepositAll(ctx: SimContext, pid?: number): void {
     // it blocks new deposits instead of losing anything.
     const headroom = Math.max(0, cap - held);
     if (headroom <= 0) continue;
-    const special = isVaultSpecialSlot(slot);
     // An instanced row cannot be split across two containers. If the whole
     // stack does not fit, leave it carried and continue the sweep.
     if (slot.instance !== undefined && headroom < slot.count) continue;
     const moved = Math.min(slot.count, headroom);
-    // Atomic per slot: the outcome above is fully decided, so the take and the
-    // grant commit together and the item count is conserved exactly.
-    if (moved >= slot.count) meta.inventory.splice(i, 1);
-    else slot.count -= moved;
-    if (special) {
-      addStacked(vault.special, slot.itemId, moved, slot.instance, slot.craftedRecipeId);
-    } else {
-      const pooled = Object.hasOwn(vault.stock, slot.itemId) ? vault.stock[slot.itemId] : 0;
-      // A plain assignment is safe here (unlike the load path's fromEntries): the
-      // id passed the content-derived material set, which contains no '__proto__'.
-      vault.stock[slot.itemId] = pooled + moved;
-    }
+    // hasOwn, not a plain index: vaultDeposit's own guard, for the same reason,
+    // and read here rather than inside the shared commit body for the same
+    // locality reason.
+    const pooled = Object.hasOwn(vault.stock, slot.itemId) ? vault.stock[slot.itemId] : 0;
+    // Atomic per slot, through the SAME commit body the targeted op uses, so
+    // the two cannot route one slot differently: the outcome is fully decided
+    // before anything moves, the item count is conserved exactly, and a slot
+    // whose provenance the shared model cannot read is SKIPPED (the sweep's
+    // silent-skip idiom) rather than packed around.
+    if (!applyVaultDeposit(vault, meta.inventory, i, moved, pooled)) continue;
     movedAny = true;
   }
   if (movedAny) {
@@ -414,13 +562,21 @@ export function vaultDepositAll(ctx: SimContext, pid?: number): void {
  *  save (stock held while locked, or an id the taxonomy no longer calls a
  *  material) must always be recoverable, so nothing the vault holds can ever be
  *  trapped there. A counted fungible returning to the bags must re-credit any
- *  collect quest, so success pokes the quest-inventory recompute. */
+ *  collect quest, so success pokes the quest-inventory recompute.
+ *
+ *  `selection` is the trailing optional per-source half (`VaultWithdrawSelection`),
+ *  not reachable from the wire yet. Without it an identity-row withdrawal keeps
+ *  its exact shipped behavior: the whole row, or a clamped partial taken in the
+ *  shared default spend order (unrecorded first, premium last). With it the take
+ *  is exactly the named descriptors and the row selector becomes
+ *  composition-exact, both refusing rather than substituting. */
 export function vaultWithdraw(
   ctx: SimContext,
   itemId: string,
   count?: number,
   specialOrPid?: VaultSpecialRef | number,
   pid?: number,
+  selection?: VaultWithdrawSelection,
 ): void {
   const specialRef = typeof specialOrPid === 'number' ? undefined : specialOrPid;
   const resolvedPid = typeof specialOrPid === 'number' ? specialOrPid : pid;
@@ -439,18 +595,78 @@ export function vaultWithdraw(
   // different capacity models.
   const carriedPools = bagPools(meta.bags);
   if (specialRef !== undefined) {
-    const index = resolveVaultSpecialIndex(vault.special, itemId, specialRef);
+    let selectedSources = selection?.sources;
+    let selectedCount: number | undefined;
+    if (specialRef.selection !== undefined) {
+      const requested = specialRef.selection;
+      if (requested.itemId !== itemId || requested.target.slotIndex !== specialRef.index) return;
+      const resolved = resolveMaterialSourceTransferSelection(vault.special, requested);
+      if (!resolved.ok || (count ?? resolved.value.count) !== resolved.value.count) return;
+      selectedSources = resolved.value.sources;
+      selectedCount = resolved.value.count;
+    }
+    const index = resolveVaultSpecialIndex(
+      vault.special,
+      itemId,
+      specialRef,
+      specialRef.selection === undefined ? selection?.expectedSources : undefined,
+    );
     if (index < 0) return;
     const slot = vault.special[index];
     const held = safeStoredCount(slot.count);
     if (held <= 0) return;
-    const requested = count === undefined ? held : Math.floor(count);
+    const requested = count === undefined ? (selectedCount ?? held) : Math.floor(count);
     if (!(requested > 0)) return;
-    const want = Math.min(requested, held);
+    const want = selectedCount === undefined ? Math.min(requested, held) : requested;
     // An instance payload is one identity for the whole stack. Never split it
     // into two independently mutable rows; recipe-only provenance is immutable
     // and may withdraw partially.
     if (slot.instance !== undefined && want !== held) return;
+    // A MATERIAL row takes the source-aware path: the exact buckets ride out
+    // with the units, the remainder keeps the rest, and the fit is modelled
+    // against the stack that would really land. A row the taxonomy no longer
+    // calls a material has no source model to read and keeps the pre-provenance
+    // payout below, which is what keeps dormant stock recoverable rather than
+    // trapped.
+    if (vaultMaterialIds().has(itemId)) {
+      const outcome = planVaultRowWithdraw(
+        slot,
+        want,
+        vaultMaterialIds(),
+        selectedSources,
+        // The fit is modelled on the stack that would REALLY land, payload,
+        // crafted marker and buckets included: a pre-check that models the
+        // grant differently re-opens the overflow class (#2139).
+        (preview) =>
+          countFit(
+            meta.inventory,
+            carriedPools,
+            itemId,
+            want,
+            preview.instance,
+            preview.craftedRecipeId,
+            preview.materialSources,
+          ),
+      );
+      if (outcome.kind === 'refused') return;
+      if (outcome.kind === 'full') {
+        bagsFullError(ctx, meta.entityId);
+        return;
+      }
+      if (outcome.remaining === null) vault.special.splice(index, 1);
+      else vault.special[index] = outcome.remaining;
+      addStacked(
+        meta.inventory,
+        itemId,
+        outcome.moved,
+        outcome.taken.instance,
+        outcome.taken.craftedRecipeId,
+        outcome.taken.materialSources,
+      );
+      bumpVaultWireRev(meta);
+      ctx.onInventoryChangedForQuests(meta);
+      return;
+    }
     const moved = countFit(
       meta.inventory,
       carriedPools,
@@ -501,11 +717,17 @@ export function vaultWithdraw(
   ctx.onInventoryChangedForQuests(meta);
 }
 
-/** How many units of `itemId` a vault stock record can actually pay out: the
+/** How many units of `itemId` a vault stock RECORD can actually pay out: the
  *  own-row count when it is a positive integer inside float precision, else 0.
  *
- *  The read half of the two-pool crafting mechanic, and the ONE place the
- *  drawable rule lives. The bound is `vaultWithdraw`'s covenant restated for a
+ *  READ THE ARGUMENT CAREFULLY. This takes a stock RECORD, and since the vault
+ *  gained per-unit provenance the record a craft plans against is the
+ *  PROJECTION (`vaultDrawStock` / `craftVaultStockFor`), which already folds in
+ *  the eligible identity-row units. What it is NOT is a way to ask a LIVE vault
+ *  what it can pay, because half of that lives in the other store; the one
+ *  caller needing that is `consumeVaultStock`, which plans across both.
+ *
+ *  The bound is `vaultWithdraw`'s covenant restated for a
  *  path with no player at a banker to see a refusal: sanitizeVaultState floors
  *  and clamps what it loads, but a hand-edited or future-shaped save can still
  *  present zero, a negative, NaN, Infinity, a fraction, or a past-precision
@@ -533,9 +755,11 @@ export function drawableVaultCount(
   itemId: string,
 ): number {
   if (!stock || !Object.hasOwn(stock, itemId)) return 0;
-  const held = stock[itemId];
-  if (!Number.isInteger(held) || held <= 0 || held > Number.MAX_SAFE_INTEGER) return 0;
-  return held;
+  // The RULE itself lives in vault_material_sources.ts drawableStockUnits, so
+  // the identity-collection projection applies the same bound to the same kind
+  // of count instead of restating it; this entry keeps the own-property guard,
+  // which is about the RECORD rather than the count.
+  return drawableStockUnits(stock[itemId]);
 }
 
 /** The null-or-counter adapter every vault-tier planner consumes: a nullable
@@ -551,14 +775,25 @@ export function drawableCounterFor(
   return stock === null ? null : (itemId: string) => drawableVaultCount(stock, itemId);
 }
 
-/** Apply a PLANNED vault draw: spend exactly `count` units of `itemId`.
+/** Apply a PLANNED vault draw: spend exactly `count` units of `itemId`, ACROSS
+ *  BOTH STORES.
  *
- *  Returns false and mutates NOTHING unless the draw is one the row can pay in
- *  full: a positive integer no larger than `drawableVaultCount`. Partial
- *  spends do not exist here, because the caller already decided the whole
- *  reagent line against the same drawable read (professions/reagent_sources.ts
- *  plans, this applies); a half-spent line would be the partial-consumption
- *  defect the craft path denies precisely to avoid.
+ *  Returns false and mutates NOTHING unless the draw is one the vault can pay
+ *  in full: a positive integer no larger than what the compact record and the
+ *  ELIGIBLE identity rows hold between them. Partial spends do not exist here,
+ *  because the caller already decided the whole reagent line against the same
+ *  drawable read (professions/reagent_sources.ts plans, this applies); a
+ *  half-spent line would be the partial-consumption defect the craft path
+ *  denies precisely to avoid.
+ *
+ *  WHAT "ELIGIBLE" MEANS, and why it is not a widening. Before per-unit
+ *  provenance, no identity row was auto-drawable, because every one was
+ *  premium, rolled, bound, locked or recipe-marked. Plainly gathered material is
+ *  none of those, so it stays spendable now that its representation moved; a
+ *  premium bucket stays unspendable, including inside a mixed row, and a row
+ *  keeping any per-copy identity contributes nothing. `planVaultDraw` refuses
+ *  anything past the SAME per-id total the projection publishes, which is what
+ *  makes read and spend agree by construction rather than by review.
  *
  *  Reaching zero DELETES the key rather than writing a 0 row. The load path
  *  skips rows that coerce to zero, so a 0 row would vanish on the next relog
@@ -587,7 +822,14 @@ export function consumeVaultStock(
   count: number,
 ): boolean {
   const held = drawableVaultCount(vault.stock, itemId);
-  if (!Number.isInteger(count) || count <= 0 || count > held) return false;
+  // The WHOLE draw is planned before a single write, across BOTH stores: the
+  // compact row pays first (its units are unrecorded stock, which the shared
+  // spend order puts ahead of everything else) and only the remainder reaches
+  // the eligible identity rows, where premium buckets stay untouched. A plan
+  // that cannot be paid in full answers null and nothing moves, which is the
+  // all-or-nothing contract this function has always had.
+  const plan = planVaultDraw(vault.stock, vault.special, itemId, count, vaultMaterialIds());
+  if (plan === null) return false;
   // Byte-for-byte `vaultWithdraw`'s write shape (delete at zero, else
   // decrement), and that is a requirement rather than a coincidence: it is the
   // only other path that removes a row, and the audit's diffVaultOp reads
@@ -598,8 +840,13 @@ export function consumeVaultStock(
   // drawable count above zero proves an own data row under that id. So even a
   // dormant '__proto__' row is decremented as data rather than reaching the
   // inherited setter.
-  if (count >= held) delete vault.stock[itemId];
-  else vault.stock[itemId] = held - count;
+  if (plan.fromStock > 0) {
+    if (plan.fromStock >= held) delete vault.stock[itemId];
+    else vault.stock[itemId] = held - plan.fromStock;
+  }
+  // The identity half is the shared take planner's inert edit: replacements by
+  // index, then removals back to front, and nothing it does not name.
+  if (plan.fromRows !== null) applyMaterialInventoryTake(vault.special, plan.fromRows);
   return true;
 }
 
@@ -646,16 +893,23 @@ export function emitVaultCraftConsume(
   ctx.emit({ type: 'vaultCraftConsume', pid: meta.entityId, takes, upgrades: meta.vault.upgrades });
 }
 
-/** The vault stock a craft may draw from for `pid`, as a FRESH boundary clone
+/** The vault stock a craft may draw from for `pid`, as a FRESH boundary value
  *  holding only the drawable rows: null when the player is unresolvable, holds
  *  no vault, or stands somewhere vault draw is refused (vault_craft_gate.ts).
  *
- *  This is the read for consumers that must not touch the live record: the
- *  Create All batch simulation spends it as a throwaway scratch vault, and the
- *  IWorld member the crafting window's availability projection reads is built
- *  on it. It is THE boundary shape: `vaultDrawStock` (vault_craft_gate.ts)
- *  hands back the live record and is sim-internal, so anything crossing the
- *  IWorld seam comes through here instead.
+ *  ONE PER-ID ANSWER OVER BOTH STORES. `vaultDrawStock` folds the compact count
+ *  record together with the ELIGIBLE units of the identity collection, and this
+ *  re-applies the drawable rule per row on top: the two filters agree, so the
+ *  second is defence in depth rather than a second rule. Consumers that model
+ *  the vault as a bare count map keep working unchanged, which is why the fold
+ *  happens below the boundary and not at each of them.
+ *
+ *  This is the read for consumers that must not touch the live stores: the
+ *  Create All batch simulation spends it as a throwaway scratch vault (empty
+ *  identity collection beside it, rightly, its units are already folded in
+ *  here), and the IWorld member the crafting window reads is built on it.
+ *  `vaultDrawStock` is sim-internal, so anything crossing the IWorld seam comes
+ *  through here.
  *
  *  Carries no nearBanker gate and no dead gate, deliberately and for the same
  *  reasons `consumeVaultStock` carries neither: it is a read primitive rather
@@ -792,9 +1046,23 @@ export function vaultInfoFor(ctx: SimContext, pid: number): VaultInfo | null {
  *  an unparseable count keeps the never-destroy floor of 1, clamped to
  *  MAX_SAFE_INTEGER so withdraw arithmetic stays exact, and
  *  `upgrades` clamps into the purchasable range so the price indexing stays
- *  coherent. A malformed JSON-shaped save loads; it never throws (both hosts
- *  deliver saves through JSON.parse, which cannot produce the exotic values,
- *  a Symbol or a throwing valueOf, that could trip Number()).
+ *  coherent. A malformed JSON-shaped save loads; the ONLY thing that throws is
+ *  unreadable provenance (next paragraph), and the exotic values that could
+ *  otherwise trip Number() cannot reach here at all (both hosts deliver saves
+ *  through JSON.parse, which produces no Symbol and no throwing valueOf).
+ *
+ *  PER-UNIT PROVENANCE IS THE ONE THING THIS PATH CAN THROW ON, and it is not
+ *  this module's policy: `material_slot_load.ts` is the shared
+ *  pre-validate/coerce/normalize triple every container runs, and a row whose
+ *  buckets it cannot read refuses the WHOLE character load rather than being
+ *  kept. There is deliberately no vault-local tolerant arm; a second policy for
+ *  one corruption is how a store ends up holding attribution a character save
+ *  would have refused. The per-row body is vault_slot_ops.ts
+ *  `loadVaultSpecialRow`, which runs those steps in the bank arm's exact order.
+ *  Two consequences worth stating: a legal legacy OVER-CAP material holding
+ *  survives (the shared material exemption sits in front of the instanced
+ *  tamper ceiling), and a legacy charge-bearing row with no buckets still
+ *  clamps to one.
  *
  *  PURE aside from the droppedSink trace: this function builds and returns a
  *  fresh record and never touches live player state, so a dry-run caller can
@@ -858,49 +1126,16 @@ export function sanitizeVaultState(
   }
   if (Array.isArray(r.special)) {
     for (const entry of r.special) {
-      if (!entry || typeof entry !== 'object' || Array.isArray(entry)) continue;
-      const e = entry as {
-        itemId?: unknown;
-        count?: unknown;
-        instance?: unknown;
-        craftedRecipeId?: unknown;
-      };
-      if (typeof e.itemId !== 'string' || e.itemId === '') continue;
-      const hasInstance =
-        !!e.instance && typeof e.instance === 'object' && !Array.isArray(e.instance);
-      const rawMarker: { itemId: string; craftedRecipeId?: unknown } = {
-        itemId: e.itemId,
-        craftedRecipeId: e.craftedRecipeId,
-      };
-      boundCraftedRecipeIdOnLoad(rawMarker, localDrops, 'vault');
-      const craftedRecipeId = rawMarker.craftedRecipeId as string | undefined;
-      const instance = hasInstance ? (e.instance as ItemInstancePayload) : undefined;
-      const count = Math.min(
-        Number.MAX_SAFE_INTEGER,
-        instancedCountCap(ITEMS[e.itemId], instance),
-        Math.max(1, Math.floor(Number(e.count)) || 1),
-      );
-      const slot: InvSlot = instance
-        ? { itemId: e.itemId, count, instance }
-        : { itemId: e.itemId, count };
-      if (craftedRecipeId !== undefined) slot.craftedRecipeId = craftedRecipeId;
-      const cleaned = cloneInvSlot(slot);
-      delete cleaned.slot;
-      if (cleaned.instance?.rift && ownerId !== undefined) {
-        const rebuilt = sanitizeRiftGearInstance(cleaned.itemId, cleaned.instance, ownerId);
-        if (rebuilt) cleaned.instance = rebuilt;
-        else delete cleaned.instance;
-      }
-      if (cleaned.instance) {
-        const { payload, dropped } = sanitizeItemInstancePayloadOnLoad(cleaned.instance);
-        for (const path of dropped) localDrops.push(`vault.${cleaned.itemId}.${path}`);
-        if (payload) cleaned.instance = payload;
-        else delete cleaned.instance;
-      }
-      // Even when sanitization removes the only identity marker, retain the row
-      // in the special collection. Folding it into stock would silently merge a
-      // corrupt/tolerated row with ordinary material and erase its audit identity.
-      special.push(cleaned);
+      // ONE row body, vault_slot_ops.ts loadVaultSpecialRow, which runs the
+      // SHARED material_slot_load.ts triple in the same order the bank and the
+      // guild book run it. A row whose buckets that model cannot read THROWS
+      // out of here and refuses the whole character load, before anything is
+      // registered and before a count clamp could erase what the buckets said.
+      // Even when sanitization removes the only identity marker, the row is
+      // retained in this collection: folding it into stock would silently merge
+      // a tolerated row with ordinary material and erase its audit identity.
+      const row = loadVaultSpecialRow(entry, localDrops, ownerId);
+      if (row !== null) special.push(row);
     }
   }
   // Deliberately the COMPILED table, not a resolved override: this load path

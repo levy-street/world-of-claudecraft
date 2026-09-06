@@ -7,9 +7,19 @@ import type { CharacterState } from '../../src/sim/sim';
 
 vi.mock('../../server/db', () => ({ runWithStatementTimeout: vi.fn() }));
 
+/** The one revision this fixture's signer rewrite journals: the personal bank,
+ *  minted at revision 1 for character 41. Answered so the write is exercised
+ *  for real rather than skipped; a fake answering nothing would make the
+ *  journal throw about the row it did not get back. */
+const JOURNAL_ROW = { ord: 0, realm: REALM, container: 'personal', owner_id: '41', revision: '1' };
+
 function transaction(state: CharacterState | null, updated = 1) {
   const query = vi.fn(async (sql: string, _values?: unknown[]) => ({
-    rows: sql.startsWith('SELECT level') ? [{ level: 17, state }] : [],
+    rows: sql.startsWith('SELECT level')
+      ? [{ level: 17, state }]
+      : sql.startsWith('WITH input AS')
+        ? [JOURNAL_ROW]
+        : [],
     rowCount: sql.startsWith('UPDATE characters') ? updated : 0,
     command: '',
     oid: 0,
@@ -65,7 +75,38 @@ describe('fresh offline character signer mutation', () => {
       equipmentInstances: { chest: { signer: 'After' } },
       toolEffectSlots: { mining: { craftedBy: 'After', charges: 5 } },
     });
-    expect(query).toHaveBeenCalledTimes(5);
+    // The sanctioned signer rewrite is a MATERIAL source movement: the banked
+    // iron ore keeps its three units and changes descriptor, so the journal
+    // carries one count-0 row with an exact decrement and an exact increment,
+    // in the SAME transaction, AFTER the write it audits.
+    const journal = query.mock.calls[5];
+    expect(String(journal[0])).toContain('WITH input AS');
+    const records = JSON.parse(String((journal[1] as unknown[])[0])) as {
+      container: string;
+      owner_id: number;
+      opening: unknown;
+      movements: { itemId: string; count: number; sourceDeltas: unknown[] }[];
+    }[];
+    expect(records).toHaveLength(1);
+    expect(records[0].container).toBe('personal');
+    expect(records[0].owner_id).toBe(41);
+    expect(records[0].movements).toEqual([
+      {
+        itemId: 'iron_ore',
+        count: 0,
+        sourceDeltas: [
+          { source: { signer: 'After' }, count: 3 },
+          { source: { signer: 'Before' }, count: -3 },
+        ],
+      },
+    ]);
+    // The opening replays from the pre-mutation state, signer and all.
+    expect(records[0].opening).toEqual({
+      entries: [
+        { itemId: 'iron_ore', count: 3, sources: [{ source: { signer: 'Before' }, count: 3 }] },
+      ],
+    });
+    expect(query).toHaveBeenCalledTimes(6);
   });
 
   it('reads fresh state even if nothing needs changing, and skips every write', async () => {

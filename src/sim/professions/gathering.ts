@@ -9,7 +9,7 @@
 // 20 Hz tick loop (sim.ts `tick()`, next to `updateRested`), so a grant only
 // ever takes effect on the deterministic tick path, never out of band.
 
-import { bagPools, bagsFullError, countFit } from '../bags';
+import { bagsFullError } from '../bags';
 import { isActionLockingFormAuraKind } from '../combat/forms';
 import { GATHER_NODES } from '../content/gather_nodes';
 import {
@@ -20,6 +20,7 @@ import {
   TOOL_EFFECTS,
 } from '../content/professions';
 import { ITEMS } from '../data';
+import { gatheredMaterialSources } from '../material_gatherer';
 import { forceDismount } from '../mounts';
 import type { Rng } from '../rng';
 import type { PlayerMeta } from '../sim';
@@ -816,6 +817,25 @@ export function completeGatherCast(ctx: SimContext, p: Entity, meta: PlayerMeta)
   let grantedQty = 0;
   // Fungible grant: find the largest count that still fits (stack top-up
   // plus free slots, ctx.canAddItem). The pre-gate guarantees at least 1.
+  //
+  // ONE arm now serves both a plain and a rare-event harvest. The premium
+  // signature moved OUT of the item payload and into the granted units' own
+  // source bucket (material_gatherer.ts gatheredMaterialSources), where it sits
+  // beside the gatherer and is decided independently of it: recording who
+  // gathered a unit never signs it, and a signed unit is signed by the roll
+  // alone. Two consequences, both deliberate:
+  //   * A signed yield is no longer a distinct payload, so it merges into the
+  //     same stacks plain material does instead of needing same-signer room or
+  //     a free slot of its own. The old signed pre-walk (countFit against a
+  //     `{signer}` payload) and its truncation fallback existed only to model
+  //     that separate room, and with it gone a rare event can no longer lose
+  //     its mark to capacity: the node `gatherDowngrade` arm is unreachable and
+  //     is removed rather than left as dead player-facing feedback.
+  //   * The composition never changes the FIT. Compatible stacks are decided by
+  //     item, payload and craft provenance, never by whose units they hold, so
+  //     this is the same capacity walk in the same order it always was, and the
+  //     granted quantity can only be greater than or equal to what the signed
+  //     path used to land.
   const grantFungibleFit = (): number => {
     let fit = qty;
     while (fit > 1 && !ctx.canAddItem(itemId, fit, meta.entityId)) fit--;
@@ -825,44 +845,22 @@ export function completeGatherCast(ctx: SimContext, p: Entity, meta: PlayerMeta)
     // stack on top of it, and it logs the rarity-colored, item-linked gather
     // line, so the hub's "You receive:" line would be a second line for the
     // one grant (#2430).
-    ctx.addItem(itemId, fit, meta.entityId, { silent: true, callerLogs: true });
+    //
+    // One batched grant: a x5 windfall lands as ONE hub loot event instead of
+    // five (the recorded loot-burst polish), which the gather line then renders
+    // as a single "You gather: X x5." line.
+    ctx.addItem(itemId, fit, meta.entityId, {
+      silent: true,
+      callerLogs: true,
+      materialSources: gatheredMaterialSources(
+        meta,
+        fit,
+        signed ? { signer: meta.name } : undefined,
+      ),
+    });
     return fit;
   };
-  if (signed) {
-    // A signed instance merges only into a byte-equal same-signer stack
-    // (identical-payload stacking; never a plain stack, #1165):
-    // countFit with the payload counts that merge room plus free slots, so a
-    // rare-event windfall lands whole once a single slot (or same-signer
-    // stack room) is open, where the earlier contract needed one free slot
-    // per unit. The fungible pre-gate above can pass on plain-stack top-up
-    // room alone, so when no signed unit fits the yield falls back to an
-    // unsigned top-up grant (the truncation contract wins over signing in
-    // that self-inflicted edge; the crossing-case pin lives in
-    // tests/gather_rare_events.test.ts).
-    const pools = bagPools(meta.bags);
-    const fit = countFit(meta.inventory, pools, itemId, qty, { signer: meta.name });
-    if (fit > 0) {
-      // One batched grant: a x5 windfall lands as ONE hub loot event
-      // instead of five (the recorded loot-burst polish), which the gather
-      // line then renders as a single "You gather: X x5." line.
-      // silent + callerLogs: see grantFungibleFit's matching comment above,
-      // same reasons.
-      ctx.addItemInstance(itemId, { signer: meta.name }, meta.entityId, fit, {
-        silent: true,
-        callerLogs: true,
-      });
-      grantedQty = fit;
-    }
-    if (grantedQty === 0) {
-      grantedQty = grantFungibleFit();
-      // The yield survived as a plain top-up but its signature did
-      // not; tell the player (a text-free personal event, the gatherDenied
-      // idiom; one signed batch per harvest, so no dedupe flag is needed).
-      ctx.emit({ type: 'gatherDowngrade', pid: meta.entityId, surface: 'node', lost: 'mark' });
-    }
-  } else {
-    grantedQty = grantFungibleFit();
-  }
+  grantedQty = grantFungibleFit();
   // The R42 charge settle, AFTER the grant so truncation is visible: the
   // charge is spent only when the bonus actually changed what the player
   // received. The two kinds reduce to one predicate over the counterfactual

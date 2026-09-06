@@ -1,3 +1,4 @@
+import { readMaterialSourceTransferWire } from './material_source_transfer_wire';
 // Materials Vault wire glue: the vault command dispatch bodies and the cvault
 // snapshot cadence rule, extracted from server/game.ts behind narrow host
 // interfaces (the module-first seam: none of this needs GameServer's private
@@ -41,6 +42,10 @@
 //   reads as unchanged.
 
 import { MAX_INSTANCE_STRING_LENGTH } from '../src/sim/item_instance_load';
+import {
+  materialSourceTransferSelectionMatches,
+  readMaterialSourceTransferSelection,
+} from '../src/sim/material_source_transfer_selection';
 import type { VaultInfo, VaultSpecialRef } from '../src/world_api';
 import { buildVaultLedgerRows, recordVaultOp } from './bank_ledger';
 import type { BankLedgerAdmission, BankLedgerAdmissionHandle } from './bank_ledger_admission';
@@ -54,7 +59,14 @@ export interface VaultSim {
     error(id: number, text: string): void;
   };
   vaultInfoFor(pid?: number): VaultInfo | null;
-  vaultDeposit(slot: number, count?: number, pid?: number): void;
+  vaultDeposit(
+    slot: number,
+    count?: number,
+    pidOrSelection?:
+      | number
+      | import('../src/sim/material_source_transfer_selection').MaterialSourceTransferSelection,
+    pid?: number,
+  ): void;
   vaultWithdraw(itemId: string, count?: number, pid?: number): void;
   vaultWithdraw(
     itemId: string,
@@ -126,7 +138,7 @@ export function emitVaultSelfKeys(
   }
 }
 
-const SPECIAL_REF_KEYS = new Set(['index', 'instance', 'craftedRecipeId']);
+const SPECIAL_REF_KEYS = new Set(['index', 'instance', 'craftedRecipeId', 'selection']);
 const MAX_SPECIAL_REF_NODES = 1_024;
 const MAX_SPECIAL_REF_DEPTH = 12;
 
@@ -164,13 +176,19 @@ export function decodeVaultSpecialRef(value: unknown): VaultSpecialRef | null {
   ) {
     return null;
   }
+  const selection = Object.hasOwn(value, 'selection')
+    ? readMaterialSourceTransferSelection(value.selection)
+    : undefined;
+  if (Object.hasOwn(value, 'selection') && selection === null) return null;
   if (
     value.instance !== undefined &&
     (!isRecord(value.instance) || !isBoundedJson(value.instance))
   ) {
     return null;
   }
-  return value as unknown as VaultSpecialRef;
+  return selection === undefined
+    ? (value as unknown as VaultSpecialRef)
+    : ({ ...value, selection } as VaultSpecialRef);
 }
 
 export type VaultCommandName =
@@ -254,13 +272,15 @@ export function dispatchVaultCommand(
     case 'vault_deposit':
       if (typeof msg.slot === 'number') {
         const slot = msg.slot;
-        const count = typeof msg.count === 'number' ? msg.count : undefined;
+        const transfer = readMaterialSourceTransferWire(msg, slot);
+        if (transfer === null) break;
+        const { count, selection } = transfer;
         const reservation = reserveLedgerRows(admission, sim, pid, 'vault_deposit');
         if (reservation === null) break;
         const before = runReservedSimCall(
           reservation,
           () => sim.vaultInfoFor(pid),
-          () => sim.vaultDeposit(slot, count, pid),
+          () => sim.vaultDeposit(slot, count, selection, pid),
         );
         finishReservedSimCall(reservation, () => {
           const after = sim.vaultInfoFor(pid);
@@ -272,11 +292,20 @@ export function dispatchVaultCommand(
     case 'vault_withdraw':
       if (typeof msg.itemId === 'string') {
         const itemId = msg.itemId;
+        const count = typeof msg.count === 'number' ? msg.count : undefined;
         const special = msg.special === undefined ? undefined : decodeVaultSpecialRef(msg.special);
         if (special === null) break;
+        if (
+          special?.selection !== undefined &&
+          !materialSourceTransferSelectionMatches(special.selection, {
+            itemId,
+            slotIndex: special.index,
+            count: msg.count,
+          })
+        )
+          break;
         const reservation = reserveLedgerRows(admission, sim, pid, 'vault_withdraw');
         if (reservation === null) break;
-        const count = typeof msg.count === 'number' ? msg.count : undefined;
         const before = runReservedSimCall(
           reservation,
           () => sim.vaultInfoFor(pid),

@@ -161,6 +161,7 @@ import { music } from './game/music';
 import { tryNearbyInteraction } from './game/nearby_interaction';
 import { nextNpcTarget } from './game/npc_cycle';
 import { isOfflineModeAvailable } from './game/offline_mode_gate';
+import { offlineWorldConfig } from './game/offline_world_config';
 import { interpolatedOnlineSelfFacing } from './game/online_facing_mirror';
 import { sendOnlineMovementFrame } from './game/online_movement_frame';
 import { padCastPress, padCastRelease } from './game/pad_cast_routing';
@@ -383,13 +384,11 @@ import {
   DT,
   dist2d,
   MELEE_RANGE,
-  PLAYER_INTEREST_DROP_RADIUS,
   type PlayerClass,
   RUN_SPEED,
   type WorldContent,
 } from './sim/types';
 import { zoneBiomeAt } from './sim/world';
-import { WORLD_SEED } from './sim/world_seed';
 import { startSitePresence } from './site_presence';
 import {
   accountPortalModel,
@@ -5260,21 +5259,15 @@ async function startOffline(
   const sim = loadSpan(
     'sim-build',
     () =>
-      new Sim({
-        seed: seedOverride ?? WORLD_SEED,
-        playerClass,
-        playerName: name,
-        devCommands: import.meta.env.DEV,
-        // Live-world features (custom editor play-test maps keep both off).
-        riftPortals: world === undefined,
-        compulsoryTutorial: world === undefined,
-        // Match the live server's proven-safe idle-AI interest throttle. Ordinary
-        // entity rigs are gone by 96 yd and mob aggro caps at 20 yd, so this removes
-        // full-world wilderness AI from the browser's 20 Hz tick without changing
-        // anything visible or interactable.
-        idleMobTickRadius: PLAYER_INTEREST_DROP_RADIUS,
-        world,
-      }),
+      new Sim(
+        offlineWorldConfig({
+          playerClass,
+          name,
+          world,
+          seedOverride,
+          devCommands: import.meta.env.DEV,
+        }),
+      ),
   );
   sim.setPlayerSkin(sim.playerId, skin);
   // Offline has no account and no character row, so the local draft IS this

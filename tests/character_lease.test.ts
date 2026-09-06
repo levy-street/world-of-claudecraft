@@ -201,12 +201,27 @@ describe('shutdown wiring (source pin)', () => {
 // saveCharacterAndMarketState directly). The character UPDATE reports the given
 // rowCount; every other statement (BEGIN / SET LOCAL / world_state / COMMIT /
 // ROLLBACK) resolves harmlessly. rowCount drives the lease-fence boolean.
+// The material-source pre-image columns the save's locking read (or, on the
+// single-statement path, its own RETURNING) really answers with. This fixture's
+// character holds neither container, which is a REAL pre-image: a row that
+// answered NOTHING would be refused by the save rather than read as empty.
+const PREIMAGE_ROW = { before_bank: null, before_vault: null };
+
 function checkedOutClient(updateRowCount: number | undefined) {
-  const query = vi.fn(async (sql: string, _values?: unknown[]) =>
-    /UPDATE characters/i.test(String(sql))
-      ? ({ rows: [], rowCount: updateRowCount } as any)
-      : ({ rows: [], rowCount: 0 } as any),
-  );
+  const query = vi.fn(async (sql: string, _values?: unknown[]) => {
+    const text = String(sql);
+    // The separate D145 row lock: the character row exists, so it answers.
+    if (/FOR NO KEY UPDATE/i.test(text) && !/UPDATE characters/i.test(text)) {
+      return { rows: [PREIMAGE_ROW], rowCount: 1 } as any;
+    }
+    if (/UPDATE characters/i.test(text)) {
+      // A landed write returns its row (the CTE form RETURNs the pre-image); a
+      // fenced-out one returns none, exactly as PostgreSQL would.
+      const rows = (updateRowCount ?? 0) > 0 ? [PREIMAGE_ROW] : [];
+      return { rows, rowCount: updateRowCount } as any;
+    }
+    return { rows: [], rowCount: 0 } as any;
+  });
   const release = vi.fn();
   return { query, release, on: vi.fn(), removeListener: vi.fn() };
 }
@@ -258,7 +273,12 @@ const STORAGE_EFFECT: StorageAppliedEffect = {
 function storageEffectClient(updateRowCount: number) {
   const query = vi.fn(async (sql: string) => {
     if (/SELECT id FROM accounts/i.test(sql)) return { rows: [{ id: 7 }], rowCount: 1 };
-    if (/UPDATE characters/i.test(sql)) return { rows: [], rowCount: updateRowCount };
+    if (/FOR NO KEY UPDATE/i.test(sql) && !/UPDATE characters/i.test(sql)) {
+      return { rows: [PREIMAGE_ROW], rowCount: 1 };
+    }
+    if (/UPDATE characters/i.test(sql)) {
+      return { rows: updateRowCount > 0 ? [PREIMAGE_ROW] : [], rowCount: updateRowCount };
+    }
     if (/FROM storage_purchase_applied_receipts/i.test(sql)) return { rows: [], rowCount: 0 };
     if (/FROM storage_purchases[\s\S]*FOR UPDATE/i.test(sql)) {
       return {

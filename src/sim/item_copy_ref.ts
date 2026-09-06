@@ -49,6 +49,8 @@
 // removed rather than left as documented-but-unused advice.
 
 import { anchorMatchesSelection, type ItemCopyAnchor } from './item_copy_anchor';
+import { isMaterialItemId } from './material_ids';
+import { takeMaterialUnit, takeMaterialUnitFromSlot } from './material_item_custody';
 import { cloneItemInstancePayload, type InventoryUnit, type InvSlot } from './types';
 
 /** Stable, order-independent JSON, so a pin does not depend on key insertion
@@ -80,6 +82,17 @@ export function itemCopyPin(slot: InvSlot | undefined): string {
     c: slot.craftedRecipeId ?? null,
     i: slot.itemId,
     p: slot.instance ?? null,
+    // The material composition joins the pin because it is the one part of a
+    // copy's identity that can change while the id, the payload AND the count
+    // all stay put: spend two of a stack's premium units and re-grant two plain
+    // ones and every other field reads unchanged. Kept as the ORDERED list it
+    // is (sortedJson sorts object keys, never array positions), so a canonical
+    // re-ordering is the only thing that could move it, and that is a change.
+    //
+    // Passed RAW, never `?? null`: sortedJson drops an undefined-valued key, so
+    // a slot with no composition pins byte-identically to what it always did.
+    // Only a real composition extends the pin.
+    s: slot.materialSources,
   });
 }
 
@@ -119,6 +132,11 @@ export function consumeSelectedInventorySlot(
   const slot = inventory[slotIndex];
   if (slot.itemId !== itemId || slot.count < 1) return null;
   if (!anchorMatchesSelection(inventory, itemId, slotIndex, anchor)) return null;
+  // A MATERIAL leaves through the shared take instead of a raw decrement: the
+  // unit carries its exact source and the stack keeps the canonical remainder,
+  // which a `count -= 1` cannot express. A named stack that cannot give a unit
+  // (a locked copy) refuses like any other invalid selection.
+  if (isMaterialItemId(itemId)) return takeMaterialUnitFromSlot(inventory, itemId, slotIndex);
   const instance =
     slot.instance && slot.count > 1 ? cloneItemInstancePayload(slot.instance) : slot.instance;
   const craftedRecipeId = slot.craftedRecipeId;
@@ -141,6 +159,17 @@ export function consumeSelectedInventorySlot(
  * walk above and needs no meta in a test.
  */
 export function consumeNewestInventoryUnit(inventory: InvSlot[], itemId: string): InventoryUnit {
+  // A MATERIAL does NOT take the newest-first walk below. Its automatic order
+  // is global (unrecorded and other nonpremium first, premium last, across
+  // every stack), so choosing the newest stack first could spend a premium unit
+  // while plain units sat in an earlier one. The newest bias survives only as
+  // the planner's tie-break between stacks holding the same descriptor.
+  // Nothing matched still answers the empty unit this has always returned.
+  if (isMaterialItemId(itemId)) {
+    return (
+      takeMaterialUnit(inventory, itemId) ?? { instance: undefined, craftedRecipeId: undefined }
+    );
+  }
   for (let i = inventory.length - 1; i >= 0; i--) {
     const slot = inventory[i];
     if (slot.itemId !== itemId) continue;

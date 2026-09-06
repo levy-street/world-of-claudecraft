@@ -449,8 +449,20 @@ describe('deposit rules', () => {
     expect(errorTexts(sim.drainEvents())).toEqual([]);
     expect(m.inventory).toEqual(bagBase);
     expect(m.vault.stock).toEqual({});
+    // The legacy payload `signer` is STORED as a source descriptor now, and the
+    // payload it emptied is gone. That projection is the shared material
+    // model's (material_stack.ts normalizeMaterialStack), applied by the
+    // packing core every material grant goes through, and it is lossless: the
+    // same signature, the same premium ineligibility for the automatic craft
+    // draw, one representation instead of two. The vault WIRE already expects
+    // exactly this shape (src/net/vault_snapshot_wire.ts refuses a row that
+    // carries both an instance signer and buckets).
     expect(m.vault.special).toEqual([
-      { itemId: 'copper_ore', count: 3, instance: { signer: 'Ana' } },
+      {
+        itemId: 'copper_ore',
+        count: 3,
+        materialSources: [{ source: { signer: 'Ana' }, count: 3 }],
+      },
     ]);
     expect(totalHeld(m, 'copper_ore')).toBe(before);
   });
@@ -467,11 +479,16 @@ describe('deposit rules', () => {
     expect(errorTexts(sim.drainEvents())).toEqual([]);
     expect(m.inventory).toEqual(bagBase);
     expect(m.vault.stock).toEqual({});
+    // Every stored material row carries its EXACT per-unit quantities, never a
+    // bare count: four units nobody recorded a gatherer for are four units in
+    // the unrecorded bucket, which is what lets a later top-up journal one unit
+    // as one unit instead of a whole-stack rewrite.
     expect(m.vault.special).toEqual([
       {
         itemId: 'copper_ore',
         count: 4,
         craftedRecipeId: 'recipe_test_crafted',
+        materialSources: [{ source: {}, count: 4 }],
       },
     ]);
     expect(totalHeld(m, 'copper_ore')).toBe(before);
@@ -1542,7 +1559,11 @@ describe('the vault material scope', () => {
     expect(fnBody('craftVaultStockFor')).not.toMatch(/stock\[/);
     expect(fnBody('consumeVaultStock').match(/vault\.stock\[itemId\]/g) ?? []).toHaveLength(2);
     expect(fnBody('consumeVaultStock')).toContain('delete vault.stock[itemId];');
-    expect(fnBody('consumeVaultStock')).toContain('vault.stock[itemId] = held - count;');
+    // `plan.fromStock`, not `count`, since a draw can be paid partly out of the
+    // identity collection: the compact row gives up only its own share. The
+    // two occurrences above are still exactly the two WRITES, both landing on a
+    // row drawableVaultCount has already proved is an own data property.
+    expect(fnBody('consumeVaultStock')).toContain('vault.stock[itemId] = held - plan.fromStock;');
   });
 });
 
@@ -1731,10 +1752,28 @@ describe('vaultDepositAll (the batched server-side sweep, Bank Storage Phase 03)
     sim.drainEvents();
     sim.vaultDepositAll();
     expect(errorTexts(sim.drainEvents())).toEqual([]);
-    expect(m.vault.stock).toEqual({ copper_ore: 3 });
+    // The plain three do NOT open a compact chip beside the signed block. The
+    // sweep walks descending, so the signed copper row lands first, and the
+    // plain units then join it rather than making one material visible twice at
+    // once (a compact chip AND an identity row). Nothing is granted by the
+    // merge: the automatic craft draw still counts the three unrecorded units
+    // and refuses the two premium ones, exactly as it did when they sat apart.
+    expect(m.vault.stock).toEqual({});
     expect(m.vault.special).toEqual([
-      { itemId: 'iron_ore', count: 2, craftedRecipeId: 'recipe_test_crafted' },
-      { itemId: 'copper_ore', count: 2, instance: { signer: 'Ana' } },
+      {
+        itemId: 'iron_ore',
+        count: 2,
+        craftedRecipeId: 'recipe_test_crafted',
+        materialSources: [{ source: {}, count: 2 }],
+      },
+      {
+        itemId: 'copper_ore',
+        count: 5,
+        materialSources: [
+          { source: {}, count: 3 },
+          { source: { signer: 'Ana' }, count: 2 },
+        ],
+      },
     ]);
     expect(m.inventory).toEqual(bagBase);
   });
@@ -1815,10 +1854,17 @@ describe('vaultDepositAll (the batched server-side sweep, Bank Storage Phase 03)
     expect(m.vault.stock).toEqual({});
   });
 
-  it('fills a partial stack IN PLACE when headroom takes only part of it', () => {
-    // The one line that decrements a live carried stack (the mint-or-destroy
-    // line): cap 40, 25 pre-stocked, one carried 20-stack. 15 move, 5 stay ON
-    // THE SAME SLOT, and the total is conserved exactly.
+  it('fills a partial stack and REPLACES the carried remainder when headroom takes only part of it', () => {
+    // The mint-or-destroy line: cap 40, 25 pre-stocked, one carried 20-stack.
+    // 15 move, 5 stay, and the total is conserved exactly.
+    //
+    // The surviving five now arrive as a FRESH slot rather than a decremented
+    // one, and that is inherent rather than incidental: the units are lifted
+    // through the shared exact take, so the remainder carries its own bucket
+    // quantities, which an in-place `count -= moved` cannot express. The slot
+    // the deposit read from is never mutated at all, which is what makes the
+    // whole op decided-before-written; nothing in the sim holds a carried-slot
+    // reference across a command.
     const sim = makeSim();
     const m = meta(sim);
     m.vault = { stock: { copper_ore: 25 }, special: [], upgrades: 1 };
@@ -1828,8 +1874,15 @@ describe('vaultDepositAll (the batched server-side sweep, Bank Storage Phase 03)
     expect(m.vault.stock).toEqual({ copper_ore: 40 });
     const carried = m.inventory.filter((s) => s.itemId === 'copper_ore');
     expect(carried).toHaveLength(1);
-    expect(carried[0]).toBe(stack); // decremented in place, never respliced
-    expect(carried[0].count).toBe(5);
+    expect(carried[0]).not.toBe(stack);
+    expect(carried[0]).toEqual({
+      itemId: 'copper_ore',
+      count: 5,
+      materialSources: [{ source: {}, count: 5 }],
+    });
+    // Untouched, not half-edited: a refusal anywhere in the op would have left
+    // the original exactly as it is here.
+    expect(stack?.count).toBe(20);
     expect(heldTotal(m, 'copper_ore')).toBe(45);
   });
 
@@ -2203,12 +2256,38 @@ describe('vault wire revision', () => {
     });
     sim.vaultDeposit(m.inventory.length - 1);
     expect(m.vaultWireRev).toBe(4);
+    // TWO things happened here, and the selector below depends on both. The
+    // legacy payload `signer` was STORED as a source descriptor with no payload
+    // left (the shared material projection), and the three units still pooled
+    // in `stock` FOLDED into the same block, because one material must never be
+    // visible twice at once as a compact chip AND an identity row. Asserted
+    // rather than assumed: the ref below is only decisive if this really is the
+    // row a viewer sees, and vaultInfoFor hands the client exactly this.
+    expect(m.vault.stock).toEqual({});
+    expect(m.vault.special).toEqual([
+      {
+        itemId: 'copper_ore',
+        count: 4,
+        materialSources: [
+          { source: {}, count: 3 },
+          { source: { signer: 'Wire revision' }, count: 1 },
+        ],
+      },
+    ]);
+    // A ref built against the PRE-normalization payload MISSES, silently, and
+    // the rev does not move: the existing stale-selector behavior (never a
+    // fallback onto another copy by item id). That is also what stops a client
+    // holding a cached pre-change ref from withdrawing twice across the
+    // representation move; the load-time rev bump re-sends it the real shape.
     sim.vaultWithdraw(
       'copper_ore',
-      undefined,
+      1,
       { index: 0, instance: { signer: 'Wire revision' } },
       sim.playerId,
     );
+    expect(m.vaultWireRev).toBe(4);
+    // The ref a viewer builds from that row does move it.
+    sim.vaultWithdraw('copper_ore', 1, { index: 0 }, sim.playerId);
     expect(m.vaultWireRev).toBe(5);
 
     sim.addItem('rough_hide', 2);

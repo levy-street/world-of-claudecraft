@@ -82,7 +82,6 @@
 // carries plantedAtMs and readyAtMs, which is everything a client needs to
 // compute the stage itself.
 
-import { bagPools, countFit } from '../bags';
 import {
   FARM_COMPOST_ITEM_ID,
   FARM_GROWTH_TONIC_ITEM_ID,
@@ -96,6 +95,7 @@ import { FARM_BED_IDS, farmBedById, farmBedZoneId } from '../content/farm_patche
 import { ITEMS } from '../data';
 import { onCropHarvestedForDeeds } from '../deeds';
 import { countUnlockedInSlots, removeUnlockedFromSlots } from '../item_lock';
+import { gatheredMaterialSources } from '../material_gatherer';
 import { forceDismount } from '../mounts';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -934,6 +934,9 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
   // always defined when the count is positive (an id the catalog dropped
   // reads tier 1 above and never rolls); the guard narrows the type rather
   // than expressing doubt.
+  // Deliberately UNATTRIBUTED: a seed-back is a REFUND of the seed this player
+  // already owned and planted, not a unit this harvest produced. Stamping
+  // provenance on returned property would mint attribution out of a round trip.
   if (seedBackCount > 0 && crop) {
     ctx.addItem(crop.seedItemId, seedBackCount, meta.entityId, {
       silent: true,
@@ -945,6 +948,12 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
     // The failure payout. Granted, not merely announced: a failed crop is a
     // smaller reward, never a punishment. No proficiency: the schedule pays
     // for a harvest, and there was nothing to harvest.
+    //
+    // Deliberately UNATTRIBUTED, on that same line: this arm pays no gathering
+    // proficiency precisely because nothing was harvested, so a husk is not an
+    // earned gather outcome and records no gatherer. Proficiency is the rule
+    // this file already applies for "did the player actually gather this", and
+    // provenance follows it rather than inventing a second, disagreeing one.
     //
     // silent + callerLogs: the farmWithered event below owns BOTH halves of
     // the player feedback (the gatherResult/fishingResult idiom, #2430). The
@@ -1092,42 +1101,34 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
   // dings on the event's cue.
   if (golden) {
     // A golden windfall lands SIGNED, the node rare-event idiom (gathering.ts
-    // resolveHarvest's signed arm): signed { signer } instances up to what
-    // the bags genuinely fit (countFit models same-signer merge room plus
-    // free slots, identical-payload stacking), then the plain
-    // overflow-tolerant grant for the remainder. Farming's nothing-rots rule
-    // outranks the signature: the TOTAL granted quantity is always the full
-    // five-fold yield, and only the SIGNATURE truncates on full bags. The
-    // truncation NAMES itself: one gatherDowngrade
-    // { surface: 'crop', lost: 'mark' } per harvest command (the dedupe
-    // idiom, even when both grades truncate), always 'mark' and never
-    // 'find' because the units themselves always land here.
-    // `capacity` is hoisted (slot capacity cannot change from a grant), but
-    // grantGolden runs TWICE and the second countFit deliberately reads the
-    // meta.inventory the first grant already mutated: the fine grade must
-    // see the slots the base grade consumed. Do not "clean this up" by
-    // snapshotting the inventory.
-    const capacity = bagPools(meta.bags);
-    let signatureTruncated = false;
+    // resolveHarvest's signed arm). Farming's nothing-rots rule still outranks
+    // everything: the TOTAL granted quantity is always the full five-fold
+    // yield, granted overflow-tolerantly.
+    //
+    // The signature no longer truncates, and the arm that reported it is gone.
+    // It existed because a `{ signer }` PAYLOAD could only merge into a
+    // byte-equal same-signer stack, so a full bag could land the units but not
+    // the mark; with the signature in the units' own source bucket there is no
+    // separate room to run out of. Both grades are one uncapped grant each, in
+    // the same order, and the fine grade still lands after the base grade.
+    // The signature now rides the granted units' own SOURCE bucket beside the
+    // gatherer (material_gatherer.ts), not the item payload. A signed golden
+    // yield is therefore no longer a separate payload competing for same-signer
+    // room, so the whole quantity lands signed in ONE grant and the signature
+    // can no longer truncate: the `gatherDowngrade { surface: 'crop' }` arm and
+    // its `countFit` pre-walk existed only to model that separate room and are
+    // removed rather than left unreachable. The nothing-rots rule is unchanged
+    // (still an uncapped force-add), and the granted TOTAL is identical.
     const grantGolden = (itemId: string, qty: number): void => {
       if (qty <= 0) return;
-      const fit = countFit(meta.inventory, capacity, itemId, qty, { signer: meta.name });
-      if (fit > 0) {
-        ctx.addItemInstance(itemId, { signer: meta.name }, meta.entityId, fit, {
-          silent: true,
-          callerLogs: true,
-        });
-      }
-      if (fit < qty) {
-        signatureTruncated = true;
-        ctx.addItem(itemId, qty - fit, meta.entityId, { silent: true, callerLogs: true });
-      }
+      ctx.addItem(itemId, qty, meta.entityId, {
+        silent: true,
+        callerLogs: true,
+        materialSources: gatheredMaterialSources(meta, qty, { signer: meta.name }),
+      });
     };
     grantGolden(crop.produceItemId, count);
     grantGolden(crop.fineProduceItemId, fine);
-    if (signatureTruncated) {
-      ctx.emit({ type: 'gatherDowngrade', pid: meta.entityId, surface: 'crop', lost: 'mark' });
-    }
     // THE GOLDEN BONUS (Phase 11f, decision D): exactly ONE extra item, off
     // the draw the block above already spent. This is the ONLY place that
     // roll is read, which is what makes it a constant-count draw rather than
@@ -1142,13 +1143,28 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
     // zone announce and its gather_event:golden_harvest visit mark are the
     // shared celebration family and Phase 13 has to live beside them.
     const bonusItemId = resolveFarmGoldenBonus(goldenBonusRoll, cropTier);
-    ctx.addItem(bonusItemId, 1, meta.entityId, { silent: true, callerLogs: true });
+    ctx.addItem(bonusItemId, 1, meta.entityId, {
+      silent: true,
+      callerLogs: true,
+      // Attributed but NOT signed, matching the comment above: the farmer
+      // earned it from this harvest, and the signature marks the crop windfall
+      // alone. The two halves are independent by construction.
+      materialSources: gatheredMaterialSources(meta, 1),
+    });
     goldenBonusItemId = bonusItemId;
   } else {
     if (count > 0)
-      ctx.addItem(crop.produceItemId, count, meta.entityId, { silent: true, callerLogs: true });
+      ctx.addItem(crop.produceItemId, count, meta.entityId, {
+        silent: true,
+        callerLogs: true,
+        materialSources: gatheredMaterialSources(meta, count),
+      });
     if (fine > 0)
-      ctx.addItem(crop.fineProduceItemId, fine, meta.entityId, { silent: true, callerLogs: true });
+      ctx.addItem(crop.fineProduceItemId, fine, meta.entityId, {
+        silent: true,
+        callerLogs: true,
+        materialSources: gatheredMaterialSources(meta, fine),
+      });
   }
   // The R42 charge settle plus the R47 use-time ratchet, the
   // completeGatherCast pattern. The ratchet's rarity read is the UNFILTERED
@@ -1327,6 +1343,10 @@ export function convertHusks(ctx: SimContext, p: Entity, meta: PlayerMeta): void
   // of the player feedback (the farmHarvested precedent, #2430). The generic
   // "You receive:" hub line would be a second line for the one trade, and
   // naming only the compost would hide what it cost.
+  //
+  // Deliberately UNATTRIBUTED: this is a CONVERSION of husks the player already
+  // holds (which may have been traded in from anyone), not a gather. Recording
+  // the converter as the gatherer would attribute units nobody gathered here.
   ctx.addItem(FARM_COMPOST_ITEM_ID, batches, meta.entityId, {
     silent: true,
     callerLogs: true,

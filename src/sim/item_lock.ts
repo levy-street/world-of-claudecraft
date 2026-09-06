@@ -20,6 +20,8 @@
 import type { ItemCopyAnchor } from './item_copy_anchor';
 import { selectedInventorySlot } from './item_copy_ref';
 import { isItemLocked } from './item_lock_flag';
+import { isMaterialItemId } from './material_ids';
+import { takeMaterialInventoryForHub } from './material_inventory_hub';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import type { InvSlot, ItemInstancePayload } from './types';
@@ -92,6 +94,11 @@ export function countRawInSlots(
  *  the #2350 capacity scratch simulation share this one walk so the two can
  *  never disagree about which slots free up. */
 export function removeUnlockedFromSlots(inventory: InvSlot[], itemId: string, count: number): void {
+  if (isMaterialItemId(itemId) && count > 0) {
+    takeMaterialInventoryForHub(inventory, itemId, count);
+    return;
+  }
+
   let remaining = count;
   for (let i = inventory.length - 1; i >= 0 && remaining > 0; i--) {
     const s = inventory[i];

@@ -326,6 +326,7 @@ export const ja_JP: EnTranslations = {
     }
   },
   "hudChrome": {
+    "materialStackSelectionUnavailable": "この素材の選択は利用できなくなりました。",
     "warlock": {
       "doomLabel": "断罪",
       "fateThreadsLabel": "運命の糸",
@@ -3047,7 +3048,33 @@ export const ja_JP: EnTranslations = {
       "enchantedFallback": "エンチャント済み",
       "partyTradeWindow": "このアイテムはあと{time}の間、同じドロップを分かち合ったプレイヤーと取引できます。装備すると取引期間は終了します。",
       "perfectedBadge": "完全化済み",
-      "perfectingRank": "完全化：ランク{rank}／{ranks}"
+      "perfectingRank": "完全化：ランク{rank}／{ranks}",
+      "materialSourceGatherer": "{count} × {name}が採集",
+      "materialSourceGathererSigned": "{count} × {name}が採集、{signer}が署名",
+      "materialSourceUnrecorded": "{count} × 採集者の記録なし",
+      "materialSourceUnrecordedSigned": "{count} × 採集者の記録なし、{name}が署名",
+      "materialSourceMore": "ほか{sources}件の入手元、計{units}個"
+    },
+    "materialSources": {
+      "detailsTitle": "{item}の入手元",
+      "pickerTitle": "{item}の入手元を選択",
+      "close": "素材の入手元を閉じる",
+      "view": "入手元",
+      "choose": "入手元",
+      "viewAria": "{item}の素材の入手元をすべて表示",
+      "chooseAria": "{item}から移動する素材の入手元を選択",
+      "cancel": "キャンセル",
+      "confirm": "選択した個数を移動",
+      "listAria": "素材の入手元一覧",
+      "total": "このスタックは計{units}個",
+      "row": "{count}個：{source}",
+      "gatherer": "{name}が採集",
+      "gathererSigned": "{name}が採集、{signer}が署名",
+      "unrecorded": "採集者の記録なし",
+      "unrecordedSigned": "採集者の記録なし、{name}が署名",
+      "quantityAria": "{source}からの個数、最大{count}個",
+      "decreaseAria": "{source}からの個数を減らす",
+      "increaseAria": "{source}からの個数を増やす"
     },
     "materialHint": {
       "fineGrade": "上質な等級。素材より上位の道具で満位の採取地から採ったもので、通常版が求められる場所ではそのまま代用できます。",
@@ -4058,7 +4085,11 @@ export const ja_JP: EnTranslations = {
       "applyEnchant": "エンチャントを付与",
       "sunder": "断つ",
       "sell": "売却",
-      "sellAll": "すべて売却（{count}）"
+      "sellAll": "すべて売却（{count}）",
+      "viewSources": "入手元を見る",
+      "separateByGatherer": "採集者別に分ける",
+      "takeChosenQuantity": "指定数を取り出す",
+      "combine": "素材スタックを結合"
     },
     "enchanting": {
       "disenchantedLine": "{item}を魔力分解した。",

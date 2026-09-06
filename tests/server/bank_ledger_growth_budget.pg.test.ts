@@ -1,6 +1,18 @@
-// Executed PostgreSQL proof for the database-wide bank-ledger ceiling. The
+// Executed PostgreSQL proof for the database-wide AGGREGATE audit ceiling. The
 // always-on sibling pins DDL text and error decoding; this suite proves actual
-// transition-row counts, rollback, receipt idempotency, and concurrent writers.
+// transition-row counts across BOTH audited tables, the one-time migration of a
+// legacy install, rollback, receipt idempotency, owner cascades, and concurrent
+// writers.
+//
+// The material source tables here are a MINIMAL fixture: the real DDL
+// (MATERIAL_SOURCE_JOURNAL_SCHEMA in server/material_source_journal_db.ts) adds
+// the opening/current_revision/movements JSONB payloads, the container-kind and
+// positivity CHECKs, and the partial cascade index. None of that changes what
+// this suite measures, which is row transitions and cascade reach: the same
+// composite primary keys, the same ON DELETE CASCADE from the owning character
+// to the anchor and from the anchor to the journal. Applying the real fragment
+// from ensureSchema, in order and before this one, is the parent's integration
+// step and is not exercised here.
 
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
@@ -11,8 +23,147 @@ const OVER_CAP_SCHEMA = 'bank_ledger_growth_over_cap_pg_test';
 const MULTI_STATEMENT_SCHEMA = 'bank_ledger_growth_multi_statement_pg_test';
 const BOOTSTRAP_RACE_SCHEMA = 'bank_ledger_growth_bootstrap_race_pg_test';
 const CONFIG_DRIFT_SCHEMA = 'bank_ledger_growth_config_drift_pg_test';
+const LEGACY_SCHEMA = 'bank_ledger_growth_legacy_migration_pg_test';
+const AGGREGATE_SCHEMA = 'bank_ledger_growth_aggregate_pg_test';
+const RECOVERY_SCHEMA = 'bank_ledger_growth_recovery_pg_test';
 const priorLimit = process.env.BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS;
 if (url !== '') process.env.BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS = '4';
+
+/**
+ * The minimal source-journal shape the budget actually depends on: a
+ * container-owned anchor that cascades with its owning character, and journal
+ * rows that cascade with their anchor. `ownerTable` is null for schemas with no
+ * characters table, where only the journal rows themselves are counted.
+ */
+const sourceFixtureSql = (schema: string, ownerTable: string | null): string => `
+  CREATE TABLE "${schema}".material_source_containers (
+    realm TEXT NOT NULL,
+    container TEXT NOT NULL,
+    owner_id BIGINT NOT NULL,
+    owner_character_id INT${ownerTable === null ? '' : ` REFERENCES ${ownerTable}(id) ON DELETE CASCADE`},
+    PRIMARY KEY (realm, container, owner_id)
+  );
+  CREATE TABLE "${schema}".material_source_journal (
+    realm TEXT NOT NULL,
+    container TEXT NOT NULL,
+    owner_id BIGINT NOT NULL,
+    revision BIGINT NOT NULL,
+    PRIMARY KEY (realm, container, owner_id, revision),
+    FOREIGN KEY (realm, container, owner_id)
+      REFERENCES "${schema}".material_source_containers (realm, container, owner_id)
+      ON DELETE CASCADE
+  );`;
+
+/**
+ * The pre-aggregate budget as it actually shipped: two tables, the ledger-only
+ * INSERT accumulator, the deferred enforcer, both triggers, and the seed.
+ * Written out literally rather than produced by downgrading the current
+ * fragment, so the migration is proven against the shape deployed installs
+ * really carry (and so a downgrade script cannot quietly become the premise).
+ */
+const legacyBudgetSql = (schema: string, limitRows: number): string => `
+CREATE TABLE "${schema}".bank_ledger_growth_budget (
+  singleton BOOLEAN PRIMARY KEY DEFAULT TRUE CHECK (singleton),
+  committed_rows BIGINT NOT NULL CHECK (committed_rows >= 0),
+  hard_limit_rows BIGINT NOT NULL CHECK (hard_limit_rows > 0),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+) WITH (autovacuum_vacuum_scale_factor = 0, autovacuum_vacuum_threshold = 1000);
+
+CREATE TABLE "${schema}".bank_ledger_growth_pending (
+  transaction_id xid8 PRIMARY KEY,
+  inserted_rows BIGINT NOT NULL CHECK (inserted_rows > 0)
+) WITH (autovacuum_vacuum_scale_factor = 0, autovacuum_vacuum_threshold = 100);
+
+CREATE FUNCTION "${schema}".accumulate_bank_ledger_growth_budget()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SET search_path = pg_catalog, "${schema}", pg_temp
+AS $legacy_accumulate$
+DECLARE
+  inserted_rows BIGINT;
+BEGIN
+  SELECT count(*)::bigint INTO inserted_rows FROM inserted_bank_ledger_rows;
+  IF inserted_rows = 0 THEN
+    RETURN NULL;
+  END IF;
+  INSERT INTO "${schema}".bank_ledger_growth_pending (transaction_id, inserted_rows)
+  VALUES (pg_catalog.pg_current_xact_id(), inserted_rows)
+  ON CONFLICT (transaction_id) DO UPDATE
+    SET inserted_rows = "${schema}".bank_ledger_growth_pending.inserted_rows
+                      + EXCLUDED.inserted_rows;
+  RETURN NULL;
+END
+$legacy_accumulate$;
+
+CREATE FUNCTION "${schema}".enforce_bank_ledger_growth_budget()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SET search_path = pg_catalog, "${schema}", pg_temp
+AS $legacy_enforce$
+DECLARE
+  attempted_rows BIGINT;
+  before_rows BIGINT;
+  stored_limit BIGINT;
+BEGIN
+  DELETE FROM "${schema}".bank_ledger_growth_pending
+   WHERE transaction_id = NEW.transaction_id
+  RETURNING inserted_rows INTO attempted_rows;
+  IF NOT FOUND THEN
+    RETURN NULL;
+  END IF;
+
+  UPDATE "${schema}".bank_ledger_growth_budget
+     SET committed_rows = committed_rows + attempted_rows,
+         updated_at = now()
+   WHERE singleton = TRUE
+     AND hard_limit_rows = ${limitRows}
+     AND committed_rows + attempted_rows <= hard_limit_rows
+  RETURNING hard_limit_rows INTO stored_limit;
+  IF FOUND THEN
+    RETURN NULL;
+  END IF;
+
+  SELECT committed_rows, hard_limit_rows
+    INTO before_rows, stored_limit
+    FROM "${schema}".bank_ledger_growth_budget
+   WHERE singleton = TRUE;
+  IF NOT FOUND THEN
+    RAISE EXCEPTION USING
+      ERRCODE = '55000',
+      MESSAGE = 'bank ledger growth budget is not initialized';
+  END IF;
+  IF stored_limit <> ${limitRows} THEN
+    RAISE EXCEPTION USING
+      ERRCODE = '22023',
+      MESSAGE = 'BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS config drift: this process disagrees with the durable bank-ledger limit';
+  END IF;
+
+  RAISE EXCEPTION USING
+    ERRCODE = 'P0001',
+    MESSAGE = 'bank ledger growth limit exceeded',
+    CONSTRAINT = 'bank_ledger_growth_hard_limit',
+    DETAIL = pg_catalog.json_build_object(
+      'committed_rows', before_rows,
+      'attempted_rows', attempted_rows,
+      'hard_limit_rows', stored_limit
+    )::text;
+END
+$legacy_enforce$;
+
+CREATE CONSTRAINT TRIGGER bank_ledger_growth_budget_commit
+  AFTER INSERT OR UPDATE ON "${schema}".bank_ledger_growth_pending
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE FUNCTION "${schema}".enforce_bank_ledger_growth_budget();
+
+CREATE TRIGGER bank_ledger_growth_budget_insert
+  AFTER INSERT ON "${schema}".bank_ledger
+  REFERENCING NEW TABLE AS inserted_bank_ledger_rows
+  FOR EACH STATEMENT
+  EXECUTE FUNCTION "${schema}".accumulate_bank_ledger_growth_budget();
+
+INSERT INTO "${schema}".bank_ledger_growth_budget (singleton, committed_rows, hard_limit_rows)
+SELECT TRUE, COUNT(*)::bigint, ${limitRows} FROM "${schema}".bank_ledger;`;
 
 d('bank ledger durable growth budget against real PostgreSQL', () => {
   let pool: import('pg').Pool;
@@ -108,6 +259,7 @@ d('bank ledger durable growth budget against real PostgreSQL', () => {
       counterparty_count INT,
       created_at TIMESTAMPTZ NOT NULL DEFAULT now()
     )`);
+    await pool.query(sourceFixtureSql(SCHEMA, `"${SCHEMA}".characters`));
     await pool.query(`INSERT INTO "${SCHEMA}".accounts (id) VALUES (1)`);
     await pool.query(`INSERT INTO "${SCHEMA}".characters (id, account_id) VALUES (1, 1)`);
     await pool.query(insertSql, ledgerValues('legacy_before_guard'));
@@ -126,6 +278,9 @@ d('bank ledger durable growth budget against real PostgreSQL', () => {
       await admin.query(`DROP SCHEMA IF EXISTS "${MULTI_STATEMENT_SCHEMA}" CASCADE`);
       await admin.query(`DROP SCHEMA IF EXISTS "${BOOTSTRAP_RACE_SCHEMA}" CASCADE`);
       await admin.query(`DROP SCHEMA IF EXISTS "${CONFIG_DRIFT_SCHEMA}" CASCADE`);
+      await admin.query(`DROP SCHEMA IF EXISTS "${LEGACY_SCHEMA}" CASCADE`);
+      await admin.query(`DROP SCHEMA IF EXISTS "${AGGREGATE_SCHEMA}" CASCADE`);
+      await admin.query(`DROP SCHEMA IF EXISTS "${RECOVERY_SCHEMA}" CASCADE`);
       await admin.query(`DROP SCHEMA IF EXISTS "${SCHEMA}_counterfeit" CASCADE`);
       await admin.end();
     }
@@ -362,6 +517,7 @@ d('bank ledger durable growth budget against real PostgreSQL', () => {
   it('seeds an already-over-cap ledger exactly and refuses only later ledger inserts', async () => {
     await pool.query(`CREATE SCHEMA "${OVER_CAP_SCHEMA}"`);
     await pool.query(`CREATE TABLE "${OVER_CAP_SCHEMA}".bank_ledger (id BIGSERIAL PRIMARY KEY)`);
+    await pool.query(sourceFixtureSql(OVER_CAP_SCHEMA, null));
     await pool.query(
       `INSERT INTO "${OVER_CAP_SCHEMA}".bank_ledger
        SELECT FROM pg_catalog.generate_series(1, 5)`,
@@ -384,6 +540,524 @@ d('bank ledger durable growth budget against real PostgreSQL', () => {
         (await pool.query(`SELECT count(*) FROM "${OVER_CAP_SCHEMA}".bank_ledger`)).rows[0].count,
       ),
     ).toBe(5);
+  });
+
+  it('counts both audited tables against one deferred budget and refuses a crossed aggregate ceiling atomically', async () => {
+    const rowsOf = async (table: string): Promise<number> =>
+      Number(
+        (await pool.query(`SELECT count(*) FROM "${AGGREGATE_SCHEMA}".${table}`)).rows[0].count,
+      );
+    const committed = async (): Promise<number> =>
+      Number(
+        (
+          await pool.query(
+            `SELECT committed_rows FROM "${AGGREGATE_SCHEMA}".bank_ledger_growth_budget`,
+          )
+        ).rows[0].committed_rows,
+      );
+
+    await pool.query(`CREATE SCHEMA "${AGGREGATE_SCHEMA}"`);
+    await pool.query(`CREATE TABLE "${AGGREGATE_SCHEMA}".characters (id INT PRIMARY KEY)`);
+    await pool.query(`CREATE TABLE "${AGGREGATE_SCHEMA}".bank_ledger (
+      id BIGSERIAL PRIMARY KEY,
+      character_id INT REFERENCES "${AGGREGATE_SCHEMA}".characters(id) ON DELETE CASCADE,
+      item_id TEXT NOT NULL
+    )`);
+    await pool.query(sourceFixtureSql(AGGREGATE_SCHEMA, `"${AGGREGATE_SCHEMA}".characters`));
+    await pool.query(`INSERT INTO "${AGGREGATE_SCHEMA}".characters (id) VALUES (1), (2)`);
+    await pool.query(growth.bankLedgerGrowthBudgetSchema(AGGREGATE_SCHEMA));
+    expect(
+      (
+        await pool.query(
+          `SELECT committed_rows, hard_limit_rows, budget_revision
+             FROM "${AGGREGATE_SCHEMA}".bank_ledger_growth_budget`,
+        )
+      ).rows,
+    ).toEqual([{ committed_rows: '0', hard_limit_rows: '4', budget_revision: 2 }]);
+
+    const both = await pool.connect();
+    try {
+      await both.query('BEGIN');
+      await both.query(
+        `INSERT INTO "${AGGREGATE_SCHEMA}".bank_ledger (character_id, item_id)
+         VALUES (1, 'aggregate_ledger')`,
+      );
+      await both.query(
+        `INSERT INTO "${AGGREGATE_SCHEMA}".material_source_containers
+           (realm, container, owner_id, owner_character_id)
+         VALUES ('pg-growth', 'personal', 1, 1)`,
+      );
+      await both.query(
+        `INSERT INTO "${AGGREGATE_SCHEMA}".material_source_journal
+           (realm, container, owner_id, revision)
+         VALUES ('pg-growth', 'personal', 1, 1)`,
+      );
+      // ONE shared accumulator row for both tables, and the singleton is
+      // untouched until COMMIT: no save transaction holds it across its
+      // storage or source-journal tail.
+      expect(
+        (
+          await both.query(
+            `SELECT inserted_rows, deleted_rows
+               FROM "${AGGREGATE_SCHEMA}".bank_ledger_growth_pending
+              WHERE transaction_id = pg_catalog.pg_current_xact_id()`,
+          )
+        ).rows,
+      ).toEqual([{ inserted_rows: '2', deleted_rows: '0' }]);
+      expect(
+        Number(
+          (
+            await both.query(
+              `SELECT count(*) FROM "${AGGREGATE_SCHEMA}".bank_ledger_growth_pending`,
+            )
+          ).rows[0].count,
+        ),
+      ).toBe(1);
+      expect(
+        Number(
+          (
+            await both.query(
+              `SELECT committed_rows FROM "${AGGREGATE_SCHEMA}".bank_ledger_growth_budget`,
+            )
+          ).rows[0].committed_rows,
+        ),
+      ).toBe(0);
+      await both.query('COMMIT');
+    } finally {
+      await both.query('ROLLBACK').catch(() => {});
+      both.release();
+    }
+    // The anchor is deliberately NOT counted: it is minted with its first
+    // journal row and reaped with its last, so counting it would charge the
+    // same lifecycle twice.
+    expect(await committed()).toBe(2);
+    expect(await rowsOf('material_source_containers')).toBe(1);
+
+    const rolledBackSource = await pool.connect();
+    try {
+      await rolledBackSource.query('BEGIN');
+      await rolledBackSource.query(
+        `INSERT INTO "${AGGREGATE_SCHEMA}".material_source_journal
+           (realm, container, owner_id, revision)
+         VALUES ('pg-growth', 'personal', 1, 2)`,
+      );
+      expect(
+        (
+          await rolledBackSource.query(
+            `SELECT inserted_rows, deleted_rows
+               FROM "${AGGREGATE_SCHEMA}".bank_ledger_growth_pending
+              WHERE transaction_id = pg_catalog.pg_current_xact_id()`,
+          )
+        ).rows,
+      ).toEqual([{ inserted_rows: '1', deleted_rows: '0' }]);
+      await rolledBackSource.query('ROLLBACK');
+    } finally {
+      await rolledBackSource.query('ROLLBACK').catch(() => {});
+      rolledBackSource.release();
+    }
+    expect(await committed()).toBe(2);
+    expect(await rowsOf('bank_ledger_growth_pending')).toBe(0);
+    expect(await rowsOf('material_source_journal')).toBe(1);
+
+    // The owner cascade, two hops deep: the character reaps its ledger rows
+    // directly and its journal rows through the anchor, and BOTH give their
+    // capacity back.
+    await pool.query(`DELETE FROM "${AGGREGATE_SCHEMA}".characters WHERE id = 1`);
+    expect(await rowsOf('bank_ledger')).toBe(0);
+    expect(await rowsOf('material_source_containers')).toBe(0);
+    expect(await rowsOf('material_source_journal')).toBe(0);
+    expect(await committed()).toBe(0);
+
+    // One transaction whose COMBINED audit growth crosses the shared ceiling
+    // is refused whole, at COMMIT, across both tables.
+    const overshoot = await pool.connect();
+    let refusal: unknown;
+    try {
+      await overshoot.query('BEGIN');
+      await overshoot.query(
+        `INSERT INTO "${AGGREGATE_SCHEMA}".bank_ledger (character_id, item_id)
+         VALUES (2, 'over_a'), (2, 'over_b'), (2, 'over_c')`,
+      );
+      await overshoot.query(
+        `INSERT INTO "${AGGREGATE_SCHEMA}".material_source_containers
+           (realm, container, owner_id, owner_character_id)
+         VALUES ('pg-growth', 'personal', 2, 2)`,
+      );
+      await overshoot.query(
+        `INSERT INTO "${AGGREGATE_SCHEMA}".material_source_journal
+           (realm, container, owner_id, revision)
+         VALUES ('pg-growth', 'personal', 2, 1), ('pg-growth', 'personal', 2, 2)`,
+      );
+      expect(
+        (
+          await overshoot.query(
+            `SELECT inserted_rows, deleted_rows
+               FROM "${AGGREGATE_SCHEMA}".bank_ledger_growth_pending
+              WHERE transaction_id = pg_catalog.pg_current_xact_id()`,
+          )
+        ).rows,
+      ).toEqual([{ inserted_rows: '5', deleted_rows: '0' }]);
+      await overshoot.query('COMMIT');
+      expect.unreachable('the crossed aggregate ceiling must refuse the whole transaction');
+    } catch (error) {
+      refusal = error;
+    } finally {
+      await overshoot.query('ROLLBACK').catch(() => {});
+      overshoot.release();
+    }
+    expect(refusal).toMatchObject({
+      code: growth.BANK_LEDGER_GROWTH_LIMIT_SQLSTATE,
+      constraint: growth.BANK_LEDGER_GROWTH_LIMIT_CONSTRAINT,
+    });
+    // The refusal reports the AGGREGATE attempt, not a per-table figure.
+    expect(growth.bankLedgerGrowthLimitFromError(refusal)).toMatchObject({
+      committedRows: 0,
+      attemptedRows: 5,
+      hardLimitRows: 4,
+    });
+    expect(await committed()).toBe(0);
+    expect(await rowsOf('bank_ledger')).toBe(0);
+    expect(await rowsOf('material_source_journal')).toBe(0);
+    expect(await rowsOf('material_source_containers')).toBe(0);
+    expect(await rowsOf('bank_ledger_growth_pending')).toBe(0);
+  });
+
+  it('lets removals rescue an audit surface already over the ceiling, and refuses to underflow', async () => {
+    const committed = async (): Promise<number> =>
+      Number(
+        (
+          await pool.query(
+            `SELECT committed_rows FROM "${RECOVERY_SCHEMA}".bank_ledger_growth_budget`,
+          )
+        ).rows[0].committed_rows,
+      );
+
+    await pool.query(`CREATE SCHEMA "${RECOVERY_SCHEMA}"`);
+    await pool.query(`CREATE TABLE "${RECOVERY_SCHEMA}".bank_ledger (id BIGSERIAL PRIMARY KEY)`);
+    await pool.query(sourceFixtureSql(RECOVERY_SCHEMA, null));
+    await pool.query(
+      `INSERT INTO "${RECOVERY_SCHEMA}".bank_ledger SELECT FROM pg_catalog.generate_series(1, 3)`,
+    );
+    await pool.query(
+      `INSERT INTO "${RECOVERY_SCHEMA}".material_source_containers
+         (realm, container, owner_id, owner_character_id)
+       VALUES ('pg-growth', 'guild', 7, NULL)`,
+    );
+    await pool.query(
+      `INSERT INTO "${RECOVERY_SCHEMA}".material_source_journal
+         (realm, container, owner_id, revision)
+       SELECT 'pg-growth', 'guild', 7, generate_series FROM pg_catalog.generate_series(1, 3)`,
+    );
+
+    // Seeded EXACTLY at the aggregate size, deliberately above the ceiling:
+    // the audit surface is refused further growth without taking unrelated
+    // gameplay down, and the operator has a way back.
+    await pool.query(growth.bankLedgerGrowthBudgetSchema(RECOVERY_SCHEMA));
+    expect(
+      (
+        await pool.query(
+          `SELECT committed_rows, hard_limit_rows, budget_revision
+             FROM "${RECOVERY_SCHEMA}".bank_ledger_growth_budget`,
+        )
+      ).rows,
+    ).toEqual([{ committed_rows: '6', hard_limit_rows: '4', budget_revision: 2 }]);
+
+    await expect(
+      pool.query(`INSERT INTO "${RECOVERY_SCHEMA}".bank_ledger DEFAULT VALUES`),
+    ).rejects.toMatchObject({
+      code: growth.BANK_LEDGER_GROWTH_LIMIT_SQLSTATE,
+      constraint: growth.BANK_LEDGER_GROWTH_LIMIT_CONSTRAINT,
+    });
+    expect(await committed()).toBe(6);
+
+    // A removal is admitted even though the budget is still over the limit:
+    // the capacity predicate only judges transactions that GROW the surface.
+    await pool.query(
+      `DELETE FROM "${RECOVERY_SCHEMA}".material_source_journal WHERE revision <= 3`,
+    );
+    expect(await committed()).toBe(3);
+    // Back under the ceiling, growth resumes on its own, with no operator
+    // action and no counter surgery.
+    await expect(
+      pool.query(`INSERT INTO "${RECOVERY_SCHEMA}".bank_ledger DEFAULT VALUES`),
+    ).resolves.toMatchObject({ rowCount: 1 });
+    expect(await committed()).toBe(4);
+    await expect(
+      pool.query(`INSERT INTO "${RECOVERY_SCHEMA}".bank_ledger DEFAULT VALUES`),
+    ).rejects.toMatchObject({ code: growth.BANK_LEDGER_GROWTH_LIMIT_SQLSTATE });
+
+    // An impossible removal (more rows leaving than the budget ever
+    // accounted) is its own named refusal: never a clamp to zero, never a
+    // wrapped counter, and never mistaken for capacity.
+    await pool.query(
+      `UPDATE "${RECOVERY_SCHEMA}".bank_ledger_growth_budget SET committed_rows = 1`,
+    );
+    let underflow: unknown;
+    try {
+      await pool.query(`DELETE FROM "${RECOVERY_SCHEMA}".bank_ledger`);
+      expect.unreachable('an underflowing removal must be refused');
+    } catch (error) {
+      underflow = error;
+    }
+    expect(underflow).toMatchObject({
+      code: growth.BANK_LEDGER_GROWTH_UNDERFLOW_SQLSTATE,
+      message: expect.stringContaining(growth.BANK_LEDGER_GROWTH_UNDERFLOW_MESSAGE),
+    });
+    expect(JSON.parse(String((underflow as { detail?: string }).detail ?? 'null'))).toMatchObject({
+      committed_rows: 1,
+      attempted_inserted_rows: 0,
+      attempted_deleted_rows: 4,
+    });
+    // Not a capacity refusal, so the client-side converter must leave it alone.
+    expect(growth.bankLedgerGrowthLimitFromError(underflow)).toBeNull();
+    // The refused transaction rolled back whole: the rows are still there.
+    expect(
+      Number(
+        (await pool.query(`SELECT count(*) FROM "${RECOVERY_SCHEMA}".bank_ledger`)).rows[0].count,
+      ),
+    ).toBe(4);
+    expect(await committed()).toBe(1);
+  });
+
+  it('migrates an initialized legacy budget exactly once, then boots without scanning', async () => {
+    const budgetRow = async (): Promise<Record<string, unknown>> =>
+      (
+        await pool.query(
+          `SELECT committed_rows, hard_limit_rows, budget_revision, xmin::text AS row_version
+             FROM "${LEGACY_SCHEMA}".bank_ledger_growth_budget`,
+        )
+      ).rows[0];
+
+    const columnsOf = async (table: string): Promise<string[]> =>
+      (
+        await pool.query(
+          `SELECT attname FROM pg_catalog.pg_attribute
+            WHERE attrelid = '"${LEGACY_SCHEMA}".${table}'::pg_catalog.regclass
+              AND attnum > 0 AND NOT attisdropped
+            ORDER BY attnum`,
+        )
+      ).rows.map((row) => String(row.attname));
+    const pendingChecks = async (): Promise<string[]> =>
+      (
+        await pool.query(
+          `SELECT pg_catalog.pg_get_constraintdef(oid) AS def FROM pg_catalog.pg_constraint
+            WHERE conrelid = '"${LEGACY_SCHEMA}".bank_ledger_growth_pending'::pg_catalog.regclass
+              AND contype = 'c'
+            ORDER BY conname`,
+        )
+      ).rows.map((row) => String(row.def));
+    const growthTriggers = async (): Promise<string[]> =>
+      (
+        await pool.query(
+          `SELECT tgname FROM pg_catalog.pg_trigger
+            WHERE tgrelid IN ('"${LEGACY_SCHEMA}".bank_ledger'::pg_catalog.regclass,
+                              '"${LEGACY_SCHEMA}".material_source_journal'::pg_catalog.regclass,
+                              '"${LEGACY_SCHEMA}".bank_ledger_growth_pending'::pg_catalog.regclass)
+              AND NOT tgisinternal
+            ORDER BY tgname`,
+        )
+      ).rows.map((row) => String(row.tgname));
+
+    await pool.query(`CREATE SCHEMA "${LEGACY_SCHEMA}"`);
+    await pool.query(`CREATE TABLE "${LEGACY_SCHEMA}".characters (id INT PRIMARY KEY)`);
+    await pool.query(`CREATE TABLE "${LEGACY_SCHEMA}".bank_ledger (
+      id BIGSERIAL PRIMARY KEY,
+      character_id INT REFERENCES "${LEGACY_SCHEMA}".characters(id) ON DELETE CASCADE
+    )`);
+    await pool.query(sourceFixtureSql(LEGACY_SCHEMA, `"${LEGACY_SCHEMA}".characters`));
+    await pool.query(`INSERT INTO "${LEGACY_SCHEMA}".characters (id) VALUES (1)`);
+    // The deployed pre-aggregate install, applied literally.
+    await pool.query(legacyBudgetSql(LEGACY_SCHEMA, 4));
+
+    // Legacy history: three ledger inserts counted, ONE of them later deleted
+    // with no delete accumulator to credit it back, and source rows the legacy
+    // install never counted at all. Its tally is wrong in both directions.
+    await pool.query(
+      `INSERT INTO "${LEGACY_SCHEMA}".bank_ledger (character_id) VALUES (1), (1), (1)`,
+    );
+    await pool.query(
+      `DELETE FROM "${LEGACY_SCHEMA}".bank_ledger
+        WHERE id = (SELECT min(id) FROM "${LEGACY_SCHEMA}".bank_ledger)`,
+    );
+    await pool.query(
+      `INSERT INTO "${LEGACY_SCHEMA}".material_source_containers
+         (realm, container, owner_id, owner_character_id)
+       VALUES ('pg-growth', 'personal', 1, 1)`,
+    );
+    await pool.query(
+      `INSERT INTO "${LEGACY_SCHEMA}".material_source_journal
+         (realm, container, owner_id, revision)
+       VALUES ('pg-growth', 'personal', 1, 1), ('pg-growth', 'personal', 1, 2)`,
+    );
+
+    // The pre-aggregate shape, asserted rather than assumed.
+    expect(await columnsOf('bank_ledger_growth_budget')).not.toContain('budget_revision');
+    expect(await columnsOf('bank_ledger_growth_pending')).toEqual([
+      'transaction_id',
+      'inserted_rows',
+    ]);
+    expect(await pendingChecks()).toEqual(['CHECK ((inserted_rows > 0))']);
+    expect(await growthTriggers()).toEqual([
+      'bank_ledger_growth_budget_commit',
+      'bank_ledger_growth_budget_insert',
+    ]);
+    // Read WITHOUT budget_revision: the legacy singleton has no such column,
+    // which is the whole premise of the migration below.
+    expect(
+      (await pool.query(`SELECT committed_rows FROM "${LEGACY_SCHEMA}".bank_ledger_growth_budget`))
+        .rows[0].committed_rows,
+    ).toBe('3');
+
+    await pool.query(growth.bankLedgerGrowthBudgetSchema(LEGACY_SCHEMA));
+    const migrated = await budgetRow();
+    // Replaced by the EXACT aggregate live count (2 ledger rows + 2 journal
+    // rows; the anchor is not counted), and marked converged.
+    expect(migrated).toMatchObject({
+      committed_rows: '4',
+      hard_limit_rows: '4',
+      budget_revision: 2,
+    });
+    // The accumulator shape converged additively, and the legacy positive-only
+    // CHECK (which a removal would violate) is gone.
+    expect(await columnsOf('bank_ledger_growth_pending')).toEqual([
+      'transaction_id',
+      'inserted_rows',
+      'deleted_rows',
+    ]);
+    // One CHECK, semantics pinned by operand rather than by the deparser's
+    // exact parenthesisation.
+    const converged = await pendingChecks();
+    expect(converged).toHaveLength(1);
+    expect(converged[0]).toMatch(/inserted_rows >= 0/);
+    expect(converged[0]).toMatch(/deleted_rows >= 0/);
+    expect(converged[0]).toMatch(/inserted_rows \+ deleted_rows\) > 0/);
+    expect(await growthTriggers()).toEqual([
+      'bank_ledger_growth_budget_commit',
+      'bank_ledger_growth_budget_delete',
+      'bank_ledger_growth_budget_insert',
+      'material_source_journal_growth_budget_delete',
+      'material_source_journal_growth_budget_insert',
+    ]);
+    // A LATER boot owes nothing: it takes no source-table lock, runs no COUNT,
+    // and does not touch the singleton row at all (its row version is the
+    // migration's).
+    await pool.query(growth.bankLedgerGrowthBudgetSchema(LEGACY_SCHEMA));
+    expect(await budgetRow()).toEqual(migrated);
+
+    // And the converged install accounts for both tables from here on.
+    await pool.query(`DELETE FROM "${LEGACY_SCHEMA}".characters WHERE id = 1`);
+    expect(await budgetRow()).toMatchObject({ committed_rows: '0' });
+  });
+
+  it('keeps the singleton unlocked until COMMIT, so audit writers never queue on each other', async () => {
+    const holder = await pool.connect();
+    const rival = await pool.connect();
+    try {
+      await holder.query('BEGIN');
+      await holder.query(
+        `INSERT INTO "${AGGREGATE_SCHEMA}".material_source_containers
+           (realm, container, owner_id, owner_character_id)
+         VALUES ('pg-growth', 'guild', 11, NULL)`,
+      );
+      await holder.query(
+        `INSERT INTO "${AGGREGATE_SCHEMA}".material_source_journal
+           (realm, container, owner_id, revision)
+         VALUES ('pg-growth', 'guild', 11, 1)`,
+      );
+      const holderPid = Number(
+        (await holder.query('SELECT pg_catalog.pg_backend_pid() AS pid')).rows[0].pid,
+      );
+      // The accumulator row is written, but the deferred enforcement has not
+      // run: the singleton carries NO lock from this transaction, which is the
+      // whole point of applying the budget at COMMIT rather than per statement.
+      expect(
+        (
+          await pool.query(
+            `SELECT locktype, mode FROM pg_catalog.pg_locks
+              WHERE pid = $1
+                AND relation = '"${AGGREGATE_SCHEMA}".bank_ledger_growth_budget'::pg_catalog.regclass`,
+            [holderPid],
+          )
+        ).rows,
+      ).toEqual([]);
+
+      // A rival audit writer commits straight through while that transaction
+      // is still open.
+      await rival.query('BEGIN');
+      await rival.query(
+        `INSERT INTO "${AGGREGATE_SCHEMA}".bank_ledger (character_id, item_id)
+         VALUES (2, 'rival_writer')`,
+      );
+      await rival.query('COMMIT');
+      await holder.query('COMMIT');
+    } finally {
+      await holder.query('ROLLBACK').catch(() => {});
+      await rival.query('ROLLBACK').catch(() => {});
+      holder.release();
+      rival.release();
+    }
+    expect(
+      Number(
+        (
+          await pool.query(
+            `SELECT committed_rows FROM "${AGGREGATE_SCHEMA}".bank_ledger_growth_budget`,
+          )
+        ).rows[0].committed_rows,
+      ),
+    ).toBe(2);
+  });
+
+  it('fails boot when a source-journal trigger is dropped or replaced', async () => {
+    const schemaSql = growth.bankLedgerGrowthBudgetSchema(AGGREGATE_SCHEMA);
+    await pool.query(
+      `DROP TRIGGER material_source_journal_growth_budget_insert
+         ON "${AGGREGATE_SCHEMA}".material_source_journal`,
+    );
+    await expect(pool.query(schemaSql)).rejects.toThrow(/missing an enforcement trigger/);
+    await pool.query(
+      `CREATE TRIGGER material_source_journal_growth_budget_insert
+       AFTER INSERT ON "${AGGREGATE_SCHEMA}".material_source_journal
+       REFERENCING NEW TABLE AS inserted_material_source_journal_rows
+       FOR EACH STATEMENT
+       EXECUTE FUNCTION "${AGGREGATE_SCHEMA}".accumulate_material_source_journal_growth_budget()`,
+    );
+    await expect(pool.query(schemaSql)).resolves.toBeDefined();
+
+    // A named-but-altered trigger is reported rather than silently replaced.
+    await pool.query(
+      `DROP TRIGGER material_source_journal_growth_budget_delete
+         ON "${AGGREGATE_SCHEMA}".material_source_journal;
+       CREATE TRIGGER material_source_journal_growth_budget_delete
+       AFTER DELETE ON "${AGGREGATE_SCHEMA}".material_source_journal
+       REFERENCING OLD TABLE AS deleted_material_source_journal_rows
+       FOR EACH STATEMENT
+       WHEN (FALSE)
+       EXECUTE FUNCTION "${AGGREGATE_SCHEMA}".accumulate_material_source_journal_growth_budget()`,
+    );
+    await expect(pool.query(schemaSql)).rejects.toThrow(
+      /material_source_journal_growth_budget_delete has an unsafe definition/,
+    );
+    await pool.query(
+      `DROP TRIGGER material_source_journal_growth_budget_delete
+         ON "${AGGREGATE_SCHEMA}".material_source_journal;
+       CREATE TRIGGER material_source_journal_growth_budget_delete
+       AFTER DELETE ON "${AGGREGATE_SCHEMA}".material_source_journal
+       REFERENCING OLD TABLE AS deleted_material_source_journal_rows
+       FOR EACH STATEMENT
+       EXECUTE FUNCTION "${AGGREGATE_SCHEMA}".accumulate_material_source_journal_growth_budget()`,
+    );
+    await expect(pool.query(schemaSql)).resolves.toBeDefined();
+
+    // A database whose source journal has not been created yet is named, not
+    // left to fail on a bare regclass cast.
+    const missing = 'bank_ledger_growth_missing_source_pg_test';
+    await pool.query(`DROP SCHEMA IF EXISTS "${missing}" CASCADE`);
+    await pool.query(`CREATE SCHEMA "${missing}"`);
+    await pool.query(`CREATE TABLE "${missing}".bank_ledger (id BIGSERIAL PRIMARY KEY)`);
+    await expect(pool.query(growth.bankLedgerGrowthBudgetSchema(missing))).rejects.toThrow(
+      /requires material_source_journal to exist first/,
+    );
+    await pool.query(`DROP SCHEMA "${missing}" CASCADE`);
   });
 
   it('applies the storage parameters to both budget tables', async () => {
@@ -658,6 +1332,7 @@ d('bank ledger durable growth budget against real PostgreSQL', () => {
     // fillfactor an earlier build set), and the budget table predates any
     // storage parameters.
     await pool.query(`CREATE TABLE "${schema}".bank_ledger (id BIGSERIAL PRIMARY KEY)`);
+    await pool.query(sourceFixtureSql(schema, null));
     await pool.query(
       `CREATE TABLE "${schema}".bank_ledger_growth_pending (
          transaction_id xid8 PRIMARY KEY,
@@ -739,6 +1414,7 @@ d('bank ledger durable growth budget against real PostgreSQL', () => {
     await pool.query(
       `CREATE TABLE "${CONFIG_DRIFT_SCHEMA}".bank_ledger (id BIGSERIAL PRIMARY KEY)`,
     );
+    await pool.query(sourceFixtureSql(CONFIG_DRIFT_SCHEMA, null));
     await pool.query(growth.bankLedgerGrowthBudgetSchema(CONFIG_DRIFT_SCHEMA));
     await pool.query(`INSERT INTO "${CONFIG_DRIFT_SCHEMA}".bank_ledger DEFAULT VALUES`);
 
@@ -784,6 +1460,7 @@ d('bank ledger durable growth budget against real PostgreSQL', () => {
       id BIGSERIAL PRIMARY KEY,
       item_id TEXT NOT NULL
     )`);
+    await pool.query(sourceFixtureSql(MULTI_STATEMENT_SCHEMA, null));
     await pool.query(growth.bankLedgerGrowthBudgetSchema(MULTI_STATEMENT_SCHEMA));
 
     const admitted = await pool.connect();
@@ -898,6 +1575,7 @@ d('bank ledger durable growth budget against real PostgreSQL', () => {
       id BIGSERIAL PRIMARY KEY,
       item_id TEXT NOT NULL
     )`);
+    await pool.query(sourceFixtureSql(BOOTSTRAP_RACE_SCHEMA, null));
     const writer = await pool.connect();
     const bootstrap = await pool.connect();
     try {

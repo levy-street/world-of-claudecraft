@@ -89,7 +89,7 @@ type _PerfectingKeysAreNew = AssertNever<
 >;
 
 describe('wire compatibility epoch', () => {
-  it('fences every pre-masterwrought epoch out at the epoch-26 handshake', () => {
+  it('fences older item formats out at the epoch-27 handshake', () => {
     // The runtime epoch pin: the world handshake version that fences older
     // snapshot shapes out before any snapshot is admitted. The three frozen
     // fixtures above carry the per-epoch rationale: bank storage (10) added
@@ -99,9 +99,10 @@ describe('wire compatibility epoch', () => {
     // ladder moved release/v0.41.0 from 11 to 25 (src/world_api.ts) before
     // this branch merged it, so masterwrought sits one past that tip; any
     // epoch at or above 11 keeps the bank and vault fences.
-    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(26);
+    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(27);
     expect(ONLINE_WORLD_AUTH_TYPE).toBe(`auth-world-${ONLINE_WORLD_LAYOUT_VERSION}`);
-    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-26');
+    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-27');
+    expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-26');
     expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-25');
     expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-11');
     expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-10');

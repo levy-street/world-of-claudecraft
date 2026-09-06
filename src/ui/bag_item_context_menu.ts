@@ -17,11 +17,14 @@
 
 import { ENCHANTS } from '../sim/content/enchants';
 import { isItemLocked } from '../sim/item_lock';
+import { isMaterialItemId } from '../sim/material_ids';
+import type { MaterialComposition } from '../sim/material_sources';
 import { isDisenchantable, isEnchantedInstance } from '../sim/professions/enchanting';
 import { isSalvageable } from '../sim/professions/salvage';
 import { isSunderable } from '../sim/professions/sundering';
 import type { ItemDef, ItemInstancePayload } from '../sim/types';
 import type { TranslationKey } from './i18n.catalog';
+import { separableMaterialSources } from './material_sources_view';
 
 // Every item id that appears in ANY enchant's reagent list: the Apply Enchant
 // action is offered on these (an enchant reagent the flow can spend). Derived
@@ -42,7 +45,11 @@ export type BagItemNewActionId =
   | 'sunder'
   | 'applyEnchant'
   | 'lock'
-  | 'unlock';
+  | 'unlock'
+  | 'viewSources'
+  | 'separateByGatherer'
+  | 'takeChosenQuantity'
+  | 'combine';
 export type BagItemContextActionId = 'default' | 'sellAll' | BagItemNewActionId;
 
 export interface BagItemContextAction {
@@ -60,6 +67,10 @@ const NEW_ACTION_LABEL_KEY: Record<BagItemNewActionId, TranslationKey> = {
   applyEnchant: 'hudChrome.itemMenu.applyEnchant',
   lock: 'hudChrome.bags.lockItem',
   unlock: 'hudChrome.bags.unlockItem',
+  viewSources: 'hudChrome.itemMenu.viewSources',
+  separateByGatherer: 'hudChrome.itemMenu.separateByGatherer',
+  takeChosenQuantity: 'hudChrome.itemMenu.takeChosenQuantity',
+  combine: 'hudChrome.itemMenu.combine',
 };
 
 /** The classic left-click verb for the default (first) menu row, so the menu's
@@ -87,12 +98,22 @@ export function bagItemNewActions(
   def: ItemDef,
   itemId: string,
   instance?: ItemInstancePayload,
+  materialSources?: MaterialComposition,
+  includeMaterialActions = false,
 ): BagItemNewActionId[] {
   const out: BagItemNewActionId[] = [];
   if (isDisenchantable(def)) out.push('disenchant');
   if (isSalvageable(def) && !isItemLocked(instance)) out.push('salvage');
   if (isSunderable(def)) out.push('sunder');
   if (isEnchantReagentItem(itemId)) out.push('applyEnchant');
+  if (includeMaterialActions && isMaterialItemId(itemId)) {
+    if (materialSources !== undefined && materialSources.length > 0) {
+      out.push('viewSources');
+      if (separableMaterialSources(materialSources)) out.push('separateByGatherer');
+      out.push('takeChosenQuantity');
+    }
+    out.push('combine');
+  }
   out.push(isItemLocked(instance) ? 'unlock' : 'lock');
   return out;
 }
@@ -104,8 +125,12 @@ export function bagItemHasContextActions(
   def: ItemDef,
   itemId: string,
   instance?: ItemInstancePayload,
+  materialSources?: MaterialComposition,
+  includeMaterialActions = false,
 ): boolean {
-  return bagItemNewActions(def, itemId, instance).length > 0;
+  return (
+    bagItemNewActions(def, itemId, instance, materialSources, includeMaterialActions).length > 0
+  );
 }
 
 /** The full ordered menu: the classic default row first (so left-click's binding
@@ -114,9 +139,17 @@ export function bagItemContextActions(
   def: ItemDef,
   itemId: string,
   instance?: ItemInstancePayload,
+  materialSources?: MaterialComposition,
+  includeMaterialActions = false,
 ): BagItemContextAction[] {
   const rows: BagItemContextAction[] = [{ id: 'default', labelKey: defaultActionLabelKey(def) }];
-  for (const id of bagItemNewActions(def, itemId, instance)) {
+  for (const id of bagItemNewActions(
+    def,
+    itemId,
+    instance,
+    materialSources,
+    includeMaterialActions,
+  )) {
     rows.push({ id, labelKey: NEW_ACTION_LABEL_KEY[id] });
   }
   return rows;

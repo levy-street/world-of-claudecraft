@@ -1,4 +1,4 @@
-// Phase 16 item 4: the character-blob growth bound
+// Phase 16 item 4: the gear-heavy character-blob growth bound
 // (docs/design/professions-tuning-packet-review.md). Builds the WORST-CASE
 // professions blob (every field at its plausible ceiling: all live nodes on
 // cooldown, every recipe known, every craft and gathering skill capped, all
@@ -9,7 +9,7 @@
 // entry caps that make the growth model linear-in-content rather than
 // unbounded-per-player.
 //
-// The bound protects the save path: at 1,000 online the server writes every
+// The gear-heavy bound protects the save path: at 1,000 online the server writes every
 // blob whole every 30 s (no dirty tracking), so professions bytes multiply
 // straight into autosave write volume. The two content-scaled fields grow at
 // roughly 26 bytes per authored node (nodeHarvestCooldowns) and 29 bytes per
@@ -50,6 +50,7 @@ import { defaultBuild, MAX_LOADOUTS, SAVED_LOADOUT_BAR_SLOTS } from '../src/sim/
 import { ALL_RECIPES, DELVES, DUNGEONS, ITEMS, QUESTS } from '../src/sim/data';
 import { VISITED_MARK_NAMESPACES } from '../src/sim/deeds';
 import { MASTERWROUGHT_LEGENDARY_CAP } from '../src/sim/equipment_rules';
+import type { MaterialComposition } from '../src/sim/material_sources';
 import {
   VAULT_UPGRADE_RUNGS,
   vaultCapacityPerMaterial,
@@ -145,6 +146,7 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
   // that enters the blob outside the serializer.
   'jail',
   'contentRevision',
+  'materialGathererIdentity',
   'level',
   'xp',
   'lifetimeXp',
@@ -1631,7 +1633,142 @@ function maximalCharacterSim(): Sim {
   return sim;
 }
 
-describe('the whole-character maximal blob (Phase 18 U-MEASURE)', () => {
+type MaterialSourceCase = 'representative' | 'varied' | 'premium-per-unit';
+const MATERIAL_SOURCE_CASES: readonly MaterialSourceCase[] = [
+  'representative',
+  'varied',
+  'premium-per-unit',
+];
+
+function measuredMaterialComposition(
+  units: number,
+  shape: MaterialSourceCase,
+  cursor: { value: number },
+): MaterialComposition {
+  if (shape === 'representative') {
+    return [
+      { source: { gatherer: { kind: 'character', id: 4242, name: 'Aeliana' } }, count: units },
+    ];
+  }
+  if (shape === 'varied') {
+    const counts = Array.from(
+      { length: 5 },
+      (_, index) => Math.floor(units / 5) + (index < units % 5 ? 1 : 0),
+    );
+    return counts
+      .filter((count) => count > 0)
+      .map((count, index) => ({
+        source: {
+          gatherer: {
+            kind: 'character' as const,
+            id: 2_147_483_647 - index,
+            name: `Gatherer${index}`.padEnd(16, 'x'),
+          },
+        },
+        count,
+      }));
+  }
+  return Array.from({ length: units }, () => {
+    const id = 2_147_483_647 - cursor.value++;
+    return {
+      source: {
+        gatherer: { kind: 'character' as const, id, name: 'P'.repeat(16) },
+        signer: 'S'.repeat(16),
+      },
+      count: 1,
+    };
+  });
+}
+
+function applyMeasuredMaterialCase(sim: Sim, shape: MaterialSourceCase): void {
+  const meta = sim.players.get(sim.playerId) as PlayerMeta;
+  const cursor = { value: 0 };
+  const materialIds = [...vaultMaterialIds()];
+  const materialId = materialIds[0] ?? Object.keys(ITEMS)[0];
+  if (!materialId) throw new Error('no material id available for source matrix');
+  const materialBag = Object.values(ITEMS).find(
+    (item) => item.kind === 'bag' && item.materialsOnly === true && item.bagSlots === 24,
+  );
+  if (!materialBag) throw new Error('24-slot material bag missing from live catalog');
+  const stack = (units: number) => ({
+    itemId: materialId,
+    count: units,
+    materialSources: measuredMaterialComposition(units, shape, cursor),
+  });
+  meta.bags = Array.from({ length: BAG_SOCKETS }, () => materialBag.id);
+  meta.inventory = Array.from({ length: bagCapacity(meta.bags) }, () => stack(20));
+  const bankSlots = BANK_BASE_SLOTS + BANK_PURCHASED_SLOTS_MAX + BANK_MAX_BONUS_SLOTS;
+  meta.bank.inventory = Array.from({ length: bankSlots + BANK_BAG_SOCKETS * 24 }, () => stack(20));
+  meta.vault.stock = {};
+  meta.vault.special = materialIds.map((id) => ({ ...stack(200), itemId: id }));
+  meta.vendorBuyback = Array.from({ length: 12 }, () => stack(20));
+}
+
+function sourceCount(state: CharacterState): number {
+  const keys = new Set<string>();
+  const add = (slot: InvSlot): void => {
+    for (const row of slot.materialSources ?? []) keys.add(JSON.stringify(row.source));
+  };
+  for (const slot of state.inventory ?? []) add(slot);
+  for (const slot of state.bank?.inventory ?? []) add(slot);
+  for (const slot of state.vendorBuyback ?? []) add(slot);
+  for (const slot of state.vault?.special ?? []) add(slot);
+  return keys.size;
+}
+
+function materialSourceBytes(state: CharacterState): number {
+  return Buffer.byteLength(JSON.stringify(state), 'utf8');
+}
+
+// This matrix measures source-bearing occupancy separately from the existing
+// gear-heavy band. Its rows describe legal source compositions, not a universal
+// maximum or an expected production occupancy.
+describe('whole-character material source composition matrix', () => {
+  it('measures representative and maximal source shapes with conservation', () => {
+    for (const shape of MATERIAL_SOURCE_CASES) {
+      const sim = maximalCharacterSim();
+      applyMeasuredMaterialCase(sim, shape);
+      const first = sim.serializeCharacter(sim.playerId) as CharacterState;
+      const secondSim = makeSim(52, CEILING_EPOCH_MS);
+      const secondPid = secondSim.addPlayer('warrior', `Matrix-${shape}`, { state: first });
+      const second = secondSim.serializeCharacter(secondPid) as CharacterState;
+      const thirdSim = makeSim(53, CEILING_EPOCH_MS);
+      const thirdPid = thirdSim.addPlayer('warrior', `Matrix-${shape}-again`, { state: second });
+      const third = thirdSim.serializeCharacter(thirdPid) as CharacterState;
+
+      expect(third).toEqual(second);
+      expect(second.inventory).toHaveLength(112);
+      expect(second.bank?.inventory).toHaveLength(208);
+      expect(second.vendorBuyback).toHaveLength(12);
+      expect(second.vault?.special).toHaveLength(vaultMaterialIds().size);
+      expect(second.vault?.stock).toEqual({});
+      expect(second.inventory.every((slot) => slot.count === 20)).toBe(true);
+      expect(second.bank?.inventory.every((slot) => slot.count === 20)).toBe(true);
+      expect(second.vault?.special?.every((slot) => slot.count === 200)).toBe(true);
+
+      const expectedSources =
+        shape === 'representative'
+          ? 1
+          : shape === 'varied'
+            ? 5
+            : 112 * 20 + 208 * 20 + 12 * 20 + vaultMaterialIds().size * 200;
+      expect(sourceCount(second)).toBe(expectedSources);
+      process.stdout.write(
+        `[professions-blob-material-sources] ${JSON.stringify({
+          label: shape,
+          compactJSONBytes: materialSourceBytes(second),
+          sources: sourceCount(second),
+          warningBytes: CHARACTER_BLOB_WARN_BYTES,
+          relationToWarning:
+            materialSourceBytes(second) < CHARACTER_BLOB_WARN_BYTES ? 'below' : 'at-or-above',
+          physicalUnits: 112 * 20 + 208 * 20 + 12 * 20 + vaultMaterialIds().size * 200,
+        })}\n`,
+      );
+    }
+  });
+});
+
+describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () => {
   it('settles to a fixed point with every container at its legal ceiling, inside the band', () => {
     const sim = maximalCharacterSim();
     const s1 = sim.serializeCharacter(sim.playerId) as CharacterState;

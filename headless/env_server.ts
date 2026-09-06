@@ -16,6 +16,7 @@ import type { TalentAllocation } from '../src/sim/content/talents';
 import { ACTIONS, applyAction, encodeObs, NUM_ACTIONS, obsSize } from '../src/sim/obs';
 import { type RewardCounters, Sim } from '../src/sim/sim';
 import { ALL_CLASSES, MAX_LEVEL, type PlayerClass } from '../src/sim/types';
+import { allocateHeadlessGathererIdentity } from './gatherer_identity';
 import {
   MAX_INPUT_LINE_LENGTH,
   parseTalentResetRequest,
@@ -95,6 +96,11 @@ class Env {
       respawnSeconds: this.config.respawnSeconds,
       autoEquip: true,
       idleMobTickRadius: 80,
+      // Allocated by the HOST, once per episode, before the world exists. The
+      // sim receives a finished value and derives nothing, so this episode
+      // replays identically while two episodes (even at one seed) never share a
+      // gatherer record.
+      gathererIdentity: allocateHeadlessGathererIdentity(),
     });
     if (playerLevel !== 1) this.sim.setPlayerLevel(playerLevel);
     if (talents && !this.sim.applyTalents(talents)) throw new Error('invalid talents');

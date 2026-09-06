@@ -8596,4 +8596,9 @@
     touch-action: auto;
     cursor: auto;
   }
+
+  body.mobile-touch .material-sources-dialog {
+    width: min(460px, calc(var(--app-vw, 100vw) / var(--ui-scale, 1) - 20px));
+    max-height: calc(var(--app-vh, 100dvh) / var(--ui-scale, 1) - 20px);
+  }
 }

@@ -84,6 +84,12 @@ import {
   marketCollectBadgeCount,
   marketFilterMenus,
 } from './market_view';
+import {
+  appendMaterialSourcesActionAfter,
+  attachMaterialSourcesContextMenu,
+  closeMaterialSourcesDialogForOwner,
+} from './material_sources_dialog';
+import { materialSourcesForDisplay } from './material_sources_view';
 import type { PainterHostPresentation } from './painter_host';
 import { svgIcon } from './ui_icons';
 import { wornItemCellParts } from './worn_item_cell_view';
@@ -219,11 +225,13 @@ export class MarketWindow {
 
   close(): void {
     if (!this.opened) return;
+    const root = this.deps.root();
+    closeMaterialSourcesDialogForOwner(root);
     this.opened = false;
     this.sellItemId = null;
     this.sellInstance = null;
     this.pushSellPriceCheck();
-    this.deps.root().style.display = 'none';
+    root.style.display = 'none';
     this.deps.hideTooltip();
     document.body.classList.remove('market-open');
     this.deps.syncBags(false);
@@ -796,6 +804,7 @@ export class MarketWindow {
       const row = document.createElement('div');
       row.className = 'mkt-row';
       const itemName = parts.name;
+      const displayedSources = materialSourcesForDisplay(l);
       const each =
         l.count > 1
           ? `<br><span class="seller">${esc(t('itemUi.market.each', { money: formatLocalizedMoney(Math.ceil(l.price / l.count)) }))}</span>`
@@ -857,8 +866,23 @@ export class MarketWindow {
         else this.promptBuy(l, itemName);
       });
       row.appendChild(btn);
-      this.deps.attachTooltip(row, () => this.deps.itemTooltip(item, l.instance));
+      // A bulk material listing states WHOSE units are in it: the buyer is
+      // agreeing to those exact contributors, and the listing carries them
+      // (world_api/market.ts MarketListingView.materialSources).
+      this.deps.attachTooltip(row, () => this.deps.itemTooltip(item, l.instance, displayedSources));
+      attachMaterialSourcesContextMenu(
+        row,
+        itemName,
+        displayedSources,
+        this.deps.openMaterialSources,
+      );
       list.appendChild(row);
+      appendMaterialSourcesActionAfter(
+        row,
+        itemName,
+        displayedSources,
+        this.deps.openMaterialSources,
+      );
     }
     if (page.pageCount > 1) {
       const pager = document.createElement('div');

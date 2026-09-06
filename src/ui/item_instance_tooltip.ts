@@ -11,6 +11,8 @@
 // is reading the tooltip for.
 import { ENCHANTS } from '../sim/content/enchants';
 import { effectiveQuality } from '../sim/equipment_rules';
+import { requiredLevelFor } from '../sim/item_level_req';
+import type { MaterialComposition } from '../sim/material_sources';
 import { isCommissionEligibleKind } from '../sim/professions/commission';
 import { isEnchantedInstance } from '../sim/professions/enchanting';
 import { LEGENDARY_PROMOTION_COST, PERFECTING_RANKS } from '../sim/professions/perfecting';
@@ -18,10 +20,15 @@ import type { ItemDef, ItemInstancePayload, Stats } from '../sim/types';
 import { durationText } from './duration_text';
 import { esc } from './esc';
 import { MASTERWORK_SEAL_IMAGE_URL } from './hud/professions/profession_art';
-import { formatNumber, type TranslationKey, t } from './i18n';
+import { formatMoney, formatNumber, type TranslationKey, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
 import { ITEM_QUALITY_LABEL_KEYS } from './item_kind_label';
 import { itemNameColor } from './item_name_color';
+import {
+  boundedMaterialSourceRows,
+  materialSourceSummary,
+  suppressesLegacyGatheredLine,
+} from './material_sources_view';
 import { svgIcon } from './ui_icons';
 
 const ITEM_STAT_LABEL_KEYS: Partial<Record<keyof Stats, TranslationKey>> = {
@@ -352,13 +359,90 @@ export function isGatheredProvenance(def: ItemDef | undefined): boolean {
   );
 }
 
+/** The per-unit provenance rows for a material stack (the model is the pure
+ *  leaf material_sources_view.ts; this only renders it). One line per
+ *  descriptor, in the composition's canonical order, each stating the surviving
+ *  unit count and who is recorded for it. Names are historic display-name
+ *  SNAPSHOTS carried on the stack, esc'd raw like every other player-authored
+ *  string here: nothing is looked up, so no profile read or account data can
+ *  reach a tooltip.
+ *
+ *  A row that also carries a premium signature says so on its own line rather
+ *  than in a separate marker, so the benefit lands on exactly the units that
+ *  hold it. Legacy signer-only stock has no recorded gatherer at all and reads
+ *  that way, naming the signer as the signer: it never claims someone gathered
+ *  those units, and a recorded gatherer never claims the signature's crafting
+ *  benefit.
+ *
+ *  Renders nothing for a stack with no composition, which is every
+ *  non-material item and every legacy stack that predates provenance. */
+export function materialSourceLines(sources?: MaterialComposition): string {
+  const summary = materialSourceSummary(sources);
+  if (summary === null) return '';
+  const bounded = boundedMaterialSourceRows(summary);
+  if (bounded === null) return '';
+  let html = '';
+  for (const row of bounded.rows) {
+    const count = itemNumber(row.count);
+    const key: TranslationKey =
+      row.kind === 'gatherer'
+        ? row.premium
+          ? 'hudChrome.itemTooltip.materialSourceGathererSigned'
+          : 'hudChrome.itemTooltip.materialSourceGatherer'
+        : row.premium
+          ? 'hudChrome.itemTooltip.materialSourceUnrecordedSigned'
+          : 'hudChrome.itemTooltip.materialSourceUnrecorded';
+    html += `<div class="tt-sub tt-material-source" style="color:${QUALITY_COLOR.uncommon}">${esc(
+      t(key, { count, name: row.name, signer: row.signer }),
+    )}</div>`;
+  }
+  if (bounded.hiddenSources > 0) {
+    html += `<div class="tt-sub tt-material-source-more" style="color:${QUALITY_COLOR.uncommon}">${esc(
+      t('hudChrome.itemTooltip.materialSourceMore', {
+        sources: itemNumber(bounded.hiddenSources),
+        units: itemNumber(bounded.hiddenUnits),
+      }),
+    )}</div>`;
+  }
+  return html;
+}
+
+/** Complete material provenance block for the shared item-card painter. */
+export function materialMakersMarkLines(
+  item: ItemDef,
+  instance?: ItemInstancePayload,
+  sources?: MaterialComposition,
+): string {
+  const summary = materialSourceSummary(sources);
+  return (
+    materialSourceLines(sources) +
+    (suppressesLegacyGatheredLine(summary) ? '' : instanceMakersMarkLine(instance, item))
+  );
+}
+
+/** The vendor price line only when the live sell command accepts this def. */
+export function vendorSellTooltipLine(item: ItemDef): string {
+  if (item.sellValue <= 0 || item.noVendorSell || item.soulbound) return '';
+  return `<div class="tt-sub">${esc(
+    t('itemUi.tooltip.sellPrice', { money: formatMoney(item.sellValue) }),
+  )}</div>`;
+}
+
+/** The classic weapon/armor level gate line for the shared item card. */
+export function itemRequiredLevelLine(item: ItemDef, playerLevel: number): string {
+  const req = requiredLevelFor(item);
+  if ((item.kind !== 'weapon' && item.kind !== 'armor') || req <= 1) return '';
+  return `<div class="${playerLevel >= req ? 'tt-sub' : 'tt-red'}">${esc(
+    t('hudChrome.itemTooltip.requiresLevel', { level: itemNumber(req) }),
+  )}</div>`;
+}
+
 /** The classic "Crafted by X" flavor line for a signed copy, or "Gathered by
- *  X" when the item reads as a gathered material. No
- *  payload change: the same eqi signer field feeds both wordings. Legacy
- *  signed instances (signer without the masterwork flag) render the mark
- *  alone. Takes the DEF rather than the bare kind since masterwrought Phase
- *  11k, because the crafted-placeable carve-out above cannot be decided from
- *  the kind alone. */
+ *  X" when the item reads as a gathered material. No payload change: the same
+ *  eqi signer field feeds both wordings. Legacy signed instances (signer
+ *  without the masterwork flag) render the mark alone. Takes the DEF rather
+ *  than the bare kind since the crafted-placeable carve-out above cannot be
+ *  decided from the kind alone. */
 export function instanceMakersMarkLine(instance?: ItemInstancePayload, def?: ItemDef): string {
   if (!instance?.signer) return '';
   if (isGatheredProvenance(def)) {

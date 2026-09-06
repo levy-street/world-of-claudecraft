@@ -110,7 +110,7 @@ describe('guide harvest-family prose derives from the live harvest maps', () => 
 
   it('specimenBodyFamilies counts and names exactly the specimen-less families', () => {
     const m = matchOrFail(
-      /the other (\w+), (.+?), sign the yield itself\./,
+      /[Tt]he other (\w+), (.+?), sign the yield itself\./,
       guideStrings.profPages.specimenBodyFamilies,
       'the specimen-less arm reads "the other N, a, b, ..., sign the yield itself."',
     );

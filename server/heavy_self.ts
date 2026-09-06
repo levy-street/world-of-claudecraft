@@ -6,6 +6,8 @@
 export const HEAVY_SELF_CMDS = new Set<string>([
   'equip',
   'inv_move', // rewrites the inventory array order: the self snapshot must resend it
+  'material_separate',
+  'material_combine',
   'inv_sort', // consolidates stacks + restamps cell hints: the self snapshot must resend it
   'unequip_item',
   // salvage_item is deliberately ABSENT since the Craft Cast System: the

@@ -33,6 +33,15 @@
 // qr-19-qprofintro-overflow-grant; the resulting over-capacity bag is visible,
 // since the bag counter paints used over capacity.
 //
+// An honest MATERIAL takes a second path through this module, in both
+// directions: grants (countFit/addStacked, and canAddItem/canGrantCopies/
+// canGrantItemInstance/fitsAll routed through them) answer from
+// material_stack_packing.ts, and spends (removeStacked/consumeOneScratch) from
+// material_inventory_take.ts. So differently signed and unrecorded units share
+// real stack room, every landed stack carries its exact per-source composition,
+// and spending takes unrecorded material before premium. Membership is the
+// material_ids.ts registry; non-materials keep the legacy paths unchanged.
+//
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/
 // Date.now (enforced by tests/architecture.test.ts). This module draws NO rng.
 
@@ -44,7 +53,17 @@ import {
   selectedInventorySlot,
 } from './item_copy_ref';
 import { canStackInstancePayloads, isMergeableInstancePayload } from './item_instance_merge';
-import { isMaterialItemId } from './material_ids';
+import { isMaterialItemId, materialItemIds } from './material_ids';
+import {
+  applyMaterialInventoryTake,
+  type MaterialTakePlan,
+  planMaterialInventoryTake,
+  soleTakenSource,
+} from './material_inventory_take';
+import { materialSourceUnitPayload } from './material_inventory_units';
+import type { MaterialComposition, MaterialSource } from './material_sources';
+import type { MaterialStackSlot } from './material_stack';
+import { materialStackFit, planMaterialStackAdd } from './material_stack_packing';
 import type { SimContext } from './sim_context';
 import {
   cloneItemInstancePayload,
@@ -113,6 +132,40 @@ export function bagCapacity(bags: readonly (string | null)[]): number {
   return totalPoolCapacity(bagPools(bags));
 }
 
+// --- The material arm -------------------------------------------------------
+// The two shared leaves own every rule; this module only adapts them to the
+// bags signatures. Membership comes from the existing registry, never a second
+// classification, and the legacy paths below stay byte for byte for everything
+// that is not a material.
+
+/** Dev-channel only, never player-visible: a caller handed the bags material
+ *  data the shared model refuses to read. Thrown BEFORE any slot is written. */
+const MATERIAL_GRANT_REFUSED = 'bags: material stack packing refused the grant';
+const MATERIAL_TAKE_REFUSED = 'bags: material inventory take refused the spend';
+
+/** True when this operation is the material arm's business. A non-positive
+ *  count stays on the legacy path so its established result (a zero fit, the
+ *  `true` its all-or-nothing wrappers answer, a no-op removal) is unchanged. */
+const isMaterialOperation = (itemId: string, count: number): boolean =>
+  count > 0 && isMaterialItemId(itemId);
+
+/** The incoming stack, assembled from the identity arguments a caller already
+ *  passes. Absent fields stay absent: an explicitly `undefined` payload must
+ *  not read as a present-but-empty one. */
+function materialIncoming(
+  itemId: string,
+  count: number,
+  instance?: ItemInstancePayload,
+  craftedRecipeId?: string,
+  materialSources?: MaterialComposition,
+): MaterialStackSlot {
+  const slot: MaterialStackSlot = { itemId, count };
+  if (instance !== undefined) slot.instance = instance;
+  if (craftedRecipeId !== undefined) slot.craftedRecipeId = craftedRecipeId;
+  if (materialSources !== undefined) slot.materialSources = materialSources;
+  return slot;
+}
+
 /** How many of `count` copies of an item would fit: existing stacks absorb up
  *  to their stackSize, then each free slot holds one fresh stack. `instance`
  *  is the payload of the copies being added (absent for a plain fungible
@@ -123,7 +176,11 @@ export function bagCapacity(bags: readonly (string | null)[]): number {
  *  still occupies a slot in the used count. Topping up an existing stack
  *  occupies no new slot, so it is pool-blind; only FRESH stacks consult the
  *  two-pool free-slot math (a non-material may only take general headroom, a
- *  material takes materials headroom first, bag_pools.ts freePoolSlots). */
+ *  material takes materials headroom first, bag_pools.ts freePoolSlots).
+ *
+ *  A MATERIAL takes the arm above instead: the same free-slot budget, but the
+ *  top-up decision and the cap come from the packing leaf, and a refusal
+ *  answers 0 rather than falling back to a source-blind read. */
 export function countFit(
   inventory: readonly InvSlot[],
   pools: PoolCapacity,
@@ -131,9 +188,25 @@ export function countFit(
   count: number,
   instance?: ItemInstancePayload,
   craftedRecipeId?: string,
+  materialSources?: MaterialComposition,
 ): number {
   const def = ITEMS[itemId];
   const stack = stackSizeOf(def);
+  const freeSlots = freePoolSlots(inventory, pools, itemId, isMaterialItemId);
+  if (isMaterialOperation(itemId, count)) {
+    // Materials answer through the shared packing core, so differently signed
+    // and unrecorded units share the room they really have, a separated block
+    // is never a target, and malformed provenance refuses rather than reading
+    // as unrecorded stock. Fresh slots still come from the same pool math.
+    const fit = materialStackFit({
+      inventory,
+      incoming: materialIncoming(itemId, count, instance, craftedRecipeId, materialSources),
+      materialIds: materialItemIds(),
+      stackSize: stack,
+      maxNewSlots: freeSlots,
+    });
+    return fit.ok ? fit.value : 0;
+  }
   let room = 0;
   for (const s of inventory) {
     if (
@@ -145,7 +218,6 @@ export function countFit(
       room += stack - s.count;
     }
   }
-  const freeSlots = freePoolSlots(inventory, pools, itemId, isMaterialItemId);
   // A non-mergeable payload (charges) keeps one-per-slot semantics, so each
   // fresh slot absorbs exactly one copy instead of a full stack.
   const perFreshSlot = instance && !isMergeableInstancePayload(instance) ? 1 : stack;
@@ -174,8 +246,9 @@ export function canGrantItemInstance(
   itemId: string,
   instance: ItemInstancePayload,
   count = 1,
+  materialSources?: MaterialComposition,
 ): boolean {
-  return countFit(inventory, pools, itemId, count, instance) >= count;
+  return countFit(inventory, pools, itemId, count, instance, undefined, materialSources) >= count;
 }
 
 /** True when all `count` copies fit. */
@@ -184,8 +257,9 @@ export function canAddItem(
   pools: PoolCapacity,
   itemId: string,
   count: number,
+  materialSources?: MaterialComposition,
 ): boolean {
-  return countFit(inventory, pools, itemId, count) >= count;
+  return countFit(inventory, pools, itemId, count, undefined, undefined, materialSources) >= count;
 }
 
 /** The ONE capacity check the exchange pipes share (market buy/cancel/collect,
@@ -205,12 +279,17 @@ export function canGrantCopies(
   count: number,
   instance?: ItemInstancePayload,
   craftedRecipeId?: string,
+  materialSources?: MaterialComposition,
 ): boolean {
-  return countFit(inventory, pools, itemId, count, instance, craftedRecipeId) >= count;
+  return (
+    countFit(inventory, pools, itemId, count, instance, craftedRecipeId, materialSources) >= count
+  );
 }
 
 /** True when EVERY add in the batch fits together (simulated cumulatively on a
- *  scratch copy, so three 1-slot items against one free slot correctly fail). */
+ *  scratch copy, so three 1-slot items against one free slot correctly fail).
+ *  Each add's own `materialSources` is threaded into BOTH the check and the
+ *  scratch add, so the batch models the sources it would really land. */
 export function fitsAll(
   inventory: readonly InvSlot[],
   pools: PoolCapacity,
@@ -218,9 +297,17 @@ export function fitsAll(
 ): boolean {
   const scratch = inventory.map((s) => ({ ...s }));
   for (const a of adds) {
-    if (countFit(scratch, pools, a.itemId, a.count, a.instance, a.craftedRecipeId) < a.count)
-      return false;
-    addStacked(scratch, a.itemId, a.count, a.instance, a.craftedRecipeId);
+    const fit = countFit(
+      scratch,
+      pools,
+      a.itemId,
+      a.count,
+      a.instance,
+      a.craftedRecipeId,
+      a.materialSources,
+    );
+    if (fit < a.count) return false;
+    addStacked(scratch, a.itemId, a.count, a.instance, a.craftedRecipeId, a.materialSources);
   }
   return true;
 }
@@ -263,9 +350,15 @@ export function addStacked(
   count: number,
   instance?: ItemInstancePayload,
   craftedRecipeId?: string,
+  materialSources?: MaterialComposition,
 ): void {
   const def = ITEMS[itemId];
   const stack = stackSizeOf(def);
+  if (isMaterialOperation(itemId, count)) {
+    const incoming = materialIncoming(itemId, count, instance, craftedRecipeId, materialSources);
+    addMaterialStacked(inventory, incoming, stack);
+    return;
+  }
   let remaining = count;
   for (const s of inventory) {
     if (remaining <= 0) return;
@@ -294,6 +387,34 @@ export function addStacked(
   }
 }
 
+/** The material arm of addStacked: plan the WHOLE grant through the packing
+ *  core, then apply it. `maxNewSlots` is the requested count (one unit per slot
+ *  is the worst case), so the UNCAPPED-grant contract is unchanged: capacity
+ *  stays a caller pre-check and the plan can never run short of slots. Every
+ *  topped-up stack is REPLACED by the planned slot, which is what carries the
+ *  exact merged composition; a legacy signer on the incoming payload has
+ *  already projected losslessly into its own bucket by then. */
+function addMaterialStacked(
+  inventory: InvSlot[],
+  incoming: MaterialStackSlot,
+  stackSize: number,
+): void {
+  const plan = planMaterialStackAdd({
+    inventory,
+    incoming,
+    materialIds: materialItemIds(),
+    stackSize,
+    maxNewSlots: incoming.count,
+  });
+  // Refused before a single write: a half-applied plan would strand units, and
+  // packing around provenance this model cannot read would launder it.
+  if (!plan.ok) throw new Error(MATERIAL_GRANT_REFUSED);
+  for (const replacement of plan.value.replacements) {
+    inventory[replacement.index] = replacement.slot;
+  }
+  for (const fresh of plan.value.appended) inventory.push(fresh);
+}
+
 /** Units of `itemId` a scratch inventory holds, instanced slots included: the
  *  read half of removeStacked below, for a capacity simulation that has to
  *  decide HOW MUCH it can take from the scratch copy before taking it (the
@@ -309,8 +430,13 @@ export function countStacked(inventory: readonly InvSlot[], itemId: string): num
  *  instanced slots included, exactly like removeItem), for capacity simulations
  *  on a scratch copy whose live path removes with removeItem (the trade swap,
  *  craft/enchant reagents). The quest turn-in gate instead models its
- *  prefer-plain hand-in with consumeOneScratch below. */
+ *  prefer-plain hand-in with consumeOneScratch below. A MATERIAL routes through
+ *  the shared take planner instead (removeMaterialStacked). */
 export function removeStacked(inventory: InvSlot[], itemId: string, count: number): void {
+  if (isMaterialOperation(itemId, count)) {
+    removeMaterialStacked(inventory, itemId, count);
+    return;
+  }
   let remaining = count;
   for (let i = inventory.length - 1; i >= 0 && remaining > 0; i--) {
     const s = inventory[i];
@@ -320,6 +446,24 @@ export function removeStacked(inventory: InvSlot[], itemId: string, count: numbe
     remaining -= take;
     if (s.count <= 0) inventory.splice(i, 1);
   }
+}
+
+/** The material arm of removeStacked: the shared planner picks the units
+ *  (unrecorded before premium, across every unlocked stack), and the legacy
+ *  take-what-is-there semantics survive as `allowPartial`, so a short
+ *  inventory still spends what it has instead of refusing. Locked copies are
+ *  now preserved rather than spent, which the legacy end-first walk did not
+ *  distinguish. */
+function removeMaterialStacked(inventory: InvSlot[], itemId: string, count: number): void {
+  const plan = planMaterialInventoryTake({
+    inventory,
+    itemId,
+    count,
+    materialIds: materialItemIds(),
+    allowPartial: true,
+  });
+  if (!plan.ok) throw new Error(MATERIAL_TAKE_REFUSED);
+  applyMaterialInventoryTake(inventory, plan.value);
 }
 
 /** Scratch mirror of the sim's preferential single-copy removers, for
@@ -341,12 +485,17 @@ export function removeStacked(inventory: InvSlot[], itemId: string, count: numbe
  *  victim slot's payload (undefined for a plain victim or no victim at all)
  *  so a transform command can model the grant it mints FROM the consumed
  *  copy. A capacity pre-check must model the removal identically to the
- *  remover it gates, or the guard re-opens the overflow class (#2139). */
+ *  remover it gates, or the guard re-opens the overflow class (#2139).
+ *
+ *  A MATERIAL does NOT take these three passes: it ranks by the canonical
+ *  source order instead, with `excludeInstance` judged per unit on its
+ *  effective payload (consumeOneMaterialScratch says why). */
 export function consumeOneScratch(
   scratch: InvSlot[],
   itemId: string,
   excludeInstance?: (instance: ItemInstancePayload) => boolean,
 ): ItemInstancePayload | undefined {
+  if (isMaterialItemId(itemId)) return consumeOneMaterialScratch(scratch, itemId, excludeInstance);
   const passes: ((s: InvSlot) => boolean)[] = [
     (s) => !s.instance,
     (s) => !!s.instance && !excludeInstance?.(s.instance),
@@ -363,6 +512,68 @@ export function consumeOneScratch(
     }
   }
   return undefined;
+}
+
+/**
+ * The material arm of consumeOneScratch. Materials rank by ONE canonical order:
+ * the shared source order over every eligible unlocked bucket. Whether a stack
+ * still carries a payload is deliberately NOT a priority here, unlike the legacy
+ * three-pass walk above: after load and grant changed how a unit's provenance is
+ * represented, a plain unrecorded unit can sit in a payload-bearing stack beside
+ * a canonical block of premium, and the raw plain-slot-first walk would burn the
+ * premium unit first.
+ *
+ * `excludeInstance` still applies, one pass earlier than the fallback and judged
+ * per UNIT on its EFFECTIVE payload (the exclusion cannot see a descriptor's
+ * signer otherwise). A unit with no effective payload is never excludable, which
+ * is what the legacy `!!s.instance` guard meant. Only when nothing else is left
+ * does the fallback pass reach the excluded units, preserving the old
+ * excluded-last intent.
+ */
+function consumeOneMaterialScratch(
+  scratch: InvSlot[],
+  itemId: string,
+  excludeInstance?: (instance: ItemInstancePayload) => boolean,
+): ItemInstancePayload | undefined {
+  const preferred =
+    excludeInstance === undefined
+      ? undefined
+      : (source: MaterialSource, slot: MaterialStackSlot): boolean => {
+          const effective = materialSourceUnitPayload(slot, source);
+          return effective === undefined || !excludeInstance(effective);
+        };
+  // The single unfiltered pass is always last, and is the ONLY pass when the
+  // caller excludes nothing.
+  const passes = preferred === undefined ? [undefined] : [preferred, undefined];
+  for (const eligibleSource of passes) {
+    const plan = planMaterialInventoryTake({
+      inventory: scratch,
+      itemId,
+      count: 1,
+      materialIds: materialItemIds(),
+      eligibleSource,
+    });
+    if (!plan.ok) {
+      if (plan.error === 'insufficient') continue;
+      throw new Error(MATERIAL_TAKE_REFUSED);
+    }
+    applyMaterialInventoryTake(scratch, plan.value);
+    return spentUnitPayload(plan.value);
+  }
+  return undefined;
+}
+
+/** The consumed unit in the shape the pre-source removers reported, which the
+ *  transform commands and the crafted-attribution reads still expect: the
+ *  EFFECTIVE payload of the unit actually taken, its descriptor's legacy signer
+ *  included. A gatherer alone was never a payload field and never becomes one,
+ *  so provenance cannot leak in as a premium signature. The remaining stack
+ *  keeps its canonical composition. */
+function spentUnitPayload(plan: MaterialTakePlan): ItemInstancePayload | undefined {
+  const taken = plan.taken[0];
+  const source = soleTakenSource(plan);
+  if (taken === undefined || source === undefined) return undefined;
+  return materialSourceUnitPayload(taken, source);
 }
 
 /** The standard full-bags rejection, shared by every capacity-gated command. */

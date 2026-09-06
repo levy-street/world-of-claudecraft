@@ -27,6 +27,12 @@ function structurallyEqual(a: unknown, b: unknown): boolean {
   const keysB = Object.keys(rb).filter((k) => rb[k] !== undefined);
   if (keysA.length !== keysB.length) return false;
   for (const k of keysA) {
+    // The other side must OWN the key: a bare `rb[k]` read goes through the
+    // prototype, so a JSON-parsed own '__proto__' key would compare against
+    // Object.prototype, whose own enumerable keys are none, and wrongly match an
+    // empty object. Only defined own keys reach here, so absent-equals-undefined
+    // is untouched.
+    if (!Object.hasOwn(rb, k)) return false;
     if (!structurallyEqual(ra[k], rb[k])) return false;
   }
   return true;

@@ -31,6 +31,8 @@
 
 import { canStackInstancePayloads, isMergeableInstancePayload } from './item_instance_merge';
 import type { Quality } from './loot_master';
+import { materialItemIds } from './material_ids';
+import { consolidateMaterialStacks } from './material_stack_grouping';
 import { baseMaterialFor } from './professions/material_grades';
 import { ALL_EQUIP_SLOTS, type InvSlot, type ItemDef, type ItemKind } from './types';
 
@@ -183,8 +185,17 @@ export function consolidateBagStacks(
   lookup: ItemDefLookup,
   stackCap: (def: ItemDef | undefined) => number,
 ): void {
+  const materialIds = materialItemIds();
+  const materialResult = consolidateMaterialStacks(inventory, materialIds, (itemId) =>
+    stackCap(lookup(itemId)),
+  );
+  // Source validation and consolidation completed without touching the input.
+  // Assign by index to keep legacy over-capacity arrays safe from spread limits.
+  inventory.length = materialResult.length;
+  for (let i = 0; i < materialResult.length; i++) inventory[i] = materialResult[i];
   for (let i = 0; i < inventory.length; i++) {
     const target = inventory[i];
+    if (materialIds.has(target.itemId)) continue;
     // A corrupt persisted count (non-positive, fractional, or non-finite) is
     // INERT on both sides of a merge: as a target it would absorb honest
     // units into its deficit (10 poured into a -3 leaves 7, three real items

@@ -14307,6 +14307,8 @@ const RULES: Rule[] = [
 
 // Returns the localized form of a sim-emitted message, or null if not one of ours.
 export function localizeSimText(text: string): string | null {
+  if (text === 'That material selection is no longer available.')
+    return t('hudChrome.materialStackSelectionUnavailable');
   const exactKey = EXACT[text];
   if (exactKey) return tSim(exactKey);
   for (const rule of RULES) {

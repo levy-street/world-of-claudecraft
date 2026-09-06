@@ -455,7 +455,10 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // moved): the specimen now lands on attempt index 5.
     expect(hitAt).toBe(5);
     const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
-    expect(specimen?.instance?.signer).toBe(meta.name);
+    // The signature rides materialSources, not instance.signer (the two are
+    // mutually exclusive; corpse_harvest_grant.test.ts / corpse_harvest_sim.test.ts
+    // pin the same shape for a signed specimen grant).
+    expect(specimen?.materialSources).toEqual([{ source: { signer: meta.name }, count: 1 }]);
     expect(meta.deedStats.visited.has('gather_event:perfect_specimen')).toBe(true);
     // Reliquary field-note trophy reuses the same gather_event:* id.
     expect(meta.reliquary.marks.has('gather_event:perfect_specimen')).toBe(true);

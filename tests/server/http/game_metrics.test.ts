@@ -10,7 +10,10 @@
 
 import { Registry } from 'prom-client';
 import { describe, expect, it, vi } from 'vitest';
-import { observeBankLedgerGrowthBudget } from '../../../server/bank_ledger_growth_budget';
+import {
+  observeBankLedgerGrowthBudget,
+  observeBankLedgerGrowthBytes,
+} from '../../../server/bank_ledger_growth_budget';
 import { COPPER_FLOW_SOURCES, HARVEST_BANDS, NODE_TIERS } from '../../../server/economy_telemetry';
 import {
   FISHING_BANDS,
@@ -212,6 +215,9 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
 
     expect(measureValues(text, WOC_BANK_LEDGER_GROWTH_BUDGET)).toEqual({
       hard_limit_rows: '10000000',
+      accounted_rows: '0',
+      bytes_known: '0',
+      total_bytes: '0',
       initialized: '0',
       limit_warning: '0',
       observation_age_seconds: '0',
@@ -280,6 +286,7 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
 
   it('exports the fixed durable ledger limit and last database observation', async () => {
     observeBankLedgerGrowthBudget(123, 10_000_000, Date.now() - 2_000);
+    observeBankLedgerGrowthBytes('65536');
     const registry = new Registry();
     registerGameStateMetrics(registry, stubSource());
     const text = await registry.metrics();
@@ -290,15 +297,32 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
         'initialized',
         'limit_warning',
         'observation_age_seconds',
+        'accounted_rows',
         'lifetime_inserted_rows',
+        'total_bytes',
+        'bytes_known',
       ]),
     );
+    // The honest name and the retained compatibility alias carry the SAME
+    // value: the counter is the aggregate audit rows currently accounted for,
+    // and the alias exists only so deployed dashboards and alerts keep working
+    // until they move over.
+    expect(
+      sampleValue(text, /^woc_bank_ledger_growth_budget\{measure="accounted_rows"\} (\d+)$/m),
+    ).toBe('123');
     expect(
       sampleValue(
         text,
         /^woc_bank_ledger_growth_budget\{measure="lifetime_inserted_rows"\} (\d+)$/m,
       ),
     ).toBe('123');
+    // Bytes ride the same readout, aggregate over the audit tables.
+    expect(
+      sampleValue(text, /^woc_bank_ledger_growth_budget\{measure="total_bytes"\} (\d+)$/m),
+    ).toBe('65536');
+    expect(
+      sampleValue(text, /^woc_bank_ledger_growth_budget\{measure="bytes_known"\} (\d+)$/m),
+    ).toBe('1');
     // 123 of 10,000,000 is far under the warn fraction.
     expect(
       sampleValue(text, /^woc_bank_ledger_growth_budget\{measure="limit_warning"\} (\d+)$/m),
@@ -774,15 +798,17 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
     expect(sampleValue(text, /^woc_sim_tick_hz (\d+)$/m)).toBe('0');
   });
 
-  // LAST in this describe on purpose: the budget readout is module-global and
-  // monotonic, so observing 9,000,000 here would pin every earlier
-  // lifetime_inserted_rows assertion at this value if it ran first.
+  // LAST in this describe on purpose: the budget readout is module-global, so
+  // observing 9,000,000 here would carry into every earlier assertion.
   it('flips limit_warning to 1 when the observation crosses the warn fraction', async () => {
     expect(observeBankLedgerGrowthBudget(9_000_000, 10_000_000, Date.now())).toBe(true);
     const registry = new Registry();
     registerGameStateMetrics(registry, stubSource());
     const text = await registry.metrics();
 
+    expect(
+      sampleValue(text, /^woc_bank_ledger_growth_budget\{measure="accounted_rows"\} (\d+)$/m),
+    ).toBe('9000000');
     expect(
       sampleValue(
         text,
@@ -794,6 +820,18 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
     expect(
       sampleValue(text, /^woc_bank_ledger_growth_budget\{measure="limit_warning"\} (\d+)$/m),
     ).toBe('1');
+
+    // The counter is net, not a lifetime tally: an owner cascade reaps audit
+    // rows and the gauge must come back DOWN with them, clearing the warning.
+    // A value-monotonic gauge would have stayed paged at the high-water mark.
+    expect(observeBankLedgerGrowthBudget(1_000_000, 10_000_000, Date.now())).toBe(true);
+    const after = await registry.metrics();
+    expect(
+      sampleValue(after, /^woc_bank_ledger_growth_budget\{measure="accounted_rows"\} (\d+)$/m),
+    ).toBe('1000000');
+    expect(
+      sampleValue(after, /^woc_bank_ledger_growth_budget\{measure="limit_warning"\} (\d+)$/m),
+    ).toBe('0');
   });
 });
 

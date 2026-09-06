@@ -326,6 +326,7 @@ export const ko_KR: EnTranslations = {
     }
   },
   "hudChrome": {
+    "materialStackSelectionUnavailable": "해당 재료 선택을 더 이상 사용할 수 없습니다.",
     "warlock": {
       "doomLabel": "단죄",
       "fateThreadsLabel": "운명의 실타래",
@@ -3047,7 +3048,33 @@ export const ko_KR: EnTranslations = {
       "enchantedFallback": "마법부여됨",
       "partyTradeWindow": "앞으로 {time} 동안 이 아이템을 같은 전리품을 함께 획득한 플레이어와 거래할 수 있습니다. 착용하면 거래 기간이 끝납니다.",
       "perfectedBadge": "완전해짐",
-      "perfectingRank": "완전화: {ranks}단계 중 {rank}단계"
+      "perfectingRank": "완전화: {ranks}단계 중 {rank}단계",
+      "materialSourceGatherer": "{count} × {name} 채집",
+      "materialSourceGathererSigned": "{count} × {name} 채집, {signer} 서명",
+      "materialSourceUnrecorded": "{count} × 채집자 기록 없음",
+      "materialSourceUnrecordedSigned": "{count} × 채집자 기록 없음, {name} 서명",
+      "materialSourceMore": "그 외 출처 {sources}개, 총 {units}개"
+    },
+    "materialSources": {
+      "detailsTitle": "{item} 출처",
+      "pickerTitle": "{item}에서 출처 선택",
+      "close": "재료 출처 닫기",
+      "view": "출처",
+      "choose": "출처",
+      "viewAria": "{item}의 모든 재료 출처 보기",
+      "chooseAria": "{item}에서 옮길 재료 출처 선택",
+      "cancel": "취소",
+      "confirm": "선택한 수량 옮기기",
+      "listAria": "재료 출처 목록",
+      "total": "이 묶음에 총 {units}개",
+      "row": "{count}개: {source}",
+      "gatherer": "{name} 채집",
+      "gathererSigned": "{name} 채집, {signer} 서명",
+      "unrecorded": "채집자 기록 없음",
+      "unrecordedSigned": "채집자 기록 없음, {name} 서명",
+      "quantityAria": "{source} 출처 수량, 최대 {count}개",
+      "decreaseAria": "{source} 출처 수량 줄이기",
+      "increaseAria": "{source} 출처 수량 늘리기"
     },
     "materialHint": {
       "fineGrade": "상급 등급입니다. 해당 재료보다 높은 등급의 도구로 만렙 채집지에서 캐낸 것이며, 일반 등급이 필요한 곳 어디에서나 대신 사용됩니다.",
@@ -4058,7 +4085,11 @@ export const ko_KR: EnTranslations = {
       "applyEnchant": "마법부여 적용",
       "sunder": "가르기",
       "sell": "판매",
-      "sellAll": "모두 판매 ({count})"
+      "sellAll": "모두 판매 ({count})",
+      "viewSources": "출처 보기",
+      "separateByGatherer": "채집자별 분리",
+      "takeChosenQuantity": "지정 수량 꺼내기",
+      "combine": "재료 묶음 합치기"
     },
     "enchanting": {
       "disenchantedLine": "{item}의 마력을 추출했습니다.",

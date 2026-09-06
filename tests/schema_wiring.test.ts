@@ -13,6 +13,7 @@ const h = vi.hoisted(() => {
   // can flip it to null to exercise the throw; every other query returns empty rows
   // (the existing assertions only inspect `calls`, so they are unaffected).
   const state = {
+    announcesWriterCapability: true,
     rateLimitsExists: true,
     invalidMetricsIndexExists: false,
     failOpenIndexCreate: false,
@@ -89,6 +90,16 @@ const h = vi.hoisted(() => {
         rowCount: 1,
       });
     }
+    // The material-source writer capability probe. Boot REFUSES unless every
+    // connection it writes through announces this binary's version, so the fake
+    // answers as a migrated connection does; a flag lets a case drive the
+    // refusal arm instead of leaving it unexercised.
+    if (String(sql).includes('woc.material_source_writer')) {
+      return Promise.resolve({
+        rows: [{ capability: state.announcesWriterCapability ? '1' : null }],
+        rowCount: 1,
+      });
+    }
     return Promise.resolve({ rows: [], rowCount: 0 });
   });
   return {
@@ -157,6 +168,7 @@ const emptyMarket: MarketSave = { listings: [], collections: [], nextListingId: 
 describe('ensureSchema wires every schema module at boot', () => {
   beforeEach(() => {
     h.calls.length = 0;
+    h.state.announcesWriterCapability = true;
     h.state.rateLimitsExists = true;
     h.state.invalidMetricsIndexExists = false;
     h.state.failOpenIndexCreate = false;
@@ -259,6 +271,72 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(ddl).toContain('CREATE INDEX IF NOT EXISTS unstuck_reports_created');
     expect(ddl).toContain('ON DELETE SET NULL');
     expect(ddl).not.toMatch(/\b(?:DROP|TRUNCATE|ALTER COLUMN)\b/i);
+  });
+
+  it('applies the material source audit storage after characters and before the growth budget', async () => {
+    // Ordering is the whole claim. It FK-references characters(id), so it cannot
+    // precede the core schema; and the aggregate audit-row budget installed by
+    // the growth-budget fragment has to be able to COUNT this table, so it
+    // cannot follow it. Same defined-but-unwired hazard as the DISCORD_SCHEMA
+    // lesson: deleting the ensureSchema line must fail here.
+    await ensureSchema();
+    const coreIndex = h.calls.findIndex((sql) =>
+      sql.includes('CREATE TABLE IF NOT EXISTS characters'),
+    );
+    const sourceIndex = h.calls.findIndex((sql) =>
+      sql.includes('CREATE TABLE IF NOT EXISTS material_source_containers'),
+    );
+    const budgetIndex = h.calls.findIndex((sql) => sql.includes('bank_ledger_growth_budget'));
+    expect(coreIndex).toBeGreaterThanOrEqual(0);
+    expect(sourceIndex).toBeGreaterThan(coreIndex);
+    expect(budgetIndex).toBeGreaterThan(sourceIndex);
+    const ddl = h.calls[sourceIndex];
+    expect(ddl).toContain('CREATE TABLE IF NOT EXISTS material_source_journal');
+    expect(ddl).toContain('REFERENCES characters(id) ON DELETE CASCADE');
+    expect(ddl).not.toMatch(/\b(?:DROP|TRUNCATE|ALTER COLUMN)\b/i);
+  });
+
+  it('installs the source writer guard on EVERY boot, after every table it guards', async () => {
+    // No switch and no cutover flag: this binary writes material compositions,
+    // so an un-migrated writer on the same rows is the defect the guard exists
+    // to prevent, and a floor that ships disarmed is not a floor. Ordering is
+    // the other half: a trigger cannot be created on a table that does not
+    // exist yet, so it must follow the last guarded table's DDL.
+    await ensureSchema();
+    const guardIndex = h.calls.findIndex((sql) =>
+      sql.includes('CREATE OR REPLACE TRIGGER woc_msw_guard_characters'),
+    );
+    expect(guardIndex).toBeGreaterThanOrEqual(0);
+    for (const guarded of [
+      'CREATE TABLE IF NOT EXISTS characters',
+      'CREATE TABLE IF NOT EXISTS world_state',
+      'CREATE TABLE IF NOT EXISTS bank_ledger',
+      'CREATE TABLE IF NOT EXISTS character_leases',
+      'CREATE TABLE IF NOT EXISTS guild_banks',
+      'CREATE TABLE IF NOT EXISTS mail_custody_parcels',
+      'CREATE TABLE IF NOT EXISTS woc_market_listings',
+    ]) {
+      const tableIndex = h.calls.findIndex((sql) => sql.includes(guarded));
+      expect(tableIndex, `${guarded} must be applied before the guard`).toBeGreaterThanOrEqual(0);
+      expect(tableIndex).toBeLessThan(guardIndex);
+    }
+    // And the capability probe runs BEFORE the guard it gates: a process that
+    // could not satisfy its own guard must refuse to boot, not install it.
+    const probeIndex = h.calls.findIndex((sql) => sql.includes('woc.material_source_writer'));
+    expect(probeIndex).toBeGreaterThanOrEqual(0);
+    expect(probeIndex).toBeLessThan(guardIndex);
+  });
+
+  it('REFUSES to boot when this process does not announce the writer capability', async () => {
+    // The unsafe startup: the composed startup option did not reach the server
+    // (a connection string that re-supplies its own `options` is the documented
+    // way), so this process would install a guard its own saves cannot satisfy.
+    // Boot fails, and the guard is never created.
+    h.state.announcesWriterCapability = false;
+    await expect(ensureSchema()).rejects.toThrow(/material source writer capability/);
+    const applied = h.calls.join('\n');
+    expect(applied).not.toContain('CREATE OR REPLACE TRIGGER woc_msw_guard_');
+    expect(h.calls).toContain('ROLLBACK');
   });
 
   it('disables the statement timeout for the boot transaction before the advisory lock', async () => {

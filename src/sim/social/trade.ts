@@ -28,6 +28,14 @@ import { partyTradeWindowAllows } from '../loot/bop_trade_window';
 import type { PlayerMeta, TradeSession } from '../sim';
 import type { SimContext } from '../sim_context';
 import { cloneItemInstancePayload, dist2d, type InvSlot, type ItemInstancePayload } from '../types';
+import {
+  carriersReadable,
+  mergedUnitSources,
+  pinnedOfferSources,
+  pinnedTradeUnits,
+  plainGrantBatches,
+  unitGrantCarriers,
+} from './trade_offer_sources';
 
 // A trade is only offered/kept while both parties are within this many yards;
 // the drift sweep cancels an open session once they wander past TRADE_RANGE + 4.
@@ -235,6 +243,12 @@ function stagedOfferSlots(
     ITEMS[itemId]?.soulbound === true,
   );
   const out: InvSlot[] = [];
+  // The units behind each emitted slot, so a material line can PIN the exact
+  // composition it offers. Units of one material stack share a canonical
+  // payload (the legacy signer now lives in the descriptor), so they group into
+  // ONE line whose buckets name every contributor: a mixed stack stays one
+  // selectable block instead of degenerating into a line per gatherer.
+  const grouped: VendorRemovedUnit[][] = [];
   const key = (instance: ItemInstancePayload | undefined, crafted: string | undefined): string =>
     itemCopyPin({
       itemId,
@@ -246,6 +260,7 @@ function stagedOfferSlots(
     const prev = out[out.length - 1];
     if (prev && key(prev.instance, prev.craftedRecipeId) === key(u.instance, u.craftedRecipeId)) {
       prev.count += 1;
+      grouped[grouped.length - 1].push(u);
       continue;
     }
     out.push({
@@ -254,6 +269,16 @@ function stagedOfferSlots(
       ...(u.instance === undefined ? {} : { instance: u.instance }),
       ...(u.craftedRecipeId === undefined ? {} : { craftedRecipeId: u.craftedRecipeId }),
     });
+    grouped.push([u]);
+  }
+  for (let i = 0; i < out.length; i++) {
+    const merged = mergedUnitSources(grouped[i]);
+    // A refusal means provenance this model cannot read. The line stays
+    // UNPINNED rather than being shown with invented sources, and the swap
+    // still cannot launder it: the source-aware removal validates every stack
+    // in scope and refuses the take. Failing loudly here instead would only
+    // move the same refusal earlier at the cost of a silent, sourceless offer.
+    if (merged.ok && merged.value !== undefined) out[i].materialSources = merged.value;
   }
   return out;
 }
@@ -501,6 +526,33 @@ function shippedOfferUnits(
     if (meta && inventory) {
       const skip = skipFor(s.itemId);
       const soulbound = ITEMS[s.itemId]?.soulbound === true;
+      // A SOURCE-PINNED line takes exactly the descriptors it staged, through
+      // the shared take core, all or nothing. This arm has NO generic
+      // fallback on purpose: the counterparty agreed to those units, and
+      // substituting another gatherer's is the provenance equivalent of
+      // swapping the copy. A refusal reports a pin miss, which tradeConfirm's
+      // close turns into a refused swap with both sides' goods still in place,
+      // so the giver's source budget survives a failed trade intact.
+      const pinned = pinnedOfferSources(s);
+      if (pinned !== undefined) {
+        // The pin carries the WHOLE staged identity, not just the descriptors:
+        // the same gatherer can sit behind two different payloads or crafted
+        // markers, and an item-plus-sources take would ship whichever stack it
+        // reached first. One call site, so staging, the accept-time re-pin, the
+        // capacity model and the live removal all pin identically.
+        const taken = pinnedTradeUnits({
+          inventory,
+          itemId: s.itemId,
+          sources: pinned,
+          instance: s.instance,
+          craftedRecipeId: s.craftedRecipeId,
+          skip,
+        });
+        if (taken === null) onPinMiss?.(s);
+        else units.push(...taken);
+        grants.push({ itemId: s.itemId, units });
+        continue;
+      }
       for (let unit = 0; unit < s.count; unit++) {
         const matched =
           s.instance !== undefined
@@ -581,15 +633,26 @@ function grantOffer(ctx: SimContext, grants: PendingGrant[], toPid: number): voi
     // separate stacks on arrival (bags.ts addStacked keys its merge on the
     // marker too), instead of one addItem call washing every plain unit's
     // provenance into whichever marker happened to be checked last.
-    const plainByRecipe = new Map<string | undefined, number>();
-    for (const unit of g.units) {
-      if (unit.instance) continue;
-      plainByRecipe.set(unit.craftedRecipeId, (plainByRecipe.get(unit.craftedRecipeId) ?? 0) + 1);
-    }
-    for (const [craftedRecipeId, count] of plainByRecipe) {
+    // Each batch carries its own COALESCED provenance, so a bulk material line
+    // arrives as one grant naming every contributor rather than as one grant
+    // per unit: the ordinary bulk trade route the program contract requires to
+    // survive attribution. A batch whose sources cannot be read is not shipped
+    // (plainGrantBatches refuses rather than laundering it).
+    // Batched when the grouping reads, per unit when it does not. NEVER an
+    // empty list: dropping a batch here would destroy units the giver has
+    // already lost, which is the one outcome a custody path must not have.
+    // tradeConfirm refuses on scratch long before this, so the per-unit arm is
+    // a floor, not a route anything is expected to take.
+    const batched = plainGrantBatches(g.units);
+    const batches = batched.ok ? batched.value : unitGrantCarriers(g.units);
+    for (const batch of batches) {
       // movement: the other player already held these, so the trade moves them
       // rather than sourcing them from the world (no Reliquary obtain count).
-      ctx.addItem(g.itemId, count, toPid, { craftedRecipeId, movement: true });
+      ctx.addItem(g.itemId, batch.count, toPid, {
+        craftedRecipeId: batch.craftedRecipeId,
+        materialSources: batch.materialSources,
+        movement: true,
+      });
     }
     for (const unit of g.units) {
       if (!unit.instance) continue;
@@ -604,8 +667,43 @@ function grantOffer(ctx: SimContext, grants: PendingGrant[], toPid: number): voi
         unit.instance.boundTo = toPid;
       }
       // movement: the instanced arm of the same handover (see the plain arm).
+      // A payload-bearing MATERIAL unit forwards its exact composition too: the
+      // canonical payload and the descriptor are two channels of one unit, and
+      // granting only the payload would drop the gatherer at the boundary.
       ctx.addItemInstance(g.itemId, unit.instance, toPid, 1, {
         craftedRecipeId: unit.craftedRecipeId,
+        materialSources: unit.materialSources,
+        movement: true,
+      });
+    }
+  }
+}
+
+/**
+ * Hands removed units straight back to the player they came from, conserving
+ * the exact sources: one carrier per unit, so no merge can refuse, and each
+ * carrier keeps its own composition and crafted marker verbatim.
+ *
+ * The room is available by construction (the giver freed exactly these units a
+ * moment ago and nothing has landed since), so this is a restore rather than a
+ * grant that can bounce. Instanced copies go back through the same per-copy arm
+ * grantOffer uses, minus the bind-on-trade stamp: a rolled-back trade never
+ * changed hands, so nothing may be marked as though it had.
+ */
+function restoreOffer(ctx: SimContext, grants: PendingGrant[], toPid: number): void {
+  for (const g of grants) {
+    for (const carrier of unitGrantCarriers(g.units)) {
+      ctx.addItem(g.itemId, carrier.count, toPid, {
+        craftedRecipeId: carrier.craftedRecipeId,
+        materialSources: carrier.materialSources,
+        movement: true,
+      });
+    }
+    for (const unit of g.units) {
+      if (!unit.instance) continue;
+      ctx.addItemInstance(g.itemId, unit.instance, toPid, 1, {
+        craftedRecipeId: unit.craftedRecipeId,
+        materialSources: unit.materialSources,
         movement: true,
       });
     }
@@ -660,9 +758,16 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
   // accepts cleared rather than closing: the offer on the table is stale, the
   // fix is to re-stage it, and a re-stage is a tradeSetOffer, which already
   // clears the accepts. Plain lines are not re-pinned (see onPinMiss).
+  //
+  // The SAME scratch run also answers the grant side's only refusal: whether
+  // every carrier the swap would hand over can be read back into a grant. That
+  // question used to be asked after the live removal, where a refusal had
+  // nowhere to put the units it was holding. Asking it here, on copies, is what
+  // makes an unreadable composition a refused trade with both inventories
+  // untouched instead of a dropped grant.
   const stagedCopiesStand = (giver: PlayerMeta, gives: InvSlot[], toPid: number): boolean => {
     let missed = false;
-    shippedOfferUnits(
+    const grants = shippedOfferUnits(
       ctx,
       gives,
       giver.entityId,
@@ -673,7 +778,8 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
         missed = true;
       },
     );
-    return !missed;
+    if (missed) return false;
+    return grants.every((g) => carriersReadable(g.itemId, g.units));
   };
   if (
     !stagedCopiesStand(metaA, session.offerA.items, session.b) ||
@@ -737,10 +843,17 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
           u.instance.boundTo === undefined
             ? { ...u.instance, boundTo: meta.entityId }
             : u.instance;
-        if (countFit(scratchOwn, pools, g.itemId, 1, arrival, u.craftedRecipeId) < 1) {
+        // The composition rides into BOTH the fit gate and the landing: a
+        // material unit merges by payload identity plus provenance, so a model
+        // that budgeted it source-blind would disagree with the real grant and
+        // re-open the receiver-overflow class in either direction.
+        if (
+          countFit(scratchOwn, pools, g.itemId, 1, arrival, u.craftedRecipeId, u.materialSources) <
+          1
+        ) {
           return false;
         }
-        addStacked(scratchOwn, g.itemId, 1, arrival, u.craftedRecipeId);
+        addStacked(scratchOwn, g.itemId, 1, arrival, u.craftedRecipeId, u.materialSources);
       }
     }
     return true;
@@ -754,11 +867,27 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
     closeTrade(ctx, session);
     return;
   }
-  // swap
-  metaA.copper = metaA.copper - session.offerA.copper + session.offerB.copper;
-  metaB.copper = metaB.copper - session.offerB.copper + session.offerA.copper;
+  // swap. BOTH removals run first (the shared-itemId ordering rule above), then
+  // the carriers are re-checked before a single unit lands and before any copper
+  // moves. The preflight on scratch already proved this, so a refusal here means
+  // the live bags disagreed with their own copies; the units are in hand, so
+  // they go straight back to the player who gave them, one carrier per unit
+  // (unitGrantCarriers cannot itself refuse), and the trade fails with both
+  // sides whole. Nothing is ever dropped to keep the swap moving.
   const grantsToB = removeOffer(ctx, session.offerA.items, session.a, session.b, nowMsFor);
   const grantsToA = removeOffer(ctx, session.offerB.items, session.b, session.a, nowMsFor);
+  const shippable = (grants: PendingGrant[]): boolean =>
+    grants.every((g) => carriersReadable(g.itemId, g.units));
+  if (!shippable(grantsToB) || !shippable(grantsToA)) {
+    restoreOffer(ctx, grantsToB, session.a);
+    restoreOffer(ctx, grantsToA, session.b);
+    for (const tPid of [session.a, session.b])
+      ctx.error(tPid, 'Trade failed: items or money no longer available.');
+    closeTrade(ctx, session);
+    return;
+  }
+  metaA.copper = metaA.copper - session.offerA.copper + session.offerB.copper;
+  metaB.copper = metaB.copper - session.offerB.copper + session.offerA.copper;
   grantOffer(ctx, grantsToB, session.b);
   grantOffer(ctx, grantsToA, session.a);
   for (const tPid of [session.a, session.b]) {

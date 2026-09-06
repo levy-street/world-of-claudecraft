@@ -61,6 +61,12 @@ import { formatMoney, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
 import { cornerMarkHtml, INSTANCE_GLYPH_ARIA_KEYS, lockMarkHtml } from './item_instance_glyph_mark';
 import { knownItemDef } from './known_item';
+import { guildMaterialWithdrawSelection } from './material_source_storage_actions';
+import {
+  appendMaterialSourcesActionAfter,
+  attachMaterialSourcesContextMenu,
+} from './material_sources_dialog';
+import { materialSourcesForDisplay } from './material_sources_view';
 import type { PainterHostPresentation } from './painter_host';
 import { tSim } from './sim_i18n';
 import { StorageRungEchoLatch } from './storage_rung_echo_core';
@@ -506,7 +512,25 @@ export class GuildBankTab {
     }
     // NO filter/sort layer and NO unknown-id drop: every slot renders at its
     // wire index, dormant ones visibly distinct (the carried-forward line).
-    for (const slot of model.slots) grid.appendChild(this.buildCell(slot, model.readOnly));
+    for (const slot of model.slots) {
+      const cell = this.buildCell(slot, model.readOnly);
+      const item = knownItemDef(ITEMS, slot.itemId);
+      const itemName = item ? itemDisplayName(item) : slot.itemId;
+      grid.appendChild(cell);
+      appendMaterialSourcesActionAfter(
+        cell,
+        itemName,
+        materialSourcesForDisplay(slot),
+        this.deps.openMaterialSources,
+        model.readOnly || slot.dormant
+          ? undefined
+          : guildMaterialWithdrawSelection(this.deps.world(), slot.itemId, slot.slotIndex, () => {
+              this.deps.hideTooltip();
+              this.deps.onInventoryChanged();
+              this.deps.requestRender();
+            }),
+      );
+    }
     for (let i = 0; i < model.emptyCells; i++) {
       const cell = document.createElement('div');
       cell.className = 'bank-item empty';
@@ -529,6 +553,7 @@ export class GuildBankTab {
     // the cell describes its copy the same way every other grid does.
     const parts = item ? wornItemCellParts(item, slot.instance) : null;
     const itemName = parts ? parts.name : t('hudChrome.bank.guildUnknownItem');
+    const displayedSources = materialSourcesForDisplay(slot);
     const count = this.fmt(slot.count);
     // Corner marks share the bags/personal-bank helpers and priority core
     // (bag_corner_mark_view.ts) so a guild-banked masterwork or fine stack
@@ -569,7 +594,7 @@ export class GuildBankTab {
                   ? `<div class="tt-sub">${esc(t('hudChrome.bank.withdrawPartialHint'))}</div>`
                   : ''
               }`;
-        return `${this.deps.itemTooltip(item, slot.instance)}${hint}`;
+        return `${this.deps.itemTooltip(item, slot.instance, displayedSources)}${hint}`;
       });
     } else {
       // Unknown id (a removed def): a recoverable dormant-shaped cell. The sim
@@ -597,6 +622,12 @@ export class GuildBankTab {
         }`;
       });
     }
+    attachMaterialSourcesContextMenu(
+      cell,
+      itemName,
+      displayedSources,
+      this.deps.openMaterialSources,
+    );
     // Dormant wording outranks every other announcement (the guild-permission
     // lock is the action fact); the player item lock (issue 3042) outranks
     // the per-copy glyph next, since "this copy is protected" is the most

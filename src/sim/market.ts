@@ -45,6 +45,16 @@ import {
   recordSale,
   sanitizeSaleLog,
 } from './market_sale_log';
+import { planPlainMaterialTransfer } from './material_exchange_transfer';
+import { applyMaterialInventoryTake } from './material_inventory_take';
+import { cloneMaterialData } from './material_payload_identity';
+import { rekeyMaterialSignature } from './material_signatures';
+import {
+  normalizeLoadedMaterialSlot,
+  preservesMaterialCountOnLoad,
+  validateMaterialSlotSourcesOnLoad,
+} from './material_slot_load';
+import type { MaterialComposition } from './material_sources';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import {
@@ -164,6 +174,7 @@ export interface MarketListing {
   // crafted item's provenance and reopens the disenchant anti-farming gate
   // (professions/enchanting.ts isCraftedDisenchantVictim).
   craftedRecipeId?: string;
+  materialSources?: MaterialComposition;
 }
 
 // Gold + items awaiting pickup at the Merchant (sale proceeds, expired
@@ -193,6 +204,7 @@ export interface MarketSave {
      *  on plain rows and on every pre-payload save, which load unchanged. */
     instance?: ItemInstancePayload;
     craftedRecipeId?: string;
+    materialSources?: MaterialComposition;
   }[];
   collections: {
     key: string;
@@ -417,11 +429,13 @@ export class Market {
         // would detach the original-crafter discount, or after a reclaim
         // name a stranger. Foreign signers are untouched (the accepted
         // craftedBy limitation).
+        if (rekeyMaterialSignature(listing, oldName, newName)) changed = true;
         if (rekeySigner(listing.instance, oldName, newName)) changed = true;
       }
     }
     const collection = this.marketCollections.get(key);
     for (const slot of collection?.items ?? []) {
+      if (rekeyMaterialSignature(slot, oldName, newName)) changed = true;
       if (rekeySigner(slot.instance, oldName, newName)) changed = true;
     }
     // In-place listing edits (sellerName/signer) that the length guard on the
@@ -601,6 +615,7 @@ export class Market {
     // item leaves the seller's bag (#2605 review: a dual-provenance stack
     // could otherwise push the seller over the listing cap, or price a
     // bucket at 0 copper and hand the item away for free).
+    const materialTransfer = planPlainMaterialTransfer(meta.inventory, itemId, want);
     const previewByRecipe = new Map<string | undefined, number>();
     let previewLeft = want;
     for (let i = meta.inventory.length - 1; i >= 0 && previewLeft > 0; i--) {
@@ -610,7 +625,7 @@ export class Market {
       previewByRecipe.set(s.craftedRecipeId, (previewByRecipe.get(s.craftedRecipeId) ?? 0) + take);
       previewLeft -= take;
     }
-    const bucketCountPreview = previewByRecipe.size;
+    const bucketCountPreview = materialTransfer?.rows.length ?? previewByRecipe.size;
     if (mine + bucketCountPreview > MARKET_MAX_LISTINGS) {
       this.ctx.error(
         meta.entityId,
@@ -622,14 +637,26 @@ export class Market {
       this.ctx.error(meta.entityId, 'Name a price of at least 1 copper.');
       return;
     }
-    const units = removeVendorSellUnits(this.ctx, itemId, want, meta.entityId, () => true);
-    const byRecipe = new Map<string | undefined, number>();
-    for (const unit of units) {
-      byRecipe.set(unit.craftedRecipeId, (byRecipe.get(unit.craftedRecipeId) ?? 0) + 1);
+    let buckets: InvSlot[];
+    if (materialTransfer) {
+      buckets = materialTransfer.rows;
+      applyMaterialInventoryTake(meta.inventory, materialTransfer.plan);
+      this.ctx.onInventoryChangedForQuests?.(meta);
+    } else {
+      const units = removeVendorSellUnits(this.ctx, itemId, want, meta.entityId, () => true);
+      const byRecipe = new Map<string | undefined, number>();
+      for (const unit of units) {
+        byRecipe.set(unit.craftedRecipeId, (byRecipe.get(unit.craftedRecipeId) ?? 0) + 1);
+      }
+      buckets = [...byRecipe].map(([craftedRecipeId, count]) => ({
+        itemId,
+        count,
+        ...(craftedRecipeId === undefined ? {} : { craftedRecipeId }),
+      }));
     }
-    const buckets = [...byRecipe.entries()];
     let priceLeft = ask;
-    buckets.forEach(([craftedRecipeId, bucketCount], i) => {
+    buckets.forEach((bucket, i) => {
+      const { craftedRecipeId, count: bucketCount } = bucket;
       const remainingBuckets = buckets.length - i;
       const bucketPrice =
         i === buckets.length - 1
@@ -651,6 +678,9 @@ export class Market {
         price: bucketPrice,
         expiresAt: this.ctx.time + MARKET_LISTING_DURATION,
         house: false,
+        ...(bucket.materialSources === undefined
+          ? {}
+          : { materialSources: bucket.materialSources }),
         ...(craftedRecipeId === undefined ? {} : { craftedRecipeId }),
       });
     });
@@ -727,7 +757,7 @@ export class Market {
       return;
     }
     const escrowed = removeMatchingInstance(this.ctx, itemId, instance, meta.entityId);
-    if (!escrowed?.instance) return; // revalidation raced away; nothing was removed
+    if (!escrowed) return;
     this.marketListings.push({
       id: this.nextListingId++,
       sellerKey,
@@ -737,7 +767,10 @@ export class Market {
       price: ask,
       expiresAt: this.ctx.time + MARKET_LISTING_DURATION,
       house: false,
-      instance: escrowed.instance,
+      ...(escrowed.instance === undefined ? {} : { instance: escrowed.instance }),
+      ...(escrowed.materialSources === undefined
+        ? {}
+        : { materialSources: escrowed.materialSources }),
       // An instanced row CAN also be crafted (a masterwork proc, an enchanted
       // crafted piece), so the marker rides alongside the payload rather than
       // being assumed absent here.
@@ -794,6 +827,7 @@ export class Market {
         listing.count,
         listing.instance,
         listing.craftedRecipeId,
+        listing.materialSources,
       )
     ) {
       this.ctx.error(meta.entityId, 'Your bags are full.');
@@ -807,6 +841,7 @@ export class Market {
       listing.count,
       listing.instance,
       listing.craftedRecipeId,
+      listing.materialSources,
     );
     if (!listing.house) {
       const proceeds = Math.max(0, Math.floor(listing.price * (1 - MARKET_CUT)));
@@ -868,6 +903,7 @@ export class Market {
         listing.count,
         listing.instance,
         listing.craftedRecipeId,
+        listing.materialSources,
       )
     ) {
       this.ctx.error(meta.entityId, 'Your bags are full.');
@@ -882,6 +918,7 @@ export class Market {
       listing.count,
       listing.instance,
       listing.craftedRecipeId,
+      listing.materialSources,
     );
     const def = ITEMS[listing.itemId];
     this.ctx.emit({
@@ -941,9 +978,18 @@ export class Market {
           s.count,
           s.instance,
           s.craftedRecipeId,
+          s.materialSources,
         )
       ) {
-        grantCopies(this.ctx, meta.entityId, s.itemId, s.count, s.instance, s.craftedRecipeId);
+        grantCopies(
+          this.ctx,
+          meta.entityId,
+          s.itemId,
+          s.count,
+          s.instance,
+          s.craftedRecipeId,
+          s.materialSources,
+        );
       } else {
         kept.push(s);
       }
@@ -977,6 +1023,9 @@ export class Market {
         count: l.count,
         ...(l.instance ? { instance: l.instance } : {}),
         ...(l.craftedRecipeId === undefined ? {} : { craftedRecipeId: l.craftedRecipeId }),
+        ...(l.materialSources === undefined
+          ? {}
+          : { materialSources: cloneMaterialData(l.materialSources) }),
       });
       const sellerMeta = this.metaByMarketSellerKey(l.sellerKey);
       if (sellerMeta) {
@@ -1052,6 +1101,9 @@ export class Market {
       // goods, so the full payload never crosses the wire. Conditional spread:
       // plain rows stay byte-identical (no `instance: undefined` key).
       ...(l.instance ? { instance: publicInstanceView(l.instance) } : {}),
+      ...(l.materialSources === undefined
+        ? {}
+        : { materialSources: cloneMaterialData(l.materialSources) }),
     }));
     const col = this.collectionForSeller(meta);
     const myListingCount = this.marketListings.reduce(
@@ -1124,6 +1176,9 @@ export class Market {
           // mutable rolled/charges maps. Conditional so plain rows are unchanged.
           ...(l.instance ? { instance: cloneItemInstancePayload(l.instance) } : {}),
           ...(l.craftedRecipeId === undefined ? {} : { craftedRecipeId: l.craftedRecipeId }),
+          ...(l.materialSources === undefined
+            ? {}
+            : { materialSources: cloneMaterialData(l.materialSources) }),
         })),
       collections: [...this.marketCollections.entries()].map(([key, c]) => ({
         key,
@@ -1142,6 +1197,10 @@ export class Market {
 
   loadMarket(save: MarketSave | null | undefined): void {
     if (!save) return;
+    for (const listing of save.listings ?? []) validateMaterialSlotSourcesOnLoad(listing);
+    for (const collection of save.collections ?? []) {
+      for (const slot of collection?.items ?? []) validateMaterialSlotSourcesOnLoad(slot);
+    }
     // Drop the rows that carry no item id at all BEFORE planning, so the plan
     // describes exactly what gets pushed: no planned id is burned on a row that
     // never lands, and `remapped` counts only reissues the book actually took.
@@ -1184,11 +1243,10 @@ export class Market {
       // granted into the buyer's live bags on purchase. A payload the bound
       // rejects whole leaves the listing as dormant plain data, the same
       // doctrine as an unknown item id.
-      // The single-copy clamp keys on the RAW row's instance, not the
-      // post-bound survivor: a payload the bound rejects whole must still
-      // load as count 1, or a tampered instanced row would launder its
-      // count through deliberately corrupt payload bytes (the round 5
-      // finder caught the clamp reading the bound's output).
+      // Any legacy instanced row without an explicit material composition keeps
+      // the raw single-copy safety clamp, even when payload sanitation accepts
+      // the instance. An explicit composition was already validated against its
+      // count above and must never be clipped during payload sanitation.
       const hadInstance = !!(l.instance && typeof l.instance === 'object');
       let instance: ItemInstancePayload | undefined;
       if (hadInstance && l.instance) {
@@ -1201,7 +1259,17 @@ export class Market {
         sellerKey: String(l.sellerKey ?? ''),
         sellerName: String(l.sellerName ?? l.sellerKey ?? '?'),
         itemId: l.itemId,
-        count: hadInstance ? 1 : Math.max(1, l.count | 0),
+        count:
+          l.materialSources === undefined && hadInstance
+            ? 1
+            : preservesMaterialCountOnLoad(l)
+              ? l.count
+              : hadInstance
+                ? 1
+                : Math.max(1, l.count | 0),
+        ...(l.materialSources === undefined
+          ? {}
+          : { materialSources: cloneMaterialData(l.materialSources) }),
         price: Math.max(
           MARKET_MIN_PRICE,
           Math.min(MARKET_MAX_PRICE, Math.floor(l.price) || MARKET_MIN_PRICE),
@@ -1223,7 +1291,9 @@ export class Market {
       // slot-level marker drop needs its own label to stay tellable apart
       // in the one aggregated book line.
       boundCraftedRecipeIdOnLoad(listing, escrowDrops, 'listingSlot');
-      this.marketListings.push(listing);
+      const normalized = normalizeLoadedMaterialSlot(listing);
+      const { instance: _legacyInstance, materialSources: _rawSources, ...rest } = listing;
+      this.marketListings.push({ ...rest, ...normalized });
     }
     for (const c of save.collections ?? []) {
       if (!c || typeof c.key !== 'string') continue;
@@ -1289,6 +1359,9 @@ export class Market {
         count: l.count,
         ...(l.instance ? { instance: l.instance } : {}),
         ...(l.craftedRecipeId === undefined ? {} : { craftedRecipeId: l.craftedRecipeId }),
+        ...(l.materialSources === undefined
+          ? {}
+          : { materialSources: cloneMaterialData(l.materialSources) }),
       });
     }
   }

@@ -18,6 +18,18 @@
 
 import { sanitizeItemInstancePayloadOnLoad } from './item_instance_load';
 import { itemInstancePayloadsEqual } from './item_instance_merge';
+import { isMaterialItemId, materialItemIds } from './material_ids';
+import { countMaterialInventoryForHub } from './material_inventory_hub';
+import { applyMaterialInventoryTake, planMaterialInventoryTake } from './material_inventory_take';
+import { materialInventoryUnits, materialSourceUnitPayload } from './material_inventory_units';
+import { cloneMaterialPayload } from './material_payload_identity';
+import {
+  normalizeLoadedMaterialSlot,
+  preservesMaterialCountOnLoad,
+  validateMaterialSlotSourcesOnLoad,
+} from './material_slot_load';
+import type { MaterialComposition } from './material_sources';
+import { normalizeMaterialStack } from './material_stack';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { isTransferLockedInstance } from './transfer_lock';
@@ -68,6 +80,14 @@ export function countMatchingUnlocked(
   itemId: string,
   instance: ItemInstancePayload,
 ): number {
+  if (isMaterialItemId(itemId)) {
+    return countMaterialInventoryForHub(
+      meta.inventory ?? [],
+      itemId,
+      (payload) =>
+        !isTransferLockedInstance(payload) && itemInstancePayloadsEqual(payload, instance),
+    );
+  }
   let n = 0;
   for (const s of meta.inventory ?? []) {
     if (s.itemId !== itemId || !s.instance) continue;
@@ -85,6 +105,17 @@ export function holdsMatchingLocked(
   itemId: string,
   instance: ItemInstancePayload,
 ): boolean {
+  if (isMaterialItemId(itemId)) {
+    return (meta.inventory ?? []).some((slot) => {
+      if (slot.itemId !== itemId) return false;
+      const read = normalizeMaterialStack(slot, materialItemIds());
+      if (!read.ok) throw new Error('invalid material source state in escrow selection');
+      return (read.value.materialSources ?? []).some(({ source }) => {
+        const payload = materialSourceUnitPayload(read.value, source);
+        return isTransferLockedInstance(payload) && itemInstancePayloadsEqual(payload, instance);
+      });
+    });
+  }
   for (const s of meta.inventory ?? []) {
     if (s.itemId !== itemId || !s.instance) continue;
     if (isTransferLockedInstance(s.instance) && itemInstancePayloadsEqual(s.instance, instance))
@@ -116,6 +147,26 @@ export function removeMatchingInstance(
   const { meta } = r;
   // `?? []`: same decoupled-test-ctx contract as the two counters above.
   const inventory = meta.inventory ?? [];
+  if (isMaterialItemId(itemId)) {
+    const plan = planMaterialInventoryTake({
+      inventory,
+      itemId,
+      count: 1,
+      materialIds: materialItemIds(),
+      eligibleSource: (source, slot) => {
+        const payload = materialSourceUnitPayload(slot, source);
+        return !isTransferLockedInstance(payload) && itemInstancePayloadsEqual(payload, instance);
+      },
+    });
+    if (!plan.ok) {
+      if (plan.error === 'insufficient') return null;
+      throw new Error('invalid material source state in escrow selection');
+    }
+    const [unit] = materialInventoryUnits(plan.value);
+    applyMaterialInventoryTake(inventory, plan.value);
+    ctx.onInventoryChangedForQuests?.(meta);
+    return unit;
+  }
   for (let i = inventory.length - 1; i >= 0; i--) {
     const s = inventory[i];
     if (s.itemId !== itemId || !s.instance) continue;
@@ -157,6 +208,7 @@ export function grantCopies(
   count: number,
   instance?: ItemInstancePayload,
   craftedRecipeId?: string,
+  materialSources?: MaterialComposition,
 ): void {
   // movement: every pipe that shares this grant hands over copies that already
   // existed in somebody's hands (a market purchase, a cancelled or collected
@@ -166,8 +218,14 @@ export function grantCopies(
     ctx.addItemInstance(itemId, cloneItemInstancePayload(instance), pid, count, {
       craftedRecipeId,
       movement: true,
+      ...(materialSources === undefined ? {} : { materialSources }),
     });
-  else ctx.addItem(itemId, count, pid, { craftedRecipeId, movement: true });
+  else
+    ctx.addItem(itemId, count, pid, {
+      craftedRecipeId,
+      movement: true,
+      ...(materialSources === undefined ? {} : { materialSources }),
+    });
 }
 
 /** Rebuild a persisted exchange-escrow slot (market collection item, mail
@@ -178,22 +236,23 @@ export function grantCopies(
  *  `cap` is instancedCountCap(def, instance) from bags.ts, passed in so this
  *  module stays free of the ITEMS table. */
 export function sanitizeEscrowSlot(raw: InvSlot, cap: number, dropped?: string[]): InvSlot {
-  const count = Math.min(Math.max(1, raw.count | 0), cap);
-  if (!raw.instance || typeof raw.instance !== 'object') {
-    return { itemId: raw.itemId, count };
+  validateMaterialSlotSourcesOnLoad(raw);
+  const count = preservesMaterialCountOnLoad(raw)
+    ? raw.count
+    : Math.min(Math.max(1, raw.count | 0), cap);
+  const out: InvSlot = {
+    itemId: raw.itemId,
+    count,
+    ...(raw.materialSources === undefined ? {} : { materialSources: raw.materialSources }),
+  };
+  if (raw.instance && typeof raw.instance === 'object') {
+    const clone =
+      raw.materialSources === undefined
+        ? cloneItemInstancePayload(raw.instance)
+        : cloneMaterialPayload(raw.instance);
+    const { payload, dropped: drops } = sanitizeItemInstancePayloadOnLoad(clone);
+    if (dropped) for (const d of drops) dropped.push(`${raw.itemId}.${d}`);
+    if (payload) out.instance = payload;
   }
-  // The SAME load-side payload bound the four character-blob containers take
-  // (item_instance_load.ts), on the clone this function owns: the phase 18
-  // whole-branch review found the two persisted escrow books (mail
-  // attachments, market listings and collections) were the only load arms
-  // outside it, and unlike a character blob these rows can persist forever
-  // with no later login to self-heal them. The bound also catches the
-  // clone-mangled array case (typeof [] is 'object', so the guard above
-  // passes an array into the spread, and the numeric-key arm drops the
-  // junk whole). `dropped` aggregates for the caller's one-per-book log.
-  const clone = cloneItemInstancePayload(raw.instance);
-  const { payload, dropped: drops } = sanitizeItemInstancePayloadOnLoad(clone);
-  if (dropped) for (const d of drops) dropped.push(`${raw.itemId}.${d}`);
-  if (!payload) return { itemId: raw.itemId, count };
-  return { itemId: raw.itemId, count, instance: payload };
+  return normalizeLoadedMaterialSlot(out);
 }

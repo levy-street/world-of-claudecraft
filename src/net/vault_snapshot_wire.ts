@@ -4,6 +4,8 @@
 // undefined counts or aliased payload junk into the vault painter.
 
 import { MAX_INSTANCE_STRING_LENGTH } from '../sim/item_instance_load';
+import type { MaterialSourceTransferSelection } from '../sim/material_source_transfer_selection';
+import { canonicalMaterialComposition } from '../sim/material_sources';
 import { VAULT_BASE_CAP, VAULT_UPGRADE_RUNGS, VAULT_UPGRADE_STEP } from '../sim/materials_vault';
 import { cloneItemInstancePayload, type InvSlot } from '../sim/types';
 import type { VaultInfo, VaultSpecialRef } from '../world_api';
@@ -35,6 +37,7 @@ const SPECIAL_KEY_LIST = [
   'count',
   'instance',
   'craftedRecipeId',
+  'materialSources',
 ] as const satisfies readonly (keyof InvSlot)[];
 const SPECIAL_KEYS: ReadonlySet<string> = new Set(SPECIAL_KEY_LIST);
 
@@ -44,6 +47,7 @@ const SPECIAL_KEYS: ReadonlySet<string> = new Set(SPECIAL_KEY_LIST);
 const BANK_SLOT_KEY_LIST = [
   ...SPECIAL_KEY_LIST,
   'slot',
+  'materialSeparated',
 ] as const satisfies readonly (keyof InvSlot)[];
 type _BankSlotKeysExhaustive = AssertNever<
   Exclude<keyof InvSlot, (typeof BANK_SLOT_KEY_LIST)[number]>
@@ -113,6 +117,12 @@ function isWireInvSlotRow(value: unknown, keys: ReadonlySet<string>): value is I
     return false;
   }
   if (value.slot !== undefined && !isSafeCount(value.slot, true)) return false;
+  if (value.materialSeparated !== undefined && value.materialSeparated !== true) return false;
+  if (value.materialSources !== undefined) {
+    if (!canonicalMaterialComposition(value.materialSources, value.count).ok) return false;
+    // A normalized material carries its signer in its source buckets only.
+    if (isRecord(value.instance) && value.instance.signer !== undefined) return false;
+  }
   return true;
 }
 
@@ -158,6 +168,20 @@ export interface VaultWithdrawPayload {
   special?: VaultSpecialRef;
 }
 
+function cloneSourceSelection(
+  selection: MaterialSourceTransferSelection,
+): MaterialSourceTransferSelection {
+  return {
+    itemId: selection.itemId,
+    target: {
+      slotIndex: selection.target.slotIndex,
+      pin: selection.target.pin,
+      anchor: { ...selection.target.anchor },
+    },
+    quantities: selection.quantities.map((quantity) => ({ ...quantity })),
+  };
+}
+
 /** Build a withdrawal intent without aliasing the UI's identity fingerprint. */
 export function vaultWithdrawPayload(
   itemId: string,
@@ -178,6 +202,9 @@ export function vaultWithdrawPayload(
             ...(special.craftedRecipeId === undefined
               ? {}
               : { craftedRecipeId: special.craftedRecipeId }),
+            ...(special.selection === undefined
+              ? {}
+              : { selection: cloneSourceSelection(special.selection) }),
           },
         }),
   };

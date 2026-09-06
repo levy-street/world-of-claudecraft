@@ -1,4 +1,5 @@
 import type { GuildBankOpDelta } from '../src/sim/guild_bank';
+import { canonicalMaterialSourceLegs } from '../src/sim/guild_bank_material';
 import type { BankLedgerProjectionSurface } from './bank_ledger_admission';
 import type {
   BankLedgerOutboxSnapshot,
@@ -17,6 +18,21 @@ export interface GuildLedgerPrefixState {
   readonly guildBankDeficitSkips: { delete(guildId: number): boolean };
 }
 
+/** Both sides through the ONE canonical adapter, then compared as text: the
+ *  durable side has round-tripped through JSONB and the live side has not, so
+ *  raw stringify would disagree on leg order alone. A live delta carrying legs
+ *  must never verify against a durable sidecar that lost them, or the prefix
+ *  splice would retire a command whose exact provenance never committed. */
+function sameGuildDeltaSources(
+  live: GuildBankOpDelta,
+  durable: SerializedBankLedgerGuildDelta,
+): boolean {
+  const liveLegs = canonicalMaterialSourceLegs(live.materialSources);
+  const durableLegs = canonicalMaterialSourceLegs(durable.materialSources);
+  if (!liveLegs.ok || !durableLegs.ok) return false;
+  return JSON.stringify(liveLegs.value) === JSON.stringify(durableLegs.value);
+}
+
 function guildDeltaMatches(
   live: GuildBankOpDelta,
   durable: SerializedBankLedgerGuildDelta,
@@ -31,7 +47,8 @@ function guildDeltaMatches(
     (live.craftedRecipeId ?? null) === durable.craftedRecipeId &&
     live.copperDelta === durable.copperDelta &&
     live.purchasedSlotsBefore === durable.purchasedSlotsBefore &&
-    live.purchasedSlotsAfter === durable.purchasedSlotsAfter
+    live.purchasedSlotsAfter === durable.purchasedSlotsAfter &&
+    sameGuildDeltaSources(live, durable)
   );
 }
 

@@ -1,3 +1,4 @@
+import type { MaterialComposition } from './material_sources';
 import type { ItemInstancePayload } from './types';
 
 // Collapses plain market listings down to at most one per distinct item id: the
@@ -24,6 +25,7 @@ export interface CollapsibleListing {
   itemId: string;
   price: number;
   instance?: ItemInstancePayload;
+  materialSources?: MaterialComposition;
 }
 
 export function collapseToLowestPerItem<T extends CollapsibleListing>(listings: readonly T[]): T[] {
@@ -31,7 +33,8 @@ export function collapseToLowestPerItem<T extends CollapsibleListing>(listings: 
   for (const listing of listings) {
     // Listing ids are unique within the market book. Giving each instanced row its id as
     // the key preserves every non-fungible copy without serializing or comparing payloads.
-    const identity = listing.instance ? listing.id : listing.itemId;
+    const hasSignature = listing.materialSources?.some(({ source }) => source.signer !== undefined);
+    const identity = listing.instance || hasSignature ? listing.id : listing.itemId;
     const current = bestByIdentity.get(identity);
     if (
       !current ||

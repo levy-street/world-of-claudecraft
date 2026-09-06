@@ -27,7 +27,18 @@ import {
   warnDroppedInstanceKeys,
 } from './item_instance_load';
 import { isMergeableInstancePayload } from './item_instance_merge';
+import { moveMaterialBetweenContainers } from './material_container_move';
 import { isMaterialItemId } from './material_ids';
+import {
+  normalizeLoadedMaterialSlot,
+  preservesMaterialCountOnLoad,
+  validateMaterialSlotSourcesOnLoad,
+} from './material_slot_load';
+import {
+  type MaterialSourceTransferSelection,
+  resolveMaterialSourceTransferSelection,
+} from './material_source_transfer_selection';
+import type { MaterialComposition } from './material_sources';
 import { sanitizeRiftGearInstance } from './rift/progression';
 import type { SimContext } from './sim_context';
 import { cloneInvSlot, dist2d, type Entity, INTERACT_RANGE, type InvSlot } from './types';
@@ -315,11 +326,22 @@ export function moveBetweenContainers(
   count: number | undefined,
   dest: InvSlot[],
   destPools: PoolCapacity,
+  selectedSources?: MaterialComposition,
 ): MoveResult {
   if (!Number.isInteger(sourceIndex) || sourceIndex < 0 || sourceIndex >= source.length) {
     return { moved: 0, refusal: 'invalid' };
   }
   const slot = source[sourceIndex];
+  if (isMaterialItemId(slot.itemId)) {
+    return moveMaterialBetweenContainers(
+      source,
+      sourceIndex,
+      count,
+      dest,
+      destPools,
+      selectedSources,
+    );
+  }
 
   // Instanced: the whole slot moves as one unit (a per-instance payload can never
   // be split from its units), merging into a byte-equal dest stack when one has
@@ -422,9 +444,12 @@ export function bankDeposit(
   ctx: SimContext,
   slotIndex: number,
   count?: number,
+  pidOrSelection?: number | MaterialSourceTransferSelection,
   pid?: number,
 ): void {
-  const r = ctx.resolve(pid);
+  const selection = typeof pidOrSelection === 'number' ? undefined : pidOrSelection;
+  const resolvedPid = typeof pidOrSelection === 'number' ? pidOrSelection : pid;
+  const r = ctx.resolve(resolvedPid);
   if (!r) return;
   const { meta, e: p } = r;
   if (p.dead) return; // the market/mail town-service idiom: dead players bank nothing
@@ -438,6 +463,14 @@ export function bankDeposit(
     ctx.error(meta.entityId, 'You cannot store quest items in the bank.');
     return;
   }
+  let selectedSources: MaterialComposition | undefined;
+  if (selection !== undefined) {
+    if (selection.itemId !== slot.itemId || selection.target.slotIndex !== slotIndex) return;
+    const resolved = resolveMaterialSourceTransferSelection(meta.inventory, selection);
+    if (!resolved.ok || (count ?? resolved.value.count) !== resolved.value.count) return;
+    selectedSources = resolved.value.sources;
+    count = resolved.value.count;
+  }
   // The socket-derived two-pool split (bankPools), never a flat budget: a
   // socketed materials-only satchel adds capacity only materials may take,
   // and countFit inside the move consults the same materials-first
@@ -450,6 +483,7 @@ export function bankDeposit(
     count,
     meta.bank.inventory,
     pools,
+    selectedSources,
   );
   if (result.refusal === 'no_fit') {
     // The cause is DISCRIMINATED by the move itself (MoveResult.noFitCause).
@@ -487,9 +521,12 @@ export function bankWithdraw(
   ctx: SimContext,
   slotIndex: number,
   count?: number,
+  pidOrSelection?: number | MaterialSourceTransferSelection,
   pid?: number,
 ): void {
-  const r = ctx.resolve(pid);
+  const selection = typeof pidOrSelection === 'number' ? undefined : pidOrSelection;
+  const resolvedPid = typeof pidOrSelection === 'number' ? pidOrSelection : pid;
+  const r = ctx.resolve(resolvedPid);
   if (!r) return;
   const { meta, e: p } = r;
   if (p.dead) return; // the market/mail town-service idiom: dead players bank nothing
@@ -500,12 +537,22 @@ export function bankWithdraw(
   if (!Number.isInteger(slotIndex) || slotIndex < 0 || slotIndex >= meta.bank.inventory.length) {
     return;
   }
+  let selectedSources: MaterialComposition | undefined;
+  if (selection !== undefined) {
+    const slot = meta.bank.inventory[slotIndex];
+    if (selection.itemId !== slot.itemId || selection.target.slotIndex !== slotIndex) return;
+    const resolved = resolveMaterialSourceTransferSelection(meta.bank.inventory, selection);
+    if (!resolved.ok || (count ?? resolved.value.count) !== resolved.value.count) return;
+    selectedSources = resolved.value.sources;
+    count = resolved.value.count;
+  }
   const result = moveBetweenContainers(
     meta.bank.inventory,
     slotIndex,
     count,
     meta.inventory,
     bagPools(meta.bags),
+    selectedSources,
   );
   if (result.refusal === 'no_fit') {
     // The deposit arm's discrimination, mirrored (MoveResult.noFitCause):
@@ -741,8 +788,11 @@ export function sanitizeBankState(
         count?: unknown;
         instance?: unknown;
         craftedRecipeId?: unknown;
+        materialSources?: InvSlot['materialSources'];
+        materialSeparated?: true;
       };
       if (typeof e.itemId !== 'string' || e.itemId === '') continue;
+      validateMaterialSlotSourcesOnLoad(e);
       const hasInstance = !!e.instance && typeof e.instance === 'object';
       // The ONE shared doctrine helper judges the RAW marker (the fix-wave
       // review found this arm re-implementing the rule with its own quieter
@@ -759,15 +809,23 @@ export function sanitizeBankState(
       // counted instanced slot (including an in-place locked whole stack), 1
       // for a charge-bearing payload, and an unknown item def stays dormant
       // uncapped data like the plain arm.
-      const instanceCap = instancedCountCap(
-        ITEMS[e.itemId],
-        hasInstance ? (e.instance as InvSlot['instance']) : undefined,
-      );
+      const instanceCap = preservesMaterialCountOnLoad({
+        itemId: e.itemId,
+        materialSources: e.materialSources,
+        instance: hasInstance ? (e.instance as InvSlot['instance']) : undefined,
+      })
+        ? Number.MAX_SAFE_INTEGER
+        : instancedCountCap(
+            ITEMS[e.itemId],
+            hasInstance ? (e.instance as InvSlot['instance']) : undefined,
+          );
       const count = Math.min(instanceCap, Math.max(1, Math.floor(Number(e.count)) || 1));
       const slot: InvSlot = hasInstance
         ? { itemId: e.itemId, count, instance: e.instance as InvSlot['instance'] }
         : { itemId: e.itemId, count };
       if (craftedRecipeId !== undefined) slot.craftedRecipeId = craftedRecipeId;
+      if (e.materialSources !== undefined) slot.materialSources = e.materialSources;
+      if (e.materialSeparated === true) slot.materialSeparated = true;
       const cleaned = cloneInvSlot(slot);
       // Rift rebuild FIRST, exactly as the bags and equipment arms order it
       // (the whole-branch review: this arm and the buyback arm skipped the
@@ -795,7 +853,7 @@ export function sanitizeBankState(
         if (payload) cleaned.instance = payload;
         else delete cleaned.instance;
       }
-      inventory.push(cleaned);
+      inventory.push(normalizeLoadedMaterialSlot(cleaned));
     }
   }
   // Deliberately the COMPILED table, not a resolved override: this load path

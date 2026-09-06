@@ -986,7 +986,8 @@ const MONOLITHS: MonolithRow[] = [
     // wc -l < src/sim/sim.ts after biome. Exact count.
     // Lowered 12028 -> 12006 in PR 3872 cleanup after removing the retired
     // tutorial action and its write-only account fact. Exact count, zero slack.
-    ceiling: 12006,
+    // Shared grant options and inventory consumption now live in their sibling modules.
+    ceiling: 12005,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1192,7 +1193,8 @@ const MONOLITHS: MonolithRow[] = [
     // DiscordClick and the registration send) were covered by NOTHING
     // behavioral, since the only suite that drives the sender drives the module.
     // Measured with wc -l after biome. Exact count, zero slack.
-    ceiling: 11459,
+    // Offline gathering identity bootstrap moved to offline_world_config.ts.
+    ceiling: 11448,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1519,7 +1521,8 @@ const MONOLITHS: MonolithRow[] = [
     // feast signer mirror and retired tutorial command sender. Measured after
     // formatting; exact count.
     // Copy-safe Perfecting command construction extracted to perfecting_command.ts.
-    ceiling: 5861,
+    // Source-aware storage payload construction moved to material_storage_command.ts.
+    ceiling: 5857,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -1939,7 +1942,9 @@ const MONOLITHS: MonolithRow[] = [
     // the copy and the active language, so it went to
     // src/ui/bank_item_name_core.ts and the window's private method went with
     // it. Measured after the fix round, the phase 17 rule.
-    ceiling: 1937,
+    // LOWERED 1937 -> 1859: personal bank item painting now lives in
+    // personal_bank_item_cell.ts; this coordinator only composes the cell.
+    ceiling: 1859,
     seam: 'a pure view-core plus a thin painter sibling (src/ui/CLAUDE.md)',
   },
   {
