@@ -198,6 +198,8 @@ const TREE_ALLOWANCES: ReadonlyArray<[file: string, value: number, anchor: strin
   ['src/ui/meters.ts', 1000000, 'v / 1000000'],
   // The census millions divisor.
   ['src/render/scene_census_core.ts', 1000000, 'const M = 1000000'],
+  // A render megapixel unit, not money.
+  ['src/render/post_pixel_budget_core.ts', 1000000, 'MEGAPIXEL'],
   // A memo-size cap, not money.
   ['src/render/shore_water_gate_core.ts', 400000, 'PROBE_MEMO_LIMIT'],
   // The WIRE-BOUNDARY cap on a client-declared cost, not a price and not from

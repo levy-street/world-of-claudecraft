@@ -523,7 +523,9 @@ describe('withdraw rules', () => {
 
     // The non-material first, so the material arm below runs on the IDENTICAL state.
     sim.bankWithdraw(1);
-    expect(hasErr(sim.drainEvents(), 'Your bags are full.')).toBe(true);
+    expect(hasErr(sim.drainEvents(), 'Only materials fit in the space left in your bags.')).toBe(
+      true,
+    );
     expect(m.bank.inventory).toEqual(bankBefore); // kept in the bank, not destroyed
     expect(sim.countItem('roasted_boar')).toBe(0);
     expect(m.inventory).toHaveLength(16); // nothing squeezed into the full general pool
