@@ -112,6 +112,27 @@ COSMETIC (may be tiered down on lower presets):
   write): the governor can only ever dim a cosmetic depth cue that already varies with
   viewing angle and distance, not remove terrain, change its collision height, or touch
   anything a player reacts to.
+- Post-processing shed under budget pressure (`src/render/post_shed_core.ts`, applied by
+  `post_shed.ts`, `render_budget.ts`'s `post` level). Under sustained over-budget readings the
+  composer tiers shed their post chain one rung at a time, in this order: the tail SMAA gives
+  way to the fused FXAA arm compiled into a twin of the output grade pass (the same arm medium
+  ships), bloom drops its two smallest blur mips, bloom goes dark, and N8AO becomes a white
+  passthrough (its evaluate and denoise passes skip; the scene still draws through its own
+  scene pass). Edge anti-aliasing, bloom and ambient occlusion all filter or shade the
+  DISPLAY-SPACE image after everything a player reads has been drawn into it: none of them
+  adds, removes, hides, delays or repositions a body, a nameplate, a cast bar, an aura or a
+  position, so an image with less AA, no glow or no contact shading carries the same
+  information at the same time. A GOVERNOR-driven shed by design, like the shadow cadence
+  above: it reads the live budget governor because it is a perf-governor output, not a HUD
+  tier knob, so the static-preset rule for HUD tier knobs does not apply to it. The FLOOR of the level is still a pure function of the STATIC preset: the
+  tier band (`GFX_BUCKET_BANDS[tier].post`, governable only on the composer tiers) plus which
+  sheddable passes the session's own static chain built (`postShedFloor`), never a live
+  reading, so two sessions on the same preset have the same rungs available. Every rung is a
+  pass `enabled` flag or a one-time clear of a target the chain already allocated: never a
+  program compile in a live frame (the FXAA twin compiles under the `post.initial-frame`
+  prewarm), never a render-target reallocation, never a `.visible` or `.castShadow` write.
+  There is no half-resolution AO rung on purpose: that switch reallocates the AO targets and
+  relinks the AO program, which the scheduler contract forbids mid-fight.
 - Deed Heraldry's decorative bloom (the Book of Deeds rewards worn in-world and on social
   surfaces). Heraldry is IDENTITY: it encodes no health, range, rank, or threat, so its
   forged seal, motif, material, and structural edge may never be hidden. The world seal and
@@ -478,6 +499,30 @@ player acts on, but the tree one deserves its reasoning written down rather than
   tap by its fractional weight, the average by the live weight sum), that the program cache
   key is byte-identical across levels, and that writing the uniforms changes nothing about
   the compiled source (no relink).
+- `tests/post_shed_core.test.ts` + `tests/post_shed.test.ts` + `tests/post_shed_wiring.test.ts`:
+  the post-processing shed. The core imports nothing and is scanned free of any tier, preset,
+  profile or governor input (the level is its only input); the rung order, the step and the
+  bloom mip count are literal-pinned; the floor is proven a pure function of the chain (an
+  Advanced mix with bloom and AO dialed off floors at the SMAA rung, a chain with no post pass
+  is not governable); and the plan never enables a pass the chain did not build. The painter
+  tests drive the real three passes through `buildComposer` and pin every rung to its pass
+  flags and its one-time clear (bloom to transparent black, AO to white), that holding a rung
+  re-clears nothing, that restoring re-enables every pass with no clear, that a resize re-runs
+  the clears the rung relies on, that every clear restores the render target and clear colour
+  it found, that the SMAA rung is refused (the tail keeps running) until the twin's one prewarm
+  draw has linked it and that a draw that throws leaves it refused, and that a disposed painter
+  touches neither a pass nor WebGL on a late level, resize or prewarm.
+  The wiring scan pins the renderer's one application path (no pass flag or target write of
+  its own), the twin's boot compile under the presentation prewarm, the perfStats/overlay/fleet
+  readouts, that the painter compiles nothing, resizes nothing and hides nothing, and that the
+  governor steps the level with its existing ladder machinery and no timer of its own.
+  `tests/render_budget.test.ts` pins the governor integration: one rung per over-budget step
+  in the pinned order, the chain held until every density bucket is floored (except under
+  severe frame pressure), restored after the density buckets and before render scale, the
+  grade-only tiers held at 1 under the same pressure, the ladder walking only the rungs the
+  session's OWN chain carries (a chain with only AO steps 1 to 0 in one step, spending no
+  cooldown on a dead rung; a governor handed no chain holds 1 until the built pipeline hands
+  it one), the `?postshed=off` kill switch and the `?postshed=` pin with the governor on or off.
 - `tests/weapon_vfx_shed.test.ts`: the weapon-skin fade. Neither arm reaches zero and the
   lever's floor is proven to stay clear of the multiplier at which a part would stop drawing,
   so the fade can never be mistaken for a cull; the distance arm is anchored to the fixed

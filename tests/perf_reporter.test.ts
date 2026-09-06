@@ -63,6 +63,7 @@ function qualityBuckets(): NonNullable<PerfSnapshot['renderer']>['qualityBuckets
       },
       ui: { min: 0.86, baseline: 1, max: 1, roi: 0.86, cost: 'cpu', governable: false },
       detail: { min: 0, baseline: 1, max: 1, roi: 0.92, cost: 'gpu', governable: true },
+      post: { min: 0, baseline: 1, max: 1, roi: 0.9, cost: 'gpu', governable: true },
     },
     baseline: {
       resolution: 1,
@@ -78,6 +79,7 @@ function qualityBuckets(): NonNullable<PerfSnapshot['renderer']>['qualityBuckets
       worldStreaming: 0.88,
       ui: 1,
       detail: 1,
+      post: 1,
     },
     levels: {
       resolution: 0.9,
@@ -93,6 +95,7 @@ function qualityBuckets(): NonNullable<PerfSnapshot['renderer']>['qualityBuckets
       worldStreaming: 0.88,
       ui: 1,
       detail: 0.66,
+      post: 0.75,
     },
     features: {
       composer: true,
@@ -176,6 +179,7 @@ function prewarmStats(): NonNullable<NonNullable<PerfSnapshot['renderer']>['prew
               lighting: 0.9,
               resolution: 0.9,
               detail: 1,
+              post: 1,
             },
             elapsedMs: 24,
             syncMs: 18,
@@ -193,6 +197,7 @@ function prewarmStats(): NonNullable<NonNullable<PerfSnapshot['renderer']>['prew
               lighting: 0.78,
               resolution: 0.9,
               detail: 1,
+              post: 1,
             },
             elapsedMs: 20,
             syncMs: 15,
@@ -540,6 +545,7 @@ function snapshot(): PerfSnapshot {
       shadowExtentScale: 1,
       shadowExtentHalf: 105,
       terrainDetailLevel: 1,
+      postShedRung: 'full',
       renderBudget: {
         enabled: true,
         mode: 'stable',
@@ -554,7 +560,7 @@ function snapshot(): PerfSnapshot {
         stallHoldSeconds: 0,
         stableSeconds: 0,
         cooldownSeconds: 0,
-        levels: { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 0.9, detail: 1 },
+        levels: { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 0.9, detail: 1, post: 1 },
         caps: {
           targetCalls: 330,
           urgentCalls: 500,
@@ -761,7 +767,7 @@ describe('perf reporter payload', () => {
     expect(summaryEntries?.[1]?.budgetVariants).toEqual([
       {
         index: 0,
-        levels: { grass: 1, foliage: 0.86, vfx: 0.92, lighting: 0.9, resolution: 0.9, detail: 1 },
+        levels: { grass: 1, foliage: 0.86, vfx: 0.92, lighting: 0.9, resolution: 0.9, detail: 1, post: 1 },
         elapsedMs: 24,
         syncMs: 18,
         programsBefore: 10,
@@ -778,6 +784,7 @@ describe('perf reporter payload', () => {
           lighting: 0.78,
           resolution: 0.9,
           detail: 1,
+          post: 1,
         },
         elapsedMs: 20,
         syncMs: 15,
@@ -1183,7 +1190,7 @@ describe('perf reporter payload', () => {
               stallHoldSeconds: 0,
               stableSeconds: 0,
               cooldownSeconds: 0,
-              levels: { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 0.9, detail: 1 },
+              levels: { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 0.9, detail: 1, post: 1 },
               caps: {
                 targetCalls: 330,
                 urgentCalls: 500,
