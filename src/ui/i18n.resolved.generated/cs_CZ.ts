@@ -3100,6 +3100,7 @@ export const cs_CZ: EnTranslations = {
       "close": "Zavřít",
       "keybind": "Panel Discordu",
       "disabled": "Discord integrace teď není dostupná.",
+      "queuePingsLabel": "Send me a Discord direct message when my battleground or arena queue pops (needs a linked Discord account)",
       "tiers": {
         "none": "Bez hodnosti",
         "initiate": "Zasvěcenec",
@@ -4831,7 +4832,8 @@ export const cs_CZ: EnTranslations = {
       "link_required": "Nejdřív propoj svůj Discord účet.",
       "swag_claimed": "Tuto odměnu už sis vyzvedl(a).",
       "swag_tier": "Pro vyzvednutí dosáhni vyšší hodnosti.",
-      "swag_points": "Nemáš dost bodů."
+      "swag_points": "Nemáš dost bodů.",
+      "invalid_input": "Invalid input."
     },
     "deeds": {
       "invalid_input": "Neplatný vstup."

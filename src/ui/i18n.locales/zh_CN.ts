@@ -775,6 +775,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.healthPercent': '百分比',
   'hudChrome.partyFrames.healthCurrent': '当前值',
   'hudChrome.partyFrames.healthCurrentMax': '当前 / 最大',
+  'hudChrome.partyFrames.healthCurrentMaxPercent': '当前 / 最大（百分比）',
   'hudChrome.partyFrames.sort': '玩家排序',
   'hudChrome.partyFrames.sortGroup': '小队',
   'hudChrome.partyFrames.showResource': '显示法力、怒气和能量',
@@ -8939,6 +8940,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'apiError.json.malformed': '无法读取该请求。请重试。',
   'apiError.body.too_large': '该请求过大。请减少数据后重试。',
   'apiError.body.unsupported_media_type': '不支持的请求格式。',
+  'apiError.discord.invalid_input': '输入无效。',
   'apiError.deeds.invalid_input': '输入无效。',
   'apiError.guilds.invalid_roster_name': '公会名称无效。',
   'apiError.guilds.unknown': '没有这个名字的公会。',
@@ -10241,6 +10243,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.lbSelfAccount': '你的账号：第 {rank} 名，位居前 {percent}%，名望 {renown}',
   'hudChrome.deeds.lbSelfRank': '你的账号：第 {rank} 名，位居前 {percent}%',
   'hudChrome.deeds.lbEmpty': '暂无上榜的编年史家。',
+  'hudChrome.discord.queuePingsLabel':
+    '当我的战场或竞技场排队匹配成功时，通过 Discord 私信通知我（需要已关联的 Discord 账号）',
   'hudChrome.deeds.broadcastsLabel':
     '与公会成员和关注者分享功绩达成，并向 Discord 动态分享功绩与杰作卡片',
   'guide.deedsPage.catHeading': '{label}（{count}）',

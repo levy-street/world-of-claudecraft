@@ -3100,6 +3100,7 @@ export const en_CA: EnTranslations = {
       "close": "Close",
       "keybind": "Discord Panel",
       "disabled": "Discord integration is not available right now.",
+      "queuePingsLabel": "Send me a Discord direct message when my battleground or arena queue pops (needs a linked Discord account)",
       "tiers": {
         "none": "Unranked",
         "initiate": "Initiate",
@@ -4831,7 +4832,8 @@ export const en_CA: EnTranslations = {
       "link_required": "Link your Discord account first.",
       "swag_claimed": "You have already claimed this reward.",
       "swag_tier": "Reach a higher rank to claim this.",
-      "swag_points": "Not enough points."
+      "swag_points": "Not enough points.",
+      "invalid_input": "Invalid input."
     },
     "deeds": {
       "invalid_input": "Invalid input."

@@ -628,7 +628,10 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned after the selected health-text and Discord queue integrations
     // added their thin client/server hooks beside existing extracted modules.
     // Measured on the merged tree. Exact count, zero headroom.
-    ceiling: 11548,
+    // Re-pinned after the queue-pop Discord DM options hook merged on top of
+    // the health-text settings hook. Measured on the merged tree. Exact count,
+    // zero headroom.
+    ceiling: 11553,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

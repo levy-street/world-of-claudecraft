@@ -3100,6 +3100,7 @@ export const da_DK: EnTranslations = {
       "close": "Luk",
       "keybind": "Discord-panel",
       "disabled": "Discord-integration er ikke tilgængelig lige nu.",
+      "queuePingsLabel": "Send me a Discord direct message when my battleground or arena queue pops (needs a linked Discord account)",
       "tiers": {
         "none": "Urangeret",
         "initiate": "Indviet",
@@ -4831,7 +4832,8 @@ export const da_DK: EnTranslations = {
       "link_required": "Knyt din Discord-konto først.",
       "swag_claimed": "Du har allerede indløst denne belønning.",
       "swag_tier": "Nå en højere rang for at indløse denne.",
-      "swag_points": "Ikke nok point."
+      "swag_points": "Ikke nok point.",
+      "invalid_input": "Invalid input."
     },
     "deeds": {
       "invalid_input": "Ugyldig indtastning."

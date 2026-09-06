@@ -10,6 +10,7 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "apiError.discord.invalid_input",
     "apiError.kick.admin_target",
     "apiError.kick.reason_required",
     "apiError.kick.target_offline",
@@ -29,6 +30,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.depositAllNotableFull",
     "hudChrome.bank.vaultDepositAllNotable",
     "hudChrome.bank.vaultDepositAllNotableFull",
+    "hudChrome.discord.queuePingsLabel",
     "hudChrome.enchanting.riftGear",
     "hudChrome.interfaceUnlock.frameNames.targetDots",
     "hudChrome.itemTooltip.riftGemSocket",
@@ -132,6 +134,7 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.realmBuilderMonumentName"
   ],
   "es_ES": [
+    "apiError.discord.invalid_input",
     "apiError.kick.admin_target",
     "apiError.kick.reason_required",
     "apiError.kick.target_offline",
@@ -151,6 +154,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.depositAllNotableFull",
     "hudChrome.bank.vaultDepositAllNotable",
     "hudChrome.bank.vaultDepositAllNotableFull",
+    "hudChrome.discord.queuePingsLabel",
     "hudChrome.enchanting.riftGear",
     "hudChrome.interfaceUnlock.frameNames.targetDots",
     "hudChrome.itemTooltip.riftGemSocket",
@@ -254,6 +258,7 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.realmBuilderMonumentName"
   ],
   "fr_FR": [
+    "apiError.discord.invalid_input",
     "apiError.kick.admin_target",
     "apiError.kick.reason_required",
     "apiError.kick.target_offline",
@@ -273,6 +278,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.depositAllNotableFull",
     "hudChrome.bank.vaultDepositAllNotable",
     "hudChrome.bank.vaultDepositAllNotableFull",
+    "hudChrome.discord.queuePingsLabel",
     "hudChrome.enchanting.riftGear",
     "hudChrome.interfaceUnlock.frameNames.targetDots",
     "hudChrome.itemTooltip.riftGemSocket",
@@ -376,6 +382,7 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.realmBuilderMonumentName"
   ],
   "fr_CA": [
+    "apiError.discord.invalid_input",
     "apiError.kick.admin_target",
     "apiError.kick.reason_required",
     "apiError.kick.target_offline",
@@ -395,6 +402,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.depositAllNotableFull",
     "hudChrome.bank.vaultDepositAllNotable",
     "hudChrome.bank.vaultDepositAllNotableFull",
+    "hudChrome.discord.queuePingsLabel",
     "hudChrome.enchanting.riftGear",
     "hudChrome.interfaceUnlock.frameNames.targetDots",
     "hudChrome.itemTooltip.riftGemSocket",
@@ -499,6 +507,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "apiError.discord.invalid_input",
     "apiError.kick.admin_target",
     "apiError.kick.reason_required",
     "apiError.kick.target_offline",
@@ -518,6 +527,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.depositAllNotableFull",
     "hudChrome.bank.vaultDepositAllNotable",
     "hudChrome.bank.vaultDepositAllNotableFull",
+    "hudChrome.discord.queuePingsLabel",
     "hudChrome.enchanting.riftGear",
     "hudChrome.interfaceUnlock.frameNames.targetDots",
     "hudChrome.itemTooltip.riftGemSocket",
@@ -621,6 +631,7 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.realmBuilderMonumentName"
   ],
   "de_DE": [
+    "apiError.discord.invalid_input",
     "apiError.kick.admin_target",
     "apiError.kick.reason_required",
     "apiError.kick.target_offline",
@@ -640,6 +651,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.depositAllNotableFull",
     "hudChrome.bank.vaultDepositAllNotable",
     "hudChrome.bank.vaultDepositAllNotableFull",
+    "hudChrome.discord.queuePingsLabel",
     "hudChrome.enchanting.riftGear",
     "hudChrome.interfaceUnlock.frameNames.targetDots",
     "hudChrome.itemTooltip.riftGemSocket",
@@ -751,7 +763,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lootExplorer.source",
     "hudChrome.lootExplorer.sourceWithContext",
     "hudChrome.lootExplorer.tabItems",
-    "hudChrome.partyFrames.healthCurrentMaxPercent",
     "hudChrome.riftForge.currency",
     "hudChrome.riftForge.gemOption",
     "hudChrome.targetDots.row"
@@ -765,7 +776,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lootExplorer.source",
     "hudChrome.lootExplorer.sourceWithContext",
     "hudChrome.lootExplorer.tabItems",
-    "hudChrome.partyFrames.healthCurrentMaxPercent",
     "hudChrome.riftForge.currency",
     "hudChrome.riftForge.gemOption",
     "hudChrome.targetDots.row"
@@ -779,7 +789,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lootExplorer.source",
     "hudChrome.lootExplorer.sourceWithContext",
     "hudChrome.lootExplorer.tabItems",
-    "hudChrome.partyFrames.healthCurrentMaxPercent",
     "hudChrome.riftForge.currency",
     "hudChrome.riftForge.gemOption",
     "hudChrome.targetDots.row"
@@ -793,12 +802,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lootExplorer.source",
     "hudChrome.lootExplorer.sourceWithContext",
     "hudChrome.lootExplorer.tabItems",
-    "hudChrome.partyFrames.healthCurrentMaxPercent",
     "hudChrome.riftForge.currency",
     "hudChrome.riftForge.gemOption",
     "hudChrome.targetDots.row"
   ],
   "pt_BR": [
+    "apiError.discord.invalid_input",
     "apiError.kick.admin_target",
     "apiError.kick.reason_required",
     "apiError.kick.target_offline",
@@ -818,6 +827,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.depositAllNotableFull",
     "hudChrome.bank.vaultDepositAllNotable",
     "hudChrome.bank.vaultDepositAllNotableFull",
+    "hudChrome.discord.queuePingsLabel",
     "hudChrome.enchanting.riftGear",
     "hudChrome.interfaceUnlock.frameNames.targetDots",
     "hudChrome.itemTooltip.riftGemSocket",
@@ -929,12 +939,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lootExplorer.source",
     "hudChrome.lootExplorer.sourceWithContext",
     "hudChrome.lootExplorer.tabItems",
-    "hudChrome.partyFrames.healthCurrentMaxPercent",
     "hudChrome.riftForge.currency",
     "hudChrome.riftForge.gemOption",
     "hudChrome.targetDots.row"
   ],
   "cs_CZ": [
+    "apiError.discord.invalid_input",
     "apiError.kick.admin_target",
     "apiError.kick.reason_required",
     "apiError.kick.target_offline",
@@ -954,6 +964,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.depositAllNotableFull",
     "hudChrome.bank.vaultDepositAllNotable",
     "hudChrome.bank.vaultDepositAllNotableFull",
+    "hudChrome.discord.queuePingsLabel",
     "hudChrome.enchanting.riftGear",
     "hudChrome.interfaceUnlock.frameNames.targetDots",
     "hudChrome.itemTooltip.riftGemSocket",
@@ -1057,6 +1068,7 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.realmBuilderMonumentName"
   ],
   "nl_NL": [
+    "apiError.discord.invalid_input",
     "apiError.kick.admin_target",
     "apiError.kick.reason_required",
     "apiError.kick.target_offline",
@@ -1076,6 +1088,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.depositAllNotableFull",
     "hudChrome.bank.vaultDepositAllNotable",
     "hudChrome.bank.vaultDepositAllNotableFull",
+    "hudChrome.discord.queuePingsLabel",
     "hudChrome.enchanting.riftGear",
     "hudChrome.interfaceUnlock.frameNames.targetDots",
     "hudChrome.itemTooltip.riftGemSocket",
@@ -1179,6 +1192,7 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.realmBuilderMonumentName"
   ],
   "pl_PL": [
+    "apiError.discord.invalid_input",
     "apiError.kick.admin_target",
     "apiError.kick.reason_required",
     "apiError.kick.target_offline",
@@ -1198,6 +1212,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.depositAllNotableFull",
     "hudChrome.bank.vaultDepositAllNotable",
     "hudChrome.bank.vaultDepositAllNotableFull",
+    "hudChrome.discord.queuePingsLabel",
     "hudChrome.enchanting.riftGear",
     "hudChrome.interfaceUnlock.frameNames.targetDots",
     "hudChrome.itemTooltip.riftGemSocket",
@@ -1301,6 +1316,7 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.realmBuilderMonumentName"
   ],
   "id_ID": [
+    "apiError.discord.invalid_input",
     "apiError.kick.admin_target",
     "apiError.kick.reason_required",
     "apiError.kick.target_offline",
@@ -1320,6 +1336,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.depositAllNotableFull",
     "hudChrome.bank.vaultDepositAllNotable",
     "hudChrome.bank.vaultDepositAllNotableFull",
+    "hudChrome.discord.queuePingsLabel",
     "hudChrome.enchanting.riftGear",
     "hudChrome.interfaceUnlock.frameNames.targetDots",
     "hudChrome.itemTooltip.riftGemSocket",
@@ -1423,6 +1440,7 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.realmBuilderMonumentName"
   ],
   "tr_TR": [
+    "apiError.discord.invalid_input",
     "apiError.kick.admin_target",
     "apiError.kick.reason_required",
     "apiError.kick.target_offline",
@@ -1442,6 +1460,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.depositAllNotableFull",
     "hudChrome.bank.vaultDepositAllNotable",
     "hudChrome.bank.vaultDepositAllNotableFull",
+    "hudChrome.discord.queuePingsLabel",
     "hudChrome.enchanting.riftGear",
     "hudChrome.interfaceUnlock.frameNames.targetDots",
     "hudChrome.itemTooltip.riftGemSocket",
@@ -1545,6 +1564,7 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.realmBuilderMonumentName"
   ],
   "sv_SE": [
+    "apiError.discord.invalid_input",
     "apiError.kick.admin_target",
     "apiError.kick.reason_required",
     "apiError.kick.target_offline",
@@ -1564,6 +1584,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.depositAllNotableFull",
     "hudChrome.bank.vaultDepositAllNotable",
     "hudChrome.bank.vaultDepositAllNotableFull",
+    "hudChrome.discord.queuePingsLabel",
     "hudChrome.enchanting.riftGear",
     "hudChrome.interfaceUnlock.frameNames.targetDots",
     "hudChrome.itemTooltip.riftGemSocket",
@@ -1667,6 +1688,7 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.realmBuilderMonumentName"
   ],
   "vi_VN": [
+    "apiError.discord.invalid_input",
     "apiError.kick.admin_target",
     "apiError.kick.reason_required",
     "apiError.kick.target_offline",
@@ -1686,6 +1708,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.depositAllNotableFull",
     "hudChrome.bank.vaultDepositAllNotable",
     "hudChrome.bank.vaultDepositAllNotableFull",
+    "hudChrome.discord.queuePingsLabel",
     "hudChrome.enchanting.riftGear",
     "hudChrome.interfaceUnlock.frameNames.targetDots",
     "hudChrome.itemTooltip.riftGemSocket",
@@ -1789,6 +1812,7 @@ export const pending: Record<string, readonly string[]> = {
     "worldContent.realmBuilderMonumentName"
   ],
   "da_DK": [
+    "apiError.discord.invalid_input",
     "apiError.kick.admin_target",
     "apiError.kick.reason_required",
     "apiError.kick.target_offline",
@@ -1808,6 +1832,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.depositAllNotableFull",
     "hudChrome.bank.vaultDepositAllNotable",
     "hudChrome.bank.vaultDepositAllNotableFull",
+    "hudChrome.discord.queuePingsLabel",
     "hudChrome.enchanting.riftGear",
     "hudChrome.interfaceUnlock.frameNames.targetDots",
     "hudChrome.itemTooltip.riftGemSocket",

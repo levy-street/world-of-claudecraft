@@ -207,8 +207,14 @@ describe('options_window: deed-broadcast account row', () => {
     expect(painter).toContain(
       'if (hooks?.deedBroadcasts) buildDeedBroadcastRow(body, hooks.deedBroadcasts);',
     );
-    // The hooks seam is optional by declaration: offline main.ts never wires it.
-    expect(hudTs).toMatch(/deedBroadcasts\?: \{/);
+    // The queue-pop Discord DM opt-in row is the family's second member, on
+    // the same online-only seam rule.
+    expect(painter).toContain(
+      'if (hooks?.discordQueuePings) buildDiscordQueuePingRow(body, hooks.discordQueuePings);',
+    );
+    // The hooks seams are optional by declaration: offline main.ts never wires them.
+    expect(hudTs).toMatch(/deedBroadcasts\?: AccountToggleSeam;/);
+    expect(hudTs).toMatch(/discordQueuePings\?: AccountToggleSeam;/);
   });
 
   it('reads before it enables and reflects busy/pressed state programmatically', () => {

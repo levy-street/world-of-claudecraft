@@ -3100,6 +3100,7 @@ export const id_ID: EnTranslations = {
       "close": "Tutup",
       "keybind": "Panel Discord",
       "disabled": "Integrasi Discord sedang tidak tersedia saat ini.",
+      "queuePingsLabel": "Send me a Discord direct message when my battleground or arena queue pops (needs a linked Discord account)",
       "tiers": {
         "none": "Tanpa Peringkat",
         "initiate": "Inisiat",
@@ -4831,7 +4832,8 @@ export const id_ID: EnTranslations = {
       "link_required": "Tautkan akun Discord Anda terlebih dahulu.",
       "swag_claimed": "Anda sudah mengklaim hadiah ini.",
       "swag_tier": "Capai peringkat yang lebih tinggi untuk mengklaim ini.",
-      "swag_points": "Poin tidak cukup."
+      "swag_points": "Poin tidak cukup.",
+      "invalid_input": "Invalid input."
     },
     "deeds": {
       "invalid_input": "Masukan tidak valid."

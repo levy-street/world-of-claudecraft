@@ -804,6 +804,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.healthPercent': '백분율',
   'hudChrome.partyFrames.healthCurrent': '현재 값',
   'hudChrome.partyFrames.healthCurrentMax': '현재 / 최대',
+  'hudChrome.partyFrames.healthCurrentMaxPercent': '현재 / 최대 (백분율)',
   'hudChrome.partyFrames.sort': '플레이어 정렬',
   'hudChrome.partyFrames.sortGroup': '그룹',
   'hudChrome.partyFrames.showResource': '마나, 분노, 에너지 표시',
@@ -9321,6 +9322,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.json.malformed': '요청을 읽을 수 없습니다. 다시 시도해 주세요.',
   'apiError.body.too_large': '요청이 너무 큽니다. 데이터를 줄여 다시 시도하세요.',
   'apiError.body.unsupported_media_type': '지원되지 않는 요청 형식입니다.',
+  'apiError.discord.invalid_input': '입력이 올바르지 않습니다.',
   'apiError.deeds.invalid_input': '입력이 올바르지 않습니다.',
   'apiError.guilds.invalid_roster_name': '길드 이름이 유효하지 않습니다.',
   'apiError.guilds.unknown': '그런 이름의 길드가 없습니다.',
@@ -10743,6 +10745,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.lbSelfAccount': '내 계정: {rank}위, 상위 {percent}%, 명성 {renown}',
   'hudChrome.deeds.lbSelfRank': '내 계정: {rank}위, 상위 {percent}%',
   'hudChrome.deeds.lbEmpty': '아직 순위에 오른 연대기 작가가 없습니다.',
+  'hudChrome.discord.queuePingsLabel':
+    '전장 또는 투기장 대기열이 잡히면 Discord 다이렉트 메시지로 알려주기 (연결된 Discord 계정 필요)',
   'hudChrome.deeds.broadcastsLabel':
     '업적 달성은 길드원과 팔로워에게, 업적과 걸작 카드는 Discord 피드에 공유',
   'guide.deedsPage.catHeading': '{label} ({count})',

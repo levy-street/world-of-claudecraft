@@ -222,8 +222,10 @@ import {
   recordDeedUnlocks,
 } from './deeds_records';
 import { claimDedupeKey, enqueueActivity, releaseDedupeKey } from './discord_activity';
+import { duelActivityCard } from './discord_activity_pvp';
 import { discordFlairForAccount, grantRewardPoints } from './discord_db';
 import { enqueueLinkChange } from './discord_link_changes';
+import { observeQueuePops, queuedPidsOf, queuePopDepsFor } from './discord_queue_pops';
 import { enqueueRelay } from './discord_relay';
 import { findDungeonDoorNear } from './dungeon_door';
 import * as entryFacing from './dungeon_entry_facing';
@@ -1783,6 +1785,8 @@ export class GameServer {
   private lastPlaytimeGrantAt = new Map<number, number>(); // accountId -> sim time of last grant
   private dailyRewardActivityInterval: NodeJS.Timeout | null = null;
   private relayCooldown = new Map<number, number>(); // accountId -> last "!" relay post (ms)
+  // Queue-pop Discord DMs (server/discord_queue_pops.ts): the observer's deps, bound once.
+  private queuePopDeps = queuePopDepsFor((pid) => this.clients.get(pid), REALM);
   // pids whose holder tier was forced via the dev /woctier command — the chain
   // refresh leaves them alone so the override sticks during testing (dev only).
   private devTierPids = new Set<number>();
@@ -2799,6 +2803,7 @@ export class GameServer {
             this.parseCapture.observe(events);
             this.routeEvents(events);
             this.detectActivity(events);
+            void observeQueuePops(events, queuedPidsOf(this.sim.ctx), this.queuePopDeps);
             lap('events');
             this.runAntibotTick();
             lap('antibot');
@@ -9648,31 +9653,16 @@ export class GameServer {
             console.error('masterwork activity failed:', err);
           });
       } else if (ev.type === 'duelEnd') {
-        const w = this.sessionByName(ev.winnerName);
-        const l = this.sessionByName(ev.loserName);
-        const accountIds: number[] = [];
-        const names: string[] = [];
-        if (w) {
-          accountIds.push(w.accountId);
-          names.push(w.name);
-        }
-        if (l) {
-          accountIds.push(l.accountId);
-          names.push(l.name);
-        }
-        enqueueActivity(
-          {
-            kind: 'duel',
-            accountIds,
-            names,
-            realm: REALM,
-            profileUrl: this.profileUrlFor(ev.winnerName),
-            winnerName: ev.winnerName,
-            loserName: ev.loserName,
-          },
-          `duel:${ev.winnerName}:${ev.loserName}`,
-          now,
+        // The card shape lives in discord_activity_pvp.ts; only the session
+        // lookups the module cannot do stay here.
+        const card = duelActivityCard(
+          ev,
+          this.sessionByName(ev.winnerName),
+          this.sessionByName(ev.loserName),
+          REALM,
+          this.profileUrlFor(ev.winnerName),
         );
+        enqueueActivity(card.item, card.key, now);
       } else if (ev.type === 'arenaEnd' && !ev.draw && ev.pid !== undefined) {
         const s = this.clients.get(ev.pid);
         if (!s) continue;

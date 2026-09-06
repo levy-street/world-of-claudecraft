@@ -2968,7 +2968,7 @@ export const ja_JP: EnTranslations = {
       "healthPercent": "パーセント",
       "healthCurrent": "現在値",
       "healthCurrentMax": "現在値 / 最大値",
-      "healthCurrentMaxPercent": "Current / Max (Percent)",
+      "healthCurrentMaxPercent": "現在値 / 最大値（パーセント）",
       "sort": "プレイヤーの並び順",
       "sortGroup": "グループ",
       "sortRole": "ロール",
@@ -3100,6 +3100,7 @@ export const ja_JP: EnTranslations = {
       "close": "閉じる",
       "keybind": "Discordパネル",
       "disabled": "Discord連携は現在利用できません。",
+      "queuePingsLabel": "バトルグラウンドまたはアリーナのキューが成立したら Discord のダイレクトメッセージで知らせる（Discord アカウントの連携が必要）",
       "tiers": {
         "none": "ランク外",
         "initiate": "見習い",
@@ -4831,7 +4832,8 @@ export const ja_JP: EnTranslations = {
       "link_required": "まずDiscordアカウントを連携してください。",
       "swag_claimed": "この報酬は既に受け取っています。",
       "swag_tier": "これを受け取るにはより高いランクが必要です。",
-      "swag_points": "ポイントが足りません。"
+      "swag_points": "ポイントが足りません。",
+      "invalid_input": "入力が無効です。"
     },
     "deeds": {
       "invalid_input": "入力が無効です。"

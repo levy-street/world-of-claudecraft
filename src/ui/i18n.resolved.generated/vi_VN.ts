@@ -3100,6 +3100,7 @@ export const vi_VN: EnTranslations = {
       "close": "Đóng",
       "keybind": "Bảng Discord",
       "disabled": "Tích hợp Discord hiện không khả dụng.",
+      "queuePingsLabel": "Send me a Discord direct message when my battleground or arena queue pops (needs a linked Discord account)",
       "tiers": {
         "none": "Chưa Xếp Hạng",
         "initiate": "Tân Binh",
@@ -4831,7 +4832,8 @@ export const vi_VN: EnTranslations = {
       "link_required": "Hãy liên kết tài khoản Discord của bạn trước.",
       "swag_claimed": "Bạn đã nhận phần thưởng này rồi.",
       "swag_tier": "Hãy đạt cấp bậc cao hơn để nhận phần thưởng này.",
-      "swag_points": "Không đủ điểm."
+      "swag_points": "Không đủ điểm.",
+      "invalid_input": "Invalid input."
     },
     "deeds": {
       "invalid_input": "Dữ liệu nhập không hợp lệ."

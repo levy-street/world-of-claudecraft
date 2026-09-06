@@ -546,11 +546,11 @@ ALTER TABLE accounts ADD COLUMN IF NOT EXISTS locale TEXT;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS email_verified_at TIMESTAMPTZ;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS marketing_opt_in BOOLEAN NOT NULL DEFAULT FALSE;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS unsubscribe_token TEXT;
--- Deed broadcast opt-out. When FALSE the server skips the guild/friend
--- broadcast of this account's marquee deed unlocks (the earner's own client
--- toast is local and unaffected). Defaults TRUE so broadcasts are on unless
--- the player opts out; the flag never gates the unlock itself.
+-- Deed broadcast opt-out (defaults TRUE: on unless the player opts out; never
+-- gates the unlock itself) and the queue-pop Discord DM opt-in (defaults FALSE:
+-- a DM is intrusive, so the player asks for it; server/discord_queue_pops.ts).
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS deed_broadcasts BOOLEAN NOT NULL DEFAULT TRUE;
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS discord_queue_pings BOOLEAN NOT NULL DEFAULT FALSE;
 -- Index + collision guard for the public unsubscribe lookup. Partial (the column
 -- is NULL until an account first opts in) and UNIQUE so two accounts can never
 -- share a token. The token is a low-sensitivity capability (its only power is to

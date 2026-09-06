@@ -655,7 +655,7 @@ import { MountRaceStrip } from './mount_race_strip';
 import { type FrameDimension, MovableFrame } from './movable_frame';
 import { NoticeboardPopup } from './noticeboard_popup';
 import { NPC_WINDOW_CLOSE_RANGE } from './npc_service_range';
-import { OptionsWindow } from './options_window';
+import { type AccountToggleSeam, OptionsWindow } from './options_window';
 import {
   makeWriterFacet,
   type PainterHostPresentation,
@@ -884,16 +884,13 @@ export interface OptionsHooks {
   // bag footer and player card reflect on-chain token changes. No-op when the wallet
   // feature is off or no wallet is connected/linked.
   refreshWocBalance(force?: boolean): void;
-  // Account deed-broadcast opt-out seam (accounts.deed_broadcasts): whether a
-  // marquee deed unlock fans out to guildmates and followers, and whether the
-  // Discord activity feed posts the account's deed and masterwork cards (R58).
-  // main.ts wires the REST read/write pair ONLINE ONLY; the options row
-  // renders only when the seam is present (offline characters have no
-  // account, so no row).
-  deedBroadcasts?: {
-    get(): Promise<boolean>;
-    set(enabled: boolean): Promise<boolean>;
-  };
+  // Account toggle seams, each a REST read/write pair main.ts wires ONLINE
+  // ONLY (offline characters have no account row); the options row renders
+  // only when its seam is present. deedBroadcasts: the deed-broadcast opt-out
+  // (accounts.deed_broadcasts, R58). discordQueuePings: the queue-pop Discord
+  // DM opt-in (accounts.discord_queue_pings).
+  deedBroadcasts?: AccountToggleSeam;
+  discordQueuePings?: AccountToggleSeam;
   perfOverlay: PerfOverlayHooks;
   // UI theming seam — main.ts owns the ThemeStore + live CSS-variable apply.
   theme: ThemeHooks;

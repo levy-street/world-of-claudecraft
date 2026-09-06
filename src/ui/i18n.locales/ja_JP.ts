@@ -806,6 +806,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.healthPercent': 'パーセント',
   'hudChrome.partyFrames.healthCurrent': '現在値',
   'hudChrome.partyFrames.healthCurrentMax': '現在値 / 最大値',
+  'hudChrome.partyFrames.healthCurrentMaxPercent': '現在値 / 最大値（パーセント）',
   'hudChrome.partyFrames.sort': 'プレイヤーの並び順',
   'hudChrome.partyFrames.sortGroup': 'グループ',
   'hudChrome.partyFrames.showResource': 'マナ・怒り・エネルギーを表示',
@@ -9346,6 +9347,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.json.malformed': 'リクエストを読み取れませんでした。もう一度お試しください。',
   'apiError.body.too_large': 'リクエストが大きすぎます。データを減らしてもう一度お試しください。',
   'apiError.body.unsupported_media_type': 'サポートされていないリクエスト形式です。',
+  'apiError.discord.invalid_input': '入力が無効です。',
   'apiError.deeds.invalid_input': '入力が無効です。',
   'apiError.guilds.invalid_roster_name': 'ギルド名が無効です。',
   'apiError.guilds.unknown': 'その名前のギルドはありません。',
@@ -10779,6 +10781,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'あなたのアカウント：{rank} 位（上位 {percent}%）、名声 {renown}',
   'hudChrome.deeds.lbSelfRank': 'あなたのアカウント：{rank} 位（上位 {percent}%）',
   'hudChrome.deeds.lbEmpty': 'ランク入りした年代記作家はまだいません。',
+  'hudChrome.discord.queuePingsLabel':
+    'バトルグラウンドまたはアリーナのキューが成立したら Discord のダイレクトメッセージで知らせる（Discord アカウントの連携が必要）',
   'hudChrome.deeds.broadcastsLabel':
     '功績の達成をギルドメンバーとフォロワーに、功績と傑作のカードをDiscordフィードに共有する',
   'guide.deedsPage.catHeading': '{label}（{count}）',

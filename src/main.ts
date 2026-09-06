@@ -3156,13 +3156,18 @@ async function startGame(
     },
     changeLanguage: (lang, onStatus) => changeLanguage(lang, onStatus),
     refreshWocBalance: (force) => refreshWocBalanceOnDemand(force),
-    // Deed-broadcast opt-out: online only (an offline character has no account
-    // row); the options row hides itself when this seam is absent.
+    // Account toggles (deed-broadcast opt-out, queue-pop Discord DM opt-in):
+    // online only (an offline character has no account row); each options row
+    // hides itself when its seam is absent. The fallback is the column default.
     ...(online
       ? {
           deedBroadcasts: {
-            get: () => api.deedBroadcasts(),
-            set: (enabled: boolean) => api.setDeedBroadcasts(enabled),
+            get: () => api.accountToggle('/api/deeds/broadcasts', true),
+            set: (enabled: boolean) => api.setAccountToggle('/api/deeds/broadcasts', enabled),
+          },
+          discordQueuePings: {
+            get: () => api.accountToggle('/api/discord/queue-pings', false),
+            set: (enabled: boolean) => api.setAccountToggle('/api/discord/queue-pings', enabled),
           },
         }
       : {}),
