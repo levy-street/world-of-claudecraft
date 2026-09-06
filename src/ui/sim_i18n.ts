@@ -118,7 +118,7 @@ const baseEnTable = {
   // in the book and the officer asked to take it out; that arm is reachable only
   // from a tampered or legacy row, which the guild pane renders as dormant.
   'error.guildBankQuestItem': 'You cannot store quest items in the guild bank.',
-  'error.guildBankSoulbound': 'You cannot store soulbound items in the guild bank.',
+  'error.guildBankAccountBound': 'You cannot store account bound items in the guild bank.',
   'error.guildBankNoTransfer': 'That item cannot be stored in the guild bank.',
   'error.guildBankWithdrawRefused': 'That item cannot be withdrawn from the guild bank.',
   'error.guildBankTreasuryCap': 'The guild treasury cannot hold that much.',
@@ -1152,8 +1152,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankStackIndivisible':
       'Ese montón no se puede dividir para caber en el espacio que queda en el banco de la hermandad.',
     'error.guildBankQuestItem': 'No puedes guardar objetos de misión en el banco de la hermandad.',
-    'error.guildBankSoulbound':
-      'No puedes guardar objetos ligados al alma en el banco de la hermandad.',
+    'error.guildBankAccountBound':
+      'No puedes guardar objetos ligados a la cuenta en el banco de la hermandad.',
     'error.guildBankNoTransfer': 'Ese objeto no se puede guardar en el banco de la hermandad.',
     'error.guildBankWithdrawRefused': 'Ese objeto no se puede retirar del banco de la hermandad.',
     'error.guildBankTreasuryCap': 'La tesorería de la hermandad no puede contener tanto.',
@@ -1635,8 +1635,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankStackIndivisible':
       'Ese montón no se puede dividir para caber en el espacio que queda en el banco de la hermandad.',
     'error.guildBankQuestItem': 'No puedes guardar objetos de misión en el banco de la hermandad.',
-    'error.guildBankSoulbound':
-      'No puedes guardar objetos ligados al alma en el banco de la hermandad.',
+    'error.guildBankAccountBound':
+      'No puedes guardar objetos ligados a la cuenta en el banco de la hermandad.',
     'error.guildBankNoTransfer': 'Ese objeto no se puede guardar en el banco de la hermandad.',
     'error.guildBankWithdrawRefused': 'Ese objeto no se puede retirar del banco de la hermandad.',
     'error.guildBankTreasuryCap': 'La tesorería de la hermandad no puede contener tanto.',
@@ -2120,8 +2120,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
       "Cette pile ne peut pas être divisée pour tenir dans l'espace restant de la banque de guilde.",
     'error.guildBankQuestItem':
       "Vous ne pouvez pas déposer d'objets de quête dans la banque de guilde.",
-    'error.guildBankSoulbound':
-      "Vous ne pouvez pas déposer d'objets liés à l'âme dans la banque de guilde.",
+    'error.guildBankAccountBound':
+      "Vous ne pouvez pas déposer d'objets liés au compte dans la banque de guilde.",
     'error.guildBankNoTransfer': 'Cet objet ne peut pas être déposé dans la banque de guilde.',
     'error.guildBankWithdrawRefused': 'Cet objet ne peut pas être retiré de la banque de guilde.',
     'error.guildBankTreasuryCap':
@@ -2616,8 +2616,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
       "Cette pile ne peut pas être divisée pour tenir dans l'espace restant de la banque de guilde.",
     'error.guildBankQuestItem':
       "Vous ne pouvez pas déposer d'objets de quête dans la banque de guilde.",
-    'error.guildBankSoulbound':
-      "Vous ne pouvez pas déposer d'objets liés à l'âme dans la banque de guilde.",
+    'error.guildBankAccountBound':
+      "Vous ne pouvez pas déposer d'objets liés au compte dans la banque de guilde.",
     'error.guildBankNoTransfer': 'Cet objet ne peut pas être déposé dans la banque de guilde.',
     'error.guildBankWithdrawRefused': 'Cet objet ne peut pas être retiré de la banque de guilde.',
     'error.guildBankTreasuryCap':
@@ -3311,8 +3311,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankStackIndivisible':
       'Quella pila non può essere divisa per entrare nello spazio rimasto nella banca della gilda.',
     'error.guildBankQuestItem': 'Non puoi depositare oggetti missione nella banca della gilda.',
-    'error.guildBankSoulbound':
-      "Non puoi depositare oggetti vincolati all'anima nella banca della gilda.",
+    'error.guildBankAccountBound':
+      "Non puoi depositare oggetti vincolati all'account nella banca della gilda.",
     'error.guildBankNoTransfer': "Quell'oggetto non può essere depositato nella banca della gilda.",
     'error.guildBankWithdrawRefused':
       "Quell'oggetto non può essere ritirato dalla banca della gilda.",
@@ -3799,8 +3799,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankStackIndivisible':
       'Dieser Stapel kann nicht geteilt werden, um in den restlichen Platz der Gildenbank zu passen.',
     'error.guildBankQuestItem': 'Ihr könnt keine Questgegenstände in der Gildenbank lagern.',
-    'error.guildBankSoulbound':
-      'Ihr könnt keine seelengebundenen Gegenstände in der Gildenbank lagern.',
+    'error.guildBankAccountBound':
+      'Ihr könnt keine accountgebundenen Gegenstände in der Gildenbank lagern.',
     'error.guildBankNoTransfer': 'Dieser Gegenstand kann nicht in der Gildenbank gelagert werden.',
     'error.guildBankWithdrawRefused':
       'Dieser Gegenstand kann nicht aus der Gildenbank entnommen werden.',
@@ -4283,7 +4283,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankRank': '只有公会官员才能使用公会银行。',
     'error.guildBankFull': '公会银行已满。',
     'error.guildBankStackIndivisible': '该物品堆无法拆分，放不进公会银行的剩余空间。',
-    'error.guildBankSoulbound': '你无法将灵魂绑定的物品存入公会银行。',
+    'error.guildBankAccountBound': '你无法将账号绑定的物品存入公会银行。',
     'error.guildBankNoTransfer': '该物品无法存入公会银行。',
     'error.guildBankTreasuryCap': '公会金库无法容纳这么多金钱。',
     'error.guildBankTreasuryShort': '公会金库没有这么多金钱。',
@@ -4749,7 +4749,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankRank': '只有公會幹部才能使用公會銀行。',
     'error.guildBankFull': '公會銀行已滿。',
     'error.guildBankStackIndivisible': '該物品堆無法拆分，放不進公會銀行的剩餘空間。',
-    'error.guildBankSoulbound': '你無法將靈魂綁定物品存入公會銀行。',
+    'error.guildBankAccountBound': '你無法將帳號綁定物品存入公會銀行。',
     'error.guildBankNoTransfer': '該物品無法存入公會銀行。',
     'error.guildBankTreasuryCap': '公會金庫容納不下這麼多金錢。',
     'error.guildBankTreasuryShort': '公會金庫沒有這麼多金錢。',
@@ -5217,7 +5217,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankFull': '길드 은행이 가득 찼습니다.',
     'error.guildBankStackIndivisible':
       '해당 묶음은 나눌 수 없어 길드 은행에 남은 공간에 넣을 수 없습니다.',
-    'error.guildBankSoulbound': '귀속된 아이템은 길드 은행에 보관할 수 없습니다.',
+    'error.guildBankAccountBound': '계정 귀속 아이템은 길드 은행에 보관할 수 없습니다.',
     'error.guildBankNoTransfer': '그 아이템은 길드 은행에 보관할 수 없습니다.',
     'error.guildBankTreasuryCap': '길드 금고는 그만큼 많은 돈을 담을 수 없습니다.',
     'error.guildBankTreasuryShort': '길드 금고에 그만큼의 돈이 없습니다.',
@@ -5695,7 +5695,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankFull': 'ギルド銀行がいっぱいです。',
     'error.guildBankStackIndivisible':
       'そのスタックは分割できないため、ギルド銀行の残りのスペースに収まりません。',
-    'error.guildBankSoulbound': '魂縛のアイテムはギルド銀行に預けられません。',
+    'error.guildBankAccountBound': 'アカウント縛りのアイテムはギルド銀行に預けられません。',
     'error.guildBankNoTransfer': 'そのアイテムはギルド銀行に預けられません。',
     'error.guildBankTreasuryCap': 'ギルド金庫にはそれだけの額を入れられません。',
     'error.guildBankTreasuryShort': 'ギルド金庫にはそれだけの額がありません。',
@@ -6187,7 +6187,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankStackIndivisible':
       'Essa pilha não pode ser dividida para caber no espaço restante do banco da guilda.',
     'error.guildBankQuestItem': 'Você não pode guardar itens de missão no banco da guilda.',
-    'error.guildBankSoulbound': 'Você não pode guardar itens vinculados à alma no banco da guilda.',
+    'error.guildBankAccountBound':
+      'Você não pode guardar itens vinculados à conta no banco da guilda.',
     'error.guildBankNoTransfer': 'Esse item não pode ser guardado no banco da guilda.',
     'error.guildBankWithdrawRefused': 'Esse item não pode ser retirado do banco da guilda.',
     'error.guildBankTreasuryCap': 'A tesouraria da guilda não pode guardar tanto assim.',
@@ -6667,7 +6668,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankFull': 'Банк гильдии полон.',
     'error.guildBankStackIndivisible':
       'Эту стопку нельзя разделить, чтобы она поместилась в оставшееся место банка гильдии.',
-    'error.guildBankSoulbound': 'Персональные предметы нельзя хранить в банке гильдии.',
+    'error.guildBankAccountBound':
+      'Предметы, привязанные к учётной записи, нельзя хранить в банке гильдии.',
     'error.guildBankNoTransfer': 'Этот предмет нельзя хранить в банке гильдии.',
     'error.guildBankTreasuryCap': 'Казна гильдии не может вместить такую сумму.',
     'error.guildBankTreasuryShort': 'В казне гильдии не хватает такой суммы.',
@@ -7151,7 +7153,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankRank': 'Cechovní banku smí používat pouze důstojníci.',
     'error.guildBankFull': 'Cechovní banka je plná.',
     'error.guildBankQuestItem': 'Úkolové předměty nelze ukládat do cechovní banky.',
-    'error.guildBankSoulbound': 'Předměty vázané na duši nelze ukládat do cechovní banky.',
+    'error.guildBankAccountBound': 'Předměty vázané na účet nelze ukládat do cechovní banky.',
     'error.guildBankNoTransfer': 'Tento předmět nelze uložit do cechovní banky.',
     'error.guildBankWithdrawRefused': 'Tento předmět nelze z cechovní banky vybrat.',
     'error.guildBankTreasuryCap': 'Cechovní pokladna tolik nepojme.',
@@ -7328,7 +7330,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankRank': 'Alleen gildeofficieren mogen de gildebank gebruiken.',
     'error.guildBankFull': 'De gildebank is vol.',
     'error.guildBankQuestItem': 'Je kunt geen questvoorwerpen in de gildebank opslaan.',
-    'error.guildBankSoulbound': 'Je kunt geen zielsgebonden voorwerpen in de gildebank opslaan.',
+    'error.guildBankAccountBound':
+      'Je kunt geen accountgebonden voorwerpen in de gildebank opslaan.',
     'error.guildBankNoTransfer': 'Dat voorwerp kan niet in de gildebank worden opgeslagen.',
     'error.guildBankWithdrawRefused': 'Dat voorwerp kan niet uit de gildebank worden opgenomen.',
     'error.guildBankTreasuryCap': 'De gildekas kan niet zoveel bevatten.',
@@ -7506,8 +7509,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankRank': 'Tylko oficerowie gildii mogą korzystać z banku gildii.',
     'error.guildBankFull': 'Bank gildii jest pełny.',
     'error.guildBankQuestItem': 'Nie możesz przechowywać przedmiotów zadań w banku gildii.',
-    'error.guildBankSoulbound':
-      'Nie możesz przechowywać przedmiotów związanych z duszą w banku gildii.',
+    'error.guildBankAccountBound':
+      'Nie możesz przechowywać przedmiotów przypisanych do konta w banku gildii.',
     'error.guildBankNoTransfer': 'Tego przedmiotu nie można przechowywać w banku gildii.',
     'error.guildBankWithdrawRefused': 'Tego przedmiotu nie można wyjąć z banku gildii.',
     'error.guildBankTreasuryCap': 'Skarbiec gildii nie pomieści tak dużej kwoty.',
@@ -7687,7 +7690,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankRank': 'Hanya perwira guild yang boleh menggunakan bank guild.',
     'error.guildBankFull': 'Bank guild penuh.',
     'error.guildBankQuestItem': 'Kamu tidak bisa menyimpan barang misi di bank guild.',
-    'error.guildBankSoulbound': 'Kamu tidak bisa menyimpan barang terikat jiwa di bank guild.',
+    'error.guildBankAccountBound': 'Kamu tidak bisa menyimpan barang terikat akun di bank guild.',
     'error.guildBankNoTransfer': 'Barang itu tidak bisa disimpan di bank guild.',
     'error.guildBankWithdrawRefused': 'Barang itu tidak bisa ditarik dari bank guild.',
     'error.guildBankTreasuryCap': 'Kas guild tidak bisa menampung sebanyak itu.',
@@ -7866,7 +7869,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankRank': 'Lonca bankasını yalnızca subaylar kullanabilir.',
     'error.guildBankFull': 'Lonca bankası dolu.',
     'error.guildBankQuestItem': 'Görev eşyalarını lonca bankasında saklayamazsın.',
-    'error.guildBankSoulbound': 'Ruha bağlı eşyaları lonca bankasında saklayamazsın.',
+    'error.guildBankAccountBound': 'Hesaba bağlı eşyaları lonca bankasında saklayamazsın.',
     'error.guildBankNoTransfer': 'O eşya lonca bankasında saklanamaz.',
     'error.guildBankWithdrawRefused': 'O eşya lonca bankasından çekilemez.',
     'error.guildBankTreasuryCap': 'Lonca hazinesi bu kadarını tutamaz.',
@@ -8040,7 +8043,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankRank': 'Endast gillesofficerare får använda gillesbanken.',
     'error.guildBankFull': 'Gillesbanken är full.',
     'error.guildBankQuestItem': 'Du kan inte förvara uppdragsföremål i gillesbanken.',
-    'error.guildBankSoulbound': 'Du kan inte förvara själsbundna föremål i gillesbanken.',
+    'error.guildBankAccountBound': 'Du kan inte förvara kontobundna föremål i gillesbanken.',
     'error.guildBankNoTransfer': 'Det föremålet kan inte förvaras i gillesbanken.',
     'error.guildBankWithdrawRefused': 'Det föremålet kan inte tas ut ur gillesbanken.',
     'error.guildBankTreasuryCap': 'Gillets kassa kan inte rymma så mycket.',
@@ -8219,8 +8222,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankRank': 'Chỉ sĩ quan bang hội mới có thể sử dụng ngân hàng bang hội.',
     'error.guildBankFull': 'Ngân hàng bang hội đã đầy.',
     'error.guildBankQuestItem': 'Bạn không thể cất vật phẩm nhiệm vụ trong ngân hàng bang hội.',
-    'error.guildBankSoulbound':
-      'Bạn không thể cất vật phẩm ràng buộc linh hồn trong ngân hàng bang hội.',
+    'error.guildBankAccountBound':
+      'Bạn không thể cất vật phẩm ràng buộc tài khoản trong ngân hàng bang hội.',
     'error.guildBankNoTransfer': 'Vật phẩm đó không thể cất trong ngân hàng bang hội.',
     'error.guildBankWithdrawRefused': 'Vật phẩm đó không thể rút ra khỏi ngân hàng bang hội.',
     'error.guildBankTreasuryCap': 'Ngân khố bang hội không thể chứa nhiều đến vậy.',
@@ -8396,7 +8399,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankRank': 'Kun laugsofficerer må bruge laugsbanken.',
     'error.guildBankFull': 'Laugsbanken er fuld.',
     'error.guildBankQuestItem': 'Du kan ikke opbevare opgavegenstande i laugsbanken.',
-    'error.guildBankSoulbound': 'Du kan ikke opbevare sjælebundne genstande i laugsbanken.',
+    'error.guildBankAccountBound': 'Du kan ikke opbevare kontobundne genstande i laugsbanken.',
     'error.guildBankNoTransfer': 'Den genstand kan ikke opbevares i laugsbanken.',
     'error.guildBankWithdrawRefused': 'Den genstand kan ikke tages ud af laugsbanken.',
     'error.guildBankTreasuryCap': 'Laugets skatkammer kan ikke rumme så meget.',

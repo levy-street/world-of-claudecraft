@@ -102,9 +102,10 @@ export const GLOSSARY_TERMS: { slug: string; term: TranslationKey; def: Translat
   { slug: 'off-hand', term: 'guide.glossary.offHandTerm', def: 'guide.glossary.offHandDef' },
   { slug: 'set-bonus', term: 'guide.glossary.setBonusTerm', def: 'guide.glossary.setBonusDef' },
   {
+    // The slug is a public URL and stays; the entry now reads the account-bound pair.
     slug: 'soulbound',
-    term: 'guide.glossary.soulboundTerm',
-    def: 'guide.glossary.soulboundDef',
+    term: 'guide.glossary.accountBoundTerm',
+    def: 'guide.glossary.accountBoundDef',
   },
   {
     slug: 'commission',

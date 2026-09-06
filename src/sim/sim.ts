@@ -317,6 +317,7 @@ import {
   setPartyLootMaster as setPartyLootMasterImpl,
   submitLootRoll as submitLootRollImpl,
 } from './loot/loot_roll';
+import type { MailRecipient } from './mail/account_bound';
 import { type MailSave, PostOffice } from './mail/post_office';
 import { Market, type MarketListing, type MarketSave } from './market';
 import { defaultMarketQuery, type MarketQuery } from './market_query';
@@ -11124,9 +11125,10 @@ export class Sim {
     this.postOffice.mailSend(to, subject, body, copper, items, pid);
   }
 
-  /** Server path: the recipient identity is resolved against the character DB. */
+  /** Server path: the recipient identity is resolved against the character DB,
+   *  `sameAccount` stamped by the host (mail/account_bound.ts). */
   mailSendResolved(
-    recipient: { key: string; name: string },
+    recipient: MailRecipient,
     subject: string,
     body: string,
     copper: number,

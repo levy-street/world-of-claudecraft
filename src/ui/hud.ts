@@ -6458,10 +6458,10 @@ export class Hud {
         )}</div>`;
       }
     }
-    // Bound-to-owner marker (marks and other soulbound tokens): shown like the
-    // classic "Soulbound" line so a player can see it cannot be traded or destroyed.
+    // Account-bound marker (marks, Warfare gear, other bound defs): the classic
+    // "Soulbound" seat; a bound piece mails between the account's own characters.
     if (item.soulbound) {
-      html += `<div class="tt-sub" style="color:var(--gold)">${esc(t('hudChrome.itemSoulbound'))}</div>`;
+      html += `<div class="tt-sub" style="color:var(--gold)">${esc(t('hudChrome.itemAccountBound'))}</div>`;
     }
     // BoP party trade window: qualifies the Soulbound line above while this
     // copy can still be traded to the players who shared its drop

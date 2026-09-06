@@ -12,7 +12,7 @@ import { lead, p, related, section } from './ui';
 // it renders on its own below rather than from this table.
 const BLOCKS_AFTER_MARKS = [
   ['guide.economy.vendorsTitle', 'guide.economy.vendorsBody'],
-  ['guide.economy.buyingTitle', 'guide.economy.buyingBody'],
+  ['guide.economy.buyingTitle', 'guide.economy.buyingBodyAccountBound'],
   ['guide.economy.junkTitle', 'guide.economy.junkBody'],
   ['guide.economy.tradeTitle', 'guide.economy.tradeBody'],
 ] as const;
@@ -55,7 +55,7 @@ export const economy: GuidePage = {
         <section class="guide-block">
           <h2>${esc(t('guide.economy.mailTitle'))}</h2>
           <p>${esc(t('guide.economy.mailBody'))}</p>
-          <p>${esc(t('guide.economy.mailHow'))}</p>
+          <p>${esc(t('guide.economy.mailHowAccountBound'))}</p>
         </section>
 
         ${section('guide.economy.dailyTitle', p('guide.economy.dailyBody'))}

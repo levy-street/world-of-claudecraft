@@ -350,6 +350,7 @@ import type { PerfCaptureResult, PerfCaptureStatus } from './perf_capture_types'
 
 export type { PerfCaptureResult, PerfCaptureStatus } from './perf_capture_types';
 
+import { mailRecipientFor, resolveOfflineMailRecipient } from './mail_recipient';
 import { recordFtueDeath, recordFtueQuest, recordLevelUp } from './progress_events';
 import { eventLeadDayKey, resetDayKey } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
@@ -7952,8 +7953,10 @@ export class GameServer {
             });
             break;
           }
+          // sameAccount (server/mail_recipient.ts): bound gear rides only to
+          // the sender's own characters; the account id never crosses the wire.
           sim.mailSendResolved(
-            { key: String(live.characterId), name: live.name },
+            mailRecipientFor(live.characterId, live.name, live.accountId, session),
             subject,
             body,
             copper,
@@ -7962,12 +7965,12 @@ export class GameServer {
           );
           break;
         }
-        // Offline recipient: resolve against the character DB (realm-scoped),
-        // then book the letter on the loop's turn. Re-check the sender is
-        // still this session before touching the sim.
-        void this.socialDb
-          .findCharacterByName(to)
-          .then(async (target) => {
+        // Offline recipient: resolve against the character DB (realm-scoped,
+        // block list applied, sameAccount stamped), then book the letter on
+        // the loop's turn. Re-check the sender is still this session before
+        // touching the sim.
+        void resolveOfflineMailRecipient(this.socialDb, pool, to, session)
+          .then((target) => {
             if (this.clients.get(pid) !== session) return;
             if (!target) {
               // Structured outcome, localized client-side (the sim's mailResult shape).
@@ -7977,25 +7980,7 @@ export class GameServer {
               });
               return;
             }
-            // Offline recipient block check (same rule as the online path above):
-            // a sender the recipient has blocked is refused before any escrow.
-            const blockedBy = await this.socialDb.blockedIds(target.id);
-            if (this.clients.get(pid) !== session) return;
-            if (blockedBy.includes(session.characterId)) {
-              this.send(session, {
-                t: 'events',
-                list: [{ type: 'mailResult', code: 'noRecipient', pid }],
-              });
-              return;
-            }
-            sim.mailSendResolved(
-              { key: String(target.id), name: target.name },
-              subject,
-              body,
-              copper,
-              items,
-              pid,
-            );
+            sim.mailSendResolved(target, subject, body, copper, items, pid);
             session.selfHeavyDirty = true;
           })
           .catch((err) => console.error('mail send resolve failed:', err));

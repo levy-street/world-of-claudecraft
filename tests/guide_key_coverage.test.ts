@@ -91,6 +91,17 @@ const RETIRED_KEYS: string[] = [
   // -- Reworded successors. The replacement says something materially different, so the
   // old value is not a stale translation to fix but a claim the game no longer makes.
   'guide.gear.soulboundBody', // -> guide.gear.soulboundBodyBound (bind-on-trade rules)
+  // Account bound (src/sim/mail/account_bound.ts): bound gear rides mail between
+  // one account's characters, so every "soulbound" paragraph that promised
+  // "never mailed" was reworded as a NEW key; the old values stay untouched.
+  'guide.gear.soulboundTitle', // -> guide.gear.accountBoundTitle
+  'guide.gear.soulboundBodyBound', // -> guide.gear.accountBoundBody
+  'guide.glossary.soulboundTerm', // -> guide.glossary.accountBoundTerm
+  'guide.glossary.soulboundDef', // -> guide.glossary.accountBoundDef
+  'guide.economy.mailHow', // -> guide.economy.mailHowAccountBound
+  'guide.economy.buyingBody', // -> guide.economy.buyingBodyAccountBound
+  'guide.social.guildBankRulesBody', // -> guide.social.guildBankRulesBodyAccountBound
+  'guide.arenaPage.honorFinalNote', // -> guide.arenaPage.honorFinalNoteAccountBound
   'guide.profPages.ench.enchantsNote', // -> guide.profPages.ench.enchantsNoteOffhand
   'guide.profPages.specimenBody', // -> guide.profPages.specimenBodyFamilies
   'guide.professions.focusBody', // -> guide.professions.focusBodyTiers

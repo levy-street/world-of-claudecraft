@@ -2428,6 +2428,75 @@ export const TARGETS = [
     },
   },
   {
+    key: 'account-bound',
+    label: 'Bag tooltip on a Heroic Mark: the bound line reads Account Bound instead of Soulbound',
+    when: ['sim/mail/account_bound'],
+    // The same recipe on a base checkout renders the classic Soulbound line,
+    // which is the honest BEFORE state.
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+        document.getElementById('tutorial-greeting')?.remove();
+      });
+      await wait(300);
+      const setup = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        try {
+          sim.addItem('heroic_mark', 3);
+        } catch {}
+        const el = document.querySelector('#bags');
+        if (el && getComputedStyle(el).display === 'none') game.hud.toggleBags?.();
+        return { ok: true };
+      });
+      if (!setup.ok) throw new Error(`account-bound setup failed: ${setup.reason}`);
+      if (!(await pollForSize(page, '#bags'))) throw new Error('bags window did not open');
+      await wait(400);
+      const cell = await page.evaluate(() => {
+        const b = Array.from(document.querySelectorAll('#bags button')).find((el) =>
+          el.getAttribute('aria-label')?.includes('Heroic Mark'),
+        );
+        if (!b) return null;
+        const r = b.getBoundingClientRect();
+        return { x: r.x + r.width / 2, y: r.y + r.height / 2 };
+      });
+      if (!cell) throw new Error('heroic mark cell not found in bags');
+      await page.mouse.move(cell.x, cell.y);
+      await wait(500);
+      const shown = await page.evaluate(() => {
+        const tip = document.querySelector('#tooltip');
+        return (
+          !!tip &&
+          getComputedStyle(tip).display !== 'none' &&
+          tip.textContent?.includes('Heroic Mark')
+        );
+      });
+      if (!shown) throw new Error('bag tooltip did not appear through the hover path');
+      // The tooltip floats outside #bags, so shoot the union rect here.
+      const rect = await page.evaluate(() => {
+        const a = document.querySelector('#bags')?.getBoundingClientRect();
+        const b = document.querySelector('#tooltip')?.getBoundingClientRect();
+        if (!a || !b) return null;
+        const x0 = Math.max(0, Math.min(a.x, b.x) - 12);
+        const y0 = Math.max(0, Math.min(a.y, b.y) - 12);
+        const x1 = Math.min(innerWidth, Math.max(a.right, b.right) + 12);
+        const y1 = Math.min(innerHeight, Math.max(a.bottom, b.bottom) + 12);
+        return { x: x0, y: y0, width: x1 - x0, height: y1 - y0 };
+      });
+      if (rect && process.env.SHOTS_DIR) {
+        await page.screenshot({
+          path: `${process.env.SHOTS_DIR}/account-bound-desktop-tooltip.png`,
+          clip: rect,
+        });
+      }
+      return {};
+    },
+  },
+  {
     key: 'vendor-sell-confirm',
     label:
       'Vendor: a plain click on a valuable item confirms before selling; junk still sells instantly',

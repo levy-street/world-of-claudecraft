@@ -107,7 +107,7 @@ export const social: GuidePage = {
         <section class="guide-block">
           <h2>${esc(t('guide.social.guildBankHeading'))}</h2>
           <p>${esc(t('guide.social.guildBankBody'))}</p>
-          <p>${esc(t('guide.social.guildBankRulesBody'))}</p>
+          <p>${esc(t('guide.social.guildBankRulesBodyAccountBound'))}</p>
         </section>
 
         ${section('guide.social.calendarHeading', p('guide.social.calendarBody'))}

@@ -46,6 +46,12 @@ import {
   type InvSlot,
   type MailResultCode,
 } from '../types';
+import {
+  boundAttachmentRefusal,
+  boundParcelReturnsOnLoad,
+  letterCarriesBoundParcel,
+  type MailRecipient,
+} from './account_bound';
 import { MailIndex } from './mail_index';
 
 const MAIL_RANGE = INTERACT_RANGE + 2; // you must stand at a raven pillar to tend your post
@@ -106,6 +112,11 @@ export interface MailMessage {
   // The one return-to-sender cycle has run. The sweep's delete arm requires
   // this flag, so attachments are never destroyed without a return flight.
   returned?: boolean;
+  // A bound (def soulbound) parcel rides this player letter between two
+  // characters of ONE account (mail/account_bound.ts). Set only when a bound
+  // parcel actually rides; it exempts the letter from the boot-load migration
+  // that returns bound parcels to their sender. Persisted.
+  accountBound?: boolean;
   // Runtime-only: the arrival event already fired (not serialized; on load a
   // delivered letter is marked announced so a restart never re-toasts it).
   announced: boolean;
@@ -132,6 +143,7 @@ export interface MailSave {
     read: boolean;
     custodyRef?: string; // broker book-once reference; absent off custody mail
     returned?: boolean; // the return cycle has run; absent = false
+    accountBound?: boolean; // a bound parcel rides between one account's characters; absent = false
   }[];
   nextMailId: number;
 }
@@ -423,8 +435,10 @@ export class PostOffice {
       this.result(r.meta.entityId, 'noRecipient');
       return;
     }
+    // The offline world has no accounts: a letter to yourself is its only
+    // same-account case, so bound gear can be parked in your own mailbox.
     this.mailSendResolved(
-      { key: this.mailKeyFor(recipient), name: recipient.name },
+      { key: this.mailKeyFor(recipient), name: recipient.name, sameAccount: recipient === r.meta },
       subject,
       body,
       copper,
@@ -437,7 +451,7 @@ export class PostOffice {
   // offline, character row online). Validates proximity, escrow and postage,
   // then books the letter onto the raven.
   mailSendResolved(
-    recipient: { key: string; name: string },
+    recipient: MailRecipient,
     subject: string,
     body: string,
     copper: number,
@@ -466,8 +480,11 @@ export class PostOffice {
       const def = ITEMS[s.itemId];
       const count = Math.floor(s.count);
       if (!def || !Number.isFinite(count) || count < 1) return;
-      if (def.soulbound) {
-        this.result(meta.entityId, 'noMailSoulbound');
+      // Bound gear is account bound: it rides only to the sender's own
+      // characters (mail/account_bound.ts owns the rule).
+      const boundRefusal = boundAttachmentRefusal(def, recipient);
+      if (boundRefusal !== null) {
+        this.result(meta.entityId, boundRefusal);
         return;
       }
       if (def.kind === 'quest' || def.noMarketList) {
@@ -586,6 +603,9 @@ export class PostOffice {
       copper: coin,
       items: parcels,
       delaySeconds: MAIL_DELIVERY_SECONDS,
+      ...(recipient.sameAccount === true && letterCarriesBoundParcel(parcels, ITEMS)
+        ? { accountBound: true }
+        : {}),
     });
     this.result(meta.entityId, 'sent', { name: recipient.name, value: MAIL_POSTAGE });
     // Only a letter carrying coin or parcels counts; a bare note does not.
@@ -861,6 +881,7 @@ export class PostOffice {
     items: InvSlot[];
     delaySeconds: number;
     custodyRef?: string;
+    accountBound?: boolean;
   }): void {
     const hasAttachments = opts.copper > 0 || opts.items.length > 0;
     // Player parcels ride the attachment window (one return cycle, then the
@@ -887,6 +908,7 @@ export class PostOffice {
       expiresAt,
       read: false,
       ...(opts.custodyRef === undefined ? {} : { custodyRef: opts.custodyRef }),
+      ...(opts.accountBound === true ? { accountBound: true } : {}),
       announced: false,
     };
     this.mail.push(msg);
@@ -1099,6 +1121,7 @@ export class PostOffice {
       read: m.read,
       custodyRef: m.custodyRef,
       returned: m.returned,
+      accountBound: m.accountBound,
     };
   }
 
@@ -1204,11 +1227,14 @@ export class PostOffice {
       const body = String(m.body ?? '');
       const retainedItems: InvSlot[] = [];
       const returnedItems: InvSlot[] = [];
+      const accountBound = m.accountBound === true;
       for (const item of items) {
-        if (kind === 'player' && ITEMS[item.itemId]?.soulbound) returnedItems.push(item);
+        if (boundParcelReturnsOnLoad(kind, ITEMS[item.itemId], accountBound))
+          returnedItems.push(item);
         else retainedItems.push(item);
       }
-      // Migration for player parcels sent before an item became soulbound.
+      // Migration for player parcels sent before an item became soulbound
+      // (an account-bound letter is exempt: its bound parcel is legitimate).
       // Keyed by the STABLE sender id whenever the row carries one (#2450);
       // the display-name fallback serves only rows persisted before ids
       // existed, and a name key here is reclaim-exposed (system mail with
@@ -1263,6 +1289,7 @@ export class PostOffice {
         expiresAt,
         read: m.read === true,
         ...(typeof m.custodyRef === 'string' ? { custodyRef: m.custodyRef } : {}),
+        ...(accountBound ? { accountBound: true } : {}),
         returned: m.returned === true,
         // Already-delivered letters never re-toast after a restart.
         announced: deliverIn <= 0,

@@ -513,6 +513,7 @@ export const en_CA: EnTranslations = {
         "hintAcceptLocked": "That item is locked. Unlock it in your bags, then remove it from the trade and add it again.",
         "hintGoldOffered": "Remove your gold offer first: a trade is gold or $WOC, not both.",
         "ineligibleReason": "Soulbound, quest, and locked items, and items outside the Exchange categories, cannot be sold for $WOC.",
+        "ineligibleReasonAccountBound": "Account bound, quest, and locked items, and items outside the Exchange categories, cannot be sold for $WOC.",
         "incomingTitle": "$WOC offer from {name}",
         "incomingBody": "{name} offers to sell you {item} for {price}.",
         "moneyUsd": "{usd}",
@@ -2099,6 +2100,7 @@ export const en_CA: EnTranslations = {
     "itemHeroicTag": "[HEROIC]",
     "itemHeroicLabel": "Heroic",
     "itemSoulbound": "Soulbound",
+    "itemAccountBound": "Account Bound",
     "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
@@ -3313,6 +3315,7 @@ export const en_CA: EnTranslations = {
       "indicatorAria": "Unread mail: {count}",
       "indicatorTip": "You have {count} unread letters. Visit a mailbox to read them.",
       "clickAttach": "Click to attach to your letter.",
+      "clickAttachAccountBound": "Click to attach. Account bound: only your own characters can receive it.",
       "cannotMail": "This cannot be mailed.",
       "result": {
         "sent": "A raven takes wing with your letter to {name} ({postage} postage).",
@@ -3323,6 +3326,7 @@ export const en_CA: EnTranslations = {
         "tooManyParcels": "A letter carries at most {count} parcels.",
         "noMailQuestItems": "You cannot mail quest items.",
         "noMailBound": "That item is bound and cannot be mailed.",
+        "noMailAccountBound": "Account bound items can only be mailed to your own characters.",
         "notEnoughItems": "You do not have that many to send.",
         "cantAffordPostage": "You cannot afford the postage.",
         "recipientBoxFull": "Their mailbox is full.",
@@ -5543,6 +5547,8 @@ export const en_CA: EnTranslations = {
       "readyCheckDef": "A group leader typing /ready to poll the party or raid: everyone confirms Ready or Not Ready, and the group sees the counts.",
       "soulboundTerm": "Soulbound",
       "soulboundDef": "An item bound to your character from the moment you acquire it. It cannot be traded, mailed, vendor-sold, or listed on the market.",
+      "accountBoundTerm": "Account Bound",
+      "accountBoundDef": "An item tied to your account from the moment you acquire it. It cannot be traded, vendor-sold, or listed on the market, and a letter carries it only to another of your own characters.",
       "spiritHealerTerm": "The Pale Keeper",
       "spiritHealerDef": "The realm's spirit healer, hovering over every graveyard: it can raise your ghost on the spot at the price of a passing weakness.",
       "worldBossTerm": "World boss",
@@ -6171,6 +6177,7 @@ export const en_CA: EnTranslations = {
       "honorBody": "Honor is the currency of fighting other players. You earn it in the Coliseum and out on Thornhollow Fields, it is kept apart from your coin and never mixes with it, and your character sheet shows how much you are holding. There is exactly one thing to spend it on: Warfare gear.",
       "quartermastersBody": "Two quartermasters keep the same shelves, so trade with whichever is nearer. FURY, the Honor Quartermaster, stands in Eastbrook Vale, and Warmarshal Draven Kole, Master of the Warfare Stores, keeps the counter in Highwatch. Their stock is the Warfare tier: five armor families, plus necks, rings, and weapons shared across all of them.",
       "honorFinalNote": "Honor purchases are final. A coin purchase can be undone from a vendor's buyback list, but an Honor purchase never lands there, and Warfare gear is soulbound the moment you buy it, so it can never be traded, mailed, or sold back for anything. The shop asks you to confirm for that reason: read the piece before you press it.",
+      "honorFinalNoteAccountBound": "Honor purchases are final. A coin purchase can be undone from a vendor's buyback list, but an Honor purchase never lands there, and Warfare gear is account bound the moment you buy it, so it can never be traded or sold back for anything, only posted to another of your own characters. The shop asks you to confirm for that reason: read the piece before you press it.",
       "warfareHeading": "Warfare gear",
       "warfareBody": "Every Warfare piece carries Warfare Offense and Warfare Defense Rating, and those two ratings do nothing at all against monsters. They apply only when you fight another player, in a duel, in the arena, or on the battleground, where Offense adds to the damage you deal and Defense cuts the damage you take, each up to its own ceiling. Each armor family is also a set, and its set bonuses are likewise Warfare rating or effects that only work against players, so a full honor kit is worth nothing on a dungeon boss.",
       "warfareTradeBody": "That is the deliberate trade. Warfare gear is built for fighting players, not as a shortcut past the dungeon tiers: a Warfare piece never carries the combat ratings a dungeon epic in the same slot does, and everything it does bring is spent on other players. If you want to hold your own in the arena, buy it. If you want to clear heroics faster, earn your gear in the dungeons."
@@ -6391,7 +6398,9 @@ export const en_CA: EnTranslations = {
       "sourcesRifts": "Rifts add one more source once you are at the level cap, and a rift is a race: the group that clears one first wins its rewards. That first clear pays gear on top of everything else the run leaves behind, including a Riftbound band cut to your class role, a ring you will not find anywhere else in the world. A group that finishes second still finishes its own run and keeps the credit for the clear; what it forfeits are the first-clear rewards. The rifts page covers the race itself.",
       "bindOnTradeBody": "A softer version of the same idea also exists: some things bind on trade, meaning they can change hands exactly once and then belong to whoever received them. A crafted piece made on commission binds when the crafter hands it over. A copy under that rule never rides the market or the post, which are anonymous; it passes face to face or not at all, and once it has passed, it is bound. The tooltip says which rule a piece follows, so check before you plan to resell it.",
       "cosmeticsWeapons": "Weapon skins are a third line, and they change what you carry rather than who carries it. A skin repaints a weapon type, so the look follows whichever sword, staff, or bow you have equipped, and it never touches the weapon's stats, reach, or speed. Skins unlock for your whole account rather than one character, and they come in collections with rarity tiers like everything else. They are offered in the Armory's seasonal collections rather than found out in the world, and the Armory is also where you set them, one per weapon type, rather than from the appearance row. Everyone standing near you sees the skin you are wearing.",
-      "soulboundBodyBound": "A few special rewards are soulbound, bound to your character from the moment you earn them. A soulbound item cannot be traded, mailed, sold to a vendor, or listed on the market; it is yours and yours alone. That guards prize tokens such as Heroic Marks, and it covers every piece of Warfare gear bought with Honor, so a player-versus-player kit is worn only by the character who earned it. Most of the gear you win from the world is still yours to trade, sell, or share freely."
+      "soulboundBodyBound": "A few special rewards are soulbound, bound to your character from the moment you earn them. A soulbound item cannot be traded, mailed, sold to a vendor, or listed on the market; it is yours and yours alone. That guards prize tokens such as Heroic Marks, and it covers every piece of Warfare gear bought with Honor, so a player-versus-player kit is worn only by the character who earned it. Most of the gear you win from the world is still yours to trade, sell, or share freely.",
+      "accountBoundTitle": "Account Bound: yours, on any of your characters",
+      "accountBoundBody": "A few special rewards are account bound, tied to your account from the moment you earn them. An account bound item cannot be traded, sold to a vendor, listed on the market, or stored in the guild bank, and a letter to another player will not carry it. The one door left open is the Ravenpost between your own characters: a bound piece one character outgrows can be posted to another on the same account, class-specific gear included, so an alt of the right class can wear it. That guards prize tokens such as Heroic Marks, and it covers every piece of Warfare gear bought with Honor. Most of the gear you win from the world is still yours to trade, sell, or share freely."
     },
     "professions": {
       "intro": "Beyond combat and quests, the world rewards you for working the land and the forge: gathering raw materials, turning them into gear and goods across ten crafting trades, and settling into an identity as one of the ten archetypes those trades represent.",
@@ -6745,6 +6754,7 @@ export const en_CA: EnTranslations = {
       "bankSockets": "Past the slot ladder, the bursar also sells up to four bag sockets, unlocked in order at ever-steeper prices. Seat a spare bag from your carrying set in one and its slots join your vault room: an everyday bag widens the whole store, while a reagent satchel adds room only crafting materials may take. Click a bag in your bags to seat it and click the socket to take it back. Taking one back never costs you a thing you stored: if the vault ends up fuller than its shrunken room, everything stays put and new deposits simply wait for space.",
       "buyingTitle": "Buying and selling",
       "buyingBody": "Speak to a merchant and choose to browse their goods, and their shop opens as a single panel: everything they stock in one list, yours with a click if you can afford it. A quantity strip above the goods sets how many each click buys, one, five, or ten at a time, or a custom count, though a few special wares, mounts among them, only ever sell one at a time. Stackable coin-priced wares also carry a second offer beside the row that takes as many as your coin covers, up to a full stack, in one purchase. Selling is just as direct: while the shop is open, click an item in your bags to sell it on the spot, and what a merchant will not take, quest goods and soulbound pieces among them, simply stays put. If you part with something you regret, the shop keeps a Buyback list of your recent sales so you can buy them back for the coin you were paid.",
+      "buyingBodyAccountBound": "Speak to a merchant and choose to browse their goods, and their shop opens as a single panel: everything they stock in one list, yours with a click if you can afford it. A quantity strip above the goods sets how many each click buys, one, five, or ten at a time, or a custom count, though a few special wares, mounts among them, only ever sell one at a time. Stackable coin-priced wares also carry a second offer beside the row that takes as many as your coin covers, up to a full stack, in one purchase. Selling is just as direct: while the shop is open, click an item in your bags to sell it on the spot, and what a merchant will not take, quest goods and account bound pieces among them, simply stays put. If you part with something you regret, the shop keeps a Buyback list of your recent sales so you can buy them back for the coin you were paid.",
       "junkTitle": "Clearing out junk",
       "junkBody": "Drops you have no use for still sell to any merchant with a shop of their own, so empty your bags whenever you pass through town rather than letting them fill up. The merchant's window even keeps a one-click Sell Junk button that sells every Poor-quality oddment at once. Truly worthless odds and ends can also be discarded outright to make room.",
       "tradeTitle": "Trading with other players",
@@ -6752,6 +6762,7 @@ export const en_CA: EnTranslations = {
       "mailTitle": "The Ravenpost",
       "mailBody": "Every hub town keeps a carved raven pillar: a mailbox of the Ravenpost, the letter service of the realm. Stand at one to write to any character by name, a friend online or long offline, and attach coin or goods to the letter for a small postage. The raven takes a short while to fly; when it lands, an envelope indicator tells the recipient something is waiting.",
       "mailHow": "Collecting works the same in reverse: stand at any pillar to read your letters and take what they carry into your purse and bags. A plain letter fades away after a while, but one still carrying coin or goods waits for you, however long you take. Some things the post refuses outright: soulbound items, quest goods, bound or bind-on-trade pieces, and one-of-a-kind cosmetic tokens travel with you or not at all. And keep an eye on the pillar after a good turn-in; some questgivers write.",
+      "mailHowAccountBound": "Collecting works the same in reverse: stand at any pillar to read your letters and take what they carry into your purse and bags. A plain letter fades away after a while, but one still carrying coin or goods waits for you, however long you take. Some things the post refuses outright: quest goods, bound or bind-on-trade pieces, and one-of-a-kind cosmetic tokens travel with you or not at all, and an account bound item rides a raven only to another of your own characters. And keep an eye on the pillar after a good turn-in; some questgivers write.",
       "dailyTitle": "Daily rewards",
       "dailyBody": "A treasure chest button on your screen opens the daily rewards window. Each day sets out a handful of tasks, complete quests, fight in the Ashen Coliseum, win a Vale Cup match, and offers a free spin of the prize wheel, all worth points toward that day's standings, and the day's top earners share a prize pool for holders of the optional community token. None of it grants power in the game. The window itself spells out the day's rules and who is eligible, shows the leaderboard, and keeps your history.",
       "marketTitle": "The World Market",
@@ -6830,6 +6841,7 @@ export const en_CA: EnTranslations = {
       "guildBankHeading": "The guild bank",
       "guildBankBody": "A guild also keeps a vault of its own. Step up to a banker in one of the hub towns, open your bank, and switch to the Guild tab: there you will find a treasury of coin and a pooled store of items the guild owns together. Every member can open it and look at what is inside, and the pane says plainly who can do more. Only the guild leader and officers can act, putting coin and goods in and handing them back out, and every deposit and withdrawal is written into a log the guild can read, so nothing moves without a record.",
       "guildBankRulesBody": "The item store starts closed. An officer opens it out of their own pocket, and the guild can pay from the treasury to widen it later. Quest items, anything soulbound, and gear the Market will not take stay out of it, the same as the mail and the Market, so the bank is for goods that can still change hands.",
+      "guildBankRulesBodyAccountBound": "The item store starts closed. An officer opens it out of their own pocket, and the guild can pay from the treasury to widen it later. Quest items, anything account bound, and gear the Market will not take stay out of it, the same as the Market, so the bank is for goods that can still change hands between players.",
       "discordLinkBody": "The Discord panel in game goes the other way too. Link your Discord account to it and the community roles you hold there follow you into the world: a colored name over your head, and a tag on the chat lines of the staff roles, so you can always tell a real moderator from someone borrowing the name. Linking also tracks a status that climbs as you take part. None of it grants any power in the game.",
       "moderationHeading": "Reporting a player",
       "moderationBody": "If a player is out of line, right-click their name and choose Report Player. Pick a reason, from harassment to spam to cheating, add a line about what happened, and send it: the report goes to the moderators to read. A report is a note to them, not a punishment in itself. Sending one does not silence, kick, or jail anyone, and no reply comes back telling you what was decided. Blocking them stops the bother while you wait.",

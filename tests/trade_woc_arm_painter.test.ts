@@ -140,9 +140,9 @@ describe('what the arm renders', () => {
     const why = root.querySelector('[data-woc-ineligible-why]')?.textContent ?? '';
     expect(count).toContain('1');
     expect(count).toContain(t('hudChrome.plurals.wocTradeIneligible.one').replace('{count}', '1'));
-    expect(why).toBe(t('hudChrome.trade.woc.ineligibleReason'));
+    expect(why).toBe(t('hudChrome.trade.woc.ineligibleReasonAccountBound'));
     // Neither line carries the other's sentence.
-    expect(count).not.toContain(t('hudChrome.trade.woc.ineligibleReason'));
+    expect(count).not.toContain(t('hudChrome.trade.woc.ineligibleReasonAccountBound'));
     expect(why).not.toContain('1');
   });
 

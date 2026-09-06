@@ -869,7 +869,7 @@ export function guildBankPipeRefusal(
   if (!refused) return null;
   if (dir === 'withdraw') return 'That item cannot be withdrawn from the guild bank.';
   if (quest) return 'You cannot store quest items in the guild bank.';
-  if (def?.soulbound) return 'You cannot store soulbound items in the guild bank.';
+  if (def?.soulbound) return 'You cannot store account bound items in the guild bank.';
   return 'That item cannot be stored in the guild bank.';
 }
 

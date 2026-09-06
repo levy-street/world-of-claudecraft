@@ -32,7 +32,7 @@ export const MAIL_RESULT_ERROR_KEYS: Record<MailResultCode, TranslationKey> = {
   tooManyParcels: 'hudChrome.mailbox.result.tooManyParcels',
   noMailQuestItems: 'hudChrome.mailbox.result.noMailQuestItems',
   noMailBound: 'hudChrome.mailbox.result.noMailBound',
-  noMailSoulbound: 'hudChrome.itemSoulbound',
+  noMailSoulbound: 'hudChrome.mailbox.result.noMailAccountBound',
   notEnoughItems: 'hudChrome.mailbox.result.notEnoughItems',
   cantAffordPostage: 'hudChrome.mailbox.result.cantAffordPostage',
   recipientBoxFull: 'hudChrome.mailbox.result.recipientBoxFull',

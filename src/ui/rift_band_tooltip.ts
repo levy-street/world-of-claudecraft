@@ -51,7 +51,7 @@ export function riftBandTooltipLines(instance?: ItemInstancePayload): string {
   const rift = instance?.rift;
   if (!rift) return '';
   return (
-    `<div class="tt-sub" style="color:var(--gold)">${esc(t('hudChrome.itemSoulbound'))}</div>` +
+    `<div class="tt-sub" style="color:var(--gold)">${esc(t('hudChrome.itemAccountBound'))}</div>` +
     subLine(t('hudChrome.itemTooltip.riftTier', { tier: rift.tier })) +
     subLine(
       t('hudChrome.itemTooltip.riftUpgrade', {

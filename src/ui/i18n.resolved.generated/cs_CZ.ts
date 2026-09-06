@@ -513,6 +513,7 @@ export const cs_CZ: EnTranslations = {
         "hintAcceptLocked": "Tento předmět je uzamčen. Odemkni ho v batozích, pak ho z výměny odeber a znovu přidej.",
         "hintGoldOffered": "Nejdřív odeber svou nabídku ve zlatě: výměna probíhá buď za zlato, nebo za $WOC, nikdy za obojí.",
         "ineligibleReason": "Předměty vázané na duši, úkolové a uzamčené předměty a předměty mimo kategorie burzy nelze prodat za $WOC.",
+        "ineligibleReasonAccountBound": "Account bound, quest, and locked items, and items outside the Exchange categories, cannot be sold for $WOC.",
         "incomingTitle": "Nabídka v $WOC od hráče {name}",
         "incomingBody": "{name} ti nabízí k prodeji {item} za {price}.",
         "moneyUsd": "{usd}",
@@ -2099,6 +2100,7 @@ export const cs_CZ: EnTranslations = {
     "itemHeroicTag": "[HRDINSKÉ]",
     "itemHeroicLabel": "Hrdinský",
     "itemSoulbound": "Vázáno na duši",
+    "itemAccountBound": "Account Bound",
     "itemUniqueEquipped": "Jedinečně nositelné",
     "itemSet": {
       "header": "{name} ({have}/{total})",
@@ -3313,6 +3315,7 @@ export const cs_CZ: EnTranslations = {
       "indicatorAria": "Nepřečtená pošta: {count}",
       "indicatorTip": "Máš {count} nepřečtených dopisů. Navštiv poštovní schránku a přečti si je.",
       "clickAttach": "Klikni pro přiložení k dopisu.",
+      "clickAttachAccountBound": "Click to attach. Account bound: only your own characters can receive it.",
       "cannotMail": "Toto nelze poslat poštou.",
       "result": {
         "sent": "Havran odlétá s tvým dopisem pro {name} (poštovné {postage}).",
@@ -3323,6 +3326,7 @@ export const cs_CZ: EnTranslations = {
         "tooManyParcels": "Dopis unese nejvýše {count} balíků.",
         "noMailQuestItems": "Úkolové předměty nelze posílat poštou.",
         "noMailBound": "Tento předmět je vázaný a nelze ho poslat poštou.",
+        "noMailAccountBound": "Account bound items can only be mailed to your own characters.",
         "notEnoughItems": "Nemáš tolik kusů k odeslání.",
         "cantAffordPostage": "Nemůžeš si dovolit poštovné.",
         "recipientBoxFull": "Jejich poštovní schránka je plná.",
@@ -5543,6 +5547,8 @@ export const cs_CZ: EnTranslations = {
       "readyCheckDef": "Vedoucí skupiny napíše /ready a udělá anketu v partě nebo raidu: každý potvrdí Připraven, nebo Nepřipraven, a skupina vidí počty.",
       "soulboundTerm": "Vázané k duši",
       "soulboundDef": "Předmět spjatý s tvou postavou od chvíle, kdy ho získáš. Nelze ho směnit, poslat poštou, prodat obchodníkovi ani vystavit na trhu.",
+      "accountBoundTerm": "Account Bound",
+      "accountBoundDef": "An item tied to your account from the moment you acquire it. It cannot be traded, vendor-sold, or listed on the market, and a letter carries it only to another of your own characters.",
       "spiritHealerTerm": "Bledý strážce",
       "spiritHealerDef": "Duchovní léčitel říše, vznášející se nad každým hřbitovem: dokáže vzkřísit tvého ducha na místě za cenu pomíjivé slabosti.",
       "worldBossTerm": "Světový boss",
@@ -6171,6 +6177,7 @@ export const cs_CZ: EnTranslations = {
       "honorBody": "Čest je měna boje proti ostatním hráčům. Získáváš ji v Koloseu i venku na Thornhollowských polích, drží se odděleně od tvých mincí a nikdy se s nimi nemísí, a na listu postavy vidíš, kolik jí máš. Je přesně jedna věc, za kterou ji utratíš: válečnická výbava.",
       "quartermastersBody": "Dva zásobovači drží stejné zboží, takže obchoduj s tím, který je blíž. FÚRIE, Intendant cti, stojí v Eastbrookském údolí, a Válečný maršál Draven Kole, Mistr válečnických skladů, drží pult v Highwatchi. Jejich zásoby tvoří stupeň Válečnictví: pět rodin zbroje, plus náhrdelníky, prsteny a zbraně společné pro všechny.",
       "honorFinalNote": "Nákupy za čest jsou konečné. Nákup za mince lze vrátit ze seznamu Zpětného odkupu u obchodníka, ale nákup za čest se tam nikdy nedostane, a válečnická výbava je vázaná k duši od okamžiku koupě, takže ji nikdy nelze směnit, poslat poštou ani prodat zpátky za cokoli. Obchod tě proto žádá o potvrzení: přečti si kus, než ho stiskneš.",
+      "honorFinalNoteAccountBound": "Honor purchases are final. A coin purchase can be undone from a vendor's buyback list, but an Honor purchase never lands there, and Warfare gear is account bound the moment you buy it, so it can never be traded or sold back for anything, only posted to another of your own characters. The shop asks you to confirm for that reason: read the piece before you press it.",
       "warfareHeading": "Válečnická výbava",
       "warfareBody": "Každý válečnický kus nese hodnocení útoku i obrany ve Válečnictví, a tato dvě hodnocení proti nestvůrám nic neudělají. Uplatní se jen v boji proti jinému hráči, v duelu, v aréně nebo na bojišti, kde Útok přidává k poškození, které způsobíš, a Obrana snižuje poškození, které utrpíš, každé až po svůj vlastní strop. Každá rodina zbroje je zároveň sada a její sadové bonusy jsou stejně tak hodnocení ve Válečnictví nebo efekty, které fungují jen proti hráčům, takže plná válečnická výbava je na dungeonovém bossovi k ničemu.",
       "warfareTradeBody": "To je záměrný kompromis. Válečnická výbava je stavěná na boj proti hráčům, ne jako zkratka kolem dungeonových stupňů: válečnický kus nikdy nenese bojová hodnocení, jaká má epický dungeonový kus na stejném slotu, a všechno, co přináší, je určeno proti ostatním hráčům. Pokud chceš obstát v aréně, kup si ji. Pokud chceš rychleji čistit hrdinské dungeony, vydobuď si výbavu v dungeonech."
@@ -6391,7 +6398,9 @@ export const cs_CZ: EnTranslations = {
       "sourcesRifts": "Trhliny přidávají další zdroj, jakmile jsi na maximální úrovni, a trhlina je závod: skupina, která ji vyčistí jako první, vyhrává její odměny. To první vyčištění vyplatí výbavu navrch všeho ostatního, co běh zanechá, včetně trhlinou spoutaného prstenu ušitého na míru tvé třídní roli, prstenu, který nikde jinde ve světě nenajdeš. Skupina, která doběhne druhá, pořád dokončí svůj vlastní běh a získá zásluhu za vyčištění; přichází jen o odměny za první vyčištění. Stránka o trhlinách popisuje samotný závod.",
       "bindOnTradeBody": "Existuje i měkčí verze téže myšlenky: některé věci se váží při obchodu, což znamená, že mohou změnit majitele přesně jednou a pak patří tomu, kdo je přijal. Vyrobený kus udělaný na zakázku se naváže ve chvíli, kdy ho řemeslník předá. Kopie podléhající tomuto pravidlu nikdy nejede přes trh ani poštu, které jsou anonymní; předává se z ruky do ruky, nebo vůbec, a jakmile jednou přešla, je navázaná. Popisek říká, jaké pravidlo daný kus dodržuje, tak si to ověř dřív, než ho plánuješ znovu prodat.",
       "cosmeticsWeapons": "Skiny zbraní jsou třetí linie a mění to, co neseš, ne kdo to nese. Skin přemaluje typ zbraně, takže vzhled sleduje ať už máš nasazený meč, hůl nebo luk, a nikdy se nedotkne statistik, dosahu ani rychlosti zbraně. Skiny se odemykají pro celý tvůj účet, ne pro jednu postavu, a přicházejí v kolekcích se stupni vzácnosti jako všechno ostatní. Nabízejí se v sezónních kolekcích Zbrojnice, ne jako nález ve světě, a Zbrojnice je také místo, kde je nastavuješ, jeden na typ zbraně, ne z řádku vzhledu. Každý, kdo stojí poblíž, uvidí skin, který nosíš.",
-      "soulboundBodyBound": "Několik zvláštních odměn je vázaných k duši, spjatých s tvou postavou od chvíle, kdy si je vysloužíš. Předmět vázaný k duši nelze směnit, poslat poštou, prodat obchodníkovi ani vystavit na trhu; je tvůj a jen tvůj. To chrání cenné tokeny jako Hrdinské známky a zahrnuje to i každý kus výbavy Válečnictví koupený za čest, takže sadu pro souboje hráč proti hráči nosí jen ta postava, která si ji vysloužila. Většina výbavy, kterou ve světě vyhraješ, je pořád tvá, abys s ní mohl volně směňovat, prodávat ji nebo se o ni dělit."
+      "soulboundBodyBound": "Několik zvláštních odměn je vázaných k duši, spjatých s tvou postavou od chvíle, kdy si je vysloužíš. Předmět vázaný k duši nelze směnit, poslat poštou, prodat obchodníkovi ani vystavit na trhu; je tvůj a jen tvůj. To chrání cenné tokeny jako Hrdinské známky a zahrnuje to i každý kus výbavy Válečnictví koupený za čest, takže sadu pro souboje hráč proti hráči nosí jen ta postava, která si ji vysloužila. Většina výbavy, kterou ve světě vyhraješ, je pořád tvá, abys s ní mohl volně směňovat, prodávat ji nebo se o ni dělit.",
+      "accountBoundTitle": "Account Bound: yours, on any of your characters",
+      "accountBoundBody": "A few special rewards are account bound, tied to your account from the moment you earn them. An account bound item cannot be traded, sold to a vendor, listed on the market, or stored in the guild bank, and a letter to another player will not carry it. The one door left open is the Ravenpost between your own characters: a bound piece one character outgrows can be posted to another on the same account, class-specific gear included, so an alt of the right class can wear it. That guards prize tokens such as Heroic Marks, and it covers every piece of Warfare gear bought with Honor. Most of the gear you win from the world is still yours to trade, sell, or share freely."
     },
     "professions": {
       "intro": "Kromě boje a úkolů tě svět odměňuje i za práci na poli a u výhně: za sběr surovin, jejich proměnu ve výbavu a zboží napříč deseti výrobními řemesly a za přijetí identity jednoho z deseti archetypů, které tato řemesla představují.",
@@ -6745,6 +6754,7 @@ export const cs_CZ: EnTranslations = {
       "bankSockets": "Za žebříčkem slotů prodává správce pokladny také až čtyři sloty na brašny, které se postupně odemykají za stále vyšší ceny. Vlož do jednoho náhradní brašnu ze své nosné sady a její sloty se přidají k prostoru trezoru: běžná brašna rozšíří celý sklad, zatímco brašna na reagencie přidá místo pouze pro řemeslné materiály. Kliknutím na brašnu ve svých brašnách ji vložíš, kliknutím na slot ji zase vyjmeš. Vyjmutí ti nikdy nevezme nic uloženého: pokud bude trezor po zmenšení prostoru plnější, než se do něj vejde, všechno zůstane na místě a nové vklady jednoduše počkají, až se uvolní místo.",
       "buyingTitle": "Nákup a prodej",
       "buyingBody": "Promluv s obchodníkem a zvol si prohlížení jeho zboží, a jeho obchod se otevře se třemi záložkami: Prohlížet, Prodat a Zpětný odkup. Prohlížet drží vše, co má skladem, tvé, pokud na to máš. Prodat vypisuje, co z tvých batohů vykoupí, a prodej kusu, který nese vlastní vylosovanou kvalitu, tě nejdřív požádá o potvrzení, aby ceněný exemplář nikdy neproklouzl omylem. Když se rozloučíš s něčím, čeho lituješ, záložka Zpětný odkup podrží tvé nedávné prodeje, takže je můžeš koupit zpět za mince, které ti byly vyplaceny.",
+      "buyingBodyAccountBound": "Speak to a merchant and choose to browse their goods, and their shop opens as a single panel: everything they stock in one list, yours with a click if you can afford it. A quantity strip above the goods sets how many each click buys, one, five, or ten at a time, or a custom count, though a few special wares, mounts among them, only ever sell one at a time. Stackable coin-priced wares also carry a second offer beside the row that takes as many as your coin covers, up to a full stack, in one purchase. Selling is just as direct: while the shop is open, click an item in your bags to sell it on the spot, and what a merchant will not take, quest goods and account bound pieces among them, simply stays put. If you part with something you regret, the shop keeps a Buyback list of your recent sales so you can buy them back for the coin you were paid.",
       "junkTitle": "Vyklízení harampádí",
       "junkBody": "Předměty, pro které nemáš využití, se pořád prodají kterémukoli prodejci, takže batohy vyprazdňuj pokaždé, když projdeš městem, místo aby se zaplnily. Prodejní záložka u obchodníka dokonce drží tlačítko na jedno kliknutí, které naráz prodá každou drobnost chabé kvality. Opravdu bezcenné drobnosti můžeš také rovnou zahodit a udělat místo.",
       "tradeTitle": "Obchod s ostatními hráči",
@@ -6752,6 +6762,7 @@ export const cs_CZ: EnTranslations = {
       "mailTitle": "Havraní pošta",
       "mailBody": "Každé větší město drží vyřezávaný havraní sloup: schránku Havraní pošty, dopisní služby celé říše. Postav se k němu a napiš jakékoli postavě podle jména, příteli online i dávno offline, a k dopisu přilož mince nebo zboží za drobné poštovné. Havranovi chvíli trvá, než doletí; když přistane, ikona obálky příjemci prozradí, že na něj něco čeká.",
       "mailHow": "Vyzvedávání funguje stejně obráceně: postav se ke kterémukoli sloupu, přečti si dopisy a vezmi, co nesou, do měšce a batohů. Prostý dopis po čase vybledne, ale ten, který stále nese mince nebo zboží, na tebe počká, ať ti to trvá jakkoli dlouho. Některé věci pošta odmítá rovnou: předměty vázané k duši, úkolové zboží a jedinečné kosmetické tokeny cestují s tebou, nebo vůbec. A po vydařeném odevzdání úkolu měj sloup na očku; někteří zadavatelé úkolů píší.",
+      "mailHowAccountBound": "Collecting works the same in reverse: stand at any pillar to read your letters and take what they carry into your purse and bags. A plain letter fades away after a while, but one still carrying coin or goods waits for you, however long you take. Some things the post refuses outright: quest goods, bound or bind-on-trade pieces, and one-of-a-kind cosmetic tokens travel with you or not at all, and an account bound item rides a raven only to another of your own characters. And keep an eye on the pillar after a good turn-in; some questgivers write.",
       "dailyTitle": "Denní odměny",
       "dailyBody": "Tlačítko s truhlou pokladu na obrazovce otevře okno denních odměn. Každý den nabídne hrstku úkolů, dokonči úkoly, bojuj v Popelavém koloseu, vyhraj zápas Poháru údolí, a nabízí i roztočení kola cen zdarma, vše za body do denního pořadí, a nejúspěšnější hráči dne si dělí balík cen pro držitele volitelného komunitního tokenu. Nic z toho nedává ve hře sílu. Samo okno vypisuje pravidla dne a kdo je způsobilý, ukazuje žebříček a uchovává tvou historii.",
       "marketTitle": "Světový trh",
@@ -6830,6 +6841,7 @@ export const cs_CZ: EnTranslations = {
       "guildBankHeading": "Cechovní banka",
       "guildBankBody": "Cech si drží i vlastní trezor. Zajdi k bankéři v jednom z centrálních měst, otevři si banku a přepni na záložku Cech: najdeš tam pokladnici mincí a sdílený sklad předmětů, které cech vlastní společně. Otevřít ho a podívat se dovnitř může každý člen a panel jasně říká, kdo může udělat víc. Jednat, tedy vkládat mince i zboží a zase je vydávat, mohou jen mistr cechu a důstojníci, a každý vklad i výběr se zapíše do záznamu, který si cech může přečíst, takže se nic nepohne bez stopy.",
       "guildBankRulesBody": "Sklad předmětů začíná zavřený. Otevře ho důstojník z vlastní kapsy a cech ho pak může rozšířit platbou z pokladnice. Úkolové předměty, cokoli vázané k duši a výbava, kterou neodebere ani Trh, do něj nepatří, stejně jako do pošty a na Trh, takže banka je pro zboží, které si ještě může vyměnit majitele.",
+      "guildBankRulesBodyAccountBound": "The item store starts closed. An officer opens it out of their own pocket, and the guild can pay from the treasury to widen it later. Quest items, anything account bound, and gear the Market will not take stay out of it, the same as the Market, so the bank is for goods that can still change hands between players.",
       "discordLinkBody": "Panel Discord ve hře funguje i obráceně. Propoj s ním svůj účet Discordu a komunitní role, které tam máš, tě budou provázet i ve světě: barevné jméno nad hlavou a značka u chatových řádků pro moderátorské role, takže vždy poznáš skutečného moderátora od někoho, kdo si jen půjčuje jméno. Propojení navíc sleduje status, který roste s tím, jak se zapojuješ. Nic z toho ve hře neuděluje žádnou moc.",
       "moderationHeading": "Nahlášení hráče",
       "moderationBody": "Pokud si hráč něco dovoluje, klikni pravým tlačítkem na jeho jméno a vyber Nahlásit hráče. Vyber důvod, od obtěžování přes spam po podvádění, přidej řádek o tom, co se stalo, a odešli to: hlášení jde ke čtení moderátorům. Hlášení je pro ně poznámka, ne samo o sobě trest. Odeslání nikoho neumlčí, nevyhodí ani nezavře do vězení, a nepřijde ti žádná odpověď s tím, co bylo rozhodnuto. Zablokování zastaví obtěžování, zatímco čekáš.",

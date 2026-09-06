@@ -25,7 +25,7 @@ export const arena: GuidePage = {
           'guide.arenaPage.honorHeading',
           p('guide.arenaPage.honorBody') +
             p('guide.arenaPage.quartermastersBody') +
-            callout(esc(t('guide.arenaPage.honorFinalNote')), { variant: 'warn' }),
+            callout(esc(t('guide.arenaPage.honorFinalNoteAccountBound')), { variant: 'warn' }),
         )}
         ${section(
           'guide.arenaPage.warfareHeading',

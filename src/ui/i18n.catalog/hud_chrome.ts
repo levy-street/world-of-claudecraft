@@ -277,6 +277,10 @@ export const hudChromeStrings = {
       // says WHY (the exchange lock predicate's arms).
       ineligibleReason:
         'Soulbound, quest, and locked items, and items outside the Exchange categories, cannot be sold for $WOC.',
+      // The account-bound reword of ineligibleReason (which stays at its original
+      // English until the release-tier fill retires it). Wordy, M16.
+      ineligibleReasonAccountBound:
+        'Account bound, quest, and locked items, and items outside the Exchange categories, cannot be sold for $WOC.',
       incomingTitle: '$WOC offer from {name}',
       incomingBody: '{name} offers to sell you {item} for {price}.',
       // The formatter already spells the currency in every locale (US$,
@@ -2641,9 +2645,17 @@ export const hudChromeStrings = {
   // bracketed tag above is tooltip-line chrome, not a label a screen reader
   // should read as "left-bracket HEROIC right-bracket".
   itemHeroicLabel: 'Heroic',
-  // Tooltip marker for a soulbound item (bound to its owner: cannot be traded, mailed,
-  // listed, sold, or destroyed). Currency-like reward tokens (Heroic Marks) carry this.
+  // Retired tooltip marker (the pre-account-bound wording). Stays in the catalog at
+  // its original English until the release-tier fill retires it; every render site
+  // reads itemAccountBound below.
   itemSoulbound: 'Soulbound',
+  // Tooltip marker for an account bound item (def soulbound): bound to the ACCOUNT
+  // that earned it, so it cannot be traded, listed, sold, or destroyed, but it rides
+  // the Ravenpost between that account's own characters
+  // (src/sim/mail/account_bound.ts). Currency-like reward tokens (Heroic Marks),
+  // Warfare gear, and class-specific bound gear alike carry this. Wordy, M16: the
+  // five non-Latin fills land in this same change.
+  itemAccountBound: 'Account Bound',
   // Tooltip marker for a unique-equipped item (every legendary): a character can wear
   // at most one copy of it at a time (src/sim/equipment_rules.ts isUniqueEquipped).
   itemUniqueEquipped: 'Unique-Equipped',
@@ -4418,6 +4430,10 @@ export const hudChromeStrings = {
     indicatorAria: 'Unread mail: {count}',
     indicatorTip: 'You have {count} unread letters. Visit a mailbox to read them.',
     clickAttach: 'Click to attach to your letter.',
+    // Account bound piece: attaches, but the letter only reaches your own
+    // characters (the server refuses any other recipient at send). Wordy, M16.
+    clickAttachAccountBound:
+      'Click to attach. Account bound: only your own characters can receive it.',
     cannotMail: 'This cannot be mailed.',
     result: {
       sent: 'A raven takes wing with your letter to {name} ({postage} postage).',
@@ -4429,6 +4445,10 @@ export const hudChromeStrings = {
       noMailQuestItems: 'You cannot mail quest items.',
       // Wordy, M16: the five non-Latin fills land in this same change.
       noMailBound: 'That item is bound and cannot be mailed.',
+      // The account-bound refusal (mailResult noMailSoulbound, src/sim/mail/
+      // account_bound.ts): a bound item rides only to the sender's own characters.
+      // Wordy, M16: the five non-Latin fills land in this same change.
+      noMailAccountBound: 'Account bound items can only be mailed to your own characters.',
       notEnoughItems: 'You do not have that many to send.',
       cantAffordPostage: 'You cannot afford the postage.',
       recipientBoxFull: 'Their mailbox is full.',

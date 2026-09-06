@@ -559,6 +559,9 @@ const MONOLITHS: MonolithRow[] = [
     // in the self-snapshot build plus its wireParkedMana import); the
     // branch's own surface is unchanged (exact merged count, zero headroom).
     file: 'server/game.ts',
+    // Lowered 10587 -> 10572 by the account-bound mail extraction: the
+    // mail_send offline-recipient resolution (name lookup, block list, the
+    // same-account stamp) moved into server/mail_recipient.ts.
     // Lowered from 10900 with the vault-wire extraction (server/vault_wire.ts
     // took the vault dispatch bodies, the cvault cadence rule, and the
     // craft-consume batch); bank-storage phase 06+ server code lands THERE,
@@ -630,7 +633,7 @@ const MONOLITHS: MonolithRow[] = [
     // Down 10604 -> 10587 for the per-surface action-bar profiles: the
     // join read, the per-profile merge and the FIFO write moved to
     // server/hotbar_layout.ts (HotbarLayoutStore). Exact count.
-    ceiling: 10587,
+    ceiling: 10572,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

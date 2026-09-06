@@ -921,9 +921,9 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
       meta(sim).inventory.findIndex((s) => s.itemId === 'final_argument_greatblade'),
     );
     expect(fingerprint(sim)).toBe(before);
-    expect(hasErr(sim.drainEvents(), 'You cannot store soulbound items in the guild bank.')).toBe(
-      true,
-    );
+    expect(
+      hasErr(sim.drainEvents(), 'You cannot store account bound items in the guild bank.'),
+    ).toBe(true);
   });
 
   it('refuses noMarketList items on deposit, mutating nothing', () => {
@@ -1003,7 +1003,7 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
     // The WITHDRAW direction speaks its own line: telling an officer they
     // "cannot store" a copy already sitting in the book is simply wrong.
     expect(hasErr(evs, 'That item cannot be withdrawn from the guild bank.')).toBe(true);
-    expect(hasErr(evs, 'You cannot store soulbound items in the guild bank.')).toBe(false);
+    expect(hasErr(evs, 'You cannot store account bound items in the guild bank.')).toBe(false);
     expect(hasErr(evs, 'That item cannot be stored in the guild bank.')).toBe(false);
   });
 

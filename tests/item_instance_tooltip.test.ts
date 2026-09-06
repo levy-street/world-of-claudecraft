@@ -416,7 +416,7 @@ describe('hud.itemTooltip composition order (source pins)', () => {
   // The mark line takes the def's kind too: the gathered-vs-crafted
   // wording split resolves from item.kind at the one composition site.
   const mark = hud.indexOf('instanceMakersMarkLine(instance, item.kind)');
-  const soulbound = hud.indexOf("t('hudChrome.itemSoulbound')");
+  const soulbound = hud.indexOf("t('hudChrome.itemAccountBound')");
   const setBlock = hud.indexOf('this.itemSetBlock(item)');
 
   it('composes all three instance line sets exactly once each', () => {
@@ -471,7 +471,7 @@ describe('instancePartyTradeLine (the BoP party trade window line)', () => {
 
   it('composes in hud.itemTooltip right after the Soulbound line, before the bond lines', () => {
     const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
-    const soulbound = hud.indexOf("t('hudChrome.itemSoulbound')");
+    const soulbound = hud.indexOf("t('hudChrome.itemAccountBound')");
     const partyTrade = hud.indexOf('instancePartyTradeLine(instance,');
     const binding = hud.indexOf('instanceBindingLines(instance, item.kind)');
     expect(partyTrade).toBeGreaterThan(soulbound);

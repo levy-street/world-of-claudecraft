@@ -267,7 +267,7 @@ describe('guild-tab bag click routing (behavioral, real BagsWindow)', () => {
   it('each pipe deny voices its exact sim line and dispatches nothing', () => {
     const denies: Array<[string, string]> = [
       [questId, tSim('error.guildBankQuestItem')],
-      [soulboundId, tSim('error.guildBankSoulbound')],
+      [soulboundId, tSim('error.guildBankAccountBound')],
       [noMarketId, tSim('error.guildBankNoTransfer')],
     ];
     for (const [itemId, line] of denies) {
@@ -296,7 +296,7 @@ describe('guild-tab bag click routing (behavioral, real BagsWindow)', () => {
     expect(tSim('error.bankQuestItem')).not.toBe(
       guildBankPipeRefusal({ itemId: questId, count: 1 }),
     );
-    expect(tSim('error.guildBankSoulbound')).toBe(
+    expect(tSim('error.guildBankAccountBound')).toBe(
       guildBankPipeRefusal({ itemId: soulboundId, count: 1 }),
     );
     expect(tSim('error.guildBankNoTransfer')).toBe(

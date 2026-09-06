@@ -1571,7 +1571,7 @@ export class BagsWindow {
     );
     switch (action) {
       case 'transferBlockedSoulbound':
-        this.deps.showError(t('hudChrome.itemSoulbound'));
+        this.deps.showError(t('hudChrome.itemAccountBound'));
         return;
       case 'trade':
         this.deps.addItemToTrade(s.itemId);
@@ -1691,7 +1691,7 @@ export class BagsWindow {
         this.deps.showError(tSim('error.guildBankQuestItem'));
         return;
       case 'guildBankDepositBlockedSoulbound':
-        this.deps.showError(tSim('error.guildBankSoulbound'));
+        this.deps.showError(tSim('error.guildBankAccountBound'));
         return;
       case 'guildBankDepositBlockedNoTransfer':
         this.deps.showError(tSim('error.guildBankNoTransfer'));

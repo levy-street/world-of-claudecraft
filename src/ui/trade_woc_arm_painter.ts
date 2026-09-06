@@ -489,7 +489,7 @@ export function refreshWocTradeArm(root: ParentNode, model: WocTradeModel): void
   );
   setText(
     '[data-woc-ineligible-why]',
-    model.ineligible.length === 0 ? '' : t('hudChrome.trade.woc.ineligibleReason'),
+    model.ineligible.length === 0 ? '' : t('hudChrome.trade.woc.ineligibleReasonAccountBound'),
   );
   // A disabled affordance always says why: the hint rides beside it and
   // clears the moment the action becomes available. The model picks the

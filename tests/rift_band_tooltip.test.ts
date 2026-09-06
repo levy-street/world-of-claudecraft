@@ -47,7 +47,7 @@ describe('rift band tooltip: lines', () => {
     const band = createRiftGearInstance('tt', 'S', 'mage', 1, 2);
     band.instance.rift?.gems.push('rift_gem_azure');
     const html = riftBandTooltipLines(band.instance);
-    expect(html).toContain(t('hudChrome.itemSoulbound'));
+    expect(html).toContain(t('hudChrome.itemAccountBound'));
     expect(html).toContain(t('hudChrome.itemTooltip.riftTier', { tier: 'S' }));
     expect(html).toContain(t('hudChrome.itemTooltip.riftUpgrade', { level: '2', max: '5' }));
     expect(html).toContain(t('hudChrome.itemTooltip.riftSockets', { used: '1', total: '2' }));

@@ -318,33 +318,48 @@ describe('transfer-locked instanced copies (issue 1165)', () => {
   });
 });
 
-describe('soulbound transfer affordances', () => {
-  it('blocks trade, mail, market, and vendor clicks instead of staging a Heroic Mark transfer', () => {
+describe('account bound transfer affordances', () => {
+  it('blocks trade, market, and vendor clicks instead of staging a Heroic Mark transfer', () => {
     expect([
       bagItemAction(ITEMS.mark, { ...NO_MODE, tradeOpen: true }),
-      bagItemAction(ITEMS.mark, { ...NO_MODE, mailAttach: true }),
       bagItemAction(ITEMS.mark, { ...NO_MODE, marketSell: true }),
       bagItemAction(ITEMS.mark, { ...NO_MODE, vendorOpen: true }),
     ]).toEqual([
       'transferBlockedSoulbound',
       'transferBlockedSoulbound',
       'transferBlockedSoulbound',
-      'transferBlockedSoulbound',
     ]);
   });
 
-  it('labels every blocked transfer as soulbound instead of advertising the action', () => {
+  it('labels every blocked transfer as account bound instead of advertising the action', () => {
     expect([
       bagTooltipHintKey(ITEMS.mark, { ...NO_MODE, tradeOpen: true }),
-      bagTooltipHintKey(ITEMS.mark, { ...NO_MODE, mailAttach: true }),
       bagTooltipHintKey(ITEMS.mark, { ...NO_MODE, marketSell: true }),
       bagTooltipHintKey(ITEMS.mark, { ...NO_MODE, vendorOpen: true }),
     ]).toEqual([
-      'hudChrome.itemSoulbound',
-      'hudChrome.itemSoulbound',
-      'hudChrome.itemSoulbound',
-      'hudChrome.itemSoulbound',
+      'hudChrome.itemAccountBound',
+      'hudChrome.itemAccountBound',
+      'hudChrome.itemAccountBound',
     ]);
+  });
+
+  // Account bound (src/sim/mail/account_bound.ts): a bound piece rides the
+  // Ravenpost to the sender's own characters, and only the server knows whether
+  // the typed recipient is one, so the bag ATTACHES it and reads the
+  // own-characters hint; the send refuses any other recipient.
+  it('attaches an account bound item to a letter and reads the own-characters hint', () => {
+    expect(bagItemAction(ITEMS.mark, { ...NO_MODE, mailAttach: true })).toBe('mailAttach');
+    expect(bagTooltipHintKey(ITEMS.mark, { ...NO_MODE, mailAttach: true })).toBe(
+      'hudChrome.mailbox.clickAttachAccountBound',
+    );
+    // The other mail refusals still win over the bound attach: a quest or
+    // unlisted def, and a per-copy transfer lock.
+    expect(bagItemAction({ ...ITEMS.mark, kind: 'quest' }, { ...NO_MODE, mailAttach: true })).toBe(
+      'mailAttachBlocked',
+    );
+    expect(bagItemAction(ITEMS.mark, { ...NO_MODE, mailAttach: true }, { bindOnTrade: true })).toBe(
+      'mailAttachBlockedBound',
+    );
   });
 });
 
