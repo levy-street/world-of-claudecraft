@@ -506,6 +506,7 @@ import { LootRollController } from './hud/loot/loot_roll_controller';
 import { lootSettingsView } from './hud/loot/loot_settings_view';
 import { renderLootSettingsWindow } from './hud/loot/loot_settings_window';
 import { LootWindowController } from './hud/loot/loot_window_controller';
+import { LootExplorerWindow } from './hud/loot_explorer/loot_explorer_window';
 import { MapMarkerInteractionController, MapMarkerTooltipContent } from './hud/map';
 import { livingSecondaryPet } from './hud/pet_bar_core';
 import { CARD_POSES } from './hud/player_card/player_card';
@@ -2772,6 +2773,7 @@ export class Hud {
     $('#mm-quest').addEventListener('click', () => this.toggleQuestLog());
     $('#mm-deeds').addEventListener('click', () => this.toggleDeeds());
     $('#mm-reliquary')?.addEventListener('click', () => this.toggleReliquary());
+    $('#mm-loot-explorer')?.addEventListener('click', () => this.toggleLootExplorer());
     $('#mm-professions').addEventListener('click', () => this.toggleProfessions());
     // Collapse/expand the on-screen quest tracker by clicking its header. The
     // overlay is click-through (pointer-events:none) except the header button, so
@@ -3585,6 +3587,10 @@ export class Hud {
       case 'reliquary-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.reliquaryWindow.close();
+        break;
+      case 'loot-explorer-window':
+        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
+        this.lootExplorerWindow.close();
         break;
       case 'professions-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
@@ -5347,6 +5353,16 @@ export class Hud {
       this.optionsHooks?.onSettingChange('showReliquaryTracker', shown);
       this.updateReliquaryTracker();
     },
+  });
+  // Loot Explorer: a cold, static-content catalog window (no IWorld read at
+  // all, see src/ui/hud/loot_explorer/CLAUDE.md), so its deps bag is the
+  // minimal window shape with no world()/tracker members.
+  private readonly lootExplorerWindow = new LootExplorerWindow({
+    ...this.presentationBag,
+    root: () => $('#loot-explorer-window'),
+    closeOthers: () => this.closeOtherWindows('#loot-explorer-window'),
+    hideTooltip: () => this.hideTooltip(),
+    ...this.windowFocus('#loot-explorer-window'),
   });
   // Watchlist HUD tracker (#deed-tracker): slow-band painter over the one
   // reused tracker-view container (allocation-light by contract).
@@ -8177,6 +8193,7 @@ export class Hud {
       ['#mm-quest', 'questlog', 'questUi.log.title'],
       ['#mm-deeds', 'deeds', 'hudChrome.deeds.title'],
       ['#mm-reliquary', 'reliquary', 'hudChrome.reliquary.title'],
+      ['#mm-loot-explorer', 'lootExplorer', 'hudChrome.lootExplorer.title'],
       ['#mm-professions', 'professions', 'hudChrome.professions.title'],
       ['#mm-map', 'map', 'hud.core.mobileMap'],
       ['#mm-bag', 'bags', 'itemUi.bags.title'],
@@ -16388,6 +16405,10 @@ export class Hud {
 
   toggleReliquary(): void {
     this.reliquaryWindow.toggle();
+  }
+
+  toggleLootExplorer(): void {
+    this.lootExplorerWindow.toggle();
   }
 
   // Repaint the deed tracker from the live facet: the slow band, a watch

@@ -156,6 +156,8 @@ export interface MobileControlCallbacks {
   onDeeds(): void;
   /** Open The Reliquary window, folded into the More tray on mobile. */
   onReliquary(): void;
+  /** Open the Loot Explorer window, folded into the More tray on mobile. */
+  onLootExplorer(): void;
   /** Mount / dismount from the More tray. Dismounts instantly when riding;
    *  when unmounted, summons the player's first owned mount directly (no
    *  action-bar or bag detour needed), or falls back to the shared toggle's
@@ -545,6 +547,7 @@ export class MobileControls {
     this.bindButton('mobile-wocmarket', () => this.callbacks.onWocMarket());
     this.bindButton('mobile-deeds', () => this.callbacks.onDeeds());
     this.bindButton('mobile-reliquary', () => this.callbacks.onReliquary());
+    this.bindButton('mobile-loot-explorer', () => this.callbacks.onLootExplorer());
     this.bindButton('mobile-mounts', () => this.callbacks.onMountToggle());
     this.bindButton('mobile-professions', () => this.callbacks.onProfessions());
     const nameplatesBtn = document.getElementById('mobile-nameplates');

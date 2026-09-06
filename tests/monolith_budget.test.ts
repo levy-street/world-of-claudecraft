@@ -324,7 +324,15 @@ const MONOLITHS: MonolithRow[] = [
     // stays extracted in src/ui/hud/action_bar/action_bar_bind_banner.ts, and
     // the resolved Hud coordinator lands at this exact merged count.
     // Exact count, zero slack.
-    ceiling: 18918,
+    // Raised 18918 -> 18939 (+21) while merging PR #3858 for the Loot Explorer
+    // window: the field/ctor, the toggle method, the close-switch case, and
+    // the two minimap wiring lines are thin-consumer wiring to the fully
+    // extracted domain module (src/ui/hud/loot_explorer/); everything with substance (the index
+    // builder, filters, encounter grouping, the painter) lives there. Same
+    // shape as every prior window wiring (Reliquary, Deeds, Professions), and
+    // no clean branch-owned extraction exists for a brand-new window's own
+    // wiring. Maintainer decision, exact count: any further growth reds again.
+    ceiling: 18939,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -609,7 +617,11 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at this conflicted PR #3835 merge after the candidate's
     // render/post integration grew main.ts independently of the foliage tier
     // ladder. Measured on the merged tree. Exact count, zero headroom.
-    ceiling: 11539,
+    // Raised 11539 -> 11546 while merging PR #3858 for the Loot Explorer
+    // dispatch wiring: two keybind/controller switch arms plus the mobile
+    // controls hook, all thin calls into Hud's extracted window seam. Exact
+    // merged count, zero headroom.
+    ceiling: 11546,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

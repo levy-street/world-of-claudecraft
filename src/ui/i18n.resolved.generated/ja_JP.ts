@@ -978,6 +978,7 @@ export const ja_JP: EnTranslations = {
       "mounts": "マウント",
       "professions": "専門技能",
       "reliquary": "聖遺物庫",
+      "lootExplorer": "戦利品ブラウザ",
       "nameplates": "ネームプレート",
       "haptics": "振動",
       "hapticsOff": "振動オフ",
@@ -4692,6 +4693,43 @@ export const ja_JP: EnTranslations = {
       "listingStatusCancelled": "取り下げ済み",
       "listingStatusSuspended": "停止中",
       "listingStatusUnsold": "未売却"
+    },
+    "lootExplorer": {
+      "title": "戦利品ブラウザ",
+      "close": "戦利品ブラウザを閉じる",
+      "searchPlaceholder": "アイテムを検索...",
+      "searchAria": "アイテムを検索",
+      "filterCategoryAria": "入手元",
+      "filterClassAria": "クラス",
+      "filterStatAria": "Stat",
+      "filterQualityAria": "品質",
+      "filterAll": "All",
+      "tabItems": "By Item",
+      "tabEncounters": "入手先別",
+      "category": {
+        "raid": "Raid",
+        "dungeon": "ダンジョン",
+        "delve": "デルヴ",
+        "open_world": "オープンワールド",
+        "rift": "Rift",
+        "vendor": "商人",
+        "quest_reward": "クエスト報酬",
+        "quest_objective": "クエスト目標",
+        "ground_object": "フィールドオブジェクト",
+        "starting_equipment": "初期装備"
+      },
+      "difficulty": {
+        "normal": "ノーマル",
+        "heroic": "ヒロイック"
+      },
+      "riftRankLabel": "Rift Rank {rank}",
+      "source": "{category}: {name}",
+      "sourceWithContext": "{category}: {name} ({context})",
+      "chance": "ドロップ率 {pct}%",
+      "guaranteed": "確定",
+      "gatedByQuest": "クエスト進行中: {quest}",
+      "empty": "これらの絞り込み条件に一致する戦利品はありません。",
+      "resultCount": "{count} 件の結果"
     }
   },
   "gatherEvent": {
