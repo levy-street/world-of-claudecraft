@@ -17,9 +17,15 @@ export const PERF_ATTRIB_KNOB_CASES = [
   { knob: 'bladeCarpetRadius', gfxo: 'bladeCarpetRadius:0' },
   { knob: 'cliffScree', gfxo: 'cliffScree:0' },
   { knob: 'canopyDetail', gfxo: 'canopyDetail:0' },
+  // Each row carries its LOW-preset value, so this one is 0: it sheds the
+  // canopy taps while leaving the layer's textures resident, which the
+  // canopyDetail:0 row above does not (canopy_detail_tier_core.ts).
+  { knob: 'canopyDetailTaps', gfxo: 'canopyDetailTaps:0' },
   { knob: 'pixelRatioCap', gfxo: 'pixelRatioCap:1.48' },
   { knob: 'grassRadius', gfxo: 'grassRadius:72' },
   { knob: 'grassStep', gfxo: 'grassStep:2.05' },
+  // The low-preset tuft: the two uprights, no diagonal and no cap card.
+  { knob: 'grassCardsPerTuft', gfxo: 'grassCardsPerTuft:2' },
   { knob: 'leanFoliage', gfxo: 'leanFoliage:1' },
   { knob: 'standardMaterials', gfxo: 'standardMaterials:0' },
   { knob: 'terrainSplat', gfxo: 'terrainSplat:0' },

@@ -112,10 +112,11 @@ import {
 import { runSlicedBuild } from './grass_build_slicer_core';
 import {
   type GrassCapCollapseBand,
-  grassCapCollapseBand,
   grassCapCollapseShaderPatch,
   grassCardProgramCacheKey,
+  grassCollapseBandFor,
 } from './grass_cap_collapse_core';
+import { grassTuftCards, grassTuftHasCap } from './grass_tuft_cards_core';
 import {
   buildGroundDecorPrewarmTwins,
   registerGroundDecorPrewarmDraw,
@@ -776,7 +777,7 @@ let foliagePrewarmDraws: readonly FoliagePrewarmDraw[] = [];
 // The tree-detail boundary is NOT a constant: it follows the zone's fog, so an
 // impostor can never be caught standing in clear air. See that module's header.
 function lodDists(): LodDists {
-  return lodDistsFor(GFX.leanFoliage);
+  return lodDistsFor(GFX.leanFoliage, GFX.tier);
 }
 
 // Slow travelling gust, shared by the canopy and grass shaders: it scales the
@@ -2714,37 +2715,22 @@ function buildGrassRing(
   // high tier reads as a lush meadow: wider tufts with more blades; low keeps
   // the legacy sprite size
   const lush = !GFX.leanFoliage;
-  const capCollapseBand = grassCapCollapseBand(GFX.bladeCarpetRadius);
+  const hasCapCard = grassTuftHasCap(GFX.grassCardsPerTuft, lush);
+  const capCollapseBand = grassCollapseBandFor(GFX.bladeCarpetRadius, hasCapCard);
   const capNearCollapse = capCollapseBand !== null;
   const lowPlusGrassScale = GFX.lowPlus ? 1.08 : 1;
-  const quad = new THREE.PlaneGeometry(
-    lush ? 1.45 : 1.1 * lowPlusGrassScale,
-    lush ? 0.9 : 0.7 * lowPlusGrassScale,
-  );
-  quad.translate(0, lush ? 0.4 : 0.35 * lowPlusGrassScale, 0);
-  const quad2 = quad.clone().rotateY(Math.PI / 2);
-  // Lush tier gets a third card at 45 degrees with a slight lean and a
-  // narrower/taller silhouette: two perpendicular cards read as a flat
-  // cross from above (the "4-way image"); the offset third card breaks the
-  // X in every direction for one extra quad per tuft. Low tier keeps two.
-  const quad3 = lush
-    ? new THREE.PlaneGeometry(1.15, 1.05)
-        .translate(0, 0.45, 0)
-        .rotateZ(0.12)
-        .rotateY(Math.PI / 4)
-    : null;
-  // A near-horizontal cap card: from a true top-down camera (positive pitch,
-  // the chase camera's common angle) every vertical card goes edge-on and
-  // the meadow read as bare ground with green fans. The cap keeps blade
-  // texture facing the sky for one more quad on the lush tier only.
-  const quadCap = lush
-    ? new THREE.PlaneGeometry(1.05, 1.05).rotateX(-Math.PI / 2 + 0.18).translate(0, 0.34, 0)
-    : null;
   const capPart = (part: THREE.BufferGeometry, cap: 0 | 1): THREE.BufferGeometry =>
     capNearCollapse ? tagCapVertices(part, cap) : part;
-  const parts = [capPart(quad, 0), capPart(quad2, 0)];
-  if (quad3) parts.push(capPart(quad3, 0));
-  if (quadCap) parts.push(capPart(quadCap, 1));
+  // The card ladder and each card's placement live in the pure core; the tier
+  // knob (GFX.grassCardsPerTuft) decides how many of them a tuft gets.
+  const parts = grassTuftCards(GFX.grassCardsPerTuft, lush, lowPlusGrassScale).map((card) => {
+    const part = new THREE.PlaneGeometry(card.width, card.height);
+    if (card.preRotX !== 0) part.rotateX(card.preRotX);
+    part.translate(0, card.liftY, 0);
+    if (card.rotZ !== 0) part.rotateZ(card.rotZ);
+    if (card.rotY !== 0) part.rotateY(card.rotY);
+    return capPart(part, card.cap);
+  });
   const geo = mergeGeometries(parts);
   geo.deleteAttribute('normal');
 
