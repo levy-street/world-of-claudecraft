@@ -20,6 +20,8 @@ export type MountKey =
   | 'stormfeather_griffin'
   | 'thunderstrut_gobbler'
   | 'drakemaw_raptor'
+  | 'goblin_rocket_sled'
+  | 'rallycart_rxt'
   | 'mech_bird'
   | 'lanternback_troll'
   | 'chimeglass_tortoise'
@@ -119,6 +121,20 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     rarity: 'epic',
     moveSpeedPct: 0.8,
   },
+  // Developer-only while its in-world motion, exhaust, audio, and final asset
+  // contract are reviewed. Keep it above the pinned developer-tail tank.
+  goblin_rocket_sled: {
+    key: 'goblin_rocket_sled',
+    name: 'Goblin Rocket Sled',
+    rarity: 'epic',
+    moveSpeedPct: 0.8,
+  },
+  rallycart_rxt: {
+    key: 'rallycart_rxt',
+    name: 'Rallycart RXT',
+    rarity: 'epic',
+    moveSpeedPct: 0.8,
+  },
   // A hill troll broken to the saddle by lamplighters: he carries an iron
   // throne strapped across his shoulders with a storm lantern hung off each
   // arm of it, so the rider travels lit. Developer-only for now.
@@ -173,6 +189,8 @@ export const MOUNT_KEYS = Object.keys(MOUNTS) as readonly MountKey[];
  *  tests all read it, so a fourth place can never disagree about which mounts
  *  are still under development. */
 export const DEVELOPER_MOUNTS: readonly MountKey[] = [
+  'goblin_rocket_sled',
+  'rallycart_rxt',
   'lanternback_troll',
   'chimeglass_tortoise',
   'terrorspark_groundshaker',

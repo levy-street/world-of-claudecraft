@@ -17,6 +17,7 @@ import {
   type WebGLRenderTarget,
 } from 'three';
 import { FullScreenQuad, Pass } from 'three/examples/jsm/postprocessing/Pass.js';
+import { FINITE_GUARD_GLSL } from './post_finite_guard_glsl';
 
 interface TimeUniform {
   value: number;
@@ -30,12 +31,23 @@ export const OUTPUT_GRADE_FRAGMENT_SHADER = /* glsl */ `
   uniform float uTime;
   uniform vec4 uInputUvRect;
   uniform vec2 uInputTexelSize;
+  // Spirit (ghost) mode, 0 alive to 1 fully drained. Eased on the CPU by
+  // spirit_grade_core.ts, the same 0.6s CSS ease the base.css filter it
+  // replaces used to run.
+  uniform float uSpirit;
 
   #include <tonemapping_pars_fragment>
   #include <colorspace_pars_fragment>
 
   in vec2 vUv;
   out vec4 pc_fragColor;
+
+  // The classic death drain: CSS grayscale(1) brightness(0.88). The CSS
+  // filter list interpolates BOTH functions, so a half-faded ghost is a half
+  // desaturation times a half-applied brightness, not a lerp toward the final
+  // colour. Applied on display-referred sRGB values, which is where the CSS
+  // filter shorthand operates too, so the look is unchanged.
+  const float SPIRIT_BRIGHTNESS = 0.88;
 
   const vec3 LIFT = vec3(0.010, 0.008, 0.010);
   const vec3 GAIN = vec3(1.10, 1.035, 0.90);
@@ -53,18 +65,20 @@ export const OUTPUT_GRADE_FRAGMENT_SHADER = /* glsl */ `
   // the bloom high-pass reads the beauty and its Gaussian blur smears the NaN
   // across every mip, so OutputGradePass adds a frame-wide NaN and the tonemap
   // maps it to black. NaN survives only in the float composer targets (the
-  // direct-to-canvas UNSIGNED_BYTE tiers clamp it away), which is why low/medium
-  // are fine while the composer tiers go black. The IBL / PBR shader path emits
-  // those NaNs on some drivers (observed on ANGLE's OpenGL backend with NVIDIA on
-  // Linux). Every NaN comparison is false, so the (x < 0.0 || x >= 0.0) test
-  // keeps finite and infinite values and rewrites only NaN to zero. This must
-  // stay on the beauty AND the bloom read, since the blur already spread the NaN.
+  // are fine while the composer tiers go black. Sources seen so far: the IBL /
+  // PBR path on ANGLE's OpenGL backend (NVIDIA on Linux) and the N8AO
+  // compositer's depth-derived normal on Mali (Android Chrome). The scrub is the
+  // shared bit-exact guard (post_finite_guard_glsl.ts): the earlier comparison
+  // form let NaN through on Mali. It rewrites NaN and Inf to zero and must stay
+  // on the beauty AND the bloom read, since the blur already spread the NaN.
+  // The output-grade wrapper still clamps finite overflow candidates to the
+  // HalfFloat target's own max finite magnitude before quantizeHalf(), so a
+  // bright beauty + bloom sum cannot round back to Inf.
+  ${FINITE_GUARD_GLSL}
+
   vec3 sanitizeFinite(vec3 v) {
-    return vec3(
-      (v.x < 0.0 || v.x >= 0.0) ? v.x : 0.0,
-      (v.y < 0.0 || v.y >= 0.0) ? v.y : 0.0,
-      (v.z < 0.0 || v.z >= 0.0) ? v.z : 0.0
-    );
+    vec3 finite = wocSanitizeFinite(v);
+    return clamp(finite, vec3(-65504.0), vec3(65504.0));
   }
 
   // The display-referred image this pass grades: one scene sample with bloom
@@ -77,8 +91,21 @@ export const OUTPUT_GRADE_FRAGMENT_SHADER = /* glsl */ `
     outputColor.rgb = sanitizeFinite(outputColor.rgb);
 
     #ifdef BLOOM_PREPARED
+      // Sanitize the bloom addend AND the sum: the blur already smeared any
+      // NaN in the beauty target across every bloom mip, so a NaN bloom tap
+      // must be scrubbed here too, before it reaches the sum. Skipping this
+      // scrub turns a NaN bloom tap into beauty + NaN, which is NaN again,
+      // and the sum-sanitize below rewrites the WHOLE pixel to 0 instead of
+      // just dropping the bloom contribution. Sanitizing the sum on top of
+      // that (rather than instead of it) is still required: outputColor.rgb
+      // is already capped at 65504 above, and an equally-capped bloom term
+      // can still add past it (up to 131008), which packHalf2x16 below
+      // cannot represent and rounds to +Infinity, right back to the failure
+      // this pass exists to prevent. Neither scrub substitutes for the other.
       vec4 bloom = texture(tBloom, inputUv);
-      outputColor.rgb = quantizeHalf(outputColor.rgb + sanitizeFinite(bloom.rgb * bloom.a));
+      outputColor.rgb = quantizeHalf(
+        sanitizeFinite(outputColor.rgb + sanitizeFinite(bloom.rgb * bloom.a))
+      );
     #endif
 
     #ifdef LINEAR_TONE_MAPPING
@@ -258,6 +285,10 @@ export const OUTPUT_GRADE_FRAGMENT_SHADER = /* glsl */ `
     vec2 d = vUv - 0.5;
     c *= 1.0 - 0.20 * smoothstep(0.60, 0.95, dot(d, d) * 2.2);
     c += (fract(sin(dot(vUv * 731.7 + uTime, vec2(12.9898, 78.233))) * 43758.5) - 0.5) * 0.012;
+    if (uSpirit > 0.0) {
+      float grey = dot(c, vec3(0.2126, 0.7152, 0.0722));
+      c = mix(c, vec3(grey), uSpirit) * (1.0 - (1.0 - SPIRIT_BRIGHTNESS) * uSpirit);
+    }
     pc_fragColor = vec4(c, 1.0);
   }
 `;
@@ -296,6 +327,7 @@ export class OutputGradePass extends Pass {
     uTime: TimeUniform;
     uInputUvRect: { value: Vector4 };
     uInputTexelSize: { value: Vector2 };
+    uSpirit: { value: number };
   };
   readonly material: RawShaderMaterial;
   readonly fsQuad: FullScreenQuad;
@@ -319,6 +351,7 @@ export class OutputGradePass extends Pass {
       uTime: timeUniform,
       uInputUvRect: { value: new Vector4(1, 1, 1, 1) },
       uInputTexelSize: { value: new Vector2(0, 0) },
+      uSpirit: { value: 0 },
     };
     this.material = new RawShaderMaterial({
       name: 'OutputGradeShader',

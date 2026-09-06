@@ -4343,18 +4343,58 @@
      touch rule): the button drops under the sentence at the 44px floor rather
      than squeezing the copy into half the width. */
   body.mobile-touch #woc-market-window .wm-banner-wallet {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  body.mobile-touch #woc-market-window .wm-banner-wallet > strong,
+  body.mobile-touch #woc-market-window .wm-banner-wallet p {
+    grid-column: 1;
   }
   body.mobile-touch #woc-market-window .wm-banner-wallet button {
-    grid-column: 1;
+    grid-column: 1 / -1;
     grid-row: auto;
     min-height: 44px;
+  }
+  /* The dismiss glyph shares the title row so hiding the card is one tap from
+     the corner, at the shared 44px touch floor. */
+  body.mobile-touch #woc-market-window .wm-banner-wallet button.wm-banner-dismiss {
+    grid-column: 2;
+    grid-row: 1;
+    min-height: 44px;
+    min-width: 44px;
+    align-self: start;
   }
   body.mobile-touch #woc-market-window .wm-wallet-balance {
     grid-column: 1;
     grid-row: auto;
     align-items: flex-start;
     text-align: left;
+  }
+  /* Landscape phone (the only in-game orientation): the sheet is short, so
+     the card lays out as ONE row (title over the sentence, balance, action,
+     dismiss) instead of the portrait-style stack that spent four rows of a
+     412px viewport on a status line. The action keeps the 44px floor. */
+  @media (orientation: landscape) {
+    body.mobile-touch #woc-market-window .wm-banner-wallet {
+      grid-template-columns: minmax(0, 1fr) auto minmax(150px, 200px) auto;
+      padding-top: 6px;
+      padding-bottom: 6px;
+    }
+    body.mobile-touch #woc-market-window .wm-wallet-balance {
+      grid-column: 2;
+      grid-row: 1 / 3;
+      align-items: flex-end;
+      text-align: right;
+    }
+    body.mobile-touch #woc-market-window .wm-banner-wallet button {
+      grid-column: 3;
+      grid-row: 1 / 3;
+      align-self: center;
+    }
+    body.mobile-touch #woc-market-window .wm-banner-wallet button.wm-banner-dismiss {
+      grid-column: 4;
+      grid-row: 1 / 3;
+      align-self: center;
+    }
   }
   /* Row rhythm on the phone sheet (the 15 QA sign-off note): taller cells
      than the desktop 6px, and the FIRST row clears the header hairline with
@@ -5566,6 +5606,7 @@
   body.mobile-touch #quest-dialog,
   body.mobile-touch #spellbook,
   body.mobile-touch #bar-editor,
+  body.mobile-touch #loot-explorer-window,
   body.mobile-touch #options-menu,
   body.mobile-touch #options-menu.kb-wide,
   body.mobile-touch #options-menu.gfx-wide,
@@ -5578,13 +5619,16 @@
   /* Wider size group: quest-log/vendor/train/quest-dialog carry longer scrollable
      lists (quest text, vendor stock, the training ladder) so they claim more of
      the viewport width. The train window also scrolls internally here: it is a
-     standalone centered card (never the vendor's split-screen bags pairing). */
+     standalone centered card (never the vendor's split-screen bags pairing).
+     Loot Explorer joins it for the same reason: its toolbar (search plus four
+     filter selects) needs the same room as the vendor stock grid. */
   body.mobile-touch #train-window,
   body.mobile-touch #unbind-window,
   body.mobile-touch #quest-log-window,
   body.mobile-touch #vendor-window,
   body.mobile-touch #warfare-window,
-  body.mobile-touch #quest-dialog {
+  body.mobile-touch #quest-dialog,
+  body.mobile-touch #loot-explorer-window {
     width: clamp(320px, 76vw, 680px);
     max-width: calc(100vw - 20px);
   }
@@ -5629,6 +5673,17 @@
       12px -
       max(10px, env(safe-area-inset-bottom))
     );
+  }
+  /* Loot Explorer scrolls as one unit (toolbar included), the train/unbind
+     shape: it has no split-screen pairing to keep visible underneath. */
+  body.mobile-touch #loot-explorer-window {
+    max-height: calc(
+      var(--app-vh) /
+      var(--window-scale, 1) -
+      12px -
+      max(10px, env(safe-area-inset-bottom))
+    );
+    overflow-y: auto;
   }
   body.mobile-touch #train-window,
   body.mobile-touch #unbind-window {
@@ -6954,6 +7009,14 @@
      popup is transient and always the active interaction, so on touch it sits
      one step above the sheet. Desktop keeps the base 90 untouched. */
   body.mobile-touch #ctx-menu {
+    z-index: 96;
+  }
+  /* Same reasoning as #ctx-menu above: the base #error-msg (hud.css) sits at
+     90, above the ordinary .window focus band (50-89) but still under the
+     mobile Bags sheet's forced 95. A deny toast fired from inside the
+     fullscreen Bags sheet (e.g. a blocked mail attach or vendor sale) needs to
+     clear that sheet too, so touch gets the same one-step-above bump. */
+  body.mobile-touch #error-msg {
     z-index: 96;
   }
   /* An Apply Enchant picker row (Professions 2.0) carries a dim meta

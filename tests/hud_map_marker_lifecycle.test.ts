@@ -145,7 +145,7 @@ interface MapHudHarness {
   delvePainter: { paintWorldMapDelve(): DelveDrawModel | null };
   riftPainter: { paintWorldMap(): RiftMapModel | null };
   interiorMaps: {
-    paintCastleWorldMap(): string | null;
+    paintWorldMap(): { title: string; model: null } | null;
   };
   continentPainter: {
     paintContinent(): { regions: ContinentZoneRegion[] };
@@ -430,7 +430,7 @@ function lifecycleHarness(): {
     bgMapPainter: { paint: vi.fn() },
     delvePainter: { paintWorldMapDelve: vi.fn(() => null) },
     riftPainter: { paintWorldMap: vi.fn(() => null) },
-    interiorMaps: { paintCastleWorldMap: vi.fn(() => null) },
+    interiorMaps: { paintWorldMap: vi.fn(() => null) },
     continentPainter: {
       paintContinent: () => ({
         regions: [
@@ -866,7 +866,9 @@ describe('Hud zone-map marker lifecycle', () => {
     hud.mapDrag = {};
     hud.updateMapWindow();
     assertNoZoneHits();
-    expect(hud.mapLevel).toBe('zone');
+    // A mode transition opens the new band on ITS default level: the rift plan
+    // here (map_surface_core.ts defaultMapLevel); the toggle can still leave it.
+    expect(hud.mapLevel).toBe('instance');
     expect(hud.mapCenter).toBeNull();
     expect(hud.mapPing).toBeNull();
     expect(hud.mapZoneOverride).toBeNull();

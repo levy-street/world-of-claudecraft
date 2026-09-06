@@ -15,11 +15,28 @@ import {
 } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { type Party, Sim } from '../src/sim/sim';
-import { dist2d, type Entity, INTERACT_RANGE, type LootSlot } from '../src/sim/types';
+import {
+  dist2d,
+  type Entity,
+  INTERACT_RANGE,
+  type InvSlot,
+  type LootSlot,
+  type SimEvent,
+} from '../src/sim/types';
 import type { PartyMemberInfo } from '../src/world_api';
 import { face, makeFullWorld, makeWorld, mustEntity, nearestMob, teleport } from './social_shared';
 
 const FRESH_CORPSE_TIMER = 60;
+
+type ErrorEvent = Extract<SimEvent, { type: 'error' }>;
+
+function isErrorFor(event: SimEvent, pid: number): event is ErrorEvent {
+  return event.type === 'error' && event.pid === pid;
+}
+
+function errorTextsFor(events: SimEvent[], pid: number): string[] {
+  return events.filter((event) => isErrorFor(event, pid)).map((event) => event.text);
+}
 
 function mustParty(sim: Sim, pid: number): Party {
   const party = sim.partyOf(pid);
@@ -125,6 +142,84 @@ describe('parties', () => {
 
       expect(sim.entities.get(member)?.auras.find((a) => a.id === persistentAura)).toBeUndefined();
       expect(sim.entities.get(paladin)?.auras.find((a) => a.id === persistentAura)).toBeDefined();
+    }
+  });
+
+  // This bug class (a permanent paladin party aura outliving the party relationship)
+  // shipped and had to be re-fixed six times across a month of releases before landing
+  // for good in removeFromParty. The two tests above only exercise the voluntary-leave
+  // path; the three below pin the other exit routes that also fall through
+  // removeFromParty (kick, disconnect, and a full 10-player raid split across both
+  // groups) so a future refactor of that shared teardown cannot silently regress one
+  // of them while the voluntary-leave tests stay green.
+  it('removes persistent paladin auras from remaining members when the paladin is kicked from the party', () => {
+    for (const persistentAura of ['devotion_ward', 'retribution_aura'] as const) {
+      const sim = makeWorld();
+      const leader = sim.addPlayer('warrior', 'Leader');
+      const paladin = sim.addPlayer('paladin', 'Paladin');
+      sim.setPlayerLevel(16, paladin);
+      sim.partyInvite(paladin, leader);
+      sim.partyAccept(paladin);
+
+      sim.castAbility(persistentAura, paladin);
+      expect(sim.entities.get(leader)?.auras.find((a) => a.id === persistentAura)).toBeDefined();
+
+      sim.partyKick(paladin, leader);
+
+      expect(sim.entities.get(leader)?.auras.find((a) => a.id === persistentAura)).toBeUndefined();
+      expect(sim.entities.get(paladin)?.auras.find((a) => a.id === persistentAura)).toBeDefined();
+    }
+  });
+
+  it('removes persistent paladin auras from the remaining member when the paladin disconnects', () => {
+    for (const persistentAura of ['devotion_ward', 'retribution_aura'] as const) {
+      const sim = makeWorld();
+      const paladin = sim.addPlayer('paladin', 'Paladin');
+      const member = sim.addPlayer('warrior', 'Member');
+      sim.setPlayerLevel(16, paladin);
+      sim.partyInvite(member, paladin);
+      sim.partyAccept(member);
+
+      sim.castAbility(persistentAura, paladin);
+      expect(sim.entities.get(member)?.auras.find((a) => a.id === persistentAura)).toBeDefined();
+
+      sim.removePlayer(paladin);
+
+      expect(sim.entities.get(member)?.auras.find((a) => a.id === persistentAura)).toBeUndefined();
+      expect(sim.partyOf(member)).toBe(null);
+    }
+  });
+
+  it('removes persistent paladin auras from every member of a ten player raid, both groups, when the caster leaves', () => {
+    for (const persistentAura of ['devotion_ward', 'retribution_aura'] as const) {
+      const sim = makeWorld();
+      const paladin = sim.addPlayer('paladin', 'Paladin');
+      sim.setPlayerLevel(16, paladin);
+      const pids = Array.from({ length: 9 }, (_, i) => sim.addPlayer('priest', `Raid${i}`));
+      for (const pid of pids.slice(0, 4)) {
+        sim.partyInvite(pid, paladin);
+        sim.partyAccept(pid);
+      }
+      sim.convertPartyToRaid(paladin);
+      for (const pid of pids.slice(4)) {
+        sim.partyInvite(pid, paladin);
+        sim.partyAccept(pid);
+      }
+      const party = mustParty(sim, paladin);
+      expect(party.members).toHaveLength(10);
+      expect(party.members.filter((pid) => party.raidGroups.get(pid) === 1)).toHaveLength(5);
+      expect(party.members.filter((pid) => party.raidGroups.get(pid) === 2)).toHaveLength(5);
+
+      sim.castAbility(persistentAura, paladin);
+      for (const pid of pids) {
+        expect(sim.entities.get(pid)?.auras.find((a) => a.id === persistentAura)).toBeDefined();
+      }
+
+      sim.partyLeave(paladin);
+
+      for (const pid of pids) {
+        expect(sim.entities.get(pid)?.auras.find((a) => a.id === persistentAura)).toBeUndefined();
+      }
     }
   });
 
@@ -648,18 +743,20 @@ describe('duels', () => {
     sim.startAutoAttack(a);
     expect(sim.entities.get(a)?.autoAttack).toBe(true);
     let ended = false;
-    let winnerEvent: any = null;
+    let winnerEvent: Extract<SimEvent, { type: 'duelEnd' }> | undefined;
     for (let i = 0; i < 20 * 30 && !ended; i++) {
       face(sim, a, b);
       const events = sim.tick();
-      const end = events.find((e) => e.type === 'duelEnd');
+      const end = events.find(
+        (e): e is Extract<SimEvent, { type: 'duelEnd' }> => e.type === 'duelEnd',
+      );
       if (end) {
         ended = true;
         winnerEvent = end;
       }
     }
     expect(ended).toBe(true);
-    expect(winnerEvent.winnerName).toBe('Aleph');
+    expect(winnerEvent?.winnerName).toBe('Aleph');
     expect(eb.hp).toBeGreaterThanOrEqual(1); // nobody dies in a duel
     expect(eb.dead).toBe(false);
     expect(sim.duelFor(a)).toBe(null);
@@ -852,9 +949,9 @@ describe('trading', () => {
       { itemId: 'wolf_fang', count: Infinity },
       { count: 3 },
       { itemId: 'wolf_fang', count: 2 },
-    ] as any;
+    ];
     // must not throw, and only the one valid slot survives
-    expect(() => sim.tradeSetOffer(junk, 0, a)).not.toThrow();
+    expect(() => sim.tradeSetOffer(junk as InvSlot[], 0, a)).not.toThrow();
     expect(sim.tradeFor(a)?.offerA.items).toEqual([{ itemId: 'wolf_fang', count: 2 }]);
     sim.tradeConfirm(a);
     sim.tradeConfirm(b);
@@ -1080,12 +1177,14 @@ describe('dungeon difficulty slash command', () => {
     sim.chat('/dungeon reset', p);
 
     expect(
-      (sim.drainEvents() as any[]).some(
-        (event) =>
-          event.type === 'error' &&
-          event.pid === p &&
-          event.text === 'All instances have been reset.',
-      ),
+      sim
+        .drainEvents()
+        .some(
+          (event) =>
+            event.type === 'error' &&
+            event.pid === p &&
+            event.text === 'All instances have been reset.',
+        ),
     ).toBe(true);
   });
 
@@ -1096,12 +1195,14 @@ describe('dungeon difficulty slash command', () => {
       sim.drainEvents();
       sim.chat(cmd, p);
       expect(
-        (sim.drainEvents() as any[]).some(
-          (event) =>
-            event.type === 'error' &&
-            event.pid === p &&
-            event.text === 'You have no instances to reset.',
-        ),
+        sim
+          .drainEvents()
+          .some(
+            (event) =>
+              event.type === 'error' &&
+              event.pid === p &&
+              event.text === 'You have no instances to reset.',
+          ),
       ).toBe(true);
     }
   });
@@ -1117,18 +1218,25 @@ describe('dungeon difficulty slash command', () => {
     sim.chat('/dungeon heroic', member);
     expect(sim.dungeonDifficulty(leader)).toBe('normal');
     expect(
-      (sim.drainEvents() as any[]).some(
-        (e) => e.type === 'error' && e.pid === member && e.text === 'You are not the party leader.',
-      ),
+      sim
+        .drainEvents()
+        .some(
+          (e) =>
+            e.type === 'error' && e.pid === member && e.text === 'You are not the party leader.',
+        ),
     ).toBe(true);
 
     sim.chat('/dungeon heroic', leader);
     expect(sim.dungeonDifficulty(member)).toBe('heroic');
     expect(
-      (sim.drainEvents() as any[]).some(
-        (e) =>
-          e.type === 'error' && e.pid === leader && e.text === 'Dungeon difficulty set to Heroic.',
-      ),
+      sim
+        .drainEvents()
+        .some(
+          (e) =>
+            e.type === 'error' &&
+            e.pid === leader &&
+            e.text === 'Dungeon difficulty set to Heroic.',
+        ),
     ).toBe(true);
 
     sim.chat('/dungeon normal', leader);
@@ -1153,17 +1261,13 @@ describe('dungeon difficulty slash command', () => {
 
     sim.drainEvents();
     sim.chat('/dungeon', p);
-    let texts = (sim.drainEvents() as any[])
-      .filter((e) => e.type === 'error' && e.pid === p)
-      .map((e) => e.text);
+    let texts = errorTextsFor(sim.drainEvents(), p);
     expect(texts).toContain('Dungeon difficulty: Normal. Use /dungeon heroic to change it.');
 
     sim.chat('/dungeon heroic', p);
     sim.drainEvents();
     sim.chat('/dungeon', p);
-    texts = (sim.drainEvents() as any[])
-      .filter((e) => e.type === 'error' && e.pid === p)
-      .map((e) => e.text);
+    texts = errorTextsFor(sim.drainEvents(), p);
     expect(texts).toContain('Dungeon difficulty: Heroic. Use /dungeon normal to change it.');
   });
 });

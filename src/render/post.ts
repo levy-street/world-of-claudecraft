@@ -2,7 +2,6 @@ import type { N8AOPass } from 'n8ao';
 import * as THREE from 'three';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
-import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass.js';
 import type { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import type { DynamicResolutionRect } from './dynamic_resolution_core';
 import { GFX, sharedUniforms } from './gfx';
@@ -10,10 +9,16 @@ import { PreparedBloomPass } from './post_bloom';
 import { PostEffectComposer } from './post_composer';
 import { StaticOpaqueN8AOPass } from './post_n8ao';
 import { OutputGradePass } from './post_output_grade';
+import { resolveAoFullRes } from './post_pixel_budget_core';
 import { postPipelinePlan } from './post_plan_core';
+import { PostShed } from './post_shed';
+import type { PostShedChain, PostShedRung } from './post_shed_core';
+import { ByteTargetSMAAPass } from './post_smaa';
 import { renderLayerDisabled } from './render_dev_flags';
 
-// Post chain: N8AO (high: half-res Low, ultra+insane: full-res Medium)
+// Post chain: N8AO (high: half-res Low; ultra+insane: full-res Medium while the
+// drawing buffer fits the pixel budget in post_pixel_budget_core.ts, half-res
+// Low above it)
 // -> UnrealBloom -> OutputGradePass (OutputPass ACES tonemap + sRGB followed
 // by the display-space lift/gamma/gain, saturation, vignette, and grain)
 // -> ScreenFx -> SMAA (high and above). Medium uses the region-safe
@@ -42,6 +47,14 @@ import { renderLayerDisabled } from './render_dev_flags';
 // StaticOpaqueN8AOPass prevents transparency rerender allocations and replaces
 // disabled accumulation's copy with the same binary16 conversion in composite.
 // It retains the beauty clear but suppresses clears before full-coverage writes.
+//
+// The render budget's `post` level (render_budget.ts) sheds this chain under
+// sustained pressure through post_shed.ts, rung by rung (post_shed_core.ts):
+// SMAA gives way to a boot-compiled grade twin carrying the fused FXAA arm,
+// bloom drops its tail mips and then goes dark, and N8AO becomes a white
+// passthrough. Every rung is a pass toggle or a one-time target clear on a
+// pass built here; `prewarmShed` compiles the twin under the presentation
+// prewarm so no rung links a program in a live frame.
 
 // Bloom is a high-pass in linear HDR, so the threshold has to clear the
 // brightest lit diffuse or the whole sunlit world glows. Sunlit high-albedo
@@ -124,6 +137,41 @@ export interface PostPipeline {
   /** Advance ripple ages / flash decay and re-project onto the camera; call
    *  once per frame before render(). Toggles the pass off when idle. */
   updateScreenFx(dt: number): void;
+  /** Spirit-mode (ghost) grade amount, 0 alive to 1 fully drained. Folded into
+   *  the output grade pass both chains share, replacing the CSS canvas filter
+   *  (src/render/spirit_grade.ts). */
+  setSpiritGrade(amount: number): void;
+  /** Apply the render budget's `post` level (post_shed_core.ts): pass
+   *  toggles and one-time clears only, never a compile or a reallocation. */
+  setShedLevel(level: number): void;
+  /** The deepest shed rung in force, `full` for the tier's whole chain. */
+  shedRung(): PostShedRung | 'full';
+  /** Which sheddable passes this chain built: the static input of the
+   *  governor's `post` floor. */
+  readonly shedChain: PostShedChain;
+  /** Link the FXAA grade twin with one draw of that pass alone; run under
+   *  the presentation prewarm, scene hidden. Until it has run, the
+   *  `smaa-to-fxaa` rung keeps the SMAA tail instead of linking live. */
+  prewarmShed(): void;
+}
+
+// The two AO arms. Medium is 16 samples plus two 8-sample denoise passes at
+// full resolution (ultra and insane, and the Advanced Effects dial's top
+// level); Low is the high tier's half-res arm, whose depth-aware upsample keeps
+// it ~1ms-class on real GPUs (and survivable under a forced-high SwiftShader
+// probe). Shared by the builder and by setSize, which re-applies it whenever a
+// resize moves the drawing buffer across the pixel budget: n8ao rebuilds its
+// half-res targets and compositer on the halfRes write, so this runs only on an
+// actual arm change, never on every resize.
+function applyAoResolution(ao: N8AOPass, fullRes: boolean): void {
+  if (fullRes) {
+    ao.setQualityMode('Medium');
+    ao.configuration.halfRes = false;
+    return;
+  }
+  ao.setQualityMode('Low');
+  ao.configuration.halfRes = true;
+  ao.configuration.depthAwareUpsampling = true;
 }
 
 export function buildComposer(
@@ -141,16 +189,21 @@ export function buildComposer(
   // daylight tier shipping without it.
   const gradeOnly = opts?.gradeOnly === true;
   const size = webgl.getDrawingBufferSize(new THREE.Vector2());
+  // GFX.aoFullRes is the TIER's request; what the live drawing buffer can
+  // afford is a renderer decision, resolved here so GFX stays static and the
+  // HUD tier knobs keep reading the preset (the two-controller rule).
+  let aoFullRes = resolveAoFullRes(GFX.aoFullRes, size.x * size.y);
   const plan = postPipelinePlan({
     gradeOnly,
     ao: GFX.ao,
-    aoFullRes: GFX.aoFullRes,
+    aoFullRes,
     bloom: GFX.bloom,
     smaa: GFX.smaa,
     fxaa: GFX.fxaa,
     n8aoDisabled: renderLayerDisabled('n8ao'),
     smaaDisabled: renderLayerDisabled('smaa'),
     fxaaDisabled: renderLayerDisabled('fxaa'),
+    postShedDisabled: renderLayerDisabled('postshed'),
     isWebGL2: webgl.capabilities.isWebGL2,
     msaaSamples: GFX.msaaSamples,
   });
@@ -165,7 +218,7 @@ export function buildComposer(
   });
   const composer = new PostEffectComposer(webgl, target, width, height, plan.singleComposerBuffer);
 
-  let ao: N8AOPass | null = null;
+  let ao: StaticOpaqueN8AOPass | null = null;
   if (plan.scene.pass === 'n8ao') {
     // N8AOPass replaces RenderPass. A separate scene pass would be discarded.
     ao = new StaticOpaqueN8AOPass(scene, camera, size.x, size.y);
@@ -190,16 +243,7 @@ export function buildComposer(
     // costs 2 extra scene renders plus repeated full-scene traversals. AO over
     // transparent surfaces showed no visible difference in A/B shots.
     ao.configuration.transparencyAware = false;
-    if (plan.scene.aoQuality === 'Medium') {
-      // ultra and insane (and the Advanced Effects dial's top level)
-      ao.setQualityMode('Medium');
-    } else {
-      // high tier: half-res + depth-aware upsample keeps it ~1ms-class on
-      // real GPUs (and survivable under a forced-high SwiftShader probe)
-      ao.setQualityMode('Low');
-      ao.configuration.halfRes = true;
-      ao.configuration.depthAwareUpsampling = true;
-    }
+    applyAoResolution(ao, plan.scene.aoQuality === 'Medium');
     composer.addPass(ao);
   } else {
     composer.addPass(new RenderPass(scene, camera));
@@ -222,6 +266,20 @@ export function buildComposer(
     { fxaa: plan.gradeFxaa },
   );
   composer.addPass(grade);
+  // The post shed's `smaa-to-fxaa` rung swaps the grade for this twin, the
+  // same pass with the FXAA arm compiled in. Disabled until that rung, and
+  // compiled by prewarmShed below, never at its first live use.
+  const gradeFxaaTwin = plan.shed.gradeFxaaTwin
+    ? new OutputGradePass(
+        sharedUniforms.uTime,
+        bloom instanceof PreparedBloomPass ? bloom.bloomTexture : null,
+        { fxaa: true },
+      )
+    : null;
+  if (gradeFxaaTwin) {
+    gradeFxaaTwin.enabled = false;
+    composer.addPass(gradeFxaaTwin);
+  }
 
   // Screen-fx pass (display space, straight after the grade and BEFORE the
   // tail SMAA, whose last-pass position is a pinned contract: SMAA then
@@ -257,7 +315,20 @@ export function buildComposer(
   // edge pass.
   // ?smaa=off is the dev-only perf-attribution kill switch. It keeps the
   // post-AA cost attributable while comparing the revised tier policy.
-  if (plan.composerPasses.includes('smaa')) composer.addPass(new SMAAPass());
+  const smaa = plan.composerPasses.includes('smaa') ? new ByteTargetSMAAPass() : null;
+  if (smaa) composer.addPass(smaa);
+
+  const shed = new PostShed(
+    webgl,
+    {
+      smaa,
+      grade,
+      gradeFxaa: gradeFxaaTwin,
+      bloom: bloom instanceof PreparedBloomPass ? bloom : null,
+      ao,
+    },
+    plan.shed.chain,
+  );
 
   return {
     composer,
@@ -265,8 +336,23 @@ export function buildComposer(
     ao,
     grade,
     supportsDynamicResolution: plan.supportsDynamicResolution,
+    shedChain: plan.shed.chain,
     setSize(width: number, height: number, pixelRatio = webgl.getPixelRatio()): void {
       composer.setSizeAndPixelRatio(width, height, pixelRatio);
+      // A resize or a render-scale change can move the buffer across the pixel
+      // budget; re-resolve here so the AO arm follows the extent it draws at.
+      // The arm in force goes in too: crossing rebuilds and relinks n8ao, so the
+      // budget's hysteresis band holds it through a boundary wobble.
+      const resolved = resolveAoFullRes(
+        GFX.aoFullRes,
+        Math.floor(width * pixelRatio) * Math.floor(height * pixelRatio),
+        aoFullRes,
+      );
+      if (ao && resolved !== aoFullRes) {
+        aoFullRes = resolved;
+        applyAoResolution(ao, resolved);
+      }
+      shed.reclear();
       // The ripple projection maps world points to clip space, so it needs the
       // logical aspect, not the drawing-buffer extent.
       aspect = width / Math.max(1, height);
@@ -283,9 +369,22 @@ export function buildComposer(
     render(): void {
       composer.render();
     },
+    setShedLevel(level: number): void {
+      shed.apply(level);
+    },
+    shedRung(): PostShedRung | 'full' {
+      return shed.rung();
+    },
+    prewarmShed(): void {
+      // One draw of the twin alone against the composer's own buffers: the
+      // whole chain has just rendered under the same prewarm, so this adds
+      // one fullscreen quad, not a second composer frame.
+      shed.prewarm(() => gradeFxaaTwin?.render(webgl, composer.writeBuffer, composer.readBuffer));
+    },
     dispose(): void {
       if (disposed) return;
       disposed = true;
+      shed.dispose();
       for (const pass of composer.passes) pass.dispose();
       composer.dispose();
     },
@@ -312,6 +411,10 @@ export function buildComposer(
     screenFlash(strength: number): void {
       if (!screenFx) return;
       flash = Math.min(0.4, Math.max(flash, strength));
+    },
+    setSpiritGrade(amount: number): void {
+      grade.uniforms.uSpirit.value = amount;
+      if (gradeFxaaTwin) gradeFxaaTwin.uniforms.uSpirit.value = amount;
     },
     updateScreenFx(dt: number): void {
       if (!screenFx) return;

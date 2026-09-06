@@ -988,7 +988,7 @@ const classAbilityNamesEn = {
       [
         'gouge',
         'Eye Jab',
-        'Strikes the target for {damage} damage, incapacitating it for 4 sec. Any damage breaks the effect. Awards 1 combo point.',
+        'Strikes the target for {damage} damage, incapacitating it for 4 sec, and resets your own weapon swing timer so your queued auto attack does not break it. Any damage breaks the effect. Awards 1 combo point.',
       ],
       ['evasion', 'Ghostfoot', 'Increases your dodge chance by 50% for 15 sec.'],
       [
@@ -1053,12 +1053,12 @@ const classAbilityNamesEn = {
       [
         'melting_acid',
         'Melting Acid',
-        'Splashes the target with a caustic poison, dealing {damage} Nature damage and reducing its armor by 5% for 12 sec.',
+        'Coats your weapon for 30 min. Each of your melee swings splashes the target with caustic acid, reducing its armor by 5% for 12 sec.',
       ],
       [
         'nightshade_coating',
         'Nightshade Coating',
-        'Coats the target in nightshade, dealing {damage} Nature damage and reducing the healing it receives by 25% for 12 sec.',
+        'Coats your weapon for 30 min. Each of your melee swings coats the target in nightshade, reducing the healing it receives by 25% for 12 sec.',
       ],
       [
         'expose_armor',
@@ -1078,12 +1078,12 @@ const classAbilityNamesEn = {
       [
         'instant_poison',
         "Adder's Bite",
-        'Coats your weapon for 30 min, causing each of your melee swings to deal 8 additional Nature damage.',
+        'Coats your weapon for 30 min, causing each of your melee swings to deal {damage} additional Nature damage.',
       ],
       [
         'deadly_poison',
         'Festering Venom',
-        'Coats your weapon for 30 min, causing each of your melee swings to deal 14 additional Nature damage.',
+        'Coats your weapon for 30 min. Each of your melee swings adds a stack of venom to the target, up to 5, and refreshes the 12 sec duration. Each stack deals {damage} Nature damage every 2 sec.',
       ],
       [
         'blind',
@@ -2414,12 +2414,12 @@ const classAbilityNamesEn = {
       [
         'temporal_echo',
         'Temporal Echo',
-        'Marks an ally with an echo of a healthier moment, mending {damage} health at once. For {duration} sec, part of the Arcane damage you deal is drawn back through the echo to heal them.',
+        'Marks an ally with an echo of a healthier moment, mending {damage} health at once. For {duration} sec, {echoSinglePct}% of your other single-target Arcane damage and {echoAreaPct}% of your area Arcane damage heals them. Aether Surge and Aether Darts instead heal them for {echoDriverPct}% of the damage they deal.',
       ],
       [
         'temporal_cascade',
         'Temporal Cascade',
-        'Sends an echo cascading through your group: the target and up to four of their nearest allies are mended at once and each marked for {duration} sec, drawing part of the Arcane damage you deal back through their echoes to heal them. (Chronomancy)',
+        'Sends an echo cascading through your group: the target and up to four of their nearest allies are mended at once, healing for more on those who have lost the most health, and each marked for {duration} sec, drawing part of the Arcane damage you deal back through their echoes to heal them. Aether Surge and Aether Darts create an equal healing reserve from every group Echo, shared among marked allies below 60% health according to missing health. (Chronomancy)',
       ],
       [
         'temporal_reversal',

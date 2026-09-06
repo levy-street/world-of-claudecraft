@@ -164,13 +164,10 @@ describe('enchanting_view: apply-enchant toast mapping', () => {
       key: 'hudChrome.enchanting.enchantNoSpace',
       sink: 'error',
     });
-    // #2415: the two dedicated already-enchanted denies get their OWN honest
-    // copy, never the shared notHeld fallback.
+    // #2415: the dedicated already-enchanted deny gets its OWN honest copy,
+    // never the shared notHeld fallback.
     expect(applyEnchantResultToast({ ok: false, reason: 'already_enchanted' }).key).toBe(
       'hudChrome.enchanting.alreadyEnchanted',
-    );
-    expect(applyEnchantResultToast({ ok: false, reason: 'same_enchant' }).key).toBe(
-      'hudChrome.enchanting.sameEnchant',
     );
   });
   it('always routes a failure through the error sink', () => {
@@ -183,7 +180,6 @@ describe('enchanting_view: apply-enchant toast mapping', () => {
       'unknown_item',
       'no_bag_space',
       'already_enchanted',
-      'same_enchant',
     ] as const) {
       expect(applyEnchantResultToast({ ok: false, reason }).sink).toBe('error');
     }

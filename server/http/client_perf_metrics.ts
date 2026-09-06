@@ -42,6 +42,10 @@
 // the jank threshold both sit at that clamp).
 
 import { Counter, Histogram, type Registry } from 'prom-client';
+// Imported, not copied: gl_backend.ts imports nothing, so unlike the
+// suggestion-id catalog (which would cycle perf_report <-> this module) the
+// real vocabulary can be the one source here.
+import { GL_BACKEND_LABELS, type GlBackend } from '../gl_backend';
 
 /** The five graphics tiers the ingest allowlist admits (perf_report.ts gfxTier). */
 export const CLIENT_PERF_GFX_TIERS = ['low', 'medium', 'high', 'ultra', 'insane'] as const;
@@ -178,6 +182,7 @@ export interface ClientPerfSample {
   mobileTouch: boolean;
   osFamily: string;
   glRendererBucket: string;
+  glBackend: string;
   zoneOrScenario: string;
   fpsAvg: number;
   frameP95Ms: number;
@@ -269,6 +274,15 @@ function osIn(value: string): ClientPerfOsFamily {
     : 'other';
 }
 
+// The ingest derives gl_backend from the adapter name through the same closed
+// vocabulary, so membership already holds; this mirrors the tier and os
+// fallback so a direct caller cannot widen the label either.
+function backendIn(value: string): GlBackend {
+  return (GL_BACKEND_LABELS as readonly string[]).includes(value)
+    ? (value as GlBackend)
+    : 'unknown';
+}
+
 // Every observed value routes through this ONE sanitizer, and the jank compare
 // runs on its output, never the raw field: a histogram _sum is treated as
 // monotone by dashboards, so a direct caller's negative finite value must not
@@ -297,10 +311,15 @@ export function registerClientPerfMetrics(registry: Registry): ClientPerfMetrics
     labelNames: ['gfx_tier', 'device'] as const,
     registers: [registry],
   });
+  // The backend label lives HERE rather than on woc_client_reports_total,
+  // which answers the "is this graphics API slower on comparable hardware"
+  // question directly, and whose _count doubles as the per-backend report
+  // population. Putting it on the reports counter as well would multiply that
+  // cross product for a denominator this histogram already exposes.
   const frameP95 = new Histogram({
     name: WOC_CLIENT_FRAME_P95_SECONDS,
-    help: 'Reported frame-time p95 per report window, by graphics tier and device class.',
-    labelNames: ['gfx_tier', 'device'] as const,
+    help: 'Reported frame-time p95 per report window, by graphics tier, device class, and graphics backend.',
+    labelNames: ['gfx_tier', 'device', 'backend'] as const,
     buckets: [...CLIENT_PERF_FRAME_P95_BUCKETS_SECONDS],
     registers: [registry],
   });
@@ -332,10 +351,13 @@ export function registerClientPerfMetrics(registry: Registry): ClientPerfMetrics
     buckets: [...CLIENT_PERF_RENDER_SCALE_BUCKETS],
     registers: [registry],
   });
+  // A context loss is a driver-path event, so the API is the label that makes
+  // the counter actionable: "which backend drops contexts" is not answerable
+  // from the OS alone (Windows serves d3d11, opengl and vulkan clients).
   const contextLosses = new Counter({
     name: WOC_CLIENT_CONTEXT_LOSSES_TOTAL,
-    help: 'WebGL context losses summed from stored gameplay perf reports, by OS family.',
-    labelNames: ['os'] as const,
+    help: 'WebGL context losses summed from stored gameplay perf reports, by OS family and graphics backend.',
+    labelNames: ['os', 'backend'] as const,
     registers: [registry],
   });
   const suggestions = new Counter({
@@ -350,14 +372,24 @@ export function registerClientPerfMetrics(registry: Registry): ClientPerfMetrics
   // every counter cross product registers at zero and every histogram series
   // is pre-seeded, so the first post-deploy increment is visible to
   // increase()/rate() and the jank SHARE reads 0% for a healthy cohort rather
-  // than "no data". The full family is a fixed ~600-sample scrape ceiling,
-  // measured immaterial per scrape.
+  // than "no data". The full family is a fixed scrape ceiling, measured
+  // immaterial per scrape.
+  //
+  // CARDINALITY, since pre-seeding means every cross product exists whether or
+  // not a client ever reports it: the backend label multiplies exactly two
+  // series families and nothing else. frame_p95 is 5 tiers x 2 devices x 7
+  // backends = 70 series, and context_losses is 6 os x 7 backends = 42. Both
+  // vocabularies are closed and neither grows with fleet size, players, or
+  // hardware; adding a backend value is a source edit in gl_backend.ts, not a
+  // thing a beacon can mint.
   for (const gfxTier of CLIENT_PERF_GFX_TIERS) {
     for (const device of CLIENT_PERF_DEVICE_CLASSES) {
       const tierDevice = { gfx_tier: gfxTier, device };
       jankReports.inc(tierDevice, 0);
-      frameP95.zero(tierDevice);
       fpsAvg.zero(tierDevice);
+      for (const backend of GL_BACKEND_LABELS) {
+        frameP95.zero({ ...tierDevice, backend });
+      }
       for (const gpuFamily of CLIENT_PERF_GPU_FAMILIES) {
         reports.inc({ ...tierDevice, gpu_family: gpuFamily }, 0);
       }
@@ -368,7 +400,9 @@ export function registerClientPerfMetrics(registry: Registry): ClientPerfMetrics
   for (const scene of CLIENT_PERF_SCENE_CLASSES) {
     for (const device of CLIENT_PERF_DEVICE_CLASSES) worst10s.zero({ scene, device });
   }
-  for (const os of CLIENT_PERF_OS_FAMILIES) contextLosses.inc({ os }, 0);
+  for (const os of CLIENT_PERF_OS_FAMILIES) {
+    for (const backend of GL_BACKEND_LABELS) contextLosses.inc({ os, backend }, 0);
+  }
   for (const suggestion of CLIENT_PERF_SUGGESTION_IDS) suggestions.inc({ suggestion }, 0);
 
   return {
@@ -382,12 +416,16 @@ export function registerClientPerfMetrics(registry: Registry): ClientPerfMetrics
         const gfxTier = tierIn(sample.gfxTier);
         const device: ClientPerfDeviceClass = sample.mobileTouch ? 'mobile' : 'desktop';
         const tierDevice = { gfx_tier: gfxTier, device };
+        const backend = backendIn(sample.glBackend);
 
         reports.inc({
           ...tierDevice,
           gpu_family: classifyClientPerfGpuFamily(sample.glRendererBucket),
         });
-        frameP95.observe(tierDevice, observedOrZero(sample.frameP95Ms) / MS_PER_SECOND);
+        frameP95.observe(
+          { ...tierDevice, backend },
+          observedOrZero(sample.frameP95Ms) / MS_PER_SECOND,
+        );
         fpsAvg.observe(tierDevice, observedOrZero(sample.fpsAvg));
         const worst10sMs = observedOrZero(sample.worst10sFrameP95Ms);
         worst10s.observe(
@@ -401,7 +439,7 @@ export function registerClientPerfMetrics(registry: Registry): ClientPerfMetrics
         );
         renderScale.observe({ gfx_tier: gfxTier }, observedOrZero(sample.effectiveRenderScale));
         const lost = Math.floor(observedOrZero(sample.contextLostCount));
-        if (lost > 0) contextLosses.inc({ os: osIn(sample.osFamily) }, lost);
+        if (lost > 0) contextLosses.inc({ os: osIn(sample.osFamily), backend }, lost);
         for (const id of sample.suggestionIds) {
           // The ingest allowlist already filtered these; membership is re-checked
           // so a direct caller cannot mint a label value.

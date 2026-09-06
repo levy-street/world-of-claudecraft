@@ -236,7 +236,8 @@ function buildAtlasTexture(): ParticleAtlas {
     // Read back from the retained composed canvas: composeAtlasCanvas() runs at
     // most once per page, so its local 2d context is not in scope here.
     const size = atlasCanvas.width;
-    const ctx = atlasCanvas.getContext('2d')!;
+    const ctx = atlasCanvas.getContext('2d');
+    if (!ctx) throw new Error('2D canvas context unavailable');
     const pixels = ctx.getImageData(0, 0, size, size).data;
     for (let i = 0; i < SPRITE_FILES.length; i++) {
       earlyRejectRadiusSq[i] = spriteEarlyRejectRadiusSq(
@@ -361,6 +362,7 @@ export class Vfx {
   // no Color objects.
   private fwCols: THREE.Color[] = [];
   private fwFlash = new THREE.Color();
+  private rocketExhaustSide = 0;
   private quality = 1;
   private paladinSpellFx: PaladinSpellVfxController;
   private disposed = false;
@@ -704,6 +706,7 @@ export class Vfx {
     this.size.fill(0);
     this.alphaAttr.fill(0);
     this.activeCount = 0;
+    this.rocketExhaustSide = 0;
     this.activeSlotFlags.fill(0);
     this.points.geometry.setDrawRange(0, 0);
     this.points.visible = !this.cloudWarmed;
@@ -2105,6 +2108,317 @@ export class Vfx {
       0,
       SPR.sparkle,
     );
+  }
+
+  /**
+   * Smoke out of one tailpipe, at a world position, with the pipe's own exit
+   * direction.
+   *
+   * Separate from `mountExhaust` rather than an edit to it: that method is the
+   * Aether Hover Cycle's sparkle trail, and giving a new mount a different look
+   * must not retune a shipped one.
+   *
+   * `back` is the unit vector out of the pipe, already carrying the body's yaw
+   * AND its pitch and roll, so the plume stays welded to the car through a
+   * landing rather than detaching at the moment someone is most likely to be
+   * looking at the back of it.
+   */
+  mountPipeExhaust(
+    ports: readonly THREE.Vector3[],
+    weights: readonly number[],
+    back: THREE.Vector3,
+    rate: number,
+    dt: number,
+  ): void {
+    if (ports.length === 0 || !this.emitChance(rate, dt)) return;
+    // One pipe per spawn, chosen by weight, rather than every pipe every time.
+    // Four ports cost nothing over one in this pool (spawn is a write into a
+    // shared ring buffer, there are no emitter objects), so the only thing that
+    // costs is the particle COUNT, and this keeps that count the tuned rate
+    // instead of silently quadrupling it.
+    let total = 0;
+    for (const w of weights) total += w;
+    let pick = Math.random() * (total || 1);
+    let index = ports.length - 1;
+    for (let i = 0; i < ports.length; i++) {
+      pick -= weights[i] ?? 1;
+      if (pick <= 0) {
+        index = i;
+        break;
+      }
+    }
+    this.pipeSmoke(ports[index], back);
+  }
+
+  /**
+   * One soot puff, sized and coloured for the pool it lives in.
+   *
+   * THIS POOL IS ADDITIVE. That is the constraint everything here answers to,
+   * and getting it wrong is what made the first version read as white blobs.
+   * Additive can only ADD light, never occlude, so overlapping puffs SUM: three
+   * mid-greys at 0.5 clip straight to white. The brighter and the denser the
+   * smoke, the whiter it gets, which is the opposite of how smoke works.
+   *
+   * So it is dark and warm, in the same range the rocket sled's sputter smoke
+   * already uses (0x593126), and it is deliberately sparse. What this can
+   * honestly produce is a faint sooty haze that lifts off the pipes, not smoke
+   * that blocks anything. Real smoke needs to darken, and darkening needs a
+   * non-additive pass.
+   *
+   * The alpha envelope is the other half of it: alpha holds at 1 for the first
+   * 75% of a particle's life and only then ramps down, so a long-lived puff
+   * spends most of its time at full strength. Keeping lives short is what stops
+   * them piling up.
+   */
+  private pipeSmoke(at: THREE.Vector3, back: THREE.Vector3): void {
+    // Spawned off the mouth rather than in it: a smoke sprite is still wider
+    // than these pipes, so one centred on the opening would half intersect the
+    // tube it is meant to be leaving.
+    const out = 0.12 + Math.random() * 0.14;
+    const drift = 0.9 + Math.random() * 0.9;
+    // Larger further back, which is how a fixed-size sprite fakes expansion:
+    // spawn() takes no growth parameter, so a plume widens by later particles
+    // being bigger, not by any one of them changing.
+    const size = 0.22 + out * 0.5 + Math.random() * 0.1;
+    const soot = 0.11 + Math.random() * 0.09;
+    this.spawn(
+      at.x + back.x * out + (Math.random() - 0.5) * 0.12,
+      at.y + back.y * out + (Math.random() - 0.5) * 0.08,
+      at.z + back.z * out + (Math.random() - 0.5) * 0.12,
+      back.x * drift + (Math.random() - 0.5) * 0.35,
+      back.y * drift + 0.62 + Math.random() * 0.4,
+      back.z * drift + (Math.random() - 0.5) * 0.35,
+      new THREE.Color(soot, soot * 0.88, soot * 0.82),
+      size,
+      0.55 + Math.random() * 0.4,
+      -0.12,
+      SPR.smoke,
+    );
+  }
+
+  /**
+   * The launch flame: a short burst out of every pipe at once.
+   *
+   * Fired on the acceleration transient INSIDE the windup take, so it reads as
+   * the engine catching rather than as a generic effect bolted to a state
+   * change. One event per launch.
+   */
+  mountPipeFlame(ports: readonly THREE.Vector3[], back: THREE.Vector3): void {
+    for (const at of ports) {
+      for (let i = 0; i < 3; i++) {
+        const out = 0.08 + i * 0.13;
+        const speed = 3.4 - i * 0.7;
+        this.spawn(
+          at.x + back.x * out,
+          at.y + back.y * out,
+          at.z + back.z * out,
+          back.x * speed + (Math.random() - 0.5) * 0.5,
+          back.y * speed + 0.25,
+          back.z * speed + (Math.random() - 0.5) * 0.5,
+          i === 0 ? 0xfff0c0 : i === 1 ? 0xffb13b : 0xff6a1f,
+          0.3 - i * 0.05,
+          0.16 + i * 0.05,
+          0,
+          SPR.flame,
+        );
+      }
+      // A sooty kick behind the fire, so the burst leaves something behind it.
+      this.spawn(
+        at.x + back.x * 0.3,
+        at.y + back.y * 0.3,
+        at.z + back.z * 0.3,
+        back.x * 1.6,
+        back.y * 1.6 + 0.5,
+        back.z * 1.6,
+        new THREE.Color(0.17, 0.15, 0.13),
+        0.36,
+        0.5,
+        -0.1,
+        SPR.smoke,
+      );
+    }
+  }
+
+  /** Twin-nozzle combustion trail for the Goblin Rocket Sled. The continuous
+   *  flame is mount-owned geometry; this method contributes only short-lived
+   *  detached tongues, sparks, and restrained sputter smoke to the shared
+   *  bounded particle pool. */
+  mountRocketIgnition(
+    left: THREE.Vector3,
+    right: THREE.Vector3,
+    rear: THREE.Vector3,
+    fullDetail: boolean,
+  ): void {
+    for (const at of [left, right]) {
+      this.spawn(
+        at.x + rear.x * 0.12,
+        at.y,
+        at.z + rear.z * 0.12,
+        rear.x * 2.4,
+        rear.y * 2.4 + 0.08,
+        rear.z * 2.4,
+        0xffb13b,
+        0.38,
+        0.2,
+        -0.08,
+        SPR.firePuff,
+      );
+    }
+
+    const sparkCount = fullDetail ? 8 : 4;
+    for (let i = 0; i < sparkCount; i++) {
+      const at = i % 2 === 0 ? left : right;
+      const speed = 3.8 + Math.random() * 2.6;
+      this.spawn(
+        at.x + rear.x * 0.05,
+        at.y,
+        at.z + rear.z * 0.05,
+        rear.x * speed + (Math.random() - 0.5) * 1.8,
+        rear.y * speed + 0.35 + Math.random() * 1.4,
+        rear.z * speed + (Math.random() - 0.5) * 1.8,
+        0xffe09a,
+        0.07 + Math.random() * 0.045,
+        0.24 + Math.random() * 0.24,
+        1.6,
+        SPR.sparkBurst,
+      );
+    }
+
+    if (fullDetail) {
+      this.spawn(
+        (left.x + right.x) * 0.5 + rear.x * 0.18,
+        (left.y + right.y) * 0.5 + 0.04,
+        (left.z + right.z) * 0.5 + rear.z * 0.18,
+        rear.x * 1.15,
+        0.32,
+        rear.z * 1.15,
+        0x593126,
+        0.42,
+        0.62,
+        -0.06,
+        SPR.smoke,
+      );
+    }
+  }
+
+  /** Small load-change punctuation for the rocket sled. Takeoff throws a few
+   *  hot sparks down the plume; landing makes a brief broad combustion cough.
+   *  Deliberately lighter than mountRocketIgnition's full-bore event. */
+  mountRocketAirbornePulse(
+    left: THREE.Vector3,
+    right: THREE.Vector3,
+    rear: THREE.Vector3,
+    kind: 'takeoff' | 'landing',
+    fullDetail: boolean,
+  ): void {
+    for (const at of [left, right]) {
+      const landing = kind === 'landing';
+      this.spawn(
+        at.x + rear.x * 0.1,
+        at.y + rear.y * 0.1,
+        at.z + rear.z * 0.1,
+        rear.x * (landing ? 1.5 : 2.8),
+        rear.y * (landing ? 1.5 : 2.8) + (landing ? 0.04 : 0.22),
+        rear.z * (landing ? 1.5 : 2.8),
+        landing ? 0xff8a2c : 0xffe3a0,
+        landing ? 0.3 : 0.16,
+        landing ? 0.16 : 0.22,
+        -0.08,
+        SPR.firePuff,
+      );
+    }
+    const sparks = fullDetail ? (kind === 'takeoff' ? 6 : 3) : kind === 'takeoff' ? 3 : 1;
+    for (let i = 0; i < sparks; i++) {
+      const at = i % 2 === 0 ? left : right;
+      const speed = 3.4 + Math.random() * 2;
+      this.spawn(
+        at.x + rear.x * 0.05,
+        at.y,
+        at.z + rear.z * 0.05,
+        rear.x * speed + (Math.random() - 0.5) * 1.1,
+        rear.y * speed + 0.25 + Math.random() * 0.8,
+        rear.z * speed + (Math.random() - 0.5) * 1.1,
+        0xffe5a6,
+        0.06 + Math.random() * 0.035,
+        0.18 + Math.random() * 0.18,
+        1.3,
+        SPR.sparkBurst,
+      );
+    }
+  }
+
+  mountRocketExhaust(
+    left: THREE.Vector3,
+    right: THREE.Vector3,
+    rear: THREE.Vector3,
+    dt: number,
+    strength: number,
+    smokeStrength: number,
+    fullDetail: boolean,
+  ): void {
+    const power = Math.min(1, Math.max(0, strength));
+    if (power <= 0) return;
+    const flameCount = this.emitCount((fullDetail ? 42 : 20) * power, dt);
+    for (let i = 0; i < flameCount; i++) {
+      const at = this.rocketExhaustSide === 0 ? left : right;
+      this.rocketExhaustSide ^= 1;
+      const speed = 2.2 + power * 2.8 + Math.random() * 1.1;
+      const puff = Math.random() < 0.32;
+      this.spawn(
+        at.x + rear.x * 0.08 + (Math.random() - 0.5) * 0.07,
+        at.y + rear.y * 0.08 + (Math.random() - 0.5) * 0.07,
+        at.z + rear.z * 0.08 + (Math.random() - 0.5) * 0.07,
+        rear.x * speed + (Math.random() - 0.5) * 0.45,
+        rear.y * speed + (Math.random() - 0.5) * 0.45 + 0.12,
+        rear.z * speed + (Math.random() - 0.5) * 0.45,
+        puff ? 0xff7426 : 0xffc85c,
+        (puff ? 0.22 : 0.14) + Math.random() * 0.1,
+        0.2 + Math.random() * 0.22,
+        -0.15,
+        puff ? SPR.firePuff : SPR.flame,
+      );
+    }
+
+    if (fullDetail) {
+      const sparkCount = this.emitCount(5 * power, dt);
+      for (let i = 0; i < sparkCount; i++) {
+        const at = Math.random() < 0.5 ? left : right;
+        const speed = 3.5 + Math.random() * 3;
+        this.spawn(
+          at.x,
+          at.y,
+          at.z,
+          rear.x * speed + (Math.random() - 0.5) * 1.3,
+          rear.y * speed + Math.random() * 1.2,
+          rear.z * speed + (Math.random() - 0.5) * 1.3,
+          0xffd37a,
+          0.07 + Math.random() * 0.06,
+          0.28 + Math.random() * 0.32,
+          1.4,
+          SPR.sparkBurst,
+        );
+      }
+
+      const smoke = Math.min(1, Math.max(0, smokeStrength));
+      const smokeCount = this.emitCount(4 * smoke, dt);
+      for (let i = 0; i < smokeCount; i++) {
+        const at = Math.random() < 0.5 ? left : right;
+        const speed = 1.2 + Math.random() * 0.8;
+        this.spawn(
+          at.x + rear.x * 0.18,
+          at.y + 0.04,
+          at.z + rear.z * 0.18,
+          rear.x * speed + (Math.random() - 0.5) * 0.25,
+          0.28 + Math.random() * 0.24,
+          rear.z * speed + (Math.random() - 0.5) * 0.25,
+          0x5b3025,
+          0.3 + Math.random() * 0.15,
+          0.55 + Math.random() * 0.25,
+          -0.08,
+          SPR.smoke,
+        );
+      }
+    }
   }
 
   /**

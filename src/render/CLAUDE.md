@@ -68,9 +68,15 @@ Everything else is a sibling module in one of these families:
   rebuild so the same canvas + context is reused instead of a second context
   being minted), `context_release.ts` (forces context loss on `pagehide`:
   browsers cap live WebGL contexts per GPU process at ~16 and reclaim lost
-  ones lazily, and the client reloads on every logout), and
-  `software_renderer.ts` (the SINGLE source of truth for detecting a software
-  rasterizer from the adapter string; `gfx.ts`, `perf_doctor.ts`, and
+  ones lazily, and the client reloads on every logout),
+  `context_loss_recovery.ts` (`attachContextRecoveryHandlers`: the game
+  canvas's one persistent watchdog for an UNPLANNED loss that never restores,
+  e.g. a genuinely dead GPU/driver; distinct from three.js's own
+  `webglcontextlost` handler, which already requests restoration for the
+  entire life of a live renderer, and from `context_recycle.ts`'s short-lived
+  listener, which covers the deliberate rebuild's dispose-then-reconstruct
+  gap), and `software_renderer.ts` (the SINGLE source of truth for detecting a
+  software rasterizer from the adapter string; `gfx.ts`, `perf_doctor.ts`, and
   `perf_reporter.ts` all consume it so the detectors cannot drift).
 - `view_create_retry.ts`: bounded cooldown state for fail-soft character builds
   in per-frame paths, including required targets, form swaps, and visual-key
@@ -565,7 +571,10 @@ GPU work signs. Each rule names its seam and its guard.
 - **Never add, remove, or hide a directional, hemisphere, spot, or rect-area light
   after boot:** those counts are program-cache-key inputs, so one change relinks
   every lit material in view. Re-GRADE the constructor's one sun/hemi pair through
-  `interior_light_rig.ts` instead. Point lights ride the pad budget
+  `interior_light_rig.ts` instead. The outdoor hemisphere fill constants live in
+  `outdoor_light_rig_core.ts`: the Lambert terrain derives its `uTerrainFillBoost`
+  from them (`terrainFillBoostTarget`), so retune them there, never inline.
+  Point lights ride the pad budget
   (`point_light_budget.ts`). Guards: `tests/render_light_census_pin.test.ts` (the
   allowlist of every non-point light constructed under `src/render`) and
   `tests/point_light_budget.test.ts`. The Wildheart caldera rig
@@ -729,4 +738,10 @@ collision/movement.
 - **`render_budget.ts` is the renderer's adaptive-budget core** (tier-driven frame
   budget + telemetry, keyed off `gfx.ts` quality bands). `renderer.ts` owns it,
   degrades against it, and pushes the resulting grass/foliage/vfx quality levels into
-  those subsystems. Consult it rather than reinventing a frame-level budget.
+  those subsystems. Consult it rather than reinventing a frame-level budget. Its `post`
+  level is the post chain's shed (`post_shed_core.ts` pure rungs, `post_shed.ts` painter
+  over the passes `post.ts` built): pass toggles and one-time target clears only, the
+  FXAA grade twin compiled under `post.initial-frame`, `?postshed=off|<0..1>` for a bench.
+  The shed's rungs are the reason the composer tiers now have a lever below the density
+  floors; when a chain sheds its full-frame passes, `post_plan_core.ts`'s region contract
+  is where dynamic resolution could re-open for it (not done).

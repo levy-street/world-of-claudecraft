@@ -154,6 +154,7 @@ export type BagTooltipHintKey =
   | 'hudChrome.professions.toolEffectTooltip.openProfessions'
   | 'hudChrome.mailbox.clickAttach'
   | 'hudChrome.mailbox.cannotMail'
+  | 'hudChrome.mailbox.result.noMailBound'
   | '';
 
 /** Decide what a click on a bag item does. Mirrors the original click handler's
@@ -440,9 +441,16 @@ export function bagTooltipHintKey(
     return 'hudChrome.itemSoulbound';
   if (mode.tradeOpen) return 'itemUi.tooltip.clickTradeOffer';
   if (mode.mailAttach) {
-    return item.kind === 'quest' || item.noMarketList || isTransferLockedInstance(instance)
-      ? 'hudChrome.mailbox.cannotMail'
-      : 'hudChrome.mailbox.clickAttach';
+    if (item.kind === 'quest' || item.noMarketList) return 'hudChrome.mailbox.cannotMail';
+    // A per-copy transfer lock (an armed bind-on-trade grant, e.g. a disenchant
+    // typed secondary, or an already-stamped boundTo copy) gets the SAME
+    // specific reason the send-time refusal voices (post_office.ts's
+    // noMailBound), not the generic cannotMail line: the item is not simply
+    // unmailable, it is bound until traded away in person. The generic hint
+    // left a fresh disenchant reagent looking permanently broken instead of
+    // explaining why.
+    if (isTransferLockedInstance(instance)) return 'hudChrome.mailbox.result.noMailBound';
+    return 'hudChrome.mailbox.clickAttach';
   }
   if (mode.marketSell) {
     return item.kind === 'quest' || item.noMarketList || isTransferLockedInstance(instance)
@@ -702,6 +710,23 @@ export function carriedPools(
     // without capacity is unconstructible here.
     showMaterials: pools.materials > 0,
   };
+}
+
+/** How many of the grid's empty squares only a MATERIAL may take (issue
+ *  #3795): the empties past the general pool's headroom. Exactly `generalFree`
+ *  plain empty squares remain, which is precisely what a non-material pickup
+ *  can use, so the painted split can never disagree with the sim's refusal
+ *  (bag_pools.ts freePoolSlots). Zero without a materials pool, and never more
+ *  than the empties on screen (the tolerated over-capacity state). */
+export function materialsOnlyEmptyCells(
+  bags: readonly (string | null)[],
+  inventory: readonly InvSlot[],
+  emptyCells: number,
+): number {
+  const split = carriedPools(bags, inventory);
+  if (!split.showMaterials) return 0;
+  const generalFree = Math.max(0, split.general.capacity - split.general.used);
+  return Math.max(0, Math.min(emptyCells, emptyCells - generalFree));
 }
 
 export function buildBagBar(

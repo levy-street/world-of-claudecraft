@@ -16,6 +16,7 @@
 
 import { t } from './i18n';
 import {
+  anchorAdjustedMeterFrame,
   initialMeterFrame,
   METER_FRAME_LIMITS,
   type MeterFrameGeometry,
@@ -24,6 +25,11 @@ import {
   placeMeterFrame,
   serializeMeterFrame,
 } from './meters_frame_core';
+
+/** Delay for the trailing post-resize re-derive, long enough for a fullscreen
+ *  transition's window metrics to settle (mirrors MovableFrame's / the chat
+ *  box's own RESIZE_SETTLE_MS). */
+const METER_FRAME_RESIZE_SETTLE_MS = 200;
 
 export interface MeterFrameConfig {
   /** The panel being positioned. */
@@ -77,9 +83,10 @@ const HANDLE_CONTROL_SELECTOR = 'button, a, input, select, textarea';
 export class MeterFrame {
   private geo: MeterFrameGeometry | null = null;
   private gesture: Gesture | null = null;
-  private grip: HTMLElement | null = null;
   /** Where the panel lives in the HUD stack, so reset() can put it back. */
   private home: { parent: Node; next: Node | null } | null = null;
+  /** Coalesces the trailing post-resize re-derive (METER_FRAME_RESIZE_SETTLE_MS). */
+  private resizeSettleTimer: ReturnType<typeof setTimeout> | undefined;
 
   constructor(
     private readonly cfg: MeterFrameConfig,
@@ -96,7 +103,6 @@ export class MeterFrame {
     grip.title = t('hudChrome.meters.resize');
     grip.setAttribute('aria-hidden', 'true');
     el.appendChild(grip);
-    this.grip = grip;
 
     for (const handle of handles) {
       handle.classList.add('mt-move-handle');
@@ -117,7 +123,17 @@ export class MeterFrame {
     this.deps.document.addEventListener('pointerup', end);
     this.deps.document.addEventListener('pointercancel', end);
     this.deps.window.addEventListener('resize', () => {
-      if (this.geo) this.apply();
+      // Once now and once after the metrics settle: a resize event fired
+      // mid-transition (an OS fullscreen exit, emulated viewports) can still
+      // observe the OLD innerWidth/Height, making the re-anchor a silent
+      // no-op with no follow-up event to correct it. The trailing pass
+      // re-derives from storage again, which is idempotent.
+      this.rederiveFromSaved();
+      clearTimeout(this.resizeSettleTimer);
+      this.resizeSettleTimer = setTimeout(
+        () => this.rederiveFromSaved(),
+        METER_FRAME_RESIZE_SETTLE_MS,
+      );
     });
 
     let saved: string | null = null;
@@ -127,12 +143,42 @@ export class MeterFrame {
       // Storage can be unavailable in private browsing modes.
     }
     this.geo = parseMeterFrame(saved);
-    if (this.geo) this.apply();
+    if (this.geo) {
+      const legacy = this.geo.vw === undefined;
+      this.apply();
+      // One-time migration, exactly as MovableFrame / the chat box do it: a
+      // pre-stamp save cannot re-anchor, so the apply above stamps the
+      // current viewport and the persist upgrades the save in place.
+      if (legacy) this.persist();
+    }
   }
 
   /** Re-clamp after the panel is shown (a box saved at another viewport). */
   refresh(): void {
-    if (this.geo) this.apply();
+    this.rederiveFromSaved();
+  }
+
+  // Re-clamp into view when the viewport changes, deriving from the SAVED box
+  // rather than the last render: leaving fullscreen clamps a panel into the
+  // smaller window, and re-clamping from the already-clamped value would make
+  // that shrink permanent. From storage, growing the window back restores the
+  // exact saved location. A mid-gesture resize is left alone (the live drag
+  // owns the geometry; its drop re-applies and persists anyway), and a panel
+  // whose box never reached storage keeps its in-memory one.
+  private rederiveFromSaved(): void {
+    if (!this.geo || this.gesture) return;
+    let savedNow: string | null = null;
+    try {
+      savedNow = this.deps.storage.getItem(this.cfg.storageKey);
+    } catch {
+      // Storage can be unavailable in private browsing modes.
+    }
+    const parsed = parseMeterFrame(savedNow);
+    // A payload without the viewport stamp cannot re-anchor honestly; the
+    // in-memory geo carries the stamp of the viewport it was last applied
+    // under (the pre-change one), so it is the better basis then.
+    if (parsed?.vw !== undefined) this.geo = parsed;
+    this.apply();
   }
 
   /** Change only the panel width, preserving a saved position and height. */
@@ -290,13 +336,17 @@ export class MeterFrame {
 
   private apply(): void {
     if (!this.geo || this.blocked()) return;
+    const viewport = { w: this.deps.window.innerWidth, h: this.deps.window.innerHeight };
+    // A box saved under a different viewport re-anchors per axis first, so a
+    // bottom-parked panel rides the bottom edge across a fullscreen exit; the
+    // applied geometry is stamped with the CURRENT viewport for the next save.
     const placement = placeMeterFrame(
-      this.geo,
-      { w: this.deps.window.innerWidth, h: this.deps.window.innerHeight },
+      anchorAdjustedMeterFrame(this.geo, viewport),
+      viewport,
       this.deps.uiScale(),
       this.cfg.limits ?? METER_FRAME_LIMITS,
     );
-    this.geo = placement.geo;
+    this.geo = { ...placement.geo, vw: viewport.w, vh: viewport.h };
     const { css } = placement;
     const el = this.cfg.el;
     // left/top are viewport coordinates, so the panel must hang off a

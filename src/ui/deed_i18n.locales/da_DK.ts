@@ -355,7 +355,6 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_chapter_ii: {
     name: 'Dalens Krønike, Kapitel II',
-    desc: 'Afslut andet kapitel af Sauls krønike: banditter, mudfinne-snigerne og minens skadedyr nedkæmpet, Somarken spillet og Relikvariet trodset.',
   },
   chr_vale_chapter_iii: {
     name: 'Krøniken om Dalen',
@@ -370,7 +369,6 @@ export const table: DeedLocaleTable = {
   chr_vale_packbreaker: { name: 'Flokbryder', desc: 'Dræb 3 Skovulve inden for 10 sekunder.' },
   chr_vale_cup_debut: {
     name: 'Kobberspandens Kandidat',
-    desc: 'Gå på banen og rør bolden i en Dalpokal-kamp på Somarken.',
   },
   chr_vale_rares: {
     name: 'Dalens Rædsler',
@@ -531,63 +529,49 @@ export const table: DeedLocaleTable = {
   },
   pvp_vcup_first_match: {
     name: 'Støvler på Banen',
-    desc: 'Spil en hel Dalpokal-kamp til ende på Somarken, uanset sejr eller nederlag.',
   },
-  pvp_vcup_first_win: { name: 'Det Første Sølvtøj', desc: 'Vind en ranglistekamp i Dalpokalen.' },
+  pvp_vcup_first_win: { name: 'Det Første Sølvtøj' },
   pvp_vcup_wins_10: {
     name: 'Garvet Vildsvineboldspiller',
-    desc: 'Vind 10 ranglistekampe i Dalpokalen.',
   },
   pvp_vcup_wins_25: {
     name: 'Vildsvinebold-Legende',
-    desc: 'Vind 25 ranglistekampe i Dalpokalen.',
     title: 'Vildsvinebold-Legende',
   },
-  pvp_vcup_first_goal: { name: 'På Måltavlen', desc: 'Scor et mål i en Dalpokal-ranglistekamp.' },
+  pvp_vcup_first_goal: { name: 'På Måltavlen' },
   pvp_vcup_hat_trick: {
     name: 'Hattrick-Helt',
-    desc: 'Scor tre mål i en enkelt Dalpokal-ranglistekamp, i 3v3-rækken eller større.',
   },
   pvp_vcup_golden_goal: {
     name: 'Gyldent Øjeblik',
-    desc: 'Scor det gyldne mål, der afgør en Dalpokal-ranglistekamp.',
   },
   pvp_vcup_first_save: {
     name: 'Sikre Hænder',
-    desc: 'Red et skud som målmand i en Dalpokal-ranglistekamp.',
   },
   pvp_vcup_clean_sheet: {
     name: 'Intet Slipper Forbi Mig',
-    desc: 'Vind en Dalpokal-ranglistekamp som målmand uden at lukke et mål ind.',
   },
   pvp_vcup_guild_win: {
     name: 'For Banneret',
-    desc: 'Vind en Dalpokal-ranglistekamp, hvor holdet stillede op under dit gildes banner.',
   },
   pvp_fiesta_first_bout: {
     name: 'Ubuden Gæst',
-    desc: 'Kæmp en fuld 2v2 Fiesta-dyst, uanset sejr eller nederlag.',
   },
-  pvp_fiesta_first_win: { name: 'Festens Midtpunkt', desc: 'Vind en 2v2 Fiesta-dyst.' },
+  pvp_fiesta_first_win: { name: 'Festens Midtpunkt' },
   pvp_fiesta_double: {
     name: 'Dobbelt Ballade',
-    desc: 'Lav to Fiesta-nedlæggelser inden for fire sekunder.',
   },
   pvp_fiesta_shutdown: {
     name: 'Lyseslukker',
-    desc: 'Nedlæg en Fiesta-modstander, der er på en stime på tre eller mere.',
   },
   pvp_fiesta_full_build: {
     name: 'Klædt på til Lejligheden',
-    desc: 'Vind en Fiesta-dyst med en forstærkning låst fast fra alle tre bølger.',
   },
   pvp_fiesta_powerups: {
     name: 'En af Hver',
-    desc: 'Snup hver af de fire power-ups i ringen mindst én gang: Fartdjævel, Kolos, Månestøvler og Bersærk.',
   },
   pvp_fiesta_five_kills: {
     name: 'Bærer Hele Festen',
-    desc: 'Lav fem nedlæggelser i en enkelt Fiesta-dyst.',
   },
   soc_first_party: { name: 'Bedre Sammen', desc: 'Slut dig til en gruppe med en anden spiller.' },
   soc_full_house: {

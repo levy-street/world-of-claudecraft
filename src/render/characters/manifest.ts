@@ -194,6 +194,14 @@ export interface VisualDef {
   runRef?: number;
   attackTimeScale?: number;
   deathTimeScale?: number;
+  /** Cut out of locomotion into idle instead of crossfading.
+   *
+   *  For a vehicle whose locomotion clip drives WHEELS. A crossfade keeps the
+   *  outgoing clip playing while it fades, so the wheels keep turning for the
+   *  length of the fade after the throttle is released, which reads as the car
+   *  coasting on ice. A creature's legs blending to a stand is the opposite:
+   *  there the fade is what stops it looking snapped, so this stays opt-in. */
+  cutToIdle?: boolean;
   /** Final model-local sink for an authored death pose that ends above the
    *  normalized feet anchor. CharacterVisual eases it in only over the final
    *  quarter of the Death clip and restores the base offset on revive. */
@@ -1994,6 +2002,44 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: MOUNT_RIGGED,
     walkRef: 1.8,
     runRef: 4.5,
+    lazyPreload: true,
+  },
+  // Goblin Rocket Sled: clipless rigid vehicle. Runtime exhaust and motion live
+  // in its mount-owned render controller, never in a baked idle animation.
+  mount_goblin_rocket_sled: {
+    url: `${MOUNTS_DIR}/goblin_rocket_sled.glb`,
+    height: 2.5,
+    clips: MOUNT_RIGGED,
+    lazyPreload: true,
+  },
+  // Toy rally car. Rigid node animation, no skin: the wheels, the four
+  // independent springs and the body all move as separate nodes.
+  // Wheel rate is authored at 14.93 deg/frame against 9 spokes, so playback
+  // past ~1.34x makes the wheels strobe backwards; raise the clip's spoke
+  // count rather than dropping runRef past that.
+  mount_rallycart_rxt: {
+    url: `${MOUNTS_DIR}/rallycart_rxt.glb`,
+    // 3.1 was the rider-fit solve; three tuning passes in game took it down
+    // 7.5%, 7.5% and 10% from there. `seat` and `seatFwd` in mount_visuals.ts
+    // are ABSOLUTE world units, so they are scaled by the same 0.771 and must
+    // move together with any further change here.
+    height: 2.39,
+    // A car has ONE forward gait, so both bands play Run and the cadence is
+    // separated by walkRef/runRef. It reverses and jumps for real, and it has
+    // no death clip, so death holds the idle.
+    clips: {
+      idle: 'Idle',
+      walk: 'Run',
+      run: 'Run',
+      walkBack: 'WalkBackward',
+      jump: 'Jump',
+      attack: [],
+      death: 'Idle',
+    },
+    walkRef: 3,
+    runRef: 4.4,
+    // Wheels stop when the car stops, rather than turning on through a fade.
+    cutToIdle: true,
     lazyPreload: true,
   },
   // The Lanternback Troll: a hand-authored rig (troll body skinned, the iron

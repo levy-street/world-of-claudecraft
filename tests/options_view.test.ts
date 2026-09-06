@@ -253,8 +253,9 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
         ).toEqual([0, 0.5, 1, 2]);
     }
     // Effects & Lighting stops at High (the full high-tier post stack), and
-    // so does Shadow Quality (High is the 4096 map; the 8192 Insane rung is
-    // retired, so the dial no longer offers it).
+    // so does Shadow Quality (High is the dial's 4096 map, above the High
+    // tier's own 2560 base; the 8192 Insane rung is retired, so the dial no
+    // longer offers it).
     for (const key of ['effectsQuality', 'shadowQuality']) {
       const dial = find(controls, key);
       if (dial?.control === 'choice')
@@ -572,13 +573,16 @@ const FRAMES_KEYS = [
   'partyFrameShowAuras',
   'partyFrameShowPets',
   'partyFrameShowSelf',
+  'playerFrameHealthText',
+  'targetFrameHealthText',
   'aurasOnPlayerFrame',
+  'auraBarBelowFrame',
   'alwaysShowAllBuffs',
   'showTargetOfTarget',
   'showTargetSwingTimer',
   'showPetFrame',
 ];
-const CHAT_KEYS = ['chatFontScale', 'chatOpacity', 'compactChat'];
+const CHAT_KEYS = ['chatFontScale', 'chatOpacity', 'compactChat', 'filterProfanity'];
 const COMBAT_KEYS = [
   'startAttackOnAbilityUse',
   'stopAutoAttackOnTargetSwitch',
@@ -796,6 +800,39 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
 
     const off = buildInterfaceControls(makeSource({}, { forceHighPerfGpu: false }), DESKTOP_ENV);
     expect(find(off, 'forceHighPerfGpu')).toMatchObject({ control: 'boolToggle', on: false });
+  });
+
+  // Regression pin for the buff-placement bug (issue: buffs on the player
+  // frame flip above/below unpredictably): the above/below choice is now the
+  // player's OWN setting (auraBarBelowFrame), gated on aurasOnPlayerFrame the
+  // same way a dependent BoolToggleControl always gates on its parent
+  // (disabled until the parent is on, rebuilt immediately via rerender: true
+  // so the disabled state never goes stale).
+  it('enables the below-frame buff placement toggle only while buffs anchor to the player frame', () => {
+    const hidden = buildInterfaceControls(makeSource());
+    expect(find(hidden, 'aurasOnPlayerFrame')).toMatchObject({
+      control: 'boolToggle',
+      rerender: true,
+    });
+    expect(find(hidden, 'auraBarBelowFrame')).toMatchObject({
+      control: 'boolToggle',
+      disabled: true,
+    });
+
+    const visible = buildInterfaceControls(makeSource({}, { aurasOnPlayerFrame: true }));
+    expect(find(visible, 'auraBarBelowFrame')).toMatchObject({ disabled: false });
+  });
+
+  it('reads the stored buff-placement choice straight through, independent of aurasOnPlayerFrame', () => {
+    const on = buildInterfaceControls(
+      makeSource({}, { aurasOnPlayerFrame: true, auraBarBelowFrame: true }),
+    );
+    expect(find(on, 'auraBarBelowFrame')).toMatchObject({ control: 'boolToggle', on: true });
+
+    const off = buildInterfaceControls(
+      makeSource({}, { aurasOnPlayerFrame: true, auraBarBelowFrame: false }),
+    );
+    expect(find(off, 'auraBarBelowFrame')).toMatchObject({ control: 'boolToggle', on: false });
   });
 
   it('renders NO uiScale row (owner request); the comfort sliders stay live', () => {

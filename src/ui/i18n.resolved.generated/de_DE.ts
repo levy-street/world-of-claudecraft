@@ -570,9 +570,9 @@ export const de_DE: EnTranslations = {
       "tabsLabel": "Bereiche des WOC-Shops",
       "storeTab": "Shop",
       "rewardsTab": "Tägliche Belohnungen",
-      "mountsEyebrow": "Account Mounts",
-      "mountsTitle": "Machine Stable",
-      "mountBuyAria": "Purchase {item}",
+      "mountsEyebrow": "Konto-Mounts",
+      "mountsTitle": "Maschinenstabil",
+      "mountBuyAria": "Kaufen Sie {item}",
       "loading": "WOC-Shop wird geladen...",
       "error": "Der WOC-Shop ist derzeit nicht verfügbar. Bitte versuche es gleich noch einmal.",
       "balance": "Claudium-Guthaben",
@@ -978,6 +978,7 @@ export const de_DE: EnTranslations = {
       "mounts": "Reittiere",
       "professions": "Berufe",
       "reliquary": "Reliquiar",
+      "lootExplorer": "Beute-Explorer",
       "nameplates": "Namen",
       "haptics": "Haptik",
       "hapticsOff": "Haptik aus",
@@ -1141,6 +1142,9 @@ export const de_DE: EnTranslations = {
       "promptAttack": "Angreifen",
       "promptUseAbility": "Fähigkeit einsetzen",
       "promptKneel": "Knien",
+      "promptAccessInterface": "Öffne die Benutzeroberfläche",
+      "promptMoveToTarget": "Gehe zu {target}",
+      "promptSelectItem": "Wähle {item} aus",
       "promptOpenBags": "Öffne deine Taschen",
       "promptCharacterSheet": "Öffne dein Charakterfenster",
       "promptLookAround": "Halte die rechte Maustaste gedrückt und ziehe, um dich umzusehen.",
@@ -1308,9 +1312,9 @@ export const de_DE: EnTranslations = {
       "regroup": "{meter} wieder eingliedern"
     },
     "targetDots": {
-      "title": "Target Dots",
-      "row": "{aura} on {target}",
-      "overflow": "{count} more not shown"
+      "title": "Zielpunkte",
+      "row": "{aura} auf {target}",
+      "overflow": "{count} mehr nicht angezeigt"
     },
     "targetAuras": {
       "title": "Auren des Ziels",
@@ -1393,11 +1397,13 @@ export const de_DE: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage die Schattensprungkröte",
       "name_stormfeather_griffin": "Himmelsgreif Sturmfeder",
       "name_thunderstrut_gobbler": "Donnerstolz der Große Puter",
+      "name_goblin_rocket_sled": "Goblin-Raketenschlitten",
+      "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Schreckfunke, der Bodenerschütterer",
       "name_drakemaw_raptor": "Drakenrachen-Raptor",
-      "name_mech_bird": "Cluckwork Mech Bird",
-      "name_lanternback_troll": "Grumbol the Lanternback",
-      "name_chimeglass_tortoise": "Tolliver the Chimeglass",
+      "name_mech_bird": "Cluckwork-Mechvogel",
+      "name_lanternback_troll": "Grumbol der Laternenrücken",
+      "name_chimeglass_tortoise": "Tolliver das Chimeglass",
       "name_rickshaw_mount": "Knochengebundene Rikscha",
       "desc_valorsteed": "Ein robustes, trittsicheres Ross, das die Reisegeschwindigkeit erhöht.",
       "desc_grag_bear": "Ein robuster, trittsicherer Bär, der die Reisegeschwindigkeit erhöht.",
@@ -1406,11 +1412,13 @@ export const de_DE: EnTranslations = {
       "desc_shadowjump_toad": "Eine massige, trittsichere Riesenkröte, geschult in blitzschnellen Schattensprüngen über jedes Gelände.",
       "desc_stormfeather_griffin": "Ein königlicher Sturmgreif, der mit runenbeschlagenen Klauen und angelegten Schwingen über den Boden pirscht.",
       "desc_thunderstrut_gobbler": "Ein kolossaler sturmgeborener Puter, der vom Erwachenden Gipfel herabstolziert, den Schwanz gefächert wie eine Gewitterfront.",
+      "desc_goblin_rocket_sled": "Ein gefährlich überkonstruierter Goblinschlitten, angetrieben von zwei Raketen und hervorragend schlechtem Urteilsvermögen.",
+      "desc_rallycart_rxt": "Eine handliche Rallyemaschine, die die Reisegeschwindigkeit erhöht.",
       "desc_terrorspark_groundshaker": "Eine kompakte gepanzerte Maschine mit schweren Ketten, einer großkalibrigen Kanone und einem Sattel für furchtlose Piloten.",
       "desc_drakemaw_raptor": "Ein zugerittener Brutraptor aus der Drakenrachen-Caldera, ganz Sehne und Sprint, der noch schwach nach Asche riecht.",
-      "desc_mech_bird": "A hand-built clockwork war chicken that sprints on snapping servos, wind-up key still turning.",
-      "desc_lanternback_troll": "A hill troll broken to the yoke by lamplighters, carrying an iron throne across his shoulders with a storm lantern burning on either arm.",
-      "desc_chimeglass_tortoise": "A salt-flat tortoise who has outwalked three generations of caravans. Tinkers ground him spectacles from storm-glass and hung a bronze bell at his throat, so the road hears him long before it sees him.",
+      "desc_mech_bird": "Ein handgefertigtes Uhrwerk-Kriegshuhn, das mit schnappenden Servos sprintet, während sich der Aufziehschlüssel noch dreht.",
+      "desc_lanternback_troll": "Ein von Lampenanzündern bis zum Joch gebrochener Bergtroll, der einen eisernen Thron über seinen Schultern trägt und auf beiden Armen eine brennende Sturmlaterne trägt.",
+      "desc_chimeglass_tortoise": "Eine Salzschildkröte, die drei Generationen von Wohnwagen überholt hat. Kesselflicker haben ihm eine Brille aus Sturmglas geschliffen und ihm eine Bronzeglocke an den Hals gehängt, damit die Straße ihn hört, lange bevor sie ihn sieht.",
       "desc_rickshaw_mount": "Ein klappernder Knochenkarren, an dessen Deichseln ein knochiger Scherge angeschirrt ist und Euch im vollen Lauf zieht."
     },
     "mountTraining": {
@@ -1580,7 +1588,10 @@ export const de_DE: EnTranslations = {
       "uiScale": "UI-Skalierung",
       "playerFrameScale": "Skalierung des Spielerfensters",
       "targetFrameScale": "Skalierung des Zielfensters",
+      "playerHealthText": "Text zur Spielergesundheit",
+      "targetHealthText": "Zielgesundheitstext",
       "aurasOnPlayerFrame": "Stärkungszauber am Spielerfenster",
+      "auraBarBelowFrame": "Stärkungszauber unter dem Spielerfenster",
       "alwaysShowAllBuffs": "Immer alle Stärkungszauber anzeigen",
       "highContrastBackground": "Hintergrund mit hohem Kontrast",
       "startAttackOnAbility": "Auto-Angriff bei Fähigkeitseinsatz",
@@ -1603,9 +1614,9 @@ export const de_DE: EnTranslations = {
       "showTargetOfTarget": "Ziel des Ziels anzeigen",
       "showTargetSwingTimer": "Zielschwungtimer anzeigen",
       "showPetFrame": "Euren Begleiter anzeigen",
-      "showNameplateDots": "Show My Dots on Nameplates",
-      "nameplateDotScale": "Nameplate Dot Size",
-      "showTargetDots": "Show Target Dots",
+      "showNameplateDots": "Zeigen Sie meine Punkte auf Namensschildern",
+      "nameplateDotScale": "Punktgröße des Typenschilds",
+      "showTargetDots": "Zielpunkte anzeigen",
       "waterRipples": "Wasserwellen (Kielwasser)",
       "showAttackButton": "Angriffs-Schaltflache anzeigen",
       "showDailyRewardsChest": "Truhe der täglichen Belohnungen anzeigen",
@@ -2507,7 +2518,9 @@ export const de_DE: EnTranslations = {
       "unequipHint": "Klicke, um diese Tasche abzulegen",
       "poolGeneral": "Allgemein: {used} von {total}",
       "poolMaterials": "Materialien: {used} von {total}",
-      "capacityPoolsAria": "Belegte Taschenplätze: {used} von {total}. Allgemeine Gegenstände: {generalUsed} von {generalTotal}. Materialien: {materialsUsed} von {materialsTotal}."
+      "capacityPoolsAria": "Belegte Taschenplätze: {used} von {total}. Allgemeine Gegenstände: {generalUsed} von {generalTotal}. Materialien: {materialsUsed} von {materialsTotal}.",
+      "capacityPools": "Gegenstände {generalUsed}/{generalTotal}, Materialien {materialsUsed}/{materialsTotal}",
+      "emptyMaterialsOnly": "Nur Materialien"
     },
     "raidConvert": {
       "toPartyDone": "Euer Schlachtzug wurde wieder in eine Gruppe umgewandelt.",
@@ -2744,7 +2757,7 @@ export const de_DE: EnTranslations = {
       "suddenDeath": "Euer nächstes Frühes Grab kostet keine Wut und ignoriert seine Gesundheitsvoraussetzung",
       "aoeEcho": "{charges} Echos verbleiben: Fähigkeiten mit einem Ziel verursachen {pct}% Schaden an bis zu {targets} nahen Gegnern",
       "sureCrit": "{charges} schadensverursachende Fähigkeitseinsätze sind garantiert kritische Treffer",
-      "temporalEcho": "Der Arkanschaden des Wirkers heilt Euch um {singlePct}% bei Einzelziel- oder {areaPct}% bei Flächenschaden",
+      "temporalEcho": "Der Arkanschaden des Wirkers heilt Euch um {singlePct}% bei Einzelziel- oder {areaPct}% bei Flächenschaden. Ätherwoge und Äthergeschosse erhalten bei einem individuellen Zeitlichen Echo einen 4-fachen Bonus. Gruppenechos erzeugen eine gleich große Heilreserve, die nach fehlender Gesundheit unter markierten Verbündeten mit weniger als 60% Gesundheit verteilt wird",
       "arcaneCharge": "{stacks} Arkane Ladungen: Ätherschwall verursacht {damagePct}% mehr Schaden, wirkt {castPct}% schneller und kostet {costMult}x Mana",
       "physicalReduction": "Verringert erlittenen physischen Schaden um {pct}%",
       "temporalHourglass": "Immun und handlungsunfähig; stellt Gesundheit wieder her und beschleunigt die Abklingzeit-Regeneration. Rechtsklick zum Abbrechen.",
@@ -2955,6 +2968,7 @@ export const de_DE: EnTranslations = {
       "healthPercent": "Prozent",
       "healthCurrent": "Aktuell",
       "healthCurrentMax": "Aktuell / Maximum",
+      "healthCurrentMaxPercent": "Aktuell/Max (Prozent)",
       "sort": "Spieler sortieren",
       "sortGroup": "Gruppe",
       "sortRole": "Rolle",
@@ -2994,7 +3008,7 @@ export const de_DE: EnTranslations = {
         "targetFrame": "Ziel",
         "partyFrames": "Gruppe",
         "swingBar": "Automatischer Angriff",
-        "targetDots": "Target Dots"
+        "targetDots": "Zielpunkte"
       },
       "framesMenu": "Rahmeneinstellungen",
       "framesMenuTitle": "Einzelne Rahmen ein- oder ausblenden. Ein deaktivierter Rahmen bleibt verborgen, bis du ihn wieder aktivierst oder auf die Standardeinstellungen zurücksetzt.",
@@ -3027,33 +3041,33 @@ export const de_DE: EnTranslations = {
       "wrongKind": "Dieser Code hat einen anderen Exporttyp."
     },
     "riftForge": {
-      "title": "Rift Forge",
-      "subtitle": "Riftbound bands",
+      "title": "Rissschmiede",
+      "subtitle": "Riftbound-Bänder",
       "currency": "{name}: {count}",
-      "empty": "No Riftbound band in your bags. A ranked Rift first clear mints one.",
-      "wornHint": "Worn. Unequip it to forge.",
-      "upgradeBtn": "Upgrade to item level {level} ({cost} essence)",
-      "upgradeMax": "Fully upgraded",
-      "gemPickAria": "Gem to socket",
+      "empty": "Kein Riftbound-Band in Ihren Taschen. Ein Rift-Ranglistenspieler, der als Erster klarkommt, prägt einen.",
+      "wornHint": "Getragen. Lege es ab, um es zu schmieden.",
+      "upgradeBtn": "Upgrade auf Gegenstandsebene {level} ({cost}-Essenz)",
+      "upgradeMax": "Vollständig aufgerüstet",
+      "gemPickAria": "Edelstein zum Sockel",
       "gemOption": "{name} ({bonus})",
-      "socketReplaceHint": "Sockets full: the next gem replaces the oldest, {gem}.",
-      "socketBtn": "Socket",
-      "socketsNone": "no gems",
-      "noGems": "No Rift gems in your bags",
-      "refused": "The forge refused. Stand at the Riftwright and try again.",
+      "socketReplaceHint": "Steckdosen voll: Der nächste Edelstein ersetzt den ältesten, {gem}.",
+      "socketBtn": "Steckdose",
+      "socketsNone": "keine Edelsteine",
+      "noGems": "Keine Rift-Juwelen in deinen Taschen",
+      "refused": "Die Schmiede lehnte ab. Stellen Sie sich zum Riftwright und versuchen Sie es erneut.",
       "reason": {
-        "notFound": "That band is not in your bags.",
-        "notRiftGear": "Only a Riftbound band can be forged.",
-        "maxUpgrade": "That band is fully upgraded.",
-        "insufficientEssence": "Not enough Rift Essence.",
-        "invalidGem": "You have no such Rift gem.",
-        "dead": "You can't do that while dead.",
-        "tooFar": "You are too far from the Rift Forge."
+        "notFound": "Diese Band ist nicht in euren Taschen.",
+        "notRiftGear": "Nur ein Riftbound-Band kann geschmiedet werden.",
+        "maxUpgrade": "Diese Band ist vollständig aufgerüstet.",
+        "insufficientEssence": "Nicht genug Rift-Essenz.",
+        "invalidGem": "Du hast kein solches Rift-Juwel.",
+        "dead": "Das kann man nicht tun, wenn man tot ist.",
+        "tooFar": "Du bist zu weit von der Rift Forge entfernt."
       },
       "done": {
-        "upgrade": "Upgraded {name}.",
-        "socket": "Socketed a gem into {name}.",
-        "socketReplaced": "Socketed a gem into {name}; {gem} was destroyed."
+        "upgrade": "{name} aktualisiert.",
+        "socket": "Ein Juwel in {name} eingefasst.",
+        "socketReplaced": "Einen Edelstein in {name} eingesteckt; {gem} wurde zerstört."
       }
     },
     "itemTooltip": {
@@ -3061,7 +3075,7 @@ export const de_DE: EnTranslations = {
       "riftTier": "Riss-Gegenstand (Rang {tier})",
       "riftUpgrade": "Riss-Aufwertung {level}/{max}",
       "riftSockets": "Riss-Edelsteine {used}/{total}",
-      "riftGemSocket": "Socket bonus for a Riftbound band",
+      "riftGemSocket": "Sockelbonus für ein Riftbound-Band",
       "statEnchanted": "+{value} {stat} (Verzaubert)",
       "enchantedFallback": "Verzaubert",
       "partyTradeWindow": "Du kannst diesen Gegenstand noch {time} lang an Spieler weitergeben, die denselben Beutefund erhalten haben. Das Anlegen beendet dieses Handelsfenster."
@@ -3086,6 +3100,7 @@ export const de_DE: EnTranslations = {
       "close": "Schließen",
       "keybind": "Discord-Panel",
       "disabled": "Die Discord-Integration ist momentan nicht verfügbar.",
+      "queuePingsLabel": "Sende mir eine Discord-Direktnachricht, wenn meine Schlachtfeld- oder Arena-Warteschlange auftaucht (erfordert ein verknüpftes Discord-Konto)",
       "tiers": {
         "none": "Ohne Rang",
         "initiate": "Eingeweihter",
@@ -3343,13 +3358,13 @@ export const de_DE: EnTranslations = {
       "close": "Schließen"
     },
     "realmBuilder": {
-      "title": "Realm Builder of the Month",
-      "currentLabel": "Honoured this month",
-      "placeholderName": "Your Name Here",
-      "placeholderHint": "This plate is waiting for its first name.",
-      "pastTitle": "Past honourees",
-      "pastEmpty": "No names on the roll yet.",
-      "close": "Close"
+      "title": "Realm Builder des Monats",
+      "currentLabel": "Diesen Monat geehrt",
+      "placeholderName": "Ihr Name hier",
+      "placeholderHint": "Dieser Teller wartet auf seinen Vornamen.",
+      "pastTitle": "Ehemalige Preisträger",
+      "pastEmpty": "Noch sind keine Namen auf der Liste.",
+      "close": "Schließen"
     },
     "bank": {
       "title": "Bank",
@@ -3406,6 +3421,8 @@ export const de_DE: EnTranslations = {
       "depositAllDone": "Eingelagerte Materialien: {count}.",
       "depositAllFull": "Eingelagerte Materialien: {count}. Die Bank ist jetzt voll.",
       "depositAllNone": "Bank voll: nichts eingelagert.",
+      "depositAllNotable": "Hinterlegte Materialien: {count}, einschließlich {item}.",
+      "depositAllNotableFull": "Hinterlegte Materialien: {count}, einschließlich {item}. Bank jetzt voll.",
       "bonusTitle": "Bonusfächer",
       "bonusEarned": "+{count}",
       "bonusStatusEarned": "+{count}",
@@ -3444,6 +3461,8 @@ export const de_DE: EnTranslations = {
       "vaultDepositAllDone": "Eingelagerte Materialien: {count}.",
       "vaultDepositAllFull": "Eingelagerte Materialien: {count}. Manche Obergrenzen sind erreicht.",
       "vaultDepositAllNone": "Tresor-Obergrenzen erreicht: nichts eingelagert.",
+      "vaultDepositAllNotable": "Hinterlegte Materialien: {count}, einschließlich {item}.",
+      "vaultDepositAllNotableFull": "Hinterlegte Materialien: {count}, einschließlich {item}. Einige Decken sind voll.",
       "vaultWithdrawShort": "Nur {fit} von {count} passen in deine Taschen.",
       "vaultDepositHint": "Klicken, um in deinen Tresor einzulagern",
       "vaultCannotDeposit": "Kann nicht in den Tresor gelegt werden",
@@ -3580,17 +3599,17 @@ export const de_DE: EnTranslations = {
         }
       },
       "roster": {
-        "seats": "{count} of {cap} seats",
-        "expand": "Expand roster (+{seats} seats for {price})",
-        "maxed": "The roster is at its largest size",
-        "confirm": "Expand the guild roster by {seats} seats for {price}? The gold comes from your own purse and is not refunded.",
-        "confirmAction": "Expand",
-        "expandedLine": "{name} has expanded the guild roster to {cap} members.",
+        "seats": "{count} von {cap} Sitzen",
+        "expand": "Kader erweitern (+{seats}-Plätze für {price})",
+        "maxed": "Der Dienstplan ist am größten",
+        "confirm": "Erweitern Sie die Gildenliste um {seats}-Plätze für {price}? Das Gold stammt aus Ihrem eigenen Portemonnaie und wird nicht erstattet.",
+        "confirmAction": "Erweitern",
+        "expandedLine": "{name} hat die Gildenliste auf {cap}-Mitglieder erweitert.",
         "result": {
-          "notLeader": "Only the Guild Master may expand the guild roster.",
-          "maxed": "The guild roster cannot grow any larger.",
-          "cannotAfford": "You need {price} to expand the guild roster.",
-          "retry": "The guild roster changed while you were buying. Try again."
+          "notLeader": "Nur der Gildenmeister darf die Gildenliste erweitern.",
+          "maxed": "Die Gildenliste kann nicht größer werden.",
+          "cannotAfford": "Du benötigst {price}, um die Gildenliste zu erweitern.",
+          "retry": "Die Gildenliste hat sich während des Kaufs geändert. Versuchen Sie es erneut."
         }
       }
     },
@@ -4009,7 +4028,7 @@ export const de_DE: EnTranslations = {
       "yieldLineRange": "{min} bis {max} {item}",
       "alreadyEnchanted": "Dieser Gegenstand ist bereits verzaubert.",
       "sameEnchant": "Dieser Gegenstand hat diese Verzauberung bereits.",
-      "riftGear": "Riftbound bands take Rift gems, not enchants.",
+      "riftGear": "Riftbound-Bands erhalten Rift-Edelsteine, keine Verzauberungen.",
       "replaceTag": "Ersetzt {enchant}",
       "sameEnchantTag": "Bereits angewendet",
       "plainTag": "Nicht verzaubert",
@@ -4314,6 +4333,7 @@ export const de_DE: EnTranslations = {
       "sourceProfession": "Durch {profession} verdient",
       "sourceDeed": "Wird von der Tat {deed} verliehen",
       "sourceVendor": "Wird von {vendor} verkauft",
+      "sourceVendorGated": "Wird von {vendor} verkauft ({requirement})",
       "sourceBossZone": "Beute von {boss} in {zone}",
       "sourceDelve": "Im Tiefgang {delve} zu finden",
       "sourceRift": "Beute aus Rissdurchgängen des Rangs {rank}",
@@ -4333,6 +4353,10 @@ export const de_DE: EnTranslations = {
       "filterAll": "Alle",
       "filterOwned": "Katalogisiert",
       "filterMissing": "Fehlend",
+      "filterIlluminated": "Beleuchtet",
+      "filterRemaining": "Übrig",
+      "filterEmptyPages": "Keine Seite entspricht diesem Filter.",
+      "filterGroupAriaPages": "Filtern Sie Seiten danach, ob sie beleuchtet sind",
       "recentJumpAria": "Die Seite zu {name} öffnen",
       "recentEmpty": "Noch keine Funde. Reliquien, die du ab jetzt katalogisierst, landen hier.",
       "nearlyEmpty": "Seiten kurz vor der Vervollständigung sammeln sich hier.",
@@ -4440,6 +4464,7 @@ export const de_DE: EnTranslations = {
       "summary": "Weltkarte. Wähle eine Zone, um ihre Karte zu öffnen.",
       "toWorld": "Weltkarte",
       "toZone": "Zonenkarte",
+      "toInstance": "Instanzkarte",
       "toggleAria": "Zwischen Weltkarte und Zonenkarte wechseln",
       "levels": "Stufe {min} bis {max}"
     },
@@ -4474,6 +4499,7 @@ export const de_DE: EnTranslations = {
       "walletLinkedConnected": "Deine verknüpfte Wallet-App ist verbunden und bereit für $WOC-Käufe.",
       "walletUsdBalance": "{amount} USD",
       "walletUsdUnknown": "Unbekannt",
+      "walletCardDismiss": "Brieftaschenkarte ausblenden",
       "rateNote": "Kurs: etwa {tokens} $WOC pro 1,00 USD, Stand {time}.",
       "rateNotePaused": "Letzter bekannter Kurs: etwa {tokens} $WOC pro 1,00 USD, Stand {time}.",
       "estimateNote": "Etwa {tokens} $WOC für {usd} zum aktuellen Kurs.",
@@ -4665,6 +4691,43 @@ export const de_DE: EnTranslations = {
       "listingStatusCancelled": "Zurückgezogen",
       "listingStatusSuspended": "Ausgesetzt",
       "listingStatusUnsold": "Nicht verkauft"
+    },
+    "lootExplorer": {
+      "title": "Beute-Explorer",
+      "close": "Schließen Sie den Loot Explorer",
+      "searchPlaceholder": "Artikel suchen...",
+      "searchAria": "Elemente suchen",
+      "filterCategoryAria": "Quelle",
+      "filterClassAria": "Klasse",
+      "filterStatAria": "Attribut",
+      "filterQualityAria": "Qualität",
+      "filterAll": "Alle",
+      "tabItems": "Nach Artikel",
+      "tabEncounters": "Durch Begegnung",
+      "category": {
+        "raid": "Überfall",
+        "dungeon": "Kerker",
+        "delve": "Tauchen Sie ein",
+        "open_world": "Offene Welt",
+        "rift": "Riss",
+        "vendor": "Anbieter",
+        "quest_reward": "Questbelohnung",
+        "quest_objective": "Questziel",
+        "ground_object": "Weltobjekt",
+        "starting_equipment": "Startausrüstung"
+      },
+      "difficulty": {
+        "normal": "Normalmodus",
+        "heroic": "Heroisch"
+      },
+      "riftRankLabel": "Rift-Rang {rank}",
+      "source": "{category}: {name}",
+      "sourceWithContext": "{category}: {name} ({context})",
+      "chance": "{pct}% Chance",
+      "guaranteed": "Garantiert",
+      "gatedByQuest": "Während der Quest: {quest}",
+      "empty": "Keine Beute entspricht diesen Filtern.",
+      "resultCount": "{count}-Ergebnisse"
     }
   },
   "gatherEvent": {
@@ -4763,7 +4826,8 @@ export const de_DE: EnTranslations = {
       "link_required": "Verknüpfe zuerst dein Discord-Konto.",
       "swag_claimed": "Du hast diese Belohnung bereits beansprucht.",
       "swag_tier": "Erreiche einen höheren Rang, um dies zu beanspruchen.",
-      "swag_points": "Nicht genügend Punkte."
+      "swag_points": "Nicht genügend Punkte.",
+      "invalid_input": "Ungültige Eingabe."
     },
     "deeds": {
       "invalid_input": "Ungültige Eingabe."
@@ -4815,6 +4879,11 @@ export const de_DE: EnTranslations = {
       "reason_required": "Ein Grund ist erforderlich.",
       "invalid_duration": "Gib eine Markierungsdauer von mindestens einer Sekunde ein.",
       "not_marked": "Dieses Konto ist nicht markiert."
+    },
+    "kick": {
+      "reason_required": "Es ist ein Grund erforderlich.",
+      "admin_target": "Betreiberkonten können nicht gekündigt werden.",
+      "target_offline": "Dieser Spieler ist auf diesem Realm nicht mehr online."
     },
     "woc_market": {
       "invalid_input": "Ungültige Eingabe.",
@@ -5249,10 +5318,13 @@ export const de_DE: EnTranslations = {
       "ifPlayerFrameScale": "Die Größe Ihres eigenen Spielerfensters.",
       "ifTargetFrameScale": "Die Größe Ihres Zielfensters.",
       "ifPartyStyle": "Das Gruppenlayout: Automatisch richtet sich nach Ihrer Gruppengröße, Klassische Gruppenrahmen sind der traditionelle Stapel, und Schlachtzugsrahmen packen alle in das kompakte Raster.",
+      "ifPlayerHealthText": "Was Ihre eigene Gesundheitsanzeige ausgibt: nichts, ein Prozentsatz, aktuelle Gesundheit, aktuelle und maximale Gesundheit oder beides mit dem Prozentsatz daneben.",
+      "ifTargetHealthText": "Was die Gesundheitsbalken „Ziel“ und „Ziel des Ziels“ ausdrucken, mit den gleichen Auswahlmöglichkeiten wie Ihr eigener Rahmen.",
       "ifPartyHealthText": "Was die Gruppenbalken anzeigen: nichts, einen Prozentwert, die aktuelle Gesundheit oder aktuell und maximal.",
       "ifPartySort": "Die Reihenfolge, in der Gruppenmitglieder aufgelistet werden: Gruppenreihenfolge, Rolle oder Name.",
       "ifPartyShowAuras": "Ob Stärkungs- und Schwächungseffekte auf den Gruppenfenstern erscheinen. Passende Schalter regeln Ressourcenbalken, Absorptionsschilde, Begleiter und ob Sie selbst in Ihrer eigenen Gruppenliste erscheinen.",
       "ifAurasOnPlayerFrame": "Zeigt Ihre Stärkungs- und Schwächungseffekte zusätzlich zur Auren-Leiste auch auf Ihrem eigenen Spielerfenster.",
+      "ifAuraBarBelowFrame": "Verschiebt die Stärkungszauberleiste unter dein Einheitenfenster statt darüber. Wirkt nur, solange Stärkungszauber am Spielerfenster angezeigt werden.",
       "ifAlwaysShowAllBuffs": "Zeigt jeden aktiven Stärkungseffekt auch bei der Grafikeinstellung Niedrig an und umgeht das übliche Limit für Stärkungssymbole.",
       "ifTargetOfTarget": "Zeigt, wen Ihr Ziel anvisiert, die klassische Art zu erkennen, ob der Tank es noch hält.",
       "ifPetFrame": "Zeigt ein Fenster für Ihren Begleiter.",
@@ -5260,6 +5332,7 @@ export const de_DE: EnTranslations = {
       "ifChatOpacity": "Wie deckend der Hintergrund des Chats ist.",
       "ifCompactChat": "Staucht die Chatzeilen zusammen, damit mehr davon Platz finden.",
       "ifChatTimestamps": "Fügt jeder Chatzeile eine Uhrzeit hinzu, wahlweise im 12-Stunden- oder im 24-Stunden-Format.",
+      "ifFilterProfanity": "Maskiert Schimpfwörter im Chat mit Sternchen. Standardmäßig aktiviert; Schalten Sie es hier aus, wenn Sie den Chat lieber ungefiltert lesen möchten.",
       "ifStartAttack": "Ob der Einsatz einer Fähigkeit auch Ihren Automatikangriff startet. Standardmäßig an, und das klassische Verhalten, das die meisten Spieler erwarten.",
       "ifStopAutoAttack": "Ob ein Zielwechsel Ihren Schwung stoppt. Standardmäßig aus, sodass Ihr Angriff auf das neue Ziel übergeht.",
       "ifShowAttackButton": "Setzt eine eigene Angriffs-Schaltfläche auf Ihre Aktionsleiste.",
@@ -5272,7 +5345,7 @@ export const de_DE: EnTranslations = {
       "ifHideUnused": "Blendet leere Aktionsfelder aus, sodass nur die Schaltflächen gezeichnet werden, die Sie tatsächlich nutzen.",
       "ifLockBars": "Sperrt Ihre Leisten, damit Sie eine Fähigkeit nicht versehentlich aus einem Feld ziehen.",
       "keybindsHeading": "Das Bedienfeld Tastenbelegung",
-      "keybindsBody": "Die Tastenliste ist nur die Hälfte dieses Bedienfelds. Darüber sitzen die Schalter, die bestimmen, wie Ihre Maus das Spiel steuert: Mauskamera, ob der Cursor beim Drehen gesperrt wird, Klicken zum Bewegen und welche Maustaste es auslöst, Angriffsbewegung, das Linkshänder-Touch-Layout und der Schimpfwortfilter für den Chat.",
+      "keybindsBody": "Die Schlüsselliste ist nur die Hälfte dieses Panels. Darüber befinden sich die Schalter, die entscheiden, wie Ihre Maus das Spiel steuert: Mauskamera, ob der Cursor beim Drehen gesperrt wird, zum Bewegen klicken und welche Maustaste ihn auslöst, Angriffsbewegung und das Touch-Layout für Linkshänder.",
       "keybindsMouseBody": "Zwei Dinge dort übersieht man leicht. Maustasten lassen sich wie Tasten belegen, sodass der Mausradklick und die Daumentasten Fähigkeiten tragen können, während Links- und Rechtsklick der Kamera und dem Klicken in der Welt vorbehalten bleiben. Und Sie können direkt von der Aktionsleiste aus belegen: Schalten Sie hier den Belegungsmodus auf der Leiste ein, klicken Sie dann ein Feld an und drücken Sie die gewünschte Taste."
     },
     "combat": {
@@ -6071,7 +6144,7 @@ export const de_DE: EnTranslations = {
       "heroicRewardsBody": "Heroische Bosse lassen die Beute fallen, die du kennst, verbessert und im Tooltip als Heroisch gekennzeichnet, und der Endboss jedes Durchgangs fügt Epics hinzu, die es sonst nirgends gibt. Diese letzte Tötung hinterlässt zudem für jeden Teilnehmer Heroische Marken: eine Währung, die du bei Quartiermeister Vex in Highwatch ausgibst, dessen Theke ein Regal voller Ringe und Anhänger ist, das nichts als der Nachweis der heroischen Tiefen kaufen kann.",
       "heroicLockoutBody": "Normale Dungeons lassen sich den ganzen Tag lang laufen. Der heroische Modus verlangt Geduld: Die Tötung des Endbosses beschränkt alle im Durchgang auf einen heroischen Abschluss dieses Dungeons pro Tag, und der Schlachtzug führt für jeden Schwierigkeitsgrad eine eigene Tagessperre. Auf einem Live-Reich enden alle Tagessperren gemeinsam zur nächtlichen Zurücksetzungsstunde des Reichs, ein Abschluss kurz vor dieser Stunde und einer kurz danach fallen also auf zwei verschiedene Tage; spielst du stattdessen offline in deinem Browser, läuft eine Sperre schlicht einen Tag nach deiner eigenen Tötung ab. Ein abgeschlossener Fünf-Spieler-Durchgang bleibt seiner eigenen Gruppe für Leichenläufe und Beute offen, sodass niemand von dem ausgesperrt wird, was er dort verdient hat. Der Schlachtzug ist strenger: Hat seine Tötung dich einmal gesperrt, bleibt die Tür bis zur Zurücksetzung verschlossen, und der einzige Weg zurück hindurch ist ein Leichenlauf von jemandem, der in genau dem Durchgang gefallen ist, der ihn gesperrt hat, ein lebender Schlachtzügler, der hinausgeht, ist also für den Tag hinausgegangen. Sammle deine Beute ein, bevor du die Arena verlässt. Jede dieser Sperren gehört dem Charakter, der sie sich eingehandelt hat, ein Abschluss auf deinem Hauptcharakter lässt deine anderen Charaktere also frei.",
       "resetTitle": "Instanzen zurücksetzen",
-      "resetBody": "Wenn ihr die Schwierigkeit wechselt, während eure Gruppe noch beanspruchte Läufe hält, bleiben die alten Ansprüche eine Weile bestehen, bevor sie von selbst verfallen. Der Gruppenleiter kann sie stattdessen sofort aufgeben: Wählt im Menü des eigenen Porträts Alle Instanzen zurücksetzen oder gebt /dungeon reset ein. Eine Zurücksetzung funktioniert erst nach einem tatsächlichen Schwierigkeitswechsel, nur solange niemand, ob lebend oder gefallen, drinnen ist, nur wenn jede Leiche dort drinnen sauber geplündert wurde, und zwischen zwei Zurücksetzungen liegt eine kurze Abklingzeit. Kommt ihr mit der falschen Schwierigkeit an die Tür, sagt euch das Spiel das vor dem Start. Der Schlachtzug wird so niemals zurückgesetzt; seine eigenen Sperrregeln bleiben bestehen.",
+      "resetBody": "Wechseln Sie den Schwierigkeitsgrad, während Ihre Gruppe noch beanspruchte Läufe hält und die alten Ansprüche noch eine Weile bestehen bleiben, bevor sie sich von selbst lösen. Der Gruppenanführer kann sie stattdessen sofort gehen lassen: Wählen Sie „Alle Instanzen zurücksetzen“ in seinem eigenen Porträtmenü oder geben Sie /dungeon reset ein. Ein Zurücksetzen funktioniert nur, nachdem der Schwierigkeitsgrad tatsächlich geändert wurde, nur solange niemand, ob lebend oder gefallen, drinnen bleibt, nur wenn jede Leiche darin sauber geplündert wurde und eine kurze Abklingzeit einen Reset vom nächsten trennt. Wenn Sie mit dem falschen Schwierigkeitsgrad an der Tür ankommen, sagt das Spiel dies, bevor der Lauf beginnt. Der Raid wird auf die gleiche Weise zurückgesetzt, wobei seine eigenen Aussperrungs- und Leichenrückgaberegeln weiterhin an erster Stelle stehen.",
       "templeLoreTitle": "Der Ertränkte Tempel, ein wenig tiefer",
       "templeLoreBody": "Der Tempel hat seine eigene Legende, älter als der Kult, den du anderswo verfolgst. Am Ufer des Glimmermere, eines Bergsees, der das Mondlicht trinkt und die Ertrunkenen zurückgibt, hütet ein einsamer Wächter ein Tor aus fahlem Licht. Unter der Oberfläche führt eine Treppe aus kaltem Stein zu ihm hinab. Die Leute, die dort versanken, ertranken nicht durch ein Unglück: Sie waren der Bleiche Chor, der im Gebet untertauchte und niemals zu singen aufhörte. Die alten Wärter kratzten eine einzige Warnung in die Felsen, bevor das Wasser sie holte, ein Gebet an etwas, das sie den Ertränkten Mond nannten, mit einer ruhigeren Hand, die zwei Worte darunter setzte: er schläft nur.",
       "cryptLeadTitle": "Eine Tür, die die Toten verschlossen halten sollten",
@@ -6104,8 +6177,8 @@ export const de_DE: EnTranslations = {
       "raceBody": "Jede Gruppe im Reich kann denselben Riss gleichzeitig angehen, jede in ihrer eigenen Kopie, und nur wer zuerst das bezwingt, was am Grund wartet, versiegelt ihn. Gewinnt eine Gruppe, erfährt das Reich ihre Namen und ihre Zeit, und der Zugang schließt sich hinter ihr. Das Rennen zu verlieren beendet deinen Lauf nicht: Deine Kopie bleibt offen, das, was am Grund wartet, fällt trotzdem dir, und du gehst aus eigener Kraft wieder hinaus. Was es dich kostet, ist alles, was ein Abschluss eingebracht hätte. Der Boss hinterlässt der Gruppe, die als Zweite kommt, nichts, also trägst du nur nach Hause, was von den Gegnern auf dem Weg nach unten gefallen ist, und nichts weiter. Das Buch der Taten zählt den Abschluss trotzdem, denn du hast das Ding tatsächlich zur Strecke gebracht. Es ist das einzige Rennen im Spiel, das du verlieren kannst, ohne je die Leute zu sehen, die dich geschlagen haben.",
       "rewardsHeading": "Was du davonträgst",
       "rewardsBody": "Einen Riss zu versiegeln, nicht bloß ihn zu überstehen, ist das, was sich lohnt. Bringt ihr den Riss als Erste zu Fall, zahlt er wie der instanzierte Inhalt, neben dem sein Rang steht, sodass die härteren Ränge den härteren Lauf wert sind. Das Versiegeln legt außerdem jedem, der dabei war, einen Rissgebundenen Reif in die Hand, zugeschnitten auf die Rolle deiner Klasse und persönlich an dich gebunden, dazu Riss-Essenz in deinen Taschen, und bei den härteren Rängen obendrauf Riss-Edelsteine. Neben dem Weg zurück hinterlässt das, was am Grund wartet, einen versiegelten Hort, den deine Gruppe für zusätzliche Beute aufknacken kann, mit demselben Pfad der Stifte, den du von Tiefgang-Truhen kennst, sodass eine saubere, geduldige Arbeit sich mehr lohnt als eine hastige. Nichts davon erreicht eine Gruppe, die als Zweite ankommt: Ein verlorenes Rennen lässt dir nur, was von den Gegnern auf dem Weg nach unten gefallen ist. Das Buch der Taten ist die Ausnahme, es zählt deinen Abschluss so oder so, mit einer Tat für den Abschluss deines ersten Risses und einer weiteren für die Bezwingung eines Risses vom Rang S.",
-      "forgeHeading": "The Rift Forge",
-      "forgeBody": "The band a ranked first clear mints is not finished when you receive it. Riftwright Maelis, who keeps a forge in the Watch Meadow on the Farshore, up the shore from Gullhaven beside the Breach Scholar, will raise its item level one step at a time and set the coloured gems the rifts drop into its sockets, each colour one combat rating. A full band takes a new gem in place of its oldest, so you can retune it later. All of that is paid in Rift Essence and Rift gems, the forge currency that falls from rift bosses and trades freely, so a friend can hand you the essence you are short. Take the band off before you bring it to her: she works on what is in your bags, and she does nothing at all unless you are standing at her forge.",
+      "forgeHeading": "Die Rissschmiede",
+      "forgeBody": "Das Band, das als Erstes klar prägt, ist noch nicht fertig, wenn Sie es erhalten. Riftwright Maelis, der eine Schmiede in der Watch Meadow auf dem Farshore unterhält, oberhalb von Gullhaven neben dem Breach Scholar, wird seine Gegenstandsstufe Schritt für Schritt erhöhen und die farbigen Edelsteine, die die Risse fallen lassen, in seine Fassungen einsetzen, jede Farbe hat eine Kampfwertung. Eine vollständige Band ersetzt den ältesten durch einen neuen Edelstein, sodass Sie ihn später neu stimmen können. All das wird in Rift-Essenz und Rift-Edelsteinen bezahlt, der Schmiedewährung, die von Rift-Bossen fällt und frei gehandelt werden kann, sodass ein Freund dir die Essenz geben kann, die dir fehlt. Nimm das Band ab, bevor du es ihr bringst: Sie arbeitet mit dem, was in deinen Taschen ist, und sie tut überhaupt nichts, es sei denn, du stehst an ihrer Schmiede.",
       "trackerHeading": "Die Anzeige auf deinem Bildschirm",
       "trackerBody": "Solange du drinnen bist, hält dich ein schmaler Streifen auf deinem Bildschirm orientiert: auf welcher Ebene du bist, von wie vielen insgesamt, und ein laufender Countdown. Lies diesen Countdown genau, denn er zählt nicht deinen Lauf herunter. Er zählt herunter, bis sich der Eingang draußen in der Welt schließt. Bist du erst einmal drin, spielt deine Gruppe den Riss in ihrem eigenen Tempo aus, so lange es auch dauert, doch erreicht die Uhr null, ist der Weg hinein für alle verschwunden, also überleg es dir zweimal, kurz vor Ablauf noch nach draußen zu treten."
     },
@@ -7997,7 +8070,7 @@ export const de_DE: EnTranslations = {
       "forgeUpgraded": "Riss-Aufwertung für {name} abgeschlossen.",
       "forgeEnchanted": "Riss-Verzauberung für {name} abgeschlossen.",
       "forgeSocketed": "Riss-Edelstein für {name} eingesetzt.",
-      "forgeGemReplaced": "Rift gem replaced for {name}: {gem} destroyed.",
+      "forgeGemReplaced": "Rift-Juwel für {name} ersetzt: {gem} zerstört.",
       "detonateGlacialGrave": "Gletschergrab detoniert!",
       "detonateAbsoluteZero": "Absoluter Nullpunkt bricht aus!",
       "detonateMagmaWell": "Magmaquelle bricht aus!",
@@ -8644,6 +8717,7 @@ export const de_DE: EnTranslations = {
     "connectingRealm": "Verbindung zur Welt...",
     "assetsFailed": "Ressourcen konnten nicht geladen werden: bitte neu laden. {error}",
     "rendererFailed": "Renderer konnte nicht gestartet werden: bitte neu laden. {error}",
+    "rendererContextLost": "Der 3D-Renderer hat seinen Grafikkontext verloren und konnte ihn nicht wiederherstellen. Bitte neu laden.",
     "enterTimeout": "Die Welt konnte nicht betreten werden. Die Verbindung ist abgelaufen. Läuft der Spielserver?",
     "connectionLost": "Die Verbindung zum Server wurde unterbrochen.",
     "reconnectingAttempt": "Verbindung verloren. Verbindung wird wiederhergestellt... (Versuch {attempt}/{maxAttempts}, erneuter Versuch in {seconds}s)",
@@ -8654,6 +8728,7 @@ export const de_DE: EnTranslations = {
     "realmFull": "Diese Welt ist derzeit voll. Bitte versuche es in wenigen Minuten erneut.",
     "tooManyConnections": "Zu viele Verbindungen zu dieser Welt kommen von deinem Netzwerk. Bitte schliesse zusatzliche Spielfenster oder versuche es in wenigen Minuten erneut.",
     "messageRateExceeded": "Du wurdest getrennt, weil du Aktionen zu schnell gesendet hast. Bitte warte einen Moment und melde dich erneut an.",
+    "kickedByModerator": "Ein Moderator hat Ihre Verbindung getrennt: {reason}",
     "tips": {
       "classes": "Tipp: Jede der 9 Klassen spielt sich anders. Probiere einige aus, bevor du dich für eine entscheidest.",
       "talents": "Tipp: Du kannst deine Talente jederzeit außerhalb des Kampfes zurücksetzen, eine frühe Wahl ist also nie eine Falle.",
@@ -10467,11 +10542,11 @@ export const de_DE: EnTranslations = {
       },
       "melting_acid": {
         "name": "Schmelzende Säure",
-        "description": "Bespritzt das Ziel mit einem ätzenden Gift, das {damage} Naturschaden verursacht und seine Rüstung 12 Sek. lang um 5 % verringert."
+        "description": "Überzieht eure Waffe 30 Min. lang. Jeder eurer Nahkampfschwünge bespritzt das Ziel mit ätzender Säure und verringert seine Rüstung 12 Sek. lang um 5 %."
       },
       "nightshade_coating": {
         "name": "Nachtschattenbeschichtung",
-        "description": "Hüllt das Ziel in Nachtschatten, verursacht {damage} Naturschaden und verringert die erhaltene Heilung 12 Sek. lang um 25 %."
+        "description": "Überzieht eure Waffe 30 Min. lang. Jeder eurer Nahkampfschwünge hüllt das Ziel in Nachtschatten und verringert die erhaltene Heilung 12 Sek. lang um 25 %."
       },
       "expose_armor": {
         "name": "Rüstungsbruch",
@@ -10487,11 +10562,11 @@ export const de_DE: EnTranslations = {
       },
       "instant_poison": {
         "name": "Natternbiss",
-        "description": "Überzieht eure Waffe 30 Min. lang, sodass jeder eurer Nahkampfschwünge 8 zusätzlichen Naturschaden verursacht."
+        "description": "Überzieht eure Waffe 30 Min. lang, sodass jeder eurer Nahkampfschwünge {damage} zusätzlichen Naturschaden verursacht."
       },
       "deadly_poison": {
         "name": "Eiterndes Gift",
-        "description": "Überzieht eure Waffe 30 Min. lang, sodass jeder eurer Nahkampfschwünge 14 zusätzlichen Naturschaden verursacht."
+        "description": "Überzieht eure Waffe 30 Min. lang. Jeder eurer Nahkampfschwünge fügt dem Ziel eine Giftstufe hinzu, bis zu 5, und erneuert die Dauer von 12 Sek. Jede Stufe verursacht alle 2 Sek. {damage} Naturschaden."
       },
       "blind": {
         "name": "Dreckwurf",
@@ -11589,11 +11664,11 @@ export const de_DE: EnTranslations = {
       },
       "temporal_echo": {
         "name": "Temporales Echo",
-        "description": "Markiert einen Verbündeten mit dem Echo eines gesünderen Augenblicks und heilt sofort {damage} Gesundheit. Für {duration} Sek. wird ein Teil des Arkanen Schadens, den du verursachst, durch das Echo zurückgeleitet und heilt ihn."
+        "description": "Markiert einen Verbündeten mit dem Echo eines gesünderen Augenblicks und heilt sofort {damage} Gesundheit. Für {duration} Sek. heilen ihn {echoSinglePct}% deines sonstigen Arkanen Einzelzielschadens und {echoAreaPct}% deines Arkanen Flächenschadens. Ätherwoge und Äthergeschosse heilen ihn stattdessen um {echoDriverPct}% ihres verursachten Schadens."
       },
       "temporal_cascade": {
         "name": "Temporale Kaskade",
-        "description": "Sendet ein Echo durch deine Gruppe: Das Ziel und bis zu vier seiner nächsten Verbündeten werden sofort geheilt und jeweils {duration} Sek. lang markiert, wodurch ein Teil des Arkanen Schadens, den du verursachst, durch ihre Echos zurückgeleitet wird und sie heilt. (Chronomantie)"
+        "description": "Sendet ein Echo durch deine Gruppe: Das Ziel und bis zu vier seiner nächsten Verbündeten werden sofort geheilt und jeweils {duration} Sek. lang markiert, wodurch ein Teil des Arkanen Schadens, den du verursachst, durch ihre Echos zurückgeleitet wird und sie heilt. Ätherwoge und Äthergeschosse erzeugen aus jedem Gruppenecho eine gleich große Heilreserve, die nach fehlender Gesundheit unter markierten Verbündeten mit weniger als 60% Gesundheit verteilt wird. (Chronomantie)"
       },
       "temporal_reversal": {
         "name": "Temporale Umkehr",
@@ -13281,11 +13356,17 @@ export const de_DE: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Zündschlüssel: Schreckfunke, der Bodenerschütterer"
       },
+      "reins_goblin_rocket_sled": {
+        "name": "Zündschlüssel: Goblin-Raketenschlitten"
+      },
+      "reins_rallycart_rxt": {
+        "name": "Zündschlüssel: Rallycart RXT"
+      },
       "reins_lanternback_troll": {
         "name": "Joch des Laternenanzünders: Grumbol"
       },
       "reins_chimeglass_tortoise": {
-        "name": "Roadwarden's Bellstrap: Tolliver"
+        "name": "Glockenriemen des Straßenwärters: Tolliver"
       },
       "reins_rickshaw_mount": {
         "name": "Gebundene Zügel: Knochengebundene Rikscha"
@@ -13294,7 +13375,7 @@ export const de_DE: EnTranslations = {
         "name": "Zügel des Drakenrachen-Raptors"
       },
       "reins_mech_bird": {
-        "name": "Ignition Key: Cluckwork Mech Bird"
+        "name": "Zündschlüssel: Cluckwork Mech Bird"
       },
       "rimefang": {
         "name": "Reiffang"
@@ -15921,9 +16002,9 @@ export const de_DE: EnTranslations = {
         "greeting": "Es öffnete sich genau dort, wo die Netze trocknen. Genau dort, wo ich jeden Morgen meines Lebens gestanden habe. Ich gehe nicht mehr zum Ufer hinunter. Ich gehe überhaupt nicht mehr viel irgendwohin."
       },
       "riftwright_maelis": {
-        "name": "Riftwright Maelis",
-        "title": "Rift Forgemaster",
-        "greeting": "A Riftbound band remembers the break that made it, {className}. Bring me the band, and the essence the breaks shed, and I will teach it to remember more."
+        "name": "Rissschmiedin Maelis",
+        "title": "Rift-Schmiedemeister",
+        "greeting": "Eine Riftbound-Band erinnert sich an den Durchbruch, der es geschafft hat, {className}. Bring mir die Band und die Essenz, die die Pausen vergießen, und ich werde ihr beibringen, sich mehr zu erinnern."
       },
       "forgemistress_darva": {
         "name": "Schmiedemeisterin Darva",
@@ -18985,8 +19066,8 @@ export const de_DE: EnTranslations = {
       },
       "chronoweave": {
         "name": "Gewänder des Äthergewebes",
-        "bonus2": "Zeitliches Echo wandelt 50 Prozent deines arkanen Einzelzielschadens in Heilung um. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
-        "bonus4": "Die Abklingzeit von Zeitliche Kaskade wird um 5 Sek. verkürzt."
+        "bonus2": "Zeitliches Echo wandelt 50% deines sonstigen Arkanen Einzelzielschadens in Heilung um. Ätherwoge und Äthergeschosse wandeln stattdessen 200% ihres verursachten Schadens um. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
+        "bonus4": "Die Abklingzeit von Zeitliche Kaskade wird um 5 Sek. und ihre Manakosten werden um 30% verringert."
       },
       "cinderbark": {
         "name": "Wacht der Aschenrinde",
@@ -19215,6 +19296,6 @@ export const de_DE: EnTranslations = {
     "delveRiteShrineSkullInteract": "Schädelschrein: Drücke F, um ihn zu berühren",
     "mailboxName": "Briefkasten",
     "noticeboardName": "Anschlagtafel",
-    "realmBuilderMonumentName": "Realm Builder Monument"
+    "realmBuilderMonumentName": "Reichsbauer-Denkmal"
   }
 };

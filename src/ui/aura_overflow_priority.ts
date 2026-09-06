@@ -29,6 +29,7 @@ export const ALWAYS_VISIBLE_AURA_IDS: ReadonlySet<string> = new Set([
   'moontide',
   'old_blood',
   'verdance',
+  'priest_gloomtithe',
 ]);
 
 function isExempt(s: Pick<AuraSlotState, 'isDebuff' | 'alwaysRender' | 'key'>): boolean {

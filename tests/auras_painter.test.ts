@@ -467,6 +467,26 @@ describe('AurasPainter: static-preset visible-count cap', () => {
     expect(nodes()).toHaveLength(AURA_VISIBLE_CAP_LOW + 3);
   });
 
+  it('low keeps the Vespers priest Gloomtithe bank visible beyond the ordinary buff cap', () => {
+    // priest_gloomtithe (auras_view/priest/vespers.ts GLOOMTITHE_AURA_ID) tracks the
+    // Vespers signature's 1-5 stack bank gating Call Tithefiend, the same "actionable
+    // resource cue" shape as the Shaman/Druid engine banks above. A raid buff wall (blessings,
+    // Mark of the Wild, Arcane Intellect, Battle Shout, ...) applied ahead of it must never
+    // push it past the low-tier cap and out of the player's own read of their resource.
+    const slots = Array.from({ length: AURA_VISIBLE_CAP_LOW + 2 }, (_, i) =>
+      slot({ key: `buff${i}` }),
+    );
+    slots.push(slot({ key: 'priest_gloomtithe', name: 'Gloomtithe', stacksText: '5' }));
+    tierPainter('low').paint(state(slots));
+    expect(nodes()).toHaveLength(AURA_VISIBLE_CAP_LOW + 1);
+    expect(calls).toContainEqual(
+      expect.objectContaining({
+        m: 'setStyleProp',
+        args: ['background-image', 'url(priest_gloomtithe)'],
+      }),
+    );
+  });
+
   it('FAIRNESS: low NEVER culls a debuff -- a debuff past the buff cap still renders', () => {
     // The player buff bar is mode 'all' (buffs + debuffs interleaved). A flat first-N cap
     // would hide a debuff applied after the front buffs; the debuff-priority cap renders it

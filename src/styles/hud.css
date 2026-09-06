@@ -3018,9 +3018,13 @@
   }
   /* Buffs on the Player Frame (aurasOnPlayerFrame): hud.ts reparents the BUFF
      row into #player-frame, where it inherits its position and children-zoom
-     scale. Docked, the row sits ABOVE the frame (the xp/action bars live
-     below); moved (pf-detached), it sits BELOW it, reading like the target
-     frame's debuff strip. The row runs left-to-right from the frame's left edge. */
+     scale. It sits ABOVE the frame by default (the xp/action bars live below);
+     the "Buffs Below the Player Frame" setting (auraBarBelowFrame, main.ts)
+     flips it BELOW instead, reading like the target frame's debuff strip. This
+     is keyed on that setting's own body.auras-below-frame class, NEVER on
+     pf-detached: the row must not silently flip sides just because the player
+     dragged the frame somewhere. The row runs left-to-right from the frame's
+     left edge. */
   #player-frame > #buff-bar {
     /* Re-asserted: out of the stack the row is absolute against the frame again. */
     position: absolute;
@@ -3031,9 +3035,31 @@
     flex-direction: row;
     max-width: 100%;
   }
-  #player-frame.pf-detached > #buff-bar {
+  body.auras-below-frame #player-frame > #buff-bar {
     bottom: auto;
     top: calc(100% + 8px);
+  }
+  /* Docked (never dragged) + buffs-below is a combination this fix newly makes
+     reachable: before, "below" only ever coexisted with pf-detached, which
+     already carries z-index: 6. Docked #player-frame has no z-index of its
+     own, so the flipped icon (sitting right at the frame's bottom edge, flush
+     with #actionbar's top) painted BEHIND the action bar's buttons in plain
+     DOM order. The row itself (not the whole frame, which would needlessly
+     hoist the portrait/bars into a new stacking context too) gets the same
+     z-index pf-detached uses, keeping the icon fully visible regardless of
+     whether the frame has ever been moved. There is no room in the docked 8px
+     gap to clear the action bar's first slot entirely without reflowing
+     #actionbar-stack, so this deliberately favors the buff staying READABLE
+     over the slot staying visually uncovered; pointer-events: none right
+     below hands clicks in that overlap through to the action button, which is
+     the more safety-critical of the two (a player acts on it, a buff read is
+     glanceable from its still-visible art/duration). */
+  body.auras-on-frame.auras-below-frame #player-frame > #buff-bar {
+    z-index: 6;
+    pointer-events: none;
+  }
+  body.auras-on-frame.auras-below-frame #player-frame.pf-detached > #buff-bar {
+    pointer-events: auto;
   }
   /* With the buff row reparented onto the player frame, the debuff row is the only
      child left in the stack, so it rises to the stack's top on its own (classic
@@ -4471,14 +4497,15 @@
   }
 
   /* On-bar action-bar key-binding mode (issue #1238): a plain banner (no window
-     chrome) anchored above the visible action bar(s) via #actionbar-stack's own
-     position: relative. Built/removed by hud.ts on enter/exit. */
+     chrome) that is a #ui-root child, placed by hud.ts against the LIVE primary
+     bar (inline left/top in HUD author px). Never anchored to #actionbar-stack:
+     a bar moved with Interface Unlock is reparented to #ui and painted over a
+     stack-anchored banner, so its slots ate every Done / Reset click and re-armed
+     a capture instead. Sits in the always-above tier (90+, over the 20..89
+     window band and the detached frames at 20) so no frame can cover its exit.
+     Built/removed by hud.ts on enter/exit. */
   #actionbar-bind-banner {
     position: absolute;
-    left: 50%;
-    bottom: 100%;
-    transform: translateX(-50%);
-    margin-bottom: 8px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -4493,7 +4520,7 @@
     color: var(--color-text-light);
     font-family: var(--ui-font);
     text-align: center;
-    z-index: 25;
+    z-index: 90;
   }
   .actionbar-bind-hint {
     font-size: 13px;
@@ -7942,6 +7969,13 @@
     left: 50%;
     top: 21%;
     transform: translateX(-50%);
+    /* No z-index left this at the implicit auto tier, which paints BEHIND any
+       open .window (base z-index 20, raised to the 50-89 band on focus by
+       bringWindowToFront in hud.ts): a deny toast fired while a window was
+       open (e.g. mailing an unmailable item) rendered invisible under it,
+       visible only once the window was dragged aside. 90 matches the
+       established "always above the window band" tier (#ctx-menu, hud.css). */
+    z-index: 90;
     color: #ff2020;
     font-size: 18px;
     font-weight: bold;
@@ -9556,7 +9590,13 @@
     left: 50%;
     top: 34%;
     transform: translateX(-50%);
-    z-index: 80;
+    /* 80 sat INSIDE the .window focus band (bringWindowToFront cycles 50-89 in
+       hud.ts), so a prompt mounted here (e.g. the vendor sell-confirm prompt,
+       bags_window.ts showSellConfirmPrompt) rendered behind whichever window
+       had most recently climbed past 80, intermittently and only after enough
+       window focus churn in the session: 90 clears the whole band, matching
+       #error-msg and #ctx-menu's "always above the window band" tier. */
+    z-index: 90;
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -10234,7 +10274,17 @@
     translate: -50% -50%;
     width: 300px;
     height: 232px;
-    z-index: 30;
+    /* #proc-overlay is appended straight to <body> (hud.ts), a SIBLING of #ui,
+       not a descendant of it: its own position:fixed z-index establishes a
+       stacking context that competes with #ui's as a whole, not with any
+       window's internal 20-89 focus band. #ui's desktop base is z-index 10
+       (base.css), so the old 30 here painted the Rising Phoenix / soul-crystal
+       bank ABOVE every window: opening Bags mid-proc drew the phoenix (or the
+       Warlock's soul fragments) over the bag grid. 5 sits above #nameplates (1)
+       and #game-canvas (0), so the proc stays visible over the 3D world during
+       normal play, but now clears behind #ui (and, on mobile, its already
+       higher in-game/window-open z-index of 80/90) the moment a window opens. */
+    z-index: 5;
     opacity: 0;
     pointer-events: none;
     /* OFF transition = the gentle fade-out (owner: a bit slower, no hard snap);

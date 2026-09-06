@@ -45,6 +45,11 @@ import {
   insideGrassHubExclusion,
 } from './foliage_core';
 import { survivesLeanDecimation } from './foliage_decimation_core';
+import {
+  createFoliageFrameWindows,
+  type FoliageFrameInput,
+  resolveFoliageFrameWindows,
+} from './foliage_frame_windows_core';
 import { foliageGhostPrewarmDraws } from './foliage_ghost_prewarm';
 import {
   createImpostorSession,
@@ -54,20 +59,8 @@ import {
   impostorPrewarmMeshes,
   impostorsActive,
 } from './foliage_impostor';
-import {
-  CANOPY_EMISSIVE_FLOOR,
-  IMPOSTOR_SWAP_FADE,
-  spriteSwapDistance,
-} from './foliage_impostor_core';
-import {
-  type BucketWindowInput,
-  bucketVisible,
-  foliageDistanceScale,
-  foliageFogLimit,
-  type LodDists,
-  lodDistsFor,
-  treeDetailDistance,
-} from './foliage_lod';
+import { CANOPY_EMISSIVE_FLOOR } from './foliage_impostor_core';
+import { type BucketWindowInput, bucketVisible, type LodDists, lodDistsFor } from './foliage_lod';
 import {
   type FoliageDrawPath,
   foliageAttributeList,
@@ -112,10 +105,11 @@ import {
 import { runSlicedBuild } from './grass_build_slicer_core';
 import {
   type GrassCapCollapseBand,
-  grassCapCollapseBand,
   grassCapCollapseShaderPatch,
   grassCardProgramCacheKey,
+  grassCollapseBandFor,
 } from './grass_cap_collapse_core';
+import { grassTuftCards, grassTuftHasCap } from './grass_tuft_cards_core';
 import {
   buildGroundDecorPrewarmTwins,
   registerGroundDecorPrewarmDraw,
@@ -257,7 +251,14 @@ const TREE_MODEL_URLS: ReadonlySet<string> = new Set([
   ...FOLIAGE_MODEL_URLS_HIGH.dead,
 ]);
 // Bush kinds hand off to sprites at the dress swap on the sprite arm; ferns
-// and mushrooms are sub-pixel long before their cull and stay plain.
+// and mushrooms are sub-pixel long before their cull and stay plain there.
+// On the near-edge arm (no impostors) EVERY non-tree kind takes the dress
+// window, by construction rather than by list: those rows' slabs are culled
+// from the near edge (maxNearEdge), which is only safe while the shader
+// collapses each instance past the same dress cap, so a dressing kind added
+// later cannot fall through to the fog-wall window. (Rocks take their own
+// cloned material and the rock window; the cached rock source material is
+// never drawn.)
 const DRESS_SPRITE_URLS: ReadonlySet<string> = new Set([
   FOLIAGE_MODEL_URLS_HIGH.bush[0],
   FOLIAGE_MODEL_URLS_HIGH.bushFlowers[0],
@@ -265,7 +266,7 @@ const DRESS_SPRITE_URLS: ReadonlySet<string> = new Set([
 const collapseRoleForUrl = (url: string): CollapseRole =>
   TREE_MODEL_URLS.has(url)
     ? 'tree'
-    : impostorsActive() && DRESS_SPRITE_URLS.has(url)
+    : DRESS_SPRITE_URLS.has(url) || !impostorsActive()
       ? 'dress'
       : 'plain';
 
@@ -667,6 +668,8 @@ interface BucketMesh {
   // trees cull at treeFillFar OR at the swap, whichever comes first.
   minAtDetail?: boolean;
   maxAtDetail?: boolean;
+  /** lean rock/dressing rows: the numeric cap measures from the near edge */
+  maxNearEdge?: boolean;
   lod: 'core' | 'near-fill' | 'shadow' | 'proxy' | 'impostor' | 'rock' | 'dressing';
   /** sprite rows: which per-frame swap the row keys its window on */
   spriteCategory?: ImpostorCategory;
@@ -776,7 +779,7 @@ let foliagePrewarmDraws: readonly FoliagePrewarmDraw[] = [];
 // The tree-detail boundary is NOT a constant: it follows the zone's fog, so an
 // impostor can never be caught standing in clear air. See that module's header.
 function lodDists(): LodDists {
-  return lodDistsFor(GFX.leanFoliage);
+  return lodDistsFor(GFX.leanFoliage, GFX.tier);
 }
 
 // Slow travelling gust, shared by the canopy and grass shaders: it scales the
@@ -1796,8 +1799,9 @@ function buildTrees(
   // the colorways are inert. (Safe to clone: rocks take no wind hook.)
   const rockMat = (rockParts[0][0].material as THREE.MeshStandardMaterial).clone();
   rockMat.vertexColors = true;
-  // clone() drops shader hooks, so the clone re-takes its collapse window
-  applyInstanceCollapse(rockMat, impostorsActive() ? 'rock' : 'plain');
+  // clone() drops shader hooks, so the clone re-takes its collapse window.
+  // The rock window on both arms: the lean slab culls from its near edge.
+  applyInstanceCollapse(rockMat, 'rock');
   const colorway = (tint: THREE.Color): THREE.BufferGeometry[] => {
     const singles = rockParts.map((parts) => bakeTopTint(parts[0].geometry.clone(), tint));
     const member = (
@@ -1865,7 +1869,7 @@ function buildTrees(
       lod: BucketMesh['lod'],
       minDist?: number,
       maxDist?: number,
-      atDetail?: { min?: boolean; max?: boolean },
+      atDetail?: { min?: boolean; max?: boolean; nearEdge?: boolean },
       spriteCategory?: ImpostorCategory,
       shadow?: ShadowCasterRow,
     ): void => {
@@ -1878,6 +1882,7 @@ function buildTrees(
         maxDist,
         minAtDetail: atDetail?.min,
         maxAtDetail: atDetail?.max,
+        maxNearEdge: atDetail?.nearEdge,
         lod,
         spriteCategory,
         shadow,
@@ -1986,7 +1991,9 @@ function buildTrees(
           // the missing annulus finally read as a hole.
           register(rockMesh, 'rock', undefined, undefined, { max: true }, 'rock');
         } else {
-          register(rockMesh, 'rock', undefined, lodDists().rockFar);
+          // Near-edge cull (issue #3525): a half-world slab measured from its
+          // center dropped boulders a stride away as the camera orbited.
+          register(rockMesh, 'rock', undefined, lodDists().rockFar, { nearEdge: true });
         }
       }
     }
@@ -2397,6 +2404,9 @@ function buildDressing(
           // no sprite side and keep the numeric cap.
           maxDist: spriteBacked ? undefined : lodDists().dressFar,
           maxAtDetail: spriteBacked ? true : undefined,
+          // Lean arm: every kind culls from the near edge (its shader takes
+          // the dress window there, see collapseRoleForUrl).
+          maxNearEdge: !spriteBacked && !impostorsActive() ? true : undefined,
           spriteCategory: spriteBacked ? 'dress' : undefined,
           lod: 'dressing',
           reveal: bucketRevealState(im),
@@ -2714,37 +2724,22 @@ function buildGrassRing(
   // high tier reads as a lush meadow: wider tufts with more blades; low keeps
   // the legacy sprite size
   const lush = !GFX.leanFoliage;
-  const capCollapseBand = grassCapCollapseBand(GFX.bladeCarpetRadius);
+  const hasCapCard = grassTuftHasCap(GFX.grassCardsPerTuft, lush);
+  const capCollapseBand = grassCollapseBandFor(GFX.bladeCarpetRadius, hasCapCard);
   const capNearCollapse = capCollapseBand !== null;
   const lowPlusGrassScale = GFX.lowPlus ? 1.08 : 1;
-  const quad = new THREE.PlaneGeometry(
-    lush ? 1.45 : 1.1 * lowPlusGrassScale,
-    lush ? 0.9 : 0.7 * lowPlusGrassScale,
-  );
-  quad.translate(0, lush ? 0.4 : 0.35 * lowPlusGrassScale, 0);
-  const quad2 = quad.clone().rotateY(Math.PI / 2);
-  // Lush tier gets a third card at 45 degrees with a slight lean and a
-  // narrower/taller silhouette: two perpendicular cards read as a flat
-  // cross from above (the "4-way image"); the offset third card breaks the
-  // X in every direction for one extra quad per tuft. Low tier keeps two.
-  const quad3 = lush
-    ? new THREE.PlaneGeometry(1.15, 1.05)
-        .translate(0, 0.45, 0)
-        .rotateZ(0.12)
-        .rotateY(Math.PI / 4)
-    : null;
-  // A near-horizontal cap card: from a true top-down camera (positive pitch,
-  // the chase camera's common angle) every vertical card goes edge-on and
-  // the meadow read as bare ground with green fans. The cap keeps blade
-  // texture facing the sky for one more quad on the lush tier only.
-  const quadCap = lush
-    ? new THREE.PlaneGeometry(1.05, 1.05).rotateX(-Math.PI / 2 + 0.18).translate(0, 0.34, 0)
-    : null;
   const capPart = (part: THREE.BufferGeometry, cap: 0 | 1): THREE.BufferGeometry =>
     capNearCollapse ? tagCapVertices(part, cap) : part;
-  const parts = [capPart(quad, 0), capPart(quad2, 0)];
-  if (quad3) parts.push(capPart(quad3, 0));
-  if (quadCap) parts.push(capPart(quadCap, 1));
+  // The card ladder and each card's placement live in the pure core; the tier
+  // knob (GFX.grassCardsPerTuft) decides how many of them a tuft gets.
+  const parts = grassTuftCards(GFX.grassCardsPerTuft, lush, lowPlusGrassScale).map((card) => {
+    const part = new THREE.PlaneGeometry(card.width, card.height);
+    if (card.preRotX !== 0) part.rotateX(card.preRotX);
+    part.translate(0, card.liftY, 0);
+    if (card.rotZ !== 0) part.rotateZ(card.rotZ);
+    if (card.rotY !== 0) part.rotateY(card.rotY);
+    return capPart(part, card.cap);
+  });
   const geo = mergeGeometries(parts);
   geo.deleteAttribute('normal');
 
@@ -3607,10 +3602,23 @@ export function buildFoliage(seed: number, webgl?: THREE.WebGLRenderer): Foliage
     maxDist: undefined,
     minAtDetail: undefined,
     maxAtDetail: undefined,
+    maxNearEdge: undefined,
     distanceScale: 1,
     detailFar: 0,
     revealScale: 1,
     fogLimit: 0,
+  };
+  const frameWindows = createFoliageFrameWindows();
+  // Reused per frame like bucketWindow: the resolver's input is a plain block.
+  const frameInput: FoliageFrameInput = {
+    modelQuality: 1,
+    leanFoliage: false,
+    spritesOn: false,
+    impostorsActive: false,
+    fogFar: 0,
+    atmosFogNear: 0,
+    atmosFogFar: 0,
+    dists: lodDists(),
   };
   // Light-space form of the renderer's shadow volume, and the camera-relative
   // collapse window, rebuilt each frame, plus the copies the last repack was
@@ -3788,55 +3796,19 @@ export function buildFoliage(seed: number, webgl?: THREE.WebGLRenderer): Foliage
         dt,
         reducedMotion,
       );
-      // Buckets fully behind the fog wall are pure overdraw. The handoff laws
-      // are decided in foliage_impostor_core.ts (sprite arm) and
-      // foliage_lod.ts (lean arm) and unit-tested there. The cull tracks the
-      // LIVE fog; the handoff tracks the ATMOSPHERE (see the update() doc).
-      const distanceScale = foliageDistanceScale(modelQuality, GFX.leanFoliage);
-      const fogLimit = foliageFogLimit(fogFar, modelQuality);
-      const dists = lodDists();
-      const spritesOn = spritesLive;
-      // Sprite arm: the handoff follows the budget (sprites are legible in
-      // clear air); lean arm: the old fog-blend law, trees end in the murk.
-      const detailFar = spritesOn
-        ? spriteSwapDistance(
-            dists.treeDetailFar,
-            distanceScale,
-            atmosFogNear,
-            atmosFogFar,
-            fogLimit,
-          )
-        : treeDetailDistance(
-            dists.treeDetailFar,
-            atmosFogNear,
-            atmosFogFar,
-            distanceScale,
-            fogLimit,
-          );
-      // Real geometry never outlives the foliage cull (the model-quality trim
-      // exists to shed triangles); only the SPRITES run past it to the wall.
-      const rockSwap = Math.min(dists.rockFar * distanceScale, fogLimit);
-      const dressSwap = Math.min(dists.dressFar * distanceScale, fogLimit);
-      // Real buildings die with the detail horizon (props band culls), so
-      // their sprites step in a little inside it: the overlap band hides
-      // behind the real building it pictures.
-      const buildingSwap = Math.max(0, fogFar - 40);
-      // The vertex shaders enforce these same boundaries per INSTANCE, so a
-      // surviving slab no longer drags its whole tree population along with it
-      // (foliage_collapse.ts), and each sprite starts where its real twin
-      // collapsed (foliage_impostor.ts binds the same uniforms).
-      collapseWindows.treeMax = detailFar;
-      collapseWindows.rockMax = spritesOn ? rockSwap : fogLimit;
-      collapseWindows.dressMax = spritesOn ? dressSwap : fogLimit;
-      collapseWindows.buildingMax = spritesOn ? buildingSwap : fogLimit;
-      collapseWindows.fogCull = fogLimit;
-      collapseWindows.fade = spritesOn ? IMPOSTOR_SWAP_FADE : 0;
-      // Sprites run to the view horizon: with outdoor fog gone the renderer
-      // passes the whole-world envelope through atmosFogFar, so the far
-      // field carries every tree to the world rim; under a live fog (an
-      // interior, the lean arm) the wall still bounds them.
-      collapseWindows.spriteFar = Math.max(fogFar, atmosFogFar);
+      // This frame's windows (foliage_frame_windows_core.ts): the bucket cull
+      // and the per-instance shader windows read the same resolved numbers.
+      frameInput.modelQuality = modelQuality;
+      frameInput.leanFoliage = GFX.leanFoliage;
+      frameInput.spritesOn = spritesLive;
+      frameInput.impostorsActive = impostorsActive();
+      frameInput.fogFar = fogFar;
+      frameInput.atmosFogNear = atmosFogNear;
+      frameInput.atmosFogFar = atmosFogFar;
+      frameInput.dists = lodDists();
+      resolveFoliageFrameWindows(frameInput, frameWindows, collapseWindows);
       updateCollapseUniforms(collapseWindows);
+      const { distanceScale, fogLimit, detailFar } = frameWindows;
       // The shadow rows key on the light, not the camera (foliage_shadow_core).
       setShadowVolumeBasis(shadowBasis, shadowVolumeLive ? shadowVolume : null);
       // Every shadow row shares one cap: the build-time radius trimmed by the
@@ -3936,14 +3908,15 @@ export function buildFoliage(seed: number, webgl?: THREE.WebGLRenderer): Foliage
         bucketWindow.maxDist = b.maxDist;
         bucketWindow.minAtDetail = b.minAtDetail;
         bucketWindow.maxAtDetail = b.maxAtDetail;
+        bucketWindow.maxNearEdge = b.maxNearEdge;
         bucketWindow.distanceScale = distanceScale;
         bucketWindow.detailFar =
           b.spriteCategory === 'rock'
-            ? rockSwap
+            ? frameWindows.rockSwap
             : b.spriteCategory === 'dress'
-              ? dressSwap
+              ? frameWindows.dressSwap
               : b.spriteCategory === 'building'
-                ? buildingSwap
+                ? frameWindows.buildingSwap
                 : detailFar;
         bucketWindow.revealScale = revealScale;
         bucketWindow.fogLimit = fogLimit;

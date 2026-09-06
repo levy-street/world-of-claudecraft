@@ -50,7 +50,7 @@ describe('final color NaN guard core', () => {
     const patched = patchOpaqueFragmentNanGuard(SOURCE_OPAQUE_FRAGMENT);
     expect(patched).not.toBe(SOURCE_OPAQUE_FRAGMENT);
     const marker = patched.indexOf('// WOC_OPAQUE_NAN_GUARD');
-    const alphaScrub = patched.indexOf('diffuseColor.a = ( diffuseColor.a < 0.0');
+    const alphaScrub = patched.indexOf('diffuseColor.a = ( ( floatBitsToUint( diffuseColor.a )');
     const write = patched.indexOf(OPAQUE_WRITE);
     expect(marker).toBeGreaterThan(-1);
     expect(alphaScrub).toBeGreaterThan(marker);
@@ -69,11 +69,14 @@ describe('final color NaN guard core', () => {
 
   it('scrubs outgoingLight (rgb) unconditionally before opaque_fragment writes gl_FragColor', () => {
     const patched = patchOpaqueFragmentNanGuard(SOURCE_OPAQUE_FRAGMENT);
-    const alphaScrub = patched.indexOf('diffuseColor.a = ( diffuseColor.a < 0.0');
-    const scrubStart = patched.indexOf('outgoingLight.x = ( outgoingLight.x < 0.0');
+    const alphaScrub = patched.indexOf('diffuseColor.a = ( ( floatBitsToUint( diffuseColor.a )');
+    const scrubStart = patched.indexOf('outgoingLight.x = ( ( floatBitsToUint( outgoingLight.x )');
+    // Bit-exact (exponent bits all set), never a NaN comparison: see
+    // post_finite_guard_glsl.ts for why the comparison form is unsafe on Mali.
     const zScrub =
-      'outgoingLight.z = ( outgoingLight.z < 0.0 || outgoingLight.z >= 0.0 )' +
-      ' ? outgoingLight.z : 0.0;\n';
+      'outgoingLight.z = ( ( floatBitsToUint( outgoingLight.z ) & 0x7f800000u ) == 0x7f800000u )' +
+      ' ? 0.0 : outgoingLight.z;\n';
+    expect(patched).not.toMatch(/<\s*0\.0\s*\|\|/);
     const zScrubStart = patched.indexOf(zScrub);
     const scrubEnd = zScrubStart + zScrub.length;
     const write = patched.indexOf(OPAQUE_WRITE);

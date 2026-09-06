@@ -72,6 +72,7 @@ import { tryGrantSolarReprisal } from './paladin_solar_reprisal';
 import { applyRequitalAutoAttack } from './paladin_talents';
 import { isValkyrsCallingAirborne } from './paladin_valkyrs_calling_state';
 import { effectivePlayerAttackRange } from './player_attack_reach';
+import { applyPoisonCoats } from './poison_coating';
 import { rangedShotProfile } from './ranged_shot';
 import { wearsSetBonus } from './set_bonus_wearer';
 import { triggerWardCycle } from './shaman_talents';
@@ -193,9 +194,33 @@ export function stopAutoAttack(ctx: SimContext, pid?: number): void {
   if (r) r.e.autoAttack = false;
 }
 
+// Eye Jab (gouge): classic WoW's Gouge resets the caster's own swing timer on
+// use, so the auto-attack already in flight cannot land right behind it and
+// break the incapacitate it just applied. Mirrors the exact reset a landed
+// swing applies in updatePlayerAutoAttack below (same formula, both hands),
+// so this reads as "the caster just swung," not a bespoke delay.
+export function resetSwingTimer(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
+  const haste = stanceMasteryAutoHaste(ctx, p, meta);
+  p.swingTimer = (baseSwingSpeed(p) * ctx.swingIntervalMult(p)) / (1 + haste);
+  if (p.dualWielding && p.offhandWeapon) {
+    p.offhandSwingTimer = (p.offhandWeapon.speed * ctx.swingIntervalMult(p)) / (1 + haste);
+  }
+}
+
 export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
   p.swingTimer = Math.max(0, p.swingTimer - DT);
   p.offhandSwingTimer = Math.max(0, p.offhandSwingTimer - DT);
+  tryPlayerSwing(ctx, p, meta);
+}
+
+// The swing attempt behind the per-tick driver, without the timer decay: every
+// gate (armed, not casting, target, timer, stun, facing, range, LoS) and the
+// swing itself. Reachable a second time in one tick from the spell queue
+// (casting_lifecycle.fireQueuedCast, via ctx.tryPlayerSwing): a cast that
+// completes with the next cast already queued never shows the driver a null
+// castingAbility, so the queue fires the ready swing itself before starting
+// the queued cast. Calling in here with the timer still running is a no-op.
+export function tryPlayerSwing(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
   if (isValkyrsCallingAirborne(p)) return;
   if (p.auras.some((a) => isTravelFormAuraKind(a.kind))) {
     p.autoAttack = false;
@@ -676,6 +701,10 @@ export function meleeSwing(
       triggerWardCycle(ctx, attacker);
     }
     onMeleeSwing(ctx, attacker);
+    // Weapon coats (the rogue poisons) land their rider on the struck target
+    // here, on the LANDED arm only: a miss, dodge or parry returned above, so
+    // a whiffed swing carries no poison. Draws no rng.
+    applyPoisonCoats(ctx, attacker, target);
   }
   // thorns / lightning shield: melee attackers take damage back. Charge-limited
   // thorns (Lightning Shield) consume a charge and gate on an internal cooldown.

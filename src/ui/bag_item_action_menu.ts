@@ -21,7 +21,13 @@
 //     the swap KEEPS as well as what it destroys, and the plain twin of a mixed
 //     holding (an enchanted copy of the same id in the bags OR on the body)
 //     states its own state so the pair never differs by a sub-line alone
-//     (#2421); the pure core decides all three. It also decides the two
+//     (#2421); the pure core decides all three. The one exception is a target
+//     that already carries the PICKED enchant: the sim allows re-applying it
+//     (a normal replace that nets to the same stats, so a player can burn
+//     materials and train Enchanting on gear they intend to keep), and the row
+//     stays enabled and clickable, but paints with the informational "Already
+//     applied" tag instead of the destructive one, since nothing is actually
+//     lost. It also decides the two
 //     discriminators that keep NO TWO ROWS of one target list sharing an
 //     accessible name (#2466): the heroic mark, because a heroic variant renders
 //     its base item's name, and the indexed worn tag, because both fingers read
@@ -373,9 +379,11 @@ export class BagItemActionMenu {
   // two rings holding identical copies. Already-enchanted copies paint as
   // FLAGGED replace rows (#2415): their meta names the enchant that would be
   // destroyed, activation runs the replace confirm (confirmReplace above), and
-  // a row whose victim already carries the picked enchant paints disabled (the
-  // sim would deny same_enchant; a confirm that can only lose reagents is
-  // never offered).
+  // a row whose victim already carries the picked enchant stays enabled and
+  // clickable too (the sim allows this: a normal replace that nets to the
+  // same stats, so a player can spend reagents to train Enchanting on gear
+  // they intend to keep), just tagged "Already applied" instead of naming a
+  // doomed enchant.
   private openTargetPicker(enchantId: string, x: number, y: number): void {
     const world = this.deps.world();
     // The self entity mirror carries equippedInstances in BOTH worlds (offline
@@ -411,7 +419,8 @@ export class BagItemActionMenu {
     // picker's own warning modifier (CTX_ITEM_DANGER_CLASS, the .ctx-reagent
     // .unsat token next door). The tint stays a redundant hint: the tag names
     // the doomed enchant in words either way. The already-applied tag is NOT
-    // destructive (that row is inert) and keeps the plain meta style.
+    // destructive (the replace nets to the same stats: only reagents are
+    // spent) and keeps the plain meta style even though the row is clickable.
     const replaceMeta = (replace: EnchantReplaceTargetInfo): string =>
       replace.sameEnchant
         ? `<span class="ctx-item-meta">${esc(t('hudChrome.enchanting.sameEnchantTag'))}</span>`
@@ -456,14 +465,17 @@ export class BagItemActionMenu {
       )}</span>`;
     const identityOf = (target: { itemId: string; heroic?: true }): string =>
       `${nameOf(target.itemId)}${target.heroic ? heroicMeta() : ''}`;
+    // A same-enchant replace row stays enabled: the sim allows re-applying an
+    // enchant a copy already carries (a normal replace that nets to the same
+    // stats, so it just spends reagents and trains Enchanting), so it routes
+    // through the exact same worn:/replace: dispatch as any other row; only
+    // its meta tag (replaceMeta above) reads differently.
     const rows = [
       ...worn.map((target) => {
         const html = `${identityOf(target)}${wornMeta(target)}${
           target.replace ? replaceMeta(target.replace) : ''
         }`;
-        return target.replace?.sameEnchant
-          ? { html, disabled: true }
-          : { act: `worn:${target.slot}`, html };
+        return { act: `worn:${target.slot}`, html };
       }),
       ...targets.map((target) => {
         if (!target.replace) {
@@ -471,9 +483,7 @@ export class BagItemActionMenu {
           return { act: `target:${target.itemId}`, html };
         }
         const html = `${identityOf(target)}${replaceMeta(target.replace)}`;
-        return target.replace.sameEnchant
-          ? { html, disabled: true }
-          : { act: `replace:${target.itemId}`, html };
+        return { act: `replace:${target.itemId}`, html };
       }),
     ];
     this.paint(

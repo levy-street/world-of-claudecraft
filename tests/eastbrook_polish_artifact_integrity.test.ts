@@ -1025,6 +1025,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the v0.40.0 sync merge into the guild pledge branch (the
 // OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
 // both sides). No capture was retaken.
+// Re-minted for the weapon-stow overlay fix (renderer.ts: single-writer
+// removal + the mount sheathe clause): the renderer integration leaf moved.
+// No capture was retaken.
 // Re-minted for the Ignivar raid consolidation (the v0.41.0 base merge plus
 // the renderer extraction round moved the renderer integration leaf). No
 // capture was retaken.
@@ -1034,25 +1037,39 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the Drakelands entrance merge into the raid branch (PRs 3689
 // plus 3734: both arms had re-minted, the merged renderer and evidence inputs
 // land together). No capture was retaken.
-// Re-minted at the release/v0.42.0 sync of PR #3439: renderer.ts moved for the
-// mount lifecycle seam (mount_lifecycle.ts) and the rickshaw hooks it absorbed.
-// Re-minted for the Cluckwork Mech Bird store mount (PR #3464) on top of the
-// v0.42.0 mount-lifecycle move: the renderer's stride accumulator moved to
-// src/render/stride_audio_core.ts and the mounted audio branch gained the
-// idle-hum poll. No capture was retaken.
-// Re-minted for the Realm Builder monument (PR #3695) at its release/v0.42.0
-// base merge: the civic centrepiece changed asset, subject and shader cache
-// key, so every provenance block was swept onto the merged fingerprinted
-// inputs. No capture was retaken.
-// Re-minted for the PR #3695 review fixes: the impostor fragment's fog and
-// tone-mapping tail moved realm_builder_monument_fx.ts. No capture was retaken.
+// Re-minted for the release/v0.42.0 merge into the weapon-sheathe-swim-mount
+// branch (the merged renderer.ts carries this branch's mount sheathe overlay
+// beside the release's forge-lift room and Drakelands entrance render
+// integrations, so the composite matches neither parent). No capture was
+// retaken.
+// Re-minted for the v0.42.0 release batch renderer merge: runtimeRender.renderer
+// moved with the shipped renderer tree. No capture was retaken.
+// Re-minted for the release/v0.42.0 reconcile with the Realm Builder and
+// store-mount renderer leaves. No capture was retaken.
+// Re-minted for the post-chain pixel budget: the renderer's coalesced
+// viewport-resize pass moves the runtimeRender.renderer leaf. No capture
+// was retaken.
+// Re-minted again for the review answers on the same branch (the viewport
+// poll now books the coalesced pass). No capture was retaken.
+// Re-minted for the coalesced-resize flush point (the frame drains the gate
+// before it draws). No capture was retaken.
+// Re-minted for the PR #3834 merge after PR #3833: runtimeRender.renderer
+// now carries pooled VFX material cleanup beside the coalesced viewport-resize
+// pass, so the composite matches neither parent. No capture was retaken.
+// Re-minted for the compositor-surfaces batch (renderer.ts only: the opaque
+// world context, the nameplate surface-ratio and cadence wiring, the spirit
+// grade hookup and the build-diag extraction). No capture was retaken.
+// Re-minted for the PR #3844 merge after PR #3841: the candidate's render-stack
+// renderer bytes and #3844's compositor surface/nameplate/spirit-grade bytes
+// combine in one tree, so the composite matches neither parent. No capture was
+// retaken.
+// Re-minted for the v0.42.0 release candidate renderer merge: the selected
+// renderer changes move the runtimeRender.renderer leaf and the metadata
+// authority follows the swept evidence bytes. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'aae303c8be1af767739709f2749a17c0e111cdf570280c166ef59466401ba34e';
-// Re-minted at the release/v0.42.0 sync of PR #3439: renderer.ts moved for the
-// mount lifecycle seam (mount_lifecycle.ts) and the rickshaw hooks it absorbed.
-// Re-minted again for the PR #3695 review fixes (the impostor fragment tail).
+  '35c0c6c41824f4a64665f3b864fe3282d01d8a3603d4a15856e1890727632204';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '85392484fb6509a37aa445bcc5bd5ebba58819939847318ccf288b048341b708';
+  'ee5a53b2e3ba790a408d39e8ca81a1baaa07f774823d3c025e1ef024e3ae589b';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2199,24 +2216,36 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
     // both sides): same order, the composite first, then this seal. No capture
     // was retaken.
+    // Re-minted for the weapon-stow overlay fix (renderer.ts): same order,
+    // the composite first, then this seal. No capture was retaken.
     // Re-minted for PR #3740's forge-lift room: the first-order composite
     // follows the lift room's renderer.ts hookup, then this second-order
     // performance seal follows the swept evidence bytes. No capture was
     // retaken.
+    // Re-minted for the Drakelands entrance merge into the raid branch: the
+    // composite first, then this seal. No capture was retaken.
+    // Re-minted for the release/v0.42.0 merge into the weapon-sheathe-swim-mount
+    // branch: same order, the composite first, then this seal. No capture was
+    // retaken.
+    // Re-minted for the v0.42.0 release batch renderer merge: same order, the
+    // composite first, then this seal. No capture was retaken.
+    // Re-minted for the v0.42.0 release candidate renderer merge: same order,
+    // the composite first, then this seal. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
       // Re-minted for the Drakelands entrance merge into the raid branch: the
       // composite first, then this seal. No capture was retaken.
-      // Re-minted for the Realm Builder monument (PR #3695) at its
-      // release/v0.42.0 base merge: the first-order composite follows the
-      // renderer, town and civicShader leaves, then this second-order seal
-      // follows the swept evidence bytes. No capture was retaken.
-      // Re-minted for the PR #3695 review fixes: the impostor fragment's fog
-      // and tone-mapping tail moved realm_builder_monument_fx.ts, the composite
-      // followed it, then this seal followed the swept bytes. No capture was
-      // retaken.
-    ).toBe('c5c6bdac1fc2fe0c2848300d5ca6deec0c52793b376fce1c3609ca1a39f6f754');
+      // Re-minted for the post-chain pixel budget: the composite first, then
+      // this seal. No capture was retaken.
+      // Re-minted for the PR #3834 merge after PR #3833: the composite first,
+      // then this seal. No capture was retaken.
+      // Re-minted for the compositor-surfaces batch: the composite follows the
+      // renderer.ts edits, then this seal follows the swept evidence bytes. No
+      // capture was retaken.
+      // Re-minted for the PR #3844 merge after PR #3841: same order, the
+      // composite first, then this seal. No capture was retaken.
+    ).toBe('b44ae46ffaa37352d92ade7dc327ea98d1afc91a6745dff11c959ae178d14fa2');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

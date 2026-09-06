@@ -4,6 +4,7 @@ import {
   druidEngineCombatState,
   druidEngineOnHotPlanted,
   druidEngineOnLandedStrike,
+  LOPING_STRIDE_SPEED,
   MOONTIDE_ID,
   OLD_BLOOD_ID,
   VERDANCE_ID,
@@ -11,6 +12,7 @@ import {
 import { onCastCompleted } from '../src/sim/combat/talent_procs';
 import { MOBS } from '../src/sim/data';
 import { createMob, recalcPlayerStats } from '../src/sim/entity';
+import { moveSpeedMult } from '../src/sim/player_motion';
 import { Sim } from '../src/sim/sim';
 import type { Aura, Entity } from '../src/sim/types';
 
@@ -500,5 +502,40 @@ describe('Groveheart engine', () => {
       }),
     ).toBe(true);
     expect(player.auras.some((aura) => aura.id === VERDANCE_ID)).toBe(false);
+  });
+});
+
+describe('Loping Stride', () => {
+  it('stamps a real move-speed multiplier so shapeshifting actually sprints', () => {
+    const { sim, player } = rig('feral', { 5: 'dru_r5_ferocity' });
+    expect(moveSpeedMult(player)).toBe(1);
+
+    completed(sim, 'bear_form');
+    const stride = player.auras.find((aura) => aura.id === 'loping_stride');
+    expect(stride?.kind).toBe('buff_speed');
+    // buff_speed carries a 1+fraction multiplier (1.6 = +60%), the same
+    // convention every other speed buff and form_travel use.
+    expect(stride?.value).toBe(LOPING_STRIDE_SPEED);
+    expect(moveSpeedMult(player)).toBeCloseTo(1.6);
+
+    // Travel form's own 1.4 must not win over the stronger 3s sprint.
+    player.auras.push({ ...formAura(player, 'form_travel'), value: 1.4 });
+    expect(moveSpeedMult(player)).toBeCloseTo(1.6);
+  });
+
+  it('holds the 20s internal cooldown between shifts', () => {
+    const { sim, player } = rig('feral', { 5: 'dru_r5_ferocity' });
+    completed(sim, 'cat_form');
+    player.auras = player.auras.filter((aura) => aura.id !== 'loping_stride');
+    completed(sim, 'bear_form');
+    expect(player.auras.some((aura) => aura.id === 'loping_stride')).toBe(false);
+    expect(moveSpeedMult(player)).toBe(1);
+
+    // The ICD decays through the authoritative tick: past 20s the next shift
+    // grants the sprint again.
+    for (let tick = 0; tick < 20 * 20 + 1; tick++) sim.tick();
+    completed(sim, 'cat_form');
+    expect(player.auras.some((aura) => aura.id === 'loping_stride')).toBe(true);
+    expect(moveSpeedMult(player)).toBeCloseTo(1.6);
   });
 });

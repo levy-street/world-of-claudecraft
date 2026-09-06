@@ -5,6 +5,7 @@ import {
   configureTightBoneTextures,
   optimizeSkinGpuLayout,
 } from '../src/render/characters/skin_gpu_layout';
+import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 
 function makeBones(count: number): THREE.Bone[] {
   const bones: THREE.Bone[] = [];
@@ -70,17 +71,21 @@ function skinnedPositions(mesh: THREE.SkinnedMesh): number[] {
 
 describe('skinned character GPU layout', () => {
   it('keeps the layout and texture optimizations wired into live character assembly', () => {
-    const assets = readFileSync(
-      new URL('../src/render/characters/assets.ts', import.meta.url),
-      'utf8',
+    // Through the shared stripper: both lines below are explained in prose
+    // right beside themselves, so a raw read is satisfied by a commented-out
+    // call and would stay green over code that is no longer there.
+    const assets = codeWithoutLineComments(
+      readFileSync(new URL('../src/render/characters/assets.ts', import.meta.url), 'utf8'),
     );
-    const visual = readFileSync(
-      new URL('../src/render/characters/visual.ts', import.meta.url),
-      'utf8',
+    const visual = codeWithoutLineComments(
+      readFileSync(new URL('../src/render/characters/visual.ts', import.meta.url), 'utf8'),
     );
 
+    // The palette pass reads the rig AFTER the merge and after the shared-
+    // skeleton rebind (rig_shared_skeleton.ts), which is what leaves it one
+    // skeleton to compact instead of one per surviving part.
     expect(assets).toMatch(
-      /mergeSkinnedParts\(root, animatedNodeNames\(clips\)\);\s+optimizeSkinGpuLayout\(root\);/,
+      /mergeSkinnedParts\(root, animatedNodeNames\(clips\)\);[\s\S]*?shareRigSkeleton\(root\);[\s\S]*?optimizeSkinGpuLayout\(root\);/,
     );
     expect(visual.match(/configureTightBoneTextures\((?:this\.model|payload)\)/g)).toHaveLength(3);
   });

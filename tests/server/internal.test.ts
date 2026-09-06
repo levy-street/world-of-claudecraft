@@ -107,6 +107,12 @@ import {
 // here: tests enqueue into it and the outbox handler drains it, which exercises
 // the actual FIFO rather than a fake standing in for it.
 import { drainLinkChanges, enqueueLinkChange } from '../../server/discord_link_changes';
+import {
+  enqueueQueuePop,
+  type QueuedQueuePop,
+  queuePopQueueDepth,
+  resetQueuePopsForTests,
+} from '../../server/discord_queue_pops';
 import type { QueuedRelay } from '../../server/discord_relay';
 import { drainRelay, requeueRelay } from '../../server/discord_relay';
 import { compose } from '../../server/http/compose';
@@ -291,6 +297,8 @@ beforeEach(() => {
   // The change feed is a module-global singleton and its drain is destructive,
   // so emptying it here is the reset: no test can inherit another's items.
   drainLinkChanges();
+  // The queue-pop feed likewise (plus its opt-in cache and watch signal).
+  resetQueuePopsForTests();
 });
 
 afterEach(() => {
@@ -1777,6 +1785,7 @@ describe('discord/outbox', () => {
       activity: { items: [] },
       winners: NO_WINNERS,
       linkChanges: { items: [] },
+      queuePops: { items: [], watching: false },
     });
   });
 
@@ -1798,6 +1807,7 @@ describe('discord/outbox', () => {
       activity: { items: [] },
       winners: NO_WINNERS,
       linkChanges: { items: [] },
+      queuePops: { items: [], watching: false },
     });
   });
 
@@ -1888,7 +1898,13 @@ describe('discord/outbox', () => {
 
     const r = await runRoute('GET', '/internal/discord/outbox', { headers: DISCORD_HEADERS });
 
-    expect(Object.keys(dataOf(r.body))).toEqual(['relay', 'activity', 'winners', 'linkChanges']);
+    expect(Object.keys(dataOf(r.body))).toEqual([
+      'relay',
+      'activity',
+      'winners',
+      'linkChanges',
+      'queuePops',
+    ]);
   });
 
   it('emits relay items in the retired relay GET item shape, nulls for an unlinked issuer', async () => {
@@ -2057,6 +2073,82 @@ describe('discord/outbox', () => {
         },
       ],
     });
+  });
+
+  // The queue-pop DM stream (server/discord_queue_pops.ts): the fifth stream,
+  // real module (its drain is destructive and expiry-filtered), resolved to
+  // the ONE Discord id the DM goes to through the same batched identity read.
+  function queuePop(accountId: number, over: Partial<QueuedQueuePop> = {}): QueuedQueuePop {
+    return {
+      accountId,
+      characterName: `c${accountId}`,
+      kind: 'bg',
+      format: null,
+      seconds: 30,
+      expiresAtMs: Date.now() + 30_000,
+      realm: 'R',
+      ...over,
+    };
+  }
+
+  it('ships queue pops with the linked id, drops unlinked and lapsed ones, and joins the identity read', async () => {
+    process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
+    stubDrains();
+    enqueueQueuePop(queuePop(1));
+    enqueueQueuePop(queuePop(2)); // unlinked: dropped
+    enqueueQueuePop(queuePop(3, { expiresAtMs: Date.now() - 1 })); // lapsed: dropped
+    enqueueQueuePop(queuePop(4, { kind: 'arena', format: '2v2', seconds: 0 }));
+    vi.mocked(dailyRewardService.discordWinnerAnnouncements).mockResolvedValue(NO_WINNERS);
+    vi.mocked(discordLinksForAccounts).mockResolvedValue([linkRow(1), linkRow(4)]);
+
+    const r = await runRoute('GET', '/internal/discord/outbox', { headers: DISCORD_HEADERS });
+
+    expect(r.status).toBe(200);
+    expect(vi.mocked(discordLinksForAccounts)).toHaveBeenCalledTimes(1);
+    // The lapsed item never reaches the identity read: the drain discarded it.
+    expect([...requestedAccountIds()].sort((a, b) => a - b)).toEqual([1, 2, 4]);
+    const stream = dataOf(r.body).queuePops as {
+      items: Record<string, unknown>[];
+      watching: boolean;
+    };
+    expect(stream.watching).toBe(false);
+    expect(stream.items.map((it) => [it.accountId, it.discordUserId, it.kind, it.format])).toEqual([
+      [1, 'du1', 'bg', null],
+      [4, 'du4', 'arena', '2v2'],
+    ]);
+    // The wire shape is the queued item plus the id, nothing renamed.
+    expect(Object.keys(stream.items[0])).toEqual([
+      'accountId',
+      'characterName',
+      'kind',
+      'format',
+      'seconds',
+      'expiresAtMs',
+      'realm',
+      'discordUserId',
+    ]);
+    expect(queuePopQueueDepth()).toBe(0);
+  });
+
+  it('requeues drained queue pops when the response build fails, so the DM survives the retry', async () => {
+    process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
+    stubDrains();
+    enqueueQueuePop(queuePop(1));
+    vi.mocked(dailyRewardService.discordWinnerAnnouncements).mockResolvedValue(NO_WINNERS);
+    vi.mocked(discordLinksForAccounts).mockRejectedValueOnce(new Error('db down'));
+
+    const failed = await runRoute('GET', '/internal/discord/outbox', { headers: DISCORD_HEADERS });
+    expect(failed.status).toBe(500);
+    expect(queuePopQueueDepth()).toBe(1);
+
+    vi.mocked(discordLinksForAccounts).mockResolvedValue([linkRow(1)]);
+    const retried = await runRoute('GET', '/internal/discord/outbox', { headers: DISCORD_HEADERS });
+    expect(retried.status).toBe(200);
+    expect(
+      (dataOf(retried.body).queuePops as { items: { accountId: number }[] }).items.map(
+        (it) => it.accountId,
+      ),
+    ).toEqual([1]);
   });
 
   it('is gated: an unset feature secret is the anti-enumeration 404', async () => {

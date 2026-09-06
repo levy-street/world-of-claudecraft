@@ -161,6 +161,102 @@ describe('pet_commands module (P1b)', () => {
     expect(egg.threat.has(pet.id)).toBe(true);
   });
 
+  // A mob mid-evade (leashed home, walking back to spawn) is damage/threat-immune
+  // (dealDamage's evade gate); the manual pet-command surface must refuse to newly
+  // engage one exactly like pet AI does (pet_ai.ts petPickTarget/updatePet), or a
+  // player pointing their pet at what looks like an idle boss right after a wipe
+  // still writes a durable threat-table entry onto it.
+  it('refuses petAttack against an evading mob, and works once it stops evading', () => {
+    const { sim, hid, hunter } = hunterWorld(1312);
+    summonPet(sim.ctx, hunter, 'forest_wolf');
+    const pet = petOf(sim.ctx, hid) as AnyEntity;
+    const target = spawnWolf(sim, pet);
+    hunter.targetId = target.id;
+    target.aiState = 'evade';
+
+    petAttack(sim.ctx, hid);
+    expect(pet.aggroTargetId).toBeNull();
+    expect(pet.inCombat).toBe(false);
+    expect(target.threat.has(pet.id)).toBe(false);
+
+    target.aiState = 'idle';
+    petAttack(sim.ctx, hid);
+    expect(pet.aggroTargetId).toBe(target.id);
+    expect(pet.inCombat).toBe(true);
+    expect(target.threat.has(pet.id)).toBe(true);
+  });
+
+  it('refuses petTaunt against an evading mob, and works once it stops evading', () => {
+    const { sim, hid, hunter } = hunterWorld(1313);
+    summonPet(sim.ctx, hunter, 'forest_wolf');
+    const pet = petOf(sim.ctx, hid) as AnyEntity;
+    const target = spawnWolf(sim, pet);
+    hunter.targetId = target.id;
+    target.aiState = 'evade';
+
+    petTaunt(sim.ctx, hid);
+    expect(pet.aggroTargetId).toBeNull();
+    expect(pet.inCombat).toBe(false);
+    expect(target.threat.has(pet.id)).toBe(false);
+    expect(target.forcedTargetId).not.toBe(pet.id);
+
+    target.aiState = 'idle';
+    petTaunt(sim.ctx, hid);
+    expect(pet.aggroTargetId).toBe(target.id);
+    expect(pet.inCombat).toBe(true);
+    expect(target.threat.has(pet.id)).toBe(true);
+  });
+
+  it('refuses petWaterJet against an evading mob, and works once it stops evading', () => {
+    const { sim, hid, hunter } = hunterWorld(1314);
+    summonPet(sim.ctx, hunter, 'forest_wolf');
+    const pet = petOf(sim.ctx, hid) as AnyEntity;
+    pet.templateId = 'water_elemental'; // the only family with a Water Jet
+    const target = spawnWolf(sim, pet);
+    hunter.targetId = target.id;
+    target.aiState = 'evade';
+
+    petWaterJet(sim.ctx, hid);
+    expect(pet.aggroTargetId).toBeNull();
+    expect(pet.castingAbility).not.toBe('water_jet');
+
+    target.aiState = 'idle';
+    petWaterJet(sim.ctx, hid);
+    expect(pet.aggroTargetId).toBe(target.id);
+    expect(pet.castingAbility).toBe('water_jet');
+  });
+
+  it('refuses petSpecial against an evading mob, and works once it stops evading', () => {
+    const { sim, hid, hunter } = hunterWorld(1315);
+    summonPet(sim.ctx, hunter, 'forest_wolf');
+    const pet = petOf(sim.ctx, hid) as AnyEntity;
+    pet.templateId = 'emberkin'; // ranged-active signature skill (petRanged.active)
+    const target = spawnWolf(sim, pet);
+    target.pos.z = pet.pos.z + 12; // inside the felbolt's range
+    target.prevPos = { ...target.pos };
+    hunter.targetId = target.id;
+    target.aiState = 'evade';
+    sim.drainEvents();
+
+    // useWarlockPetSkill would already refuse an evading target on its own arms
+    // (canChainPull's aiState check, useRangedActive's new one), silently. This
+    // function's own guard is what turns that silence into a real player-facing
+    // toast instead of a no-op button press.
+    petSpecial(sim.ctx, hid);
+    expect(pet.aggroTargetId).toBeNull();
+    expect(pet.petSkillTimer ?? 0).toBe(0);
+    expect(
+      sim
+        .drainEvents()
+        .some((e) => e.type === 'error' && e.text === 'Your pet needs a hostile target.'),
+    ).toBe(true);
+
+    target.aiState = 'idle';
+    petSpecial(sim.ctx, hid);
+    expect(pet.aggroTargetId).toBe(target.id);
+    expect(pet.petSkillTimer).toBeGreaterThan(0);
+  });
+
   it('preserves an explicit autocast preference and defaults legacy pet state safely', () => {
     const sim = new Sim({
       seed: 131,

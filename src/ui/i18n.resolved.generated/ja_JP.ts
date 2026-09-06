@@ -978,6 +978,7 @@ export const ja_JP: EnTranslations = {
       "mounts": "マウント",
       "professions": "専門技能",
       "reliquary": "聖遺物庫",
+      "lootExplorer": "戦利品ブラウザ",
       "nameplates": "ネームプレート",
       "haptics": "振動",
       "hapticsOff": "振動オフ",
@@ -1141,6 +1142,9 @@ export const ja_JP: EnTranslations = {
       "promptAttack": "攻撃",
       "promptUseAbility": "アビリティ使用",
       "promptKneel": "ひざまずく",
+      "promptAccessInterface": "インターフェースを開く",
+      "promptMoveToTarget": "{target}へ移動",
+      "promptSelectItem": "{item}を選択",
       "promptOpenBags": "かばんを開く",
       "promptCharacterSheet": "キャラクター画面を開く",
       "promptLookAround": "右クリックを押したまま動かして見回す",
@@ -1309,7 +1313,7 @@ export const ja_JP: EnTranslations = {
     },
     "targetDots": {
       "title": "ターゲットデバフ",
-      "row": "{aura} on {target}",
+      "row": "{target} 上の {aura}",
       "overflow": "他に{count}件は非表示"
     },
     "targetAuras": {
@@ -1393,6 +1397,8 @@ export const ja_JP: EnTranslations = {
       "name_shadowjump_toad": "影跳びのカマカゲ",
       "name_stormfeather_griffin": "スカイリーチ・ストームフェザー",
       "name_thunderstrut_gobbler": "大七面鳥サンダーストラット",
+      "name_goblin_rocket_sled": "ゴブリンロケットそり",
+      "name_rallycart_rxt": "ラリーカートRXT",
       "name_terrorspark_groundshaker": "地揺らしのテラースパーク",
       "name_drakemaw_raptor": "火口のラプトル",
       "name_mech_bird": "ゼンマイ・メカバード",
@@ -1406,6 +1412,8 @@ export const ja_JP: EnTranslations = {
       "desc_shadowjump_toad": "どんな地形も影の跳躍で瞬時に越える、巨大で足取り確かなガマ。",
       "desc_stormfeather_griffin": "ルーンの爪で地を闊歩する気高き嵐のグリフォン。翼はたたまれている。",
       "desc_thunderstrut_gobbler": "嵐より生まれた巨大な七面鳥。目覚めし峰から尾羽を雷雲のごとく広げ、闊歩して降りてくる。",
+      "desc_goblin_rocket_sled": "危険なほど過剰に組み上げられたゴブリンのそり。二基のロケットと最悪の判断力で突き進む。",
+      "desc_rallycart_rxt": "小型ながら本格的なラリーマシン。移動速度を高めてくれる。",
       "desc_terrorspark_groundshaker": "重厚な履帯と大口径砲、恐れ知らずの操縦士向けの鞍を備えた小型装甲車両。",
       "desc_drakemaw_raptor": "火口のカルデラで鞍慣らしされた巣育ちのラプトル。筋肉と疾走のかたまりで、いまなお灰の匂いをかすかに漂わせている。",
       "desc_mech_bird": "手作りのゼンマイ仕掛けの戦闘ニワトリ。サーボを軋ませて疾走し、ゼンマイのキーは今も回り続けている。",
@@ -1580,7 +1588,10 @@ export const ja_JP: EnTranslations = {
       "uiScale": "UIスケール",
       "playerFrameScale": "プレイヤーフレームの大きさ",
       "targetFrameScale": "ターゲットフレームの大きさ",
+      "playerHealthText": "プレイヤーの体力テキスト",
+      "targetHealthText": "ターゲットの体力テキスト",
       "aurasOnPlayerFrame": "バフをプレイヤーフレームに表示",
+      "auraBarBelowFrame": "バフをプレイヤーフレームの下に表示",
       "alwaysShowAllBuffs": "すべてのバフを常に表示",
       "highContrastBackground": "高コントラスト背景",
       "startAttackOnAbility": "アビリティ使用時に自動攻撃",
@@ -2507,7 +2518,9 @@ export const ja_JP: EnTranslations = {
       "unequipHint": "クリックしてこのバッグを外す",
       "poolGeneral": "一般: {total}個中{used}個",
       "poolMaterials": "素材: {total}個中{used}個",
-      "capacityPoolsAria": "使用中のバッグスロット: {total}個中{used}個。一般アイテム: {generalTotal}個中{generalUsed}個。素材: {materialsTotal}個中{materialsUsed}個。"
+      "capacityPoolsAria": "使用中のバッグスロット: {total}個中{used}個。一般アイテム: {generalTotal}個中{generalUsed}個。素材: {materialsTotal}個中{materialsUsed}個。",
+      "capacityPools": "アイテム {generalUsed}/{generalTotal}、素材 {materialsUsed}/{materialsTotal}",
+      "emptyMaterialsOnly": "素材専用"
     },
     "raidConvert": {
       "toPartyDone": "レイドがパーティに戻りました。",
@@ -2955,6 +2968,7 @@ export const ja_JP: EnTranslations = {
       "healthPercent": "パーセント",
       "healthCurrent": "現在値",
       "healthCurrentMax": "現在値 / 最大値",
+      "healthCurrentMaxPercent": "現在値 / 最大値（パーセント）",
       "sort": "プレイヤーの並び順",
       "sortGroup": "グループ",
       "sortRole": "ロール",
@@ -3086,6 +3100,7 @@ export const ja_JP: EnTranslations = {
       "close": "閉じる",
       "keybind": "Discordパネル",
       "disabled": "Discord連携は現在利用できません。",
+      "queuePingsLabel": "バトルグラウンドまたはアリーナのキューが成立したら Discord のダイレクトメッセージで知らせる（Discord アカウントの連携が必要）",
       "tiers": {
         "none": "ランク外",
         "initiate": "見習い",
@@ -3406,6 +3421,8 @@ export const ja_JP: EnTranslations = {
       "depositAllDone": "素材を預けました：{count}。",
       "depositAllFull": "素材を預けました：{count}。銀行がいっぱいになりました。",
       "depositAllNone": "銀行がいっぱいです：何も預けられませんでした。",
+      "depositAllNotable": "素材を預けました：{count}（{item}を含む）。",
+      "depositAllNotableFull": "素材を預けました：{count}（{item}を含む）。銀行がいっぱいになりました。",
       "bonusTitle": "ボーナススロット",
       "bonusEarned": "+{count}",
       "bonusStatusEarned": "+{count}",
@@ -3444,6 +3461,8 @@ export const ja_JP: EnTranslations = {
       "vaultDepositAllDone": "預けた素材：{count}個。",
       "vaultDepositAllFull": "預けた素材：{count}個。上限に達した素材があります。",
       "vaultDepositAllNone": "保管庫の上限に達しているため、何も預けられませんでした。",
+      "vaultDepositAllNotable": "預けた素材：{count}個（{item}を含む）。",
+      "vaultDepositAllNotableFull": "預けた素材：{count}個（{item}を含む）。上限に達した素材があります。",
       "vaultWithdrawShort": "バッグには{count}個のうち{fit}個しか入りません。",
       "vaultDepositHint": "クリックで保管庫に預ける",
       "vaultCannotDeposit": "保管庫には預けられません",
@@ -4314,6 +4333,7 @@ export const ja_JP: EnTranslations = {
       "sourceProfession": "{profession}で入手",
       "sourceDeed": "功績「{deed}」の報酬",
       "sourceVendor": "{vendor}が販売",
+      "sourceVendorGated": "{vendor}が販売（{requirement}）",
       "sourceBossZone": "{zone}の{boss}がドロップ",
       "sourceDelve": "デルヴ「{delve}」で入手",
       "sourceRift": "{rank}ランク・リフトのクリアでドロップ",
@@ -4333,6 +4353,10 @@ export const ja_JP: EnTranslations = {
       "filterAll": "すべて",
       "filterOwned": "収蔵済み",
       "filterMissing": "未発見",
+      "filterIlluminated": "照耀済み",
+      "filterRemaining": "未照耀",
+      "filterEmptyPages": "このフィルターに一致するページはありません。",
+      "filterGroupAriaPages": "照耀状況でページを絞り込む",
       "recentJumpAria": "{name} のページを開く",
       "recentEmpty": "まだ発見はありません。これから収蔵した聖遺物がここに並びます。",
       "nearlyEmpty": "完成が近いページはここに集まります。",
@@ -4440,6 +4464,7 @@ export const ja_JP: EnTranslations = {
       "summary": "ワールドマップ。地域を選ぶとその地図が開きます。",
       "toWorld": "ワールドマップ",
       "toZone": "ゾーンマップ",
+      "toInstance": "インスタンスマップ",
       "toggleAria": "ワールドマップとゾーンマップを切り替える",
       "levels": "レベル {min} から {max}"
     },
@@ -4474,6 +4499,7 @@ export const ja_JP: EnTranslations = {
       "walletLinkedConnected": "リンク済みのウォレットアプリに接続され、$WOC で支払う準備ができています。",
       "walletUsdBalance": "{amount} USD",
       "walletUsdUnknown": "不明",
+      "walletCardDismiss": "ウォレットカードを隠す",
       "rateNote": "レート: {time} 時点で 1 USD あたり約 {tokens} $WOC。",
       "rateNotePaused": "最後に確認したレート: {time} 時点で 1 USD あたり約 {tokens} $WOC。",
       "estimateNote": "{usd} は現在のレートで約 {tokens} $WOC です。",
@@ -4665,6 +4691,43 @@ export const ja_JP: EnTranslations = {
       "listingStatusCancelled": "取り下げ済み",
       "listingStatusSuspended": "停止中",
       "listingStatusUnsold": "未売却"
+    },
+    "lootExplorer": {
+      "title": "戦利品ブラウザ",
+      "close": "戦利品ブラウザを閉じる",
+      "searchPlaceholder": "アイテムを検索...",
+      "searchAria": "アイテムを検索",
+      "filterCategoryAria": "入手元",
+      "filterClassAria": "クラス",
+      "filterStatAria": "ステータス",
+      "filterQualityAria": "品質",
+      "filterAll": "すべて",
+      "tabItems": "項目別",
+      "tabEncounters": "入手先別",
+      "category": {
+        "raid": "襲撃",
+        "dungeon": "ダンジョン",
+        "delve": "デルヴ",
+        "open_world": "オープンワールド",
+        "rift": "リフト",
+        "vendor": "商人",
+        "quest_reward": "クエスト報酬",
+        "quest_objective": "クエスト目標",
+        "ground_object": "フィールドオブジェクト",
+        "starting_equipment": "初期装備"
+      },
+      "difficulty": {
+        "normal": "ノーマル",
+        "heroic": "ヒロイック"
+      },
+      "riftRankLabel": "リフトランク{rank}",
+      "source": "{category}: {name}",
+      "sourceWithContext": "{category}: {name} ({context})",
+      "chance": "ドロップ率 {pct}%",
+      "guaranteed": "確定",
+      "gatedByQuest": "クエスト進行中: {quest}",
+      "empty": "これらの絞り込み条件に一致する戦利品はありません。",
+      "resultCount": "{count} 件の結果"
     }
   },
   "gatherEvent": {
@@ -4763,7 +4826,8 @@ export const ja_JP: EnTranslations = {
       "link_required": "まずDiscordアカウントを連携してください。",
       "swag_claimed": "この報酬は既に受け取っています。",
       "swag_tier": "これを受け取るにはより高いランクが必要です。",
-      "swag_points": "ポイントが足りません。"
+      "swag_points": "ポイントが足りません。",
+      "invalid_input": "入力が無効です。"
     },
     "deeds": {
       "invalid_input": "入力が無効です。"
@@ -4815,6 +4879,11 @@ export const ja_JP: EnTranslations = {
       "reason_required": "理由の入力が必要です。",
       "invalid_duration": "マークの期間は1秒以上で入力してください。",
       "not_marked": "そのアカウントはマークされていません。"
+    },
+    "kick": {
+      "reason_required": "理由の入力が必要です。",
+      "admin_target": "管理者アカウントはキックできません。",
+      "target_offline": "そのプレイヤーはもうこのレルムにオンラインではありません。"
     },
     "woc_market": {
       "invalid_input": "入力が無効です。",
@@ -5249,10 +5318,13 @@ export const ja_JP: EnTranslations = {
       "ifPlayerFrameScale": "自分のユニットフレームの大きさです。",
       "ifTargetFrameScale": "ターゲットフレームの大きさです。",
       "ifPartyStyle": "パーティのレイアウトです。「自動」はグループの人数に合わせ、「クラシック」は昔ながらの縦積み、「レイド」は全員をコンパクトなグリッドに収めます。",
-      "ifPartyHealthText": "パーティのバーに表示する内容です。なし、割合、現在の体力、現在値と最大値から選べます。",
+      "ifPlayerHealthText": "自分の体力バーに表示する内容です。なし、割合、現在の体力、現在値と最大値、またはその両方に割合を添えた表示から選べます。",
+      "ifTargetHealthText": "ターゲットとターゲットのターゲットの体力バーに表示する内容で、自分のフレームと同じ選択肢です。",
+      "ifPartyHealthText": "パーティのバーに表示する内容です。なし、割合、現在の体力、現在値と最大値、またはその両方に割合を添えた表示から選べます。",
       "ifPartySort": "パーティメンバーを並べる順序です。グループ順、ロール、名前から選べます。",
       "ifPartyShowAuras": "パーティフレームにバフとデバフを表示するかどうかです。同様のスイッチが、リソースバー、吸収、ペット、そして自分をパーティ一覧に含めるかどうかにも用意されています。",
       "ifAurasOnPlayerFrame": "自分のバフとデバフを、オーラバーだけでなく自分のユニットフレームにも表示します。",
+      "ifAuraBarBelowFrame": "バフの列をユニットフレームの上ではなく下に移動します。「バフをプレイヤーフレームに表示」が有効なときのみ効果があります。",
       "ifAlwaysShowAllBuffs": "低画質プリセットでも、通常のバフアイコンの上限を無視してすべてのバフを常に表示します。",
       "ifTargetOfTarget": "ターゲットが誰を狙っているかを表示します。タンクがまだ抱えているかを確かめる、昔ながらの手立てです。",
       "ifPetFrame": "ペット用のフレームを表示します。",
@@ -5260,6 +5332,7 @@ export const ja_JP: EnTranslations = {
       "ifChatOpacity": "チャット背景の濃さです。",
       "ifCompactChat": "チャットの行間を詰めて、より多くの行を表示します。",
       "ifChatTimestamps": "チャットの各行に時刻を添えます。12時間表記と24時間表記を選べます。",
+      "ifFilterProfanity": "チャット内の暴言をアスタリスクで伏せ字にします。初期状態ではオンです。フィルターなしでチャットを読みたい場合は、ここでオフにしてください。",
       "ifStartAttack": "アビリティを使ったときに自動攻撃も始めるかどうかです。初期設定はオンで、多くのプレイヤーが期待する昔ながらの挙動です。",
       "ifStopAutoAttack": "ターゲットを切り替えたときに攻撃の手を止めるかどうかです。初期設定はオフなので、攻撃は新しいターゲットへ引き継がれます。",
       "ifShowAttackButton": "アクションバーに攻撃ボタンを明示的に置きます。",
@@ -5272,7 +5345,7 @@ export const ja_JP: EnTranslations = {
       "ifHideUnused": "空のアクションスロットを隠し、実際に使うボタンだけを描画します。",
       "ifLockBars": "バーをロックして、うっかりアビリティをスロットから引き出してしまうのを防ぎます。",
       "keybindsHeading": "「キー割り当て」パネル",
-      "keybindsBody": "キーの一覧は、あのパネルの半分にすぎません。その上には、マウスがどうゲームを動かすかを決めるスイッチが並びます。マウスカメラ、視点を回すあいだカーソルを固定するかどうか、クリック移動とそれを担うマウスボタン、アタックムーブ、左利き向けのタッチレイアウト、そしてチャットの不適切語フィルタです。",
+      "keybindsBody": "キー一覧はこのパネルの半分にすぎません。その上には、マウスでゲームをどう操作するかを決める切り替えが並びます。マウスカメラ、回転中にカーソルをロックするか、クリック移動とそれに使うマウスボタン、攻撃移動、左利き用タッチ配置をここで調整できます。",
       "keybindsMouseBody": "見落としやすい点が2つあります。まず、マウスボタンはキーと同じように割り当てられるので、ホイールクリックやサムボタンにアビリティを載せられます。左右のクリックは、カメラと世界のクリック操作のために予約されたままです。もう一つ、アクションバーから直接割り当てることもできます。ここでバー上での割り当てモードをオンにし、スロットをクリックして、割り当てたいキーを押すだけです。"
     },
     "combat": {
@@ -6071,7 +6144,7 @@ export const ja_JP: EnTranslations = {
       "heroicRewardsBody": "ヒロイックのボスは見知った戦利品を落としますが、強化されており、ツールチップには「ヒロイック」と記されます。さらに各周回の最終ボスは、他では手に入らないエピックを加えます。その最後の一撃は参加者全員にヒロイックの刻印も残します。ハイウォッチの補給官ヴェックスのもとで使う通貨で、彼のカウンターは指輪と首飾りの棚であり、ヒロイックの深みの証以外では何も買えません。",
       "heroicLockoutBody": "通常のダンジョンは一日中回れます。ヒロイックは辛抱を求めます。最終ボスの討伐は、その周回にいた全員をそのダンジョンの一日一回のヒロイック攻略に縛り、レイドは難易度ごとに日次のロックアウトを持ちます。稼働中のワールドでは日次のロックアウトはすべて、そのワールド自身の夜間リセット時刻に一斉に解けるので、その時刻の直前に取った攻略と直後に取った攻略は別々の日に落ちます。代わりにブラウザでオフラインで遊べば、ロックアウトは自分の討伐から一日後に切れるだけです。攻略済みの五人周回は、亡骸への走りと戦利品のために、そのパーティ自身には開かれたままなので、そこで得たものから締め出される人はいません。レイドはより厳格です。その討伐に一度縛られると、扉はリセットまで閉じたままで、中へ戻る唯一の道は、まさにその周回で倒れた者による亡骸への走りだけです。ですから生きて外に出たレイダーは、その日は外に出たままです。アリーナを去る前に戦利品を集めてください。これらのロックアウトはいずれもそれを得たキャラクターのものなので、主力での攻略が他のキャラクターを縛ることはありません。",
       "resetTitle": "インスタンスのリセット",
-      "resetBody": "パーティがまだ確保した周回を抱えたまま難易度を切り替えると、古い確保はしばらく居座ってから自然に解けます。パーティリーダーは代わりに一度に手放せます。自分の肖像メニューから「すべてのインスタンスをリセット」を選ぶか、/dungeon reset と入力してください。リセットが働くのは、難易度が実際に変更された後だけ、中に誰も、生者も倒れた者も残っていない間だけ、そして中の亡骸がすべて拾い尽くされた後だけで、リセットの間には短いクールダウンが挟まります。誤った難易度で扉に着けば、周回が始まる前にゲームが知らせます。レイドはこのやり方では決してリセットされません。レイド自身のロックアウト規則が働きます。",
+      "resetBody": "パーティが確保済みのインスタンスを持ったまま難度を切り替えると、古い確保はしばらく残ってから自然に消えます。パーティリーダーは、自分のポートレートメニューで「すべてのインスタンスをリセット」を選ぶか、/dungeon reset と入力して即座に解放できます。リセットは、難度が実際に変更済みで、中に生存者も倒れた仲間もおらず、すべての遺体から戦利品が回収され、短いクールダウンが終わっている場合にのみ成功します。入口に誤った難度で到着した場合、開始前にゲームが知らせてくれます。レイドも同じ方法でリセットしますが、固有のロックアウトと遺体帰還ルールはその上に残ります。",
       "templeLoreTitle": "水没の神殿、もう少し深く",
       "templeLoreBody": "神殿には、あなたが他所で追うカルトよりも古い、それ自身の伝説があります。月明かりを飲み込み、溺れた者を返すという山上の湖グリマーミアの岸辺で、一人の見張り役が淡い光の門を守っています。水面の下には、そこへ続く冷たい石の階段が伸びています。そこに沈んだ者たちは不運で溺れたのではありません。彼らは礼拝のうちに沈み、決して歌うのをやめなかった蒼白の聖歌隊でした。古き守り人たちは水に呑まれる前に、岩へただ一つの警告を刻みました。彼らが溺れし月と呼ぶものへの祈りです。そしてその下に、より落ち着いた手が二つの言葉を書き添えていました。それはただ眠っているだけだ、と。",
       "cryptLeadTitle": "死者が閉ざしておくべきだった扉",
@@ -8644,6 +8717,7 @@ export const ja_JP: EnTranslations = {
     "connectingRealm": "ワールドに接続中...",
     "assetsFailed": "アセットの読み込みに失敗しました。再読み込みしてください。{error}",
     "rendererFailed": "レンダラーを開始できません。再読み込みしてください。{error}",
+    "rendererContextLost": "3D レンダラーがグラフィックスコンテキストを失い、復旧できませんでした。再読み込みしてください。",
     "enterTimeout": "世界に入れませんでした。接続がタイムアウトしました。ゲームサーバーは動作していますか？",
     "connectionLost": "サーバーとの接続が切断されました。",
     "reconnectingAttempt": "サーバーとの接続が切断されました。再接続しています...（試行 {attempt}/{maxAttempts}、{seconds}秒後に再試行）",
@@ -8654,6 +8728,7 @@ export const ja_JP: EnTranslations = {
     "realmFull": "このワールドは現在満員です。数分後にもう一度お試しください。",
     "tooManyConnections": "お使いのネットワークからこのワールドへの接続が多すぎます。余分なゲームウィンドウを閉じるか、数分後にもう一度お試しください。",
     "messageRateExceeded": "操作の送信が速すぎたため、切断されました。しばらく待ってから再度ログインしてください。",
+    "kickedByModerator": "モデレーターによって切断されました：{reason}",
     "tips": {
       "classes": "ヒント：9つのクラスはそれぞれ遊び方が異なります。決める前にいくつか試してみましょう。",
       "talents": "ヒント：非戦闘中ならいつでも特性をリセットできるので、最初の選択が失敗になることはありません。",
@@ -10467,11 +10542,11 @@ export const ja_JP: EnTranslations = {
       },
       "melting_acid": {
         "name": "溶解酸",
-        "description": "対象に腐食性の毒を浴びせ、{damage}の自然ダメージを与え、12秒間その防御力を5%低下させます。"
+        "description": "武器に30分間毒を塗り、近接攻撃ごとに対象に腐食性の酸を浴びせ、12秒間その防御力を5%低下させます。"
       },
       "nightshade_coating": {
         "name": "ナス科毒の塗布",
-        "description": "対象をナス科毒で覆い、{damage}の自然ダメージを与え、12秒間受ける回復量を25%低下させます。"
+        "description": "武器に30分間毒を塗り、近接攻撃ごとに対象をナス科毒で覆い、12秒間受ける回復量を25%低下させます。"
       },
       "expose_armor": {
         "name": "装甲破り",
@@ -10487,11 +10562,11 @@ export const ja_JP: EnTranslations = {
       },
       "instant_poison": {
         "name": "毒蛇の噛みつき",
-        "description": "武器に30分間毒を塗り、近接攻撃ごとに8の追加自然ダメージを与えます。"
+        "description": "武器に30分間毒を塗り、近接攻撃ごとに{damage}の追加自然ダメージを与えます。"
       },
       "deadly_poison": {
         "name": "腐敗の毒",
-        "description": "武器に30分間毒を塗り、近接攻撃ごとに14の追加自然ダメージを与えます。"
+        "description": "武器に30分間毒を塗ります。近接攻撃ごとに対象へ毒のスタックを1つ追加し（最大5）、持続時間12秒を更新します。1スタックにつき2秒ごとに{damage}の自然ダメージを与えます。"
       },
       "blind": {
         "name": "砂かけ",
@@ -11589,7 +11664,7 @@ export const ja_JP: EnTranslations = {
       },
       "temporal_echo": {
         "name": "時の残響",
-        "description": "より健やかだった瞬間の残響で味方に刻印し、即座に{damage}の体力を回復する。{duration}秒間、与えた秘術ダメージの一部が残響を通じてその味方を癒やす。"
+        "description": "より健やかだった瞬間の残響で味方に刻印し、即座に{damage}の体力を回復する。{duration}秒間、あなたの他の単体秘術ダメージの{echoSinglePct}%と範囲秘術ダメージの{echoAreaPct}%がその味方を癒やす。エーテルサージとエーテルダーツは代わりに、それらが与えたダメージの{echoDriverPct}%分その味方を癒やす。"
       },
       "temporal_cascade": {
         "name": "時の連鎖",
@@ -13280,6 +13355,12 @@ export const ja_JP: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "テラースパークの始動キー"
+      },
+      "reins_goblin_rocket_sled": {
+        "name": "ゴブリンロケットそりの始動キー"
+      },
+      "reins_rallycart_rxt": {
+        "name": "ラリーカートRXTの始動キー"
       },
       "reins_lanternback_troll": {
         "name": "点灯人の軛：グルンボル"

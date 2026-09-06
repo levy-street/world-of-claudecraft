@@ -570,9 +570,9 @@ export const nl_NL: EnTranslations = {
       "tabsLabel": "Onderdelen van de WOC-winkel",
       "storeTab": "Winkel",
       "rewardsTab": "Dagelijkse beloningen",
-      "mountsEyebrow": "Account Mounts",
-      "mountsTitle": "Machine Stable",
-      "mountBuyAria": "Purchase {item}",
+      "mountsEyebrow": "Accountbevestigingen",
+      "mountsTitle": "Machinestabiel",
+      "mountBuyAria": "Koop {item}",
       "loading": "WOC-winkel laden...",
       "error": "De WOC Store is momenteel niet beschikbaar. Probeer het binnenkort opnieuw.",
       "balance": "Claudium-saldo",
@@ -978,6 +978,7 @@ export const nl_NL: EnTranslations = {
       "mounts": "Rijdieren",
       "professions": "Beroepen",
       "reliquary": "Reliquarium",
+      "lootExplorer": "Buitverkenner",
       "nameplates": "Namen",
       "haptics": "Haptiek",
       "hapticsOff": "Haptiek uit",
@@ -1141,6 +1142,9 @@ export const nl_NL: EnTranslations = {
       "promptAttack": "Aanvallen",
       "promptUseAbility": "Vaardigheid gebruiken",
       "promptKneel": "Knielen",
+      "promptAccessInterface": "Open de interface",
+      "promptMoveToTarget": "Ga naar {target}",
+      "promptSelectItem": "Selecteer {item}",
       "promptOpenBags": "Open je tassen",
       "promptCharacterSheet": "Open je personageblad",
       "promptLookAround": "Houd de rechtermuisknop ingedrukt en sleep om rond te kijken",
@@ -1308,9 +1312,9 @@ export const nl_NL: EnTranslations = {
       "regroup": "{meter} weer samenvoegen"
     },
     "targetDots": {
-      "title": "Target Dots",
-      "row": "{aura} on {target}",
-      "overflow": "{count} more not shown"
+      "title": "Doelpunten",
+      "row": "{aura} op {target}",
+      "overflow": "{count} meer niet getoond"
     },
     "targetAuras": {
       "title": "Auras van het doel",
@@ -1393,11 +1397,13 @@ export const nl_NL: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage de Schaduwspringpad",
       "name_stormfeather_griffin": "Hemelreik Stormveder",
       "name_thunderstrut_gobbler": "Donderstap de Grote Kalkoen",
+      "name_goblin_rocket_sled": "Goblin-raketslee",
+      "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Schrikvonk, de Grondschudder",
       "name_drakemaw_raptor": "Drakenmuil-Raptor",
-      "name_mech_bird": "Cluckwork Mech Bird",
-      "name_lanternback_troll": "Grumbol the Lanternback",
-      "name_chimeglass_tortoise": "Tolliver the Chimeglass",
+      "name_mech_bird": "Cluckwork Mechvogel",
+      "name_lanternback_troll": "Grumbol de Lantaarnrug",
+      "name_chimeglass_tortoise": "Tolliver het klokkenspel",
       "name_rickshaw_mount": "Beengebonden Riksja",
       "desc_valorsteed": "Een sterk, standvastig strijdros dat extra reissnelheid geeft.",
       "desc_grag_bear": "Een sterke, standvastige beer die extra reissnelheid geeft.",
@@ -1406,11 +1412,13 @@ export const nl_NL: EnTranslations = {
       "desc_shadowjump_toad": "Een enorme, standvastige reuzenpad, getraind in bliksemsnelle schaduwsprongen die elk terrein overbruggen.",
       "desc_stormfeather_griffin": "Een koninklijke stormgriffioen die met runenbeslagen klauwen over de grond sluipt, vleugels opgevouwen.",
       "desc_thunderstrut_gobbler": "Een kolossale, uit de storm geboren kalkoen die vanaf de Ontwakende Piek naar beneden stapt, staart gespreid als een onweerswolk.",
+      "desc_goblin_rocket_sled": "Een gevaarlijk overgebouwde goblinslee, voortgestuwd door twee raketten en uitstekend slecht beoordelingsvermogen.",
+      "desc_rallycart_rxt": "Een compacte rallymachine die de reissnelheid verhoogt.",
       "desc_terrorspark_groundshaker": "Een compacte gepantserde machine met zware rupsbanden, een grootkaliberkanon en een zadel gebouwd voor onverschrokken piloten.",
       "desc_drakemaw_raptor": "Een zadelmakke broedraptor uit de Drakenmuil-Caldera, één en al pezen en vaart, nog altijd zwak naar as geurend.",
-      "desc_mech_bird": "A hand-built clockwork war chicken that sprints on snapping servos, wind-up key still turning.",
-      "desc_lanternback_troll": "A hill troll broken to the yoke by lamplighters, carrying an iron throne across his shoulders with a storm lantern burning on either arm.",
-      "desc_chimeglass_tortoise": "A salt-flat tortoise who has outwalked three generations of caravans. Tinkers ground him spectacles from storm-glass and hung a bronze bell at his throat, so the road hears him long before it sees him.",
+      "desc_mech_bird": "Een met de hand gebouwde oorlogskip die sprint op klikkende servo's terwijl de opwindsleutel nog draait.",
+      "desc_lanternback_troll": "Een heuveltrol die door lantaarnopstekers tot aan zijn juk werd gebroken, met een ijzeren troon op zijn schouders en een stormlantaarn die aan beide armen brandde.",
+      "desc_chimeglass_tortoise": "Een zoutvlakteschildpad die drie generaties karavanen is ontlopen. Tinkers hebben een bril van stormglas voor hem geslepen en een bronzen bel om zijn keel gehangen, zodat de weg hem lang hoort voordat hij hem ziet.",
       "desc_rickshaw_mount": "Een ratelende bottenkar met een benige handlanger aan de disselbomen, die je in volle vaart voortsleurt."
     },
     "mountTraining": {
@@ -1580,7 +1588,10 @@ export const nl_NL: EnTranslations = {
       "uiScale": "UI-schaal",
       "playerFrameScale": "Schaal spelerframe",
       "targetFrameScale": "Schaal doelwitframe",
+      "playerHealthText": "Gezondheidstekst van speler",
+      "targetHealthText": "Doelgezondheidstekst",
       "aurasOnPlayerFrame": "Buffs op het spelerframe",
+      "auraBarBelowFrame": "Buffs onder het spelerframe",
       "alwaysShowAllBuffs": "Altijd Alle Buffs Tonen",
       "highContrastBackground": "Hoog-contrastachtergrond",
       "startAttackOnAbility": "Auto-aanval bij gebruik van vaardigheid",
@@ -1603,9 +1614,9 @@ export const nl_NL: EnTranslations = {
       "showTargetOfTarget": "Doelwit van doelwit tonen",
       "showTargetSwingTimer": "Aanvalstimer van doelwit tonen",
       "showPetFrame": "Je huisdier tonen",
-      "showNameplateDots": "Show My Dots on Nameplates",
-      "nameplateDotScale": "Nameplate Dot Size",
-      "showTargetDots": "Show Target Dots",
+      "showNameplateDots": "Toon mijn punten op naamplaatjes",
+      "nameplateDotScale": "Naamplaatje Puntgrootte",
+      "showTargetDots": "Doelpunten weergeven",
       "waterRipples": "Waterrimpels (kielzog)",
       "showAttackButton": "Aanvalsknop Tonen",
       "showDailyRewardsChest": "Kist met dagelijkse beloningen tonen",
@@ -2507,7 +2518,9 @@ export const nl_NL: EnTranslations = {
       "unequipHint": "Klik om deze tas af te doen",
       "poolGeneral": "Algemeen: {used} van {total}",
       "poolMaterials": "Materialen: {used} van {total}",
-      "capacityPoolsAria": "Tasvakken gebruikt: {used} van {total}. Algemene voorwerpen: {generalUsed} van {generalTotal}. Materialen: {materialsUsed} van {materialsTotal}."
+      "capacityPoolsAria": "Tasvakken gebruikt: {used} van {total}. Algemene voorwerpen: {generalUsed} van {generalTotal}. Materialen: {materialsUsed} van {materialsTotal}.",
+      "capacityPools": "Voorwerpen {generalUsed}/{generalTotal}, materialen {materialsUsed}/{materialsTotal}",
+      "emptyMaterialsOnly": "Alleen materialen"
     },
     "raidConvert": {
       "toPartyDone": "Je raid is terug omgezet naar een groep.",
@@ -2744,7 +2757,7 @@ export const nl_NL: EnTranslations = {
       "suddenDeath": "Je volgende Vroeg Graf kost geen woede en negeert de gezondheidsvereiste",
       "aoeEcho": "{charges} echo's resteren: vaardigheden voor één doelwit brengen {pct}% schade toe aan tot {targets} nabije vijanden",
       "sureCrit": "{charges} bezweringen van schadelijke vaardigheden zijn gegarandeerd kritieke treffers",
-      "temporalEcho": "De Arcaneschade van de werper geneest je voor {singlePct}% van schade voor één doelwit of {areaPct}% van gebiedsschade",
+      "temporalEcho": "De Arcaneschade van de werper geneest je voor {singlePct}% van schade voor één doelwit of {areaPct}% van gebiedsschade. Aethergolf en Aetherpijlen krijgen een x4-bonus op een individuele Temporal Echo. Groepsecho’s maken een even grote genezingsreserve, verdeeld naar ontbrekende gezondheid onder gemarkeerde bondgenoten met minder dan 60% gezondheid",
       "arcaneCharge": "{stacks} Arcaneladingen: Arcanekracht brengt {damagePct}% meer schade toe, wordt {castPct}% sneller gespreukt, en kost {costMult}x mana",
       "physicalReduction": "Vermindert opgelopen Fysieke schade met {pct}%",
       "temporalHourglass": "Immuun en niet in staat te handelen; herstelt gezondheid en versnelt afkoeltijdherstel. Klik met rechts om te annuleren.",
@@ -2955,6 +2968,7 @@ export const nl_NL: EnTranslations = {
       "healthPercent": "Percentage",
       "healthCurrent": "Huidig",
       "healthCurrentMax": "Huidig / Maximum",
+      "healthCurrentMaxPercent": "Huidig / Max (percentage)",
       "sort": "Spelers sorteren",
       "sortGroup": "Groep",
       "sortRole": "Rol",
@@ -2994,7 +3008,7 @@ export const nl_NL: EnTranslations = {
         "targetFrame": "Doelwit",
         "partyFrames": "Groep",
         "swingBar": "Automatische Aanval",
-        "targetDots": "Target Dots"
+        "targetDots": "Doelpunten"
       },
       "framesMenu": "Frame-instellingen",
       "framesMenuTitle": "Toon of verberg afzonderlijke frames. Een uitgevinkt frame blijft verborgen tot je het weer aanvinkt of terugzet naar de standaardinstellingen.",
@@ -3027,33 +3041,33 @@ export const nl_NL: EnTranslations = {
       "wrongKind": "Die code is een ander exporttype."
     },
     "riftForge": {
-      "title": "Rift Forge",
-      "subtitle": "Riftbound bands",
+      "title": "Rift smederij",
+      "subtitle": "Riftgebonden banden",
       "currency": "{name}: {count}",
-      "empty": "No Riftbound band in your bags. A ranked Rift first clear mints one.",
-      "wornHint": "Worn. Unequip it to forge.",
-      "upgradeBtn": "Upgrade to item level {level} ({cost} essence)",
-      "upgradeMax": "Fully upgraded",
-      "gemPickAria": "Gem to socket",
+      "empty": "Geen Riftbound-band in je tassen. Een gerangschikte Rift eerste heldere munt er één.",
+      "wornHint": "Versleten. Maak het los om te smeden.",
+      "upgradeBtn": "Upgrade naar itemniveau {level} ({cost}-essentie)",
+      "upgradeMax": "Volledig geüpgraded",
+      "gemPickAria": "Juweeltje tot stopcontact",
       "gemOption": "{name} ({bonus})",
-      "socketReplaceHint": "Sockets full: the next gem replaces the oldest, {gem}.",
-      "socketBtn": "Socket",
-      "socketsNone": "no gems",
-      "noGems": "No Rift gems in your bags",
-      "refused": "The forge refused. Stand at the Riftwright and try again.",
+      "socketReplaceHint": "Sockets vol: de volgende edelsteen vervangt de oudste, {gem}.",
+      "socketBtn": "Contactdoos",
+      "socketsNone": "geen edelstenen",
+      "noGems": "Geen Rift-edelstenen in je tassen",
+      "refused": "De smederij weigerde. Ga bij de Riftwright staan ​​en probeer het opnieuw.",
       "reason": {
-        "notFound": "That band is not in your bags.",
-        "notRiftGear": "Only a Riftbound band can be forged.",
-        "maxUpgrade": "That band is fully upgraded.",
-        "insufficientEssence": "Not enough Rift Essence.",
-        "invalidGem": "You have no such Rift gem.",
-        "dead": "You can't do that while dead.",
-        "tooFar": "You are too far from the Rift Forge."
+        "notFound": "Die band zit niet in je koffers.",
+        "notRiftGear": "Alleen een Riftbound-band kan worden gesmeed.",
+        "maxUpgrade": "Die band is volledig geüpgraded.",
+        "insufficientEssence": "Niet genoeg Rift Essentie.",
+        "invalidGem": "Je hebt niet zo'n Rift-juweeltje.",
+        "dead": "Dat kun je niet doen als je dood bent.",
+        "tooFar": "Je bent te ver van de Rift Forge."
       },
       "done": {
-        "upgrade": "Upgraded {name}.",
-        "socket": "Socketed a gem into {name}.",
-        "socketReplaced": "Socketed a gem into {name}; {gem} was destroyed."
+        "upgrade": "Verbeterde {name}.",
+        "socket": "Een juweeltje in {name} gestopt.",
+        "socketReplaced": "Een juweeltje in {name} gestopt; {gem} werd vernietigd."
       }
     },
     "itemTooltip": {
@@ -3061,7 +3075,7 @@ export const nl_NL: EnTranslations = {
       "riftTier": "{tier}-rangs Rift-voorwerp",
       "riftUpgrade": "Rift-verbetering {level}/{max}",
       "riftSockets": "Riftjuwelen {used}/{total}",
-      "riftGemSocket": "Socket bonus for a Riftbound band",
+      "riftGemSocket": "Socketbonus voor een Riftbound-band",
       "statEnchanted": "+{value} {stat} (Betoverd)",
       "enchantedFallback": "Betoverd",
       "partyTradeWindow": "Je kunt dit voorwerp de komende {time} ruilen met spelers die deze buit deelden. Uitrusten beëindigt het ruilvenster."
@@ -3086,6 +3100,7 @@ export const nl_NL: EnTranslations = {
       "close": "Sluiten",
       "keybind": "Discord-paneel",
       "disabled": "Discord-integratie is momenteel niet beschikbaar.",
+      "queuePingsLabel": "Stuur mij een direct Discord-bericht wanneer mijn wachtrij op het slagveld of in de arena verschijnt (vereist een gekoppeld Discord-account)",
       "tiers": {
         "none": "Ongerangschikt",
         "initiate": "Ingewijde",
@@ -3343,13 +3358,13 @@ export const nl_NL: EnTranslations = {
       "close": "Sluiten"
     },
     "realmBuilder": {
-      "title": "Realm Builder of the Month",
-      "currentLabel": "Honoured this month",
-      "placeholderName": "Your Name Here",
-      "placeholderHint": "This plate is waiting for its first name.",
-      "pastTitle": "Past honourees",
-      "pastEmpty": "No names on the roll yet.",
-      "close": "Close"
+      "title": "Rijksbouwer van de maand",
+      "currentLabel": "Deze maand gehuldigd",
+      "placeholderName": "Jouw naam hier",
+      "placeholderHint": "Dit bord wacht op zijn voornaam.",
+      "pastTitle": "Eerdere onderscheidingen",
+      "pastEmpty": "Er staan nog geen namen op de rol.",
+      "close": "Sluiten"
     },
     "bank": {
       "title": "Bank",
@@ -3406,6 +3421,8 @@ export const nl_NL: EnTranslations = {
       "depositAllDone": "Materialen gestort: {count}.",
       "depositAllFull": "Materialen gestort: {count}. De bank is nu vol.",
       "depositAllNone": "Bank vol: niets gestort.",
+      "depositAllNotable": "Gedeponeerde materialen: {count}, inclusief {item}.",
+      "depositAllNotableFull": "Gedeponeerde materialen: {count}, inclusief {item}. Bank nu vol.",
       "bonusTitle": "Bonusvakken",
       "bonusEarned": "+{count}",
       "bonusStatusEarned": "+{count}",
@@ -3444,6 +3461,8 @@ export const nl_NL: EnTranslations = {
       "vaultDepositAllDone": "Materialen gestort: {count}.",
       "vaultDepositAllFull": "Materialen gestort: {count}. Sommige plafonds zijn vol.",
       "vaultDepositAllNone": "Plafonds van de Materialenkluis vol: niets gestort.",
+      "vaultDepositAllNotable": "Gedeponeerde materialen: {count}, inclusief {item}.",
+      "vaultDepositAllNotableFull": "Gedeponeerde materialen: {count}, inclusief {item}. Sommige plafonds zijn vol.",
       "vaultWithdrawShort": "Slechts {fit} van {count} past in je tassen.",
       "vaultDepositHint": "Klik om in je Materialenkluis te storten",
       "vaultCannotDeposit": "Kan niet in de Materialenkluis",
@@ -3580,17 +3599,17 @@ export const nl_NL: EnTranslations = {
         }
       },
       "roster": {
-        "seats": "{count} of {cap} seats",
-        "expand": "Expand roster (+{seats} seats for {price})",
-        "maxed": "The roster is at its largest size",
-        "confirm": "Expand the guild roster by {seats} seats for {price}? The gold comes from your own purse and is not refunded.",
-        "confirmAction": "Expand",
-        "expandedLine": "{name} has expanded the guild roster to {cap} members.",
+        "seats": "{count}- of {cap}-stoelen",
+        "expand": "Rooster uitbreiden (+{seats}-stoelen voor {price})",
+        "maxed": "De selectie heeft de grootste omvang",
+        "confirm": "Het gilderooster uitbreiden met {seats}-stoelen voor {price}? Het goud komt uit uw eigen portemonnee en wordt niet terugbetaald.",
+        "confirmAction": "Uitbreiden",
+        "expandedLine": "{name} heeft de gildelijst uitgebreid naar {cap}-leden.",
         "result": {
-          "notLeader": "Only the Guild Master may expand the guild roster.",
-          "maxed": "The guild roster cannot grow any larger.",
-          "cannotAfford": "You need {price} to expand the guild roster.",
-          "retry": "The guild roster changed while you were buying. Try again."
+          "notLeader": "Alleen de Gildemeester mag de gildelijst uitbreiden.",
+          "maxed": "De gildelijst kan niet groter worden.",
+          "cannotAfford": "Je hebt {price} nodig om de gildelijst uit te breiden.",
+          "retry": "De gildelijst is gewijzigd terwijl u aan het kopen was. Probeer het opnieuw."
         }
       }
     },
@@ -4009,7 +4028,7 @@ export const nl_NL: EnTranslations = {
       "yieldLineRange": "{min} tot {max} {item}",
       "alreadyEnchanted": "Dat voorwerp is al betoverd.",
       "sameEnchant": "Dat voorwerp heeft die betovering al.",
-      "riftGear": "Riftbound bands take Rift gems, not enchants.",
+      "riftGear": "Riftbound-bands nemen Rift-edelstenen, geen betoveringen.",
       "replaceTag": "Vervangt {enchant}",
       "sameEnchantTag": "Al toegepast",
       "plainTag": "Niet betoverd",
@@ -4314,6 +4333,7 @@ export const nl_NL: EnTranslations = {
       "sourceProfession": "Verdiend via {profession}",
       "sourceDeed": "Geschonken door de daad {deed}",
       "sourceVendor": "Verkocht door {vendor}",
+      "sourceVendorGated": "Verkocht door {vendor} ({requirement})",
       "sourceBossZone": "Valt bij {boss} in {zone}",
       "sourceDelve": "Te vinden in de delve {delve}",
       "sourceRift": "Valt bij voltooiingen van Rifts met rang {rank}",
@@ -4333,6 +4353,10 @@ export const nl_NL: EnTranslations = {
       "filterAll": "Alle",
       "filterOwned": "Gecatalogiseerd",
       "filterMissing": "Ontbrekend",
+      "filterIlluminated": "Verlicht",
+      "filterRemaining": "Resterend",
+      "filterEmptyPages": "Er zijn geen pagina's die overeenkomen met dit filter.",
+      "filterGroupAriaPages": "Filter pagina's op de vraag of ze verlicht zijn",
       "recentJumpAria": "De bladzijde voor {name} openen",
       "recentEmpty": "Nog geen vondsten. Relieken die je vanaf nu catalogiseert komen hier terecht.",
       "nearlyEmpty": "Bladzijden die de voltooiing naderen verzamelen zich hier.",
@@ -4440,6 +4464,7 @@ export const nl_NL: EnTranslations = {
       "summary": "Wereldkaart. Kies een gebied om de kaart ervan te openen.",
       "toWorld": "Wereldkaart",
       "toZone": "Gebiedskaart",
+      "toInstance": "Instantiekaart",
       "toggleAria": "Schakel tussen de wereldkaart en de gebiedskaart",
       "levels": "Niveaus {min} tot {max}"
     },
@@ -4474,6 +4499,7 @@ export const nl_NL: EnTranslations = {
       "walletLinkedConnected": "Je gekoppelde portemonnee-app is verbonden en klaar voor $WOC-aankopen.",
       "walletUsdBalance": "{amount} USD",
       "walletUsdUnknown": "Onbekend",
+      "walletCardDismiss": "Portefeuillekaart verbergen",
       "rateNote": "Koers: ongeveer {tokens} $WOC per $1.00 USD, vanaf {time}.",
       "rateNotePaused": "Laatst bekende koers: ongeveer {tokens} $WOC per $1.00 USD, vanaf {time}.",
       "estimateNote": "Ongeveer {tokens} $WOC voor {usd} tegen de huidige koers.",
@@ -4665,6 +4691,43 @@ export const nl_NL: EnTranslations = {
       "listingStatusCancelled": "Geannuleerd",
       "listingStatusSuspended": "Geschorst",
       "listingStatusUnsold": "Onverkocht"
+    },
+    "lootExplorer": {
+      "title": "Buitverkenner",
+      "close": "Sluit de buitverkenner",
+      "searchPlaceholder": "Artikelen zoeken...",
+      "searchAria": "Zoek artikelen",
+      "filterCategoryAria": "Bron",
+      "filterClassAria": "Klasse",
+      "filterStatAria": "Staat",
+      "filterQualityAria": "Kwaliteit",
+      "filterAll": "Allemaal",
+      "tabItems": "Per artikel",
+      "tabEncounters": "Door ontmoeting",
+      "category": {
+        "raid": "Overval",
+        "dungeon": "Kerker",
+        "delve": "Duik",
+        "open_world": "Open wereld",
+        "rift": "Kloof",
+        "vendor": "Verkoper",
+        "quest_reward": "Quest-beloning",
+        "quest_objective": "Quest-doelstelling",
+        "ground_object": "Wereldobject",
+        "starting_equipment": "Startuitrusting"
+      },
+      "difficulty": {
+        "normal": "Normaal",
+        "heroic": "Heroïsch"
+      },
+      "riftRankLabel": "Rift-rang {rank}",
+      "source": "{category}: {name}",
+      "sourceWithContext": "{category}: {name} ({context})",
+      "chance": "{pct}% kans",
+      "guaranteed": "Gegarandeerd",
+      "gatedByQuest": "Tijdens het zoeken naar: {quest}",
+      "empty": "Geen enkele buit komt overeen met deze filters.",
+      "resultCount": "{count}-resultaten"
     }
   },
   "gatherEvent": {
@@ -4763,7 +4826,8 @@ export const nl_NL: EnTranslations = {
       "link_required": "Koppel eerst je Discord-account.",
       "swag_claimed": "Je hebt deze beloning al geclaimd.",
       "swag_tier": "Bereik een hogere rang om dit te claimen.",
-      "swag_points": "Niet genoeg punten."
+      "swag_points": "Niet genoeg punten.",
+      "invalid_input": "Ongeldige invoer."
     },
     "deeds": {
       "invalid_input": "Ongeldige invoer."
@@ -4815,6 +4879,11 @@ export const nl_NL: EnTranslations = {
       "reason_required": "Een reden is vereist.",
       "invalid_duration": "Voer een markeringsduur van minstens één seconde in.",
       "not_marked": "Dat account is niet gemarkeerd."
+    },
+    "kick": {
+      "reason_required": "Er is een reden vereist.",
+      "admin_target": "Operatoraccounts kunnen niet worden verwijderd.",
+      "target_offline": "Die speler is niet langer online in dit rijk."
     },
     "woc_market": {
       "invalid_input": "Ongeldige invoer.",
@@ -5249,10 +5318,13 @@ export const nl_NL: EnTranslations = {
       "ifPlayerFrameScale": "De grootte van je eigen spelerframe.",
       "ifTargetFrameScale": "De grootte van je doelwitframe.",
       "ifPartyStyle": "De groepsindeling: Automatisch volgt je groepsgrootte, Klassiek is de traditionele stapel, en Raid perst iedereen in het compacte raster.",
+      "ifPlayerHealthText": "Wat uw eigen gezondheidsbalk afdrukt: niets, een percentage, huidige gezondheid, huidig en maximaal, of beide met het percentage ernaast.",
+      "ifTargetHealthText": "Wat de doel- en doel-van-doel-gezondheidsbalken afdrukken, met dezelfde keuzes als uw eigen frame.",
       "ifPartyHealthText": "Wat de groepsbalken laten zien: niets, een percentage, huidige gezondheid, of huidige en maximale gezondheid.",
       "ifPartySort": "De volgorde waarin groepsleden worden weergegeven: groepsvolgorde, rol, of naam.",
       "ifPartyShowAuras": "Of buffs en debuffs op de groepsframes worden getoond. Bijbehorende schakelaars beslaan resourcebalken, absorpties, huisdieren, en of je in je eigen groepslijst verschijnt.",
       "ifAurasOnPlayerFrame": "Zet je buffs en debuffs ook op je eigen spelerframe, naast de aurabalk.",
+      "ifAuraBarBelowFrame": "Verplaatst de buffrij onder je eenheidsframe in plaats van erboven. Heeft alleen effect zolang buffs op het spelerframe staan.",
       "ifAlwaysShowAllBuffs": "Toont elke actieve buff, zelfs met de preset Lage graphics, en omzeilt de gebruikelijke limiet voor buffpictogrammen.",
       "ifTargetOfTarget": "Toont wie het doelwit van jouw doelwit is, de klassieke manier om te zien of de tank het nog vasthoudt.",
       "ifPetFrame": "Toont een frame voor je huisdier.",
@@ -5260,6 +5332,7 @@ export const nl_NL: EnTranslations = {
       "ifChatOpacity": "Hoe dekkend de achtergrond van de chat is.",
       "ifCompactChat": "Maakt de chatregels compacter zodat er meer op het scherm passen.",
       "ifChatTimestamps": "Voegt een tijd toe aan elke chatregel, in 12-uurs of 24-uurs vorm.",
+      "ifFilterProfanity": "Maskert godslastering in de chat met sterretjes. Standaard ingeschakeld; schakel het hier uit als je de chat liever ongefilterd leest.",
       "ifStartAttack": "Of het gebruiken van een vaardigheid ook je auto-aanval start. Standaard aan, en het klassieke gedrag dat de meeste spelers verwachten.",
       "ifStopAutoAttack": "Of het wisselen van doelwit je aanval stopt. Standaard uit, zodat je aanval overgaat op het nieuwe doelwit.",
       "ifShowAttackButton": "Zet een expliciete knop Aanvallen op je actiebalk.",
@@ -5272,7 +5345,7 @@ export const nl_NL: EnTranslations = {
       "ifHideUnused": "Verbergt lege actievakjes zodat alleen de knoppen die je echt gebruikt, getekend worden.",
       "ifLockBars": "Vergrendelt je balken zodat je niet per ongeluk een vaardigheid uit een vak sleept.",
       "keybindsHeading": "Het paneel Toetsbindingen",
-      "keybindsBody": "De toetsenlijst is maar de helft van dat paneel. Erboven staan de schakelaars die bepalen hoe je muis het spel bestuurt: muiscamera, of de cursor vergrendelt terwijl je draait, klik om te bewegen en welke muisknop dat activeert, aanvalsbeweging, de linkshandige aanraakindeling, en het filter voor grof taalgebruik in de chat.",
+      "keybindsBody": "De sleutellijst is slechts de helft van dat paneel. Daarboven zitten de schakelaars die bepalen hoe je muis het spel aanstuurt: muiscamera, of de cursor vergrendelt terwijl je draait, klik om te bewegen en welke muisknop hem activeert, aanvalsbeweging en de linkshandige aanraakindeling.",
       "keybindsMouseBody": "Twee dingen daar zijn makkelijk over het hoofd te zien. Muisknoppen binden als toetsen, dus de wielklik en de duimknoppen kunnen vaardigheden dragen, terwijl links- en rechtsklikken gereserveerd blijven voor de camera en voor klikken in de wereld. En je kunt rechtstreeks vanaf de actiebalk binden: zet hier de bindmodus op de actiebalk aan, klik dan op een vak en druk op de gewenste toets."
     },
     "combat": {
@@ -6071,7 +6144,7 @@ export const nl_NL: EnTranslations = {
       "heroicRewardsBody": "Heroïsche bazen laten de buit vallen die je kent, opgewaardeerd en in de tooltip als Heroïsch aangeduid, en de eindbaas van elke tocht voegt daar epics aan toe die nergens anders te vinden zijn. Die laatste dood laat ook Heroïsche Tekens achter voor elke deelnemer: een munt die je uitgeeft bij kwartiermeester Vex in Highwatch, wiens toonbank een plank vol ringen en hangers is die niets dan het bewijs van de heroïsche diepten kan kopen.",
       "heroicLockoutBody": "Gewone kerkers kun je de hele dag door lopen. Heroïsch vraagt geduld: de dood van de eindbaas beperkt iedereen in de tocht tot één heroïsche voltooiing van die kerker per dag, en de raid houdt een dagelijkse vergrendeling aan voor elke moeilijkheid. Op een live rijk vallen alle dagelijkse vergrendelingen samen weg op het eigen nachtelijke hersteluur van het rijk, zodat een voltooiing vlak voor dat uur en een vlak erna op twee verschillende dagen vallen; speel in plaats daarvan offline in je browser en een vergrendeling loopt gewoon een dag na je eigen dood af. Een al voltooide tocht voor vijf spelers blijft open voor de eigen groep voor lijkentochten en buit, zodat niemand wordt buitengesloten van wat hij daar verdiende. De raid is strenger: zodra zijn dood je heeft vergrendeld, blijft de deur dicht tot het herstel, en de enige weg terug naar binnen is een lijkentocht van iemand die viel in precies de tocht die hem vergrendelde, dus een levende raider die naar buiten loopt, is voor die dag naar buiten gelopen. Verzamel je buit voor je de arena verlaat. Elk van deze vergrendelingen hoort bij het personage dat hem verdiende, dus een voltooiing op je hoofdpersonage laat je andere personages vrij.",
       "resetTitle": "Je instanties resetten",
-      "resetBody": "Wissel van moeilijkheid terwijl je groep nog opgeëiste tochten aanhoudt en de oude claims blijven een tijdje hangen voordat ze vanzelf loslaten. De groepsleider kan ze in plaats daarvan meteen loslaten: kies Alle instanties herstellen in het menu van zijn eigen portret, of typ /dungeon reset. Een herstel werkt pas nadat de moeilijkheid echt is gewijzigd, alleen zolang er niemand, levend of gevallen, binnen is, alleen zodra elk lijk daarbinnen helemaal is leeggehaald, en een korte afkoeltijd scheidt het ene herstel van het volgende. Kom je bij de deur met de verkeerde moeilijkheid, dan zegt het spel het voor de tocht begint. De raid wordt zo nooit hersteld; zijn eigen vergrendelingsregels blijven staan.",
+      "resetBody": "Verander van moeilijkheidsgraad terwijl je groep nog steeds geclaimde runs heeft en de oude claims een tijdje blijven hangen voordat ze vanzelf verdwijnen. De groepsleider kan ze in plaats daarvan meteen laten gaan: kies Reset All Instances in hun eigen portretmenu of typ /dungeon reset. Een reset werkt alleen nadat de moeilijkheid daadwerkelijk is gewijzigd, alleen zolang niemand, levend of gevallen, binnen blijft, alleen als elk lijk daarin is geplunderd en een korte cooldown de ene reset van de volgende scheidt. Kom bij de deur op de verkeerde moeilijkheidsgraad en het spel zegt dit voordat de run begint. De overval wordt op dezelfde manier gereset, waarbij de eigen regels voor uitsluiting en lijkteruggave nog steeds bovenaan staan.",
       "templeLoreTitle": "De Verdronken Tempel, een beetje dieper",
       "templeLoreBody": "De tempel heeft zijn eigen legende, ouder dan de sekte die je elders najaagt. Aan de oever van de Glansmere, een bergmeer dat het maanlicht drinkt en de verdronkenen teruggeeft, bewaakt een eenzame wachter een poort van bleek licht. Onder het oppervlak loopt een trap van koude steen erheen naar beneden. Het volk dat daar zonk verdronk niet door een ongeluk: het was het Bleke Koor, dat in aanbidding onderging en nooit ophield met zingen. De oude wachters krasten een enkele waarschuwing in de rotsen voordat het water hen nam, een gebed tot iets dat zij de Verdronken Maan noemden, met een vastere hand die twee woorden eronder toevoegde: het slaapt slechts.",
       "cryptLeadTitle": "Een deur die de doden gesloten moesten houden",
@@ -6104,8 +6177,8 @@ export const nl_NL: EnTranslations = {
       "raceBody": "Elke groep in het rijk kan tegelijk dezelfde rift aanvallen, elk in zijn eigen kopie, en alleen de eerste die het wezen onderaan neerhaalt, verzegelt hem. Wint een groep, dan hoort het rijk hun namen en hun tijd, en de weg naar binnen sluit achter hen. De race verliezen betekent niet het einde van je run: jouw kopie blijft open, het wezen onderaan valt nog steeds voor jou, en je loopt nog steeds op eigen kracht naar buiten. Wat het je kost, is alles wat het opruimen zou hebben opgeleverd. De baas laat niets achter voor de groep die als tweede eindigt, dus wat je meeneemt naar huis is wat er van de monsters onderweg naar beneden viel, en niets meer. Het Boek der Daden telt de clear nog steeds mee, want jij hebt het wezen wel degelijk neergehaald. Het is de enige race in het spel die je kunt verliezen zonder ooit de mensen te zien die je versloegen.",
       "rewardsHeading": "Wat je mee naar buiten neemt",
       "rewardsBody": "Een rift verzegelen, niet alleen overleven, is wat loont. Haal de rift als eerste neer en hij betaalt als de geïnstantieerde inhoud waar zijn rang naast staat, dus de zwaardere rangen zijn de zwaardere run waard. Verzegelen geeft ook iedereen die erbij was een riftgebonden band in handen, afgestemd op de rol van jouw klasse en persoonlijk voor jou, en laat daarnaast Rift-Essentie in je tassen achter, met riftjuwelen erbovenop bij de zwaardere rangen. Naast de weg naar huis laat het wezen onderaan een verzegelde bergplaats achter die je groep kan openpeuteren voor extra buit, met hetzelfde slotenkraken van het Pad van de Tuimelaar dat je kent van delve-kisten, dus een schone, geduldige klus loont beter dan een gehaaste. Niets daarvan bereikt een groep die als tweede eindigt: een verloren race levert je alleen op wat er van de monsters onderweg naar beneden viel. Het Boek der Daden is de uitzondering, en telt je clear hoe dan ook mee, met een daad voor het sluiten van je eerste rift en nog een voor het neerhalen van een S-rang exemplaar.",
-      "forgeHeading": "The Rift Forge",
-      "forgeBody": "The band a ranked first clear mints is not finished when you receive it. Riftwright Maelis, who keeps a forge in the Watch Meadow on the Farshore, up the shore from Gullhaven beside the Breach Scholar, will raise its item level one step at a time and set the coloured gems the rifts drop into its sockets, each colour one combat rating. A full band takes a new gem in place of its oldest, so you can retune it later. All of that is paid in Rift Essence and Rift gems, the forge currency that falls from rift bosses and trades freely, so a friend can hand you the essence you are short. Take the band off before you bring it to her: she works on what is in your bags, and she does nothing at all unless you are standing at her forge.",
+      "forgeHeading": "De Riftsmederij",
+      "forgeBody": "De band met de als eerste gerangschikte Clear Mints is nog niet klaar wanneer u deze ontvangt. Riftwright Maelis, die een smederij heeft in de Watch Meadow op de Farshore, aan de kust van Gullhaven naast de Breach Scholar, zal het itemniveau stap voor stap verhogen en de gekleurde edelstenen plaatsen die de kloven in de sockets laten vallen, elke kleur één gevechtswaarde. Een volledige band neemt een nieuwe edelsteen in plaats van de oudste, zodat je deze later opnieuw kunt stemmen. Dat alles wordt betaald in Rift Essence en Rift-edelstenen, de smeedvaluta die van riftbazen valt en vrijelijk kan worden verhandeld, zodat een vriend je de essentie kan overhandigen die je te kort komt. Doe het bandje af voordat je het naar haar brengt: ze werkt aan wat er in je tassen zit, en ze doet helemaal niets tenzij je bij haar smidse staat.",
       "trackerHeading": "De tracker op je scherm",
       "trackerBody": "Terwijl je binnen bent, houdt een smalle strook op je scherm je georiënteerd: op welke verdieping je zit van hoeveel, en een lopend aftellen. Lees dat aftellen zorgvuldig, want het is niet je run die afloopt. Het is de ingang terug in de wereld die sluit. Zodra je erdoor bent, speelt je groep de rift op eigen tempo uit, hoe lang dat ook duurt, maar wanneer die klok op nul komt, is de weg naar binnen voor iedereen verdwenen, dus denk twee keer na voordat je tegen het einde naar buiten stapt."
     },
@@ -7997,7 +8070,7 @@ export const nl_NL: EnTranslations = {
       "forgeUpgraded": "Rift-verbetering voltooid voor {name}.",
       "forgeEnchanted": "Rift-betovering voltooid voor {name}.",
       "forgeSocketed": "Riftjuweel geplaatst voor {name}.",
-      "forgeGemReplaced": "Rift gem replaced for {name}: {gem} destroyed.",
+      "forgeGemReplaced": "Rift-juweel vervangen voor {name}: {gem} vernietigd.",
       "detonateGlacialGrave": "IJzig Graf ontploft!",
       "detonateAbsoluteZero": "Absoluut Nulpunt barst los!",
       "detonateMagmaWell": "Magmabron barst los!",
@@ -8644,6 +8717,7 @@ export const nl_NL: EnTranslations = {
     "connectingRealm": "Verbinden met wereld...",
     "assetsFailed": "Laden van assets mislukt: probeer opnieuw te laden. {error}",
     "rendererFailed": "Kon de renderer niet starten: probeer opnieuw te laden. {error}",
+    "rendererContextLost": "De 3D-renderer heeft zijn grafische context verloren en kon die niet herstellen. Laad opnieuw.",
     "enterTimeout": "Kon de wereld niet betreden. De verbinding is verlopen. Draait de gameserver?",
     "connectionLost": "De verbinding met de server is verbroken.",
     "reconnectingAttempt": "Verbinding verbroken. Opnieuw verbinding maken... (poging {attempt}/{maxAttempts}, opnieuw proberen over {seconds}s)",
@@ -8654,6 +8728,7 @@ export const nl_NL: EnTranslations = {
     "realmFull": "Deze wereld is op dit moment vol. Probeer het over een paar minuten opnieuw.",
     "tooManyConnections": "Er komen te veel verbindingen naar deze wereld vanuit jouw netwerk. Sluit extra spelvensters of probeer het over een paar minuten opnieuw.",
     "messageRateExceeded": "De verbinding is verbroken omdat je te snel acties verstuurde. Wacht even en log opnieuw in.",
+    "kickedByModerator": "Een moderator heeft de verbinding met je verbroken: {reason}",
     "tips": {
       "classes": "Tip: elk van de 9 klassen speelt anders. Probeer er een paar voordat je er een kiest.",
       "talents": "Tip: je kunt je talenten buiten gevechten altijd herstellen, dus een vroege keuze is nooit een valstrik.",
@@ -10467,11 +10542,11 @@ export const nl_NL: EnTranslations = {
       },
       "melting_acid": {
         "name": "Smeltend zuur",
-        "description": "Bespat het doelwit met een bijtend gif, richt {damage} schade aan de natuur aan en vermindert het pantser met 5% gedurende 12 seconden."
+        "description": "Bestrijkt je wapen gedurende 30 min. Elke slag van wapen bespat het doelwit met bijtend zuur en vermindert zijn pantser met 5% gedurende 12 seconden."
       },
       "nightshade_coating": {
         "name": "Nachtschade-coating",
-        "description": "Bestrijkt het doelwit met nachtschade, richt {damage} natuurschade aan en vermindert de genezing die het ontvangt met 25% gedurende 12 seconden."
+        "description": "Bestrijkt je wapen gedurende 30 min. Elke slag van wapen bestrijkt het doelwit met nachtschade en vermindert de genezing die het ontvangt met 25% gedurende 12 seconden."
       },
       "expose_armor": {
         "name": "Pantserbres",
@@ -10487,11 +10562,11 @@ export const nl_NL: EnTranslations = {
       },
       "instant_poison": {
         "name": "Adderbeet",
-        "description": "Bestrijkt je wapen gedurende 30 min, waardoor elke slag van wapen 8 extra Natuurschade toebrengt."
+        "description": "Bestrijkt je wapen gedurende 30 min, waardoor elke slag van wapen {damage} extra Natuurschade toebrengt."
       },
       "deadly_poison": {
         "name": "Etterend Gif",
-        "description": "Bestrijkt je wapen gedurende 30 min, waardoor elke slag van wapen 14 extra Natuurschade toebrengt."
+        "description": "Bestrijkt je wapen gedurende 30 min. Elke slag van wapen voegt een gifstapeling toe aan het doelwit, tot 5, en vernieuwt de duur van 12 seconden. Elke stapeling richt elke 2 seconden {damage} natuurschade aan."
       },
       "blind": {
         "name": "Zandworp",
@@ -11589,11 +11664,11 @@ export const nl_NL: EnTranslations = {
       },
       "temporal_echo": {
         "name": "Temporele Echo",
-        "description": "Markeert een bondgenoot met de echo van een gezonder moment, en herstelt direct {damage} gezondheid. Gedurende {duration} sec stroomt een deel van de Arcaneschade die je aanricht terug door de echo om hen te genezen."
+        "description": "Markeert een bondgenoot met de echo van een gezonder moment, en herstelt direct {damage} gezondheid. Gedurende {duration} sec geneest {echoSinglePct}% van je overige Arcaneschade tegen één doel en {echoAreaPct}% van je Arcane gebiedsschade die bondgenoot. Aethergolf en Aetherpijlen genezen in plaats daarvan voor {echoDriverPct}% van de schade die ze aanrichten."
       },
       "temporal_cascade": {
         "name": "Temporele Cascade",
-        "description": "Stuurt een echo door je groep: het doelwit en tot vier van hun naaste bondgenoten worden tegelijk hersteld en elk gedurende {duration} sec gemarkeerd, waarbij een deel van de Arcaneschade die je aanricht terugstroomt door hun echo om hen te genezen. (Chronomantie)"
+        "description": "Stuurt een echo door je groep: het doelwit en tot vier van hun naaste bondgenoten worden tegelijk hersteld en elk gedurende {duration} sec gemarkeerd, waarbij een deel van de Arcaneschade die je aanricht terugstroomt door hun echo om hen te genezen. Aethergolf en Aetherpijlen maken uit elke groepsecho een even grote genezingsreserve, verdeeld naar ontbrekende gezondheid onder gemarkeerde bondgenoten met minder dan 60% gezondheid. (Chronomantie)"
       },
       "temporal_reversal": {
         "name": "Temporele Omkering",
@@ -13281,11 +13356,17 @@ export const nl_NL: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Contactsleutel: Schrikvonk, de Grondschudder"
       },
+      "reins_goblin_rocket_sled": {
+        "name": "Contactsleutel: Goblin-raketslee"
+      },
+      "reins_rallycart_rxt": {
+        "name": "Contactsleutel: Rallycart RXT"
+      },
       "reins_lanternback_troll": {
         "name": "Juk van de lantaarnopsteker: Grumbol"
       },
       "reins_chimeglass_tortoise": {
-        "name": "Roadwarden's Bellstrap: Tolliver"
+        "name": "Bellstrap van Roadwarden: Tolliver"
       },
       "reins_rickshaw_mount": {
         "name": "Gebonden teugels: Beengebonden Riksja"
@@ -13294,7 +13375,7 @@ export const nl_NL: EnTranslations = {
         "name": "Teugels van de Drakenmuil-Raptor"
       },
       "reins_mech_bird": {
-        "name": "Ignition Key: Cluckwork Mech Bird"
+        "name": "Contactsleutel: Cluckwork Mech Bird"
       },
       "rimefang": {
         "name": "Rijptand"
@@ -15921,9 +16002,9 @@ export const nl_NL: EnTranslations = {
         "greeting": "Het opende zich precies waar de netten drogen. Precies daar, waar ik elke ochtend van mijn leven heb gestaan. Ik ga niet meer naar de kust. Ik ga eigenlijk nergens meer heen."
       },
       "riftwright_maelis": {
-        "name": "Riftwright Maelis",
-        "title": "Rift Forgemaster",
-        "greeting": "A Riftbound band remembers the break that made it, {className}. Bring me the band, and the essence the breaks shed, and I will teach it to remember more."
+        "name": "Riftsmid Maelis",
+        "title": "Riftsmeedmeester",
+        "greeting": "Een Riftbound-band herinnert zich de doorbraak die het maakte, {className}. Breng mij de band en de essentie van de pauzes, en ik zal hem leren meer te onthouden."
       },
       "forgemistress_darva": {
         "name": "Smeedmeesteres Darva",
@@ -18985,8 +19066,8 @@ export const nl_NL: EnTranslations = {
       },
       "chronoweave": {
         "name": "Aetherweefsel-Gewaden",
-        "bonus2": "Temporal Echo zet 50 procent van je Arcane-schade tegen één doel om in genezing. Opgelopen schade vertraagt het uitspreken van je spreuken niet meer.",
-        "bonus4": "De afkoeltijd van Temporal Cascade wordt met 5 sec. verkort."
+        "bonus2": "Temporal Echo zet 50% van je overige Arcaneschade tegen één doel om in genezing. Aethergolf en Aetherpijlen zetten in plaats daarvan 200% van hun aangerichte schade om. Opgelopen schade vertraagt het uitspreken van je spreuken niet meer.",
+        "bonus4": "De afkoeltijd van Temporal Cascade wordt met 5 sec. en de manakosten met 30% verlaagd."
       },
       "cinderbark": {
         "name": "Cinderbast-Bescherming",
@@ -19215,6 +19296,6 @@ export const nl_NL: EnTranslations = {
     "delveRiteShrineSkullInteract": "Schedelschrijn: druk op F om het aan te raken",
     "mailboxName": "Brievenbus",
     "noticeboardName": "Mededelingenbord",
-    "realmBuilderMonumentName": "Realm Builder Monument"
+    "realmBuilderMonumentName": "Rijksbouwer Monument"
   }
 };

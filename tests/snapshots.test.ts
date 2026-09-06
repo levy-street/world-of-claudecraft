@@ -135,6 +135,63 @@ function feedEventFrame(client: ClientWorld, frame: unknown): void {
   (client as any).onMessage(JSON.stringify(frame));
 }
 
+describe('self in-combat bit (cbt) wire round-trip', () => {
+  it('ships the sim flag on the self record and ClientWorld mirrors it, then elides until it flips', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Swordsworn');
+    const sim = server.sim;
+    const player = sim.entities.get(session.pid)!;
+    const client = bareClient(session.pid);
+
+    // Fresh character: the first record carries the bit explicitly as 0.
+    broadcast(server);
+    let snap = lastSnap(fc.sent);
+    expect(snap.self.cbt).toBe(0);
+    (client as any).applySnapshot(snap);
+    expect(client.player.inCombat).toBe(false);
+
+    // A real pull: a wild hostile aggroes the player and the engaged pass flags
+    // them on the next tick (the player never swings, so no personal damage
+    // event ever reaches the client: exactly the boss-fight report).
+    const mob = [...sim.entities.values()].find(
+      (e) => e.kind === 'mob' && e.hostile && !e.dead && e.ownerId === null,
+    )!;
+    mob.pos = { ...player.pos };
+    expect(sim.aggroMob(mob, player, false)).toBe(true);
+    sim.tick();
+    expect(player.inCombat).toBe(true);
+    fc.sent.length = 0;
+    broadcast(server);
+    snap = lastSnap(fc.sent);
+    expect(snap.self.cbt).toBe(1);
+    (client as any).applySnapshot(snap);
+    expect(client.player.inCombat).toBe(true);
+
+    // Unchanged: the key is omitted and the mirror keeps the held state.
+    fc.sent.length = 0;
+    broadcast(server);
+    snap = lastSnap(fc.sent);
+    expect(snap.self).not.toHaveProperty('cbt');
+    (client as any).applySnapshot(snap);
+    expect(client.player.inCombat).toBe(true);
+
+    // The fight ends: the bit flips back to 0 once and the mirror clears.
+    mob.dead = true;
+    mob.threat.clear();
+    mob.aggroTargetId = null;
+    mob.aiState = 'dead';
+    for (let i = 0; i < 20 * 6; i++) sim.tick();
+    expect(player.inCombat).toBe(false);
+    fc.sent.length = 0;
+    broadcast(server);
+    snap = lastSnap(fc.sent);
+    expect(snap.self.cbt).toBe(0);
+    (client as any).applySnapshot(snap);
+    expect(client.player.inCombat).toBe(false);
+  });
+});
+
 describe('self stat wire round-trip', () => {
   it('mirrors Paladin Devotion and Ascension state from the authoritative server', () => {
     const server = new GameServer();
@@ -4847,6 +4904,7 @@ const ALL_DELTA_KEYS = [
   'buyback',
   'bval',
   'cardDuel',
+  'cbt',
   'cds',
   'copper',
   'corder',
@@ -4967,6 +5025,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   blk: 'blockChance',
   buyback: 'vendorBuyback',
   bval: 'blockValue',
+  cbt: 'inCombat',
   cds: 'cooldowns',
   corder: 'commissionOrders',
   cosmetics: 'accountCosmetics',
@@ -5080,6 +5139,9 @@ function dirtyEveryDeltaField(): {
   // before the creator has none), so the fixture stamps one, exactly as the
   // join path does from the character's own column.
   p.modularAppearance = { gender: 'female', hair: 'highbun' };
+  // `cbt`: the authoritative in-combat bit; a fresh character is out of combat,
+  // so the fixture flags it the way the sim's engaged pass would.
+  p.inCombat = true;
 
   // Poke the encoder's exact sources for the mutually-exclusive cases.
   const run = sim.delveRunForPlayer(lp) as any;
@@ -5507,6 +5569,7 @@ describe('full self-state snapshot delta fixture', () => {
       pvpDefense: 0.13,
     }); // stats (inline s.X ?? e.X, legacy-safe object replacement)
     expect(client.player.weapon).toMatchObject({ min: 999 }); // weapon (inline s.X ?? e.X)
+    expect(client.player.inCombat).toBe(true); // cbt -> e.inCombat (combat_scalar_wire.ts)
     expect(client.player.resource).toBe(42); // res -> resource
     expect(client.player.maxResource).toBe(150); // mres -> maxResource
     expect(client.player.resourceType).toBe('rage'); // rtype -> resourceType
@@ -5927,7 +5990,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 90 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 91 unique keys in sorted order', () => {
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
     // sheet's lifetime played-time key ptime, for 67, then +16: the static
@@ -5953,8 +6016,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     // adds offhandWeapon (delta-guarded like weapon/stats: a gear swap, not a
     // per-tick change; dualWielding rides no key of its own, it is always
     // exactly offhandWeapon !== null, so the client derives it), for 90.
-    expect(ALL_DELTA_KEYS).toHaveLength(90);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(90);
+    expect(ALL_DELTA_KEYS).toHaveLength(91);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(91);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -6043,8 +6106,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // Storage Phase 2 then adds bpsl, vault, and cvault, for 87. The
     // maybeSerialized arm of the scrape then surfaces the two capability-gated
     // direct emits, auras and de, for 89. The off-hand bar adds offhandWeapon,
-    // for 90.
-    expect(scraped.size).toBe(90);
+    // for 90, and the authoritative self in-combat bit cbt (the player-frame
+    // crossed swords online) for 91.
+    expect(scraped.size).toBe(91);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

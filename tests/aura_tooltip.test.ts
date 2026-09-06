@@ -47,4 +47,24 @@ describe('renderAuraTooltipBodyHtml', () => {
       ),
     ).toBe('<div class="tt-effect">Movement speed increased by 30%</div>');
   });
+
+  it('does not combine individual Temporal Echo prose with group Echo mark rates', () => {
+    expect(
+      renderAuraTooltipBodyHtml(
+        aura({
+          id: 'temporal_echo',
+          kind: 'temporal_echo',
+          value: 0.13,
+        }),
+        {
+          abilityDescription: () => 'Your Arcane damage heals one chosen ally for 40%.',
+          effectHtml: () =>
+            '<div class="tt-effect">Arcane damage heals this ally for 13% of the damage dealt.</div>',
+          escapeHtml: (text) => text,
+        },
+      ),
+    ).toBe(
+      '<div class="tt-effect">Arcane damage heals this ally for 13% of the damage dealt.</div>',
+    );
+  });
 });

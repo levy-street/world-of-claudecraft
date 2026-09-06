@@ -749,6 +749,7 @@ export const hudChromeStrings = {
     mounts: 'Mounts',
     professions: 'Professions',
     reliquary: 'Reliquary',
+    lootExplorer: 'Loot Explorer',
     nameplates: 'Names',
     haptics: 'Haptics',
     hapticsOff: 'Haptics Off',
@@ -937,14 +938,14 @@ export const hudChromeStrings = {
     // town's twin bell is pointed out once.
     bellHomeNote:
       'Back from the shore already? That was the ferry bell you rang. Its twin hangs just there by the Ravenpost mailbox: ring it any time and the crossing will carry you back to the Proving Shore. No harm done either way.',
-    // Ferryman Odo's island welcome, shown once per device on the first
+    // Ferryman Odo's island welcome, shown once for a character's first
     // arrival: the greeting ferry lands beside his pier.
     // Deliberately short (CX: the old note was a wall of text at the exact
     // moment a new player wants to look at the world). It says where they
     // are and who to talk to; the coach card, the golden trail and the
     // floating bubble carry the rest, in place, as they need it.
     islandArrivalNote:
-      'Welcome to the Proving Shore. Warden Tam is waiting just up the strand: go and see him.',
+      'Welcome to the Proving Shore. Warden Tam is waiting just up the strand: go and see him. When you would rather be off, ring the bell beside my pier and it will carry you across to the vale at any time.',
     noteClose: 'Understood',
   },
   // New-adventurer tutorial copy for the touch interface. The default tutorial
@@ -1187,6 +1188,9 @@ export const hudChromeStrings = {
     // Screen-anchored asks: the lessons whose answer is a press on the
     // interface rather than a place in the world. With the coach card gone
     // these ARE the instruction, so each names its own press.
+    promptAccessInterface: 'Access interface',
+    promptMoveToTarget: 'Move to {target}',
+    promptSelectItem: 'Select {item}',
     promptOpenBags: 'Open your bags',
     promptCharacterSheet: 'Open your character sheet',
     promptLookAround: 'Hold right-click and drag to look around',
@@ -1608,6 +1612,8 @@ export const hudChromeStrings = {
     name_shadowjump_toad: 'Kama-Kage the Shadow-Jump Toad',
     name_stormfeather_griffin: 'Sky-Reach Stormfeather',
     name_thunderstrut_gobbler: 'Thunderstrut the Grand Gobbler',
+    name_goblin_rocket_sled: 'Goblin Rocket Sled',
+    name_rallycart_rxt: 'Rallycart RXT',
     name_terrorspark_groundshaker: 'Terrorspark Groundshaker',
     name_drakemaw_raptor: 'Drakemaw Raptor',
     name_mech_bird: 'Cluckwork Mech Bird',
@@ -1625,6 +1631,9 @@ export const hudChromeStrings = {
       'A regal storm griffin that stalks the ground on rune-shod talons, wings furled.',
     desc_thunderstrut_gobbler:
       'A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead.',
+    desc_goblin_rocket_sled:
+      'A dangerously overbuilt goblin sled propelled by twin rockets and excellent bad judgment.',
+    desc_rallycart_rxt: 'A pint-sized rally machine that provides enhanced travel speed.',
     desc_terrorspark_groundshaker:
       'A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots.',
     desc_drakemaw_raptor:
@@ -1922,7 +1931,17 @@ export const hudChromeStrings = {
     // player frame (the debuff row then slides up beside the minimap) instead
     // of the classic two-row top-right corner (wordy, M16: the five non-Latin
     // fills land in this same change).
+    // Interface panel choice rows: the health text mode printed on your own unit
+    // frame and on the target (plus target-of-target) frame, the same table the
+    // party frames use (wordy, M16: the five non-Latin fills land in this same
+    // change).
+    playerHealthText: 'Player Health Text',
+    targetHealthText: 'Target Health Text',
     aurasOnPlayerFrame: 'Buffs on the Player Frame',
+    // Interface panel toggle, disabled unless aurasOnPlayerFrame is on: flips
+    // the anchored buff row to the other side of the player frame (wordy, M16:
+    // the five non-Latin fills land in this same change).
+    auraBarBelowFrame: 'Buffs Below the Player Frame',
     // Interface panel toggle: bypass the Low graphics preset's buff-icon cap so
     // every active buff always renders, at the cap's per-frame cost (wordy,
     // M16: the five non-Latin fills land in this same change).
@@ -3246,6 +3265,12 @@ export const hudChromeStrings = {
     poolMaterials: 'Materials: {used} of {total}',
     capacityPoolsAria:
       'Bag slots used: {used} of {total}. General items: {generalUsed} of {generalTotal}. Materials: {materialsUsed} of {materialsTotal}.',
+    // Issue #3795: with a satchel equipped the counter names both pools INLINE
+    // (an item pickup can be refused while the summed pair reads roomy), and
+    // the empty squares only a material may take say so on hover.
+    // (Wordy values, M16: the five non-Latin fills land in this same change.)
+    capacityPools: 'Items {generalUsed}/{generalTotal}, Materials {materialsUsed}/{materialsTotal}',
+    emptyMaterialsOnly: 'Materials only',
   },
   // Raid -> party demotion (Social panel raid tab). The sim emits these in English;
   // src/ui/sim_i18n.ts re-localizes them through these keys. Mirrors the existing
@@ -3594,7 +3619,7 @@ export const hudChromeStrings = {
       '{charges} echoes remain: single-target abilities deal {pct}% damage to up to {targets} nearby enemies',
     sureCrit: '{charges} damaging ability casts are guaranteed critical strikes',
     temporalEcho:
-      "The caster's Arcane damage heals you for {singlePct}% of single-target or {areaPct}% of area damage",
+      "The caster's Arcane damage heals you for {singlePct}% of single-target or {areaPct}% of area damage. Aether Surge and Aether Darts use a 4x bonus on an individual Temporal Echo. Group Echoes create an equal healing reserve, shared among marked allies below 60% health according to missing health",
     arcaneCharge:
       '{stacks} Arcane Charges: Aether Surge deals {damagePct}% more damage, casts {castPct}% faster, and costs {costMult}x mana',
     physicalReduction: 'Reduces Physical damage taken by {pct}%',
@@ -3913,6 +3938,10 @@ export const hudChromeStrings = {
     healthPercent: 'Percent',
     healthCurrent: 'Current',
     healthCurrentMax: 'Current / Max',
+    // Fifth mode, shared with the player and target frame rows: the pair plus the
+    // percent in parentheses. Wordy (M16): the five non-Latin fills land in this
+    // same change.
+    healthCurrentMaxPercent: 'Current / Max (Percent)',
     sort: 'Sort Players',
     sortGroup: 'Group',
     sortRole: 'Role',
@@ -4156,6 +4185,12 @@ export const hudChromeStrings = {
     close: 'Close',
     keybind: 'Discord Panel',
     disabled: 'Discord integration is not available right now.',
+    // The options-window account row (accounts.discord_queue_pings): whether
+    // the official bot direct-messages the player when their battleground or
+    // arena queue pops. Opt-in, and it needs a linked Discord account, which
+    // the label says so an unlinked player knows why the toggle does nothing.
+    queuePingsLabel:
+      'Send me a Discord direct message when my battleground or arena queue pops (needs a linked Discord account)',
     // Status-rung display names (the ladder lives in src/sim/discord_tier.ts).
     tiers: {
       none: 'Unranked',
@@ -4572,13 +4607,19 @@ export const hudChromeStrings = {
     sortAria: 'Sort bank items',
     searchAria: 'Search bank items by name',
     // Deposit-all-materials button + its transient summary line. {count} is
-    // the number of material stacks moved.
+    // the number of material stacks moved. The Notable arms additionally name
+    // an epic-or-better material the sweep sent (the vaultDepositAllNotable
+    // sibling below; a bare count reads as unremarkable and this reagent is
+    // rare and valuable enough to call out). (Wordy values, M16: the five
+    // non-Latin fills land in this same change.)
     depositAll: 'Deposit all materials',
     depositAllTooltip:
       'Sends every crafting reagent and junk item from your bags to the bank in one trip. Gathering tools, equipped gear, quest items, and consumables are never touched.',
     depositAllDone: 'Materials deposited: {count}.',
     depositAllFull: 'Materials deposited: {count}. Bank now full.',
     depositAllNone: 'Bank full: nothing deposited.',
+    depositAllNotable: 'Materials deposited: {count}, including {item}.',
+    depositAllNotableFull: 'Materials deposited: {count}, including {item}. Bank now full.',
     // Bonus-slot breakdown footer (online only): a header total plus one row
     // per account source, advertising what linking earns. {count} is a slot count.
     bonusTitle: 'Bonus slots',
@@ -4649,6 +4690,9 @@ export const hudChromeStrings = {
     vaultDepositAllDone: 'Materials deposited: {count}.',
     vaultDepositAllFull: 'Materials deposited: {count}. Some ceilings are full.',
     vaultDepositAllNone: 'Vault ceilings full: nothing deposited.',
+    vaultDepositAllNotable: 'Materials deposited: {count}, including {item}.',
+    vaultDepositAllNotableFull:
+      'Materials deposited: {count}, including {item}. Some ceilings are full.',
     vaultWithdrawShort: 'Only {fit} of {count} fit in your bags.',
     // Bags-side hints while the VAULT tab is active (the guild pair's rule:
     // distinct keys because the target differs).
@@ -6089,6 +6133,13 @@ export const hudChromeStrings = {
     sourceProfession: 'Earned through {profession}',
     sourceDeed: 'Awarded by the deed {deed}',
     sourceVendor: 'Sold by {vendor}',
+    // {requirement} is the vendor's own lock-badge phrase (delveUi.shop.reqHeroic
+    // / reqClears), pre-localized before it reaches this template: a signature
+    // rare gated behind a delve clear reads "Sold by {vendor} (Requires a
+    // Heroic clear)" instead of an unconditional "Sold by {vendor}" that looks
+    // buyable on sight and reads as removed once it is not actually on the
+    // counter yet.
+    sourceVendorGated: 'Sold by {vendor} ({requirement})',
     // A relic with several live routes shows one line per route, so these read
     // as siblings of the six above rather than as a summary of them.
     // {boss} here is the open-world rare and {zone} where it camps: half an
@@ -6137,6 +6188,13 @@ export const hudChromeStrings = {
     filterAll: 'All',
     filterOwned: 'Catalogued',
     filterMissing: 'Missing',
+    // The same chip state on a SHELF narrows whole pages by illumination, so
+    // the shelf paints its own labels, empty line and group name: a page is
+    // illuminated or still has relics remaining, never "catalogued".
+    filterIlluminated: 'Illuminated',
+    filterRemaining: 'Remaining',
+    filterEmptyPages: 'No pages match this filter.',
+    filterGroupAriaPages: 'Filter pages by whether they are illuminated',
     // Phase 14: the Overview becomes the way IN to the catalog. Recent finds
     // are jump buttons, each strip keeps its label and explains itself when
     // empty, and three shelf cards summarize the shelves the rail lists.
@@ -6315,7 +6373,10 @@ export const hudChromeStrings = {
     // static aria/title is generic so it never needs a per-level setAttribute.
     toWorld: 'World map',
     toZone: 'Zone map',
-    toggleAria: 'Switch between the world map and the zone map',
+    // Third stop of the cycle inside an instance (and outside, when a party member
+    // is in a dungeon whose floor plan can be drawn): the schematic instance map.
+    toInstance: 'Instance map',
+    toggleAria: 'Switch between the world map, zone map, and instance map',
     // Hover tooltip over a zone region: its name plus the suggested level band.
     levels: 'Levels {min} to {max}',
   },
@@ -6380,6 +6441,9 @@ export const hudChromeStrings = {
     walletLinkedConnected: 'Your linked wallet app is connected and ready for $WOC purchases.',
     walletUsdBalance: '{amount} USD',
     walletUsdUnknown: 'Unknown',
+    // The card's dismiss button (accessible name). Only the two linked states
+    // offer it (woc_wallet_card_dismiss.ts); the card returns when the state changes.
+    walletCardDismiss: 'Hide wallet card',
     // The rate is per ONE dollar, said outright: 'per USD' read as a unit
     // label and players asked per how many.
     rateNote: 'Rate: about {tokens} $WOC per $1.00 USD as of {time}.',
@@ -6698,5 +6762,46 @@ export const hudChromeStrings = {
     listingStatusCancelled: 'Cancelled',
     listingStatusSuspended: 'Suspended',
     listingStatusUnsold: 'Unsold',
+  },
+  // Loot Explorer: a searchable, filterable catalog of every item the game
+  // can hand a player and where to get it, grouped by encounter and
+  // difficulty on request (src/ui/hud/loot_explorer/). Cold, static-content
+  // window: nothing here reads live world state.
+  lootExplorer: {
+    title: 'Loot Explorer',
+    close: 'Close Loot Explorer',
+    searchPlaceholder: 'Search items...',
+    searchAria: 'Search items',
+    filterCategoryAria: 'Source',
+    filterClassAria: 'Class',
+    filterStatAria: 'Stat',
+    filterQualityAria: 'Quality',
+    filterAll: 'All',
+    tabItems: 'By Item',
+    tabEncounters: 'By Encounter',
+    category: {
+      raid: 'Raid',
+      dungeon: 'Dungeon',
+      delve: 'Delve',
+      open_world: 'Open World',
+      rift: 'Rift',
+      vendor: 'Vendor',
+      quest_reward: 'Quest Reward',
+      quest_objective: 'Quest Objective',
+      ground_object: 'World Object',
+      starting_equipment: 'Starting Equipment',
+    },
+    difficulty: { normal: 'Normal', heroic: 'Heroic' },
+    // {rank} is the bare rank letter (C/B/A/S), which needs no translation.
+    riftRankLabel: 'Rift Rank {rank}',
+    // {category} is one of the category.* labels above, {name} the resolved
+    // boss/vendor/quest/class name, {context} the dungeon/raid/delve name.
+    source: '{category}: {name}',
+    sourceWithContext: '{category}: {name} ({context})',
+    chance: '{pct}% chance',
+    guaranteed: 'Guaranteed',
+    gatedByQuest: 'While questing: {quest}',
+    empty: 'No loot matches these filters.',
+    resultCount: '{count} results',
   },
 };

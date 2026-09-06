@@ -332,8 +332,8 @@ describe('apply-enchant admission matches its resolver (worn arm)', () => {
       },
     },
     {
-      name: 'the confirmed replace re-applies the enchant already worn',
-      expected: 'same_enchant',
+      name: 'the confirmed replace re-applies the enchant already worn (admitted: a normal replace)',
+      expected: null,
       itemId: SWORD,
       enchantId: MIGHT,
       slot: 'mainhand',
@@ -428,8 +428,8 @@ describe('apply-enchant admission matches its resolver (bagged arm)', () => {
 describe('apply-enchant admission matches its resolver (bagged replace arm)', () => {
   runApplyRows([
     {
-      name: 'the confirmed replace re-applies the enchant already on the victim',
-      expected: 'same_enchant',
+      name: 'the confirmed replace re-applies the enchant already on the victim (admitted: a normal replace)',
+      expected: null,
       itemId: SWORD,
       enchantId: MIGHT,
       confirmReplace: true,

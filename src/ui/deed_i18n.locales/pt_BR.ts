@@ -383,7 +383,6 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_chapter_ii: {
     name: 'Crônica do Vale, Capítulo II',
-    desc: 'Termine o segundo capítulo da crônica de Saul: bandidos, murlocs e pragas da mina exterminados, o Sowfield disputado e o Relicário enfrentado.',
   },
   chr_vale_chapter_iii: {
     name: 'Crônica do Vale',
@@ -404,7 +403,6 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_cup_debut: {
     name: 'Candidato ao Balde de Cobre',
-    desc: 'Entre em campo e toque na bola em uma partida da Copa do Vale no Sowfield.',
   },
   chr_vale_rares: {
     name: 'Terrores do Vale',
@@ -598,69 +596,53 @@ export const table: DeedLocaleTable = {
   },
   pvp_vcup_first_match: {
     name: 'Chuteiras no Gramado',
-    desc: 'Jogue uma partida completa da Copa do Vale no Sowfield, vencendo ou perdendo.',
   },
   pvp_vcup_first_win: {
     name: 'A Primeira Taça',
-    desc: 'Vença uma partida ranqueada da Copa do Vale.',
   },
   pvp_vcup_wins_10: {
     name: 'Javalibolista Tarimbado',
-    desc: 'Vença 10 partidas ranqueadas da Copa do Vale.',
   },
   pvp_vcup_wins_25: {
     name: 'Lenda do Javalibol',
-    desc: 'Vença 25 partidas ranqueadas da Copa do Vale.',
     title: 'Lenda do Javalibol',
   },
   pvp_vcup_first_goal: {
     name: 'Estreia no Placar',
-    desc: 'Marque um gol em uma partida ranqueada da Copa do Vale.',
   },
   pvp_vcup_hat_trick: {
     name: 'Herói do Hat-Trick',
-    desc: 'Marque três gols em uma única partida ranqueada da Copa do Vale, na chave 3v3 ou maior.',
   },
   pvp_vcup_golden_goal: {
     name: 'Momento de Ouro',
-    desc: 'Marque o gol de ouro que decide uma partida ranqueada da Copa do Vale.',
   },
   pvp_vcup_first_save: {
     name: 'Mãos Seguras',
-    desc: 'Faça uma defesa como goleiro em uma partida ranqueada da Copa do Vale.',
   },
   pvp_vcup_clean_sheet: {
     name: 'Aqui Não Passa Nada',
-    desc: 'Vença uma partida ranqueada da Copa do Vale como goleiro sem sofrer nenhum gol.',
   },
   pvp_vcup_guild_win: {
     name: 'Pelo Estandarte',
-    desc: 'Vença uma partida ranqueada da Copa do Vale disputada sob o estandarte da sua guilda.',
   },
   pvp_fiesta_first_bout: {
     name: 'Penetra na Festa',
-    desc: 'Dispute um confronto 2v2 completo da Fiesta, vencendo ou perdendo.',
   },
-  pvp_fiesta_first_win: { name: 'A Alma da Fiesta', desc: 'Vença um confronto 2v2 da Fiesta.' },
+  pvp_fiesta_first_win: { name: 'A Alma da Fiesta' },
   pvp_fiesta_double: {
     name: 'Dose Dupla de Encrenca',
-    desc: 'Consiga dois abates na Fiesta em até quatro segundos.',
   },
   pvp_fiesta_shutdown: {
     name: 'Estraga-Prazeres',
-    desc: 'Abata um adversário da Fiesta que esteja em uma sequência de três ou mais.',
   },
   pvp_fiesta_full_build: {
     name: 'Vestido para a Ocasião',
-    desc: 'Vença um confronto da Fiesta com um aprimoramento garantido de todas as três ondas.',
   },
   pvp_fiesta_powerups: {
     name: 'Um de Cada',
-    desc: 'Pegue cada um dos quatro power-ups do ringue pelo menos uma vez: Demônio da Velocidade, Colosso, Botas Lunares e Berserker.',
   },
   pvp_fiesta_five_kills: {
     name: 'Carregando a Festa nas Costas',
-    desc: 'Consiga cinco abates em um único confronto da Fiesta.',
   },
   soc_first_party: { name: 'Juntos É Melhor', desc: 'Entre em um grupo com outro jogador.' },
   soc_full_house: {

@@ -48,6 +48,7 @@ const baseEnTable = {
   // non-material deposit refused while only materials-only satchel capacity
   // remains, so "full" would contradict the two-pool meter on screen.
   'error.bankOnlyMaterialsSpace': 'Only materials fit in the space left in your bank.',
+  'error.bagsOnlyMaterialsSpace': 'Only materials fit in the space left in your bags.',
   // The granularity no_fit refusal (src/sim/bank.ts, MoveResult.noFitCause
   // 'instanced_units'): free slots exist but the indivisible payload cannot
   // land whole, so both pool lines would lie.
@@ -454,6 +455,9 @@ const baseEnTable = {
   'log.questItemRecovered': 'You recover a quest item you were missing.',
   'loot.rollWin': '{winner} wins {item} ({roll})',
   'loot.rollWinnerOffline': '{winner} was offline; {item} returned to the corpse.',
+  // The awarded-loot hold (src/sim/loot/awarded_loot_hold.ts): a full-bags
+  // winner's award stays on the corpse as a winner-only slot.
+  'loot.awardHeldOnCorpse': 'Your bags are full; {item} is waiting on the corpse for you.',
   'loot.rollNeed': 'Need Roll - {roll} for {item} by {name}',
   'loot.rollGreed': 'Greed Roll - {roll} for {item} by {name}',
   'loot.marketSellerBought':
@@ -1423,6 +1427,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.nothingToConsume': 'No hay nada que consumir.',
     'error.nothingToDevour': 'No hay nada que devorar.',
     'loot.rollWinnerOffline': '{winner} estaba sin conexión; {item} volvió al cadáver.',
+    'loot.awardHeldOnCorpse': 'Tus bolsas están llenas; {item} te espera en el cadáver.',
     'log.channelInterrupted': '¡Se ha interrumpido {mechanic}!',
     'error.merchantUnavailable': 'Ese vendedor no está disponible.',
     'error.notForSale': 'Ese objeto no está a la venta.',
@@ -1500,6 +1505,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankQuestItem': 'No puedes guardar objetos de misión en el banco.',
     'error.bankFull': 'Tu banco está lleno.',
     'error.bankOnlyMaterialsSpace': 'En el espacio que queda en tu banco solo caben materiales.',
+    'error.bagsOnlyMaterialsSpace': 'En el espacio que queda en tus bolsas solo caben materiales.',
     'error.bankStackIndivisible':
       'Ese montón no se puede dividir para caber en el espacio que queda en tu banco.',
     'error.bagsStackIndivisible':
@@ -1903,6 +1909,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.nothingToConsume': 'No hay nada que consumir.',
     'error.nothingToDevour': 'No hay nada que devorar.',
     'loot.rollWinnerOffline': '{winner} estaba sin conexión; {item} volvió al cadáver.',
+    'loot.awardHeldOnCorpse': 'Tus bolsas están llenas; {item} te espera en el cadáver.',
     'log.channelInterrupted': '¡Se ha interrumpido {mechanic}!',
     'error.merchantUnavailable': 'Ese mercader no está disponible.',
     'error.notForSale': 'Ese objeto no está a la venta.',
@@ -1980,6 +1987,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankQuestItem': 'No puedes guardar objetos de misión en el banco.',
     'error.bankFull': 'Tu banco está lleno.',
     'error.bankOnlyMaterialsSpace': 'En el espacio que queda en tu banco solo caben materiales.',
+    'error.bagsOnlyMaterialsSpace': 'En el espacio que queda en tus bolsas solo caben materiales.',
     'error.bankStackIndivisible':
       'Ese montón no se puede dividir para caber en el espacio que queda en tu banco.',
     'error.bagsStackIndivisible':
@@ -2396,6 +2404,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.nothingToConsume': 'Rien à consommer.',
     'error.nothingToDevour': 'Rien à dévorer.',
     'loot.rollWinnerOffline': '{winner} était hors ligne ; {item} est de nouveau sur le cadavre.',
+    'loot.awardHeldOnCorpse': 'Vos sacs sont pleins ; {item} vous attend sur le cadavre.',
     'log.channelInterrupted': 'Interruption de {mechanic} !',
     'error.merchantUnavailable': "Ce marchand n'est pas disponible.",
     'error.notForSale': "Cet objet n'est pas à vendre.",
@@ -2475,6 +2484,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankFull': 'Votre banque est pleine.',
     'error.bankOnlyMaterialsSpace':
       "Seuls des matériaux tiennent dans l'espace restant de votre banque.",
+    'error.bagsOnlyMaterialsSpace':
+      "Seuls des matériaux tiennent dans l'espace restant de vos sacs.",
     'error.bankStackIndivisible':
       "Cette pile ne peut pas être divisée pour tenir dans l'espace restant de votre banque.",
     'error.bagsStackIndivisible':
@@ -2891,6 +2902,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.nothingToConsume': 'Rien à consommer.',
     'error.nothingToDevour': 'Rien à dévorer.',
     'loot.rollWinnerOffline': '{winner} était hors ligne ; {item} est de nouveau sur le cadavre.',
+    'loot.awardHeldOnCorpse': 'Vos sacs sont pleins ; {item} vous attend sur le cadavre.',
     'log.channelInterrupted': 'Interruption de {mechanic} !',
     'error.merchantUnavailable': "Ce marchand n'est pas disponible.",
     'error.notForSale': "Cet objet n'est pas à vendre.",
@@ -2971,6 +2983,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankFull': 'Votre banque est pleine.',
     'error.bankOnlyMaterialsSpace':
       "Seuls des matériaux tiennent dans l'espace restant de votre banque.",
+    'error.bagsOnlyMaterialsSpace':
+      "Seuls des matériaux tiennent dans l'espace restant de vos sacs.",
     'error.bankStackIndivisible':
       "Cette pile ne peut pas être divisée pour tenir dans l'espace restant de votre banque.",
     'error.bagsStackIndivisible':
@@ -3582,6 +3596,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.nothingToConsume': 'Niente da consumare.',
     'error.nothingToDevour': 'Niente da divorare.',
     'loot.rollWinnerOffline': '{winner} era offline; {item} è di nuovo sul cadavere.',
+    'loot.awardHeldOnCorpse': 'Le tue borse sono piene; {item} ti aspetta sul cadavere.',
     'log.channelInterrupted': 'Interruzione di {mechanic}!',
     'error.merchantUnavailable': 'Quel mercante non è disponibile.',
     'error.notForSale': "Quell'oggetto non è in vendita.",
@@ -3660,6 +3675,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankFull': 'La tua banca è piena.',
     'error.bankOnlyMaterialsSpace':
       "Nello spazio rimasto nella tua banca c'è posto solo per i materiali.",
+    'error.bagsOnlyMaterialsSpace':
+      "Nello spazio rimasto nelle tue borse c'è posto solo per i materiali.",
     'error.bankStackIndivisible':
       'Quella pila non può essere divisa per entrare nello spazio rimasto nella tua banca.',
     'error.bagsStackIndivisible':
@@ -4071,6 +4088,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.nothingToConsume': 'Nichts zu verbrauchen.',
     'error.nothingToDevour': 'Nichts zu verschlingen.',
     'loot.rollWinnerOffline': '{winner} war offline; {item} wurde auf die Leiche zurückgelegt.',
+    'loot.awardHeldOnCorpse': 'Eure Taschen sind voll; {item} wartet auf der Leiche auf Euch.',
     'log.channelInterrupted': '{mechanic} wurde unterbrochen!',
     'error.merchantUnavailable': 'Dieser Händler ist nicht verfügbar.',
     'error.notForSale': 'Dieser Gegenstand ist nicht zu verkaufen.',
@@ -4150,6 +4168,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankQuestItem': 'Ihr könnt keine Questgegenstände in der Bank lagern.',
     'error.bankFull': 'Eure Bank ist voll.',
     'error.bankOnlyMaterialsSpace': 'In Eurer Bank ist nur noch Platz für Materialien.',
+    'error.bagsOnlyMaterialsSpace': 'In Euren Taschen ist nur noch Platz für Materialien.',
     'error.bankStackIndivisible':
       'Dieser Stapel kann nicht geteilt werden, um in den restlichen Platz Eurer Bank zu passen.',
     'error.bagsStackIndivisible':
@@ -4577,6 +4596,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankWithdrawRefused': '该物品无法从公会银行取出。',
     'error.bankFull': '你的银行已满。',
     'error.bankOnlyMaterialsSpace': '你的银行剩余空间只能存放材料。',
+    'error.bagsOnlyMaterialsSpace': '你的背包剩余空间只能存放材料。',
     'error.bankStackIndivisible': '该物品堆无法拆分，放不进你银行的剩余空间。',
     'error.bagsStackIndivisible': '该物品堆无法拆分，放不进你背包的剩余空间。',
     'error.bankCannotAfford': '你无力支付该银行扩展费用。',
@@ -4616,6 +4636,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.nothingToConsume': '没有可吞噬的效果。',
     'error.nothingToDevour': '没有可吞噬的法术效果。',
     'loot.rollWinnerOffline': '{winner}处于离线状态；{item}已放回尸体。',
+    'loot.awardHeldOnCorpse': '你的背包已满；{item}正在尸体上等你来取。',
     'log.channelInterrupted': '{mechanic}被打断了！',
     'error.merchantUnavailable': '该商人无法提供服务。',
     'error.notForSale': '该物品不出售。',
@@ -5043,6 +5064,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankWithdrawRefused': '該物品無法從公會銀行取出。',
     'error.bankFull': '你的銀行已滿。',
     'error.bankOnlyMaterialsSpace': '你的銀行剩餘空間只能存放材料。',
+    'error.bagsOnlyMaterialsSpace': '你的背包剩餘空間只能存放材料。',
     'error.bankStackIndivisible': '該物品堆無法拆分，放不進你銀行的剩餘空間。',
     'error.bagsStackIndivisible': '該物品堆無法拆分，放不進你背包的剩餘空間。',
     'error.bankCannotAfford': '你無力支付該銀行擴充費用。',
@@ -5082,6 +5104,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.nothingToConsume': '沒有可吞噬的效果。',
     'error.nothingToDevour': '沒有可吞噬的法術效果。',
     'loot.rollWinnerOffline': '{winner}處於離線狀態；{item}已放回屍體。',
+    'loot.awardHeldOnCorpse': '你的背包已滿；{item}正在屍體上等你來取。',
     'log.channelInterrupted': '{mechanic}被打斷了！',
     'error.merchantUnavailable': '那名商人無法使用。',
     'error.notForSale': '那件物品非賣品。',
@@ -5517,6 +5540,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankWithdrawRefused': '해당 아이템은 길드 은행에서 꺼낼 수 없습니다.',
     'error.bankFull': '은행이 가득 찼습니다.',
     'error.bankOnlyMaterialsSpace': '은행에 남은 공간에는 재료만 보관할 수 있습니다.',
+    'error.bagsOnlyMaterialsSpace': '가방에 남은 공간에는 재료만 넣을 수 있습니다.',
     'error.bankStackIndivisible': '해당 묶음은 나눌 수 없어 은행에 남은 공간에 넣을 수 없습니다.',
     'error.bagsStackIndivisible': '해당 묶음은 나눌 수 없어 가방에 남은 공간에 넣을 수 없습니다.',
     'error.bankCannotAfford': '그 은행 확장을 구매할 돈이 부족합니다.',
@@ -5556,6 +5580,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.nothingToConsume': '소모할 효과가 없습니다.',
     'error.nothingToDevour': '삼킬 효과가 없습니다.',
     'loot.rollWinnerOffline': '{winner} 님이 오프라인 상태라 {item} 아이템이 시체로 돌아갔습니다.',
+    'loot.awardHeldOnCorpse':
+      '가방이 가득 찼습니다. {item} 아이템이 시체에서 당신을 기다리고 있습니다.',
     'log.channelInterrupted': '{mechanic} 시전이 중단되었습니다!',
     'error.merchantUnavailable': '그 상인은 지금 이용할 수 없습니다.',
     'error.notForSale': '그 아이템은 판매하지 않습니다.',
@@ -6003,6 +6029,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankWithdrawRefused': 'そのアイテムはギルド銀行から引き出せません。',
     'error.bankFull': '銀行がいっぱいです。',
     'error.bankOnlyMaterialsSpace': '銀行の残りのスペースには素材しか入りません。',
+    'error.bagsOnlyMaterialsSpace': 'バッグの残りのスペースには素材しか入りません。',
     'error.bankStackIndivisible':
       'そのスタックは分割できないため、銀行の残りのスペースに収まりません。',
     'error.bagsStackIndivisible':
@@ -6044,6 +6071,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.nothingToConsume': '消費できる効果がありません。',
     'error.nothingToDevour': '喰らう効果がありません。',
     'loot.rollWinnerOffline': '{winner}がオフラインだったため、{item}は死体に戻されました。',
+    'loot.awardHeldOnCorpse': 'バッグがいっぱいです。{item}は死体の上であなたを待っています。',
     'log.channelInterrupted': '{mechanic}が中断されました！',
     'error.merchantUnavailable': 'その商人は利用できません。',
     'error.notForSale': 'そのアイテムは売り物ではありません。',
@@ -6454,6 +6482,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.nothingToConsume': 'Não há nada para consumir.',
     'error.nothingToDevour': 'Não há nada para devorar.',
     'loot.rollWinnerOffline': '{winner} estava offline; {item} voltou para o cadáver.',
+    'loot.awardHeldOnCorpse':
+      'Suas bolsas estão cheias; {item} está esperando no cadáver por você.',
     'log.channelInterrupted': 'Interrupção de {mechanic}!',
     'error.merchantUnavailable': 'Esse comerciante não está disponível.',
     'error.notForSale': 'Esse item não está à venda.',
@@ -6531,6 +6561,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankQuestItem': 'Você não pode guardar itens de missão no banco.',
     'error.bankFull': 'Seu banco está cheio.',
     'error.bankOnlyMaterialsSpace': 'No espaço restante do seu banco só cabem materiais.',
+    'error.bagsOnlyMaterialsSpace': 'No espaço restante das suas bolsas só cabem materiais.',
     'error.bankStackIndivisible':
       'Essa pilha não pode ser dividida para caber no espaço restante do seu banco.',
     'error.bagsStackIndivisible':
@@ -6974,6 +7005,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankWithdrawRefused': 'Этот предмет нельзя забрать из банка гильдии.',
     'error.bankFull': 'Ваш банк полон.',
     'error.bankOnlyMaterialsSpace': 'В вашем банке осталось место только для материалов.',
+    'error.bagsOnlyMaterialsSpace': 'В ваших сумках осталось место только для материалов.',
     'error.bankStackIndivisible':
       'Эту стопку нельзя разделить, чтобы она поместилась в оставшееся место вашего банка.',
     'error.bagsStackIndivisible':
@@ -7016,6 +7048,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.nothingToConsume': 'Поглощать нечего.',
     'error.nothingToDevour': 'Пожирать нечего.',
     'loot.rollWinnerOffline': '{winner} не в сети; предмет {item} возвращён к трупу.',
+    'loot.awardHeldOnCorpse': 'Ваши сумки полны; предмет {item} ждёт вас на трупе.',
     'log.channelInterrupted': 'Действие «{mechanic}» прервано!',
     'error.merchantUnavailable': 'Этот торговец недоступен.',
     'error.notForSale': 'Этот предмет не продаётся.',
@@ -12289,6 +12322,10 @@ const RULES: Rule[] = [
   {
     re: /^(.+) was offline; (.+) returned to the corpse\.$/,
     build: (m) => tSim('loot.rollWinnerOffline', { winner: m[1], item: m[2] }),
+  },
+  {
+    re: /^Your bags are full; (.+) is waiting on the corpse for you\.$/,
+    build: (m) => tSim('loot.awardHeldOnCorpse', { item: m[1] }),
   },
   {
     re: /^(.+) bought your (.+) for (.+) [—-] collect (.+) from the Merchant\.$/,

@@ -89,8 +89,9 @@ export interface FinderEncounterViewModel {
   // partition one draw). Singles: independent authored chances.
   groups: FinderLootGroupView[];
   singles: FinderLootItemView[];
-  // Extra heroic-only groups appended on heroic difficulty (final boss only).
+  // Extra heroic-only groups appended on heroic difficulty.
   heroicGroups: FinderLootGroupView[];
+  heroicSingles: FinderLootItemView[];
 }
 
 export interface FinderActivityDetailView {
@@ -289,11 +290,13 @@ function buildEncounters(activity: FinderActivity): FinderEncounterViewModel[] {
     for (const e of loot)
       if (e.copper)
         copper += heroicFinale && e.heroicCopper !== undefined ? e.heroicCopper : e.copper;
+    const heroicLoot = heroicClaim
+      ? lootGroups(HEROIC_BOSS_LOOT[enc.mobId] ?? [])
+      : { groups: [], singles: [] };
     // Mirror the roller's heroic-append gate exactly: a heroic claim rolls
     // HEROIC_BOSS_LOOT for ANY encounter that has a table, finale or not
     // (loot_roll.ts reads the table by mob id with no finale condition), so
     // the preview must not hide a non-finale boss's heroic slot.
-    const heroicGroups = heroicClaim ? lootGroups(HEROIC_BOSS_LOOT[enc.mobId] ?? []).groups : [];
     out.push({
       mobId: enc.mobId,
       final: enc.final === true,
@@ -303,7 +306,8 @@ function buildEncounters(activity: FinderActivity): FinderEncounterViewModel[] {
       copper,
       groups,
       singles,
-      heroicGroups,
+      heroicGroups: heroicLoot.groups,
+      heroicSingles: heroicLoot.singles,
     });
   }
   return out;
@@ -320,7 +324,7 @@ export function finderLootItemIds(): string[] {
       for (const group of [...encounter.groups, ...encounter.heroicGroups]) {
         for (const item of group.items) ids.add(item.itemId);
       }
-      for (const item of encounter.singles) ids.add(item.itemId);
+      for (const item of [...encounter.singles, ...encounter.heroicSingles]) ids.add(item.itemId);
     }
   }
   return [...ids];

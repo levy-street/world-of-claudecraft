@@ -562,13 +562,19 @@ export const guideStrings = {
     ifTargetFrameScale: 'The size of your target frame.',
     ifPartyStyle:
       'The party layout: Automatic follows your group size, Classic is the traditional stack, and Raid packs everyone into the compact grid.',
+    ifPlayerHealthText:
+      'What your own health bar prints: nothing, a percentage, current health, current and maximum, or both with the percentage beside them.',
+    ifTargetHealthText:
+      'What the target and target-of-target health bars print, with the same choices as your own frame.',
     ifPartyHealthText:
-      'What the party bars print: nothing, a percentage, current health, or current and maximum.',
+      'What the party bars print: nothing, a percentage, current health, current and maximum, or both with the percentage beside them.',
     ifPartySort: 'The order party members are listed in: group order, role, or name.',
     ifPartyShowAuras:
       'Whether buffs and debuffs show on the party frames. Matching switches cover resource bars, absorbs, pets, and whether you appear in your own party list.',
     ifAurasOnPlayerFrame:
       'Puts your buffs and debuffs on your own unit frame as well as the aura bar.',
+    ifAuraBarBelowFrame:
+      'Moves the buff row below your unit frame instead of above it. Only matters while buffs are on the player frame.',
     ifAlwaysShowAllBuffs:
       'Shows every active buff even on the Low graphics preset, bypassing its usual buff-icon cap.',
     ifTargetOfTarget:
@@ -578,6 +584,8 @@ export const guideStrings = {
     ifChatOpacity: 'How solid the chat background is.',
     ifCompactChat: 'Tightens the chat lines so more of them fit.',
     ifChatTimestamps: 'Adds a time to each chat line, in 12-hour or 24-hour form.',
+    ifFilterProfanity:
+      'Masks profanity in chat with asterisks. On by default; switch it off here if you would rather read chat unfiltered.',
     ifStartAttack:
       'Whether using an ability also starts your auto-attack. On by default, and the classic behavior most players expect.',
     ifStopAutoAttack:
@@ -597,7 +605,7 @@ export const guideStrings = {
     // The Key Bindings panel: what lives there besides the key list.
     keybindsHeading: 'The Key Bindings panel',
     keybindsBody:
-      'The key list is only half of that panel. Above it sit the switches that decide how your mouse drives the game: mouse camera, whether the cursor locks while you rotate, click to move and which mouse button triggers it, attack move, the left-handed touch layout, and the profanity filter for chat.',
+      'The key list is only half of that panel. Above it sit the switches that decide how your mouse drives the game: mouse camera, whether the cursor locks while you rotate, click to move and which mouse button triggers it, attack move, and the left-handed touch layout.',
     keybindsMouseBody:
       'Two things there are easy to miss. Mouse buttons bind like keys, so the wheel click and the thumb buttons can carry abilities, while left and right click stay reserved for the camera and for clicking on the world. And you can bind straight from the action bar: turn on the on-bar binding mode here, then click a slot and press the key you want.',
   },
@@ -1871,7 +1879,7 @@ export const guideStrings = {
     // cooldown or timer lengths in the prose.
     resetTitle: 'Resetting your instances',
     resetBody:
-      'Switch difficulty while your group still holds claimed runs and the old claims linger for a while before clearing on their own. The party leader can let them go at once instead: choose Reset All Instances on their own portrait menu, or type /dungeon reset. A reset works only after the difficulty has actually been changed, only while nobody, living or fallen, remains inside, only once every corpse in there has been looted clean, and a short cooldown separates one reset from the next. Arrive at the door on the wrong difficulty and the game says so before the run starts. The raid is never reset this way; its own lockout rules stand.',
+      'Switch difficulty while your group still holds claimed runs and the old claims linger for a while before clearing on their own. The party leader can let them go at once instead: choose Reset All Instances on their own portrait menu, or type /dungeon reset. A reset works only after the difficulty has actually been changed, only while nobody, living or fallen, remains inside, only once every corpse in there has been looted clean, and a short cooldown separates one reset from the next. Arrive at the door on the wrong difficulty and the game says so before the run starts. The raid resets the same way, its own lockout and corpse-return rules still standing on top.',
 
     // Standalone, spoiler-safe lore for the Drowned Temple card (the goddess twist and any
     // boss names are withheld).

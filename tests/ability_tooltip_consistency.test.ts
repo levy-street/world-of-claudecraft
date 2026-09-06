@@ -201,7 +201,7 @@ function proseNumbers(description: string): number[] {
 }
 
 const PLACEHOLDERS = /\$([a-zA-Z])/g;
-const SUPPORTED = new Set(['d', 'o', 'b', 't', 'h', 'e', 'p', 'g', 's', 'a']);
+const SUPPORTED = new Set(['d', 'o', 'b', 't', 'h', 'e', 'p', 'g', 's', 'a', 'x', 'y', 'z']);
 
 describe('ability descriptions match their resolved effects', () => {
   const classes = Object.keys(CLASSES) as PlayerClass[];

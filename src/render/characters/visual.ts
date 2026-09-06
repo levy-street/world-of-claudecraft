@@ -97,6 +97,7 @@ import {
   weaponSkinOrientPin,
 } from './skin_attack';
 import { configureTightBoneTextures } from './skin_gpu_layout';
+import { applySkinnedCullBounds } from './skinned_cull_bounds';
 import { applySoulRendOverlay } from './soul_rend_overlay';
 import { soulRendPrewarmTargets } from './soul_rend_prewarm_core';
 import { createStowTransition, forceStow, requestStow, tickStow } from './stow_transition';
@@ -158,6 +159,10 @@ const BOW_PIN_BLEND_S = 0.12; // engage/disengage fade for the orientation pins
 
 const FADE = 0.22;
 const ONESHOT_FADE = 0.1;
+/** Near-instant crossfade for a `cutToIdle` visual: not zero, because three
+ *  needs a frame to hand the pose over cleanly, but short enough to read as a
+ *  hard stop. */
+const CUT_FADE = 0.02;
 /** Idle-breaker cadence (seconds): a floor plus a per-fire jitter, so several
  *  copies of the same rig standing together never fidget in lockstep.
  *
@@ -510,7 +515,7 @@ export class CharacterVisual {
       attachSharedDepthMaterials(decal, decal.material);
       decal.castShadow = this.shadowOn;
       decal.receiveShadow = false;
-      decal.frustumCulled = false;
+      applySkinnedCullBounds(decal, this.root, this.height);
       this.casters.push(decal);
       this.revealDecalOnCompile(decal);
     }
@@ -900,9 +905,11 @@ export class CharacterVisual {
         mesh.castShadow = castsShadow;
         mesh.receiveShadow = false;
         if (!castsShadow) return;
-        // skinned bounds drift outside bind-pose spheres; entity-level culling
-        // (80u draw range) already bounds the cost
-        if ((mesh as unknown as THREE.SkinnedMesh).isSkinnedMesh) mesh.frustumCulled = false;
+        // a padded sphere lets three cull this caster in each pass on its own
+        // question (the camera frustum, then the shadow camera's own ortho
+        // box), which a bind-pose sphere could not answer: skinned_cull_bounds
+        const skinned = mesh as unknown as THREE.SkinnedMesh;
+        if (skinned.isSkinnedMesh) applySkinnedCullBounds(skinned, this.root, this.height);
         this.casters.push(mesh);
       });
 
@@ -2044,7 +2051,7 @@ export class CharacterVisual {
       tintedFarMaterials(
         prep.def,
         this.entityColor,
-        farSourceMaterials(this.model, bake.isBody.length),
+        farSourceMaterials(this.model, bake.slots),
         bake.isBody,
         skinTexture(this.key, this.skinIndex),
         skinEmissiveTexture(this.key, this.skinIndex),
@@ -2482,7 +2489,7 @@ export class CharacterVisual {
       const mats = tintedFarMaterials(
         this.def,
         this.entityColor,
-        composed ? farSourceMaterials(this.model, composed.isBody.length) : prep.idleSrcMats,
+        composed ? farSourceMaterials(this.model, composed.slots) : prep.idleSrcMats,
         composed ? composed.isBody : prep.idleSrcIsBody,
         skinTexture(this.key, skinIndex),
         skinEmissiveTexture(this.key, skinIndex),
@@ -2725,9 +2732,15 @@ export class CharacterVisual {
         payload.traverse((o) => {
           const mesh = o as THREE.Mesh;
           if (!mesh.isMesh) return;
+          // cloneMaterialWithHooks, never a bare clone: a rig material carries
+          // the silhouette rim glow (assets.ts buildTintedClone), and
+          // Material.clone() drops onBeforeCompile. The bare clone therefore
+          // rendered the isolated weapon WITHOUT its rim AND, since three's
+          // default program cache key IS the hook source, linked a program the
+          // source had already linked. See ../material_clone_hooks.ts.
           mesh.material = Array.isArray(mesh.material)
-            ? mesh.material.map((m) => m.clone())
-            : mesh.material.clone();
+            ? mesh.material.map((m) => cloneMaterialWithHooks(m))
+            : cloneMaterialWithHooks(mesh.material);
           mesh.userData.weaponSkinIsolated = true;
           markOwnedWeaponSkinMaterials(mesh);
         });
@@ -2924,10 +2937,17 @@ export class CharacterVisual {
     // from it, so it must be kept rather than only pushed once.
     this.weaponVfxAuthored = weaponVfxTuningFor(skin.model, spec.tier);
     this.weaponVfxShed = 1;
+    // A skin whose hand-tuned row mutes the light (weapon_vfx_tuning.ts
+    // `light: 0`) gets no PointLight at all: built anyway it would hold one of
+    // the renderer's fixed counted point-light slots away from a light that
+    // actually shines, and pay a per-frame ancestor walk, while every update()
+    // drove its intensity straight back to zero.
+    const withLight = (this.weaponVfxAuthored.light ?? 1) > 0;
     for (const payload of payloads) {
       const handle = createWeaponVfx(payload, spec, {
         grounded: false,
         budgetedLight: this.budgetedWeaponLight,
+        withLight,
       });
       handle.setBackdropVisible(false);
       handle.setTuning(this.weaponVfxAuthored);
@@ -3175,7 +3195,8 @@ export class CharacterVisual {
       }
       mesh.castShadow = this.shadowOn;
       mesh.receiveShadow = false;
-      if ((mesh as unknown as THREE.SkinnedMesh).isSkinnedMesh) mesh.frustumCulled = false;
+      const skinned = mesh as unknown as THREE.SkinnedMesh;
+      if (skinned.isSkinnedMesh) applySkinnedCullBounds(skinned, this.root, this.height);
       this.originalMaterials.set(mesh, mesh.material);
       this.casters.push(mesh);
     });
@@ -3293,7 +3314,12 @@ export class CharacterVisual {
     // A winged form without an authored Jump clip must leave its locomotion
     // stride almost immediately. The normal crossfade preserves too much of a
     // forward-leaning Run pose after takeoff and reads as a frozen leap.
-    return this.key === 'form_metamorph' && next === 'jump' ? 0.04 : FADE;
+    if (this.key === 'form_metamorph' && next === 'jump') return 0.04;
+    // A wheeled vehicle stops turning its wheels the moment it stops moving.
+    // The outgoing clip keeps playing through a crossfade, so any real fade
+    // here spins the wheels on after the throttle is released.
+    if (this.def.cutToIdle && next === 'idle') return CUT_FADE;
+    return FADE;
   }
 
   private effectMaterial<T extends THREE.Material | THREE.Material[]>(material: T): T {

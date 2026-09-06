@@ -25,6 +25,7 @@ export const CONSTRAINED_PREWARM_KEEP: readonly string[] = [
   'views.persistent-portals',
   'views.nearby',
   'world.settle-state',
+  'post.initial-frame',
   'textures.scene',
   'programs.compile',
   'world.initial-frame',

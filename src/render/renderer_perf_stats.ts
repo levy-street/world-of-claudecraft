@@ -13,6 +13,7 @@ import type { FoliagePerfStats } from './foliage';
 import type { GfxBucketBands, GfxBucketLevels, GfxRuntimeBudget } from './gfx';
 import type { GpuPrepBudgetSnapshot } from './gpu_prep_budget_core';
 import type { GpuPrepEventsSnapshot } from './gpu_prep_events';
+import type { PostShedRung } from './post_shed_core';
 import type { RendererPrewarmStats } from './prewarm_compile_lifecycle';
 import type { RenderBudgetState } from './render_budget';
 import type { RenderDiagnosticsSnapshot } from './render_diagnostics';
@@ -20,6 +21,37 @@ import type { RendererFramePhaseMs, RendererWorldPhaseMs } from './renderer_fram
 import type { ZoneStreamingStats } from './zone_prepare_stats';
 
 export type RendererPhase = 'setup' | 'entities' | 'world' | 'nameplates' | 'submit' | 'total';
+
+/** The allocated 3D drawing buffer, beside the CSS viewport it covers.
+ *
+ *  Inside THIS block the pair is redundant (`width === floor(cssWidth *
+ *  pixelRatio)`: both canvas sizing sites go through one `setPixelRatio` plus
+ *  `setSize(viewport)`). It is reported because the FLEET REPORT cannot rebuild
+ *  it from its own columns: the beacon's `dpr` is the raw
+ *  `window.devicePixelRatio`, never the renderer's capped ratio, and its
+ *  viewport is `window.innerWidth`/`innerHeight`, never the canvas rect. So
+ *  this is the only field that says what a session rasterizes.
+ *
+ *  On the dynamic-resolution path (`dynamicResolution` true: the grade-only
+ *  composer, medium today) this is the ALLOCATION, held at the manual Render
+ *  Quality ceiling while the governor rasterizes a sub-rect of it. The live
+ *  extent is then this buffer times `effectiveRenderScale / renderScale`, both
+ *  of which the report already carries as their own columns; the factor is that
+ *  RATIO and not `effectiveRenderScale` alone, because the allocation already
+ *  contains the manual scale. Everywhere else the two are the same buffer. */
+export interface DrawingBufferStats {
+  /** The canvas backing store, in device pixels (`canvas.width`/`canvas.height`). */
+  width: number;
+  height: number;
+  /** The CSS viewport it covers, from the renderer's cached measurement. */
+  cssWidth: number;
+  cssHeight: number;
+  /** Whether the governor rasterizes a sub-rect of the allocation rather than
+   *  reallocating. Reported because it is NOT derivable downstream: it comes
+   *  from the post chain's pass list, not from the tier or the quality buckets,
+   *  and without it a backed-off session reads as if it drew at full size. */
+  dynamicResolution: boolean;
+}
 
 export type RendererPhaseStats = Record<
   RendererPhase,
@@ -88,9 +120,31 @@ export interface RendererPerfStats {
   effectiveRenderScale: number;
   renderBudget: RenderBudgetState;
   shadowCadenceHalfRate: boolean;
+  /** The budget-governed sun-shadow EXTENT shed (shadow_extent_core.ts), the
+   *  render knob a capture most easily forgets it was taken under: the ladder
+   *  step (0 is full quality), the multiplier it carries, and the half-extent
+   *  actually written onto the shadow camera in world units after the
+   *  world-space floor clamp. Two shadow-pass readings are only comparable at
+   *  the same step. */
+  shadowExtentStep: number;
+  shadowExtentScale: number;
+  shadowExtentHalf: number;
+  /** The live terrain-detail shed level (render_budget.ts `detail`,
+   *  terrain_detail_shed_core.ts): 1 = the tier's own static request, 0 =
+   *  high's profile; the `?terraindetail=` dev pin holds it. Surfaced beside
+   *  the cadence so a capture can tell a shed sample from a full one. */
+  terrainDetailLevel: number;
+  /** The deepest post-shed rung in force (post_shed_core.ts), `full` for
+   *  the tier's whole chain: what the pipeline actually applied for
+   *  `renderBudget.levels.post`, surfaced beside the cadence so a capture
+   *  can tell a shed sample from a full one. */
+  postShedRung: PostShedRung | 'full';
   pixelRatio: number;
   width: number;
   height: number;
+  /** The allocated drawing buffer (see DrawingBufferStats): what the fleet perf
+   *  report reads to say the resolution a session actually plays at. */
+  drawingBuffer: DrawingBufferStats;
   calls: number;
   triangles: number;
   geometries: number;
@@ -106,6 +160,11 @@ export interface RendererPerfStats {
   /** 0 = full day, 1 = deep night; the night-visibility layers key off it. */
   nightAmount: number;
   phaseMs: RendererPhaseStats;
+  /** Nameplate SURFACE accounting beside the `nameplates` phase timing above:
+   *  how many passes actually cleared and repainted the full-viewport plate
+   *  canvas, and how many were skipped because the frame would have produced
+   *  the same pixels (nameplate_paint_gate_core.ts). */
+  nameplates: { paints: number; paintsSkipped: number };
   renderDiagnostics: RenderDiagnosticsSnapshot;
   lastFrame?: RendererFrameStats;
   prewarm: RendererPrewarmStats | null;

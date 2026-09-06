@@ -57,3 +57,59 @@ describe('snap-to-grid alignment overlay', () => {
     expect(block).toContain('pointer-events: none;');
   });
 });
+
+// Regression pin for the buff-placement bug: the anchored buff row's
+// above/below side used to be keyed on #player-frame.pf-detached (whether the
+// player has ever dragged/nudged the frame, or loaded a saved position), so
+// moving the frame even once silently and permanently flipped the buffs below
+// it. It is now keyed on its OWN class (body.auras-below-frame), driven by the
+// dedicated auraBarBelowFrame setting (main.ts), never by the frame's move
+// state.
+describe('player frame buff-row placement (auraBarBelowFrame)', () => {
+  it('sits above the frame by default', () => {
+    const docked = ruleBlock('#player-frame > #buff-bar {');
+    expect(docked).toContain('bottom: calc(100% + 8px);');
+  });
+
+  it('flips below the frame only via its own body.auras-below-frame class', () => {
+    const below = ruleBlock('body.auras-below-frame #player-frame > #buff-bar {');
+    expect(below).toContain('top: calc(100% + 8px);');
+  });
+
+  it('never re-couples the buff row to the frame drag/detach state', () => {
+    const detached = ruleBlock(
+      'body.auras-on-frame.auras-below-frame #player-frame.pf-detached > #buff-bar {',
+    );
+    expect(detached).not.toMatch(/\b(?:top|bottom):/);
+  });
+
+  // A docked (never-dragged) frame has no z-index of its own, so before this
+  // fix "buffs below" only ever coexisted with pf-detached (which does carry
+  // z-index: 6): a docked frame flipped below is a combination this fix newly
+  // makes reachable, and without a matching z-index the flipped icon painted
+  // behind the action bar's buttons (same DOM-order stacking, no positioning
+  // to override it). The z-index lands on the row itself, not the whole
+  // frame, so the portrait/bars never get hoisted into a needless new
+  // stacking context. Caught via the PR screenshot capture, not a unit test.
+  it('lifts the flipped row (not the whole frame) above the action bar', () => {
+    const lifted = ruleBlock('body.auras-on-frame.auras-below-frame #player-frame > #buff-bar {');
+    expect(lifted).toContain('z-index: 6;');
+  });
+
+  // The docked 8px gap has no room to clear the action bar's first slot
+  // entirely without reflowing #actionbar-stack, so the row's visibility (via
+  // the z-index above) trades away its own clickability here: a click in the
+  // overlap reaches the action button underneath, never the buff icon. The
+  // action slot is the more safety-critical of the two.
+  it('lets clicks in the overlap reach the action bar, not the buff icon', () => {
+    const lifted = ruleBlock('body.auras-on-frame.auras-below-frame #player-frame > #buff-bar {');
+    expect(lifted).toContain('pointer-events: none;');
+  });
+
+  it('keeps detached buff icons interactive below the player frame', () => {
+    const detached = ruleBlock(
+      'body.auras-on-frame.auras-below-frame #player-frame.pf-detached > #buff-bar {',
+    );
+    expect(detached).toContain('pointer-events: auto;');
+  });
+});

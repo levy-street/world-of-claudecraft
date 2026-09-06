@@ -129,6 +129,12 @@ describe('perf report ingestion', () => {
         graphicsPreset: 'ultra',
         gfxTier: 'ultra',
         glRendererBucket: 'apple-m2',
+        // The renderer string used to be dropped after bucketing; it is stored
+        // as received now, beside its parsed family and form-factor verdict.
+        glRendererRaw: 'ANGLE (Apple, ANGLE Metal Renderer: Apple M2)',
+        glModel: 'apple-m2',
+        glLaptop: null,
+        gpuHpAdapter: '',
         browserFamily: 'safari',
         osFamily: 'macos',
         viewportBucket: 'large-1440x900',
@@ -437,12 +443,268 @@ describe('perf report ingestion', () => {
     );
   });
 
+  it('stores the graphics backend derived from the adapter name, beside the coarse bucket', async () => {
+    // The two fields answer different questions off the SAME string: the bucket
+    // says whose hardware, gl_backend says which API. This is the pin that the
+    // backend is read from body.glRenderer and NOT from the bucket, which has
+    // already discarded the API token for every recognised vendor.
+    vi.mocked(insertClientPerfReport).mockClear();
+    await handlePerfReport(
+      fakeReq(
+        {
+          sessionId: 'backend-d3d11',
+          glRenderer:
+            'ANGLE (NVIDIA, NVIDIA GeForce RTX 3090 (0x00002204) Direct3D11 vs_5_0 ps_5_0, D3D11)',
+          rawSummary: {},
+        },
+        { remoteAddress: '203.0.113.90' },
+      ),
+      fakeRes(),
+    );
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({ glRendererBucket: 'nvidia', glBackend: 'd3d11' }),
+    );
+
+    vi.mocked(insertClientPerfReport).mockClear();
+    await handlePerfReport(
+      fakeReq(
+        {
+          sessionId: 'backend-gles',
+          glRenderer: 'ANGLE (Qualcomm, Adreno (TM) 730, OpenGL ES 3.2)',
+          rawSummary: {},
+        },
+        { remoteAddress: '203.0.113.91' },
+      ),
+      fakeRes(),
+    );
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({ glBackend: 'opengl-es' }),
+    );
+
+    // A report with no adapter name stores 'unknown', never an empty string, so
+    // the grouped column never carries two spellings of the same absence.
+    vi.mocked(insertClientPerfReport).mockClear();
+    await handlePerfReport(
+      fakeReq({ sessionId: 'backend-absent', rawSummary: {} }, { remoteAddress: '203.0.113.92' }),
+      fakeRes(),
+    );
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({ glBackend: 'unknown' }),
+    );
+  });
+
   it('keeps GPU bucketing coarse', () => {
     expect(perfReportInternalsForTest.bucketGpu('Google SwiftShader')).toBe('software');
     expect(
       perfReportInternalsForTest.bucketGpu('ANGLE (Intel, Intel(R) Iris(TM) Plus Graphics 655)'),
     ).toBe('intel-iris');
     expect(perfReportInternalsForTest.bucketGpu('ANGLE (AMD Radeon Pro)')).toBe('amd');
+  });
+
+  it('stores the raw renderer string beside a parsed model and laptop verdict', async () => {
+    await handlePerfReport(
+      fakeReq(
+        {
+          sessionId: 'gpu-model-laptop',
+          glRenderer:
+            'ANGLE (NVIDIA, NVIDIA GeForce RTX 4070 Laptop GPU (0x000028A0) Direct3D11 vs_5_0 ps_5_0, D3D11-32.0.15.6094)',
+          rawSummary: {},
+        },
+        { remoteAddress: '203.0.113.90' },
+      ),
+      fakeRes(),
+    );
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({
+        // The vendor bucket stays coarse: this row and a desktop 3060 are the
+        // same 'nvidia' there, which is exactly why the model block exists.
+        glRendererBucket: 'nvidia',
+        glRendererRaw:
+          'ANGLE (NVIDIA, NVIDIA GeForce RTX 4070 Laptop GPU (0x000028A0) Direct3D11 vs_5_0 ps_5_0, D3D11-32.0.15.6094)',
+        glModel: 'nvidia-rtx-4070',
+        glLaptop: true,
+      }),
+    );
+  });
+
+  it('clamps the stored renderer string to the wire bound and never stores a client bucket', async () => {
+    const oversized = `ANGLE (NVIDIA, NVIDIA GeForce RTX 3060 ${'x'.repeat(400)})`;
+    await handlePerfReport(
+      fakeReq(
+        {
+          sessionId: 'gpu-model-clamp',
+          glRenderer: oversized,
+          // A hostile client cannot hand the server a family key: gl_model is
+          // parsed server-side from the renderer string, never accepted.
+          glModel: 'nvidia-rtx-4090',
+          glLaptop: true,
+          glRendererRaw: 'attacker supplied',
+          rawSummary: {},
+        },
+        { remoteAddress: '203.0.113.91' },
+      ),
+      fakeRes(),
+    );
+    const row = vi.mocked(insertClientPerfReport).mock.calls.at(-1)?.[0];
+    expect(row?.glRendererRaw).toBe(oversized.slice(0, 160));
+    expect(row?.glRendererRaw.length).toBe(160);
+    expect(row?.glModel).toBe('nvidia-rtx-3060');
+    expect(row?.glLaptop).toBe(false);
+  });
+
+  it('buckets the WebGPU high-performance adapter with the same parser, and stores nothing without one', async () => {
+    await handlePerfReport(
+      fakeReq(
+        {
+          sessionId: 'gpu-hp-adapter',
+          glRenderer: 'ANGLE (Intel, Intel(R) Iris(R) Xe Graphics (0x000046A6) Direct3D11)',
+          // The mismatch this column exists to find: the page renders on the
+          // iGPU while the high-performance adapter names a discrete part.
+          // This is the adapter text a browser that fills description hands
+          // over (Chrome behind WebGPUDeveloperFeatures, and the shape the
+          // spec allows); the default-Chrome shape is the next test.
+          gpuHpAdapter: 'NVIDIA NVIDIA GeForce RTX 4070 Laptop GPU',
+          rawSummary: {},
+        },
+        { remoteAddress: '203.0.113.92' },
+      ),
+      fakeRes(),
+    );
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({ glModel: 'intel-iris-xe', gpuHpAdapter: 'nvidia-rtx-4070' }),
+    );
+
+    // A client with no WebGPU (or one older than the probe) stores '', not the
+    // 'other' key: the summary reads '' as "no evidence" and skips the row.
+    await handlePerfReport(
+      fakeReq(
+        { sessionId: 'gpu-hp-adapter-absent', glRenderer: 'Mali-G78 MP20', rawSummary: {} },
+        { remoteAddress: '203.0.113.93' },
+      ),
+      fakeRes(),
+    );
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({ glModel: 'arm-mali-g78', glLaptop: null, gpuHpAdapter: '' }),
+    );
+  });
+
+  it('stores the vendor-only key a DEFAULT Chrome adapter yields, beside a model-level renderer', async () => {
+    // What a normal page actually reads. Chrome populates GPUAdapterInfo.device
+    // and .description only behind its WebGPUDeveloperFeatures runtime flag, so
+    // describeGpuAdapterInfo joins vendor and architecture and nothing else:
+    // "apple metal-3" beside a WebGL string that parses to 'apple-m4-pro'. The
+    // two keys are DIFFERENT on a machine with ONE GPU, which is why the
+    // summary compares their leading vendor segment and not the whole key
+    // (server/admin_db.ts, pinned in tests/server/client_perf_summary_sql.test.ts).
+    const singleGpuMachines: [string, string, string, string][] = [
+      [
+        'chrome-adapter-apple',
+        'ANGLE (Apple, ANGLE Metal Renderer: Apple M4 Pro, Unspecified Version)',
+        'apple metal-3',
+        'apple',
+      ],
+      [
+        'chrome-adapter-nvidia',
+        'ANGLE (NVIDIA, NVIDIA GeForce RTX 4070 (0x00002786) Direct3D11 vs_5_0 ps_5_0, D3D11)',
+        'nvidia ampere',
+        'nvidia',
+      ],
+      [
+        'chrome-adapter-intel',
+        'ANGLE (Intel, Intel(R) Iris(R) Xe Graphics (0x000046A6) Direct3D11)',
+        'intel gen-12lp',
+        'intel',
+      ],
+      [
+        'chrome-adapter-amd',
+        'ANGLE (AMD, AMD Radeon RX 6700 XT (0x000073DF) Direct3D11 vs_5_0 ps_5_0, D3D11)',
+        'amd rdna-2',
+        'amd',
+      ],
+    ];
+    for (const [sessionId, glRenderer, gpuHpAdapter, vendor] of singleGpuMachines) {
+      await handlePerfReport(
+        fakeReq(
+          { sessionId, glRenderer, gpuHpAdapter, rawSummary: {} },
+          { remoteAddress: '203.0.113.96' },
+        ),
+        fakeRes(),
+      );
+      const row = vi.mocked(insertClientPerfReport).mock.calls.at(-1)?.[0];
+      // Vendor-only on the adapter side, model-level on the renderer side.
+      expect(row?.gpuHpAdapter).toBe(vendor);
+      expect(row?.glModel).not.toBe(vendor);
+      expect(row?.glModel.split('-')[0]).toBe(vendor);
+    }
+  });
+
+  it('strips control characters so a NUL-bearing beacon still inserts', async () => {
+    // Postgres REJECTS U+0000 in a text parameter, so one NUL anywhere in a
+    // renderer or vendor string used to fail the whole INSERT and lose the
+    // entire report, not just the offending field. The sanitizer strips C0 and
+    // DEL from every text field rather than rejecting the beacon, on the same
+    // principle as every other clamp here.
+    await handlePerfReport(
+      fakeReq(
+        {
+          sessionId: 'gpu-model-control-chars',
+          glRenderer: 'ANGLE (NVIDIA,' + '\u0000' + ' NVIDIA GeForce RTX 3060 (0x00002504))',
+          glVendor: 'NVIDIA' + '\u007f' + 'Corporation',
+          gpuHpAdapter: 'NVIDIA' + '\u0007' + ' GeForce RTX 3060',
+          // raw_summary is jsonb, and jsonb rejects the NUL escape exactly as a
+          // text parameter rejects the character: a beacon controls both the
+          // KEYS and the values here, and no field clamp above sees either.
+          rawSummary: {
+            ['zone\u0000name']: 'eastbrook\u0000town',
+            nested: ['a\u0000b', { deep: 'c\u0000d' }],
+          },
+        },
+        { remoteAddress: '203.0.113.95' },
+      ),
+      fakeRes(),
+    );
+    const row = vi.mocked(insertClientPerfReport).mock.calls.at(-1)?.[0];
+    const hasControl = (text: string | undefined): boolean =>
+      [...(text ?? '')].some((ch) => {
+        const code = ch.charCodeAt(0);
+        return code < 0x20 || code === 0x7f;
+      });
+    // Nothing a text column cannot hold reaches the insert...
+    for (const field of [row?.glRendererRaw, row?.glVendor, row?.glModel, row?.gpuHpAdapter]) {
+      expect(hasControl(field)).toBe(false);
+    }
+    // The helper is decisive on its own, including the NUL Postgres rejects.
+    expect(perfReportInternalsForTest.stripControlChars('a\u0000b\u001fc\u007fd')).toBe('abcd');
+    expect(perfReportInternalsForTest.stripControlChars('clean text')).toBe('clean text');
+    // ...and stripping costs nothing downstream: the model still resolves off
+    // the cleaned string rather than falling back to the vendor-only key.
+    expect(row?.glRendererRaw).toBe('ANGLE (NVIDIA, NVIDIA GeForce RTX 3060 (0x00002504))');
+    expect(row?.glVendor).toBe('NVIDIACorporation');
+    expect(row?.glModel).toBe('nvidia-rtx-3060');
+    expect(row?.gpuHpAdapter).toBe('nvidia-rtx-3060');
+    // The jsonb blob too, keys included, at every depth.
+    expect(JSON.stringify(row?.rawSummary)).not.toContain('\\u0000');
+    expect(row?.rawSummary).toEqual({
+      zonename: 'eastbrooktown',
+      nested: ['ab', { deep: 'cd' }],
+    });
+  });
+
+  it('stores empty model dimensions when the client sends no renderer string at all', async () => {
+    await handlePerfReport(
+      fakeReq({ sessionId: 'gpu-model-absent', rawSummary: {} }, { remoteAddress: '203.0.113.94' }),
+      fakeRes(),
+    );
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({
+        // '' rather than the 'other' key, so a grouped read tells a report with
+        // no renderer apart from one whose GPU could not be recognised.
+        glRendererRaw: '',
+        glModel: '',
+        glLaptop: null,
+        gpuHpAdapter: '',
+      }),
+    );
   });
 
   it('drops duplicate inserts from the same session inside the server throttle window', async () => {
@@ -1280,6 +1542,88 @@ describe('perf report ingestion', () => {
     );
     const stored = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0];
     expect((stored.rawSummary as Record<string, unknown>).oversized).toBeUndefined();
+  });
+
+  it('keeps the drawing buffer block, verbatim and across truncation', async () => {
+    const drawingBuffer = {
+      width: 1728,
+      height: 1080,
+      cssWidth: 1440,
+      cssHeight: 900,
+      dynamicResolution: true,
+    };
+
+    const kept = fakeRes();
+    await handlePerfReport(
+      fakeReq({
+        sessionId: 'drawing-buffer-kept',
+        rawSummary: { seconds: 30, rendererDrawingBuffer: drawingBuffer },
+      }),
+      kept,
+    );
+    expect(kept.statusCode).toBe(200);
+    const stored = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0];
+    expect((stored.rawSummary as Record<string, unknown>).rendererDrawingBuffer).toEqual(
+      drawingBuffer,
+    );
+    expect((stored.rawSummary as Record<string, unknown>).truncated).toBeUndefined();
+
+    // The block is what says at what resolution a fleet actually plays, and an
+    // oversized report is exactly the session whose resolution is worth reading,
+    // so the compact path names it too.
+    const truncated = fakeRes();
+    await handlePerfReport(
+      fakeReq({
+        sessionId: 'drawing-buffer-truncated',
+        rawSummary: {
+          seconds: 30,
+          rendererDrawingBuffer: drawingBuffer,
+          oversized: 'x'.repeat(40_000),
+        },
+      }),
+      truncated,
+    );
+    expect(truncated.statusCode).toBe(200);
+    const compacted = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0].rawSummary as Record<
+      string,
+      unknown
+    >;
+    expect(compacted.truncated).toBe(true);
+    expect(compacted.rendererDrawingBuffer).toEqual(drawingBuffer);
+    expect(compacted.oversized).toBeUndefined();
+  });
+
+  it('field-shapes the drawing buffer rather than storing what was posted', () => {
+    const { rawSummary, DRAWING_BUFFER_RAW_PIXELS_MAX } = perfReportInternalsForTest;
+
+    // Every retained key of the compact path is copied verbatim, so "four
+    // scalars" has to be enforced at the ingest, not trusted. A hostile block
+    // keeps exactly four clamped integers and loses its extra members.
+    const hostile = rawSummary({
+      rendererDrawingBuffer: {
+        width: 1e308,
+        height: -5,
+        cssWidth: '1440.7',
+        cssHeight: { nested: 'x'.repeat(4000) },
+        extra: 'x'.repeat(4000),
+        list: new Array(500).fill('x'),
+      },
+    });
+    expect(hostile.rendererDrawingBuffer).toEqual({
+      width: DRAWING_BUFFER_RAW_PIXELS_MAX,
+      height: 0,
+      cssWidth: 1440,
+      cssHeight: 0,
+      dynamicResolution: false,
+    });
+
+    // A non-record block is dropped, never stored as whatever was sent.
+    expect(rawSummary({ rendererDrawingBuffer: 'x'.repeat(4000) })).not.toHaveProperty(
+      'rendererDrawingBuffer',
+    );
+    expect(rawSummary({ rendererDrawingBuffer: [1, 2, 3] })).not.toHaveProperty(
+      'rendererDrawingBuffer',
+    );
   });
 
   it('stores the GPU queue block bounded, and keeps it when raw summaries are truncated (#3167)', async () => {

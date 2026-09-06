@@ -252,6 +252,8 @@ export interface MountTransitionInputs {
    *  no authored take. */
   summonCall(): void;
   engineReset(): void;
+  /** Warm the mount's own summon take on the channel start edge. */
+  preloadSummon(mountKey: string): void;
   preloadEngine(mountKey: string): void;
 }
 
@@ -272,6 +274,7 @@ export function syncMountTransitionFx(
   // effect is the completion glow below.
   if (x.mountCasting && !v.wasMountCasting && x.mountCastKey !== '' && x.poseAllowed) {
     x.playCallPose(x.mountCastRemaining);
+    x.preloadSummon(x.mountCastKey);
   }
   // mountKey change = summon completed, dismount completed, or a live swap: fire
   // the shimmer at the rider. Tracked separately from mountVisualKey, which lags
@@ -285,7 +288,6 @@ export function syncMountTransitionFx(
     // mount's call. lastMountKey is seeded from the entity's current state at
     // view creation, so a rider already mounted when they enter interest range
     // (or at login) never reaches this edge and stays silent.
-    if (x.mountKey !== '') x.summonCall();
     // A mountKey change (dismount, a live mount swap, or a fresh summon reusing
     // this entity id) must drop any engine mount's windup/loop state; otherwise
     // the old loop node stays connected forever once logicallyMounted goes false
@@ -293,6 +295,7 @@ export function syncMountTransitionFx(
     // or dismount), and a swap would carry the old moving state into the new
     // mount, skipping its windup.
     x.engineReset();
+    if (x.mountKey !== '') x.summonCall();
     // Warm the new mount's engine clips right away (not e.g. lazily on the first
     // movement frame): a cold first ride otherwise plays the windup through
     // playAt's cold path (silently dropped past a 0.12s fetch/decode window) and

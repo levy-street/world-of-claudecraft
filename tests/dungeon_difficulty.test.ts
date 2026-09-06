@@ -45,6 +45,7 @@ describe('heroic tuning data contract', () => {
       'gravewyrm_sanctum',
       'hollow_crypt',
       'ignivar_forge_approach',
+      'ignivar_forge_lift',
       'ignivar_inner_crucible',
       'ignivar_molten_assembly',
       'ignivar_raid_arena',

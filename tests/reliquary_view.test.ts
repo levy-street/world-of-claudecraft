@@ -20,7 +20,7 @@ import { CURATOR_RANK_DEFS, type CuratorRankDef } from '../src/sim/reliquary';
 import type { DeedDef } from '../src/sim/types';
 import { deedName } from '../src/ui/deed_i18n';
 import { dungeonDisplayName, tEntity, zoneDisplayName } from '../src/ui/entity_i18n';
-import { getLanguage, languageTag } from '../src/ui/i18n';
+import { getLanguage, languageTag, t } from '../src/ui/i18n';
 import { MOUNT_NAME_KEYS } from '../src/ui/mount_labels';
 import {
   reliquaryRelicDisplayName,
@@ -2187,6 +2187,33 @@ describe('reliquarySourceLinePlan', () => {
     ).toEqual([{ kind: 'activity', activityId: 'corpse_harvest' }]);
   });
 
+  it('rides the vendor line only when the gate is a real restriction', () => {
+    const hints = [{ sourceKind: 'vendor', sourceId: 'brother_halven_marsh' }] as const;
+    expect(reliquarySourceLinePlan(hints, undefined, 'heroicClear')).toEqual([
+      { kind: 'vendor', npcId: 'brother_halven_marsh', gate: 'heroicClear' },
+    ]);
+    expect(reliquarySourceLinePlan(hints, undefined, 'clears:3')).toEqual([
+      { kind: 'vendor', npcId: 'brother_halven_marsh', gate: 'clears:3' },
+    ]);
+    // 'available' is not a restriction worth naming, and neither is an item no
+    // shop table stocks (undefined): both must leave the plain vendor line
+    // untouched, not append a hollow gate.
+    expect(reliquarySourceLinePlan(hints, undefined, 'available')).toEqual([
+      { kind: 'vendor', npcId: 'brother_halven_marsh' },
+    ]);
+    expect(reliquarySourceLinePlan(hints, undefined)).toEqual([
+      { kind: 'vendor', npcId: 'brother_halven_marsh' },
+    ]);
+    // A non-vendor hint in the same call must never pick up the gate.
+    expect(
+      reliquarySourceLinePlan(
+        [{ sourceKind: 'boss', sourceId: 'thunzharr' }],
+        undefined,
+        'heroicClear',
+      ),
+    ).toEqual([{ kind: 'boss', bossId: 'thunzharr' }]);
+  });
+
   it('answers the empty list with no hints (an un-authored source renders no line)', () => {
     const empty = reliquarySourceLinePlan([], { kind: 'dungeon', dungeonId: 'crypt' });
     expect(empty).toEqual([]);
@@ -2379,11 +2406,133 @@ describe('grid cell source plans', () => {
     expect(cells[0].sourcePlans).toEqual([{ kind: 'zone', zoneId: 'synthetic_zone' }]);
   });
 
+  it("resolves an item relic's live DELVE_SHOPS gate onto its vendor plan, on the page's OWN delve", () => {
+    // A relic itemId that the page's OWN delve stocks behind heroicClear picks
+    // up the gate automatically; one no shop stocks does not.
+    const gated: ReliquaryPageDef = {
+      ...page,
+      id: 'gated_vendor_page',
+      clearSource: { kind: 'delve', delveId: 'drowned_litany' },
+      relics: [
+        {
+          kind: 'item',
+          itemId: 'sister_nhalia_choir_plate',
+          source: { sourceKind: 'vendor', sourceId: 'brother_halven_marsh' },
+        },
+        { kind: 'item', itemId: 'own_hint', source: { sourceKind: 'vendor', sourceId: 'vex' } },
+      ],
+    };
+    const cells = buildReliquaryPageCells(gated, { itemsDiscovered: ownedSet() });
+    expect(cells[0].sourcePlans).toEqual([
+      { kind: 'vendor', npcId: 'brother_halven_marsh', gate: 'heroicClear' },
+    ]);
+    // 'vex' stocks nothing under 'own_hint': unaffected, same as before.
+    expect(cells[1].sourcePlans).toEqual([{ kind: 'vendor', npcId: 'vex' }]);
+  });
+
+  it("never names a gate from a delve OTHER than the page's own clearSource", () => {
+    // Same real shop item, real heroicClear gate, but the page claims a
+    // DIFFERENT delve (or no delve at all): the lookup is keyed on both ids,
+    // so a page must never borrow another delve's vendor's gate.
+    const wrongDelve: ReliquaryPageDef = {
+      ...page,
+      id: 'wrong_delve_page',
+      clearSource: { kind: 'delve', delveId: 'collapsed_reliquary' },
+      relics: [
+        {
+          kind: 'item',
+          itemId: 'sister_nhalia_choir_plate',
+          source: { sourceKind: 'vendor', sourceId: 'brother_halven_marsh' },
+        },
+      ],
+    };
+    expect(
+      buildReliquaryPageCells(wrongDelve, { itemsDiscovered: ownedSet() })[0].sourcePlans,
+    ).toEqual([{ kind: 'vendor', npcId: 'brother_halven_marsh' }]);
+
+    // The shared `page` fixture's own clearSource (a dungeon, not a delve):
+    // no gate note, even though the item id is real delve-shop stock.
+    const noDelveClearSource: ReliquaryPageDef = {
+      ...page,
+      id: 'no_delve_clear_source_page',
+      relics: [
+        {
+          kind: 'item',
+          itemId: 'sister_nhalia_choir_plate',
+          source: { sourceKind: 'vendor', sourceId: 'brother_halven_marsh' },
+        },
+      ],
+    };
+    expect(
+      buildReliquaryPageCells(noDelveClearSource, { itemsDiscovered: ownedSet() })[0].sourcePlans,
+    ).toEqual([{ kind: 'vendor', npcId: 'brother_halven_marsh' }]);
+  });
+
   it('omits the plans entirely for an un-hinted relic on an un-hinted page', () => {
     // Undefined, never an empty array: a truthiness test and a length test on
     // the cell have to agree (the painter stamps the count off this field).
     const bare = buildReliquaryPageCells(sizedPage('bare', 1), { itemsDiscovered: ownedSet() });
     expect(bare[0].sourcePlans).toBeUndefined();
+  });
+});
+
+describe('The Drowned Litany reliquary page names the Marks vendor gate (live catalog)', () => {
+  // Closes the loop on a real player report: the page's "Sold by Brother
+  // Halven" line for the two Marks-only signature rares read as an ordinary,
+  // always-buyable row even though both sit behind a Heroic clear on the
+  // ACTUAL vendor. Once the Litany shop also started stocking eight
+  // Heroic-gated tool items on that same price rung (0991d68e78), a player
+  // who had not cleared Heroic could not find either rare among a wall of
+  // "Requires a Heroic clear" tool rows and read it as removed. The catalog
+  // and shop data were never wrong (tests/reliquary_content.test.ts,
+  // tests/delve_shop.test.ts); this pins the missing UX signal on the page.
+  const page = RELIQUARY_PAGES_BY_ID.conquerors_drowned_litany;
+
+  it('names the Heroic clear on the two Marks-only relics, missing or owned', () => {
+    const cells = buildReliquaryPageCells(page, { itemsDiscovered: ownedSet() });
+    for (const id of ['sister_nhalia_choir_plate', 'drowned_choir_fang']) {
+      const cell = cells.find((c) => c.id === id)!;
+      expect(cell.sourcePlans, id).toEqual([
+        { kind: 'vendor', npcId: 'brother_halven_marsh', gate: 'heroicClear' },
+      ]);
+      expect(reliquarySourceLines(cell.sourcePlans)[0], id).toContain(t('delveUi.shop.reqHeroic'));
+    }
+  });
+
+  it('leaves the six delve-drop relics on this page unaffected', () => {
+    const cells = buildReliquaryPageCells(page, { itemsDiscovered: ownedSet() });
+    for (const id of [
+      'nhalias_bell_maul',
+      'widow_silk_hood',
+      'nhalias_litany_rod',
+      'blackwater_vanguard_chest',
+      'siltstep_leggings',
+      'sunken_reliquary_hood',
+    ]) {
+      const cell = cells.find((c) => c.id === id)!;
+      expect(cell.sourcePlans, id).toEqual([{ kind: 'delve', delveId: 'drowned_litany' }]);
+    }
+  });
+});
+
+describe('The Collapsed Reliquary page names the same gate (live catalog)', () => {
+  // The entry-tier delve shares the exact same shape: two signature rares on
+  // a heroicClear Marks rung, named by the page's own clearSource.delveId.
+  // Unlike the Litany's two Marks-only rares, these two ALSO drop from the
+  // lockpick chest, so each carries a delve line ahead of its vendor line.
+  const page = RELIQUARY_PAGES_BY_ID.conquerors_collapsed_reliquary;
+
+  it('names the Heroic clear on the vendor line, alongside the chest line', () => {
+    const cells = buildReliquaryPageCells(page, { itemsDiscovered: ownedSet() });
+    for (const id of ['deacon_reliquary_helm', 'varric_shadow_cowl']) {
+      const cell = cells.find((c) => c.id === id)!;
+      expect(cell.sourcePlans, id).toEqual([
+        { kind: 'delve', delveId: 'collapsed_reliquary' },
+        { kind: 'vendor', npcId: 'brother_halven', gate: 'heroicClear' },
+      ]);
+      const lines = reliquarySourceLines(cell.sourcePlans);
+      expect(lines[1], id).toContain(t('delveUi.shop.reqHeroic'));
+    }
   });
 });
 
@@ -2446,6 +2595,40 @@ describe('search and ownership filter', () => {
     const filtered = buildReliquaryView(filterInput({ ownedFilter: 'missing' }));
     expect(filtered.pageDetail?.owned).toBe(1);
     expect(filtered.pageDetail?.total).toBe(3);
+  });
+
+  it('hides illuminated pages from the shelf list on the Missing chip, and keeps only them on Catalogued', () => {
+    // A completionist reads the shelf to learn what is LEFT: with the chip on
+    // Missing an illuminated page (every relic catalogued) drops out of the
+    // list, and Catalogued is the mirror. Both leave the open page untouched.
+    const done: ReliquaryPageDef = {
+      ...page,
+      id: 'done_page',
+      relics: [{ kind: 'item', itemId: 'gilded_crown' }],
+    };
+    const both = (partial: Partial<ReliquaryViewInput> = {}) =>
+      filterInput({ pages: [page, done], pageId: null, ...partial });
+    expect(buildReliquaryView(both()).shelfPages.map((p) => p.pageId)).toEqual([
+      'filter_page',
+      'done_page',
+    ]);
+    const missing = buildReliquaryView(both({ ownedFilter: 'missing' }));
+    expect(missing.shelfPages.map((p) => p.pageId)).toEqual(['filter_page']);
+    expect(missing.filtered).toBe(true);
+    const owned = buildReliquaryView(both({ ownedFilter: 'owned' }));
+    expect(owned.shelfPages.map((p) => p.pageId)).toEqual(['done_page']);
+    expect(owned.filtered).toBe(true);
+    // A chip that hides nothing narrows nothing, so no announcement fires.
+    const all = buildReliquaryView(both({ ownedFilter: 'all' }));
+    expect(all.filtered).toBe(false);
+    // The chip and the needle intersect on the shelf exactly as on a grid.
+    const crossed = buildReliquaryView(both({ ownedFilter: 'owned', search: 'zzz' }));
+    expect(crossed.shelfPages).toEqual([]);
+    expect(crossed.filtered).toBe(true);
+    // Shelf sums stay the shelf's true completion: the rail never lies under a chip.
+    const shelf = missing.shelves.find((s) => s.id === 'conquerors');
+    expect(shelf?.owned).toBe(2);
+    expect(shelf?.total).toBe(4);
   });
 
   it('narrows the shelf list by localized page name but still opens the active page', () => {
@@ -2683,6 +2866,33 @@ describe('reliquarySourceLineText', () => {
     expect(reliquarySourceLineText({ kind: 'deed', deedId })).toBe(
       `Awarded by the deed ${deedName(deedId)}`,
     );
+  });
+
+  it("names the unlock condition on a gated vendor line, in the shop badge's own words", () => {
+    const vendor = tEntity({ kind: 'npc', id: 'heroic_quartermaster', field: 'name' });
+    expect(
+      reliquarySourceLineText({
+        kind: 'vendor',
+        npcId: 'heroic_quartermaster',
+        gate: 'heroicClear',
+      }),
+    ).toBe(`Sold by ${vendor} (${t('delveUi.shop.reqHeroic')})`);
+    expect(
+      reliquarySourceLineText({ kind: 'vendor', npcId: 'heroic_quartermaster', gate: 'clears:3' }),
+    ).toBe(`Sold by ${vendor} (${t('delveUi.shop.reqClears', { count: '3' })})`);
+    // 'available' and no gate at all both fall back to the plain line, never a
+    // hollow "()" suffix.
+    expect(
+      reliquarySourceLineText({ kind: 'vendor', npcId: 'heroic_quartermaster', gate: 'available' }),
+    ).toBe(`Sold by ${vendor}`);
+    expect(reliquarySourceLineText({ kind: 'vendor', npcId: 'heroic_quartermaster' })).toBe(
+      `Sold by ${vendor}`,
+    );
+    // An unresolvable vendor id stays silent regardless of gate: the id, not
+    // the gate, decides whether the relic gets a line at all.
+    expect(
+      reliquarySourceLineText({ kind: 'vendor', npcId: 'merchant_nobody', gate: 'heroicClear' }),
+    ).toBe('');
   });
 
   it('names a craft and a gathering profession, and stays silent off both tables', () => {

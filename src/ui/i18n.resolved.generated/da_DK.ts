@@ -570,9 +570,9 @@ export const da_DK: EnTranslations = {
       "tabsLabel": "Sektioner i WOC-butikken",
       "storeTab": "Butik",
       "rewardsTab": "Daglige belønninger",
-      "mountsEyebrow": "Account Mounts",
-      "mountsTitle": "Machine Stable",
-      "mountBuyAria": "Purchase {item}",
+      "mountsEyebrow": "Kontomontering",
+      "mountsTitle": "Maskinstabil",
+      "mountBuyAria": "Køb {item}",
       "loading": "Indlæser WOC-butikken...",
       "error": "WOC-butikken er ikke tilgængelig lige nu. Prøv igen om lidt.",
       "balance": "Claudium-saldo",
@@ -978,6 +978,7 @@ export const da_DK: EnTranslations = {
       "mounts": "Ridedyr",
       "professions": "Erhverv",
       "reliquary": "Relikvarium",
+      "lootExplorer": "Bytteoversigt",
       "nameplates": "Navne",
       "haptics": "Haptik",
       "hapticsOff": "Haptik fra",
@@ -1141,6 +1142,9 @@ export const da_DK: EnTranslations = {
       "promptAttack": "Angrib",
       "promptUseAbility": "Brug evne",
       "promptKneel": "Knæl",
+      "promptAccessInterface": "Åbn brugerfladen",
+      "promptMoveToTarget": "Gå til {target}",
+      "promptSelectItem": "Vælg {item}",
       "promptOpenBags": "Åbn dine tasker",
       "promptCharacterSheet": "Åbn dit karakterark",
       "promptLookAround": "Hold højreklik nede, og træk for at se dig omkring",
@@ -1308,9 +1312,9 @@ export const da_DK: EnTranslations = {
       "regroup": "Saml {meter} igen"
     },
     "targetDots": {
-      "title": "Target Dots",
-      "row": "{aura} on {target}",
-      "overflow": "{count} more not shown"
+      "title": "Mål prikker",
+      "row": "{aura} på {target}",
+      "overflow": "{count} mere ikke vist"
     },
     "targetAuras": {
       "title": "Målets auraer",
@@ -1393,11 +1397,13 @@ export const da_DK: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage Skyggehop-Tudsen",
       "name_stormfeather_griffin": "Himmelrækkende Stormfjer",
       "name_thunderstrut_gobbler": "Tordenspanker den Store Kalkun",
+      "name_goblin_rocket_sled": "Goblin-raketslæde",
+      "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Skrækgnist, jordrysteren",
       "name_drakemaw_raptor": "Dragegabets Raptor",
-      "name_mech_bird": "Cluckwork Mech Bird",
-      "name_lanternback_troll": "Grumbol the Lanternback",
-      "name_chimeglass_tortoise": "Tolliver the Chimeglass",
+      "name_mech_bird": "Cluckwork-mekafugl",
+      "name_lanternback_troll": "Lanternryggen Grumbol",
+      "name_chimeglass_tortoise": "Tolliver kimeglasset",
       "name_rickshaw_mount": "Knogebundet Rickshaw",
       "desc_valorsteed": "En hårdfør, sikker ganger, der giver øget rejsehastighed.",
       "desc_grag_bear": "En hårdfør, sikker bjørn, der giver øget rejsehastighed.",
@@ -1406,11 +1412,13 @@ export const da_DK: EnTranslations = {
       "desc_shadowjump_toad": "En enorm, sikker kæmpetudse, trænet i lynhurtige skyggehop, der dækker ethvert terræn.",
       "desc_stormfeather_griffin": "En kongelig stormgrif, der bevæger sig hen over jorden på runebeslåede kløer, med sammenfoldede vinger.",
       "desc_thunderstrut_gobbler": "En kolossal, stormudklækket kalkun, der spankulerer ned fra Den Opvågnende Tinde, med halen udfoldet som en tordensky.",
+      "desc_goblin_rocket_sled": "En farligt overbygget goblinslæde, drevet af to raketter og fremragende dårlig dømmekraft.",
+      "desc_rallycart_rxt": "En lille rallymaskine, der øger rejsehastigheden.",
       "desc_terrorspark_groundshaker": "En kompakt panseret maskine med tunge larvebånd, en grovkalibret kanon og en saddel bygget til frygtløse førere.",
       "desc_drakemaw_raptor": "En saddelvant yngelraptor fra Dragegabets Caldera, kun sener og spurt, som stadig lugter svagt af aske.",
-      "desc_mech_bird": "A hand-built clockwork war chicken that sprints on snapping servos, wind-up key still turning.",
-      "desc_lanternback_troll": "A hill troll broken to the yoke by lamplighters, carrying an iron throne across his shoulders with a storm lantern burning on either arm.",
-      "desc_chimeglass_tortoise": "A salt-flat tortoise who has outwalked three generations of caravans. Tinkers ground him spectacles from storm-glass and hung a bronze bell at his throat, so the road hears him long before it sees him.",
+      "desc_mech_bird": "En håndbygget urværks-krigskylling, der spurter på knækkende servoer, mens optræksnøglen stadig drejer.",
+      "desc_lanternback_troll": "En bakketrold brækket til åget af lampetændere, der bar en jerntrone over sine skuldre med en stormlanterne brændende på begge arme.",
+      "desc_chimeglass_tortoise": "En salt-flad skildpadde, der har overgået tre generationer af campingvogne. Tindere knuste ham briller af stormglas og hængte en bronzeklokke i halsen på ham, så vejen hører ham længe før den ser ham.",
       "desc_rickshaw_mount": "En raslende knoglekærre med en knoklet håndlanger spændt for skafterne, der trækker dig af sted i fuldt firspring."
     },
     "mountTraining": {
@@ -1580,7 +1588,10 @@ export const da_DK: EnTranslations = {
       "uiScale": "UI-skala",
       "playerFrameScale": "Spillerrammens skala",
       "targetFrameScale": "Målrammens skala",
+      "playerHealthText": "Spillersundhedstekst",
+      "targetHealthText": "Målsundhedstekst",
       "aurasOnPlayerFrame": "Buffs på spillerrammen",
+      "auraBarBelowFrame": "Buffs under spillerrammen",
       "alwaysShowAllBuffs": "Vis altid alle forstærkninger",
       "highContrastBackground": "Baggrund med høj kontrast",
       "startAttackOnAbility": "Autoangreb ved brug af evne",
@@ -1603,9 +1614,9 @@ export const da_DK: EnTranslations = {
       "showTargetOfTarget": "Vis målets mål",
       "showTargetSwingTimer": "Vis målets svingtimer",
       "showPetFrame": "Vis dit kæledyr",
-      "showNameplateDots": "Show My Dots on Nameplates",
-      "nameplateDotScale": "Nameplate Dot Size",
-      "showTargetDots": "Show Target Dots",
+      "showNameplateDots": "Vis mine prikker på navneskiltene",
+      "nameplateDotScale": "Navneskilt Prikstørrelse",
+      "showTargetDots": "Vis målprikker",
       "waterRipples": "Vandkrusninger (kølvand)",
       "showAttackButton": "Vis angrebsknap",
       "showDailyRewardsChest": "Vis kisten med daglige belønninger",
@@ -2507,7 +2518,9 @@ export const da_DK: EnTranslations = {
       "unequipHint": "Klik for at fjerne denne taske",
       "poolGeneral": "Generelt: {used} af {total}",
       "poolMaterials": "Materialer: {used} af {total}",
-      "capacityPoolsAria": "Taskepladser brugt: {used} af {total}. Generelt: {generalUsed} af {generalTotal}. Materialer: {materialsUsed} af {materialsTotal}."
+      "capacityPoolsAria": "Taskepladser brugt: {used} af {total}. Generelt: {generalUsed} af {generalTotal}. Materialer: {materialsUsed} af {materialsTotal}.",
+      "capacityPools": "Genstande {generalUsed}/{generalTotal}, materialer {materialsUsed}/{materialsTotal}",
+      "emptyMaterialsOnly": "Kun materialer"
     },
     "raidConvert": {
       "toPartyDone": "Dit raid er konverteret tilbage til en gruppe.",
@@ -2744,7 +2757,7 @@ export const da_DK: EnTranslations = {
       "suddenDeath": "Din næste Tidlig Grav koster intet Raseri og ignorerer sit helbredskrav",
       "aoeEcho": "{charges} ekkoer tilbage: enkeltmålsevner gør {pct}% skade til op til {targets} nærliggende fjender",
       "sureCrit": "{charges} skadevoldende evnekast er garanteret kritiske slag",
-      "temporalEcho": "Kasterens Arkane skade helbreder dig for {singlePct}% af enkeltmåls- eller {areaPct}% af områdeskade",
+      "temporalEcho": "Kasterens Arkane skade helbreder dig for {singlePct}% af enkeltmåls- eller {areaPct}% af områdeskade. Æterbølge og Æterpile får en x4-bonus på et individuelt Temporal Echo. Gruppeekkoer skaber en tilsvarende helingsreserve, fordelt efter manglende helbred blandt markerede allierede under 60% helbred",
       "arcaneCharge": "{stacks} Arkane Ladninger: Arkan kraft gør {damagePct}% mere skade, kastes {castPct}% hurtigere og koster {costMult}x mana",
       "physicalReduction": "Reducerer Fysisk skade modtaget med {pct}%",
       "temporalHourglass": "Immun og ude af stand til at handle; gendanner helbred og fremskynder nedkølingsgendannelse. Højreklik for at annullere.",
@@ -2955,6 +2968,7 @@ export const da_DK: EnTranslations = {
       "healthPercent": "Procent",
       "healthCurrent": "Nuværende",
       "healthCurrentMax": "Nuværende / maks.",
+      "healthCurrentMaxPercent": "Aktuel/maks. (procent)",
       "sort": "Sortér spillere",
       "sortGroup": "Gruppe",
       "sortRole": "Rolle",
@@ -2994,7 +3008,7 @@ export const da_DK: EnTranslations = {
         "targetFrame": "Mål",
         "partyFrames": "Gruppe",
         "swingBar": "Autoangreb",
-        "targetDots": "Target Dots"
+        "targetDots": "Mål prikker"
       },
       "framesMenu": "Rammeindstillinger",
       "framesMenuTitle": "Vis eller skjul enkelte rammer. En fravalgt ramme forbliver skjult, indtil du vælger den igen eller nulstiller til standard.",
@@ -3027,33 +3041,33 @@ export const da_DK: EnTranslations = {
       "wrongKind": "Den kode er en anden eksporttype."
     },
     "riftForge": {
-      "title": "Rift Forge",
-      "subtitle": "Riftbound bands",
+      "title": "Kløftsmedjen",
+      "subtitle": "Riftbundne bånd",
       "currency": "{name}: {count}",
-      "empty": "No Riftbound band in your bags. A ranked Rift first clear mints one.",
-      "wornHint": "Worn. Unequip it to forge.",
-      "upgradeBtn": "Upgrade to item level {level} ({cost} essence)",
-      "upgradeMax": "Fully upgraded",
-      "gemPickAria": "Gem to socket",
+      "empty": "Intet Riftbound-bånd i dine tasker. En rangeret Rift-første klar slår en.",
+      "wornHint": "Slidt. Udruste det til at smede.",
+      "upgradeBtn": "Opgrader til vareniveau {level} ({cost} essens)",
+      "upgradeMax": "Fuldt opgraderet",
+      "gemPickAria": "Perle til fatning",
       "gemOption": "{name} ({bonus})",
-      "socketReplaceHint": "Sockets full: the next gem replaces the oldest, {gem}.",
-      "socketBtn": "Socket",
-      "socketsNone": "no gems",
-      "noGems": "No Rift gems in your bags",
-      "refused": "The forge refused. Stand at the Riftwright and try again.",
+      "socketReplaceHint": "Stikkontakter fulde: den næste perle erstatter den ældste, {gem}.",
+      "socketBtn": "Stikkontakt",
+      "socketsNone": "ingen ædelstene",
+      "noGems": "Ingen Rift ædelstene i dine tasker",
+      "refused": "Smedjen nægtede. Stå ved Riftwright og prøv igen.",
       "reason": {
-        "notFound": "That band is not in your bags.",
-        "notRiftGear": "Only a Riftbound band can be forged.",
-        "maxUpgrade": "That band is fully upgraded.",
-        "insufficientEssence": "Not enough Rift Essence.",
-        "invalidGem": "You have no such Rift gem.",
-        "dead": "You can't do that while dead.",
-        "tooFar": "You are too far from the Rift Forge."
+        "notFound": "Det band er ikke i din taske.",
+        "notRiftGear": "Kun et Riftbound-bånd kan smedes.",
+        "maxUpgrade": "Det band er fuldt opgraderet.",
+        "insufficientEssence": "Ikke nok Rift Essence.",
+        "invalidGem": "Du har ikke sådan en Rift-perle.",
+        "dead": "Du kan ikke gøre det, mens du er død.",
+        "tooFar": "Du er for langt fra Rift Forge."
       },
       "done": {
-        "upgrade": "Upgraded {name}.",
-        "socket": "Socketed a gem into {name}.",
-        "socketReplaced": "Socketed a gem into {name}; {gem} was destroyed."
+        "upgrade": "Opgraderet {name}.",
+        "socket": "Socket en perle i {name}.",
+        "socketReplaced": "Socket en perle i {name}; {gem} blev ødelagt."
       }
     },
     "itemTooltip": {
@@ -3061,7 +3075,7 @@ export const da_DK: EnTranslations = {
       "riftTier": "{tier}-rangs Rift-genstand",
       "riftUpgrade": "Rift-opgradering {level}/{max}",
       "riftSockets": "Rift-juveler {used}/{total}",
-      "riftGemSocket": "Socket bonus for a Riftbound band",
+      "riftGemSocket": "Socket bonus for et Riftbound-bånd",
       "statEnchanted": "+{value} {stat} (Fortryllet)",
       "enchantedFallback": "Fortryllet",
       "partyTradeWindow": "Du kan handle denne genstand til spillere, der delte dens bytte, i de næste {time}. Udstyrer du den, afsluttes handelsvinduet."
@@ -3086,6 +3100,7 @@ export const da_DK: EnTranslations = {
       "close": "Luk",
       "keybind": "Discord-panel",
       "disabled": "Discord-integration er ikke tilgængelig lige nu.",
+      "queuePingsLabel": "Send mig en Discord direkte besked, når min kampplads eller arena-kø dukker op (skal have en tilknyttet Discord-konto)",
       "tiers": {
         "none": "Urangeret",
         "initiate": "Indviet",
@@ -3343,13 +3358,13 @@ export const da_DK: EnTranslations = {
       "close": "Luk"
     },
     "realmBuilder": {
-      "title": "Realm Builder of the Month",
-      "currentLabel": "Honoured this month",
-      "placeholderName": "Your Name Here",
-      "placeholderHint": "This plate is waiting for its first name.",
-      "pastTitle": "Past honourees",
-      "pastEmpty": "No names on the roll yet.",
-      "close": "Close"
+      "title": "Månedens Realm Builder",
+      "currentLabel": "Hædret denne måned",
+      "placeholderName": "Dit navn her",
+      "placeholderHint": "Denne plade venter på sit fornavn.",
+      "pastTitle": "Tidligere hædersmodtagere",
+      "pastEmpty": "Ingen navne på listen endnu.",
+      "close": "Luk"
     },
     "bank": {
       "title": "Bank",
@@ -3406,6 +3421,8 @@ export const da_DK: EnTranslations = {
       "depositAllDone": "Materialer indsat: {count}.",
       "depositAllFull": "Materialer indsat: {count}. Banken er nu fuld.",
       "depositAllNone": "Banken er fuld: intet indsat.",
+      "depositAllNotable": "Materialer deponeret: {count}, inklusive {item}.",
+      "depositAllNotableFull": "Materialer deponeret: {count}, inklusive {item}. Banken er nu fuld.",
       "bonusTitle": "Bonuspladser",
       "bonusEarned": "+{count}",
       "bonusStatusEarned": "+{count}",
@@ -3444,6 +3461,8 @@ export const da_DK: EnTranslations = {
       "vaultDepositAllDone": "Materialer indsat: {count}.",
       "vaultDepositAllFull": "Materialer indsat: {count}. Nogle lofter er fulde.",
       "vaultDepositAllNone": "Hvælvets lofter er fulde: intet blev indsat.",
+      "vaultDepositAllNotable": "Materialer deponeret: {count}, inklusive {item}.",
+      "vaultDepositAllNotableFull": "Materialer deponeret: {count}, inklusive {item}. Nogle lofter er fulde.",
       "vaultWithdrawShort": "Kun {fit} af {count} er der plads til i dine tasker.",
       "vaultDepositHint": "Klik for at indsætte i dit hvælv",
       "vaultCannotDeposit": "Kan ikke lægges i hvælvet",
@@ -3580,17 +3599,17 @@ export const da_DK: EnTranslations = {
         }
       },
       "roster": {
-        "seats": "{count} of {cap} seats",
-        "expand": "Expand roster (+{seats} seats for {price})",
-        "maxed": "The roster is at its largest size",
-        "confirm": "Expand the guild roster by {seats} seats for {price}? The gold comes from your own purse and is not refunded.",
-        "confirmAction": "Expand",
-        "expandedLine": "{name} has expanded the guild roster to {cap} members.",
+        "seats": "{count} af {cap} sæder",
+        "expand": "Udvid liste (+{seats} pladser til {price})",
+        "maxed": "Listen er i sin største størrelse",
+        "confirm": "Udvide guildlisten med {seats}-sæder til {price}? Guldet kommer fra din egen pung og refunderes ikke.",
+        "confirmAction": "Udvid",
+        "expandedLine": "{name} har udvidet guildlisten til {cap}-medlemmer.",
         "result": {
-          "notLeader": "Only the Guild Master may expand the guild roster.",
-          "maxed": "The guild roster cannot grow any larger.",
-          "cannotAfford": "You need {price} to expand the guild roster.",
-          "retry": "The guild roster changed while you were buying. Try again."
+          "notLeader": "Kun laugsmesteren må udvide laugslisten.",
+          "maxed": "Lauglisten kan ikke vokse sig større.",
+          "cannotAfford": "Du skal bruge {price} for at udvide guildlisten.",
+          "retry": "Gildelisten ændrede sig, mens du købte. Prøv igen."
         }
       }
     },
@@ -4009,7 +4028,7 @@ export const da_DK: EnTranslations = {
       "yieldLineRange": "{min} til {max} {item}",
       "alreadyEnchanted": "Den genstand er allerede fortryllet.",
       "sameEnchant": "Den genstand har allerede den fortryllelse.",
-      "riftGear": "Riftbound bands take Rift gems, not enchants.",
+      "riftGear": "Riftbundne bands tager Rift-perler, ikke fortryllelser.",
       "replaceTag": "Erstatter {enchant}",
       "sameEnchantTag": "Allerede anvendt",
       "plainTag": "Ikke fortryllet",
@@ -4314,6 +4333,7 @@ export const da_DK: EnTranslations = {
       "sourceProfession": "Optjenes gennem {profession}",
       "sourceDeed": "Gives af bedriften {deed}",
       "sourceVendor": "Sælges af {vendor}",
+      "sourceVendorGated": "Sælges af {vendor} ({requirement})",
       "sourceBossZone": "Falder fra {boss} i {zone}",
       "sourceDelve": "Findes i delven {delve}",
       "sourceRift": "Falder fra gennemførsler af Rifter med rang {rank}",
@@ -4333,6 +4353,10 @@ export const da_DK: EnTranslations = {
       "filterAll": "Alle",
       "filterOwned": "Katalogiserede",
       "filterMissing": "Manglende",
+      "filterIlluminated": "Oplyst",
+      "filterRemaining": "Tilbage",
+      "filterEmptyPages": "Ingen sider matcher dette filter.",
+      "filterGroupAriaPages": "Filtrer sider efter, om de er belyst",
       "recentJumpAria": "Åbn siden for {name}",
       "recentEmpty": "Ingen fund endnu. Relikvier, du katalogiserer fra nu af, lander her.",
       "nearlyEmpty": "Sider tæt på fuldførelse samler sig her.",
@@ -4440,6 +4464,7 @@ export const da_DK: EnTranslations = {
       "summary": "Verdenskort. Vælg en zone for at åbne dens kort.",
       "toWorld": "Verdenskort",
       "toZone": "Zonekort",
+      "toInstance": "Forekomst kort",
       "toggleAria": "Skift mellem verdenskortet og zonekortet",
       "levels": "Niveauer {min} til {max}"
     },
@@ -4474,6 +4499,7 @@ export const da_DK: EnTranslations = {
       "walletLinkedConnected": "Din tilknyttede wallet-app er forbundet og klar til $WOC-køb.",
       "walletUsdBalance": "{amount} USD",
       "walletUsdUnknown": "Ukendt",
+      "walletCardDismiss": "Skjul tegnebogskort",
       "rateNote": "Kurs: omkring {tokens} $WOC for 1,00 USD, pr. {time}.",
       "rateNotePaused": "Sidst kendte kurs: omkring {tokens} $WOC for 1,00 USD, pr. {time}.",
       "estimateNote": "Omkring {tokens} $WOC for {usd} til den aktuelle kurs.",
@@ -4665,6 +4691,43 @@ export const da_DK: EnTranslations = {
       "listingStatusCancelled": "Annulleret",
       "listingStatusSuspended": "Suspenderet",
       "listingStatusUnsold": "Usolgt"
+    },
+    "lootExplorer": {
+      "title": "Bytteoversigt",
+      "close": "Luk Loot Explorer",
+      "searchPlaceholder": "Søg varer...",
+      "searchAria": "Søg efter varer",
+      "filterCategoryAria": "Kilde",
+      "filterClassAria": "Klasse",
+      "filterStatAria": "Egenskab",
+      "filterQualityAria": "Kvalitet",
+      "filterAll": "Alle",
+      "tabItems": "Efter vare",
+      "tabEncounters": "Ved møde",
+      "category": {
+        "raid": "Raidgruppe",
+        "dungeon": "Fangehul",
+        "delve": "Dyk",
+        "open_world": "Åben verden",
+        "rift": "Kløft",
+        "vendor": "Sælger",
+        "quest_reward": "Quest belønning",
+        "quest_objective": "Quest mål",
+        "ground_object": "Verdensobjekt",
+        "starting_equipment": "Startudstyr"
+      },
+      "difficulty": {
+        "normal": "Normal sværhedsgrad",
+        "heroic": "Heroisk"
+      },
+      "riftRankLabel": "Kløftrang {rank}",
+      "source": "{category}: {name}",
+      "sourceWithContext": "{category}: {name} ({context})",
+      "chance": "{pct} % chance",
+      "guaranteed": "Garanteret",
+      "gatedByQuest": "Mens du søger: {quest}",
+      "empty": "Intet bytte matcher disse filtre.",
+      "resultCount": "{count} resultater"
     }
   },
   "gatherEvent": {
@@ -4763,7 +4826,8 @@ export const da_DK: EnTranslations = {
       "link_required": "Knyt din Discord-konto først.",
       "swag_claimed": "Du har allerede indløst denne belønning.",
       "swag_tier": "Nå en højere rang for at indløse denne.",
-      "swag_points": "Ikke nok point."
+      "swag_points": "Ikke nok point.",
+      "invalid_input": "Ugyldigt input."
     },
     "deeds": {
       "invalid_input": "Ugyldig indtastning."
@@ -4815,6 +4879,11 @@ export const da_DK: EnTranslations = {
       "reason_required": "Der skal angives en grund.",
       "invalid_duration": "Angiv en markeringsvarighed på mindst ét sekund.",
       "not_marked": "Den konto er ikke markeret."
+    },
+    "kick": {
+      "reason_required": "En grund er påkrævet.",
+      "admin_target": "Operatørkonti kan ikke sparkes.",
+      "target_offline": "Den spiller er ikke længere online i dette rige."
     },
     "woc_market": {
       "invalid_input": "Ugyldigt input.",
@@ -5249,10 +5318,13 @@ export const da_DK: EnTranslations = {
       "ifPlayerFrameScale": "Størrelsen på din egen spillerramme.",
       "ifTargetFrameScale": "Størrelsen på din målramme.",
       "ifPartyStyle": "Gruppens layout: Automatisk følger din gruppestørrelse, Klassisk er den traditionelle stak, og Raid pakker alle sammen i det kompakte gitter.",
+      "ifPlayerHealthText": "Hvad din egen sundhedsbjælke udskriver: intet, en procentdel, nuværende helbred, nuværende og maksimum, eller begge med procentdelen ved siden af.",
+      "ifTargetHealthText": "Hvad target- og target-of-target-sundhedsbjælkerne udskriver, med de samme valgmuligheder som din egen ramme.",
       "ifPartyHealthText": "Hvad gruppebjælkerne viser: ingenting, en procentdel, nuværende helbred, eller nuværende og maksimum.",
       "ifPartySort": "Rækkefølgen, gruppemedlemmer vises i: gruppeorden, rolle, eller navn.",
       "ifPartyShowAuras": "Hvorvidt styrkelser og svækkelser vises på gruppens rammer. Tilsvarende kontakter dækker ressourcebjælker, absorberinger, kæledyr, og hvorvidt du selv optræder på din egen gruppeliste.",
       "ifAurasOnPlayerFrame": "Sætter dine styrkelser og svækkelser på din egen spillerramme, ud over aurabjælken.",
+      "ifAuraBarBelowFrame": "Flytter buffrækken under din enhedsramme i stedet for over den. Betyder kun noget, når buffs vises på spillerrammen.",
       "ifAlwaysShowAllBuffs": "Viser alle aktive forstærkninger, selv med grafikindstillingen Lav, og omgår den normale grænse for forstærkningsikoner.",
       "ifTargetOfTarget": "Viser, hvem dit måls mål er, den klassiske måde at se, om tanken stadig har fat i det.",
       "ifPetFrame": "Viser en ramme til dit kæledyr.",
@@ -5260,6 +5332,7 @@ export const da_DK: EnTranslations = {
       "ifChatOpacity": "Hvor solid chatbaggrunden er.",
       "ifCompactChat": "Strammer chatlinjerne, så flere af dem kan være der.",
       "ifChatTimestamps": "Tilføjer et klokkeslæt til hver chatlinje, i 12-timers eller 24-timers form.",
+      "ifFilterProfanity": "Masker bandeord i chat med stjerner. Til som standard; sluk det her, hvis du hellere vil læse chat ufiltreret.",
       "ifStartAttack": "Hvorvidt brug af en evne også starter dit autoangreb. Til som standard, og den klassiske opførsel, de fleste spillere forventer.",
       "ifStopAutoAttack": "Hvorvidt skift af mål stopper dit sving. Fra som standard, så dit angreb følger med over på det nye mål.",
       "ifShowAttackButton": "Sætter en tydelig Angrib-knap på din handlingsbjælke.",
@@ -5272,7 +5345,7 @@ export const da_DK: EnTranslations = {
       "ifHideUnused": "Skjuler tomme handlingsfelter, så kun de knapper, du faktisk bruger, bliver tegnet.",
       "ifLockBars": "Låser dine bjælker, så du ikke ved et uheld kan trække en evne ud af et felt.",
       "keybindsHeading": "Tastebindings-panelet",
-      "keybindsBody": "Tastelisten er kun halvdelen af det panel. Over den sidder de kontakter, der afgør, hvordan din mus styrer spillet: musekamera, hvorvidt markøren låses, mens du drejer, klik for at flytte og hvilken museknap der udløser det, angrebsbevægelse, det venstrehåndede touch-layout og bandeordsfilteret til chatten.",
+      "keybindsBody": "Nøglelisten er kun halvdelen af det panel. Over den sidder kontakterne, der bestemmer, hvordan din mus driver spillet: musekamera, om markøren låses, mens du roterer, klik for at flytte, og hvilken museknap, der udløser den, angrebsbevægelse og venstrehånds berøringslayout.",
       "keybindsMouseBody": "To ting der er lette at overse. Museknapper bindes som taster, så hjulklikket og tommelfingerknapperne kan bære evner, mens venstre- og højreklik forbliver reserveret til kameraet og til at klikke på verden. Og du kan binde direkte fra handlingsbjælken: slå bindingstilstanden på bjælken til her, klik derefter på et felt, og tryk på den tast, du ønsker."
     },
     "combat": {
@@ -6071,7 +6144,7 @@ export const da_DK: EnTranslations = {
       "heroicRewardsBody": "Heroiske bosser taber det bytte, du kender, opgraderet og mærket Heroisk i værktøjstippet, og hver turs slutboss lægger episke genstande til, som ikke findes andre steder. Det sidste drab efterlader også Heroiske Mærker til hver deltager: en valuta, der bruges hos kvartermester Vex i Highwatch, hvis disk er en hylde med ringe og vedhæng, som intet andet end beviset fra de heroiske dybder kan købe.",
       "heroicLockoutBody": "Almindelige fangekældre kan løbes hele dagen. Heroisk kræver tålmodighed: slutbossens fald begrænser alle på turen til én heroisk gennemførelse af den fangekælder om dagen, og raidet holder en daglig spærring for hver sværhedsgrad. På et levende rige falder alle daglige spærringer sammen ved rigets egen natlige nulstillingstime, så en gennemførelse taget lige før den time og en taget lige efter falder på to forskellige dage; spil i stedet offline i din browser, og en spærring udløber ganske enkelt et døgn efter dit eget drab. En allerede gennemført tur for fem spillere står stadig åben for gruppen selv til ligløb og bytte, så ingen bliver låst ude fra det, de tjente derinde. Raidet er strengere: når dets drab først har spærret dig, står døren lukket til nulstillingen, og den eneste vej tilbage ind er et ligløb af en, der faldt netop i den tur, som spærrede dem, så en levende raider, der går ud, er gået ud for dagen. Saml dit bytte, før du forlader arenaen. Hver af disse spærringer tilhører den figur, der tjente den, så en gennemførelse på din hovedfigur lader dine andre figurer være frie.",
       "resetTitle": "Nulstilling af dine instanser",
-      "resetBody": "Skift sværhedsgrad, mens din gruppe stadig holder ture, den har gjort krav på, og de gamle krav bliver hængende et stykke tid, før de slipper af sig selv. Gruppelederen kan slippe dem på én gang i stedet: vælg Nulstil alle instanser i menuen for eget portræt, eller skriv /dungeon reset. En nulstilling virker først, efter sværhedsgraden faktisk er ændret, kun så længe ingen, levende eller faldne, er tilbage derinde, kun når hvert lig derinde er plyndret rent, og en kort nedkølingstid adskiller den ene nulstilling fra den næste. Kommer I til døren med den forkerte sværhedsgrad, siger spillet det, før turen begynder. Raidet nulstilles aldrig sådan; dets egne spærreregler står ved magt.",
+      "resetBody": "Skift sværhedsgrad, mens din gruppe stadig har påståede løb, og de gamle påstande bliver hængende et stykke tid, før de klarer sig af sig selv. Partilederen kan lade dem gå med det samme i stedet: vælg Nulstil alle forekomster på deres egen portrætmenu, eller skriv /dungeon reset. En nulstilling virker kun, efter at sværhedsgraden faktisk er blevet ændret, kun mens ingen, levende eller faldne, bliver inde, kun når hvert lig derinde er blevet plyndret rent, og en kort nedkøling adskiller en nulstilling fra den næste. Ankommer til døren på den forkerte sværhedsgrad, og spillet siger det, før løbet starter. Raidet nulstilles på samme måde, dets egne lockout- og tilbageleveringsregler står stadig øverst.",
       "templeLoreTitle": "Det Druknede Tempel, en smule dybere",
       "templeLoreBody": "Templet har sit eget sagn, ældre end den kult, du jagter andetsteds. På bredden af Glimmertjernet, en tjern der drikker måneskinnet og giver de druknede tilbage, holder en ensom vogter en port af blegt lys. Under overfladen løber en trappe af kold sten ned til den. De folk, der sank dér, druknede ikke ved et uheld: de var Det Blege Kor, der gik under i tilbedelse og aldrig holdt op med at synge. De gamle vogtere ridsede en enkelt advarsel i klipperne, før vandet tog dem, en bøn til noget, de kaldte Den Druknede Måne, med en mere fast hånd, der tilføjede to ord nedenunder: den sover blot.",
       "cryptLeadTitle": "En dør, de døde skulle holde lukket",
@@ -6104,8 +6177,8 @@ export const da_DK: EnTranslations = {
       "raceBody": "Enhver gruppe i riget kan angribe den samme rift på samme tid, hver i sin egen kopi, og kun den første til at fælde tingen på bunden forsegler den. Når en gruppe vinder, hører riget deres navne og deres tid, og vejen ind lukker bag dem. At tabe løbet afslutter ikke jeres tur: jeres kopi forbliver åben, tingen på bunden falder stadig for jer, og I går stadig ud for egen kraft. Det, det koster jer, er alt det, en oprydning ville have betalt. Bossen efterlader intet til den gruppe, der kom nummer to, så det, I bærer hjem, er det, der droppede fra mobs på vejen ned, og intet mere. Bedrifternes Bog tæller stadig oprydningen, for I fik faktisk fældet tingen. Det er det eneste løb i spillet, du kan tabe uden nogensinde at se de folk, der slog dig.",
       "rewardsHeading": "Det du bærer ud",
       "rewardsBody": "At forsegle en rift, ikke blot at overleve den, er det, der betaler sig. Fæld riften først, og den betaler som det instansindhold, dens rang står ved siden af, så de hårdere rangeringer er den hårdere tur værd. At forsegle lægger også et Riftbundet Bånd i hænderne på alle, der var der, skåret til din klasses rolle og personligt til dig, og efterlader Rift-Essens i dine tasker oven i det, med Rift-Juveler oven i det igen ved de hårdere rangeringer. Ved siden af vejen hjem efterlader tingen på bunden en forseglet kiste, som din gruppe kan dirke op for ekstra bytte, med den samme Tappens vej-dirkning, du kender fra delve-kister, så et rent, tålmodigt arbejde betaler bedre end et forhastet et. Intet af det når frem til en gruppe, der kom nummer to: et tabt løb efterlader jer kun det, der droppede fra mobs på vejen ned. Bedrifternes Bog er undtagelsen, og den tæller jeres oprydning under alle omstændigheder, med en bedrift for at lukke jeres første rift og endnu en for at fælde en S-rangs rift.",
-      "forgeHeading": "The Rift Forge",
-      "forgeBody": "The band a ranked first clear mints is not finished when you receive it. Riftwright Maelis, who keeps a forge in the Watch Meadow on the Farshore, up the shore from Gullhaven beside the Breach Scholar, will raise its item level one step at a time and set the coloured gems the rifts drop into its sockets, each colour one combat rating. A full band takes a new gem in place of its oldest, so you can retune it later. All of that is paid in Rift Essence and Rift gems, the forge currency that falls from rift bosses and trades freely, so a friend can hand you the essence you are short. Take the band off before you bring it to her: she works on what is in your bags, and she does nothing at all unless you are standing at her forge.",
+      "forgeHeading": "Rift Forge",
+      "forgeBody": "Bandet en rangeret første clear mints er ikke færdig, når du modtager det. Riftwright Maelis, der holder en smedje i Watch Meadow på Farshore, op ad kysten fra Gullhaven ved siden af ​​Breach Scholar, vil hæve sit emneniveau et trin ad gangen og sætte de farvede ædelstene, som riftsene falder i sine sokler, hver farve en kampvurdering. Et fuldt band tager en ny perle i stedet for dens ældste, så du kan genindstille den senere. Alt dette betales i Rift Essence og Rift gems, smedevalutaen, der falder fra rift-bosserne og handler frit, så en ven kan give dig den essens, du mangler. Tag båndet af, før du bringer det til hende: hun arbejder på det, der er i dine tasker, og hun gør slet ikke noget, medmindre du står ved hendes smedje.",
       "trackerHeading": "Sporingen på din skærm",
       "trackerBody": "Mens du er indenfor, holder en lille strimmel på din skærm dig orienteret: hvilken etage du er på ud af hvor mange, og en live nedtælling. Læs den nedtælling omhyggeligt, for det er ikke din tur, der løber ud. Det er indgangen tilbage i verden, der lukker. Når du først er igennem, spiller din gruppe riften færdig i sit eget tempo, hvor lang tid det end tager, men når det ur når nul, er vejen ind væk for alle, så tænk dig om, før du træder udenfor tæt på slutningen af den."
     },
@@ -7997,7 +8070,7 @@ export const da_DK: EnTranslations = {
       "forgeUpgraded": "Rift-opgradering fuldført for {name}.",
       "forgeEnchanted": "Rift-fortryllelse fuldført for {name}.",
       "forgeSocketed": "Rift-juvel indsat for {name}.",
-      "forgeGemReplaced": "Rift gem replaced for {name}: {gem} destroyed.",
+      "forgeGemReplaced": "Riftperle udskiftet for {name}: {gem} ødelagt.",
       "detonateGlacialGrave": "Iskold Grav detonerer!",
       "detonateAbsoluteZero": "Absolut Nulpunkt bryder ud!",
       "detonateMagmaWell": "Magmakilde bryder ud!",
@@ -8644,6 +8717,7 @@ export const da_DK: EnTranslations = {
     "connectingRealm": "Forbinder til verdenen...",
     "assetsFailed": "Indlæsning af aktiver mislykkedes: prøv at genindlæse. {error}",
     "rendererFailed": "Kunne ikke starte gengiveren: prøv at genindlæse. {error}",
+    "rendererContextLost": "3D-rendereren mistede sin grafikkontekst og kunne ikke gendanne den. Genindlæs siden.",
     "enterTimeout": "Kunne ikke komme ind i verdenen. Forbindelsen fik timeout. Kører spilserveren?",
     "connectionLost": "Forbindelsen til serveren gik tabt.",
     "reconnectingAttempt": "Forbindelse mistet. Genopretter forbindelse... (forsøg {attempt}/{maxAttempts}, prøver igen om {seconds}s)",
@@ -8654,6 +8728,7 @@ export const da_DK: EnTranslations = {
     "realmFull": "Denne verden er fuld i øjeblikket. Prøv igen om et par minutter.",
     "tooManyConnections": "Der kommer for mange forbindelser til denne verden fra dit netværk. Luk ekstra spilvinduer, eller prøv igen om et par minutter.",
     "messageRateExceeded": "Forbindelsen blev afbrudt, fordi du sendte handlinger for hurtigt. Vent et øjeblik, og log ind igen.",
+    "kickedByModerator": "En moderator har afbrudt dig: {reason}",
     "tips": {
       "classes": "Tip: Hver af de 9 klasser spilles forskelligt. Prøv nogle stykker, før du vælger én.",
       "talents": "Tip: Du kan nulstille dine talenter, når du er ude af kamp, så et tidligt valg er aldrig en fælde.",
@@ -10467,11 +10542,11 @@ export const da_DK: EnTranslations = {
       },
       "melting_acid": {
         "name": "Smeltende syre",
-        "description": "Sprøjter målet med en ætsende gift, giver {damage} naturskade og reducerer dets rustning med 5 % i 12 sek."
+        "description": "Smører dit våben i 30 min. Hvert af dine nærkampshug sprøjter målet med ætsende syre og reducerer dets rustning med 5 % i 12 sek."
       },
       "nightshade_coating": {
         "name": "Natskygge belægning",
-        "description": "Overtrækker målet i natskygge, giver {damage} naturskade og reducerer helingen, den modtager med 25 % i 12 sek."
+        "description": "Smører dit våben i 30 min. Hvert af dine nærkampshug overtrækker målet i natskygge og reducerer den heling, det modtager, med 25 % i 12 sek."
       },
       "expose_armor": {
         "name": "Rustningsbrud",
@@ -10487,11 +10562,11 @@ export const da_DK: EnTranslations = {
       },
       "instant_poison": {
         "name": "Hugormbid",
-        "description": "Smører dit våben i 30 min, så hvert af dine nærkampshug volder 8 ekstra naturskade."
+        "description": "Smører dit våben i 30 min, så hvert af dine nærkampshug volder {damage} ekstra naturskade."
       },
       "deadly_poison": {
         "name": "Betændt Gift",
-        "description": "Smører dit våben i 30 min, så hvert af dine nærkampshug volder 14 ekstra naturskade."
+        "description": "Smører dit våben i 30 min. Hvert af dine nærkampshug lægger et lag gift på målet, op til 5, og fornyer varigheden på 12 sek. Hvert lag volder {damage} naturskade hvert 2. sek."
       },
       "blind": {
         "name": "Jordkast",
@@ -11589,11 +11664,11 @@ export const da_DK: EnTranslations = {
       },
       "temporal_echo": {
         "name": "Tidsekko",
-        "description": "Mærker en alliert med et ekko af et sundere øjeblik og gendanner {damage} helbred øjeblikkeligt. I {duration} sek. trækkes en del af den Arkane skade du gør tilbage gennem ekkoet for at helbrede dem."
+        "description": "Mærker en allieret med et ekko af et sundere øjeblik og gendanner {damage} helbred øjeblikkeligt. I {duration} sek. helbreder {echoSinglePct}% af din øvrige Arkane enkeltmålsskade og {echoAreaPct}% af din Arkane områdeskade dem. Æterbølge og Æterpile helbreder dem i stedet for {echoDriverPct}% af den skade, de gør."
       },
       "temporal_cascade": {
         "name": "Tidskaskade",
-        "description": "Sender et ekko kaskadevejende gennem din gruppe: målet og op til fire af deres nærmeste allierede helbredes øjeblikkeligt og markeres hver i {duration} sek., og trækker en del af den Arkane skade du gør tilbage gennem deres ekkooer for at helbrede dem. (Kronomantik)"
+        "description": "Sender et ekko kaskadevejende gennem din gruppe: målet og op til fire af deres nærmeste allierede helbredes øjeblikkeligt og markeres hver i {duration} sek., og trækker en del af den Arkane skade du gør tilbage gennem deres ekkoer for at helbrede dem. Æterbølge og Æterpile skaber en tilsvarende helingsreserve fra hvert gruppeekko, fordelt efter manglende helbred blandt markerede allierede under 60% helbred. (Kronomantik)"
       },
       "temporal_reversal": {
         "name": "Tidsvending",
@@ -13281,11 +13356,17 @@ export const da_DK: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Tændingsnøgle: Skrækgnist, jordrysteren"
       },
+      "reins_goblin_rocket_sled": {
+        "name": "Tændingsnøgle: Goblin-raketslæde"
+      },
+      "reins_rallycart_rxt": {
+        "name": "Tændingsnøgle: Rallycart RXT"
+      },
       "reins_lanternback_troll": {
         "name": "Lygtetænderens åg: Grumbol"
       },
       "reins_chimeglass_tortoise": {
-        "name": "Roadwarden's Bellstrap: Tolliver"
+        "name": "Vejvagts klokkerem: Tolliver"
       },
       "reins_rickshaw_mount": {
         "name": "Bundne tøjler: Knogebundet Rickshaw"
@@ -13294,7 +13375,7 @@ export const da_DK: EnTranslations = {
         "name": "Tøjler til Dragegabets Raptor"
       },
       "reins_mech_bird": {
-        "name": "Ignition Key: Cluckwork Mech Bird"
+        "name": "Tændingsnøgle: Cluckwork Mech Bird"
       },
       "rimefang": {
         "name": "Rimhugtand"
@@ -15921,9 +16002,9 @@ export const da_DK: EnTranslations = {
         "greeting": "Den åbnede sig lige der, hvor nettene tørrer. Lige der, hvor jeg stod hver morgen hele mit liv. Jeg går ikke ned til kysten mere. Jeg går egentlig ikke mange steder mere."
       },
       "riftwright_maelis": {
-        "name": "Riftwright Maelis",
-        "title": "Rift Forgemaster",
-        "greeting": "A Riftbound band remembers the break that made it, {className}. Bring me the band, and the essence the breaks shed, and I will teach it to remember more."
+        "name": "Riftbygger Maelis",
+        "title": "Riftsmedemester",
+        "greeting": "Et Riftbound-band husker pausen, der gjorde det, {className}. Bring mig bandet og essensen af ​​pauserne, og jeg vil lære det at huske mere."
       },
       "forgemistress_darva": {
         "name": "Smedemester Darva",
@@ -18985,8 +19066,8 @@ export const da_DK: EnTranslations = {
       },
       "chronoweave": {
         "name": "Aethervævede gevandter",
-        "bonus2": "Temporal Echo omdanner 50 procent af din Arcane-skade mod ét mål til heling. Modtaget skade forsinker ikke længere din besværgelse.",
-        "bonus4": "Temporal Cascades nedkøling reduceres med 5 sek."
+        "bonus2": "Temporal Echo omdanner 50% af din øvrige Arkane enkeltmålsskade til heling. Æterbølge og Æterpile omdanner i stedet 200% af den skade, de gør. Modtaget skade forsinker ikke længere din besværgelse.",
+        "bonus4": "Temporal Cascades nedkøling reduceres med 5 sek., og dens manaomkostning reduceres med 30%."
       },
       "cinderbark": {
         "name": "Cinderbark-værn",
@@ -19215,6 +19296,6 @@ export const da_DK: EnTranslations = {
     "delveRiteShrineSkullInteract": "Kranieskrin: Tryk på F for at røre det",
     "mailboxName": "Postkasse",
     "noticeboardName": "Opslagstavle",
-    "realmBuilderMonumentName": "Realm Builder Monument"
+    "realmBuilderMonumentName": "Rigsbygger-monument"
   }
 };

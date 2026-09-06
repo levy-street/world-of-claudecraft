@@ -1477,6 +1477,23 @@ describe('the vault material scope', () => {
     }
   });
 
+  // #3xxx: predictVaultDepositAll's notableItemId doc claims "today exactly one
+  // material, lastflame_core, is epic" as the reason the notable-item arm stays
+  // narrow rather than building a localized multi-item list. The unit tests for
+  // that arm (tests/vault_view.test.ts) only exercise it through a SYNTHETIC
+  // ember_core fixture, so the shipped-taxonomy shape was pinned only
+  // indirectly, via the window test's rendered string. This pins the claim
+  // directly against the real content: an id list rather than a bare count, so
+  // adding a second epic-or-better material fails here by NAME, not by
+  // surprising a count assertion.
+  it('has exactly one epic-or-better material today: lastflame_core (the notable-item arm stays narrow)', () => {
+    const epicOrBetter = [...vaultMaterialIds()].filter((id) => {
+      const quality = ITEMS[id]?.quality;
+      return quality === 'epic' || quality === 'legendary';
+    });
+    expect(epicOrBetter).toEqual(['lastflame_core']);
+  });
+
   it('no material id collides with an inherited Object.prototype name', () => {
     // The deposit path reads and writes vault.stock under ids from this set with
     // plain keyed access; that is only safe while no member shadows an inherited
@@ -1949,7 +1966,7 @@ describe('vaultDepositAll (the batched server-side sweep, Bank Storage Phase 03)
     const invSnap = m.inventory.map((s) => ({ ...s }));
     const info = sim.vaultInfo;
     if (!info) throw new Error('vaultInfo must be non-null at the banker');
-    const prediction = predictVaultDepositAll(invSnap, info, vaultMaterialIds());
+    const prediction = predictVaultDepositAll(invSnap, info, vaultMaterialIds(), (id) => ITEMS[id]);
     const before = new Map(
       [...vaultMaterialIds()].map((itemId) => [itemId, vaultStoredCount(m.vault, itemId)]),
     );

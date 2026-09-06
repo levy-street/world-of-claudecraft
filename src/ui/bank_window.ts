@@ -68,6 +68,7 @@ import {
 } from './bank_view';
 import type { ClaudiumPurchaseFacet } from './claudium_purchase_bridge';
 import { formatCount } from './count_format';
+import { depositAllStatusText } from './deposit_all_status_text';
 import { markDialogRoot } from './dialog_root';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
@@ -1323,14 +1324,11 @@ export class BankWindow {
     this.render();
   }
 
-  // Compose the transient summary from the PLAN (not post-facto state, which the online
-  // mirror has not caught up to yet) and arm the self-expire.
+  // Compose the transient summary from the PLAN (not post-facto state, which the
+  // online mirror has not caught up to yet) and arm the self-expire.
   private setDepositStatus(plan: DepositAllPlan): void {
-    // The arm choice (none fit / partially fit / all fit) lives in the pure core's
-    // depositAllSummaryKey so its selection is unit-pinned; only the None arm
-    // renders without a count token.
-    const key = depositAllSummaryKey(plan);
-    const text = plan.stacks === 0 ? t(key) : t(key, { count: this.fmt(plan.stacks) });
+    const notable = plan.notableItemId ? knownItemDef(ITEMS, plan.notableItemId) : undefined;
+    const text = depositAllStatusText(depositAllSummaryKey(plan), this.fmt(plan.stacks), notable);
     this.depositStatus = { text, at: performance.now() };
   }
 

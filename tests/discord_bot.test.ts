@@ -6,6 +6,7 @@ import {
   buildDailyRewardWinnersMessage,
   buildLevelNick,
   buildLinkContent,
+  buildQueuePopMessage,
   buildRelayMessage,
   buildWelcomeMessage,
   buildWhoamiContent,
@@ -25,6 +26,7 @@ import {
   MEMBERS_META_BATCH,
   memberRolesFromPayload,
   NICK_MAX,
+  type QueuePopItem,
   type RelayItem,
   reconcileMemberRolesFromUpdate,
   relayAvatarUrl,
@@ -519,6 +521,73 @@ describe('relay (in-game "!" community posts)', () => {
     expect(msg.embeds[0].author.name).toBe('Aldric - LFG');
     expect(msg.embeds[0].author.icon_url).toBeUndefined();
     expect(msg.embeds[0].thumbnail).toBeUndefined();
+  });
+});
+
+describe('queue-pop DMs (battleground offer / arena seated)', () => {
+  const bgPop: QueuePopItem = {
+    accountId: 9,
+    discordUserId: '123',
+    characterName: 'Aldric',
+    kind: 'bg',
+    format: null,
+    seconds: 30,
+    expiresAtMs: 1_700_000_030_000,
+    realm: 'Claudemoon',
+  };
+
+  it('tells a battleground pop apart: title, live deadline, character and realm, game button', () => {
+    const msg = buildQueuePopMessage(bgPop, 'https://woc.test/') as {
+      content?: string;
+      allowed_mentions: unknown;
+      embeds: Array<Record<string, any>>;
+      components: Array<Record<string, any>>;
+    };
+    const embed = msg.embeds[0];
+    expect(embed.title).toBe('Your battleground queue popped!');
+    // Discord renders <t:unix:R> as a live countdown; the unix stamp is the
+    // server deadline in SECONDS, floored.
+    expect(embed.description).toContain('<t:1700000030:R>');
+    expect(embed.description).toContain('Aldric');
+    expect(embed.description).toContain('Thornhollow Fields');
+    expect(embed.fields).toEqual([
+      { name: 'Character', value: 'Aldric', inline: true },
+      { name: 'Realm', value: 'Claudemoon', inline: true },
+    ]);
+    const button = msg.components[0].components[0];
+    expect(button.style).toBe(5); // link button
+    expect(button.url).toBe('https://woc.test');
+    expect(button.label).toBe('Open the game');
+    // A DM already notifies its recipient: no mention, and no mention parsing.
+    expect(msg.content).toBeUndefined();
+    expect(msg.allowed_mentions).toEqual({ parse: [] });
+  });
+
+  it('names the arena bracket for an arena pop, with the coliseum and no Accept wording', () => {
+    const msg = buildQueuePopMessage(
+      { ...bgPop, kind: 'arena', format: 'yumi3', seconds: 0 },
+      'https://woc.test',
+    ) as { embeds: Array<Record<string, any>> };
+    const embed = msg.embeds[0];
+    expect(embed.title).toBe('Arena match found!');
+    expect(embed.description).toContain('Protect Yumi (3)');
+    expect(embed.description).toContain('Ashen Coliseum');
+    expect(embed.description).not.toContain('Accept');
+    // An unknown bracket id falls back to itself rather than to blank copy.
+    const unknown = buildQueuePopMessage({ ...bgPop, kind: 'arena', format: 'zz9' }, 'u') as {
+      embeds: Array<Record<string, any>>;
+    };
+    expect(unknown.embeds[0].description).toContain('a zz9 bout');
+  });
+
+  it('never renders a blank embed for either kind', () => {
+    for (const kind of ['bg', 'arena'] as const) {
+      const msg = buildQueuePopMessage({ ...bgPop, kind }, 'https://woc.test') as {
+        embeds: Array<Record<string, any>>;
+      };
+      expect(msg.embeds[0].title.trim()).not.toBe('');
+      expect(msg.embeds[0].description.trim()).not.toBe('');
+    }
   });
 });
 

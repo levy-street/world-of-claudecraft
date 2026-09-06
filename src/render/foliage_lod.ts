@@ -21,6 +21,8 @@
 // floor sits past the cull (very low model quality), trees run to the cull
 // line and the blend law holds vacuously.
 
+import type { GfxTier } from './gfx';
+
 export interface LodDists {
   barkFar: number;
   treeDetailFar: number;
@@ -29,6 +31,11 @@ export interface LodDists {
   treeFillFar: number;
 }
 
+/**
+ * The full-detail table: ultra and insane. Every non-lean tier shares every
+ * row of it EXCEPT `treeDetailFar`, which the per-tier table below spreads
+ * (see TREE_DETAIL_FAR_BY_TIER).
+ */
 export const LOD_HIGH: LodDists = {
   barkFar: 330,
   treeDetailFar: 300,
@@ -37,9 +44,11 @@ export const LOD_HIGH: LodDists = {
   treeFillFar: 310,
 };
 
-// low caps must clear the worst camera-to-bucket distance (~158u for a
-// 2-column x 240u-band bucket) or nearby dressing vanishes and trunks pop at
-// bucket boundaries
+// Low caps: the tree rows still measure from the bucket CENTER, so these must
+// clear the worst camera-to-bucket-center distance a tree row can see (~158u
+// for a 2-column x 240u-band bucket) or trunks pop at bucket boundaries. The
+// rock and dressing rows measure from the near edge (maxNearEdge, below) and
+// no longer depend on this margin.
 export const LOD_LOW: LodDists = {
   barkFar: 170,
   treeDetailFar: 250,
@@ -48,8 +57,64 @@ export const LOD_LOW: LodDists = {
   treeFillFar: 245,
 };
 
-export function lodDistsFor(leanFoliage: boolean): LodDists {
-  return leanFoliage ? LOD_LOW : LOD_HIGH;
+/**
+ * The authored real-model radius per tier: how far real tree geometry is
+ * allowed to reach before the baked sprite takes over.
+ *
+ * THIS IS THE TIER LADDER'S ONE FOLIAGE-DISTANCE LEVER, and it used to be a
+ * constant. Every non-lean tier read LOD_HIGH's 300, and the only thing that
+ * moved between them was the bucket baseline feeding foliageDistanceScale
+ * (0.74 medium, 0.9 high, 1.0 ultra) and the shared SPRITE_SWAP_BUDGET: that
+ * put the clear-air handoff at 217 / 227 / 234 yards, an 8 percent span
+ * across four tiers, while real-model cost grows with the SQUARE of the
+ * radius. So medium and high paid very nearly ultra's outer ring, which is
+ * the most expensive part of the whole layer.
+ *
+ * Spreading the base is safe precisely because the sprite arm carries
+ * everything past the handoff (foliage_impostor_core.ts): the tree is still
+ * drawn, at the same base, height, tint and sway, as a baked picture of
+ * itself. What a nearer handoff costs is stated in SPRITE_SWAP_BUDGET's own
+ * header and it is the same cost here, one tier earlier: canopy
+ * self-parallax under camera translation, and a silhouette that stops
+ * changing with pitch. SPRITE_SWAP_MIN (150) is untouched and still binds
+ * first, so no tier can push a card into the near field; on medium it is now
+ * the binding term rather than the budget.
+ *
+ * A SESSION WITH NO IMPOSTORS IS NOT THE SAME SET AS THE LEAN TIERS, and the
+ * table does not try to be. The sprite verdict is
+ * `standardMaterials && !leanFoliage && !constrainedMemory`
+ * (far_terrain_core.ts farFieldPolicy, read through
+ * foliage_impostor.ts impostorsActive), so an ordinary constrained-memory
+ * phone or tablet resolving to medium or high is NOT leanFoliage and still
+ * has no sprites: it takes a row of this table and then runs the LEAN law.
+ * That is safe because the safety lives in the law, not in the table.
+ * treeDetailDistance floors its answer at the fog blend line
+ * (IMPOSTOR_MIN_FOG_BLEND), so however small a base it is handed, its trees
+ * still end at least that far into the murk; a smaller base can only trim
+ * inside a boundary the blend law already owns, and where the floor itself
+ * overshoots the cull it retreats to the cull. Only the SPRITE arm spends the
+ * base directly. The lean TIERS are absent for a different reason: they run
+ * the lean model set and their own decimation, so they keep LOD_LOW whole.
+ */
+export const TREE_DETAIL_FAR_BY_TIER: Record<GfxTier, number> = {
+  low: LOD_LOW.treeDetailFar,
+  medium: 190,
+  high: 230,
+  ultra: LOD_HIGH.treeDetailFar,
+  insane: LOD_HIGH.treeDetailFar,
+};
+
+/** The non-lean tables: LOD_HIGH with that tier's own real-model radius. */
+export const LOD_BY_TIER: Record<GfxTier, LodDists> = {
+  low: LOD_LOW,
+  medium: { ...LOD_HIGH, treeDetailFar: TREE_DETAIL_FAR_BY_TIER.medium },
+  high: { ...LOD_HIGH, treeDetailFar: TREE_DETAIL_FAR_BY_TIER.high },
+  ultra: LOD_HIGH,
+  insane: LOD_HIGH,
+};
+
+export function lodDistsFor(leanFoliage: boolean, tier: GfxTier): LodDists {
+  return leanFoliage ? LOD_LOW : LOD_BY_TIER[tier];
 }
 
 /**
@@ -149,6 +214,16 @@ export interface BucketWindowInput {
    */
   minAtDetail?: boolean;
   maxAtDetail?: boolean;
+  /**
+   * Measure the numeric max cap from the bucket's NEAR edge instead of its
+   * center. Only for rows whose vertex shader collapses every instance past
+   * that same cap (foliage_collapse.ts binds the cap as the row's window):
+   * the slab then survives until its nearest instance crosses the cap, and
+   * the instances beyond it cost a vertex-shader early-out each, never a
+   * rasterized triangle. Without that per-instance window a near-edge cap
+   * keeps a half-bucket of live triangles past the cull.
+   */
+  maxNearEdge?: boolean;
   /** adaptive budget scale applied to the build-time bounds */
   distanceScale: number;
   /** runtime tree-detail boundary (see treeDetailDistance) */
@@ -179,6 +254,16 @@ export interface BucketWindowInput {
  * edge would keep every bucket alive for another half-bucket past its cap and
  * quietly multiply the triangles they exist to cut.
  *
+ * The lean-arm rock and dressing rows are the one exception (maxNearEdge). A
+ * shipped slab is half the world wide (bounding radius ~270-310u) against a
+ * lean rock cap of ~106-190u, so keyed on the center the whole slab, boulders a
+ * stride from the player included, dropped out whenever the CAMERA orbited its
+ * center past the cap: rocks and bushes popping in and out with the view angle
+ * on Low, while the rock's collider still blocked movement. Those rows now
+ * measure from the near edge, and their vertex shader collapses each instance
+ * past the very same cap, so the extra kept instances are vertex early-outs,
+ * not the half-bucket of triangles the center rule exists to prevent.
+ *
  * The tree-detail swap is the exception: its two arms are COVERAGE tests, not a
  * partition. The real model draws while any part of the bucket is inside the
  * swap (near edge), the impostor while any part is outside it (far edge), so a
@@ -206,7 +291,11 @@ export function bucketVisible(w: BucketWindowInput): boolean {
     w.maxDist === undefined
       ? Number.POSITIVE_INFINITY
       : w.maxDist * w.distanceScale * w.revealScale;
-  if (w.centerDist < minCap || w.centerDist >= maxCap) return false;
+  // The cap probe: the center, or the near edge for the rows whose shader
+  // owns the per-instance boundary (see maxNearEdge). Camera-keyed either
+  // way, so an orbit of the camera moves it by the camera's own offset.
+  const maxProbe = w.maxNearEdge ? nearEdge : w.centerDist;
+  if (w.centerDist < minCap || maxProbe >= maxCap) return false;
 
   if (w.minAtDetail) {
     // Sprite rows come alive at the earliest per-instance handoff their

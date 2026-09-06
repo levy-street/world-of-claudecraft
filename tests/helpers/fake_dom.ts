@@ -77,6 +77,7 @@ export class FakeElement extends EventTarget {
   scrollHeight = 0;
   scrollWidth = 0;
   clientWidth = 0;
+  clientHeight = 0;
   focused = false;
   private html = '';
   private classes = '';

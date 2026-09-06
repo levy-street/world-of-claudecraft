@@ -22,6 +22,7 @@ import { clearVarkhulEncounterAuras } from '../encounters/varkhul';
 import { createGroundObject, createMob, createNpc } from '../entity';
 import { updateIgnivarForgeLift } from '../ignivar_forge_lift';
 import {
+  IGNIVAR_LIFT_ROOM_ID,
   IGNIVAR_RAID_ARENA_ID,
   IGNIVAR_RAID_ROOM_IDS,
   IGNIVAR_SECOND_WING_ID,
@@ -193,7 +194,6 @@ export function inheritDungeonResetLocks(ctx: SimContext, pid: number): void {
   if (!party) return;
   const partyKey = `party:${party.id}`;
   for (const inst of ctx.instances) {
-    if (RAID_ALLOWED_DUNGEON_IDS.has(inst.dungeonId)) continue;
     const claimLock =
       inst.partyKey === partyKey && inst.resetAvailableAt > ctx.time && inst.exitId !== null
         ? { availableAt: inst.resetAvailableAt, claimId: inst.exitId }
@@ -611,12 +611,11 @@ export function enterDungeon(
   // not strand the spirit at the door.
   const corpseBoundToClaim =
     r.e.ghost && inst !== undefined && r.e.corpseInstanceId === inst.exitId;
-  const conflictingResetLock =
-    !raidAllowed && !corpseBoundToClaim
-      ? resetOwnerPids(ctx, r.meta.entityId)
-          .map((ownerPid) => activeResetLock(ctx, ownerPid, dungeonId))
-          .find((lock) => lock !== null && lock.claimId !== inst?.exitId)
-      : undefined;
+  const conflictingResetLock = !corpseBoundToClaim
+    ? resetOwnerPids(ctx, r.meta.entityId)
+        .map((ownerPid) => activeResetLock(ctx, ownerPid, dungeonId))
+        .find((lock) => lock !== null && lock.claimId !== inst?.exitId)
+    : undefined;
   if (conflictingResetLock) {
     ctx.error(r.meta.entityId, 'Instances can only be reset once every 5 minutes.');
     return false;
@@ -624,13 +623,14 @@ export function enterDungeon(
   // The claim-wins rule above is silent, and silence is exactly the reported
   // confusion: a player who toggled the selection and walked back in landed in
   // the old-difficulty run with no explanation. A living player rejoining a
-  // standard claim whose difficulty differs from their selection is told, and
-  // pointed at the reset path. Ghosts are corpse-running back to the run they
-  // already know; raid claims are excluded from Reset All, so no advice there.
+  // claim whose difficulty differs from their selection is told, and pointed
+  // at the reset path (raid claims included, issue #3784: a raid used to have
+  // no player-facing way to switch difficulty short of disbanding and
+  // reforming the party under a fresh key, which also skipped the conflicting-
+  // reset-lock check above entirely). Ghosts are corpse-running back to the
+  // run they already know, so they get no advice.
   const mismatchedClaimDifficulty =
-    !raidAllowed && !r.e.ghost && inst !== undefined && inst.difficulty !== difficulty
-      ? inst.difficulty
-      : null;
+    !r.e.ghost && inst !== undefined && inst.difficulty !== difficulty ? inst.difficulty : null;
   if (!inst) {
     // Heroic five-mans lock on the KILL: a locked player can still corpse-run
     // back into a cleared live claim (gated on the boss being down, above), but
@@ -1099,11 +1099,27 @@ function freeInstance(ctx: SimContext, inst: InstanceSlot): void {
   inst.combatExitMemory = new Map();
 }
 
-// Explicit classic-style reset for the caller's standard dungeon claims. Durable
+// Explicit classic-style reset for the caller's dungeon AND raid claims. Durable
 // character keys keep relogs attached to the same run; this is the deliberate,
-// server-authoritative way to abandon that run before selecting another difficulty.
-// Raid approach/arena claims are excluded because their lockout and corpse-return
-// rules are stricter and are reset only by their existing lifecycle.
+// server-authoritative way to abandon a claim before selecting another difficulty.
+// Raid claims used to be excluded outright (their lockout and corpse-return rules
+// are stricter), which left disbanding and reforming the party under a fresh key
+// as the only way to switch a raid's difficulty: an UNTHROTTLED escape hatch, since
+// a fresh party key skips every check below. Issue #3784 closes that by routing raid
+// claims through the exact same gates as a standard claim, with the raid rooms'
+// own weekly/daily lockout checked alongside the heroic one below, and the Ignivar
+// chain's occupancy checked across its whole linked-room family.
+//
+// Reset is ATOMIC over every claim the caller's key currently owns, standard and
+// raid alike (they share one `owned` set because they share one partyKey): if any
+// owned claim cannot be safely reset, none are, even one the caller did not mean to
+// touch (a party that entered a five-man before converting to a raid, say). That is
+// the intended "Reset ALL Instances" contract, not a raid-specific carve-out.
+//
+// The occupancy walk and reset/free operation treat Ignivar's linked rooms as one
+// unit: a member three rooms deep blocks resetting the lift, and a difficulty
+// transition abandons deeper checkpoints instead of preserving them at the new
+// difficulty.
 export function resetDungeonInstances(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
@@ -1114,9 +1130,7 @@ export function resetDungeonInstances(ctx: SimContext, pid?: number): void {
   }
 
   const key = instanceKeyFor(ctx, r.meta.entityId);
-  const owned = ctx.instances.filter(
-    (inst) => inst.partyKey === key && !RAID_ALLOWED_DUNGEON_IDS.has(inst.dungeonId),
-  );
+  const owned = ctx.instances.filter((inst) => inst.partyKey === key);
   if (owned.length === 0) {
     ctx.error(r.meta.entityId, 'You have no instances to reset.');
     return;
@@ -1129,9 +1143,16 @@ export function resetDungeonInstances(ctx: SimContext, pid?: number): void {
   // Compare against the per-dungeon CLAMPED difficulty (what the replacement
   // claim below would actually use), so a dungeon without a heroic mode can
   // never pass the transition guard and loop same-difficulty resets.
-  const resettable = owned.filter(
+  const directlyResettable = owned.filter(
     (inst) => inst.difficulty !== claimDifficultyForDungeon(inst.dungeonId, selected),
   );
+  const resettableSet = new Set(directlyResettable);
+  if (directlyResettable.some((inst) => isIgnivarRaidRoom(inst.dungeonId))) {
+    for (const inst of owned) {
+      if (isIgnivarRaidRoom(inst.dungeonId)) resettableSet.add(inst);
+    }
+  }
+  const resettable = owned.filter((inst) => resettableSet.has(inst));
   if (resettable.length === 0) {
     ctx.error(
       r.meta.entityId,
@@ -1161,22 +1182,49 @@ export function resetDungeonInstances(ctx: SimContext, pid?: number): void {
       ctx.error(r.meta.entityId, `You are locked to Heroic ${DUNGEONS[locked.dungeonId].name}.`);
       return;
     }
+  } else {
+    // The raid rooms ALSO gate a fresh NORMAL claim on their own weekly/daily
+    // lockout (a normal kill there pays Heroic-Mark-style rewards, unlike an
+    // ordinary five-man); no other dungeon carries one, so this is a no-op
+    // for every claim outside DAILY_LOCKOUT_RAID_ROOMS/WEEKLY_LOCKOUT_RAID_ROOMS,
+    // mirroring the at-the-door check in enterDungeon above.
+    const locked = resettable.find(
+      (inst) =>
+        (DAILY_LOCKOUT_RAID_ROOMS.has(inst.dungeonId) ||
+          WEEKLY_LOCKOUT_RAID_ROOMS.has(inst.dungeonId)) &&
+        isRaidLocked(ctx, r.meta, inst.dungeonId),
+    );
+    if (locked) {
+      ctx.error(r.meta.entityId, `You are locked to ${DUNGEONS[locked.dungeonId].name}.`);
+      return;
+    }
   }
 
   // Validate every claim before freeing any so Reset All is atomic. A living player,
   // an unreleased corpse, or a released spirit still bound to a corpse in the claim
-  // keeps it alive for recovery and loot instead of being stranded by the reset.
+  // keeps it alive for recovery and loot instead of being stranded by the reset. The
+  // Ignivar rooms free as a whole linked family (mirrored below), so occupancy is
+  // checked across the WHOLE family too, exactly like the empty-instance reaper: a
+  // member fighting three rooms deep must still block a reset of the lift room.
+  // instanceClaimContains, not the plain origin box, for the same reason the reaper
+  // uses it: the Nythraxis boss arena's authored room is wider than the generic
+  // footprint, and a narrower check here would let a reset free it out from under
+  // raiders legitimately standing in its wide outer floor.
   for (const inst of resettable) {
-    const origin = instanceOriginOf(inst);
+    const familyClaims = isIgnivarRaidRoom(inst.dungeonId)
+      ? ignivarRaidClaimsForKey(ctx, key)
+      : [inst];
     for (const meta of ctx.players.values()) {
       const player = ctx.entities.get(meta.entityId);
       if (!player) continue;
-      const bodyInside = instanceContains(origin, player.pos);
+      const corpsePos = player.ghost ? player.corpsePos : null;
+      const bodyInside = familyClaims.some((claim) => instanceClaimContains(claim, player.pos));
       const corpseInside =
-        player.ghost &&
-        player.corpsePos !== null &&
-        player.corpseInstanceId === inst.exitId &&
-        instanceContains(origin, player.corpsePos);
+        corpsePos !== null &&
+        familyClaims.some(
+          (claim) =>
+            claim.exitId === player.corpseInstanceId && instanceClaimContains(claim, corpsePos),
+        );
       if (bodyInside || corpseInside) {
         ctx.error(r.meta.entityId, 'You cannot reset instances while someone is still inside.');
         return;
@@ -1192,8 +1240,21 @@ export function resetDungeonInstances(ctx: SimContext, pid?: number): void {
   // transition atomically: toggling the preference back afterward still rejoins this
   // live claim, so Reset All cannot be turned into a Normal -> Heroic -> Normal
   // zero-downtime boss-respawn loop.
+  //
+  // The Ignivar chain is the one exception: only its FIRST room (the lift, the
+  // raid's only overworld door) is reclaimed immediately, exactly like a standard
+  // dungeon's single room. Every DEEPER room the group already held is freed with
+  // no replacement claim, so the group must walk it and re-clear it again, same as
+  // every other path off an Ignivar run (the empty-instance reaper, or the old
+  // disband-and-reform workaround, both of which drop the whole chain). Reclaiming
+  // every held room immediately would instead have let a difficulty switch keep the
+  // group's checkpoint and zone straight into the deepest room on the new
+  // difficulty, with none of that room's own trash re-fought.
   for (const inst of resettable) {
     freeInstance(ctx, inst);
+    if (isIgnivarRaidRoom(inst.dungeonId) && inst.dungeonId !== IGNIVAR_LIFT_ROOM_ID) {
+      continue;
+    }
     claimInstance(ctx, inst, key, claimDifficultyForDungeon(inst.dungeonId, selected));
     if (inst.exitId === null) throw new Error('Dungeon reset replacement claim has no identity.');
     inst.resetAvailableAt = ctx.time + INSTANCE_EMPTY_TIMEOUT;

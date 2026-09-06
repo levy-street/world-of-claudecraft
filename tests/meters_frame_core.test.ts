@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  anchorAdjustedMeterFrame,
   clampMeterFrame,
   initialMeterFrame,
   METER_FRAME_LIMITS,
@@ -110,6 +111,42 @@ describe('meter frame geometry', () => {
     expect({ ...TABBED_METER_FRAME_LIMITS, minWidth: 0 }).toEqual({
       ...METER_FRAME_LIMITS,
       minWidth: 0,
+    });
+  });
+
+  it('round-trips the saved viewport through the serializer, both fields or neither', () => {
+    const withViewport = { ...geo(1, 2, 240, 180), vw: 1600, vh: 900 };
+    expect(parseMeterFrame(serializeMeterFrame(withViewport))).toEqual(withViewport);
+    // A lone axis cannot re-anchor honestly, so it is dropped on parse.
+    expect(parseMeterFrame('{"left":1,"top":2,"width":240,"height":180,"vw":1600}')).toEqual(
+      geo(1, 2, 240, 180),
+    );
+  });
+
+  describe('anchorAdjustedMeterFrame (viewport re-anchoring)', () => {
+    it('adjusts only when a saved viewport is present and differs', () => {
+      const box = geo(700, 800, 240, 180);
+      // No saved viewport (an older save): returned unchanged.
+      expect(anchorAdjustedMeterFrame(box, { w: 1200, h: 700 })).toEqual(box);
+      // Same viewport: untouched.
+      const stamped = { ...box, vw: 1600, vh: 900 };
+      expect(anchorAdjustedMeterFrame(stamped, { w: 1600, h: 900 })).toEqual(stamped);
+    });
+
+    it('re-anchors a corner-parked panel across a fullscreen exit, and growing back restores it', () => {
+      // The DPS meter dragged into the bottom-right corner at 4K.
+      const corner = { ...geo(3500, 1900, 240, 180), vw: 3840, vh: 2160 };
+      const shrunk = anchorAdjustedMeterFrame(corner, { w: 1920, h: 1080 });
+      // Rides both edges into the smaller viewport instead of keeping its
+      // absolute 4K offset (which would land off-screen or mid-window).
+      expect(shrunk).toMatchObject({ left: 1580, top: 820 });
+      // Leaving fullscreen again restores the exact 4K spot: this is the
+      // shrink-then-grow round trip the bug report described.
+      const restamped = { ...shrunk, vw: 1920, vh: 1080 };
+      expect(anchorAdjustedMeterFrame(restamped, { w: 3840, h: 2160 })).toMatchObject({
+        left: 3500,
+        top: 1900,
+      });
     });
   });
 });

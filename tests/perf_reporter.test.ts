@@ -62,6 +62,8 @@ function qualityBuckets(): NonNullable<PerfSnapshot['renderer']>['qualityBuckets
         governable: true,
       },
       ui: { min: 0.86, baseline: 1, max: 1, roi: 0.86, cost: 'cpu', governable: false },
+      detail: { min: 0, baseline: 1, max: 1, roi: 0.92, cost: 'gpu', governable: true },
+      post: { min: 0, baseline: 1, max: 1, roi: 0.9, cost: 'gpu', governable: true },
     },
     baseline: {
       resolution: 1,
@@ -76,6 +78,8 @@ function qualityBuckets(): NonNullable<PerfSnapshot['renderer']>['qualityBuckets
       weapons: 1,
       worldStreaming: 0.88,
       ui: 1,
+      detail: 1,
+      post: 1,
     },
     levels: {
       resolution: 0.9,
@@ -90,6 +94,8 @@ function qualityBuckets(): NonNullable<PerfSnapshot['renderer']>['qualityBuckets
       weapons: 1,
       worldStreaming: 0.88,
       ui: 1,
+      detail: 0.66,
+      post: 0.75,
     },
     features: {
       composer: true,
@@ -166,7 +172,15 @@ function prewarmStats(): NonNullable<NonNullable<PerfSnapshot['renderer']>['prew
         budgetVariants: [
           {
             index: 0,
-            levels: { grass: 1, foliage: 0.86, vfx: 0.92, lighting: 0.9, resolution: 0.9 },
+            levels: {
+              grass: 1,
+              foliage: 0.86,
+              vfx: 0.92,
+              lighting: 0.9,
+              resolution: 0.9,
+              detail: 1,
+              post: 1,
+            },
             elapsedMs: 24,
             syncMs: 18,
             programsBefore: 10,
@@ -176,7 +190,15 @@ function prewarmStats(): NonNullable<NonNullable<PerfSnapshot['renderer']>['prew
           },
           {
             index: 1,
-            levels: { grass: 0.86, foliage: 0.72, vfx: 0.84, lighting: 0.78, resolution: 0.9 },
+            levels: {
+              grass: 0.86,
+              foliage: 0.72,
+              vfx: 0.84,
+              lighting: 0.78,
+              resolution: 0.9,
+              detail: 1,
+              post: 1,
+            },
             elapsedMs: 20,
             syncMs: 15,
             programsBefore: 14,
@@ -519,6 +541,11 @@ function snapshot(): PerfSnapshot {
       renderScale: 1,
       effectiveRenderScale: 0.9,
       shadowCadenceHalfRate: false,
+      shadowExtentStep: 0,
+      shadowExtentScale: 1,
+      shadowExtentHalf: 105,
+      terrainDetailLevel: 1,
+      postShedRung: 'full',
       renderBudget: {
         enabled: true,
         mode: 'stable',
@@ -533,7 +560,7 @@ function snapshot(): PerfSnapshot {
         stallHoldSeconds: 0,
         stableSeconds: 0,
         cooldownSeconds: 0,
-        levels: { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 0.9 },
+        levels: { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 0.9, detail: 1, post: 1 },
         caps: {
           targetCalls: 330,
           urgentCalls: 500,
@@ -550,6 +577,15 @@ function snapshot(): PerfSnapshot {
       pixelRatio: 1.5,
       width: 1440,
       height: 900,
+      // A governor-backed-off medium session: the allocation stands at the
+      // manual ceiling and the flag says the scene rasterizes a sub-rect of it.
+      drawingBuffer: {
+        width: 1728,
+        height: 1080,
+        cssWidth: 1440,
+        cssHeight: 900,
+        dynamicResolution: true,
+      },
       calls: 500,
       triangles: 300000,
       geometries: 120,
@@ -591,6 +627,7 @@ function snapshot(): PerfSnapshot {
         submit: { count: 1, avg: 1, p95: 1, max: 1 },
         total: { count: 1, avg: 5, p95: 5, max: 5 },
       },
+      nameplates: { paints: 0, paintsSkipped: 0 },
       renderDiagnostics: renderDiagnostics(),
       prewarm: prewarmStats(),
       entryDetailHorizon: {
@@ -685,6 +722,19 @@ describe('perf reporter payload', () => {
     // rides in rawSummary (the no-DDL home), never as a top-level column.
     expect((body.rawSummary as { hiddenPresentSkips?: number }).hiddenPresentSkips).toBe(0);
     expect((body.rawSummary as { graphicsConfigVersion?: number }).graphicsConfigVersion).toBe(16);
+    // The 3D drawing buffer rides in rawSummary (the no-DDL home): the report's
+    // own columns cannot say what a session rasterizes, because `dpr` is the raw
+    // window.devicePixelRatio and the viewport columns are window.innerWidth /
+    // innerHeight, neither of which is the renderer's capped ratio or the canvas
+    // rect. The dynamicResolution flag has to survive with the numbers: without
+    // it a governor-backed-off session reads as if it drew at full allocation.
+    expect((body.rawSummary as { rendererDrawingBuffer?: unknown }).rendererDrawingBuffer).toEqual({
+      width: 1728,
+      height: 1080,
+      cssWidth: 1440,
+      cssHeight: 900,
+      dynamicResolution: true,
+    });
     // The entry reveal wait rides in rawSummary too (the fleet-side watch for the
     // establishing-shot bound): the counters verbatim, the waits from the ring.
     expect((body.rawSummary as { entryReveal?: unknown }).entryReveal).toEqual({
@@ -739,7 +789,15 @@ describe('perf reporter payload', () => {
     expect(summaryEntries?.[1]?.budgetVariants).toEqual([
       {
         index: 0,
-        levels: { grass: 1, foliage: 0.86, vfx: 0.92, lighting: 0.9, resolution: 0.9 },
+        levels: {
+          grass: 1,
+          foliage: 0.86,
+          vfx: 0.92,
+          lighting: 0.9,
+          resolution: 0.9,
+          detail: 1,
+          post: 1,
+        },
         elapsedMs: 24,
         syncMs: 18,
         programsBefore: 10,
@@ -749,7 +807,15 @@ describe('perf reporter payload', () => {
       },
       {
         index: 1,
-        levels: { grass: 0.86, foliage: 0.72, vfx: 0.84, lighting: 0.78, resolution: 0.9 },
+        levels: {
+          grass: 0.86,
+          foliage: 0.72,
+          vfx: 0.84,
+          lighting: 0.78,
+          resolution: 0.9,
+          detail: 1,
+          post: 1,
+        },
         elapsedMs: 20,
         syncMs: 15,
         programsBefore: 14,
@@ -1154,7 +1220,15 @@ describe('perf reporter payload', () => {
               stallHoldSeconds: 0,
               stableSeconds: 0,
               cooldownSeconds: 0,
-              levels: { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 0.9 },
+              levels: {
+                grass: 1,
+                foliage: 1,
+                vfx: 1,
+                lighting: 1,
+                resolution: 0.9,
+                detail: 1,
+                post: 1,
+              },
               caps: {
                 targetCalls: 330,
                 urgentCalls: 500,
@@ -1278,6 +1352,28 @@ describe('perf reporter report dimensions', () => {
       PerfSnapshot['renderer']
     >['lastFrame'];
   }
+
+  it('carries the WebGPU high-performance adapter, and null until the probe settles', () => {
+    (globalThis as any).location = { search: '' };
+    // The reporter passes the probe's cached value straight through, so a
+    // beacon built before it settles (or on a browser with no WebGPU at all)
+    // ships null rather than waiting on it. The server reads a missing or null
+    // field as "no adapter" and stores '' for it.
+    const pending = payloadFromSnapshot(snapshot(), new Settings(), 'sess1', 42, null, false)!;
+    expect(pending.gpuHpAdapter).toBe(null);
+    const settled = payloadFromSnapshot(
+      snapshot(),
+      new Settings(),
+      'sess1',
+      42,
+      null,
+      false,
+      'NVIDIA GeForce RTX 4070 Laptop GPU',
+    )!;
+    // Sent RAW: the server buckets it with the same parser it runs on
+    // glRenderer, so the client never gets to name a family key itself.
+    expect(settled.gpuHpAdapter).toBe('NVIDIA GeForce RTX 4070 Laptop GPU');
+  });
 
   it('emits the provider zone id as zoneOrScenario for gameplay sessions', () => {
     (globalThis as any).location = { search: '' };

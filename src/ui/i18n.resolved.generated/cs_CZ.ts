@@ -570,9 +570,9 @@ export const cs_CZ: EnTranslations = {
       "tabsLabel": "Sekce obchodu WOC",
       "storeTab": "Obchod",
       "rewardsTab": "Denní odměny",
-      "mountsEyebrow": "Account Mounts",
-      "mountsTitle": "Machine Stable",
-      "mountBuyAria": "Purchase {item}",
+      "mountsEyebrow": "Připojení účtu",
+      "mountsTitle": "Strojově stabilní",
+      "mountBuyAria": "Koupit {item}",
       "loading": "Načítání obchodu WOC…",
       "error": "Obchod WOC nyní není dostupný. Zkus to za chvíli znovu.",
       "balance": "Zůstatek Claudium",
@@ -978,6 +978,7 @@ export const cs_CZ: EnTranslations = {
       "mounts": "Jízdní zvířata",
       "professions": "Profese",
       "reliquary": "Relikviář",
+      "lootExplorer": "Průzkumník kořisti",
       "nameplates": "Jména",
       "haptics": "Haptika",
       "hapticsOff": "Haptika vypnuta",
@@ -1141,6 +1142,9 @@ export const cs_CZ: EnTranslations = {
       "promptAttack": "Útočit",
       "promptUseAbility": "Použít schopnost",
       "promptKneel": "Pokleknout",
+      "promptAccessInterface": "Otevři rozhraní",
+      "promptMoveToTarget": "Přejdi na {target}",
+      "promptSelectItem": "Vyber {item}",
       "promptOpenBags": "Otevřít batohy",
       "promptCharacterSheet": "Otevřít panel postavy",
       "promptLookAround": "Podržet pravé tlačítko a tažením se rozhlížet",
@@ -1308,9 +1312,9 @@ export const cs_CZ: EnTranslations = {
       "regroup": "Znovu seskupit {meter}"
     },
     "targetDots": {
-      "title": "Target Dots",
-      "row": "{aura} on {target}",
-      "overflow": "{count} more not shown"
+      "title": "Cílové body",
+      "row": "{aura} na {target}",
+      "overflow": "{count} více nezobrazeno"
     },
     "targetAuras": {
       "title": "Aury cíle",
@@ -1393,11 +1397,13 @@ export const cs_CZ: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, stínoskákací ropucha",
       "name_stormfeather_griffin": "Nebeský Bouřepero",
       "name_thunderstrut_gobbler": "Hromokrok, Velký krocan",
+      "name_goblin_rocket_sled": "Gobliní raketové saně",
+      "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Hrůzojiskra, otřásač země",
       "name_drakemaw_raptor": "Raptor z Dračí tlamy",
-      "name_mech_bird": "Cluckwork Mech Bird",
-      "name_lanternback_troll": "Grumbol the Lanternback",
-      "name_chimeglass_tortoise": "Tolliver the Chimeglass",
+      "name_mech_bird": "Mechanický pták Cluckwork",
+      "name_lanternback_troll": "Grumbol Lanternback",
+      "name_chimeglass_tortoise": "Tolliver Chimeglass",
       "name_rickshaw_mount": "Kostipoutaná rikša",
       "desc_valorsteed": "Otužilý, jistonohý oř poskytující zvýšenou rychlost cestování.",
       "desc_grag_bear": "Otužilý, jistonohý medvěd poskytující zvýšenou rychlost cestování.",
@@ -1406,11 +1412,13 @@ export const cs_CZ: EnTranslations = {
       "desc_shadowjump_toad": "Mohutná, jistonohá obří ropucha, vycvičená v bleskurychlých stínových skocích, které zvládnou jakýkoli terén.",
       "desc_stormfeather_griffin": "Vznešený bouřný gryf, který se plíží po zemi na rounami okovaných spárech, se složenými křídly.",
       "desc_thunderstrut_gobbler": "Kolosální krocan zrozený z bouře, který se hrdě prochází z Probouzejícího se vrcholu, s ocasem rozevřeným jako bouřkový mrak.",
+      "desc_goblin_rocket_sled": "Nebezpečně překonstruované gobliní saně poháněné dvěma raketami a skvěle špatným úsudkem.",
+      "desc_rallycart_rxt": "Malý rallye stroj, který zvyšuje rychlost cestování.",
       "desc_terrorspark_groundshaker": "Kompaktní obrněný stroj s těžkými pásy, velkorážním kanónem a sedlem pro nebojácné piloty.",
       "desc_drakemaw_raptor": "Osedlaný raptor z líhně v Kaldeře Dračí tlamy, samé šlachy a hbitost, ještě slabě páchnoucí popelem.",
-      "desc_mech_bird": "A hand-built clockwork war chicken that sprints on snapping servos, wind-up key still turning.",
-      "desc_lanternback_troll": "A hill troll broken to the yoke by lamplighters, carrying an iron throne across his shoulders with a storm lantern burning on either arm.",
-      "desc_chimeglass_tortoise": "A salt-flat tortoise who has outwalked three generations of caravans. Tinkers ground him spectacles from storm-glass and hung a bronze bell at his throat, so the road hears him long before it sees him.",
+      "desc_mech_bird": "Ručně vyrobené strojové válečné kuře, které sprintuje na cvakací serva, natahovací klíč se stále otáčí.",
+      "desc_lanternback_troll": "Horský troll, který lampáři zlomili do jha, nesl přes ramena železný trůn a na obou pažích hořela bouřková lucerna.",
+      "desc_chimeglass_tortoise": "Solná želva, která překonala tři generace karavanů. Tinkers mu vybrousil brýle z bouřkového skla a pověsil mu na hrdlo bronzový zvon, takže ho cesta slyší dlouho předtím, než ho uvidí.",
       "desc_rickshaw_mount": "Chrastící kostěný vozík s kostnatým pěšákem zapřaženým do ojí, který tě veze tryskem."
     },
     "mountTraining": {
@@ -1580,7 +1588,10 @@ export const cs_CZ: EnTranslations = {
       "uiScale": "Měřítko UI",
       "playerFrameScale": "Měřítko rámu hráče",
       "targetFrameScale": "Měřítko rámu cíle",
+      "playerHealthText": "Text zdraví hráče",
+      "targetHealthText": "Text cíleného zdraví",
       "aurasOnPlayerFrame": "Buffy na rámu hráče",
+      "auraBarBelowFrame": "Buffy pod rámem hráče",
       "alwaysShowAllBuffs": "Vždy zobrazit všechny buffy",
       "highContrastBackground": "Vysoce kontrastní pozadí",
       "startAttackOnAbility": "Automatický útok při použití schopnosti",
@@ -1603,9 +1614,9 @@ export const cs_CZ: EnTranslations = {
       "showTargetOfTarget": "Zobrazit cíl cíle",
       "showTargetSwingTimer": "Zobrazit časovač švihu cíle",
       "showPetFrame": "Zobrazit tvého mazlíčka",
-      "showNameplateDots": "Show My Dots on Nameplates",
-      "nameplateDotScale": "Nameplate Dot Size",
-      "showTargetDots": "Show Target Dots",
+      "showNameplateDots": "Zobrazit moje tečky na jmenovkách",
+      "nameplateDotScale": "Velikost bodu na jmenovce",
+      "showTargetDots": "Zobrazit cílové body",
       "waterRipples": "Vlnky na vodě (brázdy)",
       "showAttackButton": "Zobrazit tlačítko útoku",
       "showDailyRewardsChest": "Zobrazit truhlu denních odměn",
@@ -2507,7 +2518,9 @@ export const cs_CZ: EnTranslations = {
       "unequipHint": "Klikni pro odebrání tohoto batohu",
       "poolGeneral": "Obecné: {used} z {total}",
       "poolMaterials": "Materiály: {used} z {total}",
-      "capacityPoolsAria": "Použité sloty batohu: {used} z {total}. Obecné předměty: {generalUsed} z {generalTotal}. Materiály: {materialsUsed} z {materialsTotal}."
+      "capacityPoolsAria": "Použité sloty batohu: {used} z {total}. Obecné předměty: {generalUsed} z {generalTotal}. Materiály: {materialsUsed} z {materialsTotal}.",
+      "capacityPools": "Předměty {generalUsed}/{generalTotal}, materiály {materialsUsed}/{materialsTotal}",
+      "emptyMaterialsOnly": "Jen materiály"
     },
     "raidConvert": {
       "toPartyDone": "Tvůj raid byl převeden zpět na skupinu.",
@@ -2744,7 +2757,7 @@ export const cs_CZ: EnTranslations = {
       "suddenDeath": "Tvůj příští Předčasný hrob nestojí žádný vztek a ignoruje svůj požadavek na zdraví",
       "aoeEcho": "Zbývá {charges} ozvěn: schopnosti na jeden cíl zasáhnou i až {targets} blízké nepřátele za {pct} % poškození",
       "sureCrit": "{charges} seslání poškozujících schopností jsou zaručeně kritické zásahy",
-      "temporalEcho": "Seslatelovo arkánní poškození tě léčí za {singlePct} % poškození na jeden cíl nebo {areaPct} % plošného poškození",
+      "temporalEcho": "Seslatelovo arkánní poškození tě léčí za {singlePct}% poškození na jeden cíl nebo {areaPct}% plošného poškození. Éterová vlna a Éterové šipky získávají u individuální Časové ozvěny čtyřnásobný bonus. Skupinové ozvěny vytvářejí stejnou rezervu léčení, která se rozdělí podle chybějícího zdraví mezi označené spojence pod 60% zdraví",
       "arcaneCharge": "{stacks} Éterických nábojů: Aether Surge způsobuje o {damagePct} % více poškození, sesílá se o {castPct} % rychleji a stojí {costMult}x many",
       "physicalReduction": "Snižuje utrpěné fyzické poškození o {pct} %",
       "temporalHourglass": "Nezranitelný/á a neschopný/á jednat; obnovuje zdraví a urychluje obnovu cooldownu. Klikni pravým tlačítkem pro zrušení.",
@@ -2955,6 +2968,7 @@ export const cs_CZ: EnTranslations = {
       "healthPercent": "Procenta",
       "healthCurrent": "Aktuální",
       "healthCurrentMax": "Aktuální / Maximum",
+      "healthCurrentMaxPercent": "Aktuální / Max (procento)",
       "sort": "Seřadit hráče",
       "sortGroup": "Skupina",
       "sortRole": "Role",
@@ -2994,7 +3008,7 @@ export const cs_CZ: EnTranslations = {
         "targetFrame": "Cíl",
         "partyFrames": "Skupina",
         "swingBar": "Automatický útok",
-        "targetDots": "Target Dots"
+        "targetDots": "Cílové body"
       },
       "framesMenu": "Nastavení rámečků",
       "framesMenuTitle": "Zobraz nebo skryj jednotlivé rámečky. Nezaškrtnutý rámeček zůstane skrytý, dokud ho znovu nezaškrtneš nebo neobnovíš výchozí nastavení.",
@@ -3027,33 +3041,33 @@ export const cs_CZ: EnTranslations = {
       "wrongKind": "Tento kód je jiného typu exportu."
     },
     "riftForge": {
-      "title": "Rift Forge",
-      "subtitle": "Riftbound bands",
+      "title": "Kovárna trhlin",
+      "subtitle": "Riftbound kapely",
       "currency": "{name}: {count}",
-      "empty": "No Riftbound band in your bags. A ranked Rift first clear mints one.",
-      "wornHint": "Worn. Unequip it to forge.",
-      "upgradeBtn": "Upgrade to item level {level} ({cost} essence)",
-      "upgradeMax": "Fully upgraded",
-      "gemPickAria": "Gem to socket",
+      "empty": "Žádná Riftbound kapela ve vašich taškách. Zařazená Rift jako první čistá mincovna.",
+      "wornHint": "Nošené. Vybavit to kovat.",
+      "upgradeBtn": "Upgradujte na úroveň položky {level} (podstata {cost})",
+      "upgradeMax": "Plně upgradováno",
+      "gemPickAria": "Drahokam do zásuvky",
       "gemOption": "{name} ({bonus})",
-      "socketReplaceHint": "Sockets full: the next gem replaces the oldest, {gem}.",
-      "socketBtn": "Socket",
-      "socketsNone": "no gems",
-      "noGems": "No Rift gems in your bags",
-      "refused": "The forge refused. Stand at the Riftwright and try again.",
+      "socketReplaceHint": "Zásuvky plné: další drahokam nahrazuje nejstarší, {gem}.",
+      "socketBtn": "Zásuvka",
+      "socketsNone": "žádné drahokamy",
+      "noGems": "Žádné drahokamy Rift ve vašich taškách",
+      "refused": "Kovárna odmítla. Postavte se k Riftwrightovi a zkuste to znovu.",
       "reason": {
-        "notFound": "That band is not in your bags.",
-        "notRiftGear": "Only a Riftbound band can be forged.",
-        "maxUpgrade": "That band is fully upgraded.",
-        "insufficientEssence": "Not enough Rift Essence.",
-        "invalidGem": "You have no such Rift gem.",
-        "dead": "You can't do that while dead.",
-        "tooFar": "You are too far from the Rift Forge."
+        "notFound": "Ta kapela není ve vašich taškách.",
+        "notRiftGear": "Kovat lze pouze pásku Riftbound.",
+        "maxUpgrade": "Ta kapela je plně upgradovaná.",
+        "insufficientEssence": "Nedostatek Rift Essence.",
+        "invalidGem": "Nemáte žádný takový drahokam Rift.",
+        "dead": "Nemůžeš to udělat, když jsi mrtvý.",
+        "tooFar": "Jste příliš daleko od Rift Forge."
       },
       "done": {
-        "upgrade": "Upgraded {name}.",
-        "socket": "Socketed a gem into {name}.",
-        "socketReplaced": "Socketed a gem into {name}; {gem} was destroyed."
+        "upgrade": "Vylepšený {name}.",
+        "socket": "Zasunutý klenot do {name}.",
+        "socketReplaced": "Zasunutý drahokam do {name}; {gem} byl zničen."
       }
     },
     "itemTooltip": {
@@ -3061,7 +3075,7 @@ export const cs_CZ: EnTranslations = {
       "riftTier": "Trhlinový předmět stupně {tier}",
       "riftUpgrade": "Vylepšení trhliny {level}/{max}",
       "riftSockets": "Trhlinové drahokamy {used}/{total}",
-      "riftGemSocket": "Socket bonus for a Riftbound band",
+      "riftGemSocket": "Bonus do zásuvky pro kapelu Riftbound",
       "statEnchanted": "+{value} {stat} (okouzleno)",
       "enchantedFallback": "Okouzlený",
       "partyTradeWindow": "Tento předmět můžeš dalších {time} směňovat s hráči, kteří sdíleli jeho kořist. Nasazení předmětu okno pro směnu ukončí."
@@ -3086,6 +3100,7 @@ export const cs_CZ: EnTranslations = {
       "close": "Zavřít",
       "keybind": "Panel Discordu",
       "disabled": "Discord integrace teď není dostupná.",
+      "queuePingsLabel": "Pošlete mi přímou zprávu Discord, když se objeví fronta na bojišti nebo v aréně (vyžaduje propojený účet Discord)",
       "tiers": {
         "none": "Bez hodnosti",
         "initiate": "Zasvěcenec",
@@ -3343,13 +3358,13 @@ export const cs_CZ: EnTranslations = {
       "close": "Zavřít"
     },
     "realmBuilder": {
-      "title": "Realm Builder of the Month",
-      "currentLabel": "Honoured this month",
-      "placeholderName": "Your Name Here",
-      "placeholderHint": "This plate is waiting for its first name.",
-      "pastTitle": "Past honourees",
-      "pastEmpty": "No names on the roll yet.",
-      "close": "Close"
+      "title": "Realm Builder měsíce",
+      "currentLabel": "Oceněno tento měsíc",
+      "placeholderName": "Vaše jméno zde",
+      "placeholderHint": "Tato deska čeká na své křestní jméno.",
+      "pastTitle": "Minulá vyznamenání",
+      "pastEmpty": "Na seznamu zatím nejsou žádná jména.",
+      "close": "Zavřít"
     },
     "bank": {
       "title": "Banka",
@@ -3406,6 +3421,8 @@ export const cs_CZ: EnTranslations = {
       "depositAllDone": "Uloženo materiálů: {count}.",
       "depositAllFull": "Uloženo materiálů: {count}. Banka je teď plná.",
       "depositAllNone": "Banka je plná: nic nebylo uloženo.",
+      "depositAllNotable": "Uložené materiály: {count}, včetně {item}.",
+      "depositAllNotableFull": "Uložené materiály: {count}, včetně {item}. Banka je nyní plná.",
       "bonusTitle": "Bonusové sloty",
       "bonusEarned": "+{count}",
       "bonusStatusEarned": "+{count}",
@@ -3444,6 +3461,8 @@ export const cs_CZ: EnTranslations = {
       "vaultDepositAllDone": "Uloženo materiálů: {count}.",
       "vaultDepositAllFull": "Uloženo materiálů: {count}. Některé stropy jsou plné.",
       "vaultDepositAllNone": "Stropy trezoru jsou plné: nic nebylo uloženo.",
+      "vaultDepositAllNotable": "Uložené materiály: {count}, včetně {item}.",
+      "vaultDepositAllNotableFull": "Uložené materiály: {count}, včetně {item}. Některé stropy jsou plné.",
       "vaultWithdrawShort": "Do tvých batohů se vejde jen {fit} z {count}.",
       "vaultDepositHint": "Klikni a ulož do svého trezoru",
       "vaultCannotDeposit": "Nelze uložit do trezoru",
@@ -3580,17 +3599,17 @@ export const cs_CZ: EnTranslations = {
         }
       },
       "roster": {
-        "seats": "{count} of {cap} seats",
-        "expand": "Expand roster (+{seats} seats for {price})",
-        "maxed": "The roster is at its largest size",
-        "confirm": "Expand the guild roster by {seats} seats for {price}? The gold comes from your own purse and is not refunded.",
-        "confirmAction": "Expand",
-        "expandedLine": "{name} has expanded the guild roster to {cap} members.",
+        "seats": "{count} sedadel {cap}",
+        "expand": "Rozbalit seznam (+ sedadla {seats} pro {price})",
+        "maxed": "Seznam je ve své největší velikosti",
+        "confirm": "Rozšířit seznam cechů o místa ve {seats} pro {price}? Zlato pochází z vaší vlastní peněženky a není vráceno.",
+        "confirmAction": "Rozbalit",
+        "expandedLine": "{name} rozšířil seznam cechů o členy {cap}.",
         "result": {
-          "notLeader": "Only the Guild Master may expand the guild roster.",
-          "maxed": "The guild roster cannot grow any larger.",
-          "cannotAfford": "You need {price} to expand the guild roster.",
-          "retry": "The guild roster changed while you were buying. Try again."
+          "notLeader": "Pouze gildovní mistr může rozšiřovat cechovní seznam.",
+          "maxed": "Soupiska cechu se nemůže zvětšovat.",
+          "cannotAfford": "K rozšíření seznamu cechu potřebujete {price}.",
+          "retry": "Během nákupu se cechovní seznam změnil. Zkuste to znovu."
         }
       }
     },
@@ -4009,7 +4028,7 @@ export const cs_CZ: EnTranslations = {
       "yieldLineRange": "{min} až {max} {item}",
       "alreadyEnchanted": "Tento předmět je již okouzlený.",
       "sameEnchant": "Tento předmět už má toto okouzlení.",
-      "riftGear": "Riftbound bands take Rift gems, not enchants.",
+      "riftGear": "Riftbound kapely berou Rift drahokamy, ne enchanty.",
       "replaceTag": "Nahradí {enchant}",
       "sameEnchantTag": "Již aplikováno",
       "plainTag": "Bez okouzlení",
@@ -4314,6 +4333,7 @@ export const cs_CZ: EnTranslations = {
       "sourceProfession": "Získáno díky {profession}",
       "sourceDeed": "Uděluje skutek {deed}",
       "sourceVendor": "Prodává {vendor}",
+      "sourceVendorGated": "Prodává {vendor} ({requirement})",
       "sourceBossZone": "Padá z {boss} v {zone}",
       "sourceDelve": "K nalezení ve výpravě {delve}",
       "sourceRift": "Padá z průchodů trhlinami hodnosti {rank}",
@@ -4333,6 +4353,10 @@ export const cs_CZ: EnTranslations = {
       "filterAll": "Vše",
       "filterOwned": "Zkatalogizované",
       "filterMissing": "Chybějící",
+      "filterIlluminated": "Osvětlené",
+      "filterRemaining": "Zbývající",
+      "filterEmptyPages": "Tomuto filtru neodpovídají žádné stránky.",
+      "filterGroupAriaPages": "Filtrujte stránky podle toho, zda jsou osvětlené",
       "recentJumpAria": "Otevřít stránku pro {name}",
       "recentEmpty": "Zatím žádné nálezy. Relikvie, které od teď zkatalogizuješ, přistanou tady.",
       "nearlyEmpty": "Sem se sbíhají stránky, které mají k dokončení nablízku.",
@@ -4440,6 +4464,7 @@ export const cs_CZ: EnTranslations = {
       "summary": "Mapa světa. Vyber oblast a otevři její mapu.",
       "toWorld": "Mapa světa",
       "toZone": "Mapa oblasti",
+      "toInstance": "Mapa instance",
       "toggleAria": "Přepnout mezi mapou světa a mapou oblasti",
       "levels": "Úrovně {min} až {max}"
     },
@@ -4474,6 +4499,7 @@ export const cs_CZ: EnTranslations = {
       "walletLinkedConnected": "Tvoje propojená aplikace peněženky je připojena a připravena na nákupy za $WOC.",
       "walletUsdBalance": "{amount} USD",
       "walletUsdUnknown": "Neznámé",
+      "walletCardDismiss": "Skrýt kartu peněženky",
       "rateNote": "Kurz: přibližně {tokens} $WOC za 1,00 USD k {time}.",
       "rateNotePaused": "Poslední známý kurz: přibližně {tokens} $WOC za 1,00 USD k {time}.",
       "estimateNote": "Přibližně {tokens} $WOC za {usd} při aktuálním kurzu.",
@@ -4665,6 +4691,43 @@ export const cs_CZ: EnTranslations = {
       "listingStatusCancelled": "Zrušeno",
       "listingStatusSuspended": "Pozastaveno",
       "listingStatusUnsold": "Neprodáno"
+    },
+    "lootExplorer": {
+      "title": "Průzkumník kořisti",
+      "close": "Zavřete Loot Explorer",
+      "searchPlaceholder": "Hledat položky...",
+      "searchAria": "Hledat položky",
+      "filterCategoryAria": "Zdroj",
+      "filterClassAria": "třídy",
+      "filterStatAria": "Atribut",
+      "filterQualityAria": "Kvalita",
+      "filterAll": "všechny",
+      "tabItems": "Podle položky",
+      "tabEncounters": "Podle Setkání",
+      "category": {
+        "raid": "Nájezd",
+        "dungeon": "Podzemí",
+        "delve": "Ponořte se",
+        "open_world": "Otevřený svět",
+        "rift": "Trhlina",
+        "vendor": "Prodejce",
+        "quest_reward": "Odměna za hledání",
+        "quest_objective": "Cíl výpravy",
+        "ground_object": "Světový objekt",
+        "starting_equipment": "Startovací zařízení"
+      },
+      "difficulty": {
+        "normal": "Normální",
+        "heroic": "Hrdinské"
+      },
+      "riftRankLabel": "Stupeň trhliny {rank}",
+      "source": "{category}: {name}",
+      "sourceWithContext": "{category}: {name} ({context})",
+      "chance": "{pct}% šance",
+      "guaranteed": "Zaručeno",
+      "gatedByQuest": "Při hledání: {quest}",
+      "empty": "Těmto filtrům neodpovídá žádná kořist.",
+      "resultCount": "Výsledky {count}"
     }
   },
   "gatherEvent": {
@@ -4763,7 +4826,8 @@ export const cs_CZ: EnTranslations = {
       "link_required": "Nejdřív propoj svůj Discord účet.",
       "swag_claimed": "Tuto odměnu už sis vyzvedl(a).",
       "swag_tier": "Pro vyzvednutí dosáhni vyšší hodnosti.",
-      "swag_points": "Nemáš dost bodů."
+      "swag_points": "Nemáš dost bodů.",
+      "invalid_input": "Neplatný vstup."
     },
     "deeds": {
       "invalid_input": "Neplatný vstup."
@@ -4815,6 +4879,11 @@ export const cs_CZ: EnTranslations = {
       "reason_required": "Je nutné uvést důvod.",
       "invalid_duration": "Zadejte dobu označení alespoň jednu sekundu.",
       "not_marked": "Tento účet není označen."
+    },
+    "kick": {
+      "reason_required": "Je vyžadován důvod.",
+      "admin_target": "Účty operátorů nelze vykopnout.",
+      "target_offline": "Tento hráč již není v této sféře online."
     },
     "woc_market": {
       "invalid_input": "Neplatný vstup.",
@@ -5249,10 +5318,13 @@ export const cs_CZ: EnTranslations = {
       "ifPlayerFrameScale": "Velikost tvého vlastního rámu hráče.",
       "ifTargetFrameScale": "Velikost tvého rámu cíle.",
       "ifPartyStyle": "Rozvržení skupiny: Automatický se řídí velikostí tvé skupiny, Klasické rámečky skupiny drží tradiční sloupec a Rámečky raidu narovnají všechny do kompaktní mřížky.",
+      "ifPlayerHealthText": "Co vytiskne váš vlastní ukazatel zdraví: nic, procento, aktuální zdraví, aktuální a maximální, nebo obojí s procentem vedle nich.",
+      "ifTargetHealthText": "Co vytisknou ukazatele zdraví cíle a cíle, se stejnými možnostmi jako u vašeho vlastního snímku.",
       "ifPartyHealthText": "Co lišty skupiny zobrazují: nic, procenta, aktuální zdraví, nebo aktuální a maximální.",
       "ifPartySort": "Pořadí, ve kterém jsou vypsáni členové skupiny: podle pořadí ve skupině, role nebo jména.",
       "ifPartyShowAuras": "Zda se na rámech skupiny zobrazují buffy a debuffy. Odpovídající přepínače pokrývají lišty zdrojů, absorpce, mazlíčky a to, jestli se objevíš ve vlastním seznamu skupiny.",
       "ifAurasOnPlayerFrame": "Přidá tvé buffy a debuffy i na rám hráče, nejen na lištu aur.",
+      "ifAuraBarBelowFrame": "Přesune řadu buffů pod rám jednotky místo nad něj. Má význam jen tehdy, když jsou buffy na rámu hráče.",
       "ifAlwaysShowAllBuffs": "Zobrazuje všechna aktivní posílení i při nízkém nastavení grafiky a obchází obvyklý limit ikon posílení.",
       "ifTargetOfTarget": "Zobrazí, na koho míří tvůj cíl, klasický způsob, jak poznat, jestli ho tank ještě drží.",
       "ifPetFrame": "Zobrazí rám pro tvého mazlíčka.",
@@ -5260,6 +5332,7 @@ export const cs_CZ: EnTranslations = {
       "ifChatOpacity": "Jak neprůhledné je pozadí chatu.",
       "ifCompactChat": "Zhustí řádky chatu, aby se jich vešlo víc.",
       "ifChatTimestamps": "Přidá ke každému řádku chatu čas, ve 12hodinovém nebo 24hodinovém formátu.",
+      "ifFilterProfanity": "Maskuje vulgární výrazy v chatu pomocí hvězdiček. Ve výchozím nastavení zapnuto; zde jej vypněte, pokud chcete chat číst nefiltrovaný.",
       "ifStartAttack": "Zda použití schopnosti spustí i tvůj automatický útok. Ve výchozím stavu zapnuto, klasické chování, které většina hráčů čeká.",
       "ifStopAutoAttack": "Zda přepnutí cíle zastaví tvůj úder. Ve výchozím stavu vypnuto, takže tvůj útok přejde na nový cíl.",
       "ifShowAttackButton": "Přidá na tvou akční lištu výslovné tlačítko Útok.",
@@ -5272,7 +5345,7 @@ export const cs_CZ: EnTranslations = {
       "ifHideUnused": "Skryje prázdné akční sloty, takže se vykreslí jen tlačítka, která doopravdy používáš.",
       "ifLockBars": "Uzamkne tvé lišty, abys omylem nevytáhl schopnost ze slotu.",
       "keybindsHeading": "Panel Klávesové zkratky",
-      "keybindsBody": "Seznam kláves je jen polovina tohoto panelu. Nad ním sedí přepínače, které rozhodují, jak myš ovládá hru: kamera myší, jestli se kurzor při otáčení uzamkne, kliknutím k pohybu a které tlačítko myši ho spouští, útok pohybem, rozvržení pro leváky na dotyku a filtr vulgarit pro chat.",
+      "keybindsBody": "Seznam klíčů je pouze polovina tohoto panelu. Nad ním jsou umístěny přepínače, které rozhodují o tom, jak vaše myš řídí hru: kamera myši, zda se kurzor zamyká při otáčení, kliknutím se pohybujete a které tlačítko myši jej spouští, útočný pohyb a rozložení dotyku levou rukou.",
       "keybindsMouseBody": "Dvě věci se tam snadno přehlédnou. Tlačítka myši se váží jako klávesy, takže kliknutí kolečkem i palcová tlačítka mohou nést schopnosti, zatímco levé a pravé tlačítko zůstávají vyhrazená kameře a klikání do světa. A vázat můžeš rovnou z akční lišty: zapni si tu režim vázání přímo na liště, pak klikni na slot a stiskni klávesu, kterou chceš."
     },
     "combat": {
@@ -6071,7 +6144,7 @@ export const cs_CZ: EnTranslations = {
       "heroicRewardsBody": "Hrdinští bossové upouštějí kořist, kterou znáš, vylepšenou a v popisku označenou jako Hrdinská, a koncový boss každého běhu přidává epiky, které jinde nenajdeš. To poslední zabití také zanechá Hrdinské známky každému účastníkovi: měnu, kterou utratíš u ubytovatele Vexe v Highwatch, jehož pult je regál prstenů a přívěsků, který nekoupí nic než důkaz z hrdinských hlubin.",
       "heroicLockoutBody": "Normální dungeony lze běhat celý den. Hrdinský žádá trpělivost: zabití koncového bosse omezí všechny v běhu na jedno hrdinské dokončení toho dungeonu za den a raid drží denní zámek pro každou obtížnost. Na živé říši všechny denní zámky padají společně v její vlastní noční hodině obnovy, takže dokončení vzaté těsně před tou hodinou a jiné těsně po ní spadnou do dvou různých dnů; hraj místo toho offline v prohlížeči a zámek prostě vyprší den po tvém vlastním zabití. Už dokončený pětičlenný běh zůstává otevřený vlastní skupině pro běhy k mrtvole a kořist, takže nikdo není odříznut od toho, co si tam vysloužil. Raid je přísnější: jakmile tě jeho zabití zamkne, dveře zůstanou zavřené až do obnovy, a jediná cesta zpět dovnitř je běh k mrtvole toho, kdo padl právě v tom běhu, který ho zamkl, takže živý raider, který vyjde ven, vyšel ven na celý den. Posbírej svou kořist, než opustíš arénu. Každý z těchto zámků patří postavě, která si ho vysloužila, takže dokončení na tvé hlavní postavě nechává ostatní postavy volné.",
       "resetTitle": "Resetování instancí",
-      "resetBody": "Změň obtížnost, dokud vaše skupina ještě drží nárokované běhy, a staré nároky chvíli přetrvají, než se samy uvolní. Vůdce skupiny je může pustit naráz: vyberte Resetovat všechny instance v nabídce vlastního portrétu, nebo napište /dungeon reset. Reset funguje až po skutečné změně obtížnosti, jen dokud uvnitř nikdo nezůstal, živý ani padlý, jen když každá mrtvola uvnitř byla dočista vyloupena, a jeden reset od dalšího dělí krátká doba obnovy. Přijdete-li ke dveřím se špatnou obtížností, hra to řekne dřív, než běh začne. Raid se takto nikdy neresetuje; platí jeho vlastní pravidla zámků.",
+      "resetBody": "Přepínejte obtížnost, zatímco vaše skupina stále drží nárokované jízdy a staré nároky chvíli přetrvávají, než se samy vyčistí. Vůdce party je místo toho může nechat jít najednou: v nabídce jejich vlastního portrétu vyberte možnost Resetovat všechny instance nebo zadejte /dungeon reset. Reset funguje až poté, co byla obtížnost skutečně změněna, pouze pokud uvnitř nikdo, živý nebo padlý, nezůstane, pouze pokud je každá mrtvola uvnitř vydrancována a jeden reset od dalšího se oddělí krátkým cooldownem. Přijeďte ke dveřím na špatnou obtížnost a hra to řekne před začátkem běhu. Raid se resetuje stejným způsobem, jeho vlastní lockout a pravidla návratu mrtvol stále zůstávají na vrcholu.",
       "templeLoreTitle": "Utopený chrám, o trochu hlouběji",
       "templeLoreBody": "Chrám má vlastní legendu, starší než kult, který pronásleduješ jinde. Na břehu Třpytivého plesa, horského jezera, které pije měsíční světlo a vrací utopené, drží osamělý hlídač bránu bledého světla. Pod hladinou k ní vede schodiště studeného kamene. Lidé, kteří tam klesli, se neutopili nešťastnou náhodou: byli Bledý sbor, který sestoupil pod vodu v uctívání a nikdy nepřestal zpívat. Staří strážci vyryli do skal jediné varování, než je voda vzala, modlitbu k něčemu, čemu říkali Utopený měsíc, a pevnější ruka pod ni přidala dvě slova: jen spí.",
       "cryptLeadTitle": "Dveře, které měli mrtví udržet zavřené",
@@ -6104,8 +6177,8 @@ export const cs_CZ: EnTranslations = {
       "raceBody": "Na stejnou trhlinu může naráz zaútočit každá skupina v říši, každá ve vlastní kopii, a zapečetí ji jen ta, která jako první srazí to, co čeká na dně. Když skupina vyhraje, říše se dozví její jména i čas a cesta dovnitř se za ní zavře. Prohra v závodě tvůj běh neukončí: tvoje kopie zůstane otevřená, ta věc na dně ti stále padne a ven odejdeš vlastní silou. Přijdeš jen o všechno, co by ti zaplatilo vyčištění. Boss té skupině, která doběhla druhá, nezanechá nic, takže domů si odneseš jen to, co upustili nepřátelé cestou dolů, a nic víc. Kniha skutků čistku počítá tak jako tak, protože tu věc jsi skutečně srazil. Je to jediný závod ve hře, který můžeš prohrát, aniž bys kdy spatřil ty, kdo tě porazili.",
       "rewardsHeading": "Co si odnášíš",
       "rewardsBody": "Vyplácí se zapečetit trhlinu, ne ji jen přežít. Sraz trhlinu jako první a zaplatí jako instancovaný obsah, vedle kterého svým stupněm stojí, takže těžší stupně stojí za tu těžší dřinu. Zapečetění navíc vloží trhlinou spoutaný prsten do rukou každého, kdo byl u toho, ušitý na míru roli tvé třídy a osobní jen pro tebe, a k tomu ti do batohů přidá esenci trhliny, na těžších stupních doplněnou drahokamy trhliny. Kromě cesty domů zanechá to, co čeká na dně, zapečetěnou skrýš, kterou tvoje skupina může otevřít za extra kořist, za použití stejného vypáčení Cestou stavítek, jaké znáš ze skrýší ve výpravách, takže čistá, trpělivá práce se vyplatí víc než uspěchaná. Nic z toho se nedostane ke skupině, která doběhla druhá: prohraný závod ti nechá jen to, co upustili nepřátelé cestou dolů. Výjimkou je Kniha skutků, která tvou čistku počítá tak jako tak, se skutkem za zapečetění tvé první trhliny a dalším za sražení trhliny stupně S.",
-      "forgeHeading": "The Rift Forge",
-      "forgeBody": "The band a ranked first clear mints is not finished when you receive it. Riftwright Maelis, who keeps a forge in the Watch Meadow on the Farshore, up the shore from Gullhaven beside the Breach Scholar, will raise its item level one step at a time and set the coloured gems the rifts drop into its sockets, each colour one combat rating. A full band takes a new gem in place of its oldest, so you can retune it later. All of that is paid in Rift Essence and Rift gems, the forge currency that falls from rift bosses and trades freely, so a friend can hand you the essence you are short. Take the band off before you bring it to her: she works on what is in your bags, and she does nothing at all unless you are standing at her forge.",
+      "forgeHeading": "Rift Forge",
+      "forgeBody": "Kapela na prvním místě v žebříčku není dokončena, když ji obdržíte. Riftwright Maelis, který má kovárnu na Watch Meadow na Farshore, na břehu od Gullhavenu vedle Breach Scholar, bude postupně zvyšovat úroveň svých předmětů a dávat barevné drahokamy, které trhliny vhazují do zásuvek, každá barva má jedno bojové hodnocení. Celá kapela má místo svého nejstaršího klenot nový, takže jej můžete později přeladit. To vše se platí v Rift Essence a Rift drahokamy, měně kovárny, která padá z riftových bossů a volně se s ní obchoduje, takže vám přítel může předat esenci, na kterou jste málo. Sundejte si pásek, než jí ho přinesete: pracuje na tom, co máte v taškách, a nedělá vůbec nic, pokud nestojíte u její kovárny.",
       "trackerHeading": "Tracker na obrazovce",
       "trackerBody": "Zatímco jsi uvnitř, malý pruh na obrazovce tě drží v obraze: na kterém jsi patře z kolika celkem, a živé odpočítávání. Čti to odpočítávání pozorně, protože nejde o čas tvého běhu. Je to čas, po který se zavře vstup zpátky do světa. Jakmile jsi uvnitř, tvoje skupina hraje trhlinu vlastním tempem, ať to trvá jakkoli dlouho, ale jakmile ty hodiny dojdou na nulu, cesta dovnitř zmizí pro každého, takže si to rozmysli, než těsně před koncem vyjdeš ven."
     },
@@ -7997,7 +8070,7 @@ export const cs_CZ: EnTranslations = {
       "forgeUpgraded": "Vylepšení trhliny dokončeno pro {name}.",
       "forgeEnchanted": "Okouzlení trhliny dokončeno pro {name}.",
       "forgeSocketed": "Trhlinový drahokam osazen pro {name}.",
-      "forgeGemReplaced": "Rift gem replaced for {name}: {gem} destroyed.",
+      "forgeGemReplaced": "Riftový drahokam nahrazen za {name}: {gem} zničen.",
       "detonateGlacialGrave": "Ledovcový hrob detonuje!",
       "detonateAbsoluteZero": "Absolutní nula vybuchuje!",
       "detonateMagmaWell": "Magmová studna vybuchuje!",
@@ -8644,6 +8717,7 @@ export const cs_CZ: EnTranslations = {
     "connectingRealm": "Připojuje se ke světu...",
     "assetsFailed": "Načítání assetů selhalo: zkus stránku obnovit. {error}",
     "rendererFailed": "Renderer se nepodařilo spustit: zkus stránku obnovit. {error}",
+    "rendererContextLost": "3D renderer ztratil grafický kontext a nedokázal ho obnovit. Zkus stránku obnovit.",
     "enterTimeout": "Nepodařilo se vstoupit do světa. Připojení vypršelo. Běží herní server?",
     "connectionLost": "Připojení k serveru bylo ztraceno.",
     "reconnectingAttempt": "Spojení ztraceno. Znovu se připojuji... (pokus {attempt}/{maxAttempts}, opakování za {seconds}s)",
@@ -8654,6 +8728,7 @@ export const cs_CZ: EnTranslations = {
     "realmFull": "Tento svět je momentálně plný. Zkus to prosím znovu za několik minut.",
     "tooManyConnections": "Z tvé sítě se k tomuto světu připojuje příliš mnoho spojení. Zavři nadbytečná herní okna nebo to zkus znovu za několik minut.",
     "messageRateExceeded": "Spojení bylo přerušeno kvůli příliš rychlému odesílání akcí. Chvíli počkej a přihlas se znovu.",
+    "kickedByModerator": "Moderátor vás odpojil: {reason}",
     "tips": {
       "classes": "Tip: každá z 9 tříd se hraje jinak. Než se pro jednu rozhodneš, několik jich vyzkoušej.",
       "talents": "Tip: kdykoli nejsi v boji, můžeš resetovat své talenty, takže časná volba nikdy není past.",
@@ -10467,11 +10542,11 @@ export const cs_CZ: EnTranslations = {
       },
       "melting_acid": {
         "name": "Tavící kyselina",
-        "description": "Postříká cíl žíravým jedem, způsobí poškození přírody {damage} a sníží jeho brnění o 5 % na 12 sekund."
+        "description": "Potře zbraň na 30 min. Každý tvůj úder na blízko postříká cíl žíravou kyselinou a sníží jeho brnění o 5 % na 12 sekund."
       },
       "nightshade_coating": {
         "name": "Nátěr Nightshade",
-        "description": "Pokryje cíl v nočním stínu, způsobí {damage} poškození přírody a sníží léčení, které obdrží, o 25 % po dobu 12 sekund."
+        "description": "Potře zbraň na 30 min. Každý tvůj úder na blízko pokryje cíl nočním stínem a sníží léčení, které obdrží, o 25 % po dobu 12 sekund."
       },
       "expose_armor": {
         "name": "Průraz zbroje",
@@ -10487,11 +10562,11 @@ export const cs_CZ: EnTranslations = {
       },
       "instant_poison": {
         "name": "Zmijí kousnutí",
-        "description": "Potře zbraň na 30 min, takže každý tvůj úder na blízko způsobí 8 dodatečného přírodního poškození."
+        "description": "Potře zbraň na 30 min, takže každý tvůj úder na blízko způsobí {damage} dodatečného přírodního poškození."
       },
       "deadly_poison": {
         "name": "Hnisavý jed",
-        "description": "Potře zbraň na 30 min, takže každý tvůj úder na blízko způsobí 14 dodatečného přírodního poškození."
+        "description": "Potře zbraň na 30 min. Každý tvůj úder na blízko přidá cíli vrstvu jedu, až do 5, a obnoví trvání 12 sekund. Každá vrstva způsobí {damage} poškození přírody každé 2 sekundy."
       },
       "blind": {
         "name": "Hození hlíny",
@@ -11589,11 +11664,11 @@ export const cs_CZ: EnTranslations = {
       },
       "temporal_echo": {
         "name": "Časová ozvěna",
-        "description": "Označíš spojence ozvěnou zdravějšího okamžiku a okamžitě zacelíš {damage} zdraví. Po dobu {duration} s část arcanového poškození, které způsobuješ, se přes tuto ozvěnu vrátí a léčí je."
+        "description": "Označíš spojence ozvěnou zdravějšího okamžiku a okamžitě zacelíš {damage} zdraví. Po dobu {duration} s ho léčí {echoSinglePct}% tvého ostatního arkánního poškození na jeden cíl a {echoAreaPct}% plošného arkánního poškození. Éterová vlna a Éterové šipky ho místo toho léčí za {echoDriverPct}% způsobeného poškození."
       },
       "temporal_cascade": {
         "name": "Časová kaskáda",
-        "description": "Sešle ozvěnu přes tvou skupinu: cíl a až čtyři nejbližší spojenci jsou okamžitě zaceleni a každý je označen na {duration} s; část arcanového poškození, které způsobuješ, se přes jejich ozvěny vrátí a vyléčí je. (Chronomagie)"
+        "description": "Sešle ozvěnu přes tvou skupinu: cíl a až čtyři nejbližší spojenci jsou okamžitě zaceleni a každý je označen na {duration} s; část arkánního poškození, které způsobuješ, se přes jejich ozvěny vrátí a vyléčí je. Éterová vlna a Éterové šipky vytvoří z každé skupinové ozvěny stejnou rezervu léčení, která se rozdělí podle chybějícího zdraví mezi označené spojence pod 60% zdraví. (Chronomagie)"
       },
       "temporal_reversal": {
         "name": "Časový návrat",
@@ -13281,11 +13356,17 @@ export const cs_CZ: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Klíček zapalování: Hrůzojiskra, otřásač země"
       },
+      "reins_goblin_rocket_sled": {
+        "name": "Klíček zapalování: Gobliní raketové saně"
+      },
+      "reins_rallycart_rxt": {
+        "name": "Klíček zapalování: Rallycart RXT"
+      },
       "reins_lanternback_troll": {
         "name": "Lampářovo jho: Grumbol"
       },
       "reins_chimeglass_tortoise": {
-        "name": "Roadwarden's Bellstrap: Tolliver"
+        "name": "Zvoncový postroj cestovní hlídky: Tolliver"
       },
       "reins_rickshaw_mount": {
         "name": "Spoutané otěže: Kostipoutaná rikša"
@@ -13294,7 +13375,7 @@ export const cs_CZ: EnTranslations = {
         "name": "Otěže raptora z Dračí tlamy"
       },
       "reins_mech_bird": {
-        "name": "Ignition Key: Cluckwork Mech Bird"
+        "name": "Klíč zapalování: Cluckwork Mech Bird"
       },
       "rimefang": {
         "name": "Jinovatkový tesák"
@@ -15921,9 +16002,9 @@ export const cs_CZ: EnTranslations = {
         "greeting": "Otevřelo se to přesně tam, kde schnou sítě. Přesně tam, kde jsem stávala každé ráno svého života. Už nechodím dolů k pobřeží. Už skoro nikam nechodím."
       },
       "riftwright_maelis": {
-        "name": "Riftwright Maelis",
-        "title": "Rift Forgemaster",
-        "greeting": "A Riftbound band remembers the break that made it, {className}. Bring me the band, and the essence the breaks shed, and I will teach it to remember more."
+        "name": "Riftová tvůrkyně Maelis",
+        "title": "Mistryně riftové kovárny",
+        "greeting": "Kapela Riftbound si pamatuje přestávku, která ji udělala, {className}. Přines mi kapelu a esenci, která se zbaví, a já ji naučím pamatovat si víc."
       },
       "forgemistress_darva": {
         "name": "Mistryně kovárny Darva",
@@ -18985,8 +19066,8 @@ export const cs_CZ: EnTranslations = {
       },
       "chronoweave": {
         "name": "Roucha Éterové tkaniny",
-        "bonus2": "Časová ozvěna převádí 50 procent tvého arkánního poškození jediného cíle na léčení. Utržené poškození již nezpožďuje sesílání kouzel.",
-        "bonus4": "Doba obnovy Časové kaskády se zkracuje o 5 s."
+        "bonus2": "Časová ozvěna převádí 50% tvého ostatního arkánního poškození na jeden cíl na léčení. Éterová vlna a Éterové šipky místo toho převádějí 200% způsobeného poškození. Utržené poškození již nezpožďuje sesílání kouzel.",
+        "bonus4": "Doba obnovy Časové kaskády se zkracuje o 5 s a její cena many se snižuje o 30%."
       },
       "cinderbark": {
         "name": "Ochrana Popelavé kůry",
@@ -19215,6 +19296,6 @@ export const cs_CZ: EnTranslations = {
     "delveRiteShrineSkullInteract": "Lebková svatyně: stiskni F a dotkni se jí",
     "mailboxName": "Poštovní schránka",
     "noticeboardName": "Vývěska",
-    "realmBuilderMonumentName": "Realm Builder Monument"
+    "realmBuilderMonumentName": "Památník Realm Builder"
   }
 };

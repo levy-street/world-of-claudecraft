@@ -55,7 +55,6 @@ import {
   placementFloorHeight,
   resolveMovement,
   resolvePosition,
-  seatGroundedAt,
 } from './colliders';
 import { resolveActionReplacement } from './combat/action_replacement';
 import { clearAfflictionState } from './combat/affliction';
@@ -74,6 +73,7 @@ import {
   rangedSwing as rangedSwingImpl,
   startAutoAttack as startAutoAttackImpl,
   stopAutoAttack as stopAutoAttackImpl,
+  tryPlayerSwing as tryPlayerSwingImpl,
   updatePlayerAutoAttack as updatePlayerAutoAttackImpl,
 } from './combat/auto_attack';
 import {
@@ -138,7 +138,6 @@ import {
   updateVeilboundMarchMovement,
   veilboundMarchBlocksAura,
 } from './combat/paladin_veilbound_march';
-import { isVeilboundMarchActive } from './combat/paladin_veilbound_state';
 import { cleanupPriestState } from './combat/priest/lifecycle';
 import { resolveVespersAbility } from './combat/priest/vespers';
 import * as resurrectionOfferMod from './combat/resurrection_offer';
@@ -174,7 +173,6 @@ import {
 } from './content/skins';
 import {
   cloneAllocation,
-  computeTalentModifiers,
   emptyAllocation,
   emptyModifiers,
   FIRST_TALENT_LEVEL,
@@ -286,6 +284,7 @@ import { canStackInstancePayloads, isMergeableInstancePayload } from './item_ins
 import { meetsLevelRequirement } from './item_level_req';
 import { setItemLocked as setItemLockedCmd } from './item_lock';
 import * as items from './items';
+import { applyKnockback as applyKnockbackImpl } from './knockback';
 import {
   type DeedsLeaderboardPage,
   type DevLeaderboardPage,
@@ -1222,6 +1221,8 @@ export interface ResolvedAbility {
   freeCast?: boolean;
   charges?: number; // authored stored uses; undefined means one use
   bonusCharges?: number; // talent-added uses, kept distinct from native maxCharges
+  /** Individual Temporal Echo conversion after worn-set resolution. */
+  echoConvertSingle?: number;
   /** Destruction-only cast-time reservation; consumed once even if a projectile resists/fizzles. */
   ruinousBrandCopy?: { targetId: number; value: number };
   /** 1-based authoritative charge stage for hold-to-charge spells. */
@@ -5237,6 +5238,7 @@ export class Sim {
       isControlAura: sim.isControlAura.bind(sim),
       applyRootAura: sim.applyRootAura.bind(sim),
       applyKnockback: sim.applyKnockback.bind(sim),
+      isIceBlocked: sim.isIceBlocked.bind(sim),
       diminishedCrowdControlDuration: sim.diminishedCrowdControlDuration.bind(sim),
       hostilesInRadius: sim.hostilesInRadius.bind(sim),
       friendliesInRadius: sim.friendliesInRadius.bind(sim),
@@ -5456,6 +5458,7 @@ export class Sim {
       breakGhostWolf: sim.breakGhostWolf.bind(sim),
       forceDismount: sim.forceDismountPlayer.bind(sim),
       startAutoAttack: sim.startAutoAttack.bind(sim),
+      tryPlayerSwing: (p, meta) => tryPlayerSwingImpl(sim.ctx, p, meta),
       revivePet: sim.revivePet.bind(sim),
       completeFishing: (p, meta) => fishing.completeFishing(sim.ctx, p, meta),
       // Gather cast completion: module-bound with the live ctx,
@@ -7066,80 +7069,13 @@ export class Sim {
     });
   }
 
-  // On-hit knockback: hurl `target` up to `distance` yards straight away from
-  // `source`. Instantaneous displacement (no aura) walked in small steps so it can
-  // be terrain-clamped exactly like a warrior charge — the shove stops at the last
-  // safe footing before deep water or a cliff rather than stranding the victim off
-  // the world. Each step is also collider-swept (resolveMove, the same walker uses)
-  // so a wall (an arena side wall in particular) stops the shove instead of letting
-  // it tunnel through in one coarse hop. Returns the yards actually moved (0 if
-  // blocked immediately).
+  // Moved to knockback.ts (behind SimContext): the shove math, the
+  // skin-padded collider resolve, and the support-aware landing seat. Kept as
+  // a thin delegate because both `ctx.applyKnockback` (effect_dispatch, the
+  // delve bell, mob_swing) and the `(sim as any)` test call sites resolve it
+  // on the Sim facade.
   private applyKnockback(source: Entity, target: Entity, distance: number): number {
-    if (source.id !== target.id && this.isIceBlocked(target)) return 0;
-    if (source.id !== target.id && isVeilboundMarchActive(target)) return 0;
-    if (this.cfg.devCommands && this.players.get(target.id)?.devAnchored) return 0;
-    // Knockback resistance (the caster tier-set 2-piece grants 100%) is applied
-    // centrally here so no caller can bypass it: a fully-resisted shove moves 0 yards
-    // and never displaces the victim, so a caster keeps casting through it.
-    distance *= 1 - (target.knockbackResistance ?? 0);
-    if (distance <= 0) return 0;
-    let dx = target.pos.x - source.pos.x;
-    let dz = target.pos.z - source.pos.z;
-    let len = Math.hypot(dx, dz);
-    if (len < 1e-4) {
-      // exactly overlapping: shove along the mob's facing so the direction is stable
-      dx = Math.sin(source.facing);
-      dz = Math.cos(source.facing);
-      len = 1;
-    }
-    const ux = dx / len,
-      uz = dz / len;
-    const STEP = 0.5;
-    let moved = 0;
-    let cx = target.pos.x,
-      cz = target.pos.z;
-    while (moved < distance) {
-      const adv = Math.min(STEP, distance - moved);
-      const nx = cx + ux * adv,
-        nz = cz + uz * adv;
-      const h1 = groundHeight(nx, nz, this.cfg.seed);
-      if (h1 < waterLevelAt(nx, nz, this.cfg.seed) - SWIM_DEPTH) break; // would land in deep water
-      // ridden-surface slopes (ride_height.ts): a submerged bed bump does not
-      // stop a shove crossing shallow water. No shore step-out here: a forced
-      // displacement conservatively stops at a bank face.
-      const wls = stepWaterLevel(cx, cz, nx, nz, this.cfg.seed);
-      const r0 = Math.max(groundHeight(cx, cz, this.cfg.seed), wls);
-      const r1 = Math.max(h1, wls);
-      if (
-        r1 > r0 &&
-        ((r1 - r0) / adv > MAX_CLIMB_SLOPE ||
-          (h1 >= wls && rideSteepnessAt(nx, nz, this.cfg.seed) > MAX_CLIMB_SLOPE))
-      ) {
-        break; // would slam into a cliff
-      }
-      // resolveMove sweeps cx,cz -> nx,nz against static colliders (walls,
-      // pillars, delve module bounds/doors) in small sub-steps, so a thin wall
-      // stops the shove at its face instead of the coarse 0.5yd hop skipping
-      // over it.
-      const resolved = this.resolveMove(cx, cz, nx, nz, BODY_RADIUS, target);
-      const blocked = Math.hypot(resolved.x - nx, resolved.z - nz) > BODY_RADIUS * 0.25;
-      cx = resolved.x;
-      cz = resolved.z;
-      moved += adv;
-      if (blocked) break; // hit a wall: stop the shove here
-    }
-    if (moved <= 0) return 0;
-    // Support-aware seat: a victim shoved along crate tops stays on them, and
-    // one shoved through a passed-over prop footprint is nudged clear instead
-    // of being embedded at terrain height inside it.
-    const seat = seatGroundedAt(this.cfg.seed, cx, cz, BODY_RADIUS, target.pos.y);
-    target.pos.x = seat.x;
-    target.pos.z = seat.z;
-    target.pos.y = seat.y;
-    target.vy = 0;
-    target.onGround = true;
-    target.fallStartY = target.pos.y;
-    return moved;
+    return applyKnockbackImpl(this.ctx, source, target, distance);
   }
 
   // The one funnel every PLAYER-sourced crowd-control application passes

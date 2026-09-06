@@ -1026,11 +1026,14 @@ describe('admin api auth', () => {
       byPreset: [],
       byGfxTier: [],
       byGpu: [],
+      byBackend: [],
       byBrowser: [],
       byOs: [],
       byScenario: [],
       byCrowd: [],
       worstGpuBuckets: [],
+      byModel: [],
+      byHpMismatch: [],
       suggestionCounts: [{ id: 'hardware-acceleration', sampleCount: 3 }],
     });
     vi.mocked(clientPerfRaw).mockResolvedValue([

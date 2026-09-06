@@ -23,7 +23,11 @@ const defaultScheduler: ContextRecycleScheduler = {
   clearTimeout: (id) => clearTimeout(id),
 };
 
-const DEFAULT_RECYCLE_TIMEOUT_MS = 10_000;
+// Exported so context_loss_recovery.ts's own watchdog bound can be derived
+// from it rather than duplicating the number: that watchdog must stay looser
+// than this recycle's own worst case, or a normal graphics-preset switch
+// could trip it mid-rebuild.
+export const DEFAULT_RECYCLE_TIMEOUT_MS = 10_000;
 
 export function preflightWebGL2ContextRecycle(context: WebGL2RenderingContext): void {
   if (context.isContextLost()) throw new Error('Renderer WebGL2 context is already lost');

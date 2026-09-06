@@ -56,7 +56,7 @@ export function buyHeroicVendorItem(ctx: SimContext, itemId: string, pid?: numbe
   // (Conservative: the marks leave a slot free after the debit, but the check
   // runs first; the buyer frees a slot and retries, nothing is lost.)
   if (!ctx.canAddItem(itemId, 1, meta.entityId)) {
-    bagsFullError(ctx, meta.entityId);
+    bagsFullError(ctx, meta.entityId, itemId);
     return;
   }
   ctx.removeItem(HEROIC_MARK_ITEM_ID, entry.marks, meta.entityId);

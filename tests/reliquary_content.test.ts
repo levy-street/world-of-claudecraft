@@ -398,8 +398,9 @@ describe('Reliquary Conqueror catalog structure', () => {
     // epics, 16 wing epics, 3 + 5 heroic-only weapons and shields), on top of
     // the batch's own page: 340 + 1 + 45, plus the two developer mount slots
     // (Lanternback Troll, Chimeglass Tortoise): 388, plus the Cluckwork Mech
-    // Bird store mount on Horizons: 389.
-    expect(full).toEqual({ owned: 389, total: 389 });
+    // Bird store mount on Horizons: 389, plus the candidate Goblin Rocket Sled
+    // and Rallycart RXT slots: 391.
+    expect(full).toEqual({ owned: 391, total: 391 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -411,7 +412,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // Rickshaw's new mount slot and the 41 Crucible raid relics; marks are
     // character-scoped, so this trails the overview by the 29 account-scoped
     // weapon skins).
-    expect(character).toEqual({ owned: 360, total: 360 });
+    expect(character).toEqual({ owned: 362, total: 362 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -442,7 +443,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(424);
+    ).toBe(426);
     // Distinct mark ids: the 10 shipped before Phase 21 plus the 19
     // rare-slain proofs of conquerors_rares_of_the_realm.
     expect(
@@ -2531,13 +2532,16 @@ const SOURCE_PENDING_RULING: Readonly<Record<string, readonly string[]>> = {
   // def comment in content/drakelands.ts. Owner call recorded 2026-08-04: the
   // slot stays listed and sourceless until the mount gets a route.
   // terrorspark_groundshaker, lanternback_troll, chimeglass_tortoise and
-  // rickshaw_mount: DEVELOPER_MOUNTS, dev-grant only, deliberately absent from
-  // vendors, quests, mob loot, heroic loot, and the rift reins pools (see the
-  // def comments in content/mounts.ts).
+  // rickshaw_mount, plus the candidate goblin_rocket_sled and rallycart_rxt:
+  // DEVELOPER_MOUNTS, dev-grant only, deliberately absent from vendors, quests,
+  // mob loot, heroic loot, and the rift reins pools (see the def comments in
+  // content/mounts.ts).
   horizons_mounts: [
     'chimeglass_tortoise',
     'drakemaw_raptor',
+    'goblin_rocket_sled',
     'lanternback_troll',
+    'rallycart_rxt',
     'rickshaw_mount',
     'terrorspark_groundshaker',
   ],
@@ -3525,7 +3529,9 @@ describe('Reliquary source hint coverage', () => {
     expect(SOURCE_PENDING_RULING.horizons_mounts).toEqual([
       'chimeglass_tortoise',
       'drakemaw_raptor',
+      'goblin_rocket_sled',
       'lanternback_troll',
+      'rallycart_rxt',
       'rickshaw_mount',
       'terrorspark_groundshaker',
     ]);
@@ -3902,11 +3908,11 @@ describe('Reliquary source hint coverage', () => {
     expect(delveOnly.counts.vendor).toBeGreaterThanOrEqual(1);
   });
 
-  it('the two pending mounts really have ZERO live award routes (the row is justified)', () => {
+  it('the pending mounts really have ZERO live award routes (the row is justified)', () => {
     // The surviving SOURCE_PENDING_RULING row's whole claim is "no live table
-    // awards either mount", and the acknowledgment sweep can never check it
+    // awards any pending mount", and the acknowledgment sweep can never check it
     // (it short-circuits on un-hinted relics). This is the inverse sweep: the
-    // day content gives either mount ANY route, this reds and forces the hint
+    // day content gives a pending mount ANY route, this reds and forces the hint
     // plus the pending-row deletion in the same change, so the window can
     // never keep painting a blank silhouette content has learned to answer.
     for (const mountId of SOURCE_PENDING_RULING.horizons_mounts) {
@@ -3956,7 +3962,7 @@ describe('Reliquary source hint coverage', () => {
       if (reliquaryRelicSource(page, relic).length === 0) continue;
       watchedAwardIds.add(awardIdForSlot(relic, slotId));
     }
-    // The two PENDING mounts' reins ride along: their whole pending claim is
+    // The PENDING mounts' reins ride along: their whole pending claim is
     // "no route anywhere", and the nine-family inverse sweep above cannot see
     // these three excluded surfaces, so a pending reins entering one must red
     // HERE rather than leave the silhouette blank while content can answer.

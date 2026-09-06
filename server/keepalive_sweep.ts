@@ -14,6 +14,9 @@
 // every live session on evidence the stall itself manufactured; the dead sockets
 // drain one clean interval after the loop recovers.
 export const KEEPALIVE_STALL_FACTOR = 1.5;
+// WS protocol-level ping cadence; shared by GameServer.start() and dependency-light
+// keepalive tests.
+export const WS_KEEPALIVE_PING_MS = 30_000;
 
 // True when the gap since the previous sweep exceeds the stall threshold, meaning
 // this sweep fired late enough that pong silence is not evidence of a dead client.
@@ -24,4 +27,54 @@ export function keepaliveSweepDelayed(
 ): boolean {
   const elapsed = nowMs - lastSweepAtMs;
   return elapsed > KEEPALIVE_STALL_FACTOR * intervalMs;
+}
+
+// Hard liveness deadline, independent of the pong check above. The pong check
+// judges a one-shot flag at sweep time, so every late sweep voids its evidence
+// and (deliberately) reaps nobody; on a chronically late server a black-holed
+// socket therefore held its character 'already in world' with no upper bound
+// at all, long after the client's bounded reconnect had given up. This
+// deadline caps that: a socket the server has processed NO frame from (no
+// input, no pong; browsers answer pings on their own, so an AFK or
+// backgrounded tab still counts as alive) for ten whole minutes is terminated
+// into the linkdead grace, and the character resumes on the next reconnect.
+export const WS_SILENCE_DEADLINE_MS = 10 * 60 * 1000;
+
+// Last frame PROCESSED from each socket, keyed on socket identity (a resume
+// swaps the session's socket, so the replacement starts its own clock and a
+// late frame from the old one can never vouch for it). A WeakMap so a torn-down
+// socket takes its entry with it.
+const lastFrameAtBySocket = new WeakMap<object, number>();
+
+export function noteClientFrame(ws: object, nowMs = Date.now()): void {
+  lastFrameAtBySocket.set(ws, nowMs);
+}
+
+// True when the socket's silence, measured only up to the PREVIOUS sweep,
+// exceeds the deadline. Stopping the measurement at the previous sweep is what
+// makes the verdict stall-tolerant: a frame that arrived before the previous
+// sweep is normally processed (and stamped) in the poll phase that follows it,
+// well before this sweep, while frames that arrived since may still be queued
+// behind a stall, so that interval is never counted. The ordering is not an
+// absolute guarantee (a very large fd backlog, or an async inflate if
+// permessage-deflate were ever enabled on the WebSocketServer, can carry a
+// frame to a later turn), which is why the deadline is many ping intervals
+// long: a live client has answered several pings inside it. A socket with no
+// stamp yet (handshake just finished) is never judged.
+export function socketSilentPastDeadline(ws: object, lastSweepAtMs: number): boolean {
+  const lastFrameAt = lastFrameAtBySocket.get(ws);
+  if (lastFrameAt === undefined) return false;
+  return lastSweepAtMs - lastFrameAt >= WS_SILENCE_DEADLINE_MS;
+}
+
+// The sweep's per-session verdict: reap (terminate into the linkdead grace)
+// when the previous ping went unanswered and this sweep ran on time, OR when
+// the socket's proven silence has passed the hard deadline regardless of how
+// late this sweep is.
+export function shouldReapSession(
+  session: { awaitingPong: boolean; ws: object },
+  delayed: boolean,
+  lastSweepAtMs: number,
+): boolean {
+  return (session.awaitingPong && !delayed) || socketSilentPastDeadline(session.ws, lastSweepAtMs);
 }

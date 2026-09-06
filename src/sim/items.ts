@@ -1500,7 +1500,7 @@ export function buyBackItem(
     countFit(meta.inventory, bagPools(meta.bags), itemId, 1, slot.instance, slot.craftedRecipeId) >=
     1;
   if (!fits) {
-    bagsFullError(ctx, meta.entityId);
+    bagsFullError(ctx, meta.entityId, itemId);
     return;
   }
   meta.copper -= def.sellValue;

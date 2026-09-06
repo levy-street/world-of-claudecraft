@@ -978,6 +978,7 @@ export const ko_KR: EnTranslations = {
       "mounts": "탈것",
       "professions": "전문 기술",
       "reliquary": "성물고",
+      "lootExplorer": "전리품 탐색기",
       "nameplates": "이름표",
       "haptics": "진동",
       "hapticsOff": "진동 꺼짐",
@@ -1141,6 +1142,9 @@ export const ko_KR: EnTranslations = {
       "promptAttack": "공격",
       "promptUseAbility": "기술 사용",
       "promptKneel": "무릎 꿇기",
+      "promptAccessInterface": "인터페이스 열기",
+      "promptMoveToTarget": "{target}(으)로 이동",
+      "promptSelectItem": "{item} 선택",
       "promptOpenBags": "가방 열기",
       "promptCharacterSheet": "캐릭터 창 열기",
       "promptLookAround": "오른쪽 버튼을 누른 채 끌어서 둘러보기",
@@ -1309,7 +1313,7 @@ export const ko_KR: EnTranslations = {
     },
     "targetDots": {
       "title": "대상 디버프",
-      "row": "{aura} on {target}",
+      "row": "{target}의 {aura}",
       "overflow": "{count}개 더 있음, 표시되지 않음"
     },
     "targetAuras": {
@@ -1393,6 +1397,8 @@ export const ko_KR: EnTranslations = {
       "name_shadowjump_toad": "그림자 도약 두꺼비 카마카게",
       "name_stormfeather_griffin": "하늘닿이 폭풍깃",
       "name_thunderstrut_gobbler": "천둥활보 대왕 칠면조",
+      "name_goblin_rocket_sled": "고블린 로켓 썰매",
+      "name_rallycart_rxt": "랠리카트 RXT",
       "name_terrorspark_groundshaker": "대지를 뒤흔드는 테러스파크",
       "name_drakemaw_raptor": "화산구 랩터",
       "name_mech_bird": "태엽 기계새",
@@ -1406,6 +1412,8 @@ export const ko_KR: EnTranslations = {
       "desc_shadowjump_toad": "어떤 지형이든 번개 같은 그림자 도약으로 누비도록 훈련된 거대한 두꺼비입니다.",
       "desc_stormfeather_griffin": "룬 발톱으로 땅을 누비는 위엄 있는 폭풍 그리핀입니다. 날개는 접혀 있습니다.",
       "desc_thunderstrut_gobbler": "깨어나는 봉우리에서 꼬리깃을 뇌운처럼 펼친 채 활보하며 내려오는, 폭풍이 낳은 거대한 칠면조입니다.",
+      "desc_goblin_rocket_sled": "위험할 정도로 과하게 만들어진 고블린 썰매. 쌍발 로켓과 형편없는 판단력으로 내달린다.",
+      "desc_rallycart_rxt": "작지만 본격적인 랠리 머신. 이동 속도를 높여준다.",
       "desc_terrorspark_groundshaker": "묵직한 궤도와 대구경 포, 겁 없는 조종사를 위한 안장을 갖춘 소형 장갑 기계입니다.",
       "desc_drakemaw_raptor": "화산구 칼데라에서 길들여진 둥지 태생 랩터. 온몸이 힘줄과 질주로 이루어졌으며, 아직도 희미한 재 냄새가 난다.",
       "desc_mech_bird": "수제 태엽 전투 닭. 서보 관절을 튕기며 질주하고, 태엽 열쇠는 지금도 돌아가고 있다.",
@@ -1580,7 +1588,10 @@ export const ko_KR: EnTranslations = {
       "uiScale": "UI 배율",
       "playerFrameScale": "플레이어 프레임 크기",
       "targetFrameScale": "대상 프레임 크기",
+      "playerHealthText": "플레이어 생명력 텍스트",
+      "targetHealthText": "대상 생명력 텍스트",
       "aurasOnPlayerFrame": "버프를 플레이어 프레임에 표시",
+      "auraBarBelowFrame": "버프를 플레이어 프레임 아래에 표시",
       "alwaysShowAllBuffs": "모든 버프를 항상 표시",
       "highContrastBackground": "고대비 배경",
       "startAttackOnAbility": "스킬 사용 시 자동 공격",
@@ -2507,7 +2518,9 @@ export const ko_KR: EnTranslations = {
       "unequipHint": "클릭하여 이 가방을 해제",
       "poolGeneral": "일반: {total}칸 중 {used}칸",
       "poolMaterials": "재료: {total}칸 중 {used}칸",
-      "capacityPoolsAria": "사용 중인 가방 칸: {total}칸 중 {used}칸. 일반 아이템: {generalTotal}칸 중 {generalUsed}칸. 재료: {materialsTotal}칸 중 {materialsUsed}칸."
+      "capacityPoolsAria": "사용 중인 가방 칸: {total}칸 중 {used}칸. 일반 아이템: {generalTotal}칸 중 {generalUsed}칸. 재료: {materialsTotal}칸 중 {materialsUsed}칸.",
+      "capacityPools": "아이템 {generalUsed}/{generalTotal}, 재료 {materialsUsed}/{materialsTotal}",
+      "emptyMaterialsOnly": "재료 전용"
     },
     "raidConvert": {
       "toPartyDone": "공격대가 파티로 다시 전환되었습니다.",
@@ -2955,6 +2968,7 @@ export const ko_KR: EnTranslations = {
       "healthPercent": "백분율",
       "healthCurrent": "현재 값",
       "healthCurrentMax": "현재 / 최대",
+      "healthCurrentMaxPercent": "현재 / 최대 (백분율)",
       "sort": "플레이어 정렬",
       "sortGroup": "그룹",
       "sortRole": "역할",
@@ -3086,6 +3100,7 @@ export const ko_KR: EnTranslations = {
       "close": "닫기",
       "keybind": "Discord 패널",
       "disabled": "현재 Discord 연동을 사용할 수 없습니다.",
+      "queuePingsLabel": "전장 또는 투기장 대기열이 잡히면 Discord 다이렉트 메시지로 알려주기 (연결된 Discord 계정 필요)",
       "tiers": {
         "none": "등급 없음",
         "initiate": "입문자",
@@ -3406,6 +3421,8 @@ export const ko_KR: EnTranslations = {
       "depositAllDone": "보관한 재료: {count}.",
       "depositAllFull": "보관한 재료: {count}. 은행이 가득 찼습니다.",
       "depositAllNone": "은행이 가득 참: 아무것도 보관하지 못했습니다.",
+      "depositAllNotable": "보관한 재료: {count}({item} 포함).",
+      "depositAllNotableFull": "보관한 재료: {count}({item} 포함). 은행이 가득 찼습니다.",
       "bonusTitle": "보너스 칸",
       "bonusEarned": "+{count}",
       "bonusStatusEarned": "+{count}",
@@ -3444,6 +3461,8 @@ export const ko_KR: EnTranslations = {
       "vaultDepositAllDone": "보관한 재료: {count}개.",
       "vaultDepositAllFull": "보관한 재료: {count}개. 일부 재료가 한도에 도달했습니다.",
       "vaultDepositAllNone": "보관 한도가 가득 차서 아무것도 보관하지 못했습니다.",
+      "vaultDepositAllNotable": "보관한 재료: {count}개({item} 포함).",
+      "vaultDepositAllNotableFull": "보관한 재료: {count}개({item} 포함). 일부 재료가 한도에 도달했습니다.",
       "vaultWithdrawShort": "가방에는 {count}개 중 {fit}개만 들어갑니다.",
       "vaultDepositHint": "클릭하여 보관소에 보관",
       "vaultCannotDeposit": "보관소에 넣을 수 없습니다",
@@ -4314,6 +4333,7 @@ export const ko_KR: EnTranslations = {
       "sourceProfession": "{profession}(으)로 획득",
       "sourceDeed": "업적 \"{deed}\" 보상",
       "sourceVendor": "{vendor} 판매",
+      "sourceVendorGated": "{vendor} 판매 ({requirement})",
       "sourceBossZone": "{zone}의 {boss}에게서 획득",
       "sourceDelve": "탐굴 \"{delve}\"에서 발견",
       "sourceRift": "{rank} 등급 균열 클리어에서 획득",
@@ -4333,6 +4353,10 @@ export const ko_KR: EnTranslations = {
       "filterAll": "전체",
       "filterOwned": "수록됨",
       "filterMissing": "아직 없음",
+      "filterIlluminated": "조명됨",
+      "filterRemaining": "남음",
+      "filterEmptyPages": "이 필터와 일치하는 페이지가 없습니다.",
+      "filterGroupAriaPages": "조명 여부로 페이지 필터",
       "recentJumpAria": "{name} 페이지 열기",
       "recentEmpty": "아직 발견한 성물이 없습니다. 지금부터 수록하는 성물이 여기에 표시됩니다.",
       "nearlyEmpty": "완성이 가까운 페이지가 여기에 모입니다.",
@@ -4440,6 +4464,7 @@ export const ko_KR: EnTranslations = {
       "summary": "세계 지도. 지역을 선택하면 해당 지도가 열립니다.",
       "toWorld": "세계 지도",
       "toZone": "지역 지도",
+      "toInstance": "인스턴스 지도",
       "toggleAria": "세계 지도와 지역 지도 전환",
       "levels": "레벨 {min}부터 {max}까지"
     },
@@ -4474,6 +4499,7 @@ export const ko_KR: EnTranslations = {
       "walletLinkedConnected": "연결된 지갑 앱이 접속되어 $WOC로 결제할 준비가 되었습니다.",
       "walletUsdBalance": "{amount} USD",
       "walletUsdUnknown": "알 수 없음",
+      "walletCardDismiss": "지갑 카드 숨기기",
       "rateNote": "환율: {time} 기준 1 USD당 약 {tokens} $WOC.",
       "rateNotePaused": "마지막으로 확인된 환율: {time} 기준 1 USD당 약 {tokens} $WOC.",
       "estimateNote": "{usd}는 현재 환율로 약 {tokens} $WOC입니다.",
@@ -4665,6 +4691,43 @@ export const ko_KR: EnTranslations = {
       "listingStatusCancelled": "취소됨",
       "listingStatusSuspended": "정지됨",
       "listingStatusUnsold": "유찰"
+    },
+    "lootExplorer": {
+      "title": "전리품 탐색기",
+      "close": "전리품 탐색기 닫기",
+      "searchPlaceholder": "아이템 검색...",
+      "searchAria": "아이템 검색",
+      "filterCategoryAria": "출처",
+      "filterClassAria": "직업",
+      "filterStatAria": "통계",
+      "filterQualityAria": "품질",
+      "filterAll": "모두",
+      "tabItems": "품목별",
+      "tabEncounters": "출처별",
+      "category": {
+        "raid": "레이드",
+        "dungeon": "던전",
+        "delve": "탐굴",
+        "open_world": "오픈 월드",
+        "rift": "균열",
+        "vendor": "상인",
+        "quest_reward": "퀘스트 보상",
+        "quest_objective": "퀘스트 목표",
+        "ground_object": "월드 오브젝트",
+        "starting_equipment": "초기 장비"
+      },
+      "difficulty": {
+        "normal": "일반",
+        "heroic": "영웅"
+      },
+      "riftRankLabel": "리프트 랭크 {rank}",
+      "source": "{category}: {name}",
+      "sourceWithContext": "{category}: {name} ({context})",
+      "chance": "드롭 확률 {pct}%",
+      "guaranteed": "확정",
+      "gatedByQuest": "퀘스트 진행 중: {quest}",
+      "empty": "이 필터와 일치하는 전리품이 없습니다.",
+      "resultCount": "결과 {count}개"
     }
   },
   "gatherEvent": {
@@ -4763,7 +4826,8 @@ export const ko_KR: EnTranslations = {
       "link_required": "먼저 Discord 계정을 연결하세요.",
       "swag_claimed": "이미 이 보상을 받았습니다.",
       "swag_tier": "이 보상을 받으려면 더 높은 등급에 도달하세요.",
-      "swag_points": "포인트가 부족합니다."
+      "swag_points": "포인트가 부족합니다.",
+      "invalid_input": "입력이 올바르지 않습니다."
     },
     "deeds": {
       "invalid_input": "입력이 올바르지 않습니다."
@@ -4815,6 +4879,11 @@ export const ko_KR: EnTranslations = {
       "reason_required": "사유를 입력해야 합니다.",
       "invalid_duration": "표식 기간은 최소 1초 이상이어야 합니다.",
       "not_marked": "해당 계정에는 표식이 없습니다."
+    },
+    "kick": {
+      "reason_required": "사유를 입력해야 합니다.",
+      "admin_target": "운영자 계정은 추방할 수 없습니다.",
+      "target_offline": "해당 플레이어는 더 이상 이 서버에 접속해 있지 않습니다."
     },
     "woc_market": {
       "invalid_input": "입력이 잘못되었습니다.",
@@ -5249,10 +5318,13 @@ export const ko_KR: EnTranslations = {
       "ifPlayerFrameScale": "내 유닛 프레임의 크기입니다.",
       "ifTargetFrameScale": "대상 프레임의 크기입니다.",
       "ifPartyStyle": "파티 배치 방식입니다. 자동은 파티 인원에 맞춰 따라가고, 클래식은 전통적인 세로 배치이며, 공격대는 모두를 촘촘한 격자에 담습니다.",
-      "ifPartyHealthText": "파티 막대에 무엇을 적을지 정합니다. 표시하지 않음, 백분율, 현재 생명력, 또는 현재와 최대치 중에서 고릅니다.",
+      "ifPlayerHealthText": "자신의 생명력 막대에 무엇을 적을지 정합니다. 표시하지 않음, 백분율, 현재 생명력, 현재와 최대치, 또는 그 둘과 함께 백분율 중에서 고릅니다.",
+      "ifTargetHealthText": "대상과 대상의 대상 생명력 막대에 무엇을 적을지 정하며, 자신의 프레임과 같은 선택지입니다.",
+      "ifPartyHealthText": "파티 막대에 무엇을 적을지 정합니다. 표시하지 않음, 백분율, 현재 생명력, 현재와 최대치, 또는 그 둘과 함께 백분율 중에서 고릅니다.",
       "ifPartySort": "파티원을 나열하는 순서입니다. 파티 순서, 역할, 또는 이름 중에서 고릅니다.",
       "ifPartyShowAuras": "파티 프레임에 강화 효과와 약화 효과를 표시할지 정합니다. 자원 막대, 보호막, 소환수, 그리고 내 파티 목록에 나 자신이 나타날지에 대해서도 같은 방식의 스위치가 마련되어 있습니다.",
       "ifAurasOnPlayerFrame": "내 강화 효과와 약화 효과를 오라 막대뿐 아니라 내 유닛 프레임에도 표시합니다.",
+      "ifAuraBarBelowFrame": "강화 효과 줄을 유닛 프레임 위가 아니라 아래로 옮깁니다. 강화 효과가 플레이어 프레임에 표시되어 있을 때만 적용됩니다.",
       "ifAlwaysShowAllBuffs": "낮음 그래픽 설정에서도 평소의 버프 아이콘 상한을 무시하고 활성화된 모든 버프를 표시합니다.",
       "ifTargetOfTarget": "내 대상이 누구를 노리고 있는지 보여 줍니다. 탱커가 아직 붙잡고 있는지 확인하는 클래식한 방법입니다.",
       "ifPetFrame": "소환수의 프레임을 표시합니다.",
@@ -5260,6 +5332,7 @@ export const ko_KR: EnTranslations = {
       "ifChatOpacity": "채팅 배경이 얼마나 불투명한지 정합니다.",
       "ifCompactChat": "채팅 줄 간격을 좁혀 더 많은 줄이 들어가게 합니다.",
       "ifChatTimestamps": "채팅 줄마다 시각을 붙입니다. 12시간제와 24시간제 중에서 고를 수 있습니다.",
+      "ifFilterProfanity": "채팅의 비속어를 별표로 가립니다. 기본적으로 켜져 있으며, 필터 없이 채팅을 읽고 싶다면 여기서 끌 수 있습니다.",
       "ifStartAttack": "능력을 쓸 때 자동 공격도 함께 시작할지 정합니다. 기본값은 켜짐이며, 대부분의 플레이어가 기대하는 클래식 동작입니다.",
       "ifStopAutoAttack": "대상을 바꿀 때 공격을 멈출지 정합니다. 기본값은 꺼짐이라, 공격이 새 대상으로 그대로 이어집니다.",
       "ifShowAttackButton": "행동 단축바에 공격 버튼을 따로 올립니다.",
@@ -5272,7 +5345,7 @@ export const ko_KR: EnTranslations = {
       "ifHideUnused": "비어 있는 행동 슬롯을 숨겨 실제로 쓰는 버튼만 그립니다.",
       "ifLockBars": "단축바를 잠가 실수로 슬롯에서 능력을 끌어내지 않도록 합니다.",
       "keybindsHeading": "키 설정 패널",
-      "keybindsBody": "그 패널에서 키 목록은 절반에 지나지 않습니다. 그 위에는 마우스가 게임을 어떻게 조종할지 정하는 스위치들이 놓여 있습니다. 마우스 카메라, 회전하는 동안 커서를 고정할지, 클릭 이동과 그것을 실행할 마우스 버튼, 공격 이동, 왼손잡이용 터치 배치, 그리고 채팅 비속어 필터까지 있습니다.",
+      "keybindsBody": "키 목록은 이 패널의 절반에 불과합니다. 그 위에는 마우스가 게임을 어떻게 조작할지 정하는 스위치가 있습니다. 마우스 카메라, 회전 중 커서 잠금 여부, 클릭 이동과 사용할 마우스 버튼, 공격 이동, 왼손잡이 터치 배치를 여기서 조정합니다.",
       "keybindsMouseBody": "그중 놓치기 쉬운 것이 둘 있습니다. 마우스 버튼도 키처럼 지정할 수 있어 휠 클릭과 엄지 버튼에 능력을 올릴 수 있으며, 왼쪽과 오른쪽 클릭은 카메라와 세계 클릭용으로 남습니다. 그리고 행동 단축바에서 곧바로 지정할 수도 있습니다. 여기서 단축바 지정 모드를 켠 뒤, 슬롯을 클릭하고 원하는 키를 누르면 됩니다."
     },
     "combat": {
@@ -6071,7 +6144,7 @@ export const ko_KR: EnTranslations = {
       "heroicRewardsBody": "영웅 우두머리는 당신이 아는 전리품을 떨구되 강화되어 있고 설명에 '영웅'으로 표시되며, 각 여정의 마지막 우두머리는 다른 어디에서도 찾을 수 없는 영웅 등급 물품을 더합니다. 그 마지막 처치는 참가자 모두에게 영웅의 증표도 남깁니다. 하이워치의 병참관 벡스에게서 쓰는 화폐이며, 그의 판매대는 반지와 목걸이가 놓인 선반으로, 영웅의 심부에서 얻은 증거 말고는 무엇으로도 살 수 없습니다.",
       "heroicLockoutBody": "일반 던전은 하루 종일 돌 수 있습니다. 영웅은 인내를 요구합니다. 마지막 우두머리의 처치는 그 여정에 있던 모두를 그 던전의 하루 한 번 영웅 완주로 묶고, 공격대는 난이도마다 하루 단위의 잠금을 따로 지닙니다. 운영 중인 세계에서는 모든 하루 잠금이 그 세계 자체의 밤 초기화 시각에 함께 풀리므로, 그 시각 직전에 마친 여정과 직후에 마친 여정은 서로 다른 날에 놓입니다. 대신 브라우저에서 오프라인으로 플레이하면 잠금은 자신의 처치로부터 하루 뒤에 그냥 만료됩니다. 이미 완주한 5인 여정은 시신 달리기와 전리품을 위해 그 파티 자신에게는 열린 채 남으므로, 그곳에서 얻은 것에서 밀려나는 사람은 없습니다. 공격대는 더 엄격합니다. 그 처치가 한 번 당신을 묶으면 문은 초기화까지 닫힌 채이고, 안으로 돌아가는 유일한 길은 바로 그 잠근 여정에서 쓰러진 이의 시신 달리기뿐이므로, 살아서 걸어 나간 공격대원은 그날은 나간 것입니다. 투기장을 떠나기 전에 전리품을 챙기세요. 이 잠금들은 저마다 그것을 얻어낸 캐릭터의 것이므로, 주력 캐릭터에서의 완주가 다른 캐릭터를 묶지는 않습니다.",
       "resetTitle": "인스턴스 초기화",
-      "resetBody": "파티가 아직 차지한 여정을 쥐고 있는 동안 난이도를 바꾸면, 예전 차지가 잠시 남았다가 저절로 풀립니다. 파티장은 대신 한꺼번에 놓아 줄 수 있습니다. 자기 초상화 메뉴에서 '모든 인스턴스 초기화'를 고르거나 /dungeon reset 을 입력하세요. 초기화는 난이도가 실제로 바뀐 뒤에만, 산 자든 쓰러진 자든 안에 아무도 남지 않은 동안에만, 그리고 안의 모든 시신을 남김없이 챙긴 뒤에만 작동하며, 초기화 사이에는 짧은 재사용 대기시간이 있습니다. 잘못된 난이도로 문에 이르면 여정이 시작되기 전에 게임이 알려 줍니다. 공격대는 이런 식으로 초기화되는 일이 결코 없으며, 그 자신의 잠금 규칙이 적용됩니다.",
+      "resetBody": "파티가 점유한 인스턴스를 가진 채 난이도를 바꾸면 이전 점유는 잠시 남았다가 자동으로 사라집니다. 파티장은 자신의 초상화 메뉴에서 모든 인스턴스 초기화를 선택하거나 /dungeon reset을 입력해 즉시 해제할 수 있습니다. 초기화는 난이도가 실제로 변경되었고, 안에 살아 있거나 쓰러진 플레이어가 아무도 없으며, 모든 시체의 전리품을 비웠고, 짧은 재사용 대기시간이 지난 뒤에만 작동합니다. 잘못된 난이도로 입구에 도착하면 시작 전에 게임이 알려 줍니다. 공격대도 같은 방식으로 초기화되지만, 고유한 귀속과 시체 복귀 규칙은 그대로 적용됩니다.",
       "templeLoreTitle": "익사한 신전, 조금 더 깊이",
       "templeLoreBody": "이 신전에는 당신이 다른 곳에서 쫓는 교단보다 오래된 그만의 전설이 있습니다. 달빛을 들이마시고 익사자를 되돌려 주는 작은 호수, 글리머미어의 기슭에서 한 외로운 감시자가 창백한 빛의 관문을 지킵니다. 수면 아래로는 차가운 돌계단이 그곳까지 내려갑니다. 그곳에 가라앉은 이들은 불운으로 익사한 것이 아닙니다. 그들은 창백한 합창단이었고, 경배 속에 물밑으로 들어가 노래를 멈추지 않았습니다. 옛 수호자들은 물이 자신들을 삼키기 전에 바위에 단 하나의 경고를 새겼습니다. 익사한 달이라 부르던 무언가를 향한 기도였고, 그 아래에 한층 차분한 손길이 두 마디를 덧붙였습니다. 그것은 잠들어 있을 뿐.",
       "cryptLeadTitle": "죽은 자들이 닫아 두려 했던 문",
@@ -8644,6 +8717,7 @@ export const ko_KR: EnTranslations = {
     "connectingRealm": "월드에 연결하는 중...",
     "assetsFailed": "리소스 불러오기에 실패했습니다. 새로고침해 보세요. {error}",
     "rendererFailed": "렌더러를 시작할 수 없습니다. 새로고침해 보세요. {error}",
+    "rendererContextLost": "3D 렌더러가 그래픽 컨텍스트를 잃어 복구할 수 없습니다. 새로고침해 보세요.",
     "enterTimeout": "세계에 입장할 수 없습니다. 연결 시간이 초과되었습니다. 게임 서버가 실행 중인가요?",
     "connectionLost": "서버와의 연결이 끊어졌습니다.",
     "reconnectingAttempt": "연결이 끊어졌습니다. 다시 연결하는 중...(시도 {attempt}/{maxAttempts}, {seconds}초 후 재시도)",
@@ -8654,6 +8728,7 @@ export const ko_KR: EnTranslations = {
     "realmFull": "이 월드는 현재 포화 상태입니다. 몇 분 후에 다시 시도해 주세요.",
     "tooManyConnections": "사용 중인 네트워크에서 이 월드로 연결이 너무 많습니다. 추가 게임 창을 닫거나 몇 분 후에 다시 시도해 주세요.",
     "messageRateExceeded": "행동을 너무 빠르게 전송하여 연결이 끊어졌습니다. 잠시 기다렸다가 다시 로그인해 주세요.",
+    "kickedByModerator": "운영자가 연결을 끊었습니다: {reason}",
     "tips": {
       "classes": "팁: 9개 클래스는 저마다 플레이 방식이 다릅니다. 정하기 전에 몇 가지를 직접 해보세요.",
       "talents": "팁: 비전투 상태라면 언제든 특성을 초기화할 수 있어, 처음 선택도 절대 돌이킬 수 없는 것이 아닙니다.",
@@ -10467,11 +10542,11 @@ export const ko_KR: EnTranslations = {
       },
       "melting_acid": {
         "name": "용해 산",
-        "description": "대상에게 부식성 독을 끼얹어 {damage}의 자연 피해를 주고 12초 동안 방어도를 5% 감소시킵니다."
+        "description": "30분 동안 무기에 독을 바릅니다. 근접 공격마다 대상에게 부식성 산을 끼얹어 12초 동안 방어도를 5% 감소시킵니다."
       },
       "nightshade_coating": {
         "name": "가지독 코팅",
-        "description": "대상을 가지독으로 뒤덮어 {damage}의 자연 피해를 주고 12초 동안 받는 치유 효과를 25% 감소시킵니다."
+        "description": "30분 동안 무기에 독을 바릅니다. 근접 공격마다 대상을 가지독으로 뒤덮어 12초 동안 받는 치유 효과를 25% 감소시킵니다."
       },
       "expose_armor": {
         "name": "방어구 돌파",
@@ -10487,11 +10562,11 @@ export const ko_KR: EnTranslations = {
       },
       "instant_poison": {
         "name": "독사의 이빨",
-        "description": "30분 동안 무기에 독을 발라 근접 공격마다 8의 추가 자연 피해를 입힙니다."
+        "description": "30분 동안 무기에 독을 발라 근접 공격마다 {damage}의 추가 자연 피해를 입힙니다."
       },
       "deadly_poison": {
         "name": "곪는 독",
-        "description": "30분 동안 무기에 독을 발라 근접 공격마다 14의 추가 자연 피해를 입힙니다."
+        "description": "30분 동안 무기에 독을 바릅니다. 근접 공격마다 대상에게 독 중첩을 1 추가하고(최대 5) 지속시간 12초를 갱신합니다. 중첩 1당 2초마다 {damage}의 자연 피해를 입힙니다."
       },
       "blind": {
         "name": "흙 뿌리기",
@@ -11589,7 +11664,7 @@ export const ko_KR: EnTranslations = {
       },
       "temporal_echo": {
         "name": "시간의 메아리",
-        "description": "더 건강했던 순간의 메아리로 아군에게 표식을 남겨 즉시 생명력을 {damage} 회복시킵니다. {duration}초 동안 당신이 입힌 비전 피해의 일부가 메아리를 통해 그 아군을 치유합니다."
+        "description": "더 건강했던 순간의 메아리로 아군에게 표식을 남겨 즉시 생명력을 {damage} 회복시킵니다. {duration}초 동안 당신의 다른 단일 대상 비전 피해의 {echoSinglePct}%와 범위 비전 피해의 {echoAreaPct}%가 그 아군을 치유합니다. 에테르 쇄도와 에테르 화살은 대신 자신이 입힌 피해의 {echoDriverPct}%만큼 그 아군을 치유합니다."
       },
       "temporal_cascade": {
         "name": "시간의 연쇄",
@@ -13280,6 +13355,12 @@ export const ko_KR: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "테러스파크 시동 열쇠"
+      },
+      "reins_goblin_rocket_sled": {
+        "name": "고블린 로켓 썰매 시동 열쇠"
+      },
+      "reins_rallycart_rxt": {
+        "name": "랠리카트 RXT 시동 열쇠"
       },
       "reins_lanternback_troll": {
         "name": "점등인의 멍에: 그룸볼"

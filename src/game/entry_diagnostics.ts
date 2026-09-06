@@ -10,6 +10,7 @@ const RENDER_CHECKPOINT_INTERVAL_MS = 2_000;
 
 const STICKY_CHECKPOINTS = new Set<EntryCheckpoint>([
   'webgl-context-lost',
+  'webgl-context-stuck',
   'window-error',
   'unhandled-rejection',
   'mobile-more-open',

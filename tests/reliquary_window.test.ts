@@ -428,13 +428,15 @@ describe('painter hygiene', () => {
     // swap in "no relics match" for a shelf that is empty for another reason.
     const code = stripComments(painter);
     expect(code).toContain("return this.search.trim() !== ''");
-    // Three callers: the Overview empty line, the shelf empty line, and the
-    // grid empty-state chooser. All must ask the same question, or two
-    // surfaces disagree about whether a search is running. (The live-region
-    // gate deliberately does NOT ask it: it gates on the model's own
-    // narrowing answer, because a needle that matches everything narrows
-    // nothing; see the announce pin below.)
-    expect(code.match(/this\.searchActive\(\)/g)?.length).toBe(3);
+    // Two callers: the Overview empty line and the shared empty-state chooser
+    // (emptyGridText), which the shelf list and the grid both route through so
+    // a chip that empties a shelf blames the chip, never a search. All must
+    // ask the same question, or two surfaces disagree about whether a search
+    // is running. (The live-region gate deliberately does NOT ask it: it
+    // gates on the model's own narrowing answer, because a needle that
+    // matches everything narrows nothing; see the announce pin below.)
+    expect(code.match(/this\.searchActive\(\)/g)?.length).toBe(2);
+    expect(code).toContain("this.emptyGridText(model.filtered, 'shelf')");
     // No site may re-derive it inline and drift from the shared definition.
     expect(code).not.toMatch(/this\.search === ''/);
     expect(code).not.toMatch(/this\.search\.trim\(\) === ''/);

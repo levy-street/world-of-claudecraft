@@ -258,6 +258,16 @@ export function nearestOptionValue(value: number, options: ChoiceOption[]): numb
   return best;
 }
 
+/** The one health-text mode table the player, target and party frame rows share
+ *  (hud_frames.ts HealthTextMode): the choice values ARE the setting values. */
+const HEALTH_TEXT_CHOICES: ChoiceOption[] = [
+  { value: 0, labelKey: 'hudChrome.partyFrames.healthNone' },
+  { value: 1, labelKey: 'hudChrome.partyFrames.healthPercent' },
+  { value: 2, labelKey: 'hudChrome.partyFrames.healthCurrent' },
+  { value: 3, labelKey: 'hudChrome.partyFrames.healthCurrentMax' },
+  { value: 4, labelKey: 'hudChrome.partyFrames.healthCurrentMaxPercent' },
+];
+
 const choice = (
   s: OptionsSettingsSource,
   key: string,
@@ -297,7 +307,9 @@ const qualityLadderOptions: ChoiceOption[] = [
 // The High-capped three-step ladder, shared by the dials that stop at High.
 // Effects & Lighting: High is already the full high-tier post stack (the
 // ultra/insane tiers' full-res AO rides the preset, not this dial). Shadow
-// Quality: High is the 4096 map, and the retired Insane rung's single
+// Quality: High is the 4096 map (the High TIER renders 2560; the dial's top
+// rung is the showcase allocation the ultra tiers get), and the retired
+// Insane rung's single
 // 8192x8192 shadow target was a ~256 MB-class GPU allocation redrawn every
 // frame for marginal visible gain. Particle Effects: a three-step band clamp
 // by design (see its gfx.ts mapping).
@@ -728,12 +740,7 @@ export function buildInterfaceControls(
       // partyFrameSpacing moved into the in-editor Frames Settings dropdown
       // beside the other frame knobs; the keys stay live and this tab's
       // Reset to Defaults still clears them.
-      choice(s, 'partyFrameHealthText', 'hudChrome.partyFrames.healthText', [
-        { value: 0, labelKey: 'hudChrome.partyFrames.healthNone' },
-        { value: 1, labelKey: 'hudChrome.partyFrames.healthPercent' },
-        { value: 2, labelKey: 'hudChrome.partyFrames.healthCurrent' },
-        { value: 3, labelKey: 'hudChrome.partyFrames.healthCurrentMax' },
-      ]),
+      choice(s, 'partyFrameHealthText', 'hudChrome.partyFrames.healthText', HEALTH_TEXT_CHOICES),
       choice(s, 'partyFrameSort', 'hudChrome.partyFrames.sort', [
         { value: 0, labelKey: 'hudChrome.partyFrames.sortGroup' },
         { value: 1, labelKey: 'hudChrome.partyFrames.sortRole' },
@@ -744,7 +751,14 @@ export function buildInterfaceControls(
       boolToggle(s, 'partyFrameShowAuras', 'hudChrome.partyFrames.showAuras'),
       boolToggle(s, 'partyFrameShowPets', 'hudChrome.partyFrames.showPets'),
       boolToggle(s, 'partyFrameShowSelf', 'hudChrome.partyFrames.showSelf'),
-      boolToggle(s, 'aurasOnPlayerFrame', 'hudChrome.options.aurasOnPlayerFrame'),
+      choice(s, 'playerFrameHealthText', 'hudChrome.options.playerHealthText', HEALTH_TEXT_CHOICES),
+      choice(s, 'targetFrameHealthText', 'hudChrome.options.targetHealthText', HEALTH_TEXT_CHOICES),
+      boolToggle(s, 'aurasOnPlayerFrame', 'hudChrome.options.aurasOnPlayerFrame', {
+        rerender: true,
+      }),
+      boolToggle(s, 'auraBarBelowFrame', 'hudChrome.options.auraBarBelowFrame', {
+        disabled: !s.bool('aurasOnPlayerFrame'),
+      }),
       boolToggle(s, 'alwaysShowAllBuffs', 'hudChrome.options.alwaysShowAllBuffs'),
       boolToggle(s, 'showTargetOfTarget', 'hudChrome.options.showTargetOfTarget'),
       boolToggle(s, 'showTargetSwingTimer', 'hudChrome.options.showTargetSwingTimer'),
@@ -754,6 +768,8 @@ export function buildInterfaceControls(
       slider(s, 'chatFontScale', 'hud.options.chatFontScale'),
       slider(s, 'chatOpacity', 'hud.options.chatOpacity'),
       boolToggle(s, 'compactChat', 'hud.options.compactChat'),
+      // A chat setting, so its switch sits with the chat rows (hud.ts maskChat reads it).
+      boolToggle(s, 'filterProfanity', 'hud.options.filterProfanity'),
     ]),
     ...tag('combat', [
       boolToggle(s, 'startAttackOnAbilityUse', 'hudChrome.options.startAttackOnAbility'),

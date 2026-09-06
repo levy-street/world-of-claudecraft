@@ -1,10 +1,26 @@
-import { describe, expect, it } from 'vitest';
-import { ARENA_SLOT_COUNT, arenaOrigin, MOBS } from '../src/sim/data';
+import { afterEach, describe, expect, it } from 'vitest';
+import { type Collider, FENCE_HALF_DEPTH } from '../src/sim/colliders';
+import {
+  ARENA_SLOT_COUNT,
+  arenaOrigin,
+  BUILTIN_WORLD,
+  MOBS,
+  setActiveWorldContent,
+} from '../src/sim/data';
 import { DUNGEON_WALL_HW, DUNGEON_WALL_X } from '../src/sim/dungeon_layout';
 import { createMob } from '../src/sim/entity';
 import { PLAYER_BODY_RADIUS } from '../src/sim/pathfind';
+import {
+  type CharacterMoveParams,
+  type CharacterMoveResult,
+  MAX_STEP_HEIGHT,
+  moveCharacter,
+  SKIN_WIDTH,
+  sweepCollider,
+} from '../src/sim/physics';
 import { Sim } from '../src/sim/sim';
-import { FISHING_CAST_ID } from '../src/sim/types';
+import { FISHING_CAST_ID, type WorldContent } from '../src/sim/types';
+import { groundHeight, terrainHeight, WATER_LEVEL } from '../src/sim/world';
 
 const SEED = 5150;
 const makeSim = () => new Sim({ seed: SEED, playerClass: 'warrior' });
@@ -171,5 +187,122 @@ describe('Knockback on-hit affix (Crushing Sweep)', () => {
     const startGap = dist2d(p.pos, mob.pos);
     for (let i = 0; i < 40; i++) (sim as any).mobSwing(mob, p);
     expect(dist2d(p.pos, mob.pos)).toBeLessThan(startGap + 1);
+  });
+});
+
+// A knockback shove that settles the victim at EXACT zero clearance against a
+// static collider used to freeze every subsequent move attempt solid,
+// including straight away from the obstacle: only /unstuck (and its Unstuck
+// Sickness debuff) could free them. Reported against Thunzharr's Tectonic
+// Heave near village structures (a house, the well); reproduced here with
+// synthetic colliders standing in for both shapes the report named.
+describe('a knockback shove never leaves the target frozen against a collider', () => {
+  afterEach(() => setActiveWorldContent(null));
+
+  function world(props: Partial<WorldContent['props']>): WorldContent {
+    return { ...BUILTIN_WORLD, props: { ...BUILTIN_WORLD.props, ...props } };
+  }
+
+  function findFlatSpot(): { x: number; z: number } {
+    for (let x = -120; x <= 120; x += 3) {
+      for (let z = -120; z <= 120; z += 3) {
+        const h = terrainHeight(x, z, SEED);
+        if (h < WATER_LEVEL + 1.5) continue;
+        let ok = true;
+        for (let dz = -3; dz <= 20 && ok; dz += 1) {
+          if (Math.abs(terrainHeight(x, z + dz, SEED) - h) > 0.4) ok = false;
+        }
+        if (ok) return { x, z };
+      }
+    }
+    throw new Error('no flat spot found');
+  }
+
+  // Can the body make real progress in ANY direction? A frozen body reports
+  // `blocked` and near-zero net motion in every one of these; a merely
+  // stopped-at-the-wall body still moves freely along at least one heading.
+  function canWalkAway(seed: number, x: number, y: number, z: number): boolean {
+    const params: CharacterMoveParams = {
+      seed,
+      radius: PLAYER_BODY_RADIUS,
+      stepHeight: MAX_STEP_HEIGHT,
+      maxSlope: 0.75,
+      grounded: true,
+      swimming: false,
+      ignoreFences: false,
+    };
+    const out: CharacterMoveResult = { x: 0, y: 0, z: 0, blocked: false, stepped: 0 };
+    for (let dir = 0; dir < 8; dir++) {
+      const ang = (dir / 8) * Math.PI * 2;
+      moveCharacter(params, x, y, z, Math.cos(ang) * 0.3, Math.sin(ang) * 0.3, out);
+      if (Math.hypot(out.x - x, out.z - z) > 0.1) return true;
+    }
+    return false;
+  }
+
+  it('repeated hits against a circle collider (e.g. the well) never freeze the target', () => {
+    const spot = findFlatSpot();
+    const wx = spot.x;
+    const wz = spot.z + 10;
+    setActiveWorldContent({
+      ...world({}),
+      placements: [{ x: wx, z: wz, collideRadius: 2 }],
+    } as WorldContent);
+    const sim = new Sim({ seed: SEED, playerClass: 'warrior' });
+    const p = sim.entities.get(sim.playerId)!;
+    p.gm = true;
+    const g = groundHeight(wx, wz - 6, SEED);
+    p.pos.x = wx;
+    p.pos.z = wz - 6;
+    p.pos.y = g;
+    p.prevPos = { ...p.pos };
+    const mob = createMob(900720, MOBS.marrowlord_varkas, 1, { x: wx, y: g, z: wz - 12 });
+    for (let i = 0; i < 12; i++) (sim as any).applyKnockback(mob, p, 7);
+    expect(canWalkAway(SEED, p.pos.x, p.pos.y, p.pos.z)).toBe(true);
+  });
+
+  it('repeated hits against a flat wall face (e.g. a house) always leave a clearance margin', () => {
+    // canWalkAway is not decisive here: moveCharacter's OWN depenetration
+    // pass (a SKIN_WIDTH push on anything it finds overlapping) can mask an
+    // exact-boundary landing depending on which side of the boundary float
+    // rounding happens to land the resolve on, the same "at some point"
+    // intermittency the report described. The clearance margin itself is
+    // the decisive, deterministic guarantee: pre-fix, pushOut's OBB branch
+    // places the body at EXACTLY the wall's inflated face (zero margin);
+    // post-fix the resolve radius is padded by SKIN_WIDTH, so the body
+    // always keeps real room between its edge and the wall.
+    const spot = findFlatSpot();
+    const wx = spot.x;
+    const wz = spot.z + 10;
+    setActiveWorldContent({
+      ...world({}),
+      blockers: [{ x1: wx - 6, z1: wz, x2: wx + 6, z2: wz }],
+    } as WorldContent);
+    const sim = new Sim({ seed: SEED, playerClass: 'warrior' });
+    const p = sim.entities.get(sim.playerId)!;
+    p.gm = true;
+    const g = groundHeight(wx, wz - 6, SEED);
+    p.pos.x = wx;
+    p.pos.z = wz - 6;
+    p.pos.y = g;
+    p.prevPos = { ...p.pos };
+    const mob = createMob(900721, MOBS.marrowlord_varkas, 1, { x: wx, y: g, z: wz - 12 });
+    for (let i = 0; i < 12; i++) (sim as any).applyKnockback(mob, p, 7);
+    const edgeClearance = Math.abs(p.pos.z - wz) - FENCE_HALF_DEPTH - PLAYER_BODY_RADIUS;
+    expect(edgeClearance).toBeGreaterThanOrEqual(SKIN_WIDTH - 1e-9);
+  });
+
+  it('the shared sweep test: a body exactly tangent to a circle can still sweep away from it', () => {
+    // Direct pin of the physics/sweep.ts fix, independent of how a caller
+    // reaches exact tangency: sweepPointCircle used to report a t=0 hit
+    // regardless of direction whenever the start sat exactly on the
+    // boundary (c <= 0), so even motion straight away came back blocked.
+    const collider: Collider = { type: 'circle', x: 0, z: 0, r: 2 };
+    const r = PLAYER_BODY_RADIUS;
+    const R = collider.r + r; // the Minkowski-summed radius sweepCollider tests against
+    const hit = { t: 0, nx: 0, nz: 0 };
+    // Body center placed EXACTLY on the inflated boundary, moving straight away.
+    const away = sweepCollider(collider, R, 0, 1, 0, r, hit);
+    expect(away).toBe(false);
   });
 });

@@ -588,7 +588,7 @@ describe('ServerClient flexBatch', () => {
 });
 
 describe('ServerClient drainOutbox', () => {
-  it('returns all four streams unwrapped from the envelope', async () => {
+  it('returns all five streams unwrapped from the envelope', async () => {
     const { client } = clientReturning({
       relay: { items: [{ commandId: 'c1', message: 'lfg deadmines' }] },
       activity: { items: [{ kind: 'levelup', level: 20 }] },
@@ -604,6 +604,7 @@ describe('ServerClient drainOutbox', () => {
           },
         ],
       },
+      queuePops: { items: [{ discordUserId: 'u1', kind: 'bg' }], watching: true },
     });
 
     // Fresh literal, not the response object: distinct payloads per stream, so
@@ -624,6 +625,7 @@ describe('ServerClient drainOutbox', () => {
           },
         ],
       },
+      queuePops: { items: [{ discordUserId: 'u1', kind: 'bg' }], watching: true },
     });
   });
 

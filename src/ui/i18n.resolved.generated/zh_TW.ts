@@ -978,6 +978,7 @@ export const zh_TW: EnTranslations = {
       "mounts": "坐騎",
       "professions": "專業",
       "reliquary": "聖物庫",
+      "lootExplorer": "戰利品瀏覽器",
       "nameplates": "名條",
       "haptics": "觸覺回饋",
       "hapticsOff": "觸覺回饋已關閉",
@@ -1141,6 +1142,9 @@ export const zh_TW: EnTranslations = {
       "promptAttack": "攻擊",
       "promptUseAbility": "使用技能",
       "promptKneel": "跪下",
+      "promptAccessInterface": "開啟介面",
+      "promptMoveToTarget": "移動到{target}",
+      "promptSelectItem": "選擇{item}",
       "promptOpenBags": "打開背包",
       "promptCharacterSheet": "打開角色面板",
       "promptLookAround": "按住右鍵拖曳來環視四周",
@@ -1309,7 +1313,7 @@ export const zh_TW: EnTranslations = {
     },
     "targetDots": {
       "title": "目標減益",
-      "row": "{aura} on {target}",
+      "row": "{aura} 上 {target}",
       "overflow": "另有 {count} 個未顯示"
     },
     "targetAuras": {
@@ -1393,6 +1397,8 @@ export const zh_TW: EnTranslations = {
       "name_shadowjump_toad": "影躍蟾蜍卡瑪影",
       "name_stormfeather_griffin": "凌天風暴之羽",
       "name_thunderstrut_gobbler": "雷霆闊步大火雞",
+      "name_goblin_rocket_sled": "哥布林火箭雪橇",
+      "name_rallycart_rxt": "拉力卡丁車 RXT",
       "name_terrorspark_groundshaker": "驚雷撼地者",
       "name_drakemaw_raptor": "龍喉迅猛龍",
       "name_mech_bird": "發條機械鳥",
@@ -1406,6 +1412,8 @@ export const zh_TW: EnTranslations = {
       "desc_shadowjump_toad": "一隻體型龐大、步伐穩健的巨蟾，受訓於閃電般的暗影跳躍，可跨越任何地形。",
       "desc_stormfeather_griffin": "一頭威嚴的風暴獅鷲，收攏雙翼，以符文利爪行走於大地。",
       "desc_thunderstrut_gobbler": "一隻風暴所生的龐然大火雞，從覺醒之峰昂首闊步而下，尾羽如雷雲般展開。",
+      "desc_goblin_rocket_sled": "一輛結構過剩到危險的哥布林雪橇，靠雙發火箭和極差的判斷力推進。",
+      "desc_rallycart_rxt": "一輛小巧卻道地的拉力賽車，能提升移動速度。",
       "desc_terrorspark_groundshaker": "一台緊湊的裝甲機械，配備重型履帶、大口徑火炮，以及為無畏駕駛員打造的鞍座。",
       "desc_drakemaw_raptor": "來自龍喉火山口的馴服巢生迅猛龍，渾身筋肉、疾若奔雷，身上仍帶著淡淡的灰燼氣味。",
       "desc_mech_bird": "一隻手工打造的發條戰鬥雞，伺服關節鏗鏘疾馳，發條鑰匙仍在轉動。",
@@ -1580,7 +1588,10 @@ export const zh_TW: EnTranslations = {
       "uiScale": "介面縮放",
       "playerFrameScale": "玩家框縮放",
       "targetFrameScale": "目標框縮放",
+      "playerHealthText": "玩家生命值文字",
+      "targetHealthText": "目標生命值文字",
       "aurasOnPlayerFrame": "增益顯示在玩家框",
+      "auraBarBelowFrame": "增益顯示在玩家框下方",
       "alwaysShowAllBuffs": "始終顯示所有增益",
       "highContrastBackground": "高對比度背景",
       "startAttackOnAbility": "使用技能時自動攻擊",
@@ -2507,7 +2518,9 @@ export const zh_TW: EnTranslations = {
       "unequipHint": "點擊移除此背包",
       "poolGeneral": "一般：{used}/{total}",
       "poolMaterials": "材料：{used}/{total}",
-      "capacityPoolsAria": "背包格已用：{used}/{total}。一般物品：{generalUsed}/{generalTotal}。材料：{materialsUsed}/{materialsTotal}。"
+      "capacityPoolsAria": "背包格已用：{used}/{total}。一般物品：{generalUsed}/{generalTotal}。材料：{materialsUsed}/{materialsTotal}。",
+      "capacityPools": "物品 {generalUsed}/{generalTotal}，材料 {materialsUsed}/{materialsTotal}",
+      "emptyMaterialsOnly": "僅限材料"
     },
     "raidConvert": {
       "toPartyDone": "你的團隊已轉換回隊伍。",
@@ -2744,7 +2757,7 @@ export const zh_TW: EnTranslations = {
       "suddenDeath": "下一次斬殺不消耗怒氣並無視生命值要求",
       "aoeEcho": "剩餘 {charges} 次迴響：單體技能對附近最多 {targets} 個敵人造成 {pct}% 傷害",
       "sureCrit": "接下來 {charges} 個傷害技能必定造成致命一擊",
-      "temporalEcho": "施法者的秘法傷害會治療你，單體傷害轉化 {singlePct}%，範圍傷害轉化 {areaPct}%",
+      "temporalEcho": "施法者的秘法傷害會治療你，單體傷害轉化 {singlePct}%，範圍傷害轉化 {areaPct}%。以太湧動和乙太飛鏢對單體時光迴響獲得 4 倍加成。群體回音會產生等量的治療儲備，並依照已損失的生命值分配給生命值低於 60% 的受印記盟友",
       "arcaneCharge": "{stacks} 層秘法充能：乙太湧動傷害提高 {damagePct}%，施法加快 {castPct}%，法力消耗變為 {costMult} 倍",
       "physicalReduction": "受到的物理傷害降低 {pct}%",
       "temporalHourglass": "免疫傷害且無法行動；恢復生命並加速冷卻。按右鍵可取消。",
@@ -2955,6 +2968,7 @@ export const zh_TW: EnTranslations = {
       "healthPercent": "百分比",
       "healthCurrent": "目前值",
       "healthCurrentMax": "目前 / 最大",
+      "healthCurrentMaxPercent": "目前 / 最大（百分比）",
       "sort": "玩家排序",
       "sortGroup": "小隊",
       "sortRole": "職責",
@@ -3086,6 +3100,7 @@ export const zh_TW: EnTranslations = {
       "close": "關閉",
       "keybind": "Discord 面板",
       "disabled": "Discord 整合目前無法使用。",
+      "queuePingsLabel": "當我的戰場或競技場排隊配對成功時，透過 Discord 私訊通知我（需要已連結的 Discord 帳號）",
       "tiers": {
         "none": "未定級",
         "initiate": "新兵",
@@ -3406,6 +3421,8 @@ export const zh_TW: EnTranslations = {
       "depositAllDone": "已存入材料：{count}。",
       "depositAllFull": "已存入材料：{count}。銀行已滿。",
       "depositAllNone": "銀行已滿：未存入任何物品。",
+      "depositAllNotable": "已存入材料：{count}，其中包括{item}。",
+      "depositAllNotableFull": "已存入材料：{count}，其中包括{item}。銀行已滿。",
       "bonusTitle": "獎勵格子",
       "bonusEarned": "+{count}",
       "bonusStatusEarned": "+{count}",
@@ -3444,6 +3461,8 @@ export const zh_TW: EnTranslations = {
       "vaultDepositAllDone": "已存入材料：{count}。",
       "vaultDepositAllFull": "已存入材料：{count}。部分材料已達上限。",
       "vaultDepositAllNone": "倉庫已滿：未存入任何材料。",
+      "vaultDepositAllNotable": "已存入材料：{count}，其中包括{item}。",
+      "vaultDepositAllNotableFull": "已存入材料：{count}，其中包括{item}。部分材料已達上限。",
       "vaultWithdrawShort": "背包只裝得下{count}個中的{fit}個。",
       "vaultDepositHint": "點擊存入材料倉庫",
       "vaultCannotDeposit": "無法存入材料倉庫",
@@ -4314,6 +4333,7 @@ export const zh_TW: EnTranslations = {
       "sourceProfession": "透過{profession}獲得",
       "sourceDeed": "功績「{deed}」獎勵",
       "sourceVendor": "由{vendor}販售",
+      "sourceVendorGated": "由{vendor}販售（{requirement}）",
       "sourceBossZone": "由{zone}的{boss}掉落",
       "sourceDelve": "在秘探「{delve}」中獲得",
       "sourceRift": "通關{rank}級裂隙時掉落",
@@ -4333,6 +4353,10 @@ export const zh_TW: EnTranslations = {
       "filterAll": "全部",
       "filterOwned": "已收錄",
       "filterMissing": "尚未獲得",
+      "filterIlluminated": "已點亮",
+      "filterRemaining": "未點亮",
+      "filterEmptyPages": "沒有符合此篩選條件的頁面。",
+      "filterGroupAriaPages": "依點亮狀況篩選頁面",
       "recentJumpAria": "開啟{name}所在的頁面",
       "recentEmpty": "尚無發現。此後收錄的聖物都會出現在這裡。",
       "nearlyEmpty": "即將完成的頁面會匯集於此。",
@@ -4440,6 +4464,7 @@ export const zh_TW: EnTranslations = {
       "summary": "世界地圖。選擇一個地區以開啟其地圖。",
       "toWorld": "世界地圖",
       "toZone": "地區地圖",
+      "toInstance": "副本地圖",
       "toggleAria": "在世界地圖與地區地圖之間切換",
       "levels": "等級 {min} 至 {max}"
     },
@@ -4474,6 +4499,7 @@ export const zh_TW: EnTranslations = {
       "walletLinkedConnected": "已連結的錢包應用程式已連接，可用於 $WOC 付款。",
       "walletUsdBalance": "{amount} USD",
       "walletUsdUnknown": "未知",
+      "walletCardDismiss": "隱藏錢包卡片",
       "rateNote": "匯率：截至 {time}，約每美元 {tokens} $WOC。",
       "rateNotePaused": "最近已知匯率：截至 {time}，約每美元 {tokens} $WOC。",
       "estimateNote": "{usd} 按目前匯率約合 {tokens} $WOC。",
@@ -4665,6 +4691,43 @@ export const zh_TW: EnTranslations = {
       "listingStatusCancelled": "已取消",
       "listingStatusSuspended": "已凍結",
       "listingStatusUnsold": "未售出"
+    },
+    "lootExplorer": {
+      "title": "戰利品瀏覽器",
+      "close": "關閉戰利品瀏覽器",
+      "searchPlaceholder": "搜尋物品...",
+      "searchAria": "搜尋物品",
+      "filterCategoryAria": "來源",
+      "filterClassAria": "職業",
+      "filterStatAria": "統計數據",
+      "filterQualityAria": "品質",
+      "filterAll": "全部",
+      "tabItems": "按項目",
+      "tabEncounters": "依來源",
+      "category": {
+        "raid": "突襲",
+        "dungeon": "地城",
+        "delve": "秘探",
+        "open_world": "開放世界",
+        "rift": "裂谷",
+        "vendor": "商人",
+        "quest_reward": "任務獎勵",
+        "quest_objective": "任務目標",
+        "ground_object": "世界物件",
+        "starting_equipment": "初始裝備"
+      },
+      "difficulty": {
+        "normal": "普通",
+        "heroic": "英雄"
+      },
+      "riftRankLabel": "裂谷排名 {rank}",
+      "source": "{category}: {name}",
+      "sourceWithContext": "{category}：{name}（{context}）",
+      "chance": "{pct}% 掉落機率",
+      "guaranteed": "必得",
+      "gatedByQuest": "任務進行中：{quest}",
+      "empty": "沒有符合這些篩選條件的戰利品。",
+      "resultCount": "{count} 個結果"
     }
   },
   "gatherEvent": {
@@ -4763,7 +4826,8 @@ export const zh_TW: EnTranslations = {
       "link_required": "請先連結你的 Discord 帳號。",
       "swag_claimed": "你已經領取過此獎勵。",
       "swag_tier": "達到更高階級才能領取此項目。",
-      "swag_points": "點數不足。"
+      "swag_points": "點數不足。",
+      "invalid_input": "輸入無效。"
     },
     "deeds": {
       "invalid_input": "輸入無效。"
@@ -4815,6 +4879,11 @@ export const zh_TW: EnTranslations = {
       "reason_required": "必須填寫原因。",
       "invalid_duration": "標記時長至少須為 1 秒。",
       "not_marked": "該帳號未被標記。"
+    },
+    "kick": {
+      "reason_required": "必須填寫原因。",
+      "admin_target": "管理員帳號無法被踢出。",
+      "target_offline": "該玩家已不在此伺服器上線。"
     },
     "woc_market": {
       "invalid_input": "輸入無效。",
@@ -5249,10 +5318,13 @@ export const zh_TW: EnTranslations = {
       "ifPlayerFrameScale": "你自己那個單位框的大小。",
       "ifTargetFrameScale": "你的目標框的大小。",
       "ifPartyStyle": "隊伍的排列方式：「自動」會依你的隊伍人數調整，「經典」是傳統的直列堆疊，「團隊」則把所有人塞進緊湊的格線。",
-      "ifPartyHealthText": "隊伍血條上印出什麼：不顯示、百分比、目前生命，或目前與最大生命。",
+      "ifPlayerHealthText": "自己的血條上寫什麼：不顯示、百分比、目前生命、目前與最大生命，或兩者並附上百分比。",
+      "ifTargetHealthText": "目標和目標的目標血條上寫什麼，選項與自己的框體相同。",
+      "ifPartyHealthText": "隊伍血條上寫什麼：不顯示、百分比、目前生命、目前與最大生命，或兩者並附上百分比。",
       "ifPartySort": "隊伍成員的排列順序：入隊順序、定位，或名字。",
       "ifPartyShowAuras": "隊伍框上是否顯示增益與減益。另有對應的開關管理資源條、吸收護盾、寵物，以及你自己是否出現在自己的隊伍清單裡。",
       "ifAurasOnPlayerFrame": "除了光環列之外，也把你的增益與減益顯示在你自己的單位框上。",
+      "ifAuraBarBelowFrame": "把增益列移到你的單位框下方，而不是上方。只有在增益顯示於玩家框時才有效。",
       "ifAlwaysShowAllBuffs": "即使在低畫質預設下也顯示所有生效中的增益，繞過該檔位平時的增益圖示上限。",
       "ifTargetOfTarget": "顯示你的目標正在攻擊誰，這是判斷坦克有沒有拉穩的經典方式。",
       "ifPetFrame": "為你的寵物顯示一個框。",
@@ -5260,6 +5332,7 @@ export const zh_TW: EnTranslations = {
       "ifChatOpacity": "聊天背景有多不透明。",
       "ifCompactChat": "收緊聊天行距，讓畫面裝得下更多行。",
       "ifChatTimestamps": "替每一行聊天加上時間，可選 12 小時制或 24 小時制。",
+      "ifFilterProfanity": "用星號遮住聊天中的髒話。預設開啟；如果你想不加過濾地閱讀聊天，可以在這裡關閉。",
       "ifStartAttack": "使用技能時是否同時開始自動攻擊。預設開啟，也是多數玩家預期的經典行為。",
       "ifStopAutoAttack": "切換目標時是否停下你的揮擊。預設關閉，因此你的攻擊會延續到新目標身上。",
       "ifShowAttackButton": "在你的動作列上放一個明確的「攻擊」按鈕。",
@@ -5272,7 +5345,7 @@ export const zh_TW: EnTranslations = {
       "ifHideUnused": "隱藏空的動作格，只畫出你實際會用的按鈕。",
       "ifLockBars": "鎖定你的動作列，讓你不會不小心把技能拖出格子。",
       "keybindsHeading": "「按鍵設定」面板",
-      "keybindsBody": "按鍵清單只是那個面板的一半。清單上方是決定滑鼠如何驅動遊戲的那些開關：滑鼠鏡頭、旋轉視角時游標是否鎖定、點擊移動以及用哪個滑鼠鍵觸發、攻擊移動、左撇子的觸控佈局，還有聊天的髒話過濾。",
+      "keybindsBody": "按鍵清單只是這個面板的一半。上方還有幾個開關，決定滑鼠如何驅動遊戲：滑鼠鏡頭、旋轉時是否鎖定游標、點擊移動及使用哪個滑鼠鍵、攻擊移動，以及左手觸控版面。",
       "keybindsMouseBody": "那裡有兩件事很容易錯過。滑鼠鍵和一般按鍵一樣可以綁定，因此滾輪按下與拇指鍵都能承載技能，而左鍵與右鍵則保留給鏡頭以及點擊世界。另外，你也可以直接從動作列綁定：在這裡開啟列上綁定模式，然後點一個格子，再按下你想要的按鍵。"
     },
     "combat": {
@@ -6071,7 +6144,7 @@ export const zh_TW: EnTranslations = {
       "heroicRewardsBody": "英雄難度的首領掉落你熟悉的戰利品，只是經過升級並在提示中標註為「英雄」，而每段副本的最終首領還會額外掉落別處找不到的史詩物品。那最後一次擊殺也會為每位參與者留下英雄印記：一種在高瞭的軍需官維克斯處使用的貨幣，他的櫃檯是一排戒指和墜飾，除了來自英雄深處的證明之外，別無他物能夠購得。",
       "heroicLockoutBody": "普通地城可以整天地跑。英雄難度則要求耐心：最終首領的擊殺會把這趟副本中的所有人限制為該地城每天一次英雄通關，而團隊副本對每種難度各保有一份每日鎖定。在連線的國度上，所有每日鎖定都會在該國度自己的夜間重置時刻一併解除，因此在那個時刻之前不久完成的一趟，與剛過之後完成的一趟，會落在兩個不同的日子裡；若改在瀏覽器中離線遊玩，鎖定則只是在你自己擊殺之後一天到期。已經通關的五人副本仍對它自己的隊伍開放，可用於跑屍和拾取，因此沒有人會被擋在自己在那裡掙得的收穫之外。團隊副本更為嚴格：一旦它的擊殺鎖定了你，門便會關閉直到重置，而唯一回到裡面的途徑，是由恰好在那趟鎖定他們的副本中倒下的人跑屍帶入，因此活著走出去的團隊成員，就是這一天都走出去了。離開競技場之前請收齊你的戰利品。這些鎖定各自屬於掙得它的那個角色，因此在主力角色上的一次通關，並不妨礙你其他角色的自由。",
       "resetTitle": "重置你的地城副本",
-      "resetBody": "在隊伍仍佔用著副本時切換難度，舊的佔用會滯留一陣，然後自行釋放。隊長也可以讓它們一次性釋放：在自己的頭像選單中選擇「重置所有副本」，或輸入 /dungeon reset。重置只有在難度確實更改之後才生效，只有在裡面不再有任何人（無論活著還是倒下）時才生效，只有在裡面每具屍體都被拾取乾淨之後才生效，而且兩次重置之間隔著一段短暫的冷卻。若你們帶著錯誤的難度來到門口，遊戲會在副本開始前告知。團隊副本從不以這種方式重置；適用的是它自己的鎖定規則。",
+      "resetBody": "當隊伍仍保有已佔用的副本時切換難度，舊佔用會過一段時間才自行清除。隊長也可以立刻釋放它們：在自己的頭像選單選擇「重置所有副本」，或輸入 /dungeon reset。只有難度確實已切換、裡面沒有任何存活或倒下的玩家、所有屍體都已拾取乾淨，而且短暫冷卻結束後，重置才會生效。若你以錯誤難度抵達入口，遊戲會在開打前提醒你。團隊副本也以同樣方式重置，但仍保留自身的鎖定與屍體返回規則。",
       "templeLoreTitle": "溺亡神殿，再深入一些",
       "templeLoreBody": "這座神殿有著自己的傳說，比你在別處追查的邪教更為古老。在微光湖的岸邊（那是一座飲下月光、又交還溺亡者的山中湖泊），一名孤獨的看守者守著一道蒼白光芒之門。在水面之下，一道冰冷的石階向下通往那裡。沉沒在此的人並非死於意外：他們是蒼白唱詩班，在禮拜中沉入水底，自此再未停止吟唱。古老的守衛在被湖水吞沒之前，在岩石上刻下了唯一一句警語，一段向他們稱之為溺月之物獻上的禱詞，其下另有一隻更沉穩的手添上了兩個字：它只是沉睡。",
       "cryptLeadTitle": "一道亡者本應永遠緊閉的門",
@@ -8644,6 +8717,7 @@ export const zh_TW: EnTranslations = {
     "connectingRealm": "正在連線至世界...",
     "assetsFailed": "資源載入失敗：請嘗試重新整理。{error}",
     "rendererFailed": "無法啟動渲染器：請嘗試重新整理。{error}",
+    "rendererContextLost": "3D 渲染器遺失了圖形內容，且無法恢復。請嘗試重新整理。",
     "enterTimeout": "無法進入世界。連線已逾時。遊戲伺服器是否正在執行？",
     "connectionLost": "與伺服器的連線已中斷。",
     "reconnectingAttempt": "連線已中斷。正在重新連線...（第 {attempt}/{maxAttempts} 次嘗試，{seconds} 秒後重試）",
@@ -8654,6 +8728,7 @@ export const zh_TW: EnTranslations = {
     "realmFull": "這個世界目前已滿，請於幾分鐘後再試。",
     "tooManyConnections": "您的網路對這個世界建立的連線過多。請關閉多餘的遊戲視窗，或於幾分鐘後再試。",
     "messageRateExceeded": "由於發送操作過快，您已中斷連線。請稍候片刻後重新登入。",
+    "kickedByModerator": "管理員已將您中斷連線：{reason}",
     "tips": {
       "classes": "提示：9 個職業玩法各不相同，投入之前不妨都試一試。",
       "talents": "提示：只要不在戰鬥中，隨時都能重置天賦，因此早期的選擇不會成為陷阱。",
@@ -10467,11 +10542,11 @@ export const zh_TW: EnTranslations = {
       },
       "melting_acid": {
         "name": "溶解酸",
-        "description": "向目標潑灑腐蝕性毒液，造成 {damage} 點自然傷害，並使其護甲降低 5%，持續 12 秒。"
+        "description": "在你的武器上塗抹毒藥，持續 30 分鐘。你的每次近戰揮擊都會向目標潑灑腐蝕性強酸，使其護甲降低 5%，持續 12 秒。"
       },
       "nightshade_coating": {
         "name": "夜影塗層",
-        "description": "用夜影覆蓋目標，造成 {damage} 點自然傷害，並使其受到的治療降低 25%，持續 12 秒。"
+        "description": "在你的武器上塗抹毒藥，持續 30 分鐘。你的每次近戰揮擊都會用夜影覆蓋目標，使其受到的治療降低 25%，持續 12 秒。"
       },
       "expose_armor": {
         "name": "裂甲",
@@ -10487,11 +10562,11 @@ export const zh_TW: EnTranslations = {
       },
       "instant_poison": {
         "name": "蝰蛇之咬",
-        "description": "在你的武器上塗抹毒藥，持續 30 分鐘，使你的每次近戰揮擊額外造成 8 點自然傷害。"
+        "description": "在你的武器上塗抹毒藥，持續 30 分鐘，使你的每次近戰揮擊額外造成 {damage} 點自然傷害。"
       },
       "deadly_poison": {
         "name": "潰爛之毒",
-        "description": "在你的武器上塗抹毒藥，持續 30 分鐘，使你的每次近戰揮擊額外造成 14 點自然傷害。"
+        "description": "在你的武器上塗抹毒藥，持續 30 分鐘。你的每次近戰揮擊都會為目標疊加 1 層毒素，最多 5 層，並刷新 12 秒的持續時間。每層每 2 秒造成 {damage} 點自然傷害。"
       },
       "blind": {
         "name": "揚塵",
@@ -11589,11 +11664,11 @@ export const zh_TW: EnTranslations = {
       },
       "temporal_echo": {
         "name": "時光迴響",
-        "description": "以更健康時刻的迴響標記一名盟友，立即恢復{damage}點生命值。{duration}秒內，你造成的秘法傷害有一部分會透過迴響轉化為對其的治療。"
+        "description": "以更健康時刻的迴響標記一名盟友，立即恢復{damage}點生命值。{duration}秒內，你其他單體秘法傷害的 {echoSinglePct}% 和範圍秘法傷害的 {echoAreaPct}% 會治療該盟友。以太湧動和乙太飛鏢則會以其造成傷害的 {echoDriverPct}% 治療該盟友。"
       },
       "temporal_cascade": {
         "name": "時光奔流",
-        "description": "讓一道回音在隊伍中奔流：立即治療目標及其至多四名最近的盟友，並為每人施加持續 {duration} 秒的印記；你造成的部分秘法傷害會透過回音轉化為對他們的治療。（時光術）"
+        "description": "讓一道回音在隊伍中奔流：立即治療目標及其至多四名最近的盟友，並為每人施加持續 {duration} 秒的印記；你造成的部分秘法傷害會透過回音轉化為對他們的治療。以太湧動和乙太飛鏢會從每個群體回音中產生等量的治療儲備，並依照已損失的生命值分配給生命值低於 60% 的受印記盟友。（時光術）"
       },
       "temporal_reversal": {
         "name": "時光逆轉",
@@ -13280,6 +13355,12 @@ export const zh_TW: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "驚雷撼地者點火鑰匙"
+      },
+      "reins_goblin_rocket_sled": {
+        "name": "哥布林火箭雪橇點火鑰匙"
+      },
+      "reins_rallycart_rxt": {
+        "name": "拉力卡丁車 RXT 點火鑰匙"
       },
       "reins_lanternback_troll": {
         "name": "點燈人之軛：格倫博"
@@ -18985,8 +19066,8 @@ export const zh_TW: EnTranslations = {
       },
       "chronoweave": {
         "name": "以太織法衣",
-        "bonus2": "時光迴響將你 50% 的單體秘法傷害轉化為治療。受到傷害不再延遲你的施法。",
-        "bonus4": "時光奔流的冷卻時間縮短 5 秒。"
+        "bonus2": "時光迴響將你其他單體秘法傷害的 50% 轉化為治療。以太湧動和乙太飛鏢則轉化其傷害的 200%。受到傷害不再延遲你的施法。",
+        "bonus4": "時光奔流的冷卻時間縮短 5 秒，法力消耗降低 30%。"
       },
       "cinderbark": {
         "name": "燼皮守禦甲",

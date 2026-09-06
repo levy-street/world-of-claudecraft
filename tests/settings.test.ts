@@ -143,6 +143,8 @@ describe('Settings', () => {
     expect(s.get('targetFrameScale')).toBe(1);
     // the classic top-right aura corner stays the default; frame-anchoring is opt-in.
     expect(s.get('aurasOnPlayerFrame')).toBe(false);
+    // the anchored buff row sits above the frame by default; below is opt-in.
+    expect(s.get('auraBarBelowFrame')).toBe(false);
     expect(s.get('joystickDeadzone')).toBe(SETTING_RANGES.joystickDeadzone.def);
     // Interface Mode defaults to Auto (0): detect desktop vs touch from the device.
     expect(s.get('interfaceMode')).toBe(SETTING_RANGES.interfaceMode.def);
@@ -163,8 +165,9 @@ describe('Settings', () => {
   });
 
   it('clamps a stored historical Insane shadow dial (2) down to High on load', () => {
-    // The Shadow Quality ladder is capped at High (the 4096 map): the retired
-    // Insane rung persisted 2, which must come back as High, not survive.
+    // The Shadow Quality ladder is capped at High (the dial's 4096 map, above
+    // the High tier's own 2560 base): the retired Insane rung persisted 2,
+    // which must come back as High, not survive.
     localStorage.setItem('woc_settings', JSON.stringify({ shadowQuality: 2 }));
     const s = new Settings();
     expect(SETTING_RANGES.shadowQuality.max).toBe(1);
@@ -526,6 +529,7 @@ describe('Interface & Comfort settings pack', () => {
     expect(s.set('tooltipScale', 9)).toBe(SETTING_RANGES.tooltipScale.max);
     expect(s.set('fctScale', 0)).toBe(SETTING_RANGES.fctScale.min);
     expect(s.set('chatFontScale', 1.2)).toBe(1.2);
+    expect(s.set('chatFontScale', 9)).toBe(SETTING_RANGES.chatFontScale.max);
     expect(s.set('chatOpacity', 0)).toBe(SETTING_RANGES.chatOpacity.min);
   });
 
@@ -576,5 +580,26 @@ describe('click-to-move mouse button setting', () => {
     expect(normalizeClickMoveButton(2)).toBe(2);
     expect(clickMoveButtonLabel(0)).toBe('Left Click');
     expect(clickMoveButtonLabel(2)).toBe('Right Click');
+  });
+});
+
+// Chat text is 11px at stock, so the old 1.4 ceiling left it unreadable on a 4K
+// display at 100% OS scaling (players dropped to 1080p just to read chat). The
+// slider must reach at least 2x (1080p-equivalent size on 4K) and accept it
+// unclamped; the ceiling itself sits above that for TV / low-vision headroom.
+describe('chat text size reaches 4K-readable sizes', () => {
+  it('lets the slider double the stock chat text', () => {
+    const s = new Settings();
+    expect(SETTING_RANGES.chatFontScale.max).toBeGreaterThanOrEqual(2);
+    expect(s.set('chatFontScale', 2)).toBe(2);
+    const reloaded = new Settings();
+    expect(reloaded.get('chatFontScale')).toBe(2);
+  });
+
+  it('pins the ceiling at 2.5 and clamps above it', () => {
+    const s = new Settings();
+    expect(SETTING_RANGES.chatFontScale.max).toBe(2.5);
+    expect(s.set('chatFontScale', 2.5)).toBe(2.5);
+    expect(s.set('chatFontScale', 3)).toBe(2.5);
   });
 });

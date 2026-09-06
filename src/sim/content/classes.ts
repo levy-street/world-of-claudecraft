@@ -5,6 +5,7 @@ import {
   type AuraKind,
   type CoreStats,
   type PlayerClass,
+  type PoisonCoat,
   TEMPORAL_HOURGLASS_ALLY_COOLDOWN_RATE,
   TEMPORAL_HOURGLASS_CAPTURE_RADIUS,
   TEMPORAL_HOURGLASS_DURATION,
@@ -17,6 +18,13 @@ import {
   type WeaponInfo,
 } from '../types';
 import {
+  TEMPORAL_CASCADE_CAST_SECONDS,
+  TEMPORAL_CASCADE_ECHO_DURATION_SECONDS,
+  TEMPORAL_ECHO_DURATION_SECONDS,
+  TEMPORAL_ECHO_SINGLE_CONVERSION,
+} from './chronomancy_tuning';
+import {
+  CHRONOWEAVE_2PC_ECHO_CONVERT_SINGLE,
   GROVESPRING_2PC_SWIFTMEND_HEAL_MULT,
   GROVESPRING_4PC_OVERBLOOM_HARVEST_PCT,
   HEXTHREAD_2PC_NEEDLE_DOOM_BONUS,
@@ -2496,7 +2504,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetType: 'friendly',
     effects: [
       { type: 'heal', min: 24, max: 30 },
-      { type: 'temporalEcho', duration: 15 },
+      { type: 'temporalEcho', duration: TEMPORAL_ECHO_DURATION_SECONDS },
     ],
     ranks: [
       {
@@ -2505,7 +2513,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         cost: 60,
         effects: [
           { type: 'heal', min: 40, max: 50 },
-          { type: 'temporalEcho', duration: 15 },
+          { type: 'temporalEcho', duration: TEMPORAL_ECHO_DURATION_SECONDS },
         ],
       },
       {
@@ -2514,7 +2522,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         cost: 85,
         effects: [
           { type: 'heal', min: 58, max: 70 },
-          { type: 'temporalEcho', duration: 15 },
+          { type: 'temporalEcho', duration: TEMPORAL_ECHO_DURATION_SECONDS },
         ],
       },
       {
@@ -2523,20 +2531,20 @@ export const ABILITIES: Record<string, AbilityDef> = {
         cost: 90,
         effects: [
           { type: 'heal', min: 84, max: 102 },
-          { type: 'temporalEcho', duration: 15 },
+          { type: 'temporalEcho', duration: TEMPORAL_ECHO_DURATION_SECONDS },
         ],
       },
     ],
     description:
-      'Marks an ally with an echo of a healthier moment, mending $d health at once. For $t sec, part of the Arcane damage you deal is drawn back through the echo to heal them.',
+      'Marks an ally with an echo of a healthier moment, mending $d health at once. For $t sec, $x% of your other single-target Arcane damage and $y% of your area Arcane damage heals them. Aether Surge and Aether Darts instead heal them for $z% of the damage they deal.',
   },
   // ---- Chronomancy (healer) Phase 4: Cascada temporal (Temporal Cascade),
-  // docs/prd/mage-chronomancy.md Phase 4. The GROUP version of Temporal Echo: a 2s
+  // docs/prd/mage-chronomancy.md Phase 4. The GROUP version of Temporal Echo: a 1.5s
   // cast that centers on the friendly target (which must be the caster or a living
   // group/raid member and is ALWAYS included) and marks the nearest allies within
   // 15 yd of it, up to five total. Each takes a small initial heal and a REDUCED
-  // group echo (13% single / 6% area conversion, combat/chronomancy.ts) for 8 sec.
-  // The 15s cooldown plus the 8s window keep five echoes from ever being sustained.
+  // group echo (13% single / 6% area conversion, combat/chronomancy.ts) for 15 sec.
+  // The 17s cooldown keeps five echoes from being sustained without the raid set.
   // A pre-existing individual echo on a target is kept at 40% (never downgraded),
   // still initial-healed, and counts within the five. PLAYTEST-provisional values
   // (owner 2026-07-12), gated by tests/chronomancy_cascade_aoe.test.ts.
@@ -2547,7 +2555,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 12,
     specs: ['arcane'],
     cost: 90,
-    castTime: 2,
+    castTime: TEMPORAL_CASCADE_CAST_SECONDS,
     cooldown: 17,
     range: 30,
     school: 'arcane',
@@ -2559,7 +2567,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [
       {
         type: 'massTemporalEcho',
-        duration: 10,
+        duration: TEMPORAL_CASCADE_ECHO_DURATION_SECONDS,
         radius: 15,
         maxTargets: 5,
         heal: { min: 14, max: 18 },
@@ -2573,7 +2581,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         effects: [
           {
             type: 'massTemporalEcho',
-            duration: 10,
+            duration: TEMPORAL_CASCADE_ECHO_DURATION_SECONDS,
             radius: 15,
             maxTargets: 5,
             heal: { min: 22, max: 28 },
@@ -2587,7 +2595,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         effects: [
           {
             type: 'massTemporalEcho',
-            duration: 10,
+            duration: TEMPORAL_CASCADE_ECHO_DURATION_SECONDS,
             radius: 15,
             maxTargets: 5,
             heal: { min: 28, max: 36 },
@@ -2596,7 +2604,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Sends an echo cascading through your group: the target and up to four of their nearest allies are mended at once and each marked for $t sec, drawing part of the Arcane damage you deal back through their echoes to heal them. (Chronomancy)',
+      'Sends an echo cascading through your group: the target and up to four of their nearest allies are mended at once, healing for more on those who have lost the most health, and each marked for $t sec, drawing part of the Arcane damage you deal back through their echoes to heal them. Aether Surge and Aether Darts create an equal healing reserve from every group Echo, shared among marked allies below 60% health according to missing health. (Chronomancy)',
   },
   // ---- Chronomancy combat resurrection: Temporal Reversal. Rewinds a DEAD group/raid
   // member's timeline back to life at their corpse, IN COMBAT, with a fraction of their
@@ -3062,7 +3070,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Strikes the target for $d damage, incapacitating it for 4 sec. Any damage breaks the effect. Awards 1 combo point.',
+      'Strikes the target for $d damage, incapacitating it for 4 sec, and resets your own weapon swing timer so your queued auto attack does not break it. Any damage breaks the effect. Awards 1 combo point.',
   },
   evasion: {
     id: 'evasion',
@@ -3358,9 +3366,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'nature',
     requiresTarget: false,
-    effects: [{ type: 'imbue', bonus: 8, duration: 1800 }],
+    effects: [{ type: 'imbue', bonus: 14, duration: 1800 }],
     description:
-      'Coats your weapon for 30 min, causing each of your melee swings to deal 8 additional Nature damage.',
+      'Coats your weapon for 30 min, causing each of your melee swings to deal $d additional Nature damage.',
   },
   deadly_poison: {
     id: 'deadly_poison',
@@ -3373,17 +3381,31 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'nature',
     requiresTarget: false,
-    effects: [{ type: 'imbue', bonus: 14, duration: 1800 }],
+    // The DoT poison, and the reason it is not just a bigger Adder's Bite: the
+    // coat itself adds no flat swing damage (bonus 0), it festers a stacking
+    // Nature DoT on whatever it strikes. Every landed swing adds a stack (cap 5)
+    // and refreshes the 12 sec timer, so per-tick damage climbs 4 -> 20 the
+    // longer you stay on one target. Classic Deadly Poison, on the same
+    // stacking-DoT shape the mob `stackPoison` mechanic already uses.
+    effects: [
+      {
+        type: 'imbue',
+        bonus: 0,
+        duration: 1800,
+        coat: { rider: 'stackDot', perTick: 4, maxStacks: 5, duration: 12, interval: 2 },
+      },
+    ],
     description:
-      'Coats your weapon for 30 min, causing each of your melee swings to deal 14 additional Nature damage.',
+      'Coats your weapon for 30 min. Each of your melee swings adds a stack of venom to the target, up to 5, and refreshes the 12 sec duration. Each stack deals $d Nature damage every 2 sec.',
   },
-  // The two utility poisons. Both are STRIKE poisons in the Leaden Venom
-  // (crippling_poison) mould rather than weapon coats: same class, cost, school,
-  // melee range, and the same small 3 to 5 Nature hit that carries the strike
-  // into combat and gives the debuff something to ride in on. Only the rider
-  // differs, so no new balance number is invented beyond the two the design
-  // asked for (5% armor, 25% healing taken, 12 sec each, matching Leaden
-  // Venom's 12 sec snare).
+  // The two utility poisons. Both are weapon COATS, in the Adder's Bite mould
+  // rather than the Leaden Venom one: same class, cost, school, and 30 min
+  // duration as the damage poisons, cast on yourself, and every landed melee
+  // swing lands the rider on whatever you struck. They shipped as 40-energy
+  // targeted nukes by mistake (issue #3774), which is not what a coating is.
+  // Only the rider differs between them, so no new balance number is invented
+  // beyond the two the design asked for (5% armor, 25% healing taken, 12 sec
+  // each, matching Leaden Venom's 12 sec snare).
   melting_acid: {
     id: 'melting_acid',
     name: 'Melting Acid',
@@ -3394,13 +3416,17 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cooldown: 0,
     range: 0,
     school: 'nature',
-    requiresTarget: true,
+    requiresTarget: false,
     effects: [
-      { type: 'directDamage', min: 3, max: 5 },
-      { type: 'buffTarget', kind: 'melting_acid', value: 0.05, duration: 12 },
+      {
+        type: 'imbue',
+        bonus: 0,
+        duration: 1800,
+        coat: { rider: 'debuff', kind: 'melting_acid', value: 0.05, duration: 12 },
+      },
     ],
     description:
-      'Splashes the target with a caustic poison, dealing $d Nature damage and reducing its armor by 5% for 12 sec.',
+      'Coats your weapon for 30 min. Each of your melee swings splashes the target with caustic acid, reducing its armor by 5% for 12 sec.',
   },
   nightshade_coating: {
     id: 'nightshade_coating',
@@ -3412,17 +3438,21 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cooldown: 0,
     range: 0,
     school: 'nature',
-    requiresTarget: true,
+    requiresTarget: false,
     effects: [
-      { type: 'directDamage', min: 3, max: 5 },
       // Reuses the existing healing-taken debuff kind (combat/heal.ts folds
-      // every mortal_wound aura in). Its aura id is the ability id (the first
-      // buffTarget of a def), so it never evicts a warrior's Maiming Strike
-      // debuff or vice versa.
-      { type: 'buffTarget', kind: 'mortal_wound', value: 0.25, duration: 12 },
+      // every mortal_wound aura in). The rider borrows the coat's aura id (the
+      // ability id), so it never evicts a warrior's Maiming Strike debuff or
+      // vice versa.
+      {
+        type: 'imbue',
+        bonus: 0,
+        duration: 1800,
+        coat: { rider: 'debuff', kind: 'mortal_wound', value: 0.25, duration: 12 },
+      },
     ],
     description:
-      'Coats the target in nightshade, dealing $d Nature damage and reducing the healing it receives by 25% for 12 sec.',
+      'Coats your weapon for 30 min. Each of your melee swings coats the target in nightshade, reducing the healing it receives by 25% for 12 sec.',
   },
   blind: {
     id: 'blind',
@@ -5245,6 +5275,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 0,
     cooldown: 45,
     offGcd: true,
+    // An off-GCD burst opener pressed in the middle of the Needle cast or Consume
+    // channel it empowers (the same door Cinderfall and Phoenix Trance use):
+    // without this the busy guard rejected the press and the player gained no
+    // Condemnation.
+    usableWhileCasting: true,
     range: 30,
     school: 'shadow',
     requiresTarget: true,
@@ -5263,6 +5298,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 0,
     cooldown: 90,
     offGcd: true,
+    // Off-GCD burst opener, pressable through a running cast or channel; see
+    // possess_evil_eye above.
+    usableWhileCasting: true,
     range: 30,
     school: 'shadow',
     requiresTarget: true,
@@ -8470,6 +8508,8 @@ export interface KnownAbility {
   ignoreStealthRequirement?: boolean; // Cheap Trick: the resolved ability drops requiresStealth
   charges?: number; // resolved total uses; undefined means one use
   bonusCharges?: number; // +N stored uses resolved from def/talents; drives the abilityCharges recharge model
+  /** Individual Temporal Echo conversion after worn-set resolution. */
+  echoConvertSingle?: number;
 }
 
 // Scale one effect's damage/heal magnitudes, returning a NEW effect object - the
@@ -8509,6 +8549,17 @@ const SCALABLE_BUFF_KINDS: ReadonlySet<AuraKind> = new Set([
   'buff_spellpower',
   'thorns',
 ]);
+
+/** Scale a weapon coat's DAMAGE rider by a talent multiplier (Redhanded's
+ *  "your poison damage by 10%"). Only the stacking DoT carries damage; the
+ *  utility riders are armor and healing percentages, not damage, so they are
+ *  deliberately left alone. `perTick` stays UNROUNDED: the aura rounds
+ *  perTick x stacks once, at apply time (combat/poison_coating.ts), so a 10%
+ *  bump that would vanish into a rounded 4 still reads at higher stacks. */
+function scalePoisonCoatDamage(coat: PoisonCoat | undefined, mul: number): PoisonCoat | undefined {
+  if (coat === undefined || coat.rider !== 'stackDot') return coat;
+  return { ...coat, perTick: coat.perTick * mul };
+}
 
 function scaleEffect(
   eff: AbilityEffect,
@@ -8595,6 +8646,9 @@ function scaleEffect(
       return {
         ...eff,
         bonus: Math.round(eff.bonus * dmgMult + flat),
+        // A coat's damage rider scales with the same multiplier; the flat add
+        // is a per-SWING number and would be nonsense on a per-tick rider.
+        coat: scalePoisonCoatDamage(eff.coat, dmgMult),
       };
     case 'heal':
       if (eff.casterMaxHpPct !== undefined) return eff;
@@ -8722,6 +8776,11 @@ function scaleEffect(
 // mods stack on top and also tune cost / cast time / cooldown.
 export function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): void {
   const am = mods.abilities[entry.def.id];
+  if (entry.def.id === 'temporal_echo') {
+    entry.echoConvertSingle = mods.selected[setBonusFlag('chronoweave', 2)]
+      ? CHRONOWEAVE_2PC_ECHO_CONVERT_SINGLE
+      : TEMPORAL_ECHO_SINGLE_CONVERSION;
+  }
   // dmgMult/healMult come from the shared talent_hit_mult resolver: the SAME
   // function combat sites (effect_dispatch.ts/casting_lifecycle.ts/auto_attack.ts)
   // call to scale a resolved ability's runtime SP/AP/weapon rider, so the
@@ -8799,10 +8858,16 @@ export function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): voi
           ? { ...e, value: scaleBuffValue(e.kind, e.value, mul) }
           : e.type === 'finisherHaste'
             ? { ...e, mult: 1 + (e.mult - 1) * mul }
-            : // Weapon coats scale their per-swing rider (Redhanded's poison
-              // damage; a re-coat picks up the new value).
+            : // Weapon coats scale their per-swing rider AND their coat rider
+              // (Redhanded's poison damage: the flat swing bonus on Adder's
+              // Bite, the per-stack tick on Festering Venom). A re-coat picks
+              // up the new value.
               e.type === 'imbue'
-              ? { ...e, bonus: Math.round(e.bonus * mul) }
+              ? {
+                  ...e,
+                  bonus: Math.round(e.bonus * mul),
+                  coat: scalePoisonCoatDamage(e.coat, mul),
+                }
               : // Forgewall 2pc (the Crucible set doc's scaleEffect
                 // extension): Iron Resolve's rage-to-absorb rate is the
                 // buff-shaped value on absorbSpentResource, so the generic

@@ -201,10 +201,12 @@ describe('graphics tier resolution', () => {
       expect(Object.keys(bands).sort()).toEqual(
         [
           'characters',
+          'detail',
           'foliage',
           'grass',
           'lighting',
           'materials',
+          'post',
           'props',
           'resolution',
           'ui',
@@ -226,6 +228,59 @@ describe('graphics tier resolution', () => {
     expect(GFX_BUCKET_BANDS.low.foliage.baseline).toBeGreaterThan(GFX_BUCKET_BANDS.low.foliage.min);
     expect(GFX_BUCKET_BANDS.low.characters.baseline).toBe(1);
     expect(GFX_BUCKET_BANDS.low.weapons.baseline).toBe(1);
+    // Terrain-detail shed (terrain_detail_shed_core.ts): the tier's own
+    // terrainRelief/surfaceDetailTaps/surfaceDetailClampK request is always
+    // the baseline (the static preset itself never changes). Only ultra and
+    // insane, whose own request sits ABOVE high's floor profile on every
+    // knob, are governable with real room to shed (min 0); every tier at or
+    // under high already ships the floor, so its band is pinned non-
+    // governable with no shed range at all, a high session provably
+    // untouched by the live level regardless of pressure.
+    for (const tier of ['low', 'medium', 'high'] as const) {
+      expect(GFX_BUCKET_BANDS[tier].detail).toEqual({
+        min: 1,
+        baseline: 1,
+        max: 1,
+        roi: 0,
+        cost: 'gpu',
+        governable: false,
+      });
+    }
+    for (const tier of ['ultra', 'insane'] as const) {
+      const band = GFX_BUCKET_BANDS[tier].detail;
+      expect(band.governable).toBe(true);
+      expect(band.min).toBe(0);
+      expect(band.baseline).toBe(1);
+      expect(band.max).toBe(1);
+      expect(band.cost).toBe('gpu');
+      expect(band.roi).toBe(0.92);
+    }
+
+    // Post shed (post_shed_core.ts): the full chain is always the baseline
+    // (the static preset itself never changes). The composer tiers, which
+    // build the sheddable passes (SMAA, bloom, N8AO), are governable down to
+    // the last rung (min 0); the grade-only and direct tiers build none, so
+    // their band is pinned non-governable with no range at all.
+    for (const tier of ['low', 'medium'] as const) {
+      expect(GFX_BUCKET_BANDS[tier].post).toEqual({
+        min: 1,
+        baseline: 1,
+        max: 1,
+        roi: 0,
+        cost: 'gpu',
+        governable: false,
+      });
+    }
+    for (const tier of ['high', 'ultra', 'insane'] as const) {
+      expect(GFX_BUCKET_BANDS[tier].post).toEqual({
+        min: 0,
+        baseline: 1,
+        max: 1,
+        roi: 0.9,
+        cost: 'gpu',
+        governable: true,
+      });
+    }
   });
 
   it('keeps medium as a middle tier while high and ultra retain the premium pipeline', () => {
@@ -280,7 +335,9 @@ describe('graphics tier resolution', () => {
     expect(medium.composer).toBe(false);
     expect(medium.ao).toBe(false);
     expect(medium.shadowMap).toBeGreaterThan(low.shadowMap);
-    expect(medium.shadowMap).toBeLessThan(high.shadowMap);
+    // Medium and High share the 2560 working map: the ladder's next step up
+    // is the ultra tiers' 4096 showcase allocation, not a High-only rung.
+    expect(medium.shadowMap).toBe(high.shadowMap);
     expect(medium.pixelRatioCap).toBeLessThan(high.pixelRatioCap);
     expect(medium.msaaSamples).toBe(0);
     expect(medium.smaa).toBe(false);
@@ -291,14 +348,16 @@ describe('graphics tier resolution', () => {
     expect(high.ao).toBe(true);
     expect(high.msaaSamples).toBe(0);
     expect(high.smaa).toBe(true);
-    expect(high.shadowMap).toBe(4096);
+    expect(high.shadowMap).toBe(2560);
 
     expect(ultra.standardMaterials).toBe(true);
     expect(ultra.composer).toBe(true);
     expect(ultra.ao).toBe(true);
     expect(ultra.msaaSamples).toBe(0);
     expect(ultra.smaa).toBe(true);
-    expect(ultra.shadowMap).toBe(high.shadowMap);
+    // The one knob where ultra outruns high: 4096 against high's 2560.
+    expect(ultra.shadowMap).toBe(4096);
+    expect(ultra.shadowMap).toBeGreaterThan(high.shadowMap);
     expect(ultra.pixelRatioCap).toBe(high.pixelRatioCap);
     expect(GFX_BUCKET_BANDS.ultra.grass.baseline).toBeGreaterThan(
       GFX_BUCKET_BANDS.high.grass.baseline,
@@ -345,6 +404,16 @@ describe('graphics tier resolution', () => {
       expect(below.canopyDetail).toBe(false);
       expect(below.terrainRelief).toBe(0);
     }
+    // The grass-card ladder: lean tiers keep the legacy pair, medium and high
+    // take the two uprights plus the 45-degree breaker, and the sky-facing cap
+    // card is what ultra and insane buy (grass_tuft_cards_core.ts).
+    expect(
+      ['low', 'medium', 'high', 'ultra', 'insane'].map(
+        (tier) =>
+          gfxInternalsForTest.settingsFor(tier as 'low' | 'medium' | 'high' | 'ultra' | 'insane')
+            .grassCardsPerTuft,
+      ),
+    ).toEqual([2, 3, 3, 4, 4]);
     expect(high.surfaceDetail).toBe(true);
     expect(high.surfaceDetailTaps).toBe(0);
     expect(high.surfaceDetailClampK).toBe(0);
@@ -359,6 +428,15 @@ describe('graphics tier resolution', () => {
       expect(tier.canopyDetail).toBe(true);
       expect(tier.bloom).toBe(true);
     }
+    // Canopy clump detail splits by half, not by on/off: ultra runs the AO
+    // taps alone, insane keeps the NormalGL half too (canopy_detail_tier_core).
+    expect(
+      ['low', 'medium', 'high', 'ultra', 'insane'].map(
+        (tier) =>
+          gfxInternalsForTest.settingsFor(tier as 'low' | 'medium' | 'high' | 'ultra' | 'insane')
+            .canopyDetailTaps,
+      ),
+    ).toEqual([0, 0, 0, 3, 6]);
     expect(ultra.surfaceDetailTaps).toBe(3);
     expect(ultra.surfaceDetailClampK).toBe(0.85);
     expect(insane.surfaceDetailTaps).toBe(4);
@@ -409,8 +487,15 @@ describe('graphics tier resolution', () => {
     expect(foliageHigh.bladeCarpetRadius).toBe(34);
     expect(foliageHigh.cliffScree).toBe(true);
     expect(foliageHigh.canopyDetail).toBe(true);
+    expect(foliageHigh.canopyDetailTaps).toBe(3);
+    expect(adv({ foliageDensity: 2 }).canopyDetailTaps).toBe(6);
     expect(adv({ foliageDensity: 2 }).bladeCarpetRadius).toBe(40);
     expect(adv({ foliageDensity: 2 }).farGrassDensityFloor).toBe(0.85);
+    // The Foliage Density dial owns the grass-card ladder too, level by level.
+    expect(foliageLow.grassCardsPerTuft).toBe(2);
+    expect(foliageMedium.grassCardsPerTuft).toBe(3);
+    expect(foliageHigh.grassCardsPerTuft).toBe(4);
+    expect(adv({ foliageDensity: 2 }).grassCardsPerTuft).toBe(4);
     // Surface Detail (the town-cost dial): Off / Basic / Full / Insane.
     const surfaceOff = adv({ surfaceDetail: 0 });
     expect(surfaceOff.surfaceDetail).toBe(false);
@@ -444,8 +529,10 @@ describe('graphics tier resolution', () => {
     expect(effectsHigh.bloom).toBe(true);
     expect(effectsHigh.smaa).toBe(true);
     // Shadows: pure map-size steps; terrain-cast joins at High. The ladder
-    // caps at High's 4096: a historical stored Insane (2) falls through to
-    // the High base instead of the retired ~256 MB-class 8192 map.
+    // caps at 4096: a historical stored Insane (2) lands on that top rung
+    // instead of the retired ~256 MB-class 8192 map. The top rung is an
+    // explicit write, not a fall-through, because the High TIER base is 2560
+    // now and a stored dial value keeps the map size the player chose.
     expect(adv({ shadowQuality: 0 }).shadowMap).toBe(1024);
     expect(adv({ shadowQuality: 0 }).terrainCastShadows).toBe(false);
     expect(adv({ shadowQuality: 0.5 }).shadowMap).toBe(2560);
@@ -454,9 +541,10 @@ describe('graphics tier resolution', () => {
     expect(adv({ shadowQuality: 2 }).shadowMap).toBe(4096);
     expect(adv({ shadowQuality: 2 }).terrainCastShadows).toBe(true);
     // The load-bearing constrained arm: the retired explicit 8192 write used
-    // to OVERRIDE the phone-class 2048 cap; falling through to the base
-    // restores it (dynamicShadows stays off there regardless, so this pins
-    // the allocation, not a visible shadow).
+    // to OVERRIDE the phone-class 2048 cap, and the top rung's 4096 write
+    // must not reintroduce that. The rung stays inside the device policy
+    // (dynamicShadows stays off there regardless, so this pins the
+    // allocation, not a visible shadow).
     const constrainedInsane = gfxInternalsForTest.settingsFor('high', {
       graphicsPreset: 5,
       shadowQuality: 2,
@@ -465,6 +553,52 @@ describe('graphics tier resolution', () => {
       narrowViewport: true,
     });
     expect(constrainedInsane.shadowMap).toBe(2048);
+  });
+
+  it('ladders texture anisotropy per tier, with normals at half the colour budget', () => {
+    const rungs = {
+      low: gfxInternalsForTest.settingsFor('low'),
+      medium: gfxInternalsForTest.settingsFor('medium'),
+      high: gfxInternalsForTest.settingsFor('high'),
+      ultra: gfxInternalsForTest.settingsFor('ultra'),
+      insane: gfxInternalsForTest.settingsFor('insane'),
+    };
+
+    expect(
+      Object.fromEntries(
+        Object.entries(rungs).map(([tier, s]) => [tier, [s.anisotropy, s.normalAnisotropy]]),
+      ),
+    ).toEqual({
+      low: [1, 1],
+      medium: [2, 1],
+      high: [4, 2],
+      ultra: [8, 4],
+      insane: [8, 4],
+    });
+
+    // The two memory profiles take the low budget whatever tier the player
+    // picked: a phone-class browser and every iOS WebKit host are the most
+    // bandwidth-bound devices in the fleet.
+    const phone = { maxTouchPoints: 5, coarsePointer: true, narrowViewport: true };
+    for (const tier of ['medium', 'high', 'ultra', 'insane'] as const) {
+      const constrained = gfxInternalsForTest.settingsFor(tier, phone);
+      const ios = gfxInternalsForTest.settingsFor(tier, { platform: 'ios' });
+      expect([constrained.anisotropy, constrained.normalAnisotropy], tier).toEqual([1, 1]);
+      expect([ios.anisotropy, ios.normalAnisotropy], tier).toEqual([1, 1]);
+    }
+
+    // Monotone with the tier ladder, and never below the 1 tap that means
+    // "isotropic": a future top tier keeps the ceiling rather than falling
+    // through to a lower rung.
+    const ladder = [rungs.low, rungs.medium, rungs.high, rungs.ultra, rungs.insane];
+    for (let i = 1; i < ladder.length; i++) {
+      expect(ladder[i].anisotropy).toBeGreaterThanOrEqual(ladder[i - 1].anisotropy);
+      expect(ladder[i].normalAnisotropy).toBeGreaterThanOrEqual(ladder[i - 1].normalAnisotropy);
+    }
+    for (const s of ladder) {
+      expect(s.normalAnisotropy).toBe(Math.max(1, s.anisotropy / 2));
+      expect(s.normalAnisotropy).toBeGreaterThanOrEqual(1);
+    }
   });
 
   it('sheds the memory-spike knobs on constrained (phone-class) browsers, cosmetics only', () => {

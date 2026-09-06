@@ -169,7 +169,7 @@ function buyClaudiumModel(
   info: BankInfo,
   input: BankClaudiumInput | undefined,
 ): BankBuyClaudiumModel | undefined {
-  if (!input || !input.storeEnabled || input.nativeBuild) return undefined;
+  if (!input?.storeEnabled || input.nativeBuild) return undefined;
   const cost = info.nextRungClaudiumPrice;
   if (cost === undefined) return undefined;
   // The gold ladder's own maxed answer, reused verbatim: one ceiling, one
@@ -424,12 +424,21 @@ export interface DepositAllSend {
 }
 
 /** The deposit-all-materials plan: the ordered whole-stack sends, how many stacks
- *  they move (=== sends.length), and whether the bank ran out of room for a material
- *  that did not fit (drives the "bank filled" summary variant). */
+ *  they move (=== sends.length), whether the bank ran out of room for a material
+ *  that did not fit (drives the "bank filled" summary variant), and the id of an
+ *  epic-or-better material the plan sends, or null. A bare "Materials deposited: N"
+ *  reads as unremarkable for the common/uncommon/rare fodder deposit-all usually
+ *  sweeps, but an epic-or-better one is rare and valuable enough to name rather than
+ *  fold into a count (the vault pane's `VaultDepositAllPrediction.notableItemId`
+ *  sibling; a player who reclassified a junk reagent into a Material can hit this
+ *  button out of old habit exactly as easily as the vault's). Picks the FIRST
+ *  qualifying id the descending walk actually SENDS (a stack the bank could not fit
+ *  never sets it): tests/bank_view.test.ts pins the priority. */
 export interface DepositAllPlan {
   sends: DepositAllSend[];
   stacks: number;
   full: boolean;
+  notableItemId: string | null;
 }
 
 /** Plan a "deposit all materials" run WITHOUT mutating the live world: it simulates
@@ -468,12 +477,14 @@ export function planDepositAllMaterials(
   const bankClone = bankSlots.map(cloneInvSlot);
   const sends: DepositAllSend[] = [];
   let full = false;
+  let notableItemId: string | null = null;
   for (let i = invClone.length - 1; i >= 0; i--) {
     const slot = invClone[i];
     const item = lookup(slot.itemId);
     if (!item) continue; // unknown id: not a known material, leave it in the bags
     if (item.kind === 'quest') continue; // never bank quest items (the taxonomy also excludes them)
     if (!isMaterialItem(item)) continue;
+    const itemId = slot.itemId;
     const count = slot.count;
     const result = moveBetweenContainers(invClone, i, count, bankClone, pools);
     if (result.refusal === 'no_fit') {
@@ -482,25 +493,38 @@ export function planDepositAllMaterials(
     }
     if (result.refusal) continue; // 'invalid': malformed slot (should not happen); skip
     sends.push({ slot: i, count });
+    if (notableItemId === null && (item.quality === 'epic' || item.quality === 'legendary')) {
+      notableItemId = itemId;
+    }
   }
-  return { sends, stacks: sends.length, full };
+  return { sends, stacks: sends.length, full, notableItemId };
 }
 
-/** The three deposit-all summary lines, as t() keys so the painter stays a thin
+/** The five deposit-all summary lines, as t() keys so the painter stays a thin
  *  consumer and the arm CHOICE is unit-pinned here rather than buried in DOM code. */
 export type DepositAllSummaryKey =
   | 'hudChrome.bank.depositAllNone'
   | 'hudChrome.bank.depositAllFull'
-  | 'hudChrome.bank.depositAllDone';
+  | 'hudChrome.bank.depositAllDone'
+  | 'hudChrome.bank.depositAllNotable'
+  | 'hudChrome.bank.depositAllNotableFull';
 
-/** Which transient summary a finished deposit-all plan earns. Exactly one of three
- *  arms: no stack moved (materials existed, the button gates on
- *  hasDepositableMaterials, but none fit) -> depositAllNone; some moved but at least
- *  one did not fit -> depositAllFull; everything fit -> depositAllDone. */
+/** Which transient summary a finished deposit-all plan earns. No stack moved
+ *  (materials existed, the button gates on hasDepositableMaterials, but none fit)
+ *  -> depositAllNone. Otherwise, an epic-or-better material was sent ->
+ *  depositAllNotable (or depositAllNotableFull when some OTHER stack also did not
+ *  fit): knowing WHAT moved matters more in the moment than whether the bank also
+ *  filled up, but the fill still needs saying, so the notable arm keeps its own
+ *  full variant rather than swallowing that fact the way an earlier revision of the
+ *  vault's sibling arm did. Absent a notable item: some moved but at least one did
+ *  not fit -> depositAllFull; everything fit -> depositAllDone. */
 export function depositAllSummaryKey(
-  plan: Pick<DepositAllPlan, 'stacks' | 'full'>,
+  plan: Pick<DepositAllPlan, 'stacks' | 'full' | 'notableItemId'>,
 ): DepositAllSummaryKey {
   if (plan.stacks === 0) return 'hudChrome.bank.depositAllNone';
+  if (plan.notableItemId !== null) {
+    return plan.full ? 'hudChrome.bank.depositAllNotableFull' : 'hudChrome.bank.depositAllNotable';
+  }
   if (plan.full) return 'hudChrome.bank.depositAllFull';
   return 'hudChrome.bank.depositAllDone';
 }

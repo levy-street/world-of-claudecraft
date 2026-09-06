@@ -46,6 +46,7 @@ import {
 } from './game/click_move';
 import { clientEnvBits, installPageStateTracking, pageStateBits } from './game/client_env';
 import { getClientSeed } from './game/client_seed';
+import { buildContextRecoveryCallbacks } from './game/context_loss_diagnostics';
 import { localPartyMemberIds } from './game/corpse_loot_availability';
 import { createCrossHotbar, measureCrossHotbarLift } from './game/cross_hotbar_wiring';
 import { tryDayNightDevCommand } from './game/daynight_dev_command';
@@ -289,6 +290,7 @@ import {
 } from './render/assets/graphics_profile';
 import {
   enableKtx2MipRelease,
+  type Ktx2RestoreTarget,
   ktx2MipsOnContextLost,
   ktx2MipsRestored,
 } from './render/assets/ktx2_mip_release';
@@ -329,6 +331,7 @@ import {
   playerPortraitDataUrl,
   resetPortraitRendererForGraphicsRebuild,
 } from './render/characters/portrait';
+import { attachContextRecoveryHandlers } from './render/context_loss_recovery';
 import { type RecycledRendererContext, recycleWebGL2Context } from './render/context_recycle';
 import { installWebGLContextRelease } from './render/context_release';
 import {
@@ -408,6 +411,7 @@ import {
   relocalizeAppearancePanels,
 } from './ui/appearance_panel_locale';
 import { setThornhollowPrewarmHooks } from './ui/arena_window';
+import { applyAuraBarSide } from './ui/aura_bar_side';
 import {
   handleKeyboardActivation,
   syncInputAriaState,
@@ -1307,8 +1311,7 @@ async function startGame(
   // The world and socket stay live, but every client-frame owner pauses while
   // the renderer is recycled. The frame loop also clears its offline backlog.
   let graphicsRebuildPaused = false;
-  const ktx2RestoreUploadQueue =
-    createKtx2RestoreUploadQueueCoordinator<Renderer['backgroundGpuWork']>();
+  const ktx2RestoreUploadQueue = createKtx2RestoreUploadQueueCoordinator<Ktx2RestoreTarget>();
   let hud!: Hud;
   const baseEntryDiagnostics = (): EntryDiagnostics => {
     const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
@@ -1506,18 +1509,17 @@ async function startGame(
   uiEffectsApplier.applyNow();
   const autoLoot = new AutoLoot();
   const perf = createPerfMonitor(null, DESKTOP_APP);
-  canvas.addEventListener('webglcontextlost', () => {
-    ktx2MipsOnContextLost(ktx2RestoreUploadQueue.current);
-    entryDiagnostics.checkpoint('webgl-context-lost', {
-      ...renderEntryDiagnostics(),
-      contextLost: rendererReady ? renderer.perfStats().contextLost + 1 : 1,
-    });
-    console.warn('[entry-diag] WebGL context lost during or after world entry');
-  });
-  canvas.addEventListener('webglcontextrestored', () => {
-    entryDiagnostics.checkpoint('webgl-context-restored');
-    console.info('[entry-diag] WebGL context restored during or after world entry');
-  });
+  attachContextRecoveryHandlers(
+    canvas,
+    buildContextRecoveryCallbacks({
+      entryDiagnostics,
+      renderEntryDiagnostics,
+      ktx2MipsOnContextLost: () => ktx2MipsOnContextLost(ktx2RestoreUploadQueue.current),
+      contextLostCount: () => (rendererReady ? renderer.perfStats().contextLost : 0),
+      showFatalOverlay: fatalOverlay,
+      stuckMessage: t('loading.rendererContextLost'),
+    }),
+  );
   // The probe was armed before the locale/asset awaits above; mark that the await
   // window ended and the synchronous scene build is what runs next.
   entryDiagnostics.checkpoint('scene-build-start', baseEntryDiagnostics());
@@ -1552,7 +1554,7 @@ async function startGame(
     // character's choice onto every character on the machine.
     renderer = loadSpan('renderer-ctor', () => new Renderer(world, canvas, nameplates));
     rendererReady = true;
-    ktx2RestoreUploadQueue.publish(renderer.backgroundGpuWork);
+    ktx2RestoreUploadQueue.publish({ queue: renderer.backgroundGpuWork, host: renderer.webgl });
     publishGpuHitchRuntimeReceipt({ search: location.search, renderer: renderer.perfStats() });
     renderer.setAudioSink(sfx);
     renderer.showDevBadges = settings.get('showDevBadges');
@@ -1964,6 +1966,9 @@ async function startGame(
           case 'reliquary':
             hud.toggleReliquary();
             break;
+          case 'lootExplorer':
+            hud.toggleLootExplorer();
+            break;
           case 'sheathe': {
             // Cosmetic sheathe toggle (Z). The world owns the rule (dead-gate,
             // combat auto-unsheathe); play the cue only when the state moved.
@@ -2086,6 +2091,7 @@ async function startGame(
     onDailyRewards: () => hud.toggleDailyRewards(),
     onDeeds: () => hud.toggleDeeds(),
     onReliquary: () => hud.toggleReliquary(),
+    onLootExplorer: () => hud.toggleLootExplorer(),
     onMountToggle: () => {
       // Dismount is the shared toggleMounted() path (unchanged); summoning an
       // owned mount from a single tap goes through its reins item directly,
@@ -2301,6 +2307,9 @@ async function startGame(
         break;
       case 'reliquary':
         hud.toggleReliquary();
+        break;
+      case 'lootExplorer':
+        hud.toggleLootExplorer();
         break;
       case 'crafting':
         // The controller panel has always OFFERED this bind (it lists every
@@ -2823,14 +2832,19 @@ async function startGame(
       case 'partyFrameColumns':
         document.documentElement.style.setProperty('--party-frame-columns', String(Math.round(v)));
         break;
+      case 'playerFrameHealthText':
+      case 'targetFrameHealthText':
       case 'partyFrameHealthText':
       case 'partyFrameSort':
       case 'partyFrameStyle':
-        // Read live by Hud.updatePartyFrames; persistence above is the only
-        // page-level work needed.
+        // Read live by Hud.updatePartyFrames / the unit-frame paints; persistence
+        // above is the only page-level work needed.
         break;
       case 'aurasOnPlayerFrame':
         hud.setAurasOnPlayerFrame(!!v);
+        break;
+      case 'auraBarBelowFrame':
+        applyAuraBarSide(document.body, !!v);
         break;
       case 'alwaysShowAllBuffs':
         hud.setAlwaysShowAllBuffs(!!v);
@@ -2931,7 +2945,9 @@ async function startGame(
       graphicsRebuildPaused = paused;
       ktx2RestoreUploadQueue.setPaused(paused);
       if (paused) return;
-      ktx2RestoreUploadQueue.publish(rendererReady ? renderer.backgroundGpuWork : undefined);
+      ktx2RestoreUploadQueue.publish(
+        rendererReady ? { queue: renderer.backgroundGpuWork, host: renderer.webgl } : undefined,
+      );
       movementPrediction.resume();
       last = performance.now();
       acc = 0;
@@ -2996,7 +3012,7 @@ async function startGame(
         initializeGfx: false,
       });
       configureRebuiltRenderer(next);
-      ktx2RestoreUploadQueue.publish(next.backgroundGpuWork);
+      ktx2RestoreUploadQueue.publish({ queue: next.backgroundGpuWork, host: next.webgl });
       return next;
     },
     prepareCurrentZone: (next) =>
@@ -3027,7 +3043,7 @@ async function startGame(
       next.setAudioSink(sfx);
       renderer = next;
       rendererReady = true;
-      ktx2RestoreUploadQueue.publish(next.backgroundGpuWork);
+      ktx2RestoreUploadQueue.publish({ queue: next.backgroundGpuWork, host: next.webgl });
       publishGpuHitchRuntimeReceipt({ search: location.search, renderer: next.perfStats() });
       hud.replaceRenderer(next);
       perf.setRenderer(next);
@@ -3140,13 +3156,18 @@ async function startGame(
     },
     changeLanguage: (lang, onStatus) => changeLanguage(lang, onStatus),
     refreshWocBalance: (force) => refreshWocBalanceOnDemand(force),
-    // Deed-broadcast opt-out: online only (an offline character has no account
-    // row); the options row hides itself when this seam is absent.
+    // Account toggles (deed-broadcast opt-out, queue-pop Discord DM opt-in):
+    // online only (an offline character has no account row); each options row
+    // hides itself when its seam is absent. The fallback is the column default.
     ...(online
       ? {
           deedBroadcasts: {
-            get: () => api.deedBroadcasts(),
-            set: (enabled: boolean) => api.setDeedBroadcasts(enabled),
+            get: () => api.accountToggle('/api/deeds/broadcasts', true),
+            set: (enabled: boolean) => api.setAccountToggle('/api/deeds/broadcasts', enabled),
+          },
+          discordQueuePings: {
+            get: () => api.accountToggle('/api/discord/queue-pings', false),
+            set: (enabled: boolean) => api.setAccountToggle('/api/discord/queue-pings', enabled),
           },
         }
       : {}),
@@ -7460,7 +7481,13 @@ function renderClassDetails(
           } else if (secondaryEffect.type === 'absorb') {
             dmgText = formatClassDetailNumber(secondaryEffect.amount);
           } else if (secondaryEffect.type === 'imbue') {
-            dmgText = formatClassDetailNumber(secondaryEffect.bonus);
+            // Same rule as ability_description's $d: a coat with a damage
+            // rider reads the rider, not its zero flat swing bonus.
+            dmgText = formatClassDetailNumber(
+              secondaryEffect.coat?.rider === 'stackDot'
+                ? Math.max(1, Math.round(secondaryEffect.coat.perTick))
+                : secondaryEffect.bonus,
+            );
           }
         }
       }

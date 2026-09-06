@@ -222,8 +222,10 @@ import {
   recordDeedUnlocks,
 } from './deeds_records';
 import { claimDedupeKey, enqueueActivity, releaseDedupeKey } from './discord_activity';
+import { duelActivityCard } from './discord_activity_pvp';
 import { discordFlairForAccount, grantRewardPoints } from './discord_db';
 import { enqueueLinkChange } from './discord_link_changes';
+import { observeQueuePops, queuedPidsOf, queuePopDepsFor } from './discord_queue_pops';
 import { enqueueRelay } from './discord_relay';
 import { findDungeonDoorNear } from './dungeon_door';
 import * as entryFacing from './dungeon_entry_facing';
@@ -282,7 +284,7 @@ import { gameMetricsCounters, type WsDropCause } from './http/game_signals';
 import { bgWideInterestApplies, buildSharedInterestCandidates } from './interest_candidates';
 import { IpBlockList } from './ip_block';
 import { loadActiveBlockedIps } from './ip_block_db';
-import { keepaliveSweepDelayed } from './keepalive_sweep';
+import { keepaliveSweepDelayed, shouldReapSession, WS_KEEPALIVE_PING_MS } from './keepalive_sweep';
 import { LINKDEAD_GRACE_MS, planJoin } from './linkdead';
 import {
   consumeListReadToken,
@@ -358,6 +360,7 @@ import { RiftAssetCoordinator, riftAssetConfigFromEnv } from './rift_assets';
 import { dispatchRiftCommand } from './rift_forge_dispatch';
 import { refusedRiftForgeCommand } from './rift_forge_gate';
 import { RiftUpgradeCoordinator, riftUpgraderConfigFromEnv } from './rift_upgrader';
+import { emitSelfScalarKeys } from './self_scalar_wire';
 import {
   createDepthWarnedSerialWriter,
   createKeyedSerialWriter,
@@ -463,8 +466,6 @@ const WHO_RESULT_LIMIT = 50;
 // between an account's characters, so the old allowance of a second online
 // character (self-trade by dual-boxing) is no longer needed. GMs are exempt.
 const MAX_ACTIVE_SESSIONS_PER_ACCOUNT = 1;
-// WS protocol-level ping cadence; see the keepalive interval in start().
-const WS_KEEPALIVE_PING_MS = 30_000;
 const RESTART_COUNTDOWN_TOTAL_SECONDS = 600;
 const RESTART_COUNTDOWN_STEPS = [
   { atSeconds: 0, text: 'Server restart in 10 minutes.' },
@@ -1785,6 +1786,8 @@ export class GameServer {
   private lastPlaytimeGrantAt = new Map<number, number>(); // accountId -> sim time of last grant
   private dailyRewardActivityInterval: NodeJS.Timeout | null = null;
   private relayCooldown = new Map<number, number>(); // accountId -> last "!" relay post (ms)
+  // Queue-pop Discord DMs (server/discord_queue_pops.ts): the observer's deps, bound once.
+  private queuePopDeps = queuePopDepsFor((pid) => this.clients.get(pid), REALM);
   // pids whose holder tier was forced via the dev /woctier command — the chain
   // refresh leaves them alone so the override sticks during testing (dev only).
   private devTierPids = new Set<number>();
@@ -2801,6 +2804,7 @@ export class GameServer {
             this.parseCapture.observe(events);
             this.routeEvents(events);
             this.detectActivity(events);
+            void observeQueuePops(events, queuedPidsOf(this.sim.ctx), this.queuePopDeps);
             lap('events');
             this.runAntibotTick();
             lap('antibot');
@@ -2956,6 +2960,8 @@ export class GameServer {
   // gives up on the dead socket, which can take minutes; with it, the
   // client's reconnect backoff resumes within a ping interval or two (the
   // client tolerates that rejection mid-reconnect, src/net/reconnect_policy.ts).
+  // shouldReapSession also applies the hard ten-minute silence deadline that
+  // holds even when the stall guard below pauses the pong verdict.
   pingLiveSessions(): void {
     const now = Date.now();
     // A sweep that fired far later than its interval proves the process stalled, so
@@ -2965,13 +2971,11 @@ export class GameServer {
     const delayed = keepaliveSweepDelayed(now, this.lastKeepaliveSweepAt, WS_KEEPALIVE_PING_MS);
     for (const session of this.clients.values()) {
       if (session.linkdead || session.ws.readyState !== 1) continue;
-      if (session.awaitingPong && !delayed) {
+      if (shouldReapSession(session, delayed, this.lastKeepaliveSweepAt)) {
         const ws = session.ws;
         try {
           ws.terminate();
-        } catch {
-          /* socket already torn down */
-        }
+        } catch {} // socket already torn down
         this.socketClosed(session, ws);
         continue;
       }
@@ -8819,29 +8823,12 @@ export class GameServer {
     };
     if (session.dungeonEntryFacing.enabled)
       maybeSerialized('de', `${this.sim.entities.get(session.pid)?.dungeonEntrySeq ?? 0}`);
-    // Static combat-rating/progression scalars: rarely change (gear/talent swap,
-    // level or XP gain, a copper transaction, a heroic-key toggle), unlike every
-    // other field on this record which was still being rebuilt and stringified
-    // every tick regardless. Delta-guarded like the rest of this record; the
-    // reconciliation-critical fields above (resource, gcd, swing, combo, target,
-    // auto, queued) stay unconditional since they change on most combat ticks.
-    maybe('xp', meta.xp);
-    maybe('lxp', meta.lifetimeXp);
-    maybe('rxp', Math.round(meta.restedXp));
-    maybe('prk', meta.prestigeRank);
-    maybe('copper', meta.copper);
-    maybe('ap', p.attackPower);
-    maybe('sp', p.spellPower);
-    maybe('hpw', p.healPower);
-    maybe('sh', p.spellHaste);
-    maybe('crit', p.critChance);
-    maybe('dodge', p.dodgeChance);
-    maybe('blk', p.blockChance);
-    maybe('bval', p.blockValue);
-    maybe('crat', p.critRating);
-    maybe('hrat', p.hasteRating);
-    maybe('hirat', p.hitRating);
-    maybe('ddiff', this.sim.dungeonDifficulty(anchorSession.pid));
+    // Static combat-rating/progression scalars plus the in-combat bit: rarely
+    // change, unlike every other field on this record which is rebuilt and
+    // stringified every tick. Delta-guarded like the rest of this record; the
+    // reconciliation-critical fields above stay unconditional since they change
+    // on most combat ticks. The cohort lives in server/self_scalar_wire.ts.
+    emitSelfScalarKeys(maybe, meta, p, this.sim.dungeonDifficulty(anchorSession.pid));
     // The viewer's OWN authored look. It cannot come from the entity list (the
     // broadcast loop skips `e.id === anchorEntity.id`), and it is exactly what
     // `maybeRaw` is for: heavy, already serialized once (appearanceWireJson),
@@ -9650,31 +9637,16 @@ export class GameServer {
             console.error('masterwork activity failed:', err);
           });
       } else if (ev.type === 'duelEnd') {
-        const w = this.sessionByName(ev.winnerName);
-        const l = this.sessionByName(ev.loserName);
-        const accountIds: number[] = [];
-        const names: string[] = [];
-        if (w) {
-          accountIds.push(w.accountId);
-          names.push(w.name);
-        }
-        if (l) {
-          accountIds.push(l.accountId);
-          names.push(l.name);
-        }
-        enqueueActivity(
-          {
-            kind: 'duel',
-            accountIds,
-            names,
-            realm: REALM,
-            profileUrl: this.profileUrlFor(ev.winnerName),
-            winnerName: ev.winnerName,
-            loserName: ev.loserName,
-          },
-          `duel:${ev.winnerName}:${ev.loserName}`,
-          now,
+        // The card shape lives in discord_activity_pvp.ts; only the session
+        // lookups the module cannot do stay here.
+        const card = duelActivityCard(
+          ev,
+          this.sessionByName(ev.winnerName),
+          this.sessionByName(ev.loserName),
+          REALM,
+          this.profileUrlFor(ev.winnerName),
         );
+        enqueueActivity(card.item, card.key, now);
       } else if (ev.type === 'arenaEnd' && !ev.draw && ev.pid !== undefined) {
         const s = this.clients.get(ev.pid);
         if (!s) continue;

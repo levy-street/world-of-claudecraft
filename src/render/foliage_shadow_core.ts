@@ -1,8 +1,11 @@
 // Which foliage shadow casters can still reach the key light's shadow map.
 //
 // The sun (and the moon it hands off to) renders ONE orthographic shadow map,
-// aimed at the player, 2 * halfExtent yards across (renderer.ts sizes it: 105
-// outdoors, so a 210 yard box) and near..far deep along the light axis.
+// aimed at the player, 2 * halfExtent yards across (renderer.ts sizes it from a
+// 105 yard outdoor base, so a 210 yard box, shrunk a bounded amount under
+// sustained budget pressure by shadow_extent_core.ts) and near..far deep along
+// the light axis. The halfExtent below is the LIVE one, read off the shadow
+// camera each frame, never the base.
 // Geometry outside that box cannot darken a single texel, however close to the
 // camera it stands, and geometry inside it casts at full shadow-map resolution
 // however far away it is. Distance from the CAMERA, which is what the foliage

@@ -2564,6 +2564,37 @@ type AoeRootEffect =
       trap: { armTime: number; lifetime: number };
     });
 
+/** A weapon-coat rider: what ONE landed melee swing inflicts on the struck
+ *  target while the coating is worn. Authored on an `imbue` effect, so a coat
+ *  is always carried by the imbue aura the coating ability applies, and the
+ *  rider borrows that aura's id and display name (combat/poison_coating.ts).
+ *  This is the player-side twin of the mob on-hit DoT seam (`stackPoison`,
+ *  `venom`, `corrode` on MobTemplate): same aura shapes, but applied by a
+ *  coating the player chose to put on rather than by a creature's innate bite. */
+export type PoisonCoat =
+  // Classic Deadly Poison: a stacking damage-over-time whose per-tick damage is
+  // perTick x stacks. Every landed swing adds a stack (up to maxStacks) and
+  // fully refreshes the timer, so the poison bites harder the longer you stay on
+  // the target. Reuses the `dot` aura kind; the shared slot carries the count.
+  | {
+      rider: 'stackDot';
+      perTick: number;
+      maxStacks: number;
+      duration: number;
+      interval: number;
+      school?: Aura['school'];
+    }
+  // A plain refreshing debuff rider (an armor shred, a healing-taken cut): every
+  // landed swing re-applies it at full duration, the same shape the mob on-hit
+  // debuffs already use.
+  | {
+      rider: 'debuff';
+      kind: AuraKind;
+      value: number;
+      duration: number;
+      school?: Aura['school'];
+    };
+
 export type AbilityEffect =
   | { type: 'weaponDamage'; bonus: number } // on-next-swing bonus (heroic strike)
   | {
@@ -2818,7 +2849,9 @@ export type AbilityEffect =
       casterMaxHpPct?: number;
       auraId?: string;
     } // power word: shield
-  | { type: 'imbue'; bonus: number; duration: number } // seals / rockbiter: extra damage per swing
+  // seals / rockbiter / rogue poisons: flat extra damage on every swing, plus the
+  // optional weapon-coat rider a landed swing inflicts on whatever it strikes.
+  | { type: 'imbue'; bonus: number; duration: number; coat?: PoisonCoat }
   | { type: 'lifeTap'; hp: number; mana: number }
   | { type: 'drainTick'; min: number; max: number; healFrac: number } // channel tick that heals the caster
   | {
@@ -6513,10 +6546,10 @@ export type SimEvent = { pid?: number } & (
         | 'insufficient_materials'
         | 'throttled'
         | 'no_bag_space'
-        // #2415: already-enchanted target without the confirmReplace flag,
-        // and the identical-enchant-id re-apply denied on every arm.
+        // #2415: already-enchanted target without the confirmReplace flag. A
+        // confirmed identical-enchant-id re-apply is a normal replace, not a
+        // deny (professions/enchanting.ts).
         | 'already_enchanted'
-        | 'same_enchant'
         // A Riftbound band: forge-only gear (professions/enchanting.ts).
         | 'rift_gear'
         | 'busy';

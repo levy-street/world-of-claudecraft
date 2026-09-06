@@ -323,6 +323,9 @@ interface AttributionTargetFixture {
 // Re-minted for the v0.40.0 sync merge into the guild pledge branch (the
 // OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
 // both sides). No capture was retaken.
+// Re-minted for the weapon-stow overlay fix (renderer.ts: single-writer
+// removal + the mount sheathe clause): the renderer integration leaf moved.
+// No capture was retaken.
 // Re-minted for the entry-horizon scenery cull (renderer.ts hands the four
 // reveal-gated painters the horizon-capped cull far at both frame sites): the
 // renderer integration leaf moved. No capture was retaken.
@@ -348,22 +351,43 @@ interface AttributionTargetFixture {
 // Re-minted for the Drakelands entrance merge into the raid branch (PRs 3689
 // plus 3734: both arms had re-minted, the merged renderer and evidence inputs
 // land together). No capture was retaken.
-// Re-minted at the release/v0.42.0 sync of PR #3439: renderer.ts moved for the
-// mount lifecycle seam (mount_lifecycle.ts) and the rickshaw hooks it absorbed.
-// Re-minted for the Cluckwork Mech Bird store mount (PR #3464) on top of the
-// v0.42.0 mount-lifecycle move: the renderer's stride accumulator moved to
-// src/render/stride_audio_core.ts and the mounted audio branch gained the
-// idle-hum poll. No capture was retaken.
-// Re-minted for the Realm Builder monument (PR #3695) at its release/v0.42.0
-// base merge: the civic centrepiece changed asset, subject and shader cache
-// key on top of the mount-lifecycle and occluder-fade moves already sealed
-// above, so every fingerprinted input carries the merged bytes. No capture
+// Re-minted for the release/v0.42.0 merge into the weapon-sheathe-swim-mount
+// branch (the merged renderer.ts carries this branch's mount sheathe overlay
+// beside the release's forge-lift room and Drakelands entrance render
+// integrations, so the composite matches neither parent). No capture was
+// retaken.
+// Re-minted for the v0.42.0 release batch renderer merge: runtimeRender.renderer
+// moved with the shipped renderer tree. No capture was retaken.
+// Re-minted for the release/v0.42.0 reconcile with the Realm Builder and
+// store-mount renderer leaves. No capture was retaken.
+// Re-minted for the post-chain pixel budget: the renderer's coalesced
+// viewport-resize pass moves the runtimeRender.renderer leaf. No capture
 // was retaken.
-// Re-minted for the PR #3695 review fixes: the monument's impostor fragment
-// gained the fog, tonemapping and colourspace tail, moving
-// realm_builder_monument_fx.ts. No capture was retaken.
+// Re-minted again for the review answers on the same branch (the viewport
+// poll now books the coalesced pass). No capture was retaken.
+// Re-minted for the coalesced-resize flush point (the frame drains the gate
+// before it draws). No capture was retaken.
+// Re-minted for the PR #3834 merge after PR #3833: runtimeRender.renderer
+// now carries pooled VFX material cleanup beside the coalesced viewport-resize
+// pass, so the composite matches neither parent. No capture was retaken.
+// Re-minted for the Lambert terrain fill fix (the outdoor hemisphere
+// constants moved out to outdoor_light_rig_core.ts and the per-frame
+// uTerrainFillBoost write moved into updateAmbience): the
+// runtimeRender.renderer leaf moved. No capture was retaken.
+// Re-minted for the PR #3841 merge after PR #3839: the candidate's render-stack
+// renderer bytes and #3841's Lambert terrain fill write combine in one tree,
+// so the composite matches neither parent. No capture was retaken.
+// Re-minted for the compositor-surfaces batch (renderer.ts only: the opaque
+// world context, the nameplate surface-ratio and cadence wiring, the spirit
+// grade hookup and the build-diag extraction). No capture was retaken.
+// Re-minted for the PR #3844 merge after PR #3841: the candidate's render-stack
+// renderer bytes and #3844's compositor surface/nameplate/spirit-grade bytes
+// combine in one tree, so the composite matches neither parent. No capture was
+// retaken.
+// Re-minted for the v0.42.0 release candidate renderer merge: the selected
+// renderer changes move the runtimeRender.renderer leaf. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '85392484fb6509a37aa445bcc5bd5ebba58819939847318ccf288b048341b708';
+  'ee5a53b2e3ba790a408d39e8ca81a1baaa07f774823d3c025e1ef024e3ae589b';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
@@ -768,9 +792,6 @@ describe('Eastbrook polish capture contract', () => {
       },
       'chapel-and-weaving': {
         camera: { x: 26, y: 12, z: -100 },
-        // Round 8: the aim was the middle of the square, which the doubled
-        // Realm Builder monument now occupies, so it moved a yard past the
-        // plinth's west face. Same establishing shot, statue as its backdrop.
         target: { x: -10.5, y: 3, z: -100 },
       },
       'toolworks-service-perimeter': {
@@ -1017,9 +1038,6 @@ describe('Eastbrook polish capture contract', () => {
       EASTBROOK_LAYOUT.services.noticeboard.id,
       EASTBROOK_LAYOUT.services.noticeboard.frontStandingPoint,
     );
-    // Off-axis on purpose (see capture_contract.mjs, civic-motion): the middle
-    // of the square is the statue and due south of it is a bench, so the aim
-    // sits on the southwest diagonal, outside the plinth.
     subjectPoints.set(EASTBROOK_LAYOUT.civic.monument.id, {
       x: EASTBROOK_LAYOUT.civic.monument.position.x + 2.7,
       z: EASTBROOK_LAYOUT.civic.monument.position.z - 3.2,

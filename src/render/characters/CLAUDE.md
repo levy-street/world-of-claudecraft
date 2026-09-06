@@ -54,6 +54,18 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
 - `rig_merge.ts`: merges a KayKit rig's quantized body-part SkinnedMeshes into
   one draw per material (`assets.ts` `assembleModel` calls it). Read its
   header bind-pose proof before touching bone inverses.
+- `morph_union_core.ts`: the union target list a merge pads its parts to, and
+  the one place the merged buffer's morph-texture cost is written down (three
+  builds that DataArrayTexture lazily at the first live draw, outside the
+  compile gate's upload lane; measured, see its header).
+- `rig_shared_skeleton.ts`: the same bind-pose proof applied WITHOUT merging, so
+  a rig ends with ONE Skeleton, one palette flatten and one GPU bone texture
+  however many parts it draws (`SkeletonUtils.clone` mints one per SkinnedMesh,
+  and the modular GLB ships 246 skins over one 23-joint list). Runs after
+  `mergeSkinnedParts` on the cached variant and again on every clone, where it
+  is a pure rebind. The composed HEAD is its canonical part on purpose: the
+  canonical part is the one whose geometry is not rebaked, and the head's buffer
+  is the identity the stubble/makeup decal cuts are cached on.
 - `index.ts`: public exports + `createCharacterVisual(e, formKey?)` factory,
   plus `setModularLookProvider` (the entity-to-composed-look seam).
   `createCharacterVisual` returns null fail-soft on an asset miss, with
@@ -266,8 +278,16 @@ per part.
 - The FACE is morph targets, not geometry variants: eight paired sliders
   (`nose_up`/`nose_dn` ...) resolved by `morphInfluences()` and applied per
   instance in `applyMorphs`. Geometry stays shared, so the face must never enter
-  `modularGeometryKey`, only the signature. `mergeSkinnedParts` leaves
-  morph-carrying parts unmerged by design, which is what makes this work at all.
+  `modularGeometryKey`, only the signature. `mergeSkinnedParts` MERGES
+  morph-carrying parts (the nine skin parts are one draw), padding every part to
+  the union of their target NAMES (`morph_union_core.ts`), so `applyMorphs`
+  keeps driving by name and a slider that reaches only the torso moves only the
+  torso's vertices inside the merged buffer.
+- What a merge is NOT allowed to cross is a node-NAME fact, because the merged
+  mesh has one name of its own: the head, the mouth's lips, the jewellery and
+  the hair band. `modular_name_facts_core.ts` owns those four predicates for
+  BOTH readers (the recolour sweep and the merge's partition key), so they
+  cannot drift; the head is its own partition and never merges at all.
 - The MOUTH is a part (`M_Mouth_<style>` / `F_Mouth_<style>`), not a morph:
   lips stand PROUD of the skin, and open styles are a different MESH (aperture,
   dark cavity, own teeth), not a deformation of a closed one. The head keeps
@@ -323,9 +343,10 @@ per part.
   `setModularLookProvider` claims every player entity and composes peers from
   server truth; a character with no authored look still keeps the fixed
   `player_<class>` rig. Three consequences the code used to assume away:
-  - The unmerged morph parts (head, eyes, ears, lashes, brows, body regions) are
-    now a per-CROWD draw cost, not a one-character one. The far LOD is what
-    bounds it, and the band pulls in as the crowd grows (`crowd_lod.ts`).
+  - The parts a merge cannot fold (head, eyes, lashes, the mouth's own
+    materials, the jewellery) are a per-CROWD draw cost, not a one-character
+    one. The far LOD is what bounds it, and the band pulls in as the crowd grows
+    (`crowd_lod.ts`).
   - `prepareVisual`'s far bake measures `DEFAULT_LOOK`, so it is wrong for a
     composed body. Composed bodies bake their own (`modularFarBake`), keyed by
     part set and minted on the first crossing into the far band; the colours are

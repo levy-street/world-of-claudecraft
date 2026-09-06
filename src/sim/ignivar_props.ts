@@ -482,15 +482,13 @@ export const IGNIVAR_NON_COLLIDING_PROPS: ReadonlySet<IgnivarEnvPropKey> = new S
   // The entrance facade frames a doorway players walk THROUGH: never a
   // blocker, or its own arch would seal the raid door it dresses.
   'dungeon_entrance',
-  // The forge-lift car kit's pass-through and overhead pieces: the arch and
-  // beams span overhead, the frame and sliding door dress the gate line a
-  // body must cross once the lift arrives, and the handle and hanging
-  // weight are brush-past furniture in a car twelve riders share. Only the
-  // vertical beam (a structural post) and the winch (a machinery block)
-  // stand solid.
-  'lift_arch_beam',
+  // The forge-lift car kit's overhead and brush-past pieces: the beam
+  // courses span overhead, and the handle and hanging weight are furniture
+  // in a car twelve riders share. The door frames and arch beams are
+  // deliberately NOT here: they are the car's side walls, a yard inside the
+  // room shell, and pass-through they let a rider walk out through the
+  // timber and wedge beside a corner pylon (tests/ignivar_lift_car_walls.test.ts).
   'lift_beam',
-  'lift_frame',
   'lift_handle',
   'lift_weight',
   // The spool rides INSIDE its mount's cradle: the mount is the one solid

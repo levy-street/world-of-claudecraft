@@ -1,9 +1,15 @@
 // Signature Warlock-pet utility kept outside the general pet dispatcher.
 // The data lives on MobTemplate; this module owns the movement-authority and
 // boss-immunity boundary for Gloomshade's anti-kite chain.
+//
+// useRangedActive refuses a mob mid-evade (isEvadingWildMob, mob/evade_immunity.ts),
+// same as canChainPull's own pre-existing aiState check just above it: this
+// deliberately skips the launcher's downstream projectile draws (resist/crit/
+// damage) against a target dealDamage would void the hit on anyway.
 
 import { isPullEligible } from '../combat/pull_eligibility';
 import { MOBS } from '../data';
+import { isEvadingWildMob } from '../mob/evade_immunity';
 import { PLAYER_BODY_RADIUS } from '../pathfind';
 import type { SimContext } from '../sim_context';
 import { type Aura, dist2d, type Entity } from '../types';
@@ -101,7 +107,7 @@ function useRangedActive(
 ): boolean {
   const ranged = MOBS[pet.templateId]?.petRanged;
   if (!ranged?.active || !ranged.ability || !ranged.name) return false;
-  if (target.dead || !ctx.isHostileTo(pet, target)) return false;
+  if (target.dead || isEvadingWildMob(target) || !ctx.isHostileTo(pet, target)) return false;
   if (dist2d(pet.pos, target.pos) > ranged.range || !ctx.hasLineOfSight(pet, target)) return false;
   pet.facing = Math.atan2(target.pos.x - pet.pos.x, target.pos.z - pet.pos.z);
   launchRanged(ctx, pet, target, ranged);

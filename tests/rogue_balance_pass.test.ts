@@ -89,11 +89,15 @@ describe('rogue balance pass', () => {
     // Potent Poisons: the resolved weapon-coat riders carry the +10%.
     expect(sim.resolvedAbility('instant_poison')?.effects[0]).toMatchObject({
       type: 'imbue',
-      bonus: 9, // 8 * 1.1 rounded
+      bonus: 15, // 14 * 1.1 rounded
     });
+    // Festering Venom carries no flat per-swing damage: its payload is the
+    // stacking coat rider, so that is where the +10% has to land (unrounded,
+    // 4 -> 4.4, which the aura rounds once at 5 stacks into 22 rather than 20).
     expect(sim.resolvedAbility('deadly_poison')?.effects[0]).toMatchObject({
       type: 'imbue',
-      bonus: 15, // 14 * 1.1 rounded
+      bonus: 0,
+      coat: { rider: 'stackDot', perTick: 4.4, maxStacks: 5 },
     });
 
     // Thuggery: with the extra-attack roll forced to succeed, one auto cycle

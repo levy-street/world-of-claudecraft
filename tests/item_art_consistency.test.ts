@@ -342,8 +342,8 @@ describe('item-art consistency accepted-art provenance', () => {
       },
       {
         path: `${evidenceDir}/final-item-art-audit-verdict.json`,
-        acceptedSha256: 'e9fc76acd9db388ec6ee7a1d7c6fcd7b3fa63108a5a60d22dd402864f2ed1104',
-        acceptedBytes: 123_392,
+        acceptedSha256: '16abb4371c2868d8b46dd6f5ec2d94b884ab13ae48c6c77f8eb80212110d7c95',
+        acceptedBytes: 120_396,
       },
     ]);
     for (const evidence of [...value.sourceEvidence, ...value.generationReports]) {
@@ -458,9 +458,9 @@ describe('item-art consistency accepted-art provenance', () => {
     expect(readme).toContain('node scripts/item_art_audit.mjs\n');
     expect(readme).toContain('node scripts/item_art_audit.mjs --refresh-verdict');
     const verdictBytes = readFileSync(path.join(repoRoot, verdictPath));
-    expect(verdictBytes.length).toBe(123_392);
+    expect(verdictBytes.length).toBe(120_396);
     expect(sha256(verdictBytes)).toBe(
-      'e9fc76acd9db388ec6ee7a1d7c6fcd7b3fa63108a5a60d22dd402864f2ed1104',
+      '16abb4371c2868d8b46dd6f5ec2d94b884ab13ae48c6c77f8eb80212110d7c95',
     );
     const verdict = JSON.parse(verdictBytes.toString('utf8')) as FinalAuditVerdict;
 
@@ -470,8 +470,8 @@ describe('item-art consistency accepted-art provenance', () => {
       baselineCommit: 'aee195551b5aef628eb7a72192117d7e3079818e',
       branch: 'feature/placeholder-art-completion-v036',
       shippingDirectory: 'public/ui/items',
-      itemArtFilesReviewed: 1044,
-      liveItemDefinitions: 1059,
+      itemArtFilesReviewed: 1046,
+      liveItemDefinitions: 1061,
       generatedHeroicDefinitions: 64,
       heroicDefinitionsWithOwnWebp: 48,
       heroicWeaponArtAliases: 16,
@@ -481,7 +481,7 @@ describe('item-art consistency accepted-art provenance', () => {
       manifest().targetSets.items.map((id) => `public/ui/items/${id}.webp`),
     );
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
-      1044,
+      1046,
     );
     expect(Object.keys(verdict.auditScope.groups)).toHaveLength(22);
     expect(verdict.auditScope.incrementalReviews.at(-1)).toEqual({
@@ -534,13 +534,13 @@ describe('item-art consistency accepted-art provenance', () => {
     ]);
     expect(verdict.visualVerdict).toMatchObject({
       status: 'pass',
-      passCount: 1044,
+      passCount: 1046,
       watchCount: 0,
       watch: [],
       rejectCount: 0,
       reject: [],
       summary:
-        'All 1044 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review, plus the nine Crucible raid weapon icons (generated via the OpenAI crucible-raid-weapons-2026-08-28 batch) added on 2026-08-28, machine-checked and awaiting owner visual review, plus the two Ignivar legendary drop renders (varkhul_forgebreaker and varkhul_emberward, rendered from their own shipped held-weapon models by the deterministic weapon-still pipeline) added on 2026-08-28, machine-checked and awaiting owner visual review, plus the 192 Crucible set-piece, sigil, and off-set icons (generated via the OpenAI crucible-set-icons-2026-08-29 batch) added on 2026-08-29, machine-checked and awaiting owner visual review, plus the Core of the Last Flame reagent icon (staged early from the crucible-raid-professions-2026-08-28 batch) added on 2026-08-30, machine-checked and awaiting owner visual review, plus the seven bank-storage painted bags (implementation-agent reviewed and passed on 2026-08-26, joined at the v0.41.0 base sync), All 830 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review, plus the Bonebound Rickshaw reins icon (generated under woc-item-icon-v1 from a user-directed prompt, its own provenance recorded against its mapping.json owner) owner-reviewed against the regenerated mount contact sheet and passed on 2026-08-21, plus the Lanternback Troll mount reins icon (owner-supplied painted master, downscaled to the shipping format) owner-reviewed and passed on 2026-08-15 and the Chimeglass Tortoise mount reins icon (rendered from its shipped mount model) owner-reviewed and passed on 2026-08-16, both joining this record at the release/v0.42.0 sync of PR #3439, plus the Cluckwork Mech Bird store-mount icon (project Blender render under the same contract) added for owner review on 2026-08-17.',
+        'All 1046 shipping item-art files pass the visual contract: plus the Lanternback Troll, Chimeglass Tortoise, Cluckwork Mech Bird, Goblin Rocket Sled, and Rallycart RXT mount icons previously accepted in their parent records and joined in this v0.42 reconcile.',
     });
     expect(verdict.visualVerdict.passIds).toEqual(currentIds);
     expect(verdict.nonVisualContentWatch).toEqual([
@@ -580,8 +580,8 @@ describe('item-art consistency accepted-art provenance', () => {
 
     expect(verdict.evidence.catalog).toEqual({
       path: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      sha256: 'e3eb0b0083df930521d024db4503d3799d647061ae9048c8bcacdb029ca6697e',
-      bytes: 569_296,
+      sha256: '95bf5b52e340881c96c38b5cf71c67dd14bfc0bb62e6bd1957170472236427bb',
+      bytes: 570_369,
     });
     expect(verdict.evidence.rendererFingerprint).toBe(
       'd80ff4868f979e1717e106c889b7d6505841caf8d4cf887776ecb60848b1b2b7',
@@ -634,7 +634,7 @@ describe('item-art consistency accepted-art provenance', () => {
       sheetSetDigest.update(`${sheet.path}\0${sheet.sha256}\0${sheet.bytes}\n`);
     }
     expect(verdict.evidence.sheetSetSha256).toBe(
-      '5d9fb20e96cd7f431ce129880f4e5a222345cf86f92f8672e39ecb1bc9b70371',
+      '93129d0454267abeb518b23310fd56d25342a79b385325b31ecf5eda44c57193',
     );
     expect(sheetSetDigest.digest('hex')).toBe(verdict.evidence.sheetSetSha256);
 
@@ -644,7 +644,7 @@ describe('item-art consistency accepted-art provenance', () => {
       shippingCatalogDigest.update(`${id}\0${sha256(bytes)}\0${bytes.length}\n`);
     }
     expect(verdict.evidence.shippingCatalogSha256).toBe(
-      '017938ae50f70349630c15ffe2466b2f8ad4acf4ecf32022fddb0c27c8d7285d',
+      '2195f18375e439dd4a0ebc05f0ce4e59bee0efc7dfb5de7ef8588cad775b28d6',
     );
     expect(shippingCatalogDigest.digest('hex')).toBe(verdict.evidence.shippingCatalogSha256);
   });
@@ -756,7 +756,7 @@ describe('item-art consistency accepted-art provenance', () => {
     ).toBeUndefined();
     expect(mapping.entries).toHaveLength(43);
     expect(mapping.entries.every(({ license }) => Boolean(license))).toBe(true);
-    expect(mapping.generatedBatches).toHaveLength(24);
+    expect(mapping.generatedBatches).toHaveLength(26);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -773,13 +773,13 @@ describe('item-art consistency accepted-art provenance', () => {
     const oldGeneratedIds = mapping.generatedBatches
       .filter(({ batchId }) => batchId !== BATCH_ID)
       .flatMap(({ itemIds }) => itemIds);
-    expect(oldGeneratedIds).toHaveLength(727);
+    expect(oldGeneratedIds).toHaveLength(729);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(1044);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1044);
+    expect(allCurrentOwnerIds).toHaveLength(1046);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1046);
     expect(batch?.provenanceRecords).toEqual([
       `${evidenceDir}/accepted-art.json`,
       `${evidenceDir}/supersession-audit.json`,
@@ -915,9 +915,9 @@ describe('item-art consistency accepted-art provenance', () => {
     for (const id of ownerIds) ownerCountById.set(id, (ownerCountById.get(id) ?? 0) + 1);
 
     const violations: string[] = [];
-    if (ownerIds.length !== 1044)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1044`);
-    if (fileIds.length !== 1044) violations.push(`shipping WebP count: ${fileIds.length} != 1044`);
+    if (ownerIds.length !== 1046)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1046`);
+    if (fileIds.length !== 1046) violations.push(`shipping WebP count: ${fileIds.length} != 1046`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

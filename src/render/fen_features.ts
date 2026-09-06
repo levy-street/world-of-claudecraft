@@ -17,6 +17,8 @@ import {
 } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { GFX } from './gfx';
+import { thinLeanDressing } from './zone_dressing_lod_core';
 
 export interface FenFeaturesView {
   group: THREE.Group;
@@ -87,7 +89,7 @@ export function buildFenFeatures(seed: number): FenFeaturesView {
   const instance = (
     geo: THREE.BufferGeometry,
     material: THREE.Material,
-    spots: Placement[],
+    spots: readonly Placement[],
     tinted = false,
   ) => {
     if (spots.length === 0) return;
@@ -113,12 +115,21 @@ export function buildFenFeatures(seed: number): FenFeaturesView {
   };
 
   // instance every part of a loaded prop model at the given placements
-  const instanceProp = (key: FenPropKey, spots: Placement[]): void => {
+  const instanceProp = (key: FenPropKey, spots: readonly Placement[]): void => {
     const scene = propScenes[key];
     if (!scene || spots.length === 0) return;
     for (const part of extractParts(scene)) {
       instance(part.geo, part.mat, spots);
     }
+  };
+
+  // The purely decorative families: nothing here carries a collider or an
+  // interaction, so a lean session draws an evenly thinned band of it (these
+  // models are 5,000 to 11,400 triangles EACH, the largest triangle bucket a
+  // town frame pays). The willows below never come through here: their trunks
+  // are the sim's own colliders.
+  const instanceDressing = (key: FenPropKey, spots: readonly Placement[]): void => {
+    instanceProp(key, thinLeanDressing(spots, GFX.leanFoliage));
   };
 
   const hub = WILLOWFEN_ZONE.hub;
@@ -196,7 +207,7 @@ export function buildFenFeatures(seed: number): FenFeaturesView {
         });
       }
     }
-    instanceProp('lilies', spots);
+    instanceDressing('lilies', spots);
   }
 
   // --- the river reeds: rooted in the shallows along every shoreline ---
@@ -227,7 +238,7 @@ export function buildFenFeatures(seed: number): FenFeaturesView {
         if (!placed) continue;
       }
     }
-    instanceProp('reeds', spots);
+    instanceDressing('reeds', spots);
   }
 
   // --- mushroom-and-log patches: clumped clusters out on the fen floor ---
@@ -264,8 +275,8 @@ export function buildFenFeatures(seed: number): FenFeaturesView {
         }
       }
     }
-    instanceProp('mushrooms', mushroomSpots);
-    instanceProp('log', logSpots);
+    instanceDressing('mushrooms', mushroomSpots);
+    instanceDressing('log', logSpots);
   }
 
   return {

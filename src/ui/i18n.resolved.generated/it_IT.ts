@@ -570,9 +570,9 @@ export const it_IT: EnTranslations = {
       "tabsLabel": "Sezioni del negozio WOC",
       "storeTab": "Negozio",
       "rewardsTab": "Premi giornalieri",
-      "mountsEyebrow": "Account Mounts",
-      "mountsTitle": "Machine Stable",
-      "mountBuyAria": "Purchase {item}",
+      "mountsEyebrow": "Montaggi dell'account",
+      "mountsTitle": "Stabile alla macchina",
+      "mountBuyAria": "Acquista {item}",
       "loading": "Caricamento del negozio WOC...",
       "error": "Il negozio WOC non è al momento disponibile. Per favore riprova a breve.",
       "balance": "Saldo Claudium",
@@ -978,6 +978,7 @@ export const it_IT: EnTranslations = {
       "mounts": "Cavalcature",
       "professions": "Professioni",
       "reliquary": "Reliquiario",
+      "lootExplorer": "Esploratore del bottino",
       "nameplates": "Nomi",
       "haptics": "Vibrazione",
       "hapticsOff": "Vibrazione disattivata",
@@ -1141,6 +1142,9 @@ export const it_IT: EnTranslations = {
       "promptAttack": "Attacca",
       "promptUseAbility": "Usa abilità",
       "promptKneel": "Inginocchiati",
+      "promptAccessInterface": "Accedi all'interfaccia",
+      "promptMoveToTarget": "Vai a {target}",
+      "promptSelectItem": "Seleziona {item}",
       "promptOpenBags": "Apri le tue borse",
       "promptCharacterSheet": "Apri la tua scheda personaggio",
       "promptLookAround": "Tieni premuto il tasto destro e trascina per guardarti intorno",
@@ -1308,9 +1312,9 @@ export const it_IT: EnTranslations = {
       "regroup": "Raggruppa {meter}"
     },
     "targetDots": {
-      "title": "Target Dots",
-      "row": "{aura} on {target}",
-      "overflow": "{count} more not shown"
+      "title": "Punti bersaglio",
+      "row": "{aura} su {target}",
+      "overflow": "{count} altro non mostrato"
     },
     "targetAuras": {
       "title": "Aure del bersaglio",
@@ -1393,11 +1397,13 @@ export const it_IT: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, il Rospo Saltombra",
       "name_stormfeather_griffin": "Piumatempesta Toccacielo",
       "name_thunderstrut_gobbler": "Passotuono, il Gran Tacchino",
+      "name_goblin_rocket_sled": "Slitta a razzo goblin",
+      "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Terrorscintilla, Scuoteterra",
       "name_drakemaw_raptor": "Raptor di Drakemaw",
-      "name_mech_bird": "Cluckwork Mech Bird",
-      "name_lanternback_troll": "Grumbol the Lanternback",
-      "name_chimeglass_tortoise": "Tolliver the Chimeglass",
+      "name_mech_bird": "Cluckwork Uccello Mech",
+      "name_lanternback_troll": "Grumbol il Lanterna",
+      "name_chimeglass_tortoise": "Tolliver il Chimeglass",
       "name_rickshaw_mount": "Risciò Vincolato alle Ossa",
       "desc_valorsteed": "Un destriero robusto e dal passo sicuro che aumenta la velocità di viaggio.",
       "desc_grag_bear": "Un orso robusto e dal passo sicuro che aumenta la velocità di viaggio.",
@@ -1406,11 +1412,13 @@ export const it_IT: EnTranslations = {
       "desc_shadowjump_toad": "Un rospo gigante, massiccio e dal passo sicuro, addestrato a balzi d’ombra fulminei su ogni terreno.",
       "desc_stormfeather_griffin": "Un grifone della tempesta regale che incede al suolo su artigli runici, ali ripiegate.",
       "desc_thunderstrut_gobbler": "Un tacchino colossale nato dalla tempesta che scende impettito dal Picco Risvegliato, con la coda spiegata come un fronte di tempesta.",
+      "desc_goblin_rocket_sled": "Una slitta goblin pericolosamente sovradimensionata, spinta da due razzi e da un eccellente pessimo giudizio.",
+      "desc_rallycart_rxt": "Una piccola macchina da rally che aumenta la velocità di viaggio.",
       "desc_terrorspark_groundshaker": "Una macchina corazzata compatta con cingoli pesanti, un cannone di grosso calibro e una sella costruita per piloti impavidi.",
       "desc_drakemaw_raptor": "Un raptor da covata domato per la sella, proveniente dalla Caldera di Drakemaw, tutto muscoli e scatto, che sa ancora vagamente di cenere.",
-      "desc_mech_bird": "A hand-built clockwork war chicken that sprints on snapping servos, wind-up key still turning.",
-      "desc_lanternback_troll": "A hill troll broken to the yoke by lamplighters, carrying an iron throne across his shoulders with a storm lantern burning on either arm.",
-      "desc_chimeglass_tortoise": "A salt-flat tortoise who has outwalked three generations of caravans. Tinkers ground him spectacles from storm-glass and hung a bronze bell at his throat, so the road hears him long before it sees him.",
+      "desc_mech_bird": "Un pollo da guerra a orologeria costruito a mano che scatta su servi scattanti, con la chiave di carica ancora in movimento.",
+      "desc_lanternback_troll": "Un troll di collina piegato al giogo dai lampionai, che porta un trono di ferro sulle spalle con una lanterna antivento accesa su entrambi i bracci.",
+      "desc_chimeglass_tortoise": "Una tartaruga salata che ha superato tre generazioni di carovane. I calderai gli montarono gli occhiali di vetro anti-tempesta e gli appesero una campana di bronzo al collo, così la strada lo sentì molto prima di vederlo.",
       "desc_rickshaw_mount": "Un carro d'ossa sferragliante, con un gregario ossuto imbragato alle stanghe, che ti trascina in una corsa sfrenata."
     },
     "mountTraining": {
@@ -1580,7 +1588,10 @@ export const it_IT: EnTranslations = {
       "uiScale": "Scala dell'interfaccia",
       "playerFrameScale": "Scala del riquadro del giocatore",
       "targetFrameScale": "Scala del riquadro del bersaglio",
+      "playerHealthText": "Testo sulla salute del giocatore",
+      "targetHealthText": "Testo sulla salute dell'obiettivo",
       "aurasOnPlayerFrame": "Buff sul riquadro del giocatore",
+      "auraBarBelowFrame": "Buff sotto il riquadro del giocatore",
       "alwaysShowAllBuffs": "Mostra sempre tutti i potenziamenti",
       "highContrastBackground": "Sfondo a contrasto elevato",
       "startAttackOnAbility": "Attacco automatico all'uso dell'abilita",
@@ -1603,9 +1614,9 @@ export const it_IT: EnTranslations = {
       "showTargetOfTarget": "Mostra il bersaglio del bersaglio",
       "showTargetSwingTimer": "Mostra timer degli attacchi del bersaglio",
       "showPetFrame": "Mostra il tuo famiglio",
-      "showNameplateDots": "Show My Dots on Nameplates",
-      "nameplateDotScale": "Nameplate Dot Size",
-      "showTargetDots": "Show Target Dots",
+      "showNameplateDots": "Mostra i miei punti sulle targhette",
+      "nameplateDotScale": "Dimensione punto targhetta",
+      "showTargetDots": "Mostra punti target",
       "waterRipples": "Increspature dell'acqua (scie)",
       "showAttackButton": "Mostra Pulsante Attacco",
       "showDailyRewardsChest": "Mostra forziere delle ricompense giornaliere",
@@ -2507,7 +2518,9 @@ export const it_IT: EnTranslations = {
       "unequipHint": "Clicca per rimuovere questa borsa",
       "poolGeneral": "Generale: {used} di {total}",
       "poolMaterials": "Materiali: {used} di {total}",
-      "capacityPoolsAria": "Spazi delle borse usati: {used} di {total}. Oggetti generali: {generalUsed} di {generalTotal}. Materiali: {materialsUsed} di {materialsTotal}."
+      "capacityPoolsAria": "Spazi delle borse usati: {used} di {total}. Oggetti generali: {generalUsed} di {generalTotal}. Materiali: {materialsUsed} di {materialsTotal}.",
+      "capacityPools": "Oggetti {generalUsed}/{generalTotal}, materiali {materialsUsed}/{materialsTotal}",
+      "emptyMaterialsOnly": "Solo materiali"
     },
     "raidConvert": {
       "toPartyDone": "La tua incursione è tornata a essere un gruppo.",
@@ -2744,7 +2757,7 @@ export const it_IT: EnTranslations = {
       "suddenDeath": "La tua prossima Tomba Prematura non costa rabbia e ignora il suo requisito di salute",
       "aoeEcho": "Restano {charges} echi: le abilità a bersaglio singolo infliggono il {pct}% dei danni fino a {targets} nemici vicini",
       "sureCrit": "{charges} lanci di abilità dannose sono colpi critici garantiti",
-      "temporalEcho": "I danni Arcani del lanciatore ti curano per il {singlePct}% dei danni a bersaglio singolo o il {areaPct}% dei danni ad area",
+      "temporalEcho": "I danni Arcani del lanciatore ti curano per il {singlePct}% dei danni a bersaglio singolo o il {areaPct}% dei danni ad area. Impeto Etereo e Dardi Eterei ricevono un bonus x4 con un Eco Temporale individuale. Gli Echi di gruppo creano una riserva di cure equivalente, distribuita in base alla salute mancante tra gli alleati marchiati con meno del 60% di salute",
       "arcaneCharge": "{stacks} Cariche Arcane: Potere d'Etere infligge il {damagePct}% di danni in più, si lancia il {castPct}% più veloce e costa {costMult}x mana",
       "physicalReduction": "Riduce i danni Fisici subiti del {pct}%",
       "temporalHourglass": "Immune e impossibilitato ad agire; ripristina la salute e accelera il recupero dei tempi di recupero. Clic destro per annullare.",
@@ -2955,6 +2968,7 @@ export const it_IT: EnTranslations = {
       "healthPercent": "Percentuale",
       "healthCurrent": "Attuale",
       "healthCurrentMax": "Attuale / max",
+      "healthCurrentMaxPercent": "Corrente/Max (percentuale)",
       "sort": "Ordina giocatori",
       "sortGroup": "Gruppo",
       "sortRole": "Ruolo",
@@ -2994,7 +3008,7 @@ export const it_IT: EnTranslations = {
         "targetFrame": "Bersaglio",
         "partyFrames": "Gruppo",
         "swingBar": "Attacco automatico",
-        "targetDots": "Target Dots"
+        "targetDots": "Punti bersaglio"
       },
       "framesMenu": "Impostazioni riquadri",
       "framesMenuTitle": "Mostra o nascondi i singoli riquadri. Un riquadro deselezionato resta nascosto finché non lo riselezioni o ripristini i valori predefiniti.",
@@ -3027,33 +3041,33 @@ export const it_IT: EnTranslations = {
       "wrongKind": "Questo codice è di un tipo di esportazione diverso."
     },
     "riftForge": {
-      "title": "Rift Forge",
-      "subtitle": "Riftbound bands",
+      "title": "Forgia della spaccatura",
+      "subtitle": "Bande riftbound",
       "currency": "{name}: {count}",
-      "empty": "No Riftbound band in your bags. A ranked Rift first clear mints one.",
-      "wornHint": "Worn. Unequip it to forge.",
-      "upgradeBtn": "Upgrade to item level {level} ({cost} essence)",
-      "upgradeMax": "Fully upgraded",
-      "gemPickAria": "Gem to socket",
+      "empty": "Nessun cinturino Riftbound nelle tue borse. Un Rift classificato ne elimina per primo uno.",
+      "wornHint": "Indossato. Disequipaggiatelo per forgiarlo.",
+      "upgradeBtn": "Migliora al livello oggetto {level} (essenza {cost})",
+      "upgradeMax": "Completamente aggiornato",
+      "gemPickAria": "Gemma alla presa",
       "gemOption": "{name} ({bonus})",
-      "socketReplaceHint": "Sockets full: the next gem replaces the oldest, {gem}.",
-      "socketBtn": "Socket",
-      "socketsNone": "no gems",
-      "noGems": "No Rift gems in your bags",
-      "refused": "The forge refused. Stand at the Riftwright and try again.",
+      "socketReplaceHint": "Zoccoli pieni: la gemma successiva sostituisce la più vecchia, {gem}.",
+      "socketBtn": "Presa",
+      "socketsNone": "niente gemme",
+      "noGems": "Nessuna gemma Rift nelle tue borse",
+      "refused": "La fucina rifiutò. Posizionati al Riftwright e riprova.",
       "reason": {
-        "notFound": "That band is not in your bags.",
-        "notRiftGear": "Only a Riftbound band can be forged.",
-        "maxUpgrade": "That band is fully upgraded.",
-        "insufficientEssence": "Not enough Rift Essence.",
-        "invalidGem": "You have no such Rift gem.",
-        "dead": "You can't do that while dead.",
-        "tooFar": "You are too far from the Rift Forge."
+        "notFound": "Quella band non è nelle tue borse.",
+        "notRiftGear": "È possibile forgiare solo una fascia Riftbound.",
+        "maxUpgrade": "Quella banda è completamente aggiornata.",
+        "insufficientEssence": "Non abbastanza Essenza del Rift.",
+        "invalidGem": "Non hai una gemma del Rift del genere.",
+        "dead": "Non puoi farlo da morto.",
+        "tooFar": "Sei troppo lontano dalla Rift Forge."
       },
       "done": {
-        "upgrade": "Upgraded {name}.",
-        "socket": "Socketed a gem into {name}.",
-        "socketReplaced": "Socketed a gem into {name}; {gem} was destroyed."
+        "upgrade": "{name} aggiornato.",
+        "socket": "Inserita una gemma in {name}.",
+        "socketReplaced": "Incastonata una gemma in {name}; {gem} è stato distrutto."
       }
     },
     "itemTooltip": {
@@ -3061,7 +3075,7 @@ export const it_IT: EnTranslations = {
       "riftTier": "Oggetto dello Squarcio di rango {tier}",
       "riftUpgrade": "Potenziamento dello squarcio {level}/{max}",
       "riftSockets": "Gemme dello squarcio {used}/{total}",
-      "riftGemSocket": "Socket bonus for a Riftbound band",
+      "riftGemSocket": "Bonus presa per una banda Riftbound",
       "statEnchanted": "+{value} {stat} (Incantato)",
       "enchantedFallback": "Incantato",
       "partyTradeWindow": "Puoi scambiare questo oggetto con i giocatori che hanno condiviso il suo bottino per i prossimi {time}. Indossarlo pone fine alla finestra di scambio."
@@ -3086,6 +3100,7 @@ export const it_IT: EnTranslations = {
       "close": "Chiudi",
       "keybind": "Pannello Discord",
       "disabled": "L'integrazione con Discord non e disponibile al momento.",
+      "queuePingsLabel": "Inviami un messaggio diretto Discord quando compare la coda del campo di battaglia o dell'arena (è necessario un account Discord collegato)",
       "tiers": {
         "none": "Senza grado",
         "initiate": "Iniziato",
@@ -3343,13 +3358,13 @@ export const it_IT: EnTranslations = {
       "close": "Chiudi"
     },
     "realmBuilder": {
-      "title": "Realm Builder of the Month",
-      "currentLabel": "Honoured this month",
-      "placeholderName": "Your Name Here",
-      "placeholderHint": "This plate is waiting for its first name.",
-      "pastTitle": "Past honourees",
-      "pastEmpty": "No names on the roll yet.",
-      "close": "Close"
+      "title": "Costruttore di regni del mese",
+      "currentLabel": "Onorato questo mese",
+      "placeholderName": "Il tuo nome qui",
+      "placeholderHint": "Questo piatto sta aspettando il suo nome.",
+      "pastTitle": "Premiati in passato",
+      "pastEmpty": "Nessun nome ancora in lista.",
+      "close": "Chiudi"
     },
     "bank": {
       "title": "Banca",
@@ -3406,6 +3421,8 @@ export const it_IT: EnTranslations = {
       "depositAllDone": "Materiali depositati: {count}.",
       "depositAllFull": "Materiali depositati: {count}. Ora la banca è piena.",
       "depositAllNone": "Banca piena: non è stato depositato nulla.",
+      "depositAllNotable": "Materiali depositati: {count}, incluso {item}.",
+      "depositAllNotableFull": "Materiali depositati: {count}, incluso {item}. Banca ora piena.",
       "bonusTitle": "Spazi bonus",
       "bonusEarned": "+{count}",
       "bonusStatusEarned": "+{count}",
@@ -3444,6 +3461,8 @@ export const it_IT: EnTranslations = {
       "vaultDepositAllDone": "Materiali depositati: {count}.",
       "vaultDepositAllFull": "Materiali depositati: {count}. Alcuni limiti sono pieni.",
       "vaultDepositAllNone": "Limiti del caveau pieni: nulla è stato depositato.",
+      "vaultDepositAllNotable": "Materiali depositati: {count}, incluso {item}.",
+      "vaultDepositAllNotableFull": "Materiali depositati: {count}, incluso {item}. Alcuni soffitti sono pieni.",
       "vaultWithdrawShort": "Solo {fit} di {count} entrano nelle tue borse.",
       "vaultDepositHint": "Clicca per depositare nel tuo caveau",
       "vaultCannotDeposit": "Non può andare nel caveau",
@@ -3580,17 +3599,17 @@ export const it_IT: EnTranslations = {
         }
       },
       "roster": {
-        "seats": "{count} of {cap} seats",
-        "expand": "Expand roster (+{seats} seats for {price})",
-        "maxed": "The roster is at its largest size",
-        "confirm": "Expand the guild roster by {seats} seats for {price}? The gold comes from your own purse and is not refunded.",
-        "confirmAction": "Expand",
-        "expandedLine": "{name} has expanded the guild roster to {cap} members.",
+        "seats": "{count} dei posti {cap}",
+        "expand": "Espandi elenco (+ posti {seats} per {price})",
+        "maxed": "Il roster ha le sue dimensioni più grandi",
+        "confirm": "Espandere l'elenco delle gilde aggiungendo posti {seats} per {price}? L'oro proviene dal tuo portafoglio e non viene rimborsato.",
+        "confirmAction": "Espandi",
+        "expandedLine": "{name} ha ampliato l'elenco delle gilde ai membri {cap}.",
         "result": {
-          "notLeader": "Only the Guild Master may expand the guild roster.",
-          "maxed": "The guild roster cannot grow any larger.",
-          "cannotAfford": "You need {price} to expand the guild roster.",
-          "retry": "The guild roster changed while you were buying. Try again."
+          "notLeader": "Solo il Maestro della Gilda può espandere l'elenco della gilda.",
+          "maxed": "L'elenco delle gilde non può crescere ulteriormente.",
+          "cannotAfford": "Hai bisogno di {price} per espandere l'elenco della gilda.",
+          "retry": "L'elenco delle gilde è cambiato durante l'acquisto. Riprova."
         }
       }
     },
@@ -4009,7 +4028,7 @@ export const it_IT: EnTranslations = {
       "yieldLineRange": "Da {min} a {max} {item}",
       "alreadyEnchanted": "Quell'oggetto è già incantato.",
       "sameEnchant": "Quell'oggetto ha già quell'incantesimo.",
-      "riftGear": "Riftbound bands take Rift gems, not enchants.",
+      "riftGear": "Le bande legate al Rift prendono le gemme del Rift, non gli incantesimi.",
       "replaceTag": "Sostituisce {enchant}",
       "sameEnchantTag": "Già applicato",
       "plainTag": "Non incantato",
@@ -4314,6 +4333,7 @@ export const it_IT: EnTranslations = {
       "sourceProfession": "Si ottiene con {profession}",
       "sourceDeed": "Concessa dall'impresa {deed}",
       "sourceVendor": "Venduta da {vendor}",
+      "sourceVendorGated": "Venduta da {vendor} ({requirement})",
       "sourceBossZone": "Bottino di {boss} in {zone}",
       "sourceDelve": "Si trova nell'incursione {delve}",
       "sourceRift": "Bottino delle conquiste di Squarci di rango {rank}",
@@ -4333,6 +4353,10 @@ export const it_IT: EnTranslations = {
       "filterAll": "Tutte",
       "filterOwned": "Catalogate",
       "filterMissing": "Mancanti",
+      "filterIlluminated": "Illuminato",
+      "filterRemaining": "Rimanente",
+      "filterEmptyPages": "Nessuna pagina corrisponde a questo filtro.",
+      "filterGroupAriaPages": "Filtra le pagine in base al fatto che siano illuminate",
       "recentJumpAria": "Apri la pagina di {name}",
       "recentEmpty": "Ancora nessun ritrovamento. Le reliquie che cataloghi da ora in poi compaiono qui.",
       "nearlyEmpty": "Qui si raccolgono le pagine vicine al completamento.",
@@ -4440,6 +4464,7 @@ export const it_IT: EnTranslations = {
       "summary": "Mappa del mondo. Scegli una zona per aprire la sua mappa.",
       "toWorld": "Mappa del mondo",
       "toZone": "Mappa della zona",
+      "toInstance": "Mappa delle istanze",
       "toggleAria": "Passa dalla mappa del mondo alla mappa della zona",
       "levels": "Livelli da {min} a {max}"
     },
@@ -4474,6 +4499,7 @@ export const it_IT: EnTranslations = {
       "walletLinkedConnected": "La tua app del portafoglio collegato è connessa e pronta per gli acquisti in $WOC.",
       "walletUsdBalance": "{amount} USD",
       "walletUsdUnknown": "Sconosciuto",
+      "walletCardDismiss": "Nascondi la carta del portafoglio",
       "rateNote": "Tasso: circa {tokens} $WOC per 1,00 USD al {time}.",
       "rateNotePaused": "Ultimo tasso noto: circa {tokens} $WOC per 1,00 USD al {time}.",
       "estimateNote": "Circa {tokens} $WOC per {usd} al tasso attuale.",
@@ -4665,6 +4691,43 @@ export const it_IT: EnTranslations = {
       "listingStatusCancelled": "Annullata",
       "listingStatusSuspended": "Sospesa",
       "listingStatusUnsold": "Invenduta"
+    },
+    "lootExplorer": {
+      "title": "Esploratore del bottino",
+      "close": "Chiudi Esplora bottino",
+      "searchPlaceholder": "Cerca elementi...",
+      "searchAria": "Cerca elementi",
+      "filterCategoryAria": "Fonte",
+      "filterClassAria": "Classe",
+      "filterStatAria": "Statistica",
+      "filterQualityAria": "Qualità",
+      "filterAll": "Tutto",
+      "tabItems": "Per articolo",
+      "tabEncounters": "Per incontro",
+      "category": {
+        "raid": "Incursione",
+        "dungeon": "Spedizione",
+        "delve": "Approfondire",
+        "open_world": "Mondo aperto",
+        "rift": "Spaccatura",
+        "vendor": "Venditore",
+        "quest_reward": "Ricompensa della missione",
+        "quest_objective": "Obiettivo della missione",
+        "ground_object": "Oggetto del mondo",
+        "starting_equipment": "Attrezzatura di partenza"
+      },
+      "difficulty": {
+        "normal": "Normale",
+        "heroic": "Eroico"
+      },
+      "riftRankLabel": "Grado Rift {rank}",
+      "source": "{category}: {name}",
+      "sourceWithContext": "{category}: {name} ({context})",
+      "chance": "Probabilità del {pct}%.",
+      "guaranteed": "Garantito",
+      "gatedByQuest": "Durante la ricerca: {quest}",
+      "empty": "Nessun bottino corrisponde a questi filtri.",
+      "resultCount": "Risultati {count}"
     }
   },
   "gatherEvent": {
@@ -4763,7 +4826,8 @@ export const it_IT: EnTranslations = {
       "link_required": "Collega prima il tuo account Discord.",
       "swag_claimed": "Hai già riscattato questa ricompensa.",
       "swag_tier": "Raggiungi un grado più alto per riscattarla.",
-      "swag_points": "Punti insufficienti."
+      "swag_points": "Punti insufficienti.",
+      "invalid_input": "Immissione non valida."
     },
     "deeds": {
       "invalid_input": "Dati non validi."
@@ -4815,6 +4879,11 @@ export const it_IT: EnTranslations = {
       "reason_required": "È necessario indicare un motivo.",
       "invalid_duration": "Inserisci una durata del marchio di almeno un secondo.",
       "not_marked": "Quell'account non è contrassegnato."
+    },
+    "kick": {
+      "reason_required": "È necessario un motivo.",
+      "admin_target": "Gli account operatore non possono essere kickati.",
+      "target_offline": "Quel giocatore non è più online su questo reame."
     },
     "woc_market": {
       "invalid_input": "Input non valido.",
@@ -5249,10 +5318,13 @@ export const it_IT: EnTranslations = {
       "ifPlayerFrameScale": "La dimensione del tuo riquadro del giocatore.",
       "ifTargetFrameScale": "La dimensione del tuo riquadro del bersaglio.",
       "ifPartyStyle": "Il layout del gruppo: Automatico segue la dimensione della tua squadra, Classico è la pila tradizionale, e Incursione stipa tutti nella griglia compatta.",
+      "ifPlayerHealthText": "Ciò che stampa la tua barra della salute: niente, una percentuale, salute attuale, attuale e massima, o entrambi con la percentuale accanto.",
+      "ifTargetHealthText": "Cosa stampano le barre della salute del bersaglio e del bersaglio del bersaglio, con le stesse scelte della tua cornice.",
       "ifPartyHealthText": "Cosa stampano le barre del gruppo: niente, una percentuale, la salute attuale, oppure salute attuale e massima.",
       "ifPartySort": "L'ordine in cui sono elencati i membri del gruppo: ordine di gruppo, ruolo, o nome.",
       "ifPartyShowAuras": "Se buff e debuff compaiono sui riquadri del gruppo. Interruttori corrispondenti coprono le barre risorsa, gli assorbimenti, i famigli e se compari nella tua stessa lista del gruppo.",
       "ifAurasOnPlayerFrame": "Mette i tuoi buff e debuff sul tuo riquadro del giocatore oltre che sulla barra delle aure.",
+      "ifAuraBarBelowFrame": "Sposta la riga dei buff sotto il tuo riquadro unità invece che sopra. Conta solo quando i buff sono sul riquadro del giocatore.",
       "ifAlwaysShowAllBuffs": "Mostra ogni potenziamento attivo anche con il profilo grafico Basso, ignorando il normale limite di icone dei potenziamenti.",
       "ifTargetOfTarget": "Mostra chi sta bersagliando il tuo bersaglio, il modo classico per capire se il tank ha ancora la minaccia.",
       "ifPetFrame": "Mostra un riquadro per il tuo famiglio.",
@@ -5260,6 +5332,7 @@ export const it_IT: EnTranslations = {
       "ifChatOpacity": "Quanto è solido lo sfondo della chat.",
       "ifCompactChat": "Comprime le righe di chat così ce ne stanno di più.",
       "ifChatTimestamps": "Aggiunge un orario a ogni riga di chat, in formato 12 ore o 24 ore.",
+      "ifFilterProfanity": "Maschera volgarità in chat con asterischi. Attivo per impostazione predefinita; disattivalo qui se preferisci leggere la chat senza filtri.",
       "ifStartAttack": "Se usare un'abilità avvia anche il tuo attacco automatico. Attivata di default, ed è il comportamento classico che la maggior parte dei giocatori si aspetta.",
       "ifStopAutoAttack": "Se cambiare bersaglio interrompe il tuo attacco. Disattivata di default, così il tuo attacco prosegue sul nuovo bersaglio.",
       "ifShowAttackButton": "Mette un pulsante Attacco esplicito sulla tua barra delle azioni.",
@@ -5272,7 +5345,7 @@ export const it_IT: EnTranslations = {
       "ifHideUnused": "Nasconde gli slot azione vuoti così vengono disegnati solo i pulsanti che usi davvero.",
       "ifLockBars": "Blocca le tue barre così non puoi trascinare per sbaglio un'abilità fuori da uno slot.",
       "keybindsHeading": "Il pannello Comandi da tastiera",
-      "keybindsBody": "L'elenco dei tasti è solo metà di quel pannello. Sopra di esso si trovano gli interruttori che decidono come il mouse guida il gioco: telecamera con mouse, se il cursore si blocca durante la rotazione, clic per muoversi e quale pulsante del mouse lo attiva, movimento d'attacco, il layout touch per mancini, e il filtro del linguaggio per la chat.",
+      "keybindsBody": "L'elenco delle chiavi è solo la metà di quel pannello. Sopra si trovano gli interruttori che decidono come il mouse guida il gioco: telecamera del mouse, se il cursore si blocca mentre ruoti, fai clic per muoverti e quale pulsante del mouse lo attiva, mossa di attacco e layout touch per mancini.",
       "keybindsMouseBody": "Due cose lì sono facili da non notare. I pulsanti del mouse si associano come i tasti, quindi il clic della rotellina e i pulsanti laterali possono portare abilità, mentre il clic sinistro e destro restano riservati alla telecamera e al clic sul mondo. E puoi associare i tasti direttamente dalla barra delle azioni: attiva qui la modalità di associazione sulla barra, poi fai clic su uno slot e premi il tasto che vuoi."
     },
     "combat": {
@@ -6071,7 +6144,7 @@ export const it_IT: EnTranslations = {
       "heroicRewardsBody": "I boss eroici lasciano cadere il bottino che conosci, migliorato e contrassegnato come Eroico nella descrizione, e il boss finale di ogni sessione aggiunge epici introvabili altrove. Quell'ultima uccisione lascia anche Sigilli Eroici a ogni partecipante: una valuta che si spende dal quartiermastro Vex a Highwatch, il cui bancone è uno scaffale di anelli e pendenti che nulla se non la prova delle profondità eroiche può comprare.",
       "heroicLockoutBody": "I dungeon normali si possono percorrere tutto il giorno. L'eroico chiede pazienza: l'uccisione del boss finale limita tutti i partecipanti a un solo completamento eroico di quel dungeon al giorno, e l'incursione tiene un blocco giornaliero per ciascuna difficoltà. Su un reame in linea tutti i blocchi giornalieri decadono insieme all'ora del ripristino notturno del reame, così un completamento preso poco prima di quell'ora e uno preso poco dopo cadono in due giorni diversi; gioca invece offline nel tuo browser e un blocco scade semplicemente un giorno dopo la tua uccisione. Una sessione a cinque già completata resta aperta al suo stesso gruppo per corse del cadavere e bottino, così nessuno viene escluso da ciò che vi ha guadagnato. L'incursione è più severa: una volta che la sua uccisione ti ha bloccato, la porta resta chiusa fino al ripristino, e l'unico modo di rientrarvi è una corsa del cadavere di qualcuno caduto proprio nella sessione che lo ha bloccato, quindi un incursore vivo che esce è uscito per la giornata. Raccogli le tue spoglie prima di lasciare l'arena. Ognuno di questi blocchi appartiene al personaggio che se l'è guadagnato, così un completamento sul tuo personaggio principale lascia liberi gli altri.",
       "resetTitle": "Reimpostare le istanze",
-      "resetBody": "Se cambiate difficoltà mentre il gruppo tiene ancora sessioni rivendicate, le vecchie rivendicazioni restano un poco prima di decadere da sole. Il capogruppo può lasciarle andare subito: scegliete Azzera tutte le istanze nel menu del proprio ritratto, oppure digitate /dungeon reset. Un azzeramento funziona solo dopo che la difficoltà è stata davvero cambiata, solo finché nessuno, vivo o caduto, resta all'interno, solo una volta che ogni cadavere là dentro è stato saccheggiato del tutto, e un breve tempo di recupero separa un azzeramento dal successivo. Arrivate alla porta con la difficoltà sbagliata e il gioco ve lo dice prima che la sessione inizi. L'incursione non si azzera mai così; valgono le sue regole di blocco.",
+      "resetBody": "Cambia la difficoltà mentre il tuo gruppo mantiene ancora le corse rivendicate e le vecchie rivendicazioni persistono per un po' prima di risolversi da sole. Il leader del gruppo può invece lasciarli andare subito: scegli Ripristina tutte le istanze nel menu verticale o digita /dungeon reset. Un ripristino funziona solo dopo che la difficoltà è stata effettivamente modificata, solo finché nessuno, vivo o caduto, rimane all'interno, solo una volta che ogni cadavere è stato ripulito e un breve tempo di recupero separa un ripristino dal successivo. Arriva alla porta con la difficoltà sbagliata e il gioco lo dice prima che inizi la corsa. Il raid si ripristina allo stesso modo, con le proprie regole di blocco e restituzione del cadavere ancora in primo piano.",
       "templeLoreTitle": "Il Tempio Annegato, un po' più a fondo",
       "templeLoreBody": "Il tempio ha una sua leggenda, più antica del culto che insegui altrove. Sulla riva del Glimmermere, un laghetto che beve la luce della luna e restituisce gli annegati, un solitario guardiano custodisce una porta di pallida luce. Sotto la superficie, una scalinata di pietra fredda scende fino ad esso. Coloro che vi affondarono non annegarono per disgrazia: erano il Coro Pallido, che si immerse in preghiera e non smise mai di cantare. I vecchi custodi incisero un solo avvertimento nelle rocce prima che l'acqua li prendesse, una preghiera a qualcosa che chiamavano la Luna Annegata, con una mano più ferma che aggiunse due parole sotto di essa: dorme soltanto.",
       "cryptLeadTitle": "Una porta che i morti dovevano tenere chiusa",
@@ -6104,8 +6177,8 @@ export const it_IT: EnTranslations = {
       "raceBody": "Ogni gruppo del reame può attaccare lo stesso squarcio nello stesso momento, ciascuno nella propria copia, e solo il primo che abbatte la cosa in fondo lo sigilla. Quando un gruppo vince, il reame ne sente i nomi e il tempo, e la via d'ingresso si chiude alle loro spalle. Perdere la corsa non pone fine alla tua run: la tua copia resta aperta, la cosa in fondo cade comunque sotto i tuoi colpi, ed esci comunque con le tue forze. Ciò che ti costa è tutto ciò che avrebbe pagato completarlo. Il boss non lascia nulla al gruppo arrivato secondo, quindi ciò che porti a casa è solo ciò che i mostri hanno lasciato cadere lungo la discesa, e nient'altro. Il Libro delle Imprese conta comunque il completamento, perché quella cosa l'hai abbattuta tu. È l'unica corsa del gioco che puoi perdere senza mai posare gli occhi su chi ti ha battuto.",
       "rewardsHeading": "Cosa porti fuori",
       "rewardsBody": "È sigillare uno squarcio, non semplicemente sopravvivergli, a pagare. Sigillalo per primo e paga come il contenuto istanziato al cui fianco si colloca il suo rango, così i ranghi più duri valgono la run più dura. Sigillarlo mette anche un Anello dello Squarcio nelle mani di tutti quelli che erano presenti, tagliato per il ruolo della tua classe e personale per te, e lascia inoltre Essenza dello Squarcio nelle tue borse, con gemme dello squarcio in aggiunta ai ranghi più duri. Oltre alla via del ritorno, la cosa in fondo lascia uno scrigno sigillato che il tuo gruppo può forzare per bottino extra, usando lo stesso scasso della Via del Cilindro che conosci dagli scrigni delle incursioni, quindi un lavoro pulito e paziente paga meglio di uno frettoloso. Niente di tutto questo arriva al gruppo arrivato secondo: una corsa persa ti lascia solo ciò che i mostri hanno lasciato cadere lungo la discesa. Il Libro delle Imprese è l'eccezione, e conta comunque il tuo completamento, con un'impresa per aver chiuso il tuo primo squarcio e un'altra per averne abbattuto uno di rango S.",
-      "forgeHeading": "The Rift Forge",
-      "forgeBody": "The band a ranked first clear mints is not finished when you receive it. Riftwright Maelis, who keeps a forge in the Watch Meadow on the Farshore, up the shore from Gullhaven beside the Breach Scholar, will raise its item level one step at a time and set the coloured gems the rifts drop into its sockets, each colour one combat rating. A full band takes a new gem in place of its oldest, so you can retune it later. All of that is paid in Rift Essence and Rift gems, the forge currency that falls from rift bosses and trades freely, so a friend can hand you the essence you are short. Take the band off before you bring it to her: she works on what is in your bags, and she does nothing at all unless you are standing at her forge.",
+      "forgeHeading": "La Forgia della Spaccatura",
+      "forgeBody": "Il cinturino al primo posto nella classifica delle zecche trasparenti non è finito quando lo ricevi. Riftwright Maelis, che mantiene una fucina nel Watch Meadow sul Farshore, lungo la costa da Gullhaven accanto al Breach Scholar, aumenterà il suo livello oggetto un passo alla volta e incastonerà le gemme colorate che le spaccature lasciano cadere nei suoi incavi, ciascun colore di un valore di combattimento. Una banda completa prende una nuova gemma al posto della più vecchia, così puoi riaccordarla in seguito. Tutto ciò viene pagato in Rift Essence e Rift Gems, la valuta della forgia che cade dai boss del Rift e viene scambiata liberamente, così un amico può darti l'essenza di cui ti manca. Togli la fascia prima di portargliela: lei lavora su quello che hai nelle borse, e non fa niente a meno che tu non sia nella sua fucina.",
       "trackerHeading": "Il tracciatore sul tuo schermo",
       "trackerBody": "Mentre sei all'interno, una piccola striscia sul tuo schermo ti tiene orientato: su quale piano ti trovi rispetto al totale, e un conto alla rovescia in tempo reale. Leggi quel conto alla rovescia con attenzione, perché non è la tua run che sta per scadere: è l'ingresso nel mondo che si sta chiudendo. Una volta dentro, il tuo gruppo gioca lo squarcio al proprio ritmo, per quanto tempo serva, ma quando l'orologio arriva a zero la via d'ingresso scompare per tutti, quindi pensaci due volte prima di uscire fuori verso la fine."
     },
@@ -7997,7 +8070,7 @@ export const it_IT: EnTranslations = {
       "forgeUpgraded": "Potenziamento dello squarcio completato per {name}.",
       "forgeEnchanted": "Incantesimo dello squarcio completato per {name}.",
       "forgeSocketed": "Gemma dello squarcio incastonata per {name}.",
-      "forgeGemReplaced": "Rift gem replaced for {name}: {gem} destroyed.",
+      "forgeGemReplaced": "Gemma del Rift sostituita per {name}: {gem} distrutto.",
       "detonateGlacialGrave": "Tomba Glaciale detona!",
       "detonateAbsoluteZero": "Zero Assoluto erompe!",
       "detonateMagmaWell": "Il Pozzo di Magma erompe!",
@@ -8644,6 +8717,7 @@ export const it_IT: EnTranslations = {
     "connectingRealm": "Connessione al mondo...",
     "assetsFailed": "Caricamento risorse non riuscito: ricarica la pagina. {error}",
     "rendererFailed": "Impossibile avviare il renderer: ricarica la pagina. {error}",
+    "rendererContextLost": "Il renderer 3D ha perso il contesto grafico e non è riuscito a recuperarlo. Ricarica la pagina.",
     "enterTimeout": "Impossibile entrare nel mondo. La connessione è scaduta. Il server di gioco è in esecuzione?",
     "connectionLost": "Connessione al server persa.",
     "reconnectingAttempt": "Connessione persa. Riconnessione in corso... (tentare {attempt}/{maxAttempts}, riprovando in {seconds})",
@@ -8654,6 +8728,7 @@ export const it_IT: EnTranslations = {
     "realmFull": "Questo mondo e al completo in questo momento. Riprova tra qualche minuto.",
     "tooManyConnections": "Troppe connessioni a questo mondo provengono dalla tua rete. Chiudi le finestre di gioco extra o riprova tra qualche minuto.",
     "messageRateExceeded": "Sei stato disconnesso per aver inviato azioni troppo velocemente. Attendi un momento e accedi di nuovo.",
+    "kickedByModerator": "Un moderatore ti ha disconnesso: {reason}",
     "tips": {
       "classes": "Suggerimento: ciascuna delle 9 classi si gioca in modo diverso. Provane alcune prima di sceglierne una.",
       "talents": "Suggerimento: puoi azzerare i talenti ogni volta che sei fuori combattimento, quindi una scelta iniziale non è mai definitiva.",
@@ -10467,11 +10542,11 @@ export const it_IT: EnTranslations = {
       },
       "melting_acid": {
         "name": "Acido Fondere",
-        "description": "Spruzza il bersaglio con un veleno caustico, infliggendo {damage} danni da natura e riducendone l'armatura del 5% per 12 sec."
+        "description": "Ricopre la tua arma per 30 min. Ognuno dei tuoi attacchi in mischia spruzza il bersaglio con acido caustico e ne riduce l'armatura del 5% per 12 sec."
       },
       "nightshade_coating": {
         "name": "Rivestimento Nightshade",
-        "description": "Ricopre il bersaglio di ombra notturna, infliggendo {damage} danni da natura e riducendo le cure ricevute del 25% per 12 sec."
+        "description": "Ricopre la tua arma per 30 min. Ognuno dei tuoi attacchi in mischia ricopre il bersaglio di ombra notturna e riduce le cure ricevute del 25% per 12 sec."
       },
       "expose_armor": {
         "name": "Breccia nell'Armatura",
@@ -10487,11 +10562,11 @@ export const it_IT: EnTranslations = {
       },
       "instant_poison": {
         "name": "Morso della Vipera",
-        "description": "Ricopre la tua arma per 30 min, facendo sì che ognuno dei tuoi attacchi in mischia infligga 8 danni della Natura aggiuntivi."
+        "description": "Ricopre la tua arma per 30 min, facendo sì che ognuno dei tuoi attacchi in mischia infligga {damage} danni della Natura aggiuntivi."
       },
       "deadly_poison": {
         "name": "Veleno Putrescente",
-        "description": "Ricopre la tua arma per 30 min, facendo sì che ognuno dei tuoi attacchi in mischia infligga 14 danni della Natura aggiuntivi."
+        "description": "Ricopre la tua arma per 30 min. Ognuno dei tuoi attacchi in mischia aggiunge una carica di veleno al bersaglio, fino a 5, e rinnova la durata di 12 sec. Ogni carica infligge {damage} danni da natura ogni 2 sec."
       },
       "blind": {
         "name": "Lancio di Terra",
@@ -11589,11 +11664,11 @@ export const it_IT: EnTranslations = {
       },
       "temporal_echo": {
         "name": "Eco Temporale",
-        "description": "Contrassegna un alleato con l'eco di un momento più sano, curandolo di {damage} salute immediatamente. Per {duration} secondi, parte dei danni Arcani che infliggi viene convogliata attraverso l'eco per curarli."
+        "description": "Contrassegna un alleato con l'eco di un momento più sano, curandolo di {damage} salute immediatamente. Per {duration} secondi, il {echoSinglePct}% degli altri danni Arcani a bersaglio singolo e il {echoAreaPct}% dei danni Arcani ad area lo curano. Impeto Etereo e Dardi Eterei lo curano invece per il {echoDriverPct}% dei danni che infliggono."
       },
       "temporal_cascade": {
         "name": "Cascata Temporale",
-        "description": "Invia un'eco in cascata attraverso il tuo gruppo: il bersaglio è fino a quattro alleati più vicini vengono curati contemporaneamente e ciascuno viene contrassegnato per {duration} secondi, convogliando parte dei danni Arcani che infliggi attraverso le loro echi per curarli. (Cronomanzia)"
+        "description": "Invia un'eco in cascata attraverso il tuo gruppo: il bersaglio e fino a quattro alleati più vicini vengono curati contemporaneamente e ciascuno viene contrassegnato per {duration} secondi, convogliando parte dei danni Arcani che infliggi attraverso i loro echi per curarli. Impeto Etereo e Dardi Eterei creano una riserva di cure equivalente da ogni Eco di gruppo, distribuita in base alla salute mancante tra gli alleati marchiati con meno del 60% di salute. (Cronomanzia)"
       },
       "temporal_reversal": {
         "name": "Inversione Temporale",
@@ -13281,11 +13356,17 @@ export const it_IT: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Chiave d’accensione: Terrorscintilla, Scuoteterra"
       },
+      "reins_goblin_rocket_sled": {
+        "name": "Chiave di accensione: Slitta a razzo goblin"
+      },
+      "reins_rallycart_rxt": {
+        "name": "Chiave di accensione: Rallycart RXT"
+      },
       "reins_lanternback_troll": {
         "name": "Giogo del lampionaio: Grumbol"
       },
       "reins_chimeglass_tortoise": {
-        "name": "Roadwarden's Bellstrap: Tolliver"
+        "name": "Campanello del Guardastrada: Tolliver"
       },
       "reins_rickshaw_mount": {
         "name": "Redini vincolate: Risciò Vincolato alle Ossa"
@@ -13294,7 +13375,7 @@ export const it_IT: EnTranslations = {
         "name": "Redini del Raptor di Drakemaw"
       },
       "reins_mech_bird": {
-        "name": "Ignition Key: Cluckwork Mech Bird"
+        "name": "Chiave di accensione: Cluckwork Mech Bird"
       },
       "rimefang": {
         "name": "Zanna di Brina"
@@ -15921,9 +16002,9 @@ export const it_IT: EnTranslations = {
         "greeting": "Si è aperto proprio dove asciugano le reti. Proprio lì, dove sono stata ogni mattina della mia vita. Non scendo più alla riva. Non vado quasi più da nessuna parte."
       },
       "riftwright_maelis": {
-        "name": "Riftwright Maelis",
-        "title": "Rift Forgemaster",
-        "greeting": "A Riftbound band remembers the break that made it, {className}. Bring me the band, and the essence the breaks shed, and I will teach it to remember more."
+        "name": "Maelis, modellatrice di fenditure",
+        "title": "Mastro Forgiatore della Spaccatura",
+        "greeting": "Una band dei Riftbound ricorda la svolta che l'ha fatta, {className}. Portami la fascia e l'essenza delle pause, e gli insegnerò a ricordare di più."
       },
       "forgemistress_darva": {
         "name": "Maestra della Forgia Darva",
@@ -18985,8 +19066,8 @@ export const it_IT: EnTranslations = {
       },
       "chronoweave": {
         "name": "Vesti della Tessitura Eterea",
-        "bonus2": "L’Eco Temporale converte il 50 percento dei danni arcani a bersaglio singolo in cure. I danni subiti non ritardano più il lancio degli incantesimi.",
-        "bonus4": "Il tempo di recupero della Cascata Temporale è ridotto di 5 s."
+        "bonus2": "L’Eco Temporale converte il 50% degli altri danni Arcani a bersaglio singolo in cure. Impeto Etereo e Dardi Eterei convertono invece il 200% dei danni che infliggono. I danni subiti non ritardano più il lancio degli incantesimi.",
+        "bonus4": "Il tempo di recupero della Cascata Temporale è ridotto di 5 s e il suo costo in mana del 30%."
       },
       "cinderbark": {
         "name": "Protezione di Corteccia Cinerea",
@@ -19215,6 +19296,6 @@ export const it_IT: EnTranslations = {
     "delveRiteShrineSkullInteract": "Santuario del Teschio: premi F per toccarlo",
     "mailboxName": "Cassetta postale",
     "noticeboardName": "Bacheca degli annunci",
-    "realmBuilderMonumentName": "Realm Builder Monument"
+    "realmBuilderMonumentName": "Monumento al costruttore di regni"
   }
 };

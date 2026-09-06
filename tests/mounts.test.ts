@@ -106,8 +106,8 @@ function ride(sim: Sim, pid: number, key: string): void {
 }
 
 describe('mount catalog', () => {
-  it('has exactly thirteen mounts with the horse first and the developer rickshaw last', () => {
-    expect(MOUNT_KEYS).toHaveLength(13);
+  it('has exactly fifteen mounts with the horse first and the developer rickshaw last', () => {
+    expect(MOUNT_KEYS).toHaveLength(15);
     expect(MOUNT_KEYS[0]).toBe('valorsteed');
     expect(MOUNT_KEYS.at(-1)).toBe('rickshaw_mount');
     expect(DEFAULT_MOUNT).toBe('valorsteed');
@@ -131,6 +131,8 @@ describe('mount catalog', () => {
     expect(spec('mech_bird')).toEqual(['rare', 0.75]);
     expect(spec('aether_hover_cycle')).toEqual(['epic', 0.8]);
     expect(spec('thunderstrut_gobbler')).toEqual(['epic', 0.8]);
+    expect(spec('goblin_rocket_sled')).toEqual(['epic', 0.8]);
+    expect(spec('rallycart_rxt')).toEqual(['epic', 0.8]);
     expect(spec('lanternback_troll')).toEqual(['epic', 0.8]);
     expect(spec('chimeglass_tortoise')).toEqual(['epic', 0.8]);
     expect(spec('terrorspark_groundshaker')).toEqual(['epic', 0.8]);
@@ -182,7 +184,7 @@ describe('mount reins items (the collection: owning the item is owning the mount
   const reinsFor = (key: string) =>
     Object.values(ITEMS).filter((d) => d.kind === 'mount' && d.mount === key) as MountItemDef[];
 
-  it('every mount has exactly one reins item; player reins are unbound, the dev tank stays bound', () => {
+  it('every mount has exactly one reins item; player reins are unbound, dev mounts stay bound', () => {
     for (const key of MOUNT_KEYS) {
       const items = reinsFor(key);
       expect(items).toHaveLength(1);
@@ -257,7 +259,11 @@ describe('mount reins items (the collection: owning the item is owning the mount
     // acquisition path at all. Listed EXPLICITLY so a sourceless mount is a
     // decision and never an accident: when the world boss lands, delete the entry
     // and the rarity-derived rule below takes back over.
-    const NO_SOURCE_YET: readonly string[] = ['reins_drakemaw_raptor'];
+    const NO_SOURCE_YET: readonly string[] = [
+      'reins_drakemaw_raptor',
+      'reins_goblin_rocket_sled',
+      'reins_rallycart_rxt',
+    ];
     const FIVE_MAN_SOURCES: Record<string, readonly string[]> = {
       reins_stormfeather_griffin: ['morthen'],
       reins_shadowjump_toad: ['vael_the_mistcaller'],
@@ -1340,6 +1346,162 @@ describe('mount + form/ghost_wolf interaction', () => {
     castAbility(sim.ctx, 'ghost_wolf', pid);
 
     expect(e.mountKey).toBe('');
+  });
+});
+
+// "Stealth horse": mounting while stealthed used to leave the Duskveil aura active,
+// so a rider stayed concealed (shrunk detection radius, invisible to duel opponents
+// per canObserveEntity in server/game.ts) while ALSO gaining the mount's speed bonus,
+// an invisible-and-fast combination no duel opponent could pin down. Real MMOs prevent
+// this by having mounting break stealth outright; this suite pins that fix the same
+// way the form/ghost_wolf suite above pins its cancellation.
+describe('mount + stealth interaction (stealth horse fix)', () => {
+  // Helper: give the player the real Duskveil stealth aura directly (bypasses cast
+  // gates), matching src/sim/content/classes.ts `stealth` ability's effect exactly.
+  function putInStealth(sim: Sim, pid: number): void {
+    const e = sim.entities.get(pid)!;
+    e.auras.push({
+      id: 'stealth',
+      name: 'Duskveil',
+      kind: 'stealth',
+      remaining: 3600,
+      duration: 3600,
+      value: 0.5,
+      sourceId: pid,
+      school: 'physical',
+    });
+    e.stealthed = true;
+  }
+
+  function giveReins(sim: Sim, pid: number): void {
+    sim.addItem('reins_valorsteed', 1, pid);
+  }
+
+  it('starting a mount summon breaks stealth', () => {
+    const sim = makeWorld();
+    const pid = join(sim, 20);
+    const e = sim.entities.get(pid)!;
+    giveReins(sim, pid);
+    putInStealth(sim, pid);
+    expect(e.auras.some((a) => a.kind === 'stealth')).toBe(true);
+    expect(e.stealthed).toBe(true);
+
+    sim.drainEvents();
+    const started = summonMountItem(sim.ctx, pid, 'valorsteed');
+    const events = sim.drainEvents();
+
+    expect(started).toBe(true);
+    // Stealth is gone the instant the summon starts: no window where the rider is
+    // both concealed and accelerating toward mount speed.
+    expect(e.auras.some((a) => a.kind === 'stealth')).toBe(false);
+    expect(e.stealthed).toBe(false);
+    const removal = events.find(
+      (ev) => ev.type === 'aura' && ev.targetId === pid && !ev.gained && ev.name === 'Duskveil',
+    );
+    expect(removal).toBeDefined();
+  });
+
+  it('starting a mount summon clears stacked stealth auras through their removal funnel', () => {
+    const sim = makeWorld();
+    const pid = join(sim, 20);
+    const e = sim.entities.get(pid)!;
+    giveReins(sim, pid);
+    putInStealth(sim, pid);
+    e.auras.push({
+      id: 'greater_invisibility',
+      name: 'Greater Invisibility',
+      kind: 'stealth',
+      remaining: 20,
+      duration: 20,
+      value: 1,
+      value2: 0.35,
+      value3: 4,
+      sourceId: pid,
+      school: 'arcane',
+    });
+    expect(e.auras.filter((a) => a.kind === 'stealth').map((a) => a.name)).toEqual([
+      'Duskveil',
+      'Greater Invisibility',
+    ]);
+
+    sim.drainEvents();
+    const started = summonMountItem(sim.ctx, pid, 'valorsteed');
+    const events = sim.drainEvents();
+
+    expect(started).toBe(true);
+    expect(e.auras.filter((a) => a.kind === 'stealth')).toEqual([]);
+    expect(e.stealthed).toBe(false);
+    const removals = events.filter(
+      (ev): ev is Extract<SimEvent, { type: 'aura' }> =>
+        ev.type === 'aura' && ev.targetId === pid && !ev.gained,
+    );
+    expect(removals.map((ev) => ev.name)).toEqual(['Duskveil', 'Greater Invisibility']);
+    expect(e.auras).toContainEqual(
+      expect.objectContaining({
+        id: 'greater_invisibility_dr',
+        kind: 'buff_dr',
+        value: 0.35,
+        remaining: 4,
+      }),
+    );
+  });
+
+  it("once mounted, full mount speed applies with no lingering stealth slow (the exploit's speed half)", () => {
+    const sim = makeWorld();
+    const pid = join(sim, 20);
+    const e = sim.entities.get(pid)!;
+    giveReins(sim, pid);
+    putInStealth(sim, pid);
+
+    ride(sim, pid, 'valorsteed');
+
+    expect(e.mountKey).toBe('valorsteed');
+    expect(e.stealthed).toBe(false);
+    // Full valorsteed speed (1.6): the exploit combined the stealth slow (0.5) with the
+    // mount bonus (1.6) into a 0.8 apparent multiplier while STILL fully concealed; with
+    // stealth broken there is nothing left riding along with the mount speed.
+    expect(moveSpeedMult(e)).toBeCloseTo(1.6, 5);
+  });
+
+  it('summon completion strips a stealth aura that slipped through mid-channel', () => {
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: VENDOR_TEST_WORLD,
+    });
+    const pid = sim.addPlayer('rogue', 'Shade');
+    sim.tick();
+    sim.setPlayerLevel(20, pid);
+    const meta = sim.players.get(pid)!;
+    meta.ridingTrained = true;
+    sim.addItem('reins_valorsteed', 1, pid);
+    const e = sim.entities.get(pid)!;
+
+    // Start the summon channel (no stealth yet).
+    expect(summonMountItem(sim.ctx, pid, 'valorsteed')).toBe(true);
+    expect(e.mountCastKey).toBe('valorsteed');
+
+    // Inject a stealth aura mid-channel (simulates Duskveil cast during the 1.5s window).
+    e.auras.push({
+      id: 'stealth',
+      name: 'Duskveil',
+      kind: 'stealth',
+      remaining: 3600,
+      duration: 3600,
+      value: 0.5,
+      sourceId: pid,
+      school: 'physical',
+    });
+    e.stealthed = true;
+
+    // Act: complete the summon channel (drives updateMountTransition to completion).
+    finishTransition(sim, pid);
+
+    // Assert: the player is mounted AND stealth is gone.
+    expect(e.mountKey).toBe('valorsteed');
+    expect(e.auras.some((a) => a.kind === 'stealth')).toBe(false);
+    expect(e.stealthed).toBe(false);
   });
 });
 

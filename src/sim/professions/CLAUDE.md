@@ -118,9 +118,13 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   already-enchanted copy is REPLACEABLE only behind the explicit
   confirmReplace flag (#2415: old enchant destroyed, no refund, surgical swap
   via `replacedEnchantPayloadFor`); without it the deny is the dedicated
-  `already_enchanted` reason on both arms. The identical-id re-apply denies
-  `same_enchant` on both arms WITH the flag; unconfirmed it reads
-  `already_enchanted`, because the flag check precedes the id compare.
+  `already_enchanted` reason on both arms. The identical-id re-apply is NOT a
+  deny WITH the flag: it falls through as an ordinary confirmed replace (old
+  bonus subtracted, the same bonus re-added, netting to byte-identical
+  stats), so a player can pay the reagent cost and gain Enchanting skill on a
+  piece already carrying the enchant they want, without hunting a second
+  target. Unconfirmed it still reads `already_enchanted`, because the flag
+  check precedes the id compare.
   Enchant REAGENTS source from bags-then-vault through the same
   `reagent_sources.ts` plan crafting uses, at all six count arms (three
   resolvers plus the three admission mirrors, which must agree or a cast is

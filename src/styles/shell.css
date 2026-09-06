@@ -676,10 +676,14 @@
     height: 14px;
     display: block;
   }
-  .wallet-mini:hover,
-  .wallet-mini:focus-visible {
+  .wallet-mini:hover {
     color: var(--color-text-light);
     border-color: var(--gold-dim);
+    outline: none;
+  }
+  .wallet-mini:focus-visible {
+    color: var(--color-text-light);
+    border-color: var(--color-border-focus);
     outline: none;
   }
   #btn-wallet-unlink:hover,

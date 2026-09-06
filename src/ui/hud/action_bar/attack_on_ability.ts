@@ -170,6 +170,10 @@ export function abilityStartsAutoAttack(effects: AbilityEffect[]): boolean {
   let damaging = false;
   for (const e of effects) {
     if (e.type === 'aoeRoot' && e.breakOnDamage !== undefined) return false;
+    // A groundAoE with allyBuffPct is a FRIENDLY zone (Rune of Power): its min/max
+    // are ignored by the sim (see the AbilityEffect comment), so it deals no damage
+    // and must not be classified as an attack.
+    if (e.type === 'groundAoE' && e.allyBuffPct !== undefined) continue;
     const cls = EFFECT_CLASS[e.type];
     if (cls === 'breakCC') return false;
     if (
@@ -257,4 +261,26 @@ export function isPvpHostileTarget(
  */
 export function deferAutoAttackUntilCastEnd(castTime: number): boolean {
   return castTime > 0;
+}
+
+/**
+ * A deferred engage is RECORDED (by ability id) at button-press time, before the
+ * sim has validated anything: range, cost, cooldown, and gates such as Soulwell's
+ * `requiresOutOfCombat` can all still refuse the cast, and a refused cast never
+ * reaches `castStart` at all. Recording it unconditionally and clearing it only at
+ * a matching castStop would leave it armed forever after a refusal, so it fires on
+ * whatever unrelated cast completes next: an earlier damaging cast getting refused
+ * left this armed, and casting Soulwell (which never engages auto-attack on its
+ * own; see `summonSoulwell: 'other'` above) right after pulled the player's current
+ * target when Soulwell's own castStop found the stale request still set.
+ *
+ * Call this on EVERY castStart for the player: it keeps the request only while it
+ * is still confirmed to be the SAME cast, dropping it the moment a different
+ * ability (or none) is the one that actually started.
+ */
+export function confirmPendingAutoAttackEngage(
+  pendingAbilityId: string | null,
+  startedAbilityId: string,
+): string | null {
+  return pendingAbilityId === startedAbilityId ? pendingAbilityId : null;
 }

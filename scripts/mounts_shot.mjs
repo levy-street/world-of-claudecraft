@@ -72,6 +72,8 @@ await page.evaluate(() => {
     'reins_stormfeather_griffin',
     'reins_thunderstrut_gobbler',
     'reins_drakemaw_raptor',
+    'reins_goblin_rocket_sled',
+    'reins_rallycart_rxt',
     'reins_terrorspark_groundshaker',
     'reins_lanternback_troll',
     'reins_chimeglass_tortoise',

@@ -155,8 +155,7 @@ export class DungeonFinderWindow {
     if (view.kind === 'loading') {
       if (this.lastSig === FINDER_LOADING_SIG) return;
       this.lastSig = FINDER_LOADING_SIG;
-      el.innerHTML =
-        this.titleHtml() + `<div class="df-note">${esc(t('hudChrome.finder.syncing'))}</div>`;
+      el.innerHTML = `${this.titleHtml()}<div class="df-note">${esc(t('hudChrome.finder.syncing'))}</div>`;
       el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
       return;
     }
@@ -512,6 +511,11 @@ export class DungeonFinderWindow {
             .join('')}`
         : '',
       ...e.heroicGroups.map((g) => this.lootGroupHtml(g, 'hudChrome.finder.lootHeroic')),
+      e.heroicSingles.length > 0
+        ? `<div class="df-loot-sub">${esc(t('hudChrome.finder.lootHeroic'))}</div>${e.heroicSingles
+            .map((i) => this.lootItemHtml(i, true))
+            .join('')}`
+        : '',
     ].join('');
     const money =
       e.copper > 0 ? `<div class="df-loot-money">${this.deps.moneyHtml(e.copper)}</div>` : '';
@@ -603,7 +607,7 @@ export class DungeonFinderWindow {
         ? `<div class="df-note df-warn" data-df-clock="cooldown"></div>`
         : `<button type="button" class="btn df-join" data-act="join"${q.canQueue ? '' : ' disabled'}>${esc(t('hudChrome.finder.joinQueue'))}</button>`;
     const travel = `<div class="df-note">${esc(t('hudChrome.finder.travelNote'))}</div>`;
-    return roles + leaderNote + options + `<div class="df-footer">${status}</div>` + travel;
+    return `${roles}${leaderNote}${options}<div class="df-footer">${status}</div>${travel}`;
   }
 
   // --- premade board -----------------------------------------------------------

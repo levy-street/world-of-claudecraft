@@ -181,6 +181,7 @@ import { paladinManaCostMultiplier } from './paladin_support';
 import { isValkyrsCallingAirborne } from './paladin_valkyrs_calling_state';
 import { effectivePlayerAttackRange } from './player_attack_reach';
 import { hasTithefiendTarget } from './priest/vespers';
+import { swingReadyForQueuedCast } from './queued_cast_swing_yield';
 import { resurrectionCastRange, resurrectionReachError } from './resurrection_reach';
 import {
   detonatorFreeMultiplier,
@@ -587,7 +588,7 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
       p.castAim = null;
       p.castTargetId = null;
       ctx.emit({ type: 'castStop', entityId: p.id, success: true });
-      fireQueuedCast(ctx, p);
+      fireQueuedCast(ctx, p, true);
     }
     return;
   }
@@ -673,7 +674,7 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
     // non-aimed cast can't inherit a stale target point.
     p.castAim = null;
     p.castTargetId = null;
-    fireQueuedCast(ctx, p);
+    fireQueuedCast(ctx, p, true);
   }
 }
 
@@ -715,7 +716,7 @@ export function releaseEmpoweredAbility(ctx: SimContext, abilityId: string, pid?
   applyAbility(ctx, p, meta, { ...res, empowerLevel: level });
   p.castAim = null;
   p.castTargetId = null;
-  fireQueuedCast(ctx, p);
+  fireQueuedCast(ctx, p, true);
 }
 
 // Consumes the single-slot spell queue (see CAST_QUEUE_WINDOW_SEC), firing the
@@ -723,11 +724,39 @@ export function releaseEmpoweredAbility(ctx: SimContext, abilityId: string, pid?
 // flat GCD (the common hasted case) can complete before the GCD armed at its
 // start clears: hold the slot in that case and let updateCasting retry every
 // tick until the GCD is gone, instead of dropping the press.
-function fireQueuedCast(ctx: SimContext, p: Entity): void {
+//
+// `onComplete` marks the call made from a cast-completion path. The tick runs
+// updateCasting before updatePlayerAutoAttack, and that driver bails while
+// castingAbility is set, so a queued cast that starts here in the same tick
+// the previous one completed never shows the driver a gap: the swing timer
+// decays to zero and the ready wand bolt (or melee swing) starves for as long
+// as the spam lasts. When swingReadyForQueuedCast says a swing is ready, fire
+// it through the driver's own attempt (ctx.tryPlayerSwing, every gate intact)
+// while castingAbility is still null, then start the queued cast as before.
+// The retry arm (onComplete false) runs only when no cast is in progress, so
+// the driver already swings on those ticks.
+function fireQueuedCast(ctx: SimContext, p: Entity, onComplete = false): void {
   const queued = p.queuedCastAbility;
   if (!queued) return;
   const res = ctx.resolvedAbility(queued, p.id);
   if (res && !res.def.offGcd && p.gcdRemaining > 0) return;
+  const queuedStartsCast = !!res && res.castTime > 0;
+  if (onComplete && queuedStartsCast && swingReadyForQueuedCast(p)) {
+    const r = ctx.resolve(p.id);
+    if (r) {
+      // Run the driver's tick early, exactly: its decay first, so the timer
+      // gate inside the attempt sees the same post-decay value the driver
+      // would see this tick, then the attempt. Then hand the decay back, so
+      // the driver's own pass later this tick lands both timers where a
+      // driver-fired swing leaves them (a fresh weapon speed, or an untouched
+      // timer one DT lower), and the cadence stays the weapon's to the tick.
+      p.swingTimer = Math.max(0, p.swingTimer - DT);
+      p.offhandSwingTimer = Math.max(0, p.offhandSwingTimer - DT);
+      ctx.tryPlayerSwing(p, r.meta);
+      p.swingTimer += DT;
+      p.offhandSwingTimer += DT;
+    }
+  }
   const aim = p.queuedCastAim;
   p.queuedCastAbility = null;
   p.queuedCastAim = null;
@@ -2275,8 +2304,8 @@ function applyChannelTick(
     // Aether Darts: the FIRST landed missile consumes the caster's Arcane Charges
     // and locks a flat per-missile Arcane bonus (combat/chronomancy.ts); later
     // missiles reuse it. It is plain Arcane damage, so Temporal Echo heals from it
-    // at the normal rate. Draws no rng; a no-op (0) for any other channel and with
-    // no charges held.
+    // through the individual-mark rotation weight. Draws no rng; a no-op (0) for
+    // any other channel and with no charges held.
     const surgeBonus =
       res.def.id === 'arcane_missiles'
         ? aetherDartsBoltBonus(ctx, src, res.def.channel?.ticks ?? 1)
@@ -2290,7 +2319,21 @@ function applyChannelTick(
         // spell crit-damage channel of the mastery (plus the generic bonus) like
         // every other spell crit.
         if (crit) dmg *= 1.5 + src.critDmgSpellBonus;
-        ctx.dealDamage(src, tgt, Math.round(dmg), crit, res.def.school, res.def.name, 'hit');
+        ctx.dealDamage(
+          src,
+          tgt,
+          Math.round(dmg),
+          crit,
+          res.def.school,
+          res.def.name,
+          'hit',
+          false,
+          undefined,
+          true,
+          false,
+          false,
+          res.def.id === 'arcane_missiles' ? res.def.id : null,
+        );
         noteSpellHit(ctx, src, crit, res.def.id);
       } else if (eff.type === 'drainTick') {
         const doom = afflictionDrainTickDoom(ctx, src, tgt, consumeThreadDoomBonus);

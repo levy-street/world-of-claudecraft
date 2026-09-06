@@ -570,9 +570,9 @@ export const vi_VN: EnTranslations = {
       "tabsLabel": "Các phần của Cửa hàng WOC",
       "storeTab": "Cửa hàng",
       "rewardsTab": "Phần thưởng hàng ngày",
-      "mountsEyebrow": "Account Mounts",
-      "mountsTitle": "Machine Stable",
-      "mountBuyAria": "Purchase {item}",
+      "mountsEyebrow": "Gắn kết tài khoản",
+      "mountsTitle": "Máy ổn định",
+      "mountBuyAria": "Mua {item}",
       "loading": "Đang tải Cửa hàng WOC...",
       "error": "Cửa hàng WOC hiện không khả dụng. Vui lòng thử lại trong thời gian ngắn.",
       "balance": "Số dư Claudium",
@@ -978,6 +978,7 @@ export const vi_VN: EnTranslations = {
       "mounts": "Thú Cưỡi",
       "professions": "Nghề nghiệp",
       "reliquary": "Kỳ Trân Các",
+      "lootExplorer": "Nhà thám hiểm chiến lợi phẩm",
       "nameplates": "Tên",
       "haptics": "Phản Hồi Rung",
       "hapticsOff": "Tắt Phản Hồi Rung",
@@ -1141,6 +1142,9 @@ export const vi_VN: EnTranslations = {
       "promptAttack": "Tấn Công",
       "promptUseAbility": "Dùng Kỹ Năng",
       "promptKneel": "Quỳ Xuống",
+      "promptAccessInterface": "Truy cập giao diện",
+      "promptMoveToTarget": "Di chuyển đến {target}",
+      "promptSelectItem": "Chọn {item}",
       "promptOpenBags": "Mở túi đồ của bạn",
       "promptCharacterSheet": "Mở bảng nhân vật của bạn",
       "promptLookAround": "Giữ chuột phải và kéo để nhìn quanh",
@@ -1308,9 +1312,9 @@ export const vi_VN: EnTranslations = {
       "regroup": "Ghép lại {meter}"
     },
     "targetDots": {
-      "title": "Target Dots",
-      "row": "{aura} on {target}",
-      "overflow": "{count} more not shown"
+      "title": "Điểm mục tiêu",
+      "row": "{aura} trên {target}",
+      "overflow": "{count} không hiển thị thêm"
     },
     "targetAuras": {
       "title": "Hào Quang Mục Tiêu",
@@ -1393,11 +1397,13 @@ export const vi_VN: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage, Cóc Nhảy Bóng Tối",
       "name_stormfeather_griffin": "Stormfeather Vươn Trời",
       "name_thunderstrut_gobbler": "Thunderstrut, Gà Tây Vĩ Đại",
+      "name_goblin_rocket_sled": "Xe trượt tên lửa goblin",
+      "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Tia Kinh Hoàng, Kẻ Rung Chuyển Mặt Đất",
       "name_drakemaw_raptor": "Cuồng Long Drakemaw",
-      "name_mech_bird": "Cluckwork Mech Bird",
-      "name_lanternback_troll": "Grumbol the Lanternback",
-      "name_chimeglass_tortoise": "Tolliver the Chimeglass",
+      "name_mech_bird": "Chim Mech Cluckwork",
+      "name_lanternback_troll": "Grumbol Lưng Đèn",
+      "name_chimeglass_tortoise": "Tolliver chiếc cốc thủy tinh",
       "name_rickshaw_mount": "Xe kéo Buộc Xương",
       "desc_valorsteed": "Một con chiến mã khỏe mạnh, bước chân vững chãi, giúp tăng tốc độ di chuyển.",
       "desc_grag_bear": "Một chú gấu khỏe mạnh, bước chân vững chãi, giúp tăng tốc độ di chuyển.",
@@ -1406,11 +1412,13 @@ export const vi_VN: EnTranslations = {
       "desc_shadowjump_toad": "Một con cóc khổng lồ, bước chân vững chãi, được huấn luyện những cú nhảy bóng tối nhanh như chớp có thể vượt qua mọi địa hình.",
       "desc_stormfeather_griffin": "Một con sư tử đầu chim bão uy nghi, rảo bước trên mặt đất bằng những móng vuốt được bọc rune, đôi cánh xếp gọn.",
       "desc_thunderstrut_gobbler": "Một con gà tây khổng lồ nở ra từ giông bão, sải bước xuống từ Đỉnh Tỉnh Thức, đuôi xòe rộng như đám mây giông.",
+      "desc_goblin_rocket_sled": "Một chiếc xe trượt goblin được chế tạo quá mức đến nguy hiểm, phóng đi nhờ hai tên lửa và óc phán đoán tồi một cách xuất sắc.",
+      "desc_rallycart_rxt": "Một cỗ máy đua rally nhỏ gọn giúp tăng tốc độ di chuyển.",
       "desc_terrorspark_groundshaker": "Một cỗ máy bọc giáp nhỏ gọn với bánh xích nặng, pháo nòng lớn và yên ngồi dành cho những người lái gan dạ.",
       "desc_drakemaw_raptor": "Một con Cuồng Long thuộc bầy đàn đã được thuần yên cương từ Miệng Núi Lửa Drakemaw, toàn thân gân cốt và tốc lực, vẫn còn phảng phất mùi tro tàn.",
-      "desc_mech_bird": "A hand-built clockwork war chicken that sprints on snapping servos, wind-up key still turning.",
-      "desc_lanternback_troll": "A hill troll broken to the yoke by lamplighters, carrying an iron throne across his shoulders with a storm lantern burning on either arm.",
-      "desc_chimeglass_tortoise": "A salt-flat tortoise who has outwalked three generations of caravans. Tinkers ground him spectacles from storm-glass and hung a bronze bell at his throat, so the road hears him long before it sees him.",
+      "desc_mech_bird": "Một con gà chiến đồng hồ được chế tạo bằng tay chạy nước rút trên các động cơ servo, phím lên dây cót vẫn quay.",
+      "desc_lanternback_troll": "Một con quỷ đồi bị những người đốt đèn bẻ gãy ách, vác một chiếc ngai sắt trên vai với một chiếc đèn bão đang cháy trên hai tay.",
+      "desc_chimeglass_tortoise": "Một con rùa bằng muối đã vượt qua ba thế hệ đoàn lữ hành. Những người thợ hàn mài cho anh ta một cặp kính từ kính bão và treo một chiếc chuông đồng vào cổ anh ta, để con đường nghe thấy anh ta từ rất lâu trước khi nó nhìn thấy anh ta.",
       "desc_rickshaw_mount": "Một cỗ xe xương lọc cọc, với một tên lính xương xẩu bị buộc vào càng xe, kéo bạn lao đi hết tốc lực."
     },
     "mountTraining": {
@@ -1580,7 +1588,10 @@ export const vi_VN: EnTranslations = {
       "uiScale": "Tỷ Lệ Giao Diện",
       "playerFrameScale": "Tỷ Lệ Khung Người Chơi",
       "targetFrameScale": "Tỷ Lệ Khung Mục Tiêu",
+      "playerHealthText": "Văn bản về sức khỏe người chơi",
+      "targetHealthText": "Văn bản về sức khỏe mục tiêu",
       "aurasOnPlayerFrame": "Hiệu Ứng Có Lợi Trên Khung Người Chơi",
+      "auraBarBelowFrame": "Hiệu Ứng Có Lợi Bên Dưới Khung Người Chơi",
       "alwaysShowAllBuffs": "Luôn Hiện Mọi Buff",
       "highContrastBackground": "Nền Tương Phản Cao",
       "startAttackOnAbility": "Tự Đánh Khi Dùng Kỹ Năng",
@@ -1603,9 +1614,9 @@ export const vi_VN: EnTranslations = {
       "showTargetOfTarget": "Hiện Mục Tiêu Của Mục Tiêu",
       "showTargetSwingTimer": "Hiển thị bộ đếm vung đòn của mục tiêu",
       "showPetFrame": "Hiện Thú Cưng Của Bạn",
-      "showNameplateDots": "Show My Dots on Nameplates",
-      "nameplateDotScale": "Nameplate Dot Size",
-      "showTargetDots": "Show Target Dots",
+      "showNameplateDots": "Hiển thị dấu chấm của tôi trên bảng tên",
+      "nameplateDotScale": "Kích thước chấm bảng tên",
+      "showTargetDots": "Hiển thị dấu chấm mục tiêu",
       "waterRipples": "Gợn nước (sóng rẽ nước)",
       "showAttackButton": "Hiển Thị Nút Tấn Công",
       "showDailyRewardsChest": "Hiện Rương Phần Thưởng Hằng Ngày",
@@ -2507,7 +2518,9 @@ export const vi_VN: EnTranslations = {
       "unequipHint": "Nhấp để tháo chiếc túi này",
       "poolGeneral": "Chung: {used} trên {total}",
       "poolMaterials": "Nguyên liệu: {used} trên {total}",
-      "capacityPoolsAria": "Ô túi đã dùng: {used} trên {total}. Vật phẩm chung: {generalUsed} trên {generalTotal}. Nguyên liệu: {materialsUsed} trên {materialsTotal}."
+      "capacityPoolsAria": "Ô túi đã dùng: {used} trên {total}. Vật phẩm chung: {generalUsed} trên {generalTotal}. Nguyên liệu: {materialsUsed} trên {materialsTotal}.",
+      "capacityPools": "Vật phẩm {generalUsed}/{generalTotal}, nguyên liệu {materialsUsed}/{materialsTotal}",
+      "emptyMaterialsOnly": "Chỉ nguyên liệu"
     },
     "raidConvert": {
       "toPartyDone": "Raid của bạn đã chuyển trở lại thành tổ đội.",
@@ -2744,7 +2757,7 @@ export const vi_VN: EnTranslations = {
       "suddenDeath": "Nấm Mồ Sớm tiếp theo của bạn không tốn Nộ Khí và bỏ qua yêu cầu về lượng máu",
       "aoeEcho": "Còn lại {charges} lần vọng: kỹ năng đơn mục tiêu gây {pct}% sát thương cho tối đa {targets} kẻ địch gần đó",
       "sureCrit": "Còn lại {charges} lần thi triển kỹ năng gây sát thương chắc chắn chí mạng",
-      "temporalEcho": "Sát thương Bí Thuật của người thi triển hồi máu cho bạn bằng {singlePct}% sát thương đơn mục tiêu hoặc {areaPct}% sát thương diện rộng",
+      "temporalEcho": "Sát thương Bí Thuật của người thi triển hồi máu cho bạn bằng {singlePct}% sát thương đơn mục tiêu hoặc {areaPct}% sát thương diện rộng. Sóng Aether và Phi Tiêu Aether nhận thưởng x4 với Vọng Âm Thời Gian cá nhân. Vọng Âm nhóm tạo một lượng hồi máu dự trữ tương đương, được phân phối theo lượng máu đã mất giữa các đồng minh được đánh dấu còn dưới 60% máu",
       "arcaneCharge": "{stacks} Điện Tích Bí Thuật: Sức Mạnh Bí Thuật gây thêm {damagePct}% sát thương, thi triển nhanh hơn {castPct}%, và tốn gấp {costMult} lần mana",
       "physicalReduction": "Giảm sát thương Vật Lý phải chịu đi {pct}%",
       "temporalHourglass": "Miễn nhiễm và không thể hành động; hồi phục máu và tăng tốc phục hồi thời gian hồi chiêu. Nhấp chuột phải để hủy bỏ.",
@@ -2955,6 +2968,7 @@ export const vi_VN: EnTranslations = {
       "healthPercent": "Phần Trăm",
       "healthCurrent": "Hiện Tại",
       "healthCurrentMax": "Hiện Tại / Tối Đa",
+      "healthCurrentMaxPercent": "Hiện tại / Tối đa (Phần trăm)",
       "sort": "Sắp Xếp Người Chơi",
       "sortGroup": "Nhóm",
       "sortRole": "Vai Trò",
@@ -2994,7 +3008,7 @@ export const vi_VN: EnTranslations = {
         "targetFrame": "Mục Tiêu",
         "partyFrames": "Tổ Đội",
         "swingBar": "Tự Đánh",
-        "targetDots": "Target Dots"
+        "targetDots": "Điểm mục tiêu"
       },
       "framesMenu": "Cài Đặt Khung",
       "framesMenuTitle": "Hiện hoặc ẩn từng khung riêng lẻ. Một khung chưa được đánh dấu sẽ vẫn ẩn cho đến khi bạn đánh dấu lại hoặc đặt lại về mặc định.",
@@ -3027,33 +3041,33 @@ export const vi_VN: EnTranslations = {
       "wrongKind": "Mã đó thuộc một loại xuất khác."
     },
     "riftForge": {
-      "title": "Rift Forge",
-      "subtitle": "Riftbound bands",
+      "title": "Lò rèn rạn nứt",
+      "subtitle": "Các dải rift",
       "currency": "{name}: {count}",
-      "empty": "No Riftbound band in your bags. A ranked Rift first clear mints one.",
-      "wornHint": "Worn. Unequip it to forge.",
-      "upgradeBtn": "Upgrade to item level {level} ({cost} essence)",
-      "upgradeMax": "Fully upgraded",
-      "gemPickAria": "Gem to socket",
+      "empty": "Không có dải Riftbound trong túi của bạn. Một Rift được xếp hạng đầu tiên rõ ràng một.",
+      "wornHint": "Mặc. Tháo nó ra để rèn.",
+      "upgradeBtn": "Nâng cấp lên cấp độ vật phẩm {level} (Bản chất {cost})",
+      "upgradeMax": "Nâng cấp đầy đủ",
+      "gemPickAria": "Đá quý vào ổ cắm",
       "gemOption": "{name} ({bonus})",
-      "socketReplaceHint": "Sockets full: the next gem replaces the oldest, {gem}.",
-      "socketBtn": "Socket",
-      "socketsNone": "no gems",
-      "noGems": "No Rift gems in your bags",
-      "refused": "The forge refused. Stand at the Riftwright and try again.",
+      "socketReplaceHint": "Ổ cắm đầy: viên ngọc tiếp theo thay thế viên cũ nhất, {gem}.",
+      "socketBtn": "Ổ cắm",
+      "socketsNone": "không có đá quý",
+      "noGems": "Không có đá quý Rift trong túi của bạn",
+      "refused": "Lò rèn đã từ chối. Đứng ở Riftwright và thử lại.",
       "reason": {
-        "notFound": "That band is not in your bags.",
-        "notRiftGear": "Only a Riftbound band can be forged.",
-        "maxUpgrade": "That band is fully upgraded.",
-        "insufficientEssence": "Not enough Rift Essence.",
-        "invalidGem": "You have no such Rift gem.",
-        "dead": "You can't do that while dead.",
-        "tooFar": "You are too far from the Rift Forge."
+        "notFound": "Ban nhạc đó không có trong túi của bạn.",
+        "notRiftGear": "Chỉ có thể giả mạo dải Riftbound.",
+        "maxUpgrade": "Ban nhạc đó đã được nâng cấp đầy đủ.",
+        "insufficientEssence": "Không đủ Tinh chất Rift.",
+        "invalidGem": "Bạn không có viên ngọc Rift như vậy.",
+        "dead": "Bạn không thể làm điều đó khi đã chết.",
+        "tooFar": "Bạn ở quá xa Rift Forge."
       },
       "done": {
-        "upgrade": "Upgraded {name}.",
-        "socket": "Socketed a gem into {name}.",
-        "socketReplaced": "Socketed a gem into {name}; {gem} was destroyed."
+        "upgrade": "Đã nâng cấp {name}.",
+        "socket": "Đã gắn một viên đá quý vào {name}.",
+        "socketReplaced": "Gắn một viên đá quý vào {name}; {gem} đã bị phá hủy."
       }
     },
     "itemTooltip": {
@@ -3061,7 +3075,7 @@ export const vi_VN: EnTranslations = {
       "riftTier": "Vật phẩm Rạn Nứt hạng {tier}",
       "riftUpgrade": "Nâng cấp Rạn Nứt {level}/{max}",
       "riftSockets": "Ngọc Rạn Nứt {used}/{total}",
-      "riftGemSocket": "Socket bonus for a Riftbound band",
+      "riftGemSocket": "Phần thưởng ổ cắm cho ban nhạc Riftbound",
       "statEnchanted": "+{value} {stat} (Đã Pháp Khắc)",
       "enchantedFallback": "Đã Pháp Khắc",
       "partyTradeWindow": "Bạn có thể giao dịch vật phẩm này cho những người chơi đã cùng nhận nó rơi ra, trong {time} tới. Trang bị nó sẽ kết thúc khoảng thời gian giao dịch này."
@@ -3086,6 +3100,7 @@ export const vi_VN: EnTranslations = {
       "close": "Đóng",
       "keybind": "Bảng Discord",
       "disabled": "Tích hợp Discord hiện không khả dụng.",
+      "queuePingsLabel": "Gửi cho tôi tin nhắn trực tiếp Discord khi hàng đợi chiến trường hoặc đấu trường của tôi xuất hiện (cần tài khoản Discord được liên kết)",
       "tiers": {
         "none": "Chưa Xếp Hạng",
         "initiate": "Tân Binh",
@@ -3343,13 +3358,13 @@ export const vi_VN: EnTranslations = {
       "close": "Đóng"
     },
     "realmBuilder": {
-      "title": "Realm Builder of the Month",
-      "currentLabel": "Honoured this month",
-      "placeholderName": "Your Name Here",
-      "placeholderHint": "This plate is waiting for its first name.",
-      "pastTitle": "Past honourees",
-      "pastEmpty": "No names on the roll yet.",
-      "close": "Close"
+      "title": "Người xây dựng vương quốc của tháng",
+      "currentLabel": "Được vinh danh trong tháng này",
+      "placeholderName": "Tên của bạn ở đây",
+      "placeholderHint": "Tấm này đang chờ tên của nó.",
+      "pastTitle": "Những người được vinh danh trong quá khứ",
+      "pastEmpty": "Chưa có tên trong danh sách.",
+      "close": "Đóng"
     },
     "bank": {
       "title": "Ngân Hàng",
@@ -3406,6 +3421,8 @@ export const vi_VN: EnTranslations = {
       "depositAllDone": "Nguyên liệu đã gửi: {count}.",
       "depositAllFull": "Nguyên liệu đã gửi: {count}. Ngân hàng hiện đã đầy.",
       "depositAllNone": "Ngân hàng đầy: không gửi được gì.",
+      "depositAllNotable": "Vật liệu được ký gửi: {count}, bao gồm {item}.",
+      "depositAllNotableFull": "Vật liệu được ký gửi: {count}, bao gồm {item}. Ngân hàng bây giờ đã đầy.",
       "bonusTitle": "Ô Thưởng",
       "bonusEarned": "+{count}",
       "bonusStatusEarned": "+{count}",
@@ -3444,6 +3461,8 @@ export const vi_VN: EnTranslations = {
       "vaultDepositAllDone": "Nguyên liệu đã gửi: {count}.",
       "vaultDepositAllFull": "Nguyên liệu đã gửi: {count}. Một số mức trần đã đầy.",
       "vaultDepositAllNone": "Trần kho đã đầy: không gửi được gì.",
+      "vaultDepositAllNotable": "Vật liệu được ký gửi: {count}, bao gồm {item}.",
+      "vaultDepositAllNotableFull": "Vật liệu được ký gửi: {count}, bao gồm {item}. Một số trần nhà đã đầy.",
       "vaultWithdrawShort": "Chỉ {fit} trên {count} vừa trong túi đồ của bạn.",
       "vaultDepositHint": "Nhấp để gửi vào kho của bạn",
       "vaultCannotDeposit": "Không thể cất vào kho",
@@ -3580,17 +3599,17 @@ export const vi_VN: EnTranslations = {
         }
       },
       "roster": {
-        "seats": "{count} of {cap} seats",
-        "expand": "Expand roster (+{seats} seats for {price})",
-        "maxed": "The roster is at its largest size",
-        "confirm": "Expand the guild roster by {seats} seats for {price}? The gold comes from your own purse and is not refunded.",
-        "confirmAction": "Expand",
-        "expandedLine": "{name} has expanded the guild roster to {cap} members.",
+        "seats": "{count} của số ghế {cap}",
+        "expand": "Mở rộng danh sách (+ số ghế {seats} cho {price})",
+        "maxed": "Danh sách có kích thước lớn nhất",
+        "confirm": "Mở rộng danh sách bang hội bằng số ghế {seats} cho {price}? Vàng đến từ ví của chính bạn và không được hoàn lại.",
+        "confirmAction": "Mở rộng",
+        "expandedLine": "{name} đã mở rộng danh sách bang hội cho các thành viên {cap}.",
         "result": {
-          "notLeader": "Only the Guild Master may expand the guild roster.",
-          "maxed": "The guild roster cannot grow any larger.",
-          "cannotAfford": "You need {price} to expand the guild roster.",
-          "retry": "The guild roster changed while you were buying. Try again."
+          "notLeader": "Chỉ có Chủ Bang hội mới có thể mở rộng danh sách Bang hội.",
+          "maxed": "Danh sách bang hội không thể phát triển lớn hơn nữa.",
+          "cannotAfford": "Bạn cần {price} để mở rộng danh sách bang hội.",
+          "retry": "Danh sách bang hội đã thay đổi trong khi bạn mua. Hãy thử lại."
         }
       }
     },
@@ -4009,7 +4028,7 @@ export const vi_VN: EnTranslations = {
       "yieldLineRange": "{min} đến {max} {item}",
       "alreadyEnchanted": "Vật phẩm đó đã được pháp khắc rồi.",
       "sameEnchant": "Vật phẩm đó đã có phép khắc đó rồi.",
-      "riftGear": "Riftbound bands take Rift gems, not enchants.",
+      "riftGear": "Các ban nhạc Riftbound lấy đá quý Rift, không phải bùa mê.",
       "replaceTag": "Thay Thế {enchant}",
       "sameEnchantTag": "Đã Áp Dụng",
       "plainTag": "Chưa pháp khắc",
@@ -4314,6 +4333,7 @@ export const vi_VN: EnTranslations = {
       "sourceProfession": "Nhận được nhờ {profession}",
       "sourceDeed": "Được trao bởi kỳ công {deed}",
       "sourceVendor": "Do {vendor} bán",
+      "sourceVendorGated": "Do {vendor} bán ({requirement})",
       "sourceBossZone": "Rơi từ {boss} tại {zone}",
       "sourceDelve": "Tìm thấy trong hang sâu {delve}",
       "sourceRift": "Rơi từ các lượt hoàn thành Rạn Nứt hạng {rank}",
@@ -4333,6 +4353,10 @@ export const vi_VN: EnTranslations = {
       "filterAll": "Tất cả",
       "filterOwned": "Đã biên mục",
       "filterMissing": "Còn thiếu",
+      "filterIlluminated": "Chiếu sáng",
+      "filterRemaining": "Còn lại",
+      "filterEmptyPages": "Không có trang nào phù hợp với bộ lọc này.",
+      "filterGroupAriaPages": "Lọc các trang theo liệu chúng có được chiếu sáng hay không",
       "recentJumpAria": "Mở trang cho {name}",
       "recentEmpty": "Chưa có phát hiện nào. Kỳ trân bạn biên mục từ giờ trở đi sẽ nằm ở đây.",
       "nearlyEmpty": "Những trang sắp hoàn tất sẽ tụ về đây.",
@@ -4440,6 +4464,7 @@ export const vi_VN: EnTranslations = {
       "summary": "Bản đồ thế giới. Chọn một vùng để mở bản đồ của vùng đó.",
       "toWorld": "Bản Đồ Thế Giới",
       "toZone": "Bản Đồ Vùng",
+      "toInstance": "Bản đồ sơ thẩm",
       "toggleAria": "Chuyển đổi giữa bản đồ thế giới và bản đồ vùng",
       "levels": "Cấp {min} đến {max}"
     },
@@ -4474,6 +4499,7 @@ export const vi_VN: EnTranslations = {
       "walletLinkedConnected": "Ứng dụng ví đã liên kết của bạn đang được kết nối và sẵn sàng cho các giao dịch mua $WOC.",
       "walletUsdBalance": "{amount} USD",
       "walletUsdUnknown": "Không xác định",
+      "walletCardDismiss": "Ẩn thẻ ví",
       "rateNote": "Tỷ giá: khoảng {tokens} $WOC cho 1,00 USD, tính đến {time}.",
       "rateNotePaused": "Tỷ giá được biết lần cuối: khoảng {tokens} $WOC cho 1,00 USD, tính đến {time}.",
       "estimateNote": "Khoảng {tokens} $WOC cho {usd} theo tỷ giá hiện tại.",
@@ -4665,6 +4691,43 @@ export const vi_VN: EnTranslations = {
       "listingStatusCancelled": "Đã Hủy",
       "listingStatusSuspended": "Đã Tạm Khóa",
       "listingStatusUnsold": "Chưa Bán Được"
+    },
+    "lootExplorer": {
+      "title": "Nhà thám hiểm chiến lợi phẩm",
+      "close": "Đóng Loot Explorer",
+      "searchPlaceholder": "Tìm kiếm các mục...",
+      "searchAria": "Tìm kiếm các mục",
+      "filterCategoryAria": "Nguồn",
+      "filterClassAria": "lớp học",
+      "filterStatAria": "Thống kê",
+      "filterQualityAria": "chất lượng",
+      "filterAll": "Tất cả",
+      "tabItems": "Theo mục",
+      "tabEncounters": "Bằng cách gặp gỡ",
+      "category": {
+        "raid": "đột kích",
+        "dungeon": "ngục tối",
+        "delve": "Hang sâu",
+        "open_world": "Thế giới mở",
+        "rift": "Rạn nứt",
+        "vendor": "nhà cung cấp",
+        "quest_reward": "Phần thưởng nhiệm vụ",
+        "quest_objective": "Mục tiêu nhiệm vụ",
+        "ground_object": "Đối tượng thế giới",
+        "starting_equipment": "Thiết bị khởi động"
+      },
+      "difficulty": {
+        "normal": "Bình thường",
+        "heroic": "Anh hùng"
+      },
+      "riftRankLabel": "Thứ hạng rạn nứt {rank}",
+      "source": "{category}: {name}",
+      "sourceWithContext": "{category}: {name} ({context})",
+      "chance": "{pct}% cơ hội",
+      "guaranteed": "Đảm bảo",
+      "gatedByQuest": "Trong khi tìm kiếm: {quest}",
+      "empty": "Không có chiến lợi phẩm nào phù hợp với các bộ lọc này.",
+      "resultCount": "Kết quả {count}"
     }
   },
   "gatherEvent": {
@@ -4763,7 +4826,8 @@ export const vi_VN: EnTranslations = {
       "link_required": "Hãy liên kết tài khoản Discord của bạn trước.",
       "swag_claimed": "Bạn đã nhận phần thưởng này rồi.",
       "swag_tier": "Hãy đạt cấp bậc cao hơn để nhận phần thưởng này.",
-      "swag_points": "Không đủ điểm."
+      "swag_points": "Không đủ điểm.",
+      "invalid_input": "Đầu vào không hợp lệ."
     },
     "deeds": {
       "invalid_input": "Dữ liệu nhập không hợp lệ."
@@ -4815,6 +4879,11 @@ export const vi_VN: EnTranslations = {
       "reason_required": "Bắt buộc phải nhập lý do.",
       "invalid_duration": "Nhập thời hạn đánh dấu ít nhất một giây.",
       "not_marked": "Tài khoản đó chưa bị đánh dấu."
+    },
+    "kick": {
+      "reason_required": "Một lý do là cần thiết.",
+      "admin_target": "Tài khoản nhà điều hành không thể bị đá.",
+      "target_offline": "Người chơi đó không còn trực tuyến trên vương quốc này nữa."
     },
     "woc_market": {
       "invalid_input": "Dữ liệu nhập không hợp lệ.",
@@ -5249,10 +5318,13 @@ export const vi_VN: EnTranslations = {
       "ifPlayerFrameScale": "Kích thước khung nhân vật của chính bạn.",
       "ifTargetFrameScale": "Kích thước khung mục tiêu của bạn.",
       "ifPartyStyle": "Bố cục tổ đội: Tự Động thay đổi theo quy mô nhóm của bạn, Cổ Điển là kiểu xếp chồng truyền thống, còn Raid dồn mọi người vào lưới thu gọn.",
+      "ifPlayerHealthText": "Thanh sức khỏe của bạn in ra những gì: không có gì, tỷ lệ phần trăm, sức khỏe hiện tại, hiện tại và mức tối đa hoặc cả hai với tỷ lệ phần trăm bên cạnh.",
+      "ifTargetHealthText": "Thanh sức khỏe mục tiêu và mục tiêu của mục tiêu in ra, với các lựa chọn giống như khung của chính bạn.",
       "ifPartyHealthText": "Các thanh tổ đội hiển thị gì: không gì cả, phần trăm, lượng máu hiện tại, hoặc máu hiện tại và tối đa.",
       "ifPartySort": "Thứ tự liệt kê thành viên tổ đội: theo thứ tự nhóm, vai trò, hoặc tên.",
       "ifPartyShowAuras": "Buff và debuff có hiển thị trên khung tổ đội hay không. Các công tắc tương ứng còn bao gồm thanh tài nguyên, khiên hấp thụ, thú cưng, và việc bạn có xuất hiện trong danh sách tổ đội của chính mình hay không.",
       "ifAurasOnPlayerFrame": "Hiện buff và debuff của bạn trên khung nhân vật của chính bạn, bên cạnh thanh hiệu ứng.",
+      "ifAuraBarBelowFrame": "Di chuyển hàng hiệu ứng có lợi xuống dưới khung đơn vị của bạn thay vì phía trên. Chỉ có tác dụng khi hiệu ứng có lợi đang nằm trên khung người chơi.",
       "ifAlwaysShowAllBuffs": "Hiển thị mọi buff đang hoạt động ngay cả ở cấu hình đồ họa Thấp, bỏ qua giới hạn biểu tượng buff thông thường.",
       "ifTargetOfTarget": "Hiện mục tiêu của mục tiêu bạn đang nhắm, cách cổ điển để biết liệu tank có còn giữ được nó hay không.",
       "ifPetFrame": "Hiện một khung cho thú cưng của bạn.",
@@ -5260,6 +5332,7 @@ export const vi_VN: EnTranslations = {
       "ifChatOpacity": "Nền khung chat đặc đến mức nào.",
       "ifCompactChat": "Thu gọn các dòng chat để hiển thị được nhiều dòng hơn.",
       "ifChatTimestamps": "Thêm giờ vào mỗi dòng chat, theo định dạng 12 giờ hoặc 24 giờ.",
+      "ifFilterProfanity": "Che giấu ngôn từ tục tĩu trong cuộc trò chuyện bằng dấu hoa thị. Bật theo mặc định; hãy tắt nó ở đây nếu bạn muốn đọc cuộc trò chuyện không được lọc.",
       "ifStartAttack": "Việc dùng một kỹ năng có tự động bắt đầu tự đánh hay không. Mặc định bật, và đây là hành vi cổ điển mà hầu hết người chơi mong đợi.",
       "ifStopAutoAttack": "Việc đổi mục tiêu có dừng đòn tự đánh của bạn hay không. Mặc định tắt, nên đòn tấn công của bạn tiếp tục chuyển sang mục tiêu mới.",
       "ifShowAttackButton": "Đặt hẳn một nút Tấn Công lên thanh hành động của bạn.",
@@ -5272,7 +5345,7 @@ export const vi_VN: EnTranslations = {
       "ifHideUnused": "Ẩn các ô hành động trống để chỉ vẽ những nút bạn thực sự dùng.",
       "ifLockBars": "Khóa các thanh của bạn để bạn không vô tình kéo một kỹ năng ra khỏi ô.",
       "keybindsHeading": "Bảng Gán Phím",
-      "keybindsBody": "Danh sách phím chỉ là một nửa của bảng đó. Phía trên nó là các công tắc quyết định cách con chuột của bạn điều khiển trò chơi: Camera Chuột, con trỏ có khóa lại khi bạn xoay hay không, Bấm Để Di Chuyển và nút chuột nào kích hoạt nó, Di Chuyển Tấn Công, bố cục cảm ứng thuận tay trái, và bộ lọc lời tục tĩu cho khung chat.",
+      "keybindsBody": "Danh sách chìa khóa chỉ là một nửa của bảng đó. Phía trên nó là các công tắc quyết định cách chuột của bạn điều khiển trò chơi: camera chuột, con trỏ có khóa khi bạn xoay hay không, nhấp để di chuyển và nút chuột nào sẽ kích hoạt nó, di chuyển tấn công và bố cục cảm ứng thuận tay trái.",
       "keybindsMouseBody": "Có hai điều dễ bị bỏ sót ở đó. Nút chuột được gán như phím thường, nên nút cuộn và các nút ngón cái có thể mang kỹ năng, trong khi chuột trái và chuột phải vẫn được dành riêng cho camera và cho việc nhấp vào thế giới. Và bạn cũng có thể gán phím ngay từ thanh hành động: bật chế độ gán phím trên thanh tại đây, sau đó nhấp vào một ô và nhấn phím bạn muốn."
     },
     "combat": {
@@ -6071,7 +6144,7 @@ export const vi_VN: EnTranslations = {
       "heroicRewardsBody": "Trùm anh hùng rơi ra chiến lợi phẩm bạn đã biết, được nâng cấp và ghi Anh Hùng trên chú giải, còn trùm cuối của mỗi lượt chạy thêm vào những món sử thi không tìm được ở đâu khác. Cú hạ cuối cùng ấy cũng để lại Huy Hiệu Anh Hùng cho mọi người tham gia: một loại tiền tiêu ở chỗ Quản Nhu Vex tại Highwatch, mà quầy của ông ta là một giá đầy nhẫn và mặt dây chuyền mà không gì ngoài bằng chứng từ những tầng sâu anh hùng mua nổi.",
       "heroicLockoutBody": "Hầm ngục thường có thể chạy cả ngày. Anh hùng đòi kiên nhẫn: cú hạ trùm cuối giới hạn mọi người trong lượt chạy chỉ được một lần dọn sạch anh hùng hầm ngục đó mỗi ngày, và trận đột kích giữ một khóa hằng ngày cho từng độ khó. Trên một máy chủ trực tuyến, mọi khóa hằng ngày đều rơi cùng nhau vào giờ đặt lại ban đêm của chính máy chủ ấy, nên một lượt dọn sạch lấy ngay trước giờ đó và một lượt lấy ngay sau đó rơi vào hai ngày khác nhau; còn nếu chơi ngoại tuyến trong trình duyệt thì một khóa đơn giản hết hạn một ngày sau cú hạ trùm của chính bạn. Một lượt chạy năm người đã dọn xong vẫn mở cho chính nhóm ấy để chạy xác và lấy đồ, nên không ai bị khóa khỏi thứ mình đã giành được ở đó. Trận đột kích khắt khe hơn: một khi cú hạ của nó đã khóa bạn, cánh cửa đóng lại cho tới lần đặt lại, và lối duy nhất trở vào là một lượt chạy xác của người đã ngã xuống đúng trong lượt chạy đã khóa họ, nên một người đột kích còn sống mà bước ra là đã bước ra cho cả ngày. Hãy nhặt hết chiến lợi phẩm trước khi rời đấu trường. Mỗi khóa trong số này thuộc về nhân vật đã giành được nó, nên một lượt dọn sạch trên nhân vật chính để các nhân vật khác của bạn được tự do.",
       "resetTitle": "Đặt lại phụ bản của bạn",
-      "resetBody": "Hãy đổi độ khó khi nhóm bạn vẫn đang giữ những lượt chạy đã nhận, và các lượt nhận cũ còn nấn ná một lúc trước khi tự buông. Nhóm trưởng có thể buông hết ngay lập tức thay vì vậy: chọn Đặt Lại Mọi Thực Thể trong trình đơn chân dung của chính mình, hoặc gõ /dungeon reset. Việc đặt lại chỉ hiệu nghiệm sau khi độ khó đã thực sự đổi, chỉ khi không còn ai, còn sống hay đã ngã, ở bên trong, chỉ khi mọi cái xác trong đó đã bị nhặt sạch, và một thời gian hồi ngắn ngăn cách lần đặt lại này với lần kế tiếp. Đến cửa với sai độ khó thì trò chơi sẽ báo trước khi lượt chạy bắt đầu. Trận đột kích không bao giờ được đặt lại theo cách này; luật khóa của riêng nó vẫn giữ nguyên.",
+      "resetBody": "Chuyển đổi độ khó trong khi nhóm của bạn vẫn giữ các lượt chạy đã được xác nhận và các yêu cầu cũ tồn tại một thời gian trước khi tự xóa. Thay vào đó, người lãnh đạo nhóm có thể để họ rời đi ngay lập tức: chọn Đặt lại tất cả các phiên bản trên menu dọc của riêng họ hoặc nhập /dungeon reset. Việc thiết lập lại chỉ hoạt động sau khi độ khó thực sự đã được thay đổi, chỉ khi không có ai, dù còn sống hay đã ngã xuống, vẫn ở bên trong, chỉ khi mọi xác chết trong đó đã bị cướp sạch và thời gian hồi chiêu ngắn sẽ phân biệt giữa lần đặt lại này với lần đặt lại tiếp theo. Đến cửa sai độ khó và trò chơi sẽ thông báo như vậy trước khi cuộc chạy bắt đầu. Cuộc đột kích được thiết lập lại theo cách tương tự, các quy tắc khóa và trả lại xác của nó vẫn được đặt lên hàng đầu.",
       "templeLoreTitle": "Ngôi Đền Chết Chìm, sâu hơn một chút",
       "templeLoreBody": "Ngôi đền có truyền thuyết riêng của nó, cổ xưa hơn cả giáo phái bạn đuổi theo ở nơi khác. Bên bờ Hồ Lung Linh, một hồ băng uống ánh trăng và trả lại những kẻ chết chìm, một người canh gác cô độc giữ một cánh cổng ánh sáng nhợt nhạt. Bên dưới mặt nước, một bậc thang đá lạnh chạy xuống đó. Những kẻ chìm xuống nơi ấy không chết chìm vì tai nạn: họ là Dàn Đồng Ca Nhợt Nhạt, những kẻ chìm xuống trong sự thờ phụng và không bao giờ ngừng ca hát. Những người canh giữ xưa cào một lời cảnh báo duy nhất lên đá trước khi nước nuốt lấy họ, một lời cầu nguyện gửi đến thứ họ gọi là Mặt Trăng Chết Chìm, với một bàn tay vững vàng hơn thêm hai chữ bên dưới: nó chỉ đang ngủ.",
       "cryptLeadTitle": "Một cánh cửa mà người chết được giao nhiệm vụ giữ kín",
@@ -6104,8 +6177,8 @@ export const vi_VN: EnTranslations = {
       "raceBody": "Mọi nhóm trong vương quốc đều có thể tấn công cùng một Rạn Nứt cùng lúc, mỗi nhóm trong bản sao riêng của mình, và chỉ nhóm đầu tiên hạ được thứ dưới đáy mới niêm phong nó. Khi một nhóm chiến thắng, cả vương quốc nghe được tên và thời gian của họ, và lối vào khép lại sau lưng họ. Thua cuộc đua không có nghĩa lượt chạy của bạn kết thúc: bản sao của bạn vẫn mở, thứ dưới đáy vẫn sẽ gục ngã dưới tay bạn, và bạn vẫn bước ra bằng chính sức mình. Cái giá phải trả là toàn bộ những gì lẽ ra việc dọn sạch nó sẽ chi trả. Trùm không để lại gì cho nhóm về nhì, nên những gì bạn mang về nhà chỉ là những gì rơi ra từ lũ quái trên đường xuống, không hơn không kém. Sách Kỳ Công vẫn tính lượt dọn sạch đó, bởi bạn đã thực sự hạ được nó. Đây là cuộc đua duy nhất trong trò chơi mà bạn có thể thua mà chẳng bao giờ thấy mặt những người đã đánh bại mình.",
       "rewardsHeading": "Những gì bạn mang ra",
       "rewardsBody": "Niêm phong một Rạn Nứt, chứ không chỉ sống sót qua nó, mới là thứ trả công. Hạ Rạn Nứt trước tiên và nó trả công như nội dung instance cùng hạng với nó, nên các hạng khó hơn xứng đáng với lượt chạy khó hơn. Niêm phong cũng đặt một chiếc nhẫn Rạn Nứt vào tay mọi người có mặt ở đó, cắt riêng theo vai trò lớp nhân vật của bạn và là của riêng bạn, đồng thời để lại Tinh Chất Rạn Nứt trong túi đồ, cùng với Đá Quý Rạn Nứt ở các hạng khó hơn. Bên cạnh lối về, thứ dưới đáy còn để lại một chiếc rương niêm phong mà nhóm bạn có thể cạy mở để lấy thêm chiến lợi phẩm, bằng đúng trò cạy khóa Lối Của Ổ Khóa mà bạn đã quen thuộc từ những chiếc rương hang sâu, nên một lần cạy khóa gọn gàng, kiên nhẫn sẽ trả công hậu hĩnh hơn một lần vội vàng. Không điều nào trong số đó đến được với nhóm về nhì: thua cuộc đua chỉ để lại cho bạn những gì rơi ra từ lũ quái trên đường xuống. Sách Kỳ Công là ngoại lệ, nó vẫn tính lượt dọn sạch của bạn dù thắng hay thua cuộc đua, với một kỳ công cho lần niêm phong Rạn Nứt đầu tiên và một kỳ công khác cho việc hạ gục một Rạn Nứt hạng S.",
-      "forgeHeading": "The Rift Forge",
-      "forgeBody": "The band a ranked first clear mints is not finished when you receive it. Riftwright Maelis, who keeps a forge in the Watch Meadow on the Farshore, up the shore from Gullhaven beside the Breach Scholar, will raise its item level one step at a time and set the coloured gems the rifts drop into its sockets, each colour one combat rating. A full band takes a new gem in place of its oldest, so you can retune it later. All of that is paid in Rift Essence and Rift gems, the forge currency that falls from rift bosses and trades freely, so a friend can hand you the essence you are short. Take the band off before you bring it to her: she works on what is in your bags, and she does nothing at all unless you are standing at her forge.",
+      "forgeHeading": "Lò rèn Rift",
+      "forgeBody": "Ban nhạc được xếp hạng bạc hà rõ ràng đầu tiên vẫn chưa kết thúc khi bạn nhận được nó. Riftwright Maelis, người quản lý một lò rèn ở Watch Meadow trên Farshore, ở trên bờ biển từ Gullhaven bên cạnh Breach Scholar, sẽ nâng cấp vật phẩm của mình lên từng bước một và đặt những viên ngọc màu mà súng trường thả vào ổ cắm của nó, mỗi màu một xếp hạng chiến đấu. Một ban nhạc đầy đủ sẽ lấy một viên ngọc mới thay cho viên ngọc cũ nhất để bạn có thể điều chỉnh lại viên ngọc đó sau. Tất cả số tiền đó được thanh toán bằng Rift Essence và đá quý Rift, loại tiền giả mạo rơi ra từ các ông chủ rạn nứt và giao dịch tự do, vì vậy một người bạn có thể trao cho bạn số tinh chất mà bạn đang thiếu. Hãy tháo dây đeo ra trước khi bạn mang nó đến cho cô ấy: cô ấy làm việc với những gì có trong túi của bạn và cô ấy không làm gì cả trừ khi bạn đang đứng trước lò rèn của cô ấy.",
       "trackerHeading": "Bảng theo dõi trên màn hình",
       "trackerBody": "Trong khi bạn ở bên trong, một dải nhỏ trên màn hình giúp bạn định hướng: bạn đang ở tầng nào trên tổng số bao nhiêu tầng, cùng một bộ đếm ngược đang chạy. Hãy đọc kỹ bộ đếm ngược đó, vì nó không phải là thời gian lượt chạy của bạn sắp hết. Đó là lối vào trở lại thế giới đang đóng lại. Một khi đã vào trong, nhóm bạn chơi hết Rạn Nứt theo tốc độ của riêng mình, dù mất bao lâu cũng được, nhưng khi đồng hồ đó về không thì lối vào biến mất với tất cả mọi người, nên hãy suy nghĩ kỹ trước khi bước ra ngoài gần lúc đó."
     },
@@ -7997,7 +8070,7 @@ export const vi_VN: EnTranslations = {
       "forgeUpgraded": "Đã hoàn tất nâng cấp Rạn Nứt cho {name}.",
       "forgeEnchanted": "Đã hoàn tất phù phép Rạn Nứt cho {name}.",
       "forgeSocketed": "Đã gắn ngọc Rạn Nứt cho {name}.",
-      "forgeGemReplaced": "Rift gem replaced for {name}: {gem} destroyed.",
+      "forgeGemReplaced": "Đá quý rạn nứt được thay thế cho {name}: {gem} bị phá hủy.",
       "detonateGlacialGrave": "Nấm Mồ Băng Hà phát nổ!",
       "detonateAbsoluteZero": "Độ Không Tuyệt Đối bùng nổ!",
       "detonateMagmaWell": "Giếng Dung Nham bùng nổ!",
@@ -8644,6 +8717,7 @@ export const vi_VN: EnTranslations = {
     "connectingRealm": "Đang kết nối tới thế giới...",
     "assetsFailed": "Tải tài nguyên thất bại: thử tải lại. {error}",
     "rendererFailed": "Không thể khởi động bộ kết xuất: thử tải lại. {error}",
+    "rendererContextLost": "Bộ kết xuất 3D đã mất ngữ cảnh đồ họa và không thể khôi phục. Hãy tải lại.",
     "enterTimeout": "Không thể vào thế giới. Kết nối đã quá thời gian. Máy chủ trò chơi có đang chạy không?",
     "connectionLost": "Đã mất kết nối tới máy chủ.",
     "reconnectingAttempt": "Mất kết nối. Đang kết nối lại... (thử {attempt}/{maxAttempts}, thử lại trong {seconds})",
@@ -8654,6 +8728,7 @@ export const vi_VN: EnTranslations = {
     "realmFull": "Thế giới này đang đầy người chơi. Vui lòng thử lại sau vài phút.",
     "tooManyConnections": "Có quá nhiều kết nối đến thế giới này từ mạng của bạn. Vui lòng đóng bớt cửa sổ trò chơi hoặc thử lại sau vài phút.",
     "messageRateExceeded": "Bạn đã bị ngắt kết nối do gửi thao tác quá nhanh. Vui lòng đợi một lát rồi đăng nhập lại.",
+    "kickedByModerator": "Người điều hành đã ngắt kết nối bạn: {reason}",
     "tips": {
       "classes": "Mẹo: mỗi lớp trong 9 lớp nhân vật có lối chơi khác nhau. Hãy thử vài lớp trước khi quyết định gắn bó.",
       "talents": "Mẹo: bạn có thể đặt lại tài năng bất cứ lúc nào ngoài chiến đấu, nên lựa chọn ban đầu không bao giờ là cái bẫy.",
@@ -10467,11 +10542,11 @@ export const vi_VN: EnTranslations = {
       },
       "melting_acid": {
         "name": "Axit nóng chảy",
-        "description": "Tấn công mục tiêu bằng chất độc ăn da, gây {damage} sát thương tự nhiên và giảm 5% giáp của mục tiêu trong 12 giây."
+        "description": "Bôi lên vũ khí trong 30 phút. Mỗi đòn cận chiến tạt axit ăn da lên mục tiêu và giảm 5% giáp của mục tiêu trong 12 giây."
       },
       "nightshade_coating": {
         "name": "Lớp phủ bóng đêm",
-        "description": "Bao phủ mục tiêu trong màn đêm, gây {damage} sát thương tự nhiên và giảm khả năng hồi máu mà mục tiêu nhận được đi 25% trong 12 giây."
+        "description": "Bôi lên vũ khí trong 30 phút. Mỗi đòn cận chiến bao phủ mục tiêu trong màn đêm và giảm khả năng hồi máu mà mục tiêu nhận được đi 25% trong 12 giây."
       },
       "expose_armor": {
         "name": "Xuyên Phá Giáp",
@@ -10487,11 +10562,11 @@ export const vi_VN: EnTranslations = {
       },
       "instant_poison": {
         "name": "Vết Cắn Rắn Độc",
-        "description": "Bôi lên vũ khí trong 30 phút, khiến mỗi đòn cận chiến gây thêm 8 sát thương Tự Nhiên."
+        "description": "Bôi lên vũ khí trong 30 phút, khiến mỗi đòn cận chiến gây thêm {damage} sát thương Tự Nhiên."
       },
       "deadly_poison": {
         "name": "Nọc Độc Ung Mủ",
-        "description": "Bôi lên vũ khí trong 30 phút, khiến mỗi đòn cận chiến gây thêm 14 sát thương Tự Nhiên."
+        "description": "Bôi lên vũ khí trong 30 phút. Mỗi đòn cận chiến cộng thêm một lớp độc lên mục tiêu, tối đa 5, và làm mới thời lượng 12 giây. Mỗi lớp gây {damage} sát thương tự nhiên mỗi 2 giây."
       },
       "blind": {
         "name": "Hất Cát",
@@ -11589,11 +11664,11 @@ export const vi_VN: EnTranslations = {
       },
       "temporal_echo": {
         "name": "Vọng Âm Thời Gian",
-        "description": "Đánh dấu một đồng minh bằng tiếng vang của một khoảnh khắc khỏe mạnh hơn, hồi phục {damage} máu ngay lập tức. Trong {duration} giây, một phần sát thương Bí Thuật bạn gây ra sẽ được kéo trở lại qua tiếng vang để chữa lành họ."
+        "description": "Đánh dấu một đồng minh bằng tiếng vang của một khoảnh khắc khỏe mạnh hơn, hồi phục {damage} máu ngay lập tức. Trong {duration} giây, {echoSinglePct}% sát thương Bí Thuật đơn mục tiêu khác và {echoAreaPct}% sát thương Bí Thuật diện rộng của bạn sẽ hồi máu cho họ. Sóng Aether và Phi Tiêu Aether thay vào đó hồi máu bằng {echoDriverPct}% sát thương chúng gây ra."
       },
       "temporal_cascade": {
         "name": "Thác Đổ Thời Gian",
-        "description": "Gửi một tiếng vang lan tỏa qua nhóm của bạn: mục tiêu và tối đa bốn đồng minh gần nhất của họ được chữa lành cùng lúc và mỗi người được đánh dấu trong {duration} giây, kéo một phần sát thương Bí Thuật bạn gây ra trở lại qua những tiếng vang của họ để chữa lành họ. (Thời Thuật)"
+        "description": "Gửi một tiếng vang lan tỏa qua nhóm của bạn: mục tiêu và tối đa bốn đồng minh gần nhất của họ được chữa lành cùng lúc và mỗi người được đánh dấu trong {duration} giây, kéo một phần sát thương Bí Thuật bạn gây ra trở lại qua những tiếng vang của họ để chữa lành họ. Sóng Aether và Phi Tiêu Aether tạo một lượng hồi máu dự trữ tương đương từ mỗi Vọng Âm nhóm, được phân phối theo lượng máu đã mất giữa các đồng minh được đánh dấu còn dưới 60% máu. (Thời Thuật)"
       },
       "temporal_reversal": {
         "name": "Đảo Ngược Thời Gian",
@@ -13281,11 +13356,17 @@ export const vi_VN: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Chìa Khóa Khởi Động: Tia Kinh Hoàng, Kẻ Rung Chuyển Mặt Đất"
       },
+      "reins_goblin_rocket_sled": {
+        "name": "Khóa khởi động: Xe trượt tên lửa goblin"
+      },
+      "reins_rallycart_rxt": {
+        "name": "Khóa khởi động: Rallycart RXT"
+      },
       "reins_lanternback_troll": {
         "name": "Ách của Người Thắp Đèn: Grumbol"
       },
       "reins_chimeglass_tortoise": {
-        "name": "Roadwarden's Bellstrap: Tolliver"
+        "name": "Dây đeo chuông của Roadwarden: Tolliver"
       },
       "reins_rickshaw_mount": {
         "name": "Dây cương ràng buộc: Xe kéo Buộc Xương"
@@ -13294,7 +13375,7 @@ export const vi_VN: EnTranslations = {
         "name": "Dây Cương Cuồng Long Drakemaw"
       },
       "reins_mech_bird": {
-        "name": "Ignition Key: Cluckwork Mech Bird"
+        "name": "Chìa khóa đánh lửa: Cluckwork Mech Bird"
       },
       "rimefang": {
         "name": "Nanh Băng Giá"
@@ -15921,9 +16002,9 @@ export const vi_VN: EnTranslations = {
         "greeting": "Nó mở ra ngay chỗ phơi lưới. Ngay tại đó, nơi tôi từng đứng mỗi sáng suốt cả cuộc đời mình. Tôi không còn xuống bờ biển nữa. Tôi cũng chẳng còn đi đâu nhiều nữa."
       },
       "riftwright_maelis": {
-        "name": "Riftwright Maelis",
-        "title": "Rift Forgemaster",
-        "greeting": "A Riftbound band remembers the break that made it, {className}. Bring me the band, and the essence the breaks shed, and I will teach it to remember more."
+        "name": "Maelis, thợ dệt Khe nứt",
+        "title": "Bậc thầy Lò rèn Khe nứt",
+        "greeting": "Một ban nhạc Riftbound ghi nhớ sự phá vỡ đã tạo nên nó, {className}. Hãy mang cho tôi chiếc ban nhạc và bản chất của những khoảng nghỉ, tôi sẽ dạy nó nhớ nhiều hơn."
       },
       "forgemistress_darva": {
         "name": "Nữ thợ rèn Darva",
@@ -18985,8 +19066,8 @@ export const vi_VN: EnTranslations = {
       },
       "chronoweave": {
         "name": "Lễ Phục Dệt Aether",
-        "bonus2": "Vọng Âm Thời Gian chuyển 50% sát thương Arcane đơn mục tiêu của bạn thành hồi máu. Sát thương nhận vào không còn trì hoãn việc niệm phép.",
-        "bonus4": "Thời gian hồi của Dòng Thác Thời Gian giảm 5 giây."
+        "bonus2": "Vọng Âm Thời Gian chuyển 50% sát thương Bí Thuật đơn mục tiêu khác của bạn thành hồi máu. Sóng Aether và Phi Tiêu Aether thay vào đó chuyển 200% sát thương chúng gây ra. Sát thương nhận vào không còn trì hoãn việc niệm phép.",
+        "bonus4": "Thời gian hồi của Dòng Thác Thời Gian giảm 5 giây và tiêu hao mana giảm 30%."
       },
       "cinderbark": {
         "name": "Hộ Vệ Vỏ Tro",
@@ -19215,6 +19296,6 @@ export const vi_VN: EnTranslations = {
     "delveRiteShrineSkullInteract": "Miếu Đầu Lâu: Nhấn F để chạm vào",
     "mailboxName": "Hòm Thư",
     "noticeboardName": "Bảng Thông Báo",
-    "realmBuilderMonumentName": "Realm Builder Monument"
+    "realmBuilderMonumentName": "Đài tưởng niệm người xây dựng vương quốc"
   }
 };

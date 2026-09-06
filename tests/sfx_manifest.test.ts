@@ -164,17 +164,12 @@ describe('buildManifest', () => {
     expect(manifest).toContain('cast_lightning_bolt');
   });
 
-  // 17 mount cues across the 13 catalog mounts, not one per mount: the
-  // rickshaw carries a summon and a loop cue and no stride, while the
-  // Lanternback Troll and the Chimeglass Tortoise deliberately have no stride
-  // cue at all and borrow the player's surface footfall instead (see
-  // Sfx.mountRun's fallback branch, and the coverage tests in sfx.test.ts).
-  it('keeps the release catalog, 17 mount cues, and all 62 UI cues in one 272-key inventory', () => {
+  it('keeps the release catalog, all 34 mount cues, and all 62 UI cues in one 289-key inventory', () => {
     const keys = new Set(SFX.map((entry) => entry.key));
-    // 268 = the release catalog plus the two gendered player-voice keys from
-    // PR #2320 and the rickshaw mount's summon/loop cues.
-    // 272 = the 268 above plus the Mech Bird's run/idle/jump/land take set.
-    expect(keys.size).toBe(272);
+    // 289 = the release catalog plus the Mech Bird's four cues and this
+    // branch's Goblin Rocket Sled / Rallycart RXT engine, summon, and
+    // mount-specific jump/land cues.
+    expect(keys.size).toBe(289);
     expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(62);
     expect(keys.has('ui_craft_cast')).toBe(true);
     for (const key of [
@@ -258,7 +253,7 @@ describe('buildManifest', () => {
     // purely filesystem-discovered.
     const mobFamilyKeys = [...keys].filter((key) => key.startsWith('mob_'));
     expect(mobFamilyKeys).toHaveLength(65); // 13 families x 5 actions
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(272);
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(289);
   });
 });
 

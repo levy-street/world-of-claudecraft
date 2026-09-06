@@ -1,8 +1,10 @@
-// The nameplate compositor's image cache: one HTMLImageElement per URL, LRU
-// trimmed to NAMEPLATE_IMAGE_CACHE_LIMIT, with a bounded exponential retry after a
-// failed load so a missing badge or aura icon never re-requests every frame.
-// Lifted out of nameplate_canvas.ts so that file stays a compositor; the surface
-// owns one instance and drives it through beginFrame()/get().
+// The nameplate surface's badge / raid-marker / emote image cache, lifted out of
+// nameplate_canvas.ts (which is on the monolith ratchet) so the surface keeps
+// only its drawing code. LRU by Map insertion order with a bounded exponential
+// retry for a URL that fails to decode, both driven off a frame counter the
+// surface bumps once per painted frame: a failed avatar must not re-request an
+// image every frame, and a live working set above the cap must still evict the
+// least recently used entry rather than whatever was inserted first.
 
 export const NAMEPLATE_IMAGE_CACHE_LIMIT = 160;
 export const NAMEPLATE_IMAGE_RETRY_BASE_FRAMES = 30;
@@ -18,9 +20,19 @@ interface CachedImage {
 export class NameplateImageCache {
   private readonly entries = new Map<string, CachedImage>();
   private frame = 0;
+  private rev = 0;
 
   beginFrame(): void {
     this.frame++;
+  }
+
+  /** Monotonic stamp of every decode outcome (a badge, raid marker or emote
+   *  icon becoming drawable, or failing and later retrying). Image loads are
+   *  ASYNCHRONOUS: the plate state that names the url does not change when the
+   *  bytes land, so the surface's repaint gate needs this to know that an
+   *  otherwise identical frame would now draw a picture where it drew nothing. */
+  revision(): number {
+    return this.rev;
   }
 
   get(url: string): HTMLImageElement | null {
@@ -54,6 +66,7 @@ export class NameplateImageCache {
       if (this.entries.get(url) !== entry) return;
       entry.status = 'ready';
       entry.failures = 0;
+      this.rev++;
     });
     image.addEventListener('error', () => {
       if (this.entries.get(url) !== entry) return;
@@ -64,10 +77,14 @@ export class NameplateImageCache {
         NAMEPLATE_IMAGE_RETRY_BASE_FRAMES * 2 ** Math.min(5, entry.failures - 1),
       );
       entry.retryFrame = this.frame + delay;
+      this.rev++;
     });
     image.referrerPolicy = 'no-referrer';
     image.src = url;
-    if (image.complete && image.naturalWidth > 0) entry.status = 'ready';
+    if (image.complete && image.naturalWidth > 0) {
+      entry.status = 'ready';
+      this.rev++;
+    }
     return entry;
   }
 

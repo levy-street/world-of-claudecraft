@@ -793,12 +793,12 @@ export const ITEM_SETS: Record<string, ItemSet> = {
         effect: {},
         // The healer 2pc carries the pushback rider (full immunity, the raid
         // tier's upgrade over the leveling lineage's 50 percent).
-        text: 'Temporal Echo converts 50 percent of your single-target Arcane damage into healing. Damage taken no longer delays your spellcasting.',
+        text: 'Temporal Echo converts 50 percent of your other single-target Arcane damage into healing. Aether Surge and Aether Darts instead convert 200 percent of their damage. Damage taken no longer delays your spellcasting.',
       },
       {
         pieces: 4,
         effect: {},
-        text: "Temporal Cascade's cooldown is reduced by 5 sec.",
+        text: "Temporal Cascade's cooldown is reduced by 5 sec and its mana cost is reduced by 30 percent.",
       },
     ],
   },

@@ -66,7 +66,7 @@ export interface CoachPromptPlan {
    *  cycle button on a pad; 'kill' is the same bubble once the quarry IS the
    *  target, and chips the attack bind (desktop) or the action-bar icon (touch);
    *  'jump' bubbles chip the jump bind (the lane 2 parkour obstacles);
-   *  'use' bubbles chip the bags bind (the tide-pool lure). */
+   *  'use' bubbles guide pad players through HUD navigation to the bags and item. */
   kind: 'interact' | 'select' | 'kill' | 'jump' | 'use';
 }
 
@@ -318,6 +318,9 @@ export function coachPromptPlan(args: {
   }
   if (focus.state === 'ready') {
     return npcPlan(quest.turnInNpcId, 'hudChrome.bootcamp.promptTurnIn');
+  }
+  if (focus.questId === DEATH_LESSON_QUEST_ID && deathPhase !== 'alive') {
+    return null;
   }
   // Materialize ONCE, past the arms that never scan. The live caller hands
   // over `world.entities.values()`, a Map iterator that is spent after a

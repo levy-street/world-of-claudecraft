@@ -383,7 +383,6 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_chapter_ii: {
     name: 'Dalkroniek, Hoofdstuk II',
-    desc: 'Voltooi het tweede hoofdstuk van Sauls kroniek: bandieten, murlocs en mijnongedierte neergeslagen, op het Zeugveld gespeeld en het Reliekschrijn getrotseerd.',
   },
   chr_vale_chapter_iii: {
     name: 'Kroniek van het Dal',
@@ -401,7 +400,6 @@ export const table: DeedLocaleTable = {
   chr_vale_packbreaker: { name: 'Roedelbreker', desc: 'Dood 3 Boswolven binnen 10 seconden.' },
   chr_vale_cup_debut: {
     name: 'Kanshebber op de Koperen Emmer',
-    desc: 'Betreed het veld en raak de bal in een Dalbeker-wedstrijd op het Zeugveld.',
   },
   chr_vale_rares: {
     name: 'Verschrikkingen van het Dal',
@@ -601,69 +599,53 @@ export const table: DeedLocaleTable = {
   },
   pvp_vcup_first_match: {
     name: 'Het Veld Op',
-    desc: 'Speel een volledige Dalbeker-wedstrijd op het Zeugveld uit, winst of verlies.',
   },
   pvp_vcup_first_win: {
     name: 'Het Eerste Zilverwerk',
-    desc: 'Win een geklasseerde Dalbeker-wedstrijd.',
   },
   pvp_vcup_wins_10: {
     name: 'Doorgewinterde Zwijnenballer',
-    desc: 'Win 10 geklasseerde Dalbeker-wedstrijden.',
   },
   pvp_vcup_wins_25: {
     name: 'Zwijnenbal-Legende',
-    desc: 'Win 25 geklasseerde Dalbeker-wedstrijden.',
     title: 'Zwijnenbal-Legende',
   },
   pvp_vcup_first_goal: {
     name: 'De Ban Gebroken',
-    desc: 'Scoor een doelpunt in een geklasseerde Dalbeker-wedstrijd.',
   },
   pvp_vcup_hat_trick: {
     name: 'Hattrickheld',
-    desc: 'Scoor drie doelpunten in een enkele geklasseerde Dalbeker-wedstrijd, in de 3v3-divisie of groter.',
   },
   pvp_vcup_golden_goal: {
     name: 'Gouden Moment',
-    desc: 'Scoor de golden goal die een geklasseerde Dalbeker-wedstrijd beslist.',
   },
   pvp_vcup_first_save: {
     name: 'Veilige Handen',
-    desc: 'Verricht een redding als keeper in een geklasseerde Dalbeker-wedstrijd.',
   },
   pvp_vcup_clean_sheet: {
     name: 'De Nul Gehouden',
-    desc: 'Win een geklasseerde Dalbeker-wedstrijd als keeper zonder een doelpunt tegen te krijgen.',
   },
   pvp_vcup_guild_win: {
     name: 'Voor het Vaandel',
-    desc: 'Win een geklasseerde Dalbeker-wedstrijd, aangetreden onder het vaandel van je gilde.',
   },
   pvp_fiesta_first_bout: {
     name: 'Ongenode Gast',
-    desc: 'Vecht een volledige 2v2 Fiesta-partij uit, winst of verlies.',
   },
-  pvp_fiesta_first_win: { name: 'De Gangmaker van de Fiesta', desc: 'Win een 2v2 Fiesta-partij.' },
+  pvp_fiesta_first_win: { name: 'De Gangmaker van de Fiesta' },
   pvp_fiesta_double: {
     name: 'Dubbelslag',
-    desc: 'Scoor twee Fiesta-uitschakelingen binnen vier seconden.',
   },
   pvp_fiesta_shutdown: {
     name: 'Spelbreker',
-    desc: 'Schakel een Fiesta-tegenstander uit die een reeks van drie of meer heeft lopen.',
   },
   pvp_fiesta_full_build: {
     name: 'Gekleed voor de Gelegenheid',
-    desc: 'Win een Fiesta-partij met een vastgezette versterking uit elk van de drie golven.',
   },
   pvp_fiesta_powerups: {
     name: 'Van Alles Eén',
-    desc: 'Pak elk van de vier power-ups in de ring minstens één keer: Snelheidsduivel, Kolos, Maanlaarzen en Berserker.',
   },
   pvp_fiesta_five_kills: {
     name: 'De Kar Trekken',
-    desc: 'Scoor vijf uitschakelingen in een enkele Fiesta-partij.',
   },
   soc_first_party: { name: 'Samen Sterker', desc: 'Vorm een groep met een andere speler.' },
   soc_full_house: {

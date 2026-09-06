@@ -429,6 +429,18 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noDiscard: true,
     sellValue: 0,
   },
+  // Developer-only mount checkpoint. It deliberately has no acquisition path;
+  // use /dev mounts or /dev give reins_rallycart_rxt during visual review.
+  reins_rallycart_rxt: {
+    id: 'reins_rallycart_rxt',
+    name: 'Ignition Key: Rallycart RXT',
+    kind: 'mount',
+    mount: 'rallycart_rxt',
+    quality: 'epic',
+    soulbound: true,
+    noDiscard: true,
+    sellValue: 0,
+  },
   // Developer-only mount, on the same terms as the tank above (DEVELOPER_MOUNTS
   // in content/mounts.ts): no vendor, quest, creature, heroic, or Rift source,
   // and soulbound so a dev grant cannot be traded into the economy. Use
@@ -438,6 +450,16 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     name: "Lamplighter's Yoke: Grumbol",
     kind: 'mount',
     mount: 'lanternback_troll',
+    quality: 'epic',
+    soulbound: true,
+    noDiscard: true,
+    sellValue: 0,
+  },
+  reins_goblin_rocket_sled: {
+    id: 'reins_goblin_rocket_sled',
+    name: 'Ignition Key: Goblin Rocket Sled',
+    kind: 'mount',
+    mount: 'goblin_rocket_sled',
     quality: 'epic',
     soulbound: true,
     noDiscard: true,
