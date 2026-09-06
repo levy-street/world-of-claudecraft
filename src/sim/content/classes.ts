@@ -5245,6 +5245,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 0,
     cooldown: 45,
     offGcd: true,
+    // An off-GCD burst opener pressed in the middle of the Needle cast or Consume
+    // channel it empowers (the same door Cinderfall and Phoenix Trance use):
+    // without this the busy guard rejected the press and the player gained no
+    // Condemnation.
+    usableWhileCasting: true,
     range: 30,
     school: 'shadow',
     requiresTarget: true,
@@ -5263,6 +5268,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 0,
     cooldown: 90,
     offGcd: true,
+    // Off-GCD burst opener, pressable through a running cast or channel; see
+    // possess_evil_eye above.
+    usableWhileCasting: true,
     range: 30,
     school: 'shadow',
     requiresTarget: true,
