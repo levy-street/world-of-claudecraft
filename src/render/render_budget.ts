@@ -244,11 +244,9 @@ export function renderBudgetShaderPrewarmLevels(
       ),
       resolution: current.resolution,
       // Live uniforms, not a define: the terrain-detail shed never selects a
-      // shader program either (see terrain_detail_shed_core.ts), so the
-      // prewarm walk leaves it untouched, same as resolution above. The post
-      // shed's one extra program (the FXAA grade twin) compiles under the
-      // presentation prewarm (post.ts prewarmShed), and every other rung is a
-      // pass toggle, so the scene-program walk leaves it untouched too.
+      // shader program, and the post shed's one extra program (the FXAA grade
+      // twin) compiles under the presentation prewarm. The scene-program walk
+      // leaves both levels untouched, same as resolution above.
       detail: current.detail,
       post: current.post,
     };
@@ -372,6 +370,11 @@ export class RenderBudgetGovernor {
     this.updateDetailShed(0, 0);
     // The dev pin is the one write that ignores the ladder; both ladder arms
     // are gated on it, so asserting it here holds it for the session.
+    if (this.pinnedDetailLevel != null) {
+      this.detailShed.level = this.pinnedDetailLevel;
+      this.detailShed.target = this.pinnedDetailLevel;
+      this.levels.detail = this.pinnedDetailLevel;
+    }
     if (this.pinnedPostLevel != null) this.levels.post = this.pinnedPostLevel;
     this.frameMsEma = 16.7;
     this.submitMsEma = 0;

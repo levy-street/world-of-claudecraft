@@ -384,8 +384,10 @@ interface AttributionTargetFixture {
 // renderer bytes and #3844's compositor surface/nameplate/spirit-grade bytes
 // combine in one tree, so the composite matches neither parent. No capture was
 // retaken.
+// Re-minted for the v0.42.0 release candidate renderer merge: the selected
+// renderer changes move the runtimeRender.renderer leaf. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '4d8725cb089beecb52e7843bb4ba13bd3344609a2a4a0b002e610297f4530232';
+  '7f829e00768fb038a658e1862aa1c93f57b652910b2d500b222c1af56b73153d';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

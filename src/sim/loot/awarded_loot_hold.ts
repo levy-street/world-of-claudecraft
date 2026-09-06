@@ -17,7 +17,7 @@
 //
 // `src/sim`-pure: no DOM/Three, no wall clock, no rng of its own.
 
-import { bagPools, canGrantItemInstance } from '../bags';
+import { bagPools, countFit } from '../bags';
 import { ITEMS } from '../data';
 import type { SimContext } from '../sim_context';
 import type { ItemInstancePayload, LootSlot } from '../types';
@@ -79,14 +79,13 @@ export function grantOrHoldAwardedLoot(
   eligibility: AwardEligibility,
 ): void {
   const mob = ctx.entities.get(mobId);
-  const instance = awardInstanceFor(ctx, itemId, eligibility);
   const meta = ctx.players.get(pid);
-  const fits = meta
-    ? instance
-      ? canGrantItemInstance(meta.inventory, bagPools(meta.bags), itemId, instance)
-      : ctx.canAddItem(itemId, 1, pid)
-    : false;
-  if (!mob?.dead || !meta || fits) {
+  const instance = awardInstanceFor(ctx, itemId, eligibility);
+  if (
+    !mob?.dead ||
+    !meta ||
+    countFit(meta.inventory, bagPools(meta.bags), itemId, 1, instance) >= 1
+  ) {
     grantAwardedLootItem(ctx, itemId, pid, eligibility);
     return;
   }

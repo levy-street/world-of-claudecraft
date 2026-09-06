@@ -15,15 +15,15 @@ vi.mock('../../server/db', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../../server/db')>()),
   pool: dbMock,
 }));
-vi.mock('../../server/discord_queue_pops', () => ({ bustQueuePingCache: vi.fn() }));
+vi.mock('../../server/discord_queue_ping_cache', () => ({ bustQueuePingCache: vi.fn() }));
 
+import { bustQueuePingCache } from '../../server/discord_queue_ping_cache';
 import { QUEUE_PINGS_INVALID_INPUT_CODE, routes } from '../../server/discord_queue_pings';
 import {
   accountsWithDiscordQueuePings,
   getDiscordQueuePings,
   setDiscordQueuePings,
 } from '../../server/discord_queue_pings_db';
-import { bustQueuePingCache } from '../../server/discord_queue_pops';
 import { type FakeRes, fakeCtx } from './helpers';
 
 const PATH = '/api/discord/queue-pings';

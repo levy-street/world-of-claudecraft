@@ -324,41 +324,25 @@ const MONOLITHS: MonolithRow[] = [
     // wiring) together with release's target dots, guild roster, Riftbound
     // tooltip and action-bar profile extractions. Measured on the merged tree.
     // Exact count, zero slack.
-    // Re-measured while merging PR #3856: the on-bar key-binding banner DOM
-    // stays extracted in src/ui/hud/action_bar/action_bar_bind_banner.ts, and
-    // the resolved Hud coordinator lands at this exact merged count.
+    // The on-bar key-binding banner DOM moved into
+    // src/ui/hud/action_bar/action_bar_bind_banner.ts; measured on the merged
+    // candidate after the selected loot, combat, and Loping Stride integrations.
     // Exact count, zero slack.
-    // Raised 18918 -> 18939 (+21) while merging PR #3858 for the Loot Explorer
-    // window: the field/ctor, the toggle method, the close-switch case, and
-    // the two minimap wiring lines are thin-consumer wiring to the fully
-    // extracted domain module (src/ui/hud/loot_explorer/); everything with substance (the index
+    // Raised 18905 -> 18926 (+21) for the Loot Explorer window: the field/ctor,
+    // the toggle method, the close-switch case, and the two minimap wiring
+    // lines are thin-consumer wiring to the fully extracted domain module
+    // (src/ui/hud/loot_explorer/); everything with substance (the index
     // builder, filters, encounter grouping, the painter) lives there. Same
     // shape as every prior window wiring (Reliquary, Deeds, Professions), and
     // no clean branch-owned extraction exists for a brand-new window's own
     // wiring. Maintainer decision, exact count: any further growth reds again.
-    // Merging PR #3870 after #3858 keeps the Loot Explorer window wiring above
-    // and lands the unit-frame Health Text wiring inside the current merged HUD
-    // shape. Re-measured on this merge result. Exact count, zero slack.
-    // Lowered by 3 with the account-toggle seam: the OptionsHooks deed-broadcast
-    // shape and its queue-pop DM sibling both read the shared AccountToggleSeam
-    // type from options_window.ts instead of an inline object type each.
-    // Re-pinned while merging PR #3873 into the current candidate: the Loot
-    // Explorer and Health Text wiring stay, and the queue-pop Discord DM row
-    // shares the account-toggle seam. Measured on the merged tree.
+    // Re-pinned to the merged count after adding the player/target frame Health
+    // Text setting rows: the shared formatting/readout logic lives in
+    // hud_frames.ts and party_frames.ts, so Hud only carries the required
+    // settings/wiring. Re-pinned at this release reconcile after the map-level
+    // extraction and chat follow repair landed on the combined candidate.
     // Exact count, zero slack.
-    // Re-pinned while merging PR #3878 into the current candidate: the prior
-    // Loot Explorer, Health Text and account-toggle seam history stays, and the
-    // self in-combat flag wiring lands on the player frame while the zone-entry
-    // vista gate drops its recent-personal-event heuristic once p.inCombat is
-    // authoritative online. Measured on the merged tree. Exact count, zero slack.
-    // LOWERED by the map-level cycle while merging PR #3883: the surface choice
-    // (instance plan / zone / continent, and the party's dungeon from outside)
-    // moved into src/ui/map_surface_core.ts, and the dungeon + castle world-map
-    // branches collapsed into one InteriorMapController.paintWorldMap call. It
-    // lands after the Loot Explorer, Health Text, account-toggle seam, and
-    // self in-combat history above, so the ceiling pins the exact merged count.
-    // Exact count, zero slack.
-    ceiling: 18926,
+    ceiling: 18931,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -470,9 +454,10 @@ const MONOLITHS: MonolithRow[] = [
     // merging PR #3841 into the v0.42 candidate after PR #3839: the merged
     // renderer is the measured tree with Lambert terrain lighting preserved
     // under the standard-materials rig. Exact count, zero headroom.
-    // Re-pinned while resolving the PR #3873 integration candidate: the current
-    // renderer carries the prior candidate's render/post integration. Measured
-    // on the merged tree. Exact count, zero headroom.
+    // Re-pinned after the selected render governor merges added detail/post
+    // shed application and drawing-buffer telemetry while preserving their
+    // extracted policy cores. Measured on the merged tree. Exact count, zero
+    // headroom.
     ceiling: 13235,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
@@ -646,13 +631,12 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at this conflicted PR #3835 merge after the candidate's
     // render/post integration grew main.ts independently of the foliage tier
     // ladder. Measured on the merged tree. Exact count, zero headroom.
-    // Raised 11539 -> 11546 while merging PR #3858 for the Loot Explorer
-    // dispatch wiring: two keybind/controller switch arms plus the mobile
-    // controls hook, all thin calls into Hud's extracted window seam. Exact
-    // merged count, zero headroom.
-    // Re-pinned while merging PR #3873 into the current candidate: main keeps
-    // the Loot Explorer dispatch wiring and the queue-pop Discord DM account
-    // toggle hook. Measured on the merged tree. Exact count, zero headroom.
+    // Re-pinned after the selected health-text and Discord queue integrations
+    // added their thin client/server hooks beside existing extracted modules.
+    // Measured on the merged tree. Exact count, zero headroom.
+    // Re-pinned after the queue-pop Discord DM options hook merged on top of
+    // the health-text settings hook. Measured on the merged tree. Exact count,
+    // zero headroom.
     ceiling: 11553,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
@@ -750,20 +734,9 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at this release-line reconcile: the OSSBrain auto-face-lock
     // revert and release's server extractions both survive, and the merged
     // file measures below either conflicted ceiling. Exact count, zero slack.
-    // Lowered by 10 with the queue-pop Discord DM hook: the duelEnd activity
-    // card moved to discord_activity_pvp.ts (the arm keeps the two session
-    // lookups and the enqueue), which paid for the one observer call, its
-    // deps field and the two imports (discord_queue_pops.ts). Exact count.
-    // Re-pinned on the merged PR #3873 candidate: both the release-side
-    // server extractions and the queue-pop Discord DM hook survive. Measured
-    // on the merged tree. Exact count, zero slack.
-    // Lowered 10641 -> 10625 by the self-scalar emitter extraction
-    // (server/self_scalar_wire.ts took the static combat-rating / progression
-    // maybe(...) cohort and is where the in-combat bit cbt landed).
-    // Re-pinned while merging PR #3878 into the current candidate: the prior
-    // release-side server extractions and queue-pop Discord DM hook stay, and
-    // the self-scalar emitter extraction lands with the in-combat bit. Measured
-    // on the merged tree. Exact count, zero slack.
+    // Re-pinned while reconciling the queue-pop and self-scalar repairs with
+    // the release batch branch. Measured on the combined candidate. Exact
+    // count, zero slack.
     ceiling: 10559,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },

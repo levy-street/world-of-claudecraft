@@ -20,7 +20,7 @@ import { expectDefined } from './helpers/defined';
 
 const UNCOMMON = 'greyjaw_hide_boots'; // opens a need/greed roll under default strategies
 const SOULBOUND = 'slagbreaker_helmet'; // soulbound: the award carries the BoP trade window
-const STACKABLE_SOULBOUND = 'sigil_anvil_helmet';
+const STACKABLE_SOULBOUND = 'sigil_anvil_chest';
 const COMMON = 'worn_sword'; // common: round-robin under default party strategies
 
 const makeSim = (seed = 42) => new Sim({ seed, playerClass: 'warrior', noPlayer: true });

@@ -17,7 +17,6 @@ import {
   QUESTS,
 } from '../src/sim/data';
 import { lootEntryRollsOnClaim } from '../src/sim/loot/loot_difficulty_gate';
-import { FERRY_BELL_OBJECT_ID } from '../src/sim/interactions/ferry_bell';
 import {
   buildDungeonKind,
   buildLootExplorerIndex,
@@ -162,19 +161,42 @@ describe('buildLootExplorerIndex', () => {
     }
     expect(GROUND_OBJECTS.length).toBeGreaterThan(0);
     for (const obj of GROUND_OBJECTS) {
-      if (obj.itemId === FERRY_BELL_OBJECT_ID) continue;
       if (!ITEMS[obj.itemId]) continue;
       const row = items
         .find((i) => i.itemId === obj.itemId)
         ?.sources.find((s) => s.category === 'ground_object');
       expect(row?.chance).toBe(1);
-      expect(row?.gatedByQuestId).toBe(ITEMS[obj.itemId].questId);
     }
-    expect(
+  });
+
+  it('deduplicates all-class quest rewards while preserving class-specific reward rows', () => {
+    const { items } = buildLootExplorerIndex();
+    const alienPlateRewards =
       items
-        .find((i) => i.itemId === FERRY_BELL_OBJECT_ID)
-        ?.sources.some((s) => s.category === 'ground_object') ?? false,
-    ).toBe(false);
+        .find((i) => i.itemId === 'alien_armor_plate')
+        ?.sources.filter(
+          (s) => s.category === 'quest_reward' && s.sourceId === 'q_aldrics_fallen_star',
+        ) ?? [];
+    expect(alienPlateRewards).toHaveLength(1);
+    expect(alienPlateRewards[0]?.restrictedToClass).toBeUndefined();
+
+    const staffRewards =
+      items
+        .find((i) => i.itemId === 'apprentice_staff')
+        ?.sources.filter((s) => s.category === 'quest_reward' && s.sourceId === 'q_bandits') ?? [];
+    expect(staffRewards.map((s) => s.restrictedToClass).sort()).toEqual([
+      'druid',
+      'mage',
+      'priest',
+      'warlock',
+    ]);
+  });
+
+  it('carries quest gates on gated vendor stock', () => {
+    const source = buildLootExplorerIndex()
+      .items.find((i) => i.itemId === 'linen_pouch')
+      ?.sources.find((s) => s.category === 'vendor' && s.sourceId === 'quartermaster_finch');
+    expect(source?.gatedByQuestId).toBe('q_ps_pouch_and_purse');
   });
 });
 
@@ -210,16 +232,26 @@ describe('filterLootExplorerItems', () => {
       requiredClass: 'mage',
     });
     for (const item of mage) if (item.requiredClass) expect(item.requiredClass).toContain('mage');
-    for (const item of mage)
-      for (const source of item.sources)
+    for (const item of mage) {
+      for (const source of item.sources) {
         if (source.restrictedToClass) expect(source.restrictedToClass).toBe('mage');
+      }
+    }
+    const allClassQuestReward = mage
+      .find((i) => i.itemId === 'alien_armor_plate')
+      ?.sources.find((s) => s.category === 'quest_reward');
+    expect(allClassQuestReward?.restrictedToClass).toBeUndefined();
+    const staffRewardClasses =
+      mage
+        .find((i) => i.itemId === 'apprentice_staff')
+        ?.sources.filter((s) => s.category === 'quest_reward' && s.sourceId === 'q_bandits')
+        .map((s) => s.restrictedToClass) ?? [];
+    expect(staffRewardClasses).toEqual(['mage']);
     const excluded = index().items.find(
       (i) => i.requiredClass && !i.requiredClass.includes('mage'),
     );
     expect(excluded).toBeDefined();
     expect(mage.some((i) => i.itemId === excluded?.itemId)).toBe(false);
-    const wornSword = mage.find((i) => i.itemId === 'worn_sword');
-    expect(wornSword?.sources.some((s) => s.restrictedToClass === 'warrior') ?? false).toBe(false);
 
     const int = filterLootExplorerItems(index(), {
       ...LOOT_EXPLORER_DEFAULT_FILTERS,

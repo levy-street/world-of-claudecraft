@@ -33,8 +33,8 @@
 //   postshed    - the render budget's post shed (post_shed_core.ts): off
 //                 builds no FXAA grade twin and pins the governor's `post`
 //                 level at 1, so a bench reads the tier-static chain
-//
-// Beside the ?<name>=off layer switches, knobs with their own accessors:
+
+// Beside the ?<name>=off layer switches, knobs and modes with their own accessors:
 //   ?bladesectors=<n> - how many ways each blade-grass pool's slot grid is split
 //                  per axis, so three can frustum-cull the sectors behind the
 //                  camera (blade_grass_sector_pool.ts). 1 collapses each pool

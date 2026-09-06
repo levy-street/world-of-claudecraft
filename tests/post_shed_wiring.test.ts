@@ -85,7 +85,7 @@ describe('post shed pipeline wiring', () => {
 
   it('re-runs the clears after a composer resize and prewarms through the composer render', () => {
     expect(postSource).toMatch(
-      /composer\.setSizeAndPixelRatio\(width, height, pixelRatio\);[\s\S]*?shed\.reclear\(\);/,
+      /composer\.setSizeAndPixelRatio\(width, height, pixelRatio\);[\s\S]*?resolveAoFullRes\([\s\S]*?shed\.reclear\(\);/,
     );
     // The prewarm draws the twin alone against the composer's own buffers,
     // never a second composer frame, and the composer teardown latches the painter.

@@ -775,7 +775,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.healthPercent': '百分比',
   'hudChrome.partyFrames.healthCurrent': '目前值',
   'hudChrome.partyFrames.healthCurrentMax': '目前 / 最大',
-  'hudChrome.partyFrames.healthCurrentMaxPercent': '目前 / 最大 (百分比)',
+  'hudChrome.partyFrames.healthCurrentMaxPercent': '目前 / 最大（百分比）',
   'hudChrome.partyFrames.sort': '玩家排序',
   'hudChrome.partyFrames.sortGroup': '小隊',
   'hudChrome.partyFrames.showResource': '顯示法力、怒氣和能量',
@@ -13537,13 +13537,15 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifLockBars': '鎖定你的動作列，讓你不會不小心把技能拖出格子。',
   'guide.settingsPage.ifMouseoverCast':
     '讓治療或友方法術落在你滑鼠停留的那個隊伍框上，而不改變你的目標。',
-  'guide.settingsPage.ifPartyHealthText': '隊伍血條上寫什麼：不顯示、百分比、目前生命、目前與最大生命，或兩者並附上百分比。',
+  'guide.settingsPage.ifPartyHealthText':
+    '隊伍血條上寫什麼：不顯示、百分比、目前生命、目前與最大生命，或兩者並附上百分比。',
   'guide.settingsPage.ifPartyShowAuras':
     '隊伍框上是否顯示增益與減益。另有對應的開關管理資源條、吸收護盾、寵物，以及你自己是否出現在自己的隊伍清單裡。',
   'guide.settingsPage.ifPartySort': '隊伍成員的排列順序：入隊順序、定位，或名字。',
   'guide.settingsPage.ifPartyStyle':
     '隊伍的排列方式：「自動」會依你的隊伍人數調整，「經典」是傳統的直列堆疊，「團隊」則把所有人塞進緊湊的格線。',
-  'guide.settingsPage.ifPlayerHealthText': '自己的血條上寫什麼：不顯示、百分比、目前生命、目前與最大生命，或兩者並附上百分比。',
+  'guide.settingsPage.ifPlayerHealthText':
+    '自己的血條上寫什麼：不顯示、百分比、目前生命、目前與最大生命，或兩者並附上百分比。',
   'guide.settingsPage.ifTargetHealthText': '目標和目標的目標血條上寫什麼，選項與自己的框體相同。',
   'guide.settingsPage.ifPetFrame': '為你的寵物顯示一個框。',
   'guide.settingsPage.ifPlayerFrameScale': '你自己那個單位框的大小。',

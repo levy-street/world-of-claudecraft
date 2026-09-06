@@ -789,7 +789,15 @@ describe('perf reporter payload', () => {
     expect(summaryEntries?.[1]?.budgetVariants).toEqual([
       {
         index: 0,
-        levels: { grass: 1, foliage: 0.86, vfx: 0.92, lighting: 0.9, resolution: 0.9, detail: 1, post: 1 },
+        levels: {
+          grass: 1,
+          foliage: 0.86,
+          vfx: 0.92,
+          lighting: 0.9,
+          resolution: 0.9,
+          detail: 1,
+          post: 1,
+        },
         elapsedMs: 24,
         syncMs: 18,
         programsBefore: 10,
@@ -1212,7 +1220,15 @@ describe('perf reporter payload', () => {
               stallHoldSeconds: 0,
               stableSeconds: 0,
               cooldownSeconds: 0,
-              levels: { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 0.9, detail: 1, post: 1 },
+              levels: {
+                grass: 1,
+                foliage: 1,
+                vfx: 1,
+                lighting: 1,
+                resolution: 0.9,
+                detail: 1,
+                post: 1,
+              },
               caps: {
                 targetCalls: 330,
                 urgentCalls: 500,

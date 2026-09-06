@@ -112,7 +112,9 @@ describe('prewarm compile lifecycle', () => {
       },
     };
     const stats: Parameters<typeof runPrewarmBudgetVariants>[1] = [];
-    const levels = [{ grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 1, detail: 1, post: 1 }];
+    const levels = [
+      { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 1, detail: 1, post: 1 },
+    ];
 
     expect(runPrewarmBudgetVariants([], stats, host)).toEqual({ timedOut: false });
     expect(stats).toEqual([]);

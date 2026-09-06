@@ -44,7 +44,17 @@
 
 import type { SimEvent } from '../src/sim/types';
 import { pool } from './db';
+import {
+  bustQueuePingCache,
+  cachedQueuePingOptIn,
+  QUEUE_PING_CACHE_TTL_MS,
+  queuePingCacheBustStamp,
+  rememberQueuePingOptIn,
+  resetQueuePingCacheForTests,
+} from './discord_queue_ping_cache';
 import { accountsWithDiscordQueuePings } from './discord_queue_pings_db';
+
+export { bustQueuePingCache, QUEUE_PING_CACHE_TTL_MS } from './discord_queue_ping_cache';
 
 /** Which queue popped. */
 export type QueuePopKind = 'bg' | 'arena';
@@ -83,17 +93,6 @@ export const ARENA_POP_TTL_MS = 60_000;
  * discarded first anyway.
  */
 export const QUEUE_POP_MAX_QUEUE = 200;
-
-/**
- * How long an opt-in answer is believed before it is re-read. The toggle
- * route busts the entry it changes on this process, so the TTL only covers a
- * write that landed elsewhere (another realm process, an unlink) and the
- * eviction of players who stopped queueing.
- */
-export const QUEUE_PING_CACHE_TTL_MS = 5 * 60_000;
-
-/** Bound on the opt-in cache: one entry per account that queued recently. */
-export const QUEUE_PING_CACHE_MAX = 4096;
 
 /** What the observer needs from its host, the session identity of a pid. */
 export interface QueuePopSession {
@@ -146,54 +145,8 @@ const QUEUE: QueuedQueuePop[] = [];
 // deletes the entry it dropped.
 const pending = new Map<number, QueuedQueuePop>();
 
-// The opt-in cache: account id -> { opted in and linked, when it was read }.
-// Insertion-ordered so the bound evicts the oldest read first.
-const optIn = new Map<number, { value: boolean; at: number }>();
-
 // The watch signal the outbox reports; see the header. Recomputed per tick.
 let watching = false;
-
-// Bust bookkeeping: a monotonic stamp per bust, so a read that STARTED before a
-// toggle write landed cannot re-insert the answer that write invalidated.
-// Bounded like the cache; entries are consumed by the read that observes them.
-let bustStamp = 0;
-const bustedAt = new Map<number, number>();
-
-function cachedOptIn(accountId: number, now: number): boolean | undefined {
-  const entry = optIn.get(accountId);
-  if (!entry) return undefined;
-  if (now - entry.at >= QUEUE_PING_CACHE_TTL_MS) {
-    optIn.delete(accountId);
-    return undefined;
-  }
-  return entry.value;
-}
-
-function rememberOptIn(accountId: number, value: boolean, now: number): void {
-  optIn.delete(accountId);
-  optIn.set(accountId, { value, at: now });
-  while (optIn.size > QUEUE_PING_CACHE_MAX) {
-    const oldest = optIn.keys().next();
-    if (oldest.done) break;
-    optIn.delete(oldest.value);
-  }
-}
-
-/**
- * Forget an account's cached opt-in answer. The toggle route calls this on
- * every write so a player who opts in mid-queue is picked up by the next tick's
- * read rather than after the TTL.
- */
-export function bustQueuePingCache(accountId: number): void {
-  optIn.delete(accountId);
-  bustedAt.delete(accountId);
-  bustedAt.set(accountId, ++bustStamp);
-  while (bustedAt.size > QUEUE_PING_CACHE_MAX) {
-    const oldest = bustedAt.keys().next();
-    if (oldest.done) break;
-    bustedAt.delete(oldest.value);
-  }
-}
 
 /** Enqueue a pop for the bot, refreshing the account's undrained item if it has one. */
 export function enqueueQueuePop(item: QueuedQueuePop): void {
@@ -261,8 +214,9 @@ export function queuePopsWatching(): boolean {
 export function resetQueuePopsForTests(): void {
   QUEUE.length = 0;
   pending.clear();
-  optIn.clear();
-  bustedAt.clear();
+  delayedCandidates.clear();
+  inFlightOptIn.clear();
+  resetQueuePingCacheForTests();
   watching = false;
 }
 
@@ -275,6 +229,14 @@ interface PopCandidate {
   seconds: number;
   expiresAtMs: number;
 }
+
+interface DelayedCandidate {
+  candidate: PopCandidate;
+  realm: string;
+}
+
+const delayedCandidates = new Map<number, DelayedCandidate>();
+const inFlightOptIn = new Map<number, Promise<boolean>>();
 
 /**
  * The pops a batch of drained events names, pure over the session lookup.
@@ -329,8 +291,12 @@ function accountsToRead(
   now: number,
 ): number[] {
   const ids = new Set<number>();
-  for (const c of candidates) if (cachedOptIn(c.accountId, now) === undefined) ids.add(c.accountId);
-  for (const id of queuedAccounts) if (cachedOptIn(id, now) === undefined) ids.add(id);
+  for (const c of candidates) {
+    if (cachedQueuePingOptIn(c.accountId, now) === undefined) ids.add(c.accountId);
+  }
+  for (const id of queuedAccounts) {
+    if (cachedQueuePingOptIn(id, now) === undefined) ids.add(id);
+  }
   return [...ids];
 }
 
@@ -344,6 +310,48 @@ function enqueueCandidate(c: PopCandidate, realm: string): void {
     expiresAtMs: c.expiresAtMs,
     realm,
   });
+}
+
+function startOptInReads(
+  accountIds: readonly number[],
+  deps: QueuePopDeps,
+  now: number,
+): Promise<boolean>[] {
+  const startIds = [...new Set(accountIds)].filter((id) => !inFlightOptIn.has(id));
+  if (startIds.length === 0) return [];
+  const readStarted = queuePingCacheBustStamp();
+  const batch = deps
+    .optedIn(startIds)
+    .then((opted) => new Set(opted))
+    .catch((err) => {
+      console.error('queue-pop opt-in read failed:', err);
+      return null;
+    });
+  const out: Promise<boolean>[] = [];
+  for (const id of startIds) {
+    let promise: Promise<boolean>;
+    promise = batch
+      .then((set) => {
+        if (!set) {
+          delayedCandidates.delete(id);
+          return false;
+        }
+        const optedIn = set.has(id);
+        if (!rememberQueuePingOptIn(id, optedIn, now, readStarted)) return false;
+        const delayed = delayedCandidates.get(id);
+        if (delayed) {
+          delayedCandidates.delete(id);
+          if (optedIn) enqueueCandidate(delayed.candidate, delayed.realm);
+        }
+        return optedIn;
+      })
+      .finally(() => {
+        if (inFlightOptIn.get(id) === promise) inFlightOptIn.delete(id);
+      });
+    inFlightOptIn.set(id, promise);
+    out.push(promise);
+  }
+  return out;
 }
 
 /**
@@ -367,35 +375,26 @@ export function observeQueuePops(
   }
   // The watch signal reads the cache as it stands: a join whose answer is
   // still in flight arms it on the next tick, one poll gap at the very most.
-  watching = queuedAccounts.some((id) => cachedOptIn(id, now) === true);
+  watching = queuedAccounts.some((id) => cachedQueuePingOptIn(id, now) === true);
 
   const unanswered: PopCandidate[] = [];
   for (const c of candidates) {
-    const known = cachedOptIn(c.accountId, now);
+    const known = cachedQueuePingOptIn(c.accountId, now);
     if (known === true) enqueueCandidate(c, deps.realm);
-    else if (known === undefined) unanswered.push(c);
+    else if (known === undefined) {
+      unanswered.push(c);
+      delayedCandidates.set(c.accountId, { candidate: c, realm: deps.realm });
+    }
   }
   const toRead = accountsToRead(unanswered, queuedAccounts, now);
   if (toRead.length === 0) return Promise.resolve();
-  const readStarted = bustStamp;
-  return deps
-    .optedIn(toRead)
-    .then((opted) => {
-      const set = new Set(opted);
-      for (const id of toRead) {
-        // A toggle write that landed DURING the read invalidated this answer
-        // before it arrived; leave the entry empty so the next tick re-reads
-        // it, and consume the bust mark.
-        const busted = bustedAt.get(id);
-        if (busted !== undefined && busted > readStarted) continue;
-        if (busted !== undefined) bustedAt.delete(id);
-        rememberOptIn(id, set.has(id), now);
-      }
-      for (const c of unanswered) if (set.has(c.accountId)) enqueueCandidate(c, deps.realm);
-    })
-    .catch((err) => {
-      console.error('queue-pop opt-in read failed:', err);
-    });
+  const waits: Promise<boolean>[] = [];
+  for (const id of toRead) {
+    const existing = inFlightOptIn.get(id);
+    if (existing) waits.push(existing);
+  }
+  waits.push(...startOptInReads(toRead, deps, now));
+  return Promise.all(waits).then(() => undefined);
 }
 
 /** The production deps: the session lookup is the host's, the rest is real IO. */

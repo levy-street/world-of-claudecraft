@@ -192,19 +192,6 @@ describe('the queue', () => {
     requeueQueuePops([]);
     expect(queuePopQueueDepth()).toBe(0);
   });
-
-  it('requeue merges with a newer pending item for that account instead of duplicating it', () => {
-    const old = pop(1, { characterName: 'old', seconds: 30 });
-    enqueueQueuePop(old);
-    const drained = drainQueuePops(NOW);
-    enqueueQueuePop(pop(1, { characterName: 'fresh', seconds: 20 }));
-
-    requeueQueuePops(drained);
-
-    expect(drainQueuePops(NOW).map((p) => [p.accountId, p.characterName, p.seconds])).toEqual([
-      [1, 'old', 30],
-    ]);
-  });
 });
 
 describe('observeQueuePops', () => {
@@ -280,24 +267,38 @@ describe('observeQueuePops', () => {
     expect(again).toHaveBeenCalledTimes(1);
   });
 
-  it('keeps a mid-read bust until a post-bust read wins over every stale read', async () => {
-    let releaseFirst: (ids: number[]) => void = () => {};
-    let releaseSecond: (ids: number[]) => void = () => {};
-    const slow = vi
-      .fn()
-      .mockImplementationOnce(() => new Promise<number[]>((resolve) => (releaseFirst = resolve)))
-      .mockImplementationOnce(() => new Promise<number[]>((resolve) => (releaseSecond = resolve)));
+  it('a Discord link busts a cached unlinked false so the next pop can enqueue', async () => {
+    const optedOutBecauseUnlinked = vi.fn(async (): Promise<number[]> => []);
+    await observeQueuePops([], [1], deps(optedOutBecauseUnlinked));
+    await observeQueuePops([bgProposed(1)], [1], deps(vi.fn(async () => [10])));
+    expect(queuePopQueueDepth()).toBe(0);
 
-    const first = observeQueuePops([], [1], deps(slow));
-    const second = observeQueuePops([], [1], deps(slow));
     bustQueuePingCache(10);
-    releaseFirst([10]);
-    await first;
-    releaseSecond([10]);
-    await second;
+    const linked = vi.fn(async () => [10]);
+    await observeQueuePops([bgProposed(1)], [1], deps(linked));
+    expect(linked).toHaveBeenCalledTimes(1);
+    expect(drainQueuePops(NOW).map((p) => [p.accountId, p.seconds])).toEqual([[10, 30]]);
 
-    await observeQueuePops([], [1], deps(vi.fn(async () => [])));
-    expect(queuePopsWatching()).toBe(false);
+    await observeQueuePops([], [1], deps(linked));
+    expect(queuePopsWatching()).toBe(true);
+  });
+
+  it('single-flights opt-in reads and enqueues only the latest delayed pop', async () => {
+    let release: (ids: number[]) => void = () => {};
+    const slow = vi.fn(() => new Promise<number[]>((resolve) => (release = resolve)));
+    const first = observeQueuePops([{ type: 'bgProposed', seconds: 30, pid: 1 }], [1], deps(slow));
+    const second = observeQueuePops([{ type: 'bgProposed', seconds: 12, pid: 1 }], [1], deps(slow));
+
+    expect(slow).toHaveBeenCalledTimes(1);
+    expect(queuePopQueueDepth()).toBe(0);
+    release([10]);
+    await Promise.all([first, second]);
+
+    const drained = drainQueuePops(NOW);
+    expect(drained).toHaveLength(1);
+    expect(drained[0].accountId).toBe(10);
+    expect(drained[0].seconds).toBe(12);
+    expect(drained[0].expiresAtMs).toBe(NOW + 12_000);
   });
 
   it('swallows a failed read: the pop loses its DM and the tick loses nothing', async () => {

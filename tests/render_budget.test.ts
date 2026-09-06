@@ -637,8 +637,9 @@ describe('render budget governor', () => {
         enabled: true,
         pinnedDetailLevel: 0.5,
       });
-      governor.reset(1, 0.65, 1);
-      let state = governor.update(sample({ dt: 1 }));
+      let state = governor.reset(1, 0.65, 1);
+      expect(state.levels.detail).toBe(0.5);
+      state = governor.update(sample({ dt: 1 }));
       expect(state.levels.detail).toBe(0.5);
       for (let i = 0; i < 400; i++) {
         state = governor.update(sample({ dt: 1 / 60, frameMs: 200, totalMs: 200, submitMs: 150 }));
@@ -670,8 +671,9 @@ describe('render budget governor', () => {
         enabled: false,
         pinnedDetailLevel: 0.32,
       });
-      governor.reset(1, 0.65, 1);
-      let state = governor.update(sample({ dt: 1 }));
+      let state = governor.reset(1, 0.65, 1);
+      expect(state.levels.detail).toBe(0.32);
+      state = governor.update(sample({ dt: 1 }));
       expect(state.levels.detail).toBe(0.32);
       for (let i = 0; i < 100; i++) state = governor.update(heavy());
       expect(state.mode).toBe('disabled');

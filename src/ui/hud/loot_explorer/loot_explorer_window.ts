@@ -123,8 +123,15 @@ function sourceDetailLine(source: LootExplorerSource): string {
         pct: formatNumber(source.chance * 100, { maximumFractionDigits: 1 }),
       }),
     );
-  } else if (source.category !== 'rift') {
+  } else if (
+    source.category !== 'rift' &&
+    source.category !== 'quest_objective' &&
+    !source.gatedByQuestId
+  ) {
     bits.push(t('hudChrome.lootExplorer.guaranteed'));
+  }
+  if (source.category === 'quest_reward' && source.restrictedToClass) {
+    bits.push(tEntity({ kind: 'class', id: source.restrictedToClass, field: 'name' }));
   }
   if (source.gatedByQuestId) {
     bits.push(

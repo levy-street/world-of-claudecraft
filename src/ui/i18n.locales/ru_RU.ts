@@ -801,7 +801,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.healthPercent': 'Проценты',
   'hudChrome.partyFrames.healthCurrent': 'Текущее',
   'hudChrome.partyFrames.healthCurrentMax': 'Текущее / Максимум',
-  'hudChrome.partyFrames.healthCurrentMaxPercent': 'Текущее / Максимум (проценты)',
+  'hudChrome.partyFrames.healthCurrentMaxPercent': 'Текущее / максимум (проценты)',
   'hudChrome.partyFrames.sort': 'Сортировка игроков',
   'hudChrome.partyFrames.sortGroup': 'Группа',
   'hudChrome.partyFrames.showResource': 'Показывать ману, ярость и энергию',
@@ -8454,9 +8454,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Каскадное исцеление достигает четвёртого союзника и собирает Поток исцеления со 150%.',
   'entities.itemSets.chronoweave.name': 'Одеяние эфирного плетения',
   'entities.itemSets.chronoweave.bonus2':
-    'Временное эхо преобразует в исцеление 50% вашего прочего урона от тайной магии по одиночной цели. «Эфирный всплеск» и «Стрелы эфира» вместо этого преобразуют 200% нанесённого ими урона. Получаемый урон больше не замедляет чтение ваших заклинаний.',
+    'Временное эхо преобразует в исцеление 50% вашего урона от тайной магии по одиночной цели. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.chronoweave.bonus4':
-    'Время восстановления Временного каскада сокращается на 5 сек., а затраты маны снижаются на 30%.',
+    'Время восстановления Временного каскада сокращается на 5 сек.',
   'entities.itemSets.pyroclast.name': 'Регалии пирокласта',
   'entities.itemSets.pyroclast.bonus2':
     'Ошпаривание всегда наносит критический удар по целям с 35% здоровья или ниже. Получаемый урон больше не замедляет чтение ваших заклинаний.',
@@ -9842,7 +9842,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.walletLinkedConnected':
     'Привязанное приложение-кошелёк подключено и готово к платежам в $WOC.',
   'hudChrome.wocMarket.walletUsdUnknown': 'Неизвестно',
-  'hudChrome.wocMarket.walletCardDismiss': 'Скрыть карточку кошелька',
   'hudChrome.wocMarket.walletUsdBalance': '{amount} USD',
   'hudChrome.wocMarket.rateNote': 'Курс: около {tokens} $WOC за доллар США по состоянию на {time}.',
   'hudChrome.wocMarket.estimateNote': '{usd} по текущему курсу составляет около {tokens} $WOC.',
@@ -11205,7 +11204,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Смещает цель на мгновение из настоящего: временная оболочка поглощает {damage} урона в течение 10 сек, после чего линия времени возвращается на место.',
   'entities.abilities.temporal_echo.name': 'Временное эхо',
   'entities.abilities.temporal_echo.description':
-    'Отмечает союзника эхом более здорового мгновения, мгновенно восполняя {damage} здоровья. В течение {duration} сек {echoSinglePct}% вашего прочего урона от тайной магии по одиночной цели и {echoAreaPct}% урона по области исцеляют его. «Эфирный всплеск» и «Стрелы эфира» вместо этого исцеляют его на {echoDriverPct}% нанесённого ими урона.',
+    'Отмечает союзника эхом более здорового мгновения, мгновенно восполняя {damage} здоровья. В течение {duration} сек часть наносимого вами урона от тайной магии возвращается через эхо, исцеляя его.',
   'entities.abilities.aspect_of_the_wild.description':
     'Воодушевляет союзников в радиусе 30 м дикой силой, повышая их силу атаки на 45 и скорость атаки на 5% на 5 мин. (талант охотника)',
   'entities.abilities.avenging_wrath.description':
@@ -11348,7 +11347,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Вероятность критического эффекта ваших заклинаний против замороженных целей повышается на 50%. «Ледяные пальцы» и «Зимняя стужа» также позволяют считать цель замороженной. (ветка «Лёд»)',
   'entities.abilities.temporal_cascade.name': 'Временной каскад',
   'entities.abilities.temporal_cascade.description':
-    'Пускает эхо по группе: мгновенно исцеляет цель и до четырёх ближайших к ней союзников и отмечает каждого на {duration} сек. Часть наносимого вами урона от тайной магии возвращается через эхо и исцеляет отмеченных союзников. «Эфирный всплеск» и «Стрелы эфира» создают от каждого группового эха равный запас исцеления, который распределяется между отмеченными союзниками с менее чем 60% здоровья пропорционально недостающему здоровью. (хрономантия)',
+    'Пускает эхо по группе: мгновенно исцеляет цель и до четырёх ближайших к ней союзников и отмечает каждого на {duration} сек. Часть наносимого вами урона от тайной магии возвращается через эхо и исцеляет отмеченных союзников. (хрономантия)',
   'entities.abilities.temporal_reversal.name': 'Обращение времени',
   'entities.abilities.temporal_reversal.description':
     'Обращает ход времени погибшего союзника, возвращая его к жизни рядом с телом с частью здоровья и маны даже во время боя. (хрономантия)',
@@ -13024,7 +13023,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.continentMap.toggleAria': 'Переключение между картой мира и картой региона',
   'hudChrome.continentMap.levels': 'Уровни {min} до {max}',
   'hudChrome.continentMap.toZone': 'Карта региона',
-  'hudChrome.continentMap.toInstance': 'Карта подземелья',
   'hudChrome.enchanting.wornTagIndexed': 'Надето ({slot} {index})',
   'hudChrome.targetAuras.title': 'Ауры цели',
   'hudChrome.targetAuras.keybindLabel': 'Усиления и ослабления цели',
@@ -14468,8 +14466,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Порядок, в котором перечислены участники группы: порядок в группе, роль или имя.',
   'guide.settingsPage.ifPartyStyle':
     'Раскладка группы: «Автоматически» подстраивается под размер вашей группы, «Классическая» — привычный столбец, а «Рейдовая» собирает всех в плотную сетку.',
-  'guide.settingsPage.ifPlayerHealthText': 'Что пишет ваша полоска здоровья: ничего, проценты, текущее здоровье, текущее и максимальное или оба значения с процентами рядом.',
-  'guide.settingsPage.ifTargetHealthText': 'Что пишут полоски здоровья цели и цели цели, с теми же вариантами, что и у вашей рамки.',
+  'guide.settingsPage.ifPlayerHealthText':
+    'Что пишет ваша полоска здоровья: ничего, проценты, текущее здоровье, текущее и максимальное или оба значения с процентами рядом.',
+  'guide.settingsPage.ifTargetHealthText':
+    'Что пишут полоски здоровья цели и цели цели, с теми же вариантами, что и у вашей рамки.',
   'guide.settingsPage.ifPetFrame': 'Показывает рамку вашего питомца.',
   'guide.settingsPage.ifPlayerFrameScale': 'Размер вашей собственной рамки персонажа.',
   'guide.settingsPage.ifShowAttackButton':
@@ -14723,11 +14723,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.spellDamage': 'Повышает урон заклинаний на {pct}%',
   'hudChrome.auraEffect.spellHaste': 'Повышает скорость произнесения заклинаний на {pct}%',
   'hudChrome.auraEffect.stasis': 'Даёт неуязвимость, но не позволяет действовать',
-  'hudChrome.auraEffect.suddenDeath': 'Следующая Казнь не требует ярости и игнорирует требование к здоровью',
-  'hudChrome.auraEffect.sureCrit': 'Следующие атакующие умения ({charges}) гарантированно наносят критический удар',
-  'hudChrome.auraEffect.sweepingStrikes': 'Одиночные удары наносят {pct}% урона ещё {targets} ближайшему врагу',
+  'hudChrome.auraEffect.suddenDeath':
+    'Следующая Казнь не требует ярости и игнорирует требование к здоровью',
+  'hudChrome.auraEffect.sureCrit':
+    'Следующие атакующие умения ({charges}) гарантированно наносят критический удар',
+  'hudChrome.auraEffect.sweepingStrikes':
+    'Одиночные удары наносят {pct}% урона ещё {targets} ближайшему врагу',
   'hudChrome.auraEffect.temporalEcho':
-    'Урон заклинателя от тайной магии исцеляет вас на {singlePct}% одиночного или {areaPct}% массового урона. «Эфирный всплеск» и «Стрелы эфира» получают четырёхкратный бонус для индивидуального Временного эха. Групповые эхо создают равный запас исцеления, который распределяется между отмеченными союзниками с менее чем 60% здоровья пропорционально недостающему здоровью',
+    'Тайный урон заклинателя исцеляет вас на {singlePct}% одиночного или {areaPct}% массового урона',
   'hudChrome.auraEffect.veiledEdge': 'Следующий «Удар скрытня» нанесет двойной урон',
   'hudChrome.auraEffect.veilstrikeWindow':
     'Окутан тенью: скрытные приемы можно использовать в открытую с любого угла, наносимый урон увеличен на {pct}%',

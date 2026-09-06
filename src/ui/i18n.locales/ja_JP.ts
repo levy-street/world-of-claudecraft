@@ -806,7 +806,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.healthPercent': 'パーセント',
   'hudChrome.partyFrames.healthCurrent': '現在値',
   'hudChrome.partyFrames.healthCurrentMax': '現在値 / 最大値',
-  'hudChrome.partyFrames.healthCurrentMaxPercent': '現在値 / 最大値 (割合)',
+  'hudChrome.partyFrames.healthCurrentMaxPercent': '現在値 / 最大値（パーセント）',
   'hudChrome.partyFrames.sort': 'プレイヤーの並び順',
   'hudChrome.partyFrames.sortGroup': 'グループ',
   'hudChrome.partyFrames.showResource': 'マナ・怒り・エネルギーを表示',
@@ -8336,8 +8336,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '連なる癒しが4人目の味方に届き、治癒の奔流を150%で回収します。',
   'entities.itemSets.chronoweave.name': 'エーテルウィーブの祭服',
   'entities.itemSets.chronoweave.bonus2':
-    '時の残響が、その他の単体対象への秘術ダメージの50%を回復に変換します。エーテルサージとエーテルダートは代わりに、与えたダメージの200%を回復に変換します。被ダメージで詠唱が遅れなくなります。',
-  'entities.itemSets.chronoweave.bonus4': '時の連鎖のクールダウンが5秒短縮され、マナ消費が30%減少します。',
+    '時の残響が、単体対象への秘術ダメージの50%を回復に変換します。被ダメージで詠唱が遅れなくなります。',
+  'entities.itemSets.chronoweave.bonus4': '時の連鎖のクールダウンが5秒短縮されます。',
   'entities.itemSets.pyroclast.name': 'パイロクラストの礼装',
   'entities.itemSets.pyroclast.bonus2':
     '灼きが、体力が35%以下の対象に必ずクリティカルヒットします。被ダメージで詠唱が遅れなくなります。',
@@ -9700,7 +9700,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.walletLinkedConnected':
     'リンク済みのウォレットアプリに接続され、$WOC で支払う準備ができています。',
   'hudChrome.wocMarket.walletUsdUnknown': '不明',
-  'hudChrome.wocMarket.walletCardDismiss': 'ウォレットカードを隠す',
   'hudChrome.wocMarket.walletUsdBalance': '{amount} USD',
   'hudChrome.wocMarket.rateNote': 'レート: {time} 時点で 1 USD あたり約 {tokens} $WOC。',
   'hudChrome.wocMarket.estimateNote': '{usd} は現在のレートで約 {tokens} $WOC です。',
@@ -11040,7 +11039,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '対象を現在から一拍だけずらし、時の殻が10秒間、{damage}のダメージを吸収してから時間軸が元に戻る。',
   'entities.abilities.temporal_echo.name': '時の残響',
   'entities.abilities.temporal_echo.description':
-    'より健やかだった瞬間の残響で味方に刻印し、即座に{damage}の体力を回復する。{duration}秒間、その他の単体秘術ダメージの{echoSinglePct}%と範囲秘術ダメージの{echoAreaPct}%がその味方を回復する。エーテルサージとエーテルダートは代わりに、与えたダメージの{echoDriverPct}%を回復する。',
+    'より健やかだった瞬間の残響で味方に刻印し、即座に{damage}の体力を回復する。{duration}秒間、与えた秘術ダメージの一部が残響を通じてその味方を癒やす。',
   'entities.abilities.aspect_of_the_wild.description':
     '30ヤード以内の味方を野生の力で鼓舞し、攻撃力を45、攻撃速度を5%上昇させる。効果時間5分。（ハンターのタレント）',
   'entities.abilities.avenging_wrath.description':
@@ -11173,7 +11172,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '凍結した対象に対する呪文のクリティカル率が50%上昇します。フィンガーズ・オブ・フロストとウィンターズ・チルも対象を凍結状態として扱います。（氷）',
   'entities.abilities.temporal_cascade.name': '時の連鎖',
   'entities.abilities.temporal_cascade.description':
-    '時の残響をパーティ内に連鎖させ、対象と最も近い味方最大4人を即座に回復し、それぞれに{duration}秒間印を付けます。あなたが与えた秘術ダメージの一部が残響を通じて戻り、印のついた味方を回復します。エーテルサージとエーテルダートは各グループ残響から同量の回復力を蓄え、体力が60%未満の印のついた味方に、失った体力に応じて分配します。（クロノマンシー）',
+    '時の残響をパーティ内に連鎖させ、対象と最も近い味方最大4人を即座に回復し、それぞれに{duration}秒間印を付けます。あなたが与えた秘術ダメージの一部が残響を通じて戻り、印のついた味方を回復します。（クロノマンシー）',
   'entities.abilities.temporal_reversal.name': '時の逆転',
   'entities.abilities.temporal_reversal.description':
     '倒れた味方の時間軸を巻き戻し、戦闘中でも、その遺体の場所で体力とマナの一部を持った状態で蘇生します。（クロノマンシー）',
@@ -12815,7 +12814,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.continentMap.toggleAria': 'ワールドマップとゾーンマップを切り替える',
   'hudChrome.continentMap.levels': 'レベル {min} から {max}',
   'hudChrome.continentMap.toZone': 'ゾーンマップ',
-  'hudChrome.continentMap.toInstance': 'インスタンスマップ',
   'hudChrome.enchanting.wornTagIndexed': '装備中 ({slot}{index})',
   'hudChrome.targetAuras.title': 'ターゲットのオーラ',
   'hudChrome.targetAuras.keybindLabel': 'ターゲットのバフとデバフ',
@@ -14235,8 +14233,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'パーティメンバーを並べる順序です。グループ順、ロール、名前から選べます。',
   'guide.settingsPage.ifPartyStyle':
     'パーティのレイアウトです。「自動」はグループの人数に合わせ、「クラシック」は昔ながらの縦積み、「レイド」は全員をコンパクトなグリッドに収めます。',
-  'guide.settingsPage.ifPlayerHealthText': '自分の体力バーに表示する内容です。なし、割合、現在の体力、現在値と最大値、またはその両方に割合を添えた表示から選べます。',
-  'guide.settingsPage.ifTargetHealthText': 'ターゲットとターゲットのターゲットの体力バーに表示する内容で、自分のフレームと同じ選択肢です。',
+  'guide.settingsPage.ifPlayerHealthText':
+    '自分の体力バーに表示する内容です。なし、割合、現在の体力、現在値と最大値、またはその両方に割合を添えた表示から選べます。',
+  'guide.settingsPage.ifTargetHealthText':
+    'ターゲットとターゲットのターゲットの体力バーに表示する内容で、自分のフレームと同じ選択肢です。',
   'guide.settingsPage.ifPetFrame': 'ペット用のフレームを表示します。',
   'guide.settingsPage.ifPlayerFrameScale': '自分のユニットフレームの大きさです。',
   'guide.settingsPage.ifShowAttackButton': 'アクションバーに攻撃ボタンを明示的に置きます。',
@@ -14487,7 +14487,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.sweepingStrikes':
     '単体攻撃が近くの敵{targets}体にも{pct}%のダメージを与える',
   'hudChrome.auraEffect.temporalEcho':
-    '術者の秘術ダメージのうち、単体なら{singlePct}%、範囲なら{areaPct}%があなたへの回復になる。エーテルサージとエーテルダートは個別の時の残響に4倍のボーナスを得る。グループ残響は同量の回復力を蓄え、体力が60%未満の印のついた味方に、失った体力に応じて分配する',
+    '術者の秘術ダメージのうち、単体なら{singlePct}%、範囲なら{areaPct}%があなたへの回復になる',
   'hudChrome.auraEffect.veiledEdge': '次に放つ「潜伏者の一撃」は2倍のダメージを与える',
   'hudChrome.auraEffect.veilstrikeWindow':
     '影に包まれている:ダスクヴェール専用の先制技をどの角度からでも使用でき、与ダメージが{pct}%増加する',

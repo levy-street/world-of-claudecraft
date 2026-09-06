@@ -1018,6 +1018,15 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   { file: 'hud/vendor/train_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   { file: 'hud/vendor/unbind_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   { file: 'hud/vendor/vendor_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
+  // The Loot Explorer body preserves scroll across an explicit body rebuild,
+  // the same read-before/write-after shape as the vendor and spellbook
+  // windows. It runs only when tab/search/filter state changes the panel
+  // contents, so the long source list stays anchored under the player.
+  {
+    file: 'hud/loot_explorer/loot_explorer_window.ts',
+    reflowAllow: { '.scrollTop': 2 },
+    driverAllow: {},
+  },
   {
     file: 'hud/vendor/warfare_vendor_window.ts',
     reflowAllow: { '.scrollTop': 2 },

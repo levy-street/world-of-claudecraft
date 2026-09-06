@@ -255,6 +255,7 @@ describe('graphics tier resolution', () => {
       expect(band.cost).toBe('gpu');
       expect(band.roi).toBe(0.92);
     }
+
     // Post shed (post_shed_core.ts): the full chain is always the baseline
     // (the static preset itself never changes). The composer tiers, which
     // build the sheddable passes (SMAA, bloom, N8AO), are governable down to

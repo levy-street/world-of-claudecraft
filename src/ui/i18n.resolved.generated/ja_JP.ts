@@ -2757,7 +2757,7 @@ export const ja_JP: EnTranslations = {
       "suddenDeath": "次のエグゼキュートは怒気を消費せず、体力条件を無視する",
       "aoeEcho": "残り{charges}回：単体アビリティが近くの最大{targets}体にも{pct}%のダメージを与える",
       "sureCrit": "次のダメージアビリティ{charges}回が必ずクリティカルになる",
-      "temporalEcho": "術者の秘術ダメージのうち、単体なら{singlePct}%、範囲なら{areaPct}%があなたへの回復になる。エーテルサージとエーテルダートは個別の時の残響に4倍のボーナスを得る。グループ残響は同量の回復力を蓄え、体力が60%未満の印のついた味方に、失った体力に応じて分配する",
+      "temporalEcho": "術者の秘術ダメージのうち、単体なら{singlePct}%、範囲なら{areaPct}%があなたへの回復になる",
       "arcaneCharge": "秘術チャージ{stacks}：エーテル・サージのダメージが{damagePct}%増加、詠唱が{castPct}%短縮、マナ消費が{costMult}倍になる",
       "physicalReduction": "受ける物理ダメージが{pct}%減少する",
       "temporalHourglass": "ダメージを受けず行動不能になります。体力を回復し、クールダウンを加速します。右クリックで解除できます。",
@@ -2968,7 +2968,7 @@ export const ja_JP: EnTranslations = {
       "healthPercent": "パーセント",
       "healthCurrent": "現在値",
       "healthCurrentMax": "現在値 / 最大値",
-      "healthCurrentMaxPercent": "現在値 / 最大値 (割合)",
+      "healthCurrentMaxPercent": "現在値 / 最大値（パーセント）",
       "sort": "プレイヤーの並び順",
       "sortGroup": "グループ",
       "sortRole": "ロール",
@@ -4472,7 +4472,7 @@ export const ja_JP: EnTranslations = {
       "summary": "ワールドマップ。地域を選ぶとその地図が開きます。",
       "toWorld": "ワールドマップ",
       "toZone": "ゾーンマップ",
-      "toInstance": "インスタンスマップ",
+      "toInstance": "Instance map",
       "toggleAria": "ワールドマップとゾーンマップを切り替える",
       "levels": "レベル {min} から {max}"
     },
@@ -4507,7 +4507,7 @@ export const ja_JP: EnTranslations = {
       "walletLinkedConnected": "リンク済みのウォレットアプリに接続され、$WOC で支払う準備ができています。",
       "walletUsdBalance": "{amount} USD",
       "walletUsdUnknown": "不明",
-      "walletCardDismiss": "ウォレットカードを隠す",
+      "walletCardDismiss": "Hide wallet card",
       "rateNote": "レート: {time} 時点で 1 USD あたり約 {tokens} $WOC。",
       "rateNotePaused": "最後に確認したレート: {time} 時点で 1 USD あたり約 {tokens} $WOC。",
       "estimateNote": "{usd} は現在のレートで約 {tokens} $WOC です。",
@@ -11672,11 +11672,11 @@ export const ja_JP: EnTranslations = {
       },
       "temporal_echo": {
         "name": "時の残響",
-        "description": "より健やかだった瞬間の残響で味方に刻印し、即座に{damage}の体力を回復する。{duration}秒間、その他の単体秘術ダメージの{echoSinglePct}%と範囲秘術ダメージの{echoAreaPct}%がその味方を回復する。エーテルサージとエーテルダートは代わりに、与えたダメージの{echoDriverPct}%を回復する。"
+        "description": "より健やかだった瞬間の残響で味方に刻印し、即座に{damage}の体力を回復する。{duration}秒間、与えた秘術ダメージの一部が残響を通じてその味方を癒やす。"
       },
       "temporal_cascade": {
         "name": "時の連鎖",
-        "description": "時の残響をパーティ内に連鎖させ、対象と最も近い味方最大4人を即座に回復し、それぞれに{duration}秒間印を付けます。あなたが与えた秘術ダメージの一部が残響を通じて戻り、印のついた味方を回復します。エーテルサージとエーテルダートは各グループ残響から同量の回復力を蓄え、体力が60%未満の印のついた味方に、失った体力に応じて分配します。（クロノマンシー）"
+        "description": "時の残響をパーティ内に連鎖させ、対象と最も近い味方最大4人を即座に回復し、それぞれに{duration}秒間印を付けます。あなたが与えた秘術ダメージの一部が残響を通じて戻り、印のついた味方を回復します。（クロノマンシー）"
       },
       "temporal_reversal": {
         "name": "時の逆転",
@@ -19074,8 +19074,8 @@ export const ja_JP: EnTranslations = {
       },
       "chronoweave": {
         "name": "エーテルウィーブの祭服",
-        "bonus2": "時の残響が、その他の単体対象への秘術ダメージの50%を回復に変換します。エーテルサージとエーテルダートは代わりに、与えたダメージの200%を回復に変換します。被ダメージで詠唱が遅れなくなります。",
-        "bonus4": "時の連鎖のクールダウンが5秒短縮され、マナ消費が30%減少します。"
+        "bonus2": "時の残響が、単体対象への秘術ダメージの50%を回復に変換します。被ダメージで詠唱が遅れなくなります。",
+        "bonus4": "時の連鎖のクールダウンが5秒短縮されます。"
       },
       "cinderbark": {
         "name": "シンダーバークの守り",

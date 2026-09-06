@@ -2968,7 +2968,7 @@ export const zh_TW: EnTranslations = {
       "healthPercent": "百分比",
       "healthCurrent": "目前值",
       "healthCurrentMax": "目前 / 最大",
-      "healthCurrentMaxPercent": "目前 / 最大 (百分比)",
+      "healthCurrentMaxPercent": "目前 / 最大（百分比）",
       "sort": "玩家排序",
       "sortGroup": "小隊",
       "sortRole": "職責",

@@ -8325,8 +8325,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '물결 치유가 네 번째 아군에게 닿고 치유의 흐름을 150%로 거두어들입니다.',
   'entities.itemSets.chronoweave.name': '에테르직조 예복',
   'entities.itemSets.chronoweave.bonus2':
-    '시간의 메아리가 다른 단일 대상 비전 피해의 50%를 치유로 전환합니다. 에테르 쇄도와 에테르 화살은 대신 자신이 입힌 피해의 200%를 치유로 전환합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
-  'entities.itemSets.chronoweave.bonus4': '시간의 연쇄의 재사용 대기시간이 5초 감소하고 마나 소모량이 30% 감소합니다.',
+    '시간의 메아리가 단일 대상 비전 피해의 50%를 치유로 전환합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+  'entities.itemSets.chronoweave.bonus4': '시간의 연쇄의 재사용 대기시간이 5초 감소합니다.',
   'entities.itemSets.pyroclast.name': '화쇄류 예장',
   'entities.itemSets.pyroclast.bonus2':
     '그을리기가 생명력이 35% 이하인 대상에게 항상 치명타로 적중합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
@@ -9661,7 +9661,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.walletLinkedConnected':
     '연결된 지갑 앱이 접속되어 $WOC로 결제할 준비가 되었습니다.',
   'hudChrome.wocMarket.walletUsdUnknown': '알 수 없음',
-  'hudChrome.wocMarket.walletCardDismiss': '지갑 카드 숨기기',
   'hudChrome.wocMarket.walletUsdBalance': '{amount} USD',
   'hudChrome.wocMarket.rateNote': '환율: {time} 기준 1 USD당 약 {tokens} $WOC.',
   'hudChrome.wocMarket.estimateNote': '{usd}는 현재 환율로 약 {tokens} $WOC입니다.',
@@ -11004,7 +11003,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '대상을 현재에서 한 박자 벗어나게 합니다. 시간의 껍질이 10초 동안 피해를 {damage} 흡수한 뒤 시간선이 제자리로 돌아옵니다.',
   'entities.abilities.temporal_echo.name': '시간의 메아리',
   'entities.abilities.temporal_echo.description':
-    '더 건강했던 순간의 메아리로 아군에게 표식을 남겨 즉시 생명력을 {damage} 회복시킵니다. {duration}초 동안 다른 단일 대상 비전 피해의 {echoSinglePct}%와 광역 비전 피해의 {echoAreaPct}%가 그 아군을 치유합니다. 에테르 쇄도와 에테르 화살은 대신 자신이 입힌 피해의 {echoDriverPct}%만큼 그 아군을 치유합니다.',
+    '더 건강했던 순간의 메아리로 아군에게 표식을 남겨 즉시 생명력을 {damage} 회복시킵니다. {duration}초 동안 당신이 입힌 비전 피해의 일부가 메아리를 통해 그 아군을 치유합니다.',
   'entities.abilities.aspect_of_the_wild.description':
     '30미터 안의 아군에게 야생의 힘을 불어넣어 5분 동안 공격력을 45, 공격 속도를 5%만큼 증가시킵니다. (사냥꾼 특성)',
   'entities.abilities.avenging_wrath.description':
@@ -11136,7 +11135,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '얼어붙은 대상에 대한 주문의 치명타 확률이 50% 증가합니다. 서리의 손가락과 혹한의 추위도 대상을 얼어붙은 것으로 간주합니다. (냉기)',
   'entities.abilities.temporal_cascade.name': '시간의 연쇄',
   'entities.abilities.temporal_cascade.description':
-    '시간의 메아리를 파티에 연쇄시켜 대상과 가장 가까운 아군 최대 네 명을 즉시 치유하고 각각에게 {duration}초 동안 징표를 남깁니다. 자신이 입힌 비전 피해의 일부가 메아리를 타고 돌아와 징표가 있는 아군을 치유합니다. 에테르 쇄도와 에테르 화살은 각 그룹 메아리에서 같은 양의 치유 비축분을 생성하고, 생명력이 60% 미만인 징표 대상 아군에게 잃은 생명력에 따라 나누어 줍니다. (시간술)',
+    '시간의 메아리를 파티에 연쇄시켜 대상과 가장 가까운 아군 최대 네 명을 즉시 치유하고 각각에게 {duration}초 동안 징표를 남깁니다. 자신이 입힌 비전 피해의 일부가 메아리를 타고 돌아와 징표가 있는 아군을 치유합니다. (시간술)',
   'entities.abilities.temporal_reversal.name': '시간 역전',
   'entities.abilities.temporal_reversal.description':
     '쓰러진 아군의 시간선을 되돌려, 전투 중에도 시체가 있는 자리에서 생명력과 마나의 일부를 지닌 채 되살립니다. (시간술)',
@@ -12778,7 +12777,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.continentMap.toggleAria': '세계 지도와 지역 지도 전환',
   'hudChrome.continentMap.levels': '레벨 {min}부터 {max}까지',
   'hudChrome.continentMap.toZone': '지역 지도',
-  'hudChrome.continentMap.toInstance': '인스턴스 지도',
   'hudChrome.enchanting.wornTagIndexed': '착용 중 ({slot} {index})',
   'hudChrome.targetAuras.title': '대상 오라',
   'hudChrome.targetAuras.keybindLabel': '대상 강화 및 약화 효과',
@@ -14203,8 +14201,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '파티원을 나열하는 순서입니다. 파티 순서, 역할, 또는 이름 중에서 고릅니다.',
   'guide.settingsPage.ifPartyStyle':
     '파티 배치 방식입니다. 자동은 파티 인원에 맞춰 따라가고, 클래식은 전통적인 세로 배치이며, 공격대는 모두를 촘촘한 격자에 담습니다.',
-  'guide.settingsPage.ifPlayerHealthText': '자신의 생명력 막대에 무엇을 적을지 정합니다. 표시하지 않음, 백분율, 현재 생명력, 현재와 최대치, 또는 그 둘과 함께 백분율 중에서 고릅니다.',
-  'guide.settingsPage.ifTargetHealthText': '대상과 대상의 대상 생명력 막대에 무엇을 적을지 정하며, 자신의 프레임과 같은 선택지입니다.',
+  'guide.settingsPage.ifPlayerHealthText':
+    '자신의 생명력 막대에 무엇을 적을지 정합니다. 표시하지 않음, 백분율, 현재 생명력, 현재와 최대치, 또는 그 둘과 함께 백분율 중에서 고릅니다.',
+  'guide.settingsPage.ifTargetHealthText':
+    '대상과 대상의 대상 생명력 막대에 무엇을 적을지 정하며, 자신의 프레임과 같은 선택지입니다.',
   'guide.settingsPage.ifPetFrame': '소환수의 프레임을 표시합니다.',
   'guide.settingsPage.ifPlayerFrameScale': '내 유닛 프레임의 크기입니다.',
   'guide.settingsPage.ifShowAttackButton': '행동 단축바에 공격 버튼을 따로 올립니다.',
@@ -14453,7 +14453,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.sweepingStrikes':
     '단일 대상 공격이 주변 적 {targets}명에게도 {pct}% 피해를 줍니다',
   'hudChrome.auraEffect.temporalEcho':
-    '시전자의 비전 피해가 단일 대상 피해의 {singlePct}%, 광역 피해의 {areaPct}%만큼 당신을 치유합니다. 에테르 쇄도와 에테르 화살은 개별 시간의 메아리에 4배 보너스를 적용합니다. 그룹 메아리는 같은 양의 치유 비축분을 생성하고, 생명력이 60% 미만인 징표 대상 아군에게 잃은 생명력에 따라 나누어 줍니다',
+    '시전자의 비전 피해가 단일 대상 피해의 {singlePct}%, 광역 피해의 {areaPct}%만큼 당신을 치유합니다',
   'hudChrome.auraEffect.veiledEdge': '다음 잠복자의 일격이 두 배의 피해를 입힙니다',
   'hudChrome.auraEffect.veilstrikeWindow':
     '그림자에 휩싸임: 황혼장막 전용 선제 기술을 어느 각도에서든 사용할 수 있고, 주는 피해가 {pct}% 증가합니다',
