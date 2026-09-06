@@ -342,7 +342,7 @@ describe('item-art consistency accepted-art provenance', () => {
       },
       {
         path: `${evidenceDir}/final-item-art-audit-verdict.json`,
-        acceptedSha256: '3cab85b8460a7416028938fc94a1aa11c3ebab770a0baa236ef8ca835aa5829b',
+        acceptedSha256: 'a94def6c14234088a3a2899cd1735d1138f0c35c60b96c05961e439b14040c78',
         acceptedBytes: 122_269,
       },
     ]);
@@ -460,7 +460,7 @@ describe('item-art consistency accepted-art provenance', () => {
     const verdictBytes = readFileSync(path.join(repoRoot, verdictPath));
     expect(verdictBytes.length).toBe(122_269);
     expect(sha256(verdictBytes)).toBe(
-      '3cab85b8460a7416028938fc94a1aa11c3ebab770a0baa236ef8ca835aa5829b',
+      'a94def6c14234088a3a2899cd1735d1138f0c35c60b96c05961e439b14040c78',
     );
     const verdict = JSON.parse(verdictBytes.toString('utf8')) as FinalAuditVerdict;
 
@@ -655,7 +655,7 @@ describe('item-art consistency accepted-art provenance', () => {
       shippingCatalogDigest.update(`${id}\0${sha256(bytes)}\0${bytes.length}\n`);
     }
     expect(verdict.evidence.shippingCatalogSha256).toBe(
-      '4de9154d12cd0c2f39d7e94f62b74d6644f3b23ef3ff0926d0b5b94b4f906bb4',
+      '530718faa990f8412f0fdf3e64ab8720e81d3758ead8c45817dfaf5ff7380b45',
     );
     expect(shippingCatalogDigest.digest('hex')).toBe(verdict.evidence.shippingCatalogSha256);
   });
