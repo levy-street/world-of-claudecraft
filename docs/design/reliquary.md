@@ -20,7 +20,8 @@ standard at `DESIGN.md`.
 | Relic | One unique slot on a page (item id, profession mark, mount, skin, title). |
 | Clear count | Lifetime clears / kills credited for that page's source. |
 | Illumination | Completing every relic on a page (first-time celebration). |
-| Curator rank | Cosmetic completion tiers over character-durable catalogued fills (items, marks, mounts, titles). Account weapon skins never score rank, so grants and display stay aligned. Five ranks at 1 / 10 / 25 / 50 / 100 owned (`apprentice`, `keeper`, `master`, `grand`, `eternal`, in `src/sim/reliquary.ts`). The thresholds are deliberately NOT rescaled as the catalog grows: rank 5 stays at 100 owned. |
+| Account scope | The Reliquary counts for the ACCOUNT: a relic any character on the account has filled fills the silhouette for every character on it (the "Account scope" section below). |
+| Curator rank | Cosmetic completion tiers over account-durable catalogued fills (items, marks, mounts, titles). Account weapon skins never score rank, so grants and display stay aligned. Five ranks at 1 / 10 / 25 / 50 / 100 owned (`apprentice`, `keeper`, `master`, `grand`, `eternal`, in `src/sim/reliquary.ts`). The thresholds are deliberately NOT rescaled as the catalog grows: rank 5 stays at 100 owned. |
 | First find | Optional metadata on a filled relic: clear# (and source) at first obtain. |
 | Obtain count | How many times a filled relic has been taken from the world. Information on a tooltip, never a score. |
 
@@ -53,6 +54,55 @@ window is pure `reliquary_view.ts` + cold `reliquary_window.ts` painter.
 
 The server remains observer: character blob autosave (30s) carries the
 sparse Reliquary fields; no per-relic SQL table and no per-drop save storm.
+
+## Account scope (shipped)
+
+The Reliquary is ACCOUNT-BOUND. A relic filled by any character on the account
+fills the silhouette, the page pair, the catalog pair, the Curator rank, the
+rank and completion deed bridges, Illumination, the identity-wire standing, and
+the public sheet for every character on the account. The reason is the class
+gate: the Warfare Armory and Gallery list honor gear for every class, the
+Riftbound bands are class-personal, and most dungeon sets are class-slotted, so
+a per-character log asked a mage to buy plate it can never wear. The warfare
+pages stay in the catalog because of this scope, not despite it.
+
+What is account-wide is OWNERSHIP only, one sorted list per relic kind (items,
+marks, mounts, titles), bounded by the catalog. Weapon skins were already
+account state (`weaponSkinIds`) and never enter the ledger. What stays per
+character is HISTORY: the first-find stamp (`firstFind`), the obtain tally,
+the recent ring, every clear meter, and the sticky `illuminatedPages` record.
+A cell another character filled therefore paints owned with no clear# and no
+tally line on this character, which is correct: this character did not find
+it. The window's summary band carries a scope chip
+(`hudChrome.reliquary.accountWide`) so the player is told, not left to infer.
+
+The pieces, each pinned:
+
+| Piece | Where | Pin |
+|---|---|---|
+| Pure ledger (normalize, from-ownership, merge, size) | `src/sim/reliquary_account.ts` | `tests/reliquary_account.test.ts` |
+| THE union every read and grant path applies | `withAccountRelics` in `src/sim/reliquary.ts`, reached through `reliquaryOwnershipOpts` (both hosts' facet reads) and `characterReliquaryOwnership` (every sim grant path) | same |
+| Shared host completion reads | `src/sim/reliquary_reads.ts` (one implementation the offline `Sim` and the online `ClientWorld` both delegate to) | parity case in the same file |
+| Live-only sim stamp | `PlayerMeta.accountRelics`, handed in through `Sim.addPlayer` opts; never serialized | same |
+| Wire carrier | `AccountCosmetics.reliquary`, optional, on the `cosmetics` self key; decoded catalog-bounded by `normalizeAccountCosmetics` | same |
+| Storage | `account_relics` (account_id, kind, relic_id), insert-only, `ON CONFLICT DO NOTHING`, catalog-bounded per account, no retention sweep needed | `tests/server/account_reliquary.test.ts` |
+| Server fold | `server/account_reliquary.ts` `AccountReliquaryFold`: one live ledger per online account, growth persisted through a per-account serial writer; `curatorStandingFor` is the identity-wire stamp | same |
+| Fold cadence | join (`remember` widens from the stored read), every non-retro `reliquaryUnlock` (`detectActivity`), and the 60 second standing sweep (`refreshCuratorStanding`), which is the catch-all for surfaces with no fill event (a reins purchase, a title deed) | same |
+| Public sheet | `sheetReliquaryFromState(state, accountRelics)`; every sheet route pre-fetches the ledger beside guild/rank and degrades to the character's own fills on a failed read (a cosmetic aggregate never 500s the sheet) | `tests/character_sheet.test.ts`, `tests/server/leaderboard.test.ts` |
+
+Cross-realm: the ledger is keyed on the account, not the realm, and the insert
+is a union, so two realms folding the same account never lose a side; a fill
+on realm A reaches realm B at B's next join read. The population-rarity
+aggregate is deliberately unchanged: it still counts CHARACTERS that found a
+relic (the per-character discovery set is what the walk unnests), so "found by
+N% of collectors" keeps its meaning and an account with five alts does not
+count five times for one find.
+
+The old reading, for the record: before this shipped every surface
+above was character-scoped, and the first join of each character after the
+ship folds its own fills into the account (the `remember` plus `fold` pair at
+join), so a veteran's alts inherit the main's log the first time the main logs
+in, with no migration step.
 
 ## Rules that bind every page and relic
 
@@ -461,8 +511,9 @@ evaluated over the ownership options.
     - Rule 1 still binds: counts feed no completion, rank, drop rate, deed,
       or reward. They are shown, and nothing consumes them.
 - Power rewards, pity timers, or drop-rate buffs for incomplete pages.
-- Account-wide item discovery merge (character-scoped like deeds v1 unless
-  a later account lane lands).
+- Account-wide first-find PROVENANCE (the clear# stamp, the obtain tally, the
+  recent ring). Ownership is account-wide (the "Account scope" section);
+  history stays with the character that made it.
 - Housing museum props (no housing system yet).
 - A per-character third-party API. Still deferred: no endpoint may serve one
   character's Reliquary state beyond the existing public sheet fields.

@@ -35,8 +35,10 @@ import {
   isRelicFilled,
   pageCompletion,
 } from '../sim/reliquary';
+import { withAccountRelics } from '../sim/reliquary_account';
 import { DEED_STAT_KEYS, type DeedDef, type DeedStatKey, type DeedStats } from '../sim/types';
 import type { ReliquaryRarity } from '../world_api';
+import type { AccountReliquaryLedger } from '../world_api/cosmetics';
 import type { TranslationKey } from './i18n';
 
 /** Top-level nav: virtual Overview plus the three catalog shelves. */
@@ -292,6 +294,13 @@ export interface ReliquaryViewInput {
   pages: readonly ReliquaryPageDef[];
   /** Item ownership = itemsDiscovered (or a test Set). */
   itemsDiscovered: { has(id: string): boolean };
+  /**
+   * The account Reliquary ledger (IWorld.accountCosmetics.reliquary): fills
+   * any character on the account made. Unioned into every ownership read
+   * below, so a cell another character filled paints owned here. Absent or
+   * empty offline (one character, one account).
+   */
+  accountRelics?: AccountReliquaryLedger;
   /** Authored non-item marks (profession trophies, etc.). */
   marks: { has(id: string): boolean };
   /** Capped recent find ids (item or mark), oldest-first from the facet. */
@@ -519,13 +528,16 @@ export interface ReliquaryViewModel {
 }
 
 function ownershipOpts(input: ReliquaryViewInput) {
-  return {
-    itemsDiscovered: input.itemsDiscovered,
-    marks: input.marks,
-    ownedMounts: input.ownedMounts,
-    weaponSkins: input.weaponSkins,
-    deedsEarned: input.deedsEarned,
-  };
+  return withAccountRelics(
+    {
+      itemsDiscovered: input.itemsDiscovered,
+      marks: input.marks,
+      ownedMounts: input.ownedMounts,
+      weaponSkins: input.weaponSkins,
+      deedsEarned: input.deedsEarned,
+    },
+    input.accountRelics,
+  );
 }
 
 function pageIsShelf(page: ReliquaryPageDef, shelf: ReliquaryShelfId): boolean {

@@ -391,6 +391,7 @@ describe('reliquaryTrackerOwnershipSig', () => {
     deedsEarned: 2,
     mounts: 4,
     weaponSkins: 5,
+    accountRelics: 6,
   };
 
   it('moves when any single ownership surface moves', () => {

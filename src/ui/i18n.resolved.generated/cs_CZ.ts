@@ -4433,6 +4433,8 @@ export const cs_CZ: EnTranslations = {
       "completionAria": "Vyplněné relikvie: {owned} z {total}",
       "curatorRank": "Hodnost Kurátora {rank}",
       "curatorUnranked": "Kurátor bez hodnosti",
+      "accountWide": "Shared across your characters",
+      "accountWideHint": "A relic found by any character on your account fills the page here too.",
       "curatorRankName1": "Učeň kurátora",
       "curatorRankName2": "Strážce kořisti",
       "curatorRankName3": "Mistr kurátor",
@@ -6434,7 +6436,7 @@ export const cs_CZ: EnTranslations = {
     "reliquaryPage": {
       "intro": "Relikviář je muzeum jedinečné kořisti, kterou jsi zkatalogizoval: vytoužené kousky z dungeonů, profesní trofeje, jezdecká zvířata, vzhledy zbraní a tituly. Ke Knize skutků patří tak, jako patří síň trofejí k knize úspěchů.",
       "howHeading": "Jak sbírka funguje",
-      "howBody": "Otevři Relikviář ve hře (výchozí Shift+X). Každá police nese stránky jedinečných relikvií. Siluetu vyplníš, jakmile daný kus poprvé získáš na této postavě, a stránku iluminuješ, jakmile jsou vyplněné všechny její relikvie. Několik stránek nese označení Vyřazená nebo Osobní: stojí mimo dokončení, takže nikdy neblokují polici ani celý katalog. Živé nálezy se ohlásí a obnoví otevřené okno; postup je vázaný na postavu, s výjimkou vzhledů zbraní, které jsou kosmetikou účtu.",
+      "howBody": "Otevři Relikviář ve hře (výchozí Shift+X). Každá police obsahuje stránky jedinečných relikvií. Silueta se vyplní, jakmile kterákoli postava na tvém účtu ten kus poprvé získá, a stránka se rozsvítí, když jsou vyplněny všechny relikvie na ní. Několik stránek je označeno Vyřazené nebo Osobní: stojí mimo dokončení, takže nikdy neblokují polici ani celý katalog. Živé nálezy se ohlásí a obnoví otevřené okno; postup sdílejí všechny postavy na účtu, takže relikvie, kterou najde jedna postava, vyplní stránku všem.",
       "ranksHeading": "Hodnosti Kurátora",
       "ranksBody": "Hodnosti Kurátora rostou s každou zkatalogizovanou jedinečnou relikvií a udělují výhradně kosmetické tituly a rámečky. Nikdy nedávají bojovou sílu, šanci na kořist ani vyrovnání smůly. Vzhledy zbraní vázané na účet se do hodnosti Kurátora nezapočítávají, aby prestiž zůstala vázaná na postavu, a relikvie z Vyřazených či Osobních stránek se do ní nezapočítávají také.",
       "retiredTag": "Vyřazená",

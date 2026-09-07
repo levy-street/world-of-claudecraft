@@ -16601,9 +16601,8 @@ export class Hud {
   // Rule of three: a THIRD consumer of these ownership reads on this band earns
   // one shared once-per-tick computation instead of a third inventory walk.
   //
-  // Converges in both hosts with no optimistic write (offline setters are
-  // synchronous; online the atitle/aborder echo and the snapshot's ownership
-  // fields land well inside one band), and render() rebuilds every row fresh.
+  // Converges in both hosts with no optimistic write (offline setters are synchronous;
+  // online the atitle/aborder echo and the ownership fields land inside one band).
   private refreshCharSheetIfChanged(): void {
     const sig = charSheetRefreshSig({
       activeTitle: this.sim.activeTitle,
@@ -16612,6 +16611,7 @@ export class Hud {
       itemsDiscovered: this.sim.deedStats.itemsDiscovered.size,
       marks: this.sim.reliquaryMarks.size,
       mounts: this.sim.ownedMounts().length,
+      accountRelics: this.sim.accountCosmetics.reliquary,
     });
     if (sig === this.lastCharSheetSig) return;
     this.lastCharSheetSig = sig;

@@ -31,6 +31,19 @@ function world(
 }
 
 describe('buildReliquarySheetModel', () => {
+  it('unions the account ledger off the cosmetics facet (account-bound Reliquary)', () => {
+    const ledger = { items: ['cryptbone_helm'], marks: [], mounts: [], titles: [] };
+    const model = buildReliquarySheetModel({ ...world(), accountCosmetics: { reliquary: ledger } });
+    expect(model.owned).toBe(1);
+    expect(model.curatorRank).toBe(1);
+    // The same relic on the character itself is counted once, not twice.
+    const both = buildReliquarySheetModel({
+      ...world({ items: ['cryptbone_helm'] }),
+      accountCosmetics: { reliquary: ledger },
+    });
+    expect(both.owned).toBe(1);
+  });
+
   it('is empty and unranked with no ownership', () => {
     const model = buildReliquarySheetModel(world());
     const empty = catalogCharacterCompletion({ itemsDiscovered: new Set() });

@@ -6,6 +6,7 @@
 // Defensive by construction, the online.ts decode idiom: every field is
 // re-validated and a malformed entry is DROPPED rather than mirrored.
 
+import { normalizeAccountReliquaryLedger } from '../sim/reliquary_account';
 import type { AccountCosmetics } from '../world_api';
 
 function stringList(value: unknown): string[] {
@@ -28,10 +29,14 @@ function stringRecord(value: unknown): Record<string, string> {
  *  the rest of the online decode idiom. */
 export function normalizeAccountCosmetics(value: unknown): AccountCosmetics {
   const src = value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
-  return {
+  const out: AccountCosmetics = {
     completedQuestIds: stringList(src.completedQuestIds),
     mechChromaIds: stringList(src.mechChromaIds),
     weaponSkinIds: stringList(src.weaponSkinIds),
     weaponSkinLoadout: stringRecord(src.weaponSkinLoadout),
   };
+  // The account Reliquary ledger rides only when the server sent one (the
+  // pre-ledger payload shape stays byte-identical); catalog-bounded on decode.
+  if (src.reliquary !== undefined) out.reliquary = normalizeAccountReliquaryLedger(src.reliquary);
+  return out;
 }

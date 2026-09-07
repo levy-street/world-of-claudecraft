@@ -60,12 +60,8 @@ import { RESPEC_TIER_CONFIG, type RespecPaymentTier } from '../src/sim/professio
 import { cancelProfessionSessionOnDisplacement } from '../src/sim/professions/session_teardown';
 import { restoreToolEffectSlotAction } from '../src/sim/professions/tool_effect_actions';
 import type { ToolEffectConfirmMode } from '../src/sim/professions/tools';
-import {
-  catalogCharacterCompletion,
-  characterReliquaryOwnership,
-  curatorRankFromOwned,
-  reliquaryWireJson,
-} from '../src/sim/reliquary';
+import { catalogCharacterCompletion, reliquaryWireJson } from '../src/sim/reliquary';
+import { mergeOptionalAccountReliquaryLedgers } from '../src/sim/reliquary_account';
 import { corpseHasDecayed } from '../src/sim/respawn_policy';
 import { loadRiftWorldState, serializeRiftWorldState } from '../src/sim/rift/persistence';
 import { riftStateEventFor } from '../src/sim/rift/runs';
@@ -112,6 +108,7 @@ import {
   type StableTimerWireVersion,
 } from '../src/world_api';
 import { sameAppearance } from '../src/world_api/appearance';
+import { AccountReliquaryFold, stampAccountRelics } from './account_reliquary';
 import { recordOnlineSample } from './admin_db';
 import { type AdminGuildBankView, adminGuildBankView } from './admin_guild_bank_view';
 import { offensiveName } from './auth';
@@ -1718,6 +1715,7 @@ export class GameServer {
   private readonly sessionsByCharacterId = new Map<number, ClientSession>();
   private readonly storageRecoverySweep = new RecoverySweep(this.sessionsByCharacterId);
   private readonly accountCosmeticsByAccount = new Map<number, AccountCosmetics>();
+  private readonly accountReliquary = new AccountReliquaryFold();
   private readonly bankVaultLedgerGuardCoordinator: BankVaultLedgerGuardCoordinator =
     createBankVaultLedgerGuardCoordinator(() => Date.now() / 1000, {
       // Sized from the resolved realm player cap; cap<=0 (disabled) keeps the floor.
@@ -3287,27 +3285,24 @@ export class GameServer {
     const e = this.sim.entities.get(session.pid);
     const meta = this.sim.meta(session.pid);
     if (!e || !meta) return;
-    // Cleared BEFORE the walk so a throw inside the resolution fails to
-    // ABSENT, not to a stale stamp riding the wire (both call sites catch).
-    // The trade is explicit: a transient throw now hides a CORRECT standing
-    // for up to one sweep where the old code kept the last value; absent is
-    // the honest degraded state for a cosmetic, and the walk is pure CPU
-    // with no realistic throw path.
-    // Assigning unconditionally is free either way: wireCacheFor diffs the
-    // identity JSON, so an unchanged stamp re-broadcasts nothing and a changed
-    // one re-broadcasts itself, exactly like the flair refreshers above.
+    // Fold into the ACCOUNT ledger first; growth reaches every live session.
+    const { grown, standing } = this.accountReliquary.refresh(session.accountId, meta);
+    if (grown) {
+      this.updateLiveAccountCosmetics(session.accountId, {
+        ...session.accountCosmetics,
+        reliquary: grown,
+      });
+    }
+    // Cleared BEFORE the walk so a throw fails to ABSENT, never a stale stamp
+    // (both call sites catch). Unconditional assignment is free: wireCacheFor
+    // diffs the identity JSON, so an unchanged stamp re-broadcasts nothing.
     e.curatorRank = undefined;
     e.relicsOwned = undefined;
     e.relicsTotal = undefined;
-    const { owned, total } = catalogCharacterCompletion(characterReliquaryOwnership(meta));
-    const rank = curatorRankFromOwned(owned);
-    // Gated on the RANK, not the raw count, so all three move as one by
-    // construction: a raised rank-1 threshold could otherwise strand the pair
-    // on the wire with the rank absent. Today rank >= 1 iff owned >= 1.
-    if (rank > 0) {
-      e.curatorRank = rank;
-      e.relicsOwned = owned;
-      e.relicsTotal = total;
+    if (standing) {
+      e.curatorRank = standing.rank;
+      e.relicsOwned = standing.owned;
+      e.relicsTotal = standing.total;
     }
   }
 
@@ -3454,6 +3449,7 @@ export class GameServer {
       // never resurrects from the stale side.
       weaponSkinIds: [...new Set([...(a.weaponSkinIds ?? []), ...(b.weaponSkinIds ?? [])])],
       weaponSkinLoadout: { ...(b.weaponSkinLoadout ?? {}) },
+      reliquary: mergeOptionalAccountReliquaryLedgers(a.reliquary, b.reliquary),
     };
   }
 
@@ -3488,6 +3484,7 @@ export class GameServer {
     for (const live of this.clients.values()) {
       if (live.accountId !== accountId) continue;
       live.accountCosmetics = merged;
+      stampAccountRelics(this.sim.meta(live.pid), merged.reliquary);
       this.applyAccountQuestLockouts(live.pid, merged);
       this.sim.setWeaponSkinLoadout(live.pid, this.ownedWeaponSkinLoadout(merged));
       this.resyncQuests(live);
@@ -3691,6 +3688,7 @@ export class GameServer {
       firstCharacter: meta.firstCharacter,
       appearance: meta.appearance ?? null,
       tutorialGreetingSent: state === null,
+      accountRelics: this.accountReliquary.remember(accountId, meta.accountCosmetics?.reliquary),
     });
     const player = this.sim.entities.get(pid);
     if (player) {
@@ -9472,14 +9470,13 @@ export class GameServer {
       // deeds reach it through their titles), no character_deeds write, and
       // no forced save (membership authority stays the sparse self blob; the
       // wire pins in tests/reliquary_wire.test.ts hold this arm to that).
-      if (
-        ev.type === 'reliquaryUnlock' &&
-        ev.pid !== undefined &&
-        ev.illuminatedPageId !== undefined &&
-        ev.retro !== true
-      ) {
+      if (ev.type === 'reliquaryUnlock' && ev.pid !== undefined && ev.retro !== true) {
         const s = this.clients.get(ev.pid);
-        if (s) this.fanOutIllumination(s, ev.illuminatedPageId);
+        // A live fill folds into the account ledger at once (join and the 60s sweep
+        // are the other fold sites), so a sibling character online sees it now.
+        if (s) this.refreshCuratorStanding(s);
+        if (s && ev.illuminatedPageId !== undefined)
+          this.fanOutIllumination(s, ev.illuminatedPageId);
       }
       // Economy telemetry: one granted node harvest, counted under the ZONE
       // of the node that yielded it (R3) and the node's own tool TIER (R31, so

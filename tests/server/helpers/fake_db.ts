@@ -9,11 +9,14 @@
 // pool. Tests inject one of these fakes wherever production code would take a real
 // CharactersDb / LeaderboardDb / ReportsDb, mirroring the SocialDb/PgSocialDb
 // idiom in server/social.ts + server/social_db.ts.
+import type * as AccountReliquaryDb from '../../../server/account_reliquary_db';
 import type * as Db from '../../../server/db';
 import type * as DeedsDb from '../../../server/deeds_db';
 import type * as ModDb from '../../../server/moderation_db';
+import { emptyAccountReliquaryLedger } from '../../../src/sim/reliquary_account';
 import type { CharacterState, MailSave, MarketSave } from '../../../src/sim/sim';
 import type { ArenaFormat, PlayerClass } from '../../../src/sim/types';
+import type { AccountReliquaryLedger } from '../../../src/world_api/cosmetics';
 
 // ---------------------------------------------------------------------------
 // Interfaces (extracted faithfully from the real db.ts signatures)
@@ -64,6 +67,7 @@ export interface CharactersDb {
   findCharacterReportTargetByName(name: string): Promise<ModDb.LiveReportTarget | null>;
   listCharacterNamesForSitemap(limit?: number): Promise<string[]>;
   recentDeedsForCharacter(characterId: number, limit: number): Promise<DeedsDb.RecentDeedRow[]>;
+  loadAccountReliquary(accountId: number): Promise<AccountReliquaryLedger>;
 }
 
 export interface LeaderboardDb {
@@ -269,6 +273,17 @@ export class FakeCharactersDb implements CharactersDb {
   ): Promise<DeedsDb.RecentDeedRow[]> {
     return (this.recentDeeds.get(characterId) ?? []).slice(0, Math.max(0, limit));
   }
+
+  // The account Reliquary ledger (server/account_reliquary_db.ts), seedable.
+  private readonly accountRelics = new Map<number, AccountReliquaryLedger>();
+
+  seedAccountRelics(accountId: number, ledger: AccountReliquaryLedger): void {
+    this.accountRelics.set(accountId, ledger);
+  }
+
+  async loadAccountReliquary(accountId: number): Promise<AccountReliquaryLedger> {
+    return this.accountRelics.get(accountId) ?? emptyAccountReliquaryLedger();
+  }
 }
 
 export class FakeLeaderboardDb implements LeaderboardDb {
@@ -359,6 +374,7 @@ type _CharactersConforms = _AssertAssignable<
     findCharacterReportTargetByName: typeof Db.findCharacterReportTargetByName;
     listCharacterNamesForSitemap: typeof Db.listCharacterNamesForSitemap;
     recentDeedsForCharacter: typeof DeedsDb.recentDeedsForCharacter;
+    loadAccountReliquary: typeof AccountReliquaryDb.loadAccountReliquary;
   },
   CharactersDb
 >;

@@ -51,17 +51,18 @@ import type { RespecPaymentTier } from '../sim/professions/focus';
 import type { MaterialRarity } from '../sim/professions/gathering';
 import { emptyCraftSkills } from '../sim/professions/wheel';
 import {
-  catalogRankOwned,
-  catalogRelicCompletion,
   clearCountForSource,
-  curatorRankFromOwned,
-  pageCompletion,
   RELIQUARY_OBTAIN_COUNT_CAP,
-  RELIQUARY_PAGES_BY_ID,
   reliquaryOwnershipOpts,
   restoreReliquaryState,
   type SavedReliquaryState,
 } from '../sim/reliquary';
+import {
+  reliquaryCatalogCompletionFor,
+  reliquaryCuratorRankFor,
+  reliquaryPageClearCountFor,
+  reliquaryPageCompletionFor,
+} from '../sim/reliquary_reads';
 import { riftFloorColliders } from '../sim/rift/rift_gen';
 import type { ResolvedAbility } from '../sim/sim';
 import {
@@ -5197,28 +5198,24 @@ export class ClientWorld extends ReconWireState implements IWorld {
       ownedMounts: this.ownedMounts(),
       weaponSkinIds: this.accountCosmetics.weaponSkinIds,
       deedsEarned: this.deedsEarned,
+      accountRelics: this.accountCosmetics.reliquary,
     });
   }
   reliquaryPageCompletion(pageId: string): ReliquaryPageCompletion | null {
-    const page = RELIQUARY_PAGES_BY_ID[pageId];
-    if (!page) return null;
-    return pageCompletion(page, this.reliquaryOwnershipSurfaces());
+    return reliquaryPageCompletionFor(pageId, this.reliquaryOwnershipSurfaces());
   }
   reliquaryCatalogCompletion(): ReliquaryCatalogCompletion {
-    return catalogRelicCompletion(this.reliquaryOwnershipSurfaces());
+    return reliquaryCatalogCompletionFor(this.reliquaryOwnershipSurfaces());
   }
   reliquaryCuratorRank(): number {
-    // Rank excludes account weapon skins so display matches grant path.
-    return curatorRankFromOwned(catalogRankOwned(this.reliquaryOwnershipSurfaces()));
+    return reliquaryCuratorRankFor(this.reliquaryOwnershipSurfaces());
   }
   reliquaryPageClearCount(pageId: string): number | undefined {
-    const page = RELIQUARY_PAGES_BY_ID[pageId];
-    if (!page) return undefined;
     // clearCountForSource reads deedStats + delveClears; ClientWorld mirrors both.
-    return clearCountForSource(
-      { deedStats: this.deedStats, delveClears: this.delveClears },
-      page.clearSource,
-    );
+    return reliquaryPageClearCountFor(pageId, {
+      deedStats: this.deedStats,
+      delveClears: this.delveClears,
+    });
   }
   // The relic population-rarity aggregate: a lazy anonymous REST read on the
   // deedsRarity shape below, resolving the endpoint payload verbatim or null

@@ -4433,6 +4433,8 @@ export const vi_VN: EnTranslations = {
       "completionAria": "Kỳ trân đã lấp đầy: {owned} trên {total}",
       "curatorRank": "Cấp Quản Thủ {rank}",
       "curatorUnranked": "Quản Thủ chưa xếp cấp",
+      "accountWide": "Shared across your characters",
+      "accountWideHint": "A relic found by any character on your account fills the page here too.",
       "curatorRankName1": "Quản Thủ Tập Sự",
       "curatorRankName2": "Người Giữ Chiến Lợi",
       "curatorRankName3": "Quản Thủ Bậc Thầy",
@@ -6434,7 +6436,7 @@ export const vi_VN: EnTranslations = {
     "reliquaryPage": {
       "intro": "Kỳ Trân Các là bảo tàng những chiến lợi phẩm độc nhất mà bạn đã biên mục: các món săn lùng trong hầm ngục, cúp nghề, thú cưỡi, ngoại hình vũ khí và danh hiệu. Nó đi cùng Sách Kỳ Công như một sảnh cúp đi cùng một cuốn sổ thành tích.",
       "howHeading": "Bộ sưu tập vận hành ra sao",
-      "howBody": "Mở Kỳ Trân Các trong trò chơi (mặc định Shift+X). Mỗi kệ chứa những trang kỳ trân độc nhất. Bạn lấp đầy một bóng hình khi lần đầu sở hữu món đó trên nhân vật này, và làm rực sáng một trang khi mọi kỳ trân trên trang ấy đã được lấp đầy. Một vài trang mang nhãn Đã ngừng hoặc Riêng: chúng nằm ngoài phần hoàn tất, nên không bao giờ chặn một kệ hay cả mục lục. Vật phẩm tìm được sẽ hiện thông báo ngay và làm mới cửa sổ đang mở; tiến trình gắn với từng nhân vật, trừ ngoại hình vũ khí vốn là đồ trang trí của tài khoản.",
+      "howBody": "Mở Thánh Tích Quán trong game (mặc định Shift+X). Mỗi kệ chứa các trang thánh tích độc nhất. Một bóng hình được lấp đầy khi bất kỳ nhân vật nào trong tài khoản của bạn nhận được món đó lần đầu, và một trang được thắp sáng khi mọi thánh tích trên đó đã đầy. Vài trang được gắn nhãn Đã ngừng hoặc Cá nhân: chúng nằm ngoài phần hoàn thành nên không bao giờ chặn một kệ hay toàn bộ danh mục. Vật tìm được sẽ hiện thông báo ngay và làm mới cửa sổ đang mở; tiến trình được chia sẻ cho mọi nhân vật trong tài khoản, nên thánh tích một nhân vật tìm được sẽ lấp đầy trang cho tất cả.",
       "ranksHeading": "Cấp Quản Thủ",
       "ranksBody": "Cấp Quản Thủ tăng theo từng kỳ trân độc nhất được biên mục và chỉ trao danh hiệu cùng viền trang trí. Chúng không bao giờ trao sức mạnh chiến đấu, tỉ lệ rơi đồ hay bù trừ vận rủi. Ngoại hình vũ khí thuộc tài khoản không tính điểm cấp Quản Thủ, nhờ vậy danh vọng vẫn gắn chặt với nhân vật, và kỳ trân trên các trang Đã ngừng hoặc Riêng cũng không tính điểm cho cấp ấy.",
       "retiredTag": "Đã ngừng",

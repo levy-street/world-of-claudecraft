@@ -6330,6 +6330,10 @@ export const hudChromeStrings = {
     completionAria: 'Relics filled: {owned} of {total}',
     curatorRank: 'Curator rank {rank}',
     curatorUnranked: 'Unranked Curator',
+    // The summary band's scope chip: the Reliquary counts for the whole account,
+    // so a relic any character finds fills the page for every character.
+    accountWide: 'Shared across your characters',
+    accountWideHint: 'A relic found by any character on your account fills the page here too.',
     // Phase 6: named Curator ranks (cosmetic window chrome + rank-up toast).
     curatorRankName1: 'Apprentice Curator',
     curatorRankName2: 'Spoilskeeper',

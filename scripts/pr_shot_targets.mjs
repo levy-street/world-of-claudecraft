@@ -6157,6 +6157,61 @@ export const TARGETS = [
     },
   },
   {
+    key: 'reliquary-account-ledger',
+    label: 'The Reliquary: a page half-filled by ANOTHER character on the account',
+    when: ['sim/reliquary_account', 'server/account_reliquary', 'sim/reliquary_reads'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      const pageIds = await openReliquaryConquerorsShelf(page);
+      if (pageIds.length === 0) throw new Error('reliquary shelf listed no pages');
+      const pick = await page.evaluate((ids) => {
+        const sim = window.__game?.sim;
+        for (const id of ids) {
+          const c = sim?.reliquaryPageCompletion?.(id);
+          if (c && c.total >= 4 && c.total <= 14) return id;
+        }
+        return ids[0];
+      }, pageIds);
+      await page.evaluate((id) => {
+        document.querySelector(`#reliquary-window [data-page="${id}"]`)?.click();
+      }, pick);
+      await wait(250);
+      // Stamp HALF the page's item relics onto the ACCOUNT ledger, never onto
+      // itemsDiscovered: this is exactly what the server hands the sim for a
+      // relic a sibling character found (stampAccountRelics), so the cells must
+      // paint owned from the ledger alone. On a pre-ledger build the stamp is
+      // inert and the page stays empty, which is the BEFORE.
+      await page.evaluate(() => {
+        const cells = [...document.querySelectorAll('#reliquary-window .reliquary-cell')].filter(
+          (c) => c.dataset.cellKind === 'item',
+        );
+        const ids = cells
+          .slice(0, Math.ceil(cells.length / 2))
+          .map((c) => c.dataset.cellId)
+          .filter(Boolean);
+        const sim = window.__game?.sim;
+        const meta = sim?.players?.get?.(sim.playerId);
+        const ledger = { items: ids, marks: [], mounts: [], titles: [] };
+        if (meta) meta.accountRelics = ledger;
+        if (sim) sim.accountCosmetics = { ...sim.accountCosmetics, reliquary: ledger };
+      });
+      // Re-enter the page through the real navigation so the shot is the
+      // rebuilt detail, not a slow-band race.
+      await page.evaluate(() => {
+        document.querySelector('#reliquary-window [data-back]')?.click();
+      });
+      await wait(250);
+      await page.evaluate((id) => {
+        document.querySelector(`#reliquary-window [data-page="${id}"]`)?.click();
+      }, pick);
+      await wait(400);
+      return { clip: '#reliquary-window' };
+    },
+  },
+  {
     key: 'reliquary-overview-fresh',
     label: 'The Reliquary: fresh-character Overview (strip hints + shelf cards)',
     when: ['ui/reliquary_view', 'ui/reliquary_window'],

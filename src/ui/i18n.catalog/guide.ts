@@ -2204,7 +2204,7 @@ export const guideStrings = {
       'The Reliquary is the museum of unique spoils you have catalogued: dungeon chase uniques, profession trophies, mounts, weapon skins, and titles. It pairs with the Book of Deeds the way a trophy hall pairs with an achievement book.',
     howHeading: 'How the collection works',
     howBody:
-      'Open The Reliquary in game (default Shift+X). Each shelf holds pages of unique relics. Fill a silhouette when you obtain that piece for the first time on the character, and illuminate a page when every relic on it is filled. A few pages are labeled Retired or Personal: they sit outside completion, so they never gate a shelf or the whole catalog. Live finds toast and refresh the open window; progress is character-scoped except weapon skins, which are account cosmetics.',
+      'Open The Reliquary in game (default Shift+X). Each shelf holds pages of unique relics. Fill a silhouette when any character on your account obtains that piece for the first time, and illuminate a page when every relic on it is filled. A few pages are labeled Retired or Personal: they sit outside completion, so they never gate a shelf or the whole catalog. Live finds toast and refresh the open window; progress is shared by every character on the account, so a relic one character finds fills the page for all of them.',
     ranksHeading: 'Curator ranks',
     ranksBody:
       'Curator ranks rise with unique catalogued fills and grant only cosmetic titles and borders. They never grant combat power, drop rate, or pity. Account weapon skins do not score Curator rank so prestige stays character-durable, and relics on Retired or Personal pages score nothing toward it either.',

@@ -534,19 +534,16 @@ import {
 import { sanitizeCreditedObjects } from './quests/interact_object_credit';
 import { spawnRealmBuilderMonument } from './realm_builder_monument_spawn';
 import {
-  catalogRankOwned,
-  catalogRelicCompletion,
-  clearCountForSource,
-  curatorRankFromOwned,
   freshReliquaryState,
   noteRelicObtain,
-  pageCompletion,
   RELIQUARY_PAGES_BY_ID,
   type ReliquaryState,
   reliquaryOwnershipOpts,
   restoreReliquaryState,
   serializeReliquaryState,
 } from './reliquary';
+import { emptyAccountReliquaryLedger } from './reliquary_account';
+import * as reliquaryReads from './reliquary_reads';
 import { sanitizeRemovedZone1Content } from './removed_zone1_content';
 import { freshCounters, type RewardCounters } from './reward_counters';
 import { rideSteepnessAt, shoreStepOut, stepWaterLevel } from './ride_height';
@@ -1678,6 +1675,7 @@ export interface PlayerMeta {
   // marks, capped recent. Item ownership stays on deedStats.itemsDiscovered;
   // this field is omit-empty on serialize and never a second full discovery set.
   reliquary: ReliquaryState;
+  accountRelics: import('../world_api/cosmetics').AccountReliquaryLedger;
 }
 
 // Away-from-keyboard / do-not-disturb presence. `afk` still delivers whispers
@@ -2616,6 +2614,7 @@ export class Sim {
       // metas are session-only, but their letters would outlive them in the
       // shared mail book forever (issue #3560).
       bot?: boolean;
+      accountRelics?: import('../world_api/cosmetics').AccountReliquaryLedger;
     },
   ): number {
     const savedState = opts?.state
@@ -2825,6 +2824,7 @@ export class Sim {
       activeBorder: null,
       renown: 0,
       reliquary: freshReliquaryState(),
+      accountRelics: opts?.accountRelics ?? emptyAccountReliquaryLedger(),
     };
     // A fresh character sets out provisioned (class-defined starter rations);
     // a saved character loads its own bags from savedState below.
@@ -4651,24 +4651,20 @@ export class Sim {
       ownedMounts: this.ownedMounts(),
       weaponSkinIds: this.accountCosmetics.weaponSkinIds,
       deedsEarned: this.primary.deedsEarned,
+      accountRelics: this.accountCosmetics.reliquary,
     });
   }
   reliquaryPageCompletion(pageId: string): import('../world_api').ReliquaryPageCompletion | null {
-    const page = RELIQUARY_PAGES_BY_ID[pageId];
-    if (!page) return null;
-    return pageCompletion(page, this.reliquaryOwnershipSurfaces());
+    return reliquaryReads.reliquaryPageCompletionFor(pageId, this.reliquaryOwnershipSurfaces());
   }
   reliquaryCatalogCompletion(): import('../world_api').ReliquaryCatalogCompletion {
-    return catalogRelicCompletion(this.reliquaryOwnershipSurfaces());
+    return reliquaryReads.reliquaryCatalogCompletionFor(this.reliquaryOwnershipSurfaces());
   }
   reliquaryCuratorRank(): number {
-    // Rank excludes account weapon skins so display matches grant path.
-    return curatorRankFromOwned(catalogRankOwned(this.reliquaryOwnershipSurfaces()));
+    return reliquaryReads.reliquaryCuratorRankFor(this.reliquaryOwnershipSurfaces());
   }
   reliquaryPageClearCount(pageId: string): number | undefined {
-    const page = RELIQUARY_PAGES_BY_ID[pageId];
-    if (!page) return undefined;
-    return clearCountForSource(this.primary, page.clearSource);
+    return reliquaryReads.reliquaryPageClearCountFor(pageId, this.primary);
   }
   // Offline the sandbox has no population, so there is no relic rarity to
   // report: always null (the facet's documented no-data value; the window

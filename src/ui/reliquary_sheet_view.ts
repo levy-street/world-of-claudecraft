@@ -8,6 +8,8 @@ import {
   curatorRankFromOwned,
   type OwnedIdLookup,
 } from '../sim/reliquary';
+import { withAccountRelics } from '../sim/reliquary_account';
+import type { AccountReliquaryLedger } from '../world_api/cosmetics';
 import { esc } from './esc';
 import { formatNumber, t } from './i18n';
 import { curatorRankNameKey } from './reliquary_view';
@@ -18,6 +20,8 @@ export interface ReliquarySheetWorld {
   reliquaryMarks: OwnedIdLookup;
   ownedMounts(): readonly string[];
   deedsEarned: OwnedIdLookup;
+  /** The account ledger rides the cosmetics facet; absent offline. */
+  accountCosmetics?: { reliquary?: AccountReliquaryLedger };
 }
 
 export interface ReliquarySheetModel {
@@ -26,14 +30,17 @@ export interface ReliquarySheetModel {
   curatorRank: number;
 }
 
-/** Pure character-scoped completion + rank for the paperdoll progression block. */
+/** Pure account-wide completion + rank for the paperdoll progression block. */
 export function buildReliquarySheetModel(world: ReliquarySheetWorld): ReliquarySheetModel {
-  const opts = {
-    itemsDiscovered: world.deedStats.itemsDiscovered,
-    marks: world.reliquaryMarks,
-    ownedMounts: new Set(world.ownedMounts()),
-    deedsEarned: world.deedsEarned,
-  };
+  const opts = withAccountRelics(
+    {
+      itemsDiscovered: world.deedStats.itemsDiscovered,
+      marks: world.reliquaryMarks,
+      ownedMounts: new Set(world.ownedMounts()),
+      deedsEarned: world.deedsEarned,
+    },
+    world.accountCosmetics?.reliquary,
+  );
   const completion = catalogCharacterCompletion(opts);
   return {
     owned: completion.owned,

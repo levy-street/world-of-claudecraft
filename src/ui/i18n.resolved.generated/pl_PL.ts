@@ -4433,6 +4433,8 @@ export const pl_PL: EnTranslations = {
       "completionAria": "Wypełnione relikwie: {owned} z {total}",
       "curatorRank": "Ranga Kustosza {rank}",
       "curatorUnranked": "Kustosz bez rangi",
+      "accountWide": "Shared across your characters",
+      "accountWideHint": "A relic found by any character on your account fills the page here too.",
       "curatorRankName1": "Kustosz adept",
       "curatorRankName2": "Strażnik Łupów",
       "curatorRankName3": "Mistrz Kustosz",
@@ -6434,7 +6436,7 @@ export const pl_PL: EnTranslations = {
     "reliquaryPage": {
       "intro": "Relikwiarz to muzeum wyjątkowych łupów, które skatalogowałeś: wyczekiwane okazy z lochów, trofea zawodowe, wierzchowce, wyglądy broni i tytuły. Idzie w parze z Księgą Czynów tak, jak sala trofeów idzie w parze z księgą osiągnięć.",
       "howHeading": "Jak działa kolekcja",
-      "howBody": "Otwórz Relikwiarz w grze (domyślnie Shift+X). Każda półka mieści karty wyjątkowych relikwii. Sylwetkę wypełniasz, gdy po raz pierwszy zdobędziesz dany przedmiot na tej postaci, a kartę iluminujesz, gdy wypełnisz na niej wszystkie relikwie. Kilka kart nosi oznaczenie Wycofana lub Osobista: stoją poza ukończeniem, więc nigdy nie blokują półki ani całego katalogu. Znaleziska pojawiają się od razu jako powiadomienie i odświeżają otwarte okno; postępy są przypisane do postaci, z wyjątkiem wyglądów broni, które są kosmetyką konta.",
+      "howBody": "Otwórz Relikwiarz w grze (domyślnie Shift+X). Każda półka zawiera strony z unikatowymi relikwiami. Sylwetka wypełnia się, gdy dowolna postać na twoim koncie zdobędzie ten przedmiot po raz pierwszy, a strona rozświetla się, gdy wypełniona jest każda relikwia na niej. Kilka stron nosi oznaczenie Wycofana lub Osobista: pozostają poza ukończeniem, więc nigdy nie blokują półki ani całego katalogu. Znaleziska pojawiają się od razu jako powiadomienie i odświeżają otwarte okno; postępy są wspólne dla wszystkich postaci na koncie, więc relikwia znaleziona przez jedną postać wypełnia stronę dla wszystkich.",
       "ranksHeading": "Rangi Kustosza",
       "ranksBody": "Rangi Kustosza rosną wraz z każdą skatalogowaną wyjątkową relikwią i przyznają wyłącznie kosmetyczne tytuły oraz obramowania. Nigdy nie dają siły bojowej, szansy na łup ani rekompensaty za pecha. Wyglądy broni przypisane do konta nie liczą się do rangi Kustosza, dzięki czemu prestiż pozostaje związany z postacią, a relikwie z kart Wycofanych lub Osobistych również się do niej nie liczą.",
       "retiredTag": "Wycofana",

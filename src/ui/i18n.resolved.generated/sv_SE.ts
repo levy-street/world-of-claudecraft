@@ -4433,6 +4433,8 @@ export const sv_SE: EnTranslations = {
       "completionAria": "Fyllda reliker: {owned} av {total}",
       "curatorRank": "Intendentgrad {rank}",
       "curatorUnranked": "Intendent utan grad",
+      "accountWide": "Shared across your characters",
+      "accountWideHint": "A relic found by any character on your account fills the page here too.",
       "curatorRankName1": "Lärlingsintendent",
       "curatorRankName2": "Bytesväktare",
       "curatorRankName3": "Mästerintendent",
@@ -6434,7 +6436,7 @@ export const sv_SE: EnTranslations = {
     "reliquaryPage": {
       "intro": "Relikvariet är museet över det unika byte du har katalogiserat: eftertraktade fynd ur fängelsehålor, yrkestroféer, riddjur, vapenutseenden och titlar. Det hör ihop med Bedrifternas bok på samma sätt som en trofésal hör ihop med en bragdbok.",
       "howHeading": "Så fungerar samlingen",
-      "howBody": "Öppna Relikvariet i spelet (Skift+X som standard). Varje hylla rymmer sidor med unika reliker. Du fyller en silhuett när du får just det föremålet för första gången på den rollpersonen, och du illuminerar en sida när varje relik på den är fylld. Ett fåtal sidor är märkta Utgången eller Personlig: de står utanför fullbordandet och spärrar därför aldrig en hylla eller hela katalogen. Fynd ger en avisering direkt och uppdaterar det öppna fönstret; framstegen hör till rollpersonen, utom vapenutseenden, som är kontokosmetika.",
+      "howBody": "Öppna Relikgömman i spelet (standard Skift+X). Varje hylla rymmer sidor med unika reliker. En siluett fylls när vilken rollperson som helst på ditt konto får föremålet för första gången, och en sida lyses upp när varje relik på den är fylld. Några sidor är märkta Utgången eller Personlig: de står utanför fullbordan och spärrar därför aldrig en hylla eller hela katalogen. Fynd ger en avisering direkt och uppdaterar det öppna fönstret; framstegen delas av alla rollpersoner på kontot, så en relik som en rollperson hittar fyller sidan för alla.",
       "ranksHeading": "Intendent-grader",
       "ranksBody": "Intendent-graderna stiger med varje unik katalogiserad relik och ger uteslutande kosmetiska titlar och ramar. De ger aldrig stridsstyrka, byteschans eller oturskompensation. Vapenutseenden knutna till kontot ger inga poäng mot Intendent-graden, så att anseendet förblir knutet till rollpersonen, och reliker på Utgångna eller Personliga sidor ger inte heller några poäng mot den.",
       "retiredTag": "Utgången",

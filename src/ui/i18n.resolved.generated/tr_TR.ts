@@ -4433,6 +4433,8 @@ export const tr_TR: EnTranslations = {
       "completionAria": "Dolan yadigârlar: {total} içinde {owned}",
       "curatorRank": "Küratör derecesi {rank}",
       "curatorUnranked": "Derecesiz Küratör",
+      "accountWide": "Shared across your characters",
+      "accountWideHint": "A relic found by any character on your account fills the page here too.",
       "curatorRankName1": "Çırak Küratör",
       "curatorRankName2": "Ganimet Bekçisi",
       "curatorRankName3": "Usta Küratör",
@@ -6434,7 +6436,7 @@ export const tr_TR: EnTranslations = {
     "reliquaryPage": {
       "intro": "Yadigârlık, kataloğuna geçirdiğin benzersiz ganimetlerin müzesidir: zindanların peşine düşülen parçaları, meslek ödülleri, binekler, silah görünümleri ve unvanlar. Bir ödül salonu bir başarı kitabıyla nasıl eşleşirse, o da Yiğitlikler Kitabı'yla öyle eşleşir.",
       "howHeading": "Koleksiyon nasıl işler",
-      "howBody": "Yadigârlık'ı oyun içinde aç (varsayılan Shift+X). Her raf, benzersiz yadigârlardan oluşan sayfalar barındırır. O parçayı bu karakterde ilk kez elde ettiğinde bir silueti doldurursun, sayfadaki her yadigâr dolduğunda ise sayfayı tezhiplersin. Birkaç sayfa Kaldırıldı ya da Kişisel olarak etiketlidir: bunlar tamamlamanın dışında durur, bu yüzden hiçbir rafı ya da katalogun tamamını kilitlemez. Anlık bulunanlar bir bildirim çıkarır ve açık pencereyi tazeler; ilerleme karaktere özeldir, hesap kozmetiği olan silah görünümleri bunun dışındadır.",
+      "howBody": "Oyunda Kutsal Emanetliği aç (varsayılan Shift+X). Her raf, benzersiz emanet sayfaları barındırır. Hesabındaki herhangi bir karakter o parçayı ilk kez elde ettiğinde siluet dolar; sayfadaki her emanet dolduğunda sayfa aydınlanır. Birkaç sayfa Emekli veya Kişisel olarak etiketlidir: tamamlamanın dışında kalırlar, bu yüzden hiçbir zaman bir rafı ya da tüm kataloğu kilitlemezler. Anlık bulunanlar bir bildirim çıkarır ve açık pencereyi tazeler; ilerleme hesaptaki tüm karakterler arasında paylaşılır, dolayısıyla bir karakterin bulduğu emanet sayfayı herkes için doldurur.",
       "ranksHeading": "Küratör dereceleri",
       "ranksBody": "Küratör dereceleri kataloğa giren her benzersiz yadigârla yükselir ve yalnızca kozmetik unvanlar ile çerçeveler verir. Asla savaş gücü, ganimet şansı ya da şanssızlık telafisi vermez. Hesaba bağlı silah görünümleri Küratör derecesine puan yazmaz, böylece itibar karaktere bağlı kalır; Kaldırıldı ya da Kişisel sayfalardaki yadigârlar da bu dereceye hiçbir puan yazmaz.",
       "retiredTag": "Kaldırıldı",

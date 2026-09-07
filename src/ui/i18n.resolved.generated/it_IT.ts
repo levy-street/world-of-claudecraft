@@ -4433,6 +4433,8 @@ export const it_IT: EnTranslations = {
       "completionAria": "Reliquie riempite: {owned} su {total}",
       "curatorRank": "Grado di Curatore {rank}",
       "curatorUnranked": "Curatore senza grado",
+      "accountWide": "Shared across your characters",
+      "accountWideHint": "A relic found by any character on your account fills the page here too.",
       "curatorRankName1": "Curatore apprendista",
       "curatorRankName2": "Custode dei bottini",
       "curatorRankName3": "Maestro Curatore",
@@ -6434,7 +6436,7 @@ export const it_IT: EnTranslations = {
     "reliquaryPage": {
       "intro": "Il Reliquiario è il museo dei bottini unici che hai catalogato: i pezzi più ambiti dei dungeon, i trofei di professione, le cavalcature, gli aspetti delle armi e i titoli. Fa coppia con il Libro delle Imprese come una sala dei trofei fa coppia con un libro delle conquiste.",
       "howHeading": "Come funziona la collezione",
-      "howBody": "Apri Il Reliquiario in gioco (Maiusc+X di base). Ogni scaffale custodisce pagine di reliquie uniche. Riempi una sagoma quando ottieni quel pezzo per la prima volta con quel personaggio, e minia una pagina quando ogni sua reliquia è riempita. Alcune pagine portano l'etichetta Ritirata o Personale: restano fuori dal completamento, quindi non bloccano mai uno scaffale né l'intero catalogo. I ritrovamenti in tempo reale mostrano un avviso e aggiornano la finestra aperta; i progressi sono legati al personaggio, tranne gli aspetti delle armi, che sono cosmetici dell'account.",
+      "howBody": "Apri Il Reliquiario in gioco (Maiusc+X per impostazione predefinita). Ogni scaffale contiene pagine di reliquie uniche. Una sagoma si riempie quando un qualsiasi personaggio del tuo account ottiene quel pezzo per la prima volta, e una pagina si illumina quando ogni reliquia al suo interno è riempita. Alcune pagine sono contrassegnate come Ritirata o Personale: restano fuori dal completamento, quindi non bloccano mai uno scaffale o l'intero catalogo. I ritrovamenti dal vivo mostrano un avviso e aggiornano la finestra aperta; i progressi sono condivisi da tutti i personaggi dell'account, così una reliquia trovata da un personaggio riempie la pagina per tutti.",
       "ranksHeading": "Gradi di Curatore",
       "ranksBody": "I gradi di Curatore salgono con ogni reliquia unica catalogata e concedono soltanto titoli e bordi cosmetici. Non danno mai potenza in combattimento, probabilità di bottino o compensazione per la sfortuna. Gli aspetti delle armi legati all'account non contano per il grado di Curatore, così il prestigio resta legato al personaggio, e nemmeno le reliquie delle pagine Ritirate o Personali vi contribuiscono.",
       "retiredTag": "Ritirata",

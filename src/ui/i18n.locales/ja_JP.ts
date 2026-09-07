@@ -6420,7 +6420,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '聖遺物庫は、カタログに載せたユニークな戦利品の博物館です。ダンジョンの追撃装備、職業のトロフィー、マウント、武器スキン、称号。功績の書に対して、トロフィー室と実績帳のような関係です。',
   'guide.reliquaryPage.howHeading': 'コレクションの仕組み',
   'guide.reliquaryPage.howBody':
-    'ゲーム内で聖遺物庫を開きます（既定は Shift+X）。各棚にユニークな聖遺物のページがあります。キャラクターが初めてその品を得るとシルエットが埋まり、ページ上のすべてが埋まると点灯します。「絶版」や「専用」と表示される一部のページは達成の対象外で、棚や全体の完成を妨げることはありません。ライブの発見はトーストと開いているウィンドウの更新になります。進捗はキャラクター単位で、武器スキンだけはアカウントの見た目です。',
+    'ゲーム内で聖遺物庫を開きます（既定は Shift+X）。各棚にユニークな聖遺物のページがあります。アカウント内のいずれかのキャラクターが初めてその品を得るとシルエットが埋まり、ページ上のすべてが埋まると点灯します。「絶版」や「専用」と表示される一部のページは達成の対象外で、棚や全体の完成を妨げることはありません。ライブの発見はトーストと開いているウィンドウの更新になります。進捗はアカウント内の全キャラクターで共有され、あるキャラクターが見つけた聖遺物は全員のページを埋めます。',
   'guide.reliquaryPage.ranksHeading': 'キュレーターランク',
   'guide.reliquaryPage.ranksBody':
     'キュレーターランクはカタログに載せたユニーク埋めで上がり、装飾の称号と枠だけを与えます。戦闘力、ドロップ率、天井はありません。アカウントの武器スキンはキュレーターランクに数えず、名声はキャラクターに残ります。絶版や専用ページの聖遺物も同様にランクへは数えません。',
@@ -11717,6 +11717,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.completionAria': '埋めた聖遺物：{owned}/{total}',
   'hudChrome.reliquary.curatorRank': 'キュレーターランク {rank}',
   'hudChrome.reliquary.curatorUnranked': '未ランクのキュレーター',
+  'hudChrome.reliquary.accountWide': 'キャラクター間で共有',
+  'hudChrome.reliquary.accountWideHint': 'アカウント内のどのキャラクターが見つけた聖遺物も、ここでページを埋めます。',
   'hudChrome.reliquary.recentLabel': '最近の発見：',
   'hudChrome.reliquary.nearlyLabel': 'もうすぐ完成：',
   'hudChrome.reliquary.nearlyJumpAria': '{name}を開く、{owned}/{total} 埋め済み',

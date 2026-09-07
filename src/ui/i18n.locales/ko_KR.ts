@@ -6399,7 +6399,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '성물고는 목록에 올린 고유 전리품의 박물관입니다. 던전 추격 장비, 전문 기술 트로피, 탈것, 무기 스킨, 칭호. 공적 책과의 관계는 트로피 홀과 업적 책과 같습니다.',
   'guide.reliquaryPage.howHeading': '수집 작동 방식',
   'guide.reliquaryPage.howBody':
-    "게임에서 성물고를 엽니다(기본 Shift+X). 각 선반에 고유 성유물 페이지가 있습니다. 캐릭터가 그 조각을 처음 얻으면 실루엣이 채워지고, 페이지의 모든 성유물이 채워지면 페이지가 밝혀집니다. '단종' 또는 '전용'으로 표시된 일부 페이지는 달성 대상에서 제외되어 선반이나 전체 완성을 막지 않습니다. 실시간 발견은 알림과 열린 창 새로고침으로 이어집니다. 진행도는 캐릭터 단위이며 무기 스킨만 계정 장식입니다.",
+    "게임에서 성물고를 엽니다(기본 Shift+X). 각 선반에 고유 성유물 페이지가 있습니다. 계정의 어떤 캐릭터든 그 조각을 처음 얻으면 실루엣이 채워지고, 페이지의 모든 성유물이 채워지면 페이지가 밝혀집니다. '단종' 또는 '전용'으로 표시된 일부 페이지는 달성 대상에서 제외되어 선반이나 전체 완성을 막지 않습니다. 실시간 발견은 알림과 열린 창 새로고침으로 이어집니다. 진행도는 계정의 모든 캐릭터가 공유하므로, 한 캐릭터가 찾은 성유물은 모두의 페이지를 채웁니다.",
   'guide.reliquaryPage.ranksHeading': '큐레이터 등급',
   'guide.reliquaryPage.ranksBody':
     '큐레이터 등급은 목록에 올린 고유 채움에 따라 오르며 장식 칭호와 테두리만 줍니다. 전투 능력, 드롭률, 천장 보정은 없습니다. 계정 무기 스킨은 큐레이터 등급에 들어가지 않아 명성은 캐릭터에 남습니다. 단종·전용 페이지의 성유물도 등급에 들어가지 않습니다.',
@@ -11699,6 +11699,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.completionAria': '채운 성물: {owned}/{total}',
   'hudChrome.reliquary.curatorRank': '큐레이터 등급 {rank}',
   'hudChrome.reliquary.curatorUnranked': '미등급 큐레이터',
+  'hudChrome.reliquary.accountWide': '캐릭터 간 공유',
+  'hudChrome.reliquary.accountWideHint': '계정의 어떤 캐릭터가 찾은 성유물이든 여기서도 페이지를 채웁니다.',
   'hudChrome.reliquary.recentLabel': '최근 발견:',
   'hudChrome.reliquary.nearlyLabel': '거의 완성:',
   'hudChrome.reliquary.nearlyJumpAria': '{name} 열기, {owned}/{total} 채움',

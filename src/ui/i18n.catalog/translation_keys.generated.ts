@@ -10769,6 +10769,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.realmBuilder.title'
   | 'hudChrome.reliquary.accountScopeBadge'
   | 'hudChrome.reliquary.accountScopeNote'
+  | 'hudChrome.reliquary.accountWide'
+  | 'hudChrome.reliquary.accountWideHint'
   | 'hudChrome.reliquary.backToShelf'
   | 'hudChrome.reliquary.borderWearableNote'
   | 'hudChrome.reliquary.cellAriaWithAccountScope'

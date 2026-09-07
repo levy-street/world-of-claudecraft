@@ -6207,7 +6207,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '圣物库是你已收录的独特战利品博物馆：地下城追逐装备、专业奖杯、坐骑、武器外观与头衔。它与功绩之书的关系，就像奖杯厅与成就簿的关系。',
   'guide.reliquaryPage.howHeading': '收藏如何运作',
   'guide.reliquaryPage.howBody':
-    '在游戏中打开圣物库（默认 Shift+X）。每个架上有多页独特圣物。角色首次获得该件时填满剪影；一页上的圣物全部填满时点亮该页。少数页面标注“绝版”或“专属”：它们不计入达成，不会阻碍书架或全库的完成。实时发现会弹出提示并刷新已打开的窗口；进度按角色计算，武器外观除外（账号外观）。',
+    '在游戏中打开圣物库（默认 Shift+X）。每个架上有多页独特圣物。账号内任一角色首次获得该件时填满剪影；一页上的圣物全部填满时点亮该页。少数页面标注“绝版”或“专属”：它们不计入达成，不会阻碍书架或全库的完成。实时发现会弹出提示并刷新已打开的窗口；进度由账号内所有角色共享，一个角色找到的圣物会为所有角色填满该页。',
   'guide.reliquaryPage.ranksHeading': '策展人等级',
   'guide.reliquaryPage.ranksBody':
     '策展人等级随已收录的独特圣物上升，仅授予装饰性头衔与边框。不会提供战斗强度、掉落率或保底。账号武器外观不计策展人等级，因此声望保持角色持久。绝版与专属页面上的圣物同样不计入等级。',
@@ -11186,6 +11186,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.completionAria': '已填入圣物：{owned}/{total}',
   'hudChrome.reliquary.curatorRank': '策展人等级 {rank}',
   'hudChrome.reliquary.curatorUnranked': '未评级策展人',
+  'hudChrome.reliquary.accountWide': '账号内角色共享',
+  'hudChrome.reliquary.accountWideHint': '账号内任一角色找到的圣物也会在此填满该页。',
   'hudChrome.reliquary.recentLabel': '最近发现：',
   'hudChrome.reliquary.nearlyLabel': '即将完成：',
   'hudChrome.reliquary.nearlyJumpAria': '打开{name}，已填入 {owned}/{total}',

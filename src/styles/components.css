@@ -9778,6 +9778,18 @@
     font-weight: 400;
     color: var(--color-text-muted);
   }
+  /* The account-scope chip beside the rank: a quiet readout, not a control
+     (the tooltip carries the explanation); the pin-chip palette keeps it in
+     the window's family. */
+  .reliquary-scope {
+    flex: none;
+    font-family: var(--ui-font);
+    font-size: 11px;
+    padding: 1px 8px;
+    border-radius: var(--radius-sm);
+    border: 1px solid #4d3d1a;
+    color: var(--color-text-muted);
+  }
   /* The HUD-tracker eye at the summary's right edge: a pressed toggle (the
      paperdoll helm/playtime eye idiom) whose lit state mirrors the strip
      being on screen. Pushed to the row's end so the readouts keep their left

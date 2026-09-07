@@ -10,6 +10,8 @@ import { sanitizeRemovedZone1Content } from '../src/sim/removed_zone1_content';
 import type { CharacterState, MailSave, MarketSave } from '../src/sim/sim';
 import type { ArenaFormat, PlayerClass } from '../src/sim/types';
 import type { ActionBarLayoutProfiles, StoredActionBarLayout } from '../src/world_api/action_bar';
+import type { AccountCosmetics } from '../src/world_api/cosmetics';
+import { ACCOUNT_RELIQUARY_SCHEMA } from './account_reliquary_db';
 import { ACCOUNT_WEALTH_SCHEMA } from './account_wealth_db';
 import { AD_SPEND_SCHEMA } from './ad_spend_db';
 import { bustAdminGuildListReads } from './admin_guilds_read';
@@ -1345,9 +1347,9 @@ export async function ensureSchema(): Promise<void> {
     // bakes it. No FK on purpose: rows must survive character deletion long
     // enough for an operator to attribute them.
     await client.query(MAIL_CUSTODY_PARCELS_SCHEMA);
-    // Map editor tables: saved/forked custom maps and uploaded GLB assets.
-    // Both FK-reference accounts(id), so they run after SCHEMA. Applied
-    // unconditionally (idempotent), like the other schema modules.
+    // Map editor tables (maps + uploaded GLB assets) and the account Reliquary
+    // ledger: all FK-reference accounts(id), so they run after SCHEMA.
+    await client.query(ACCOUNT_RELIQUARY_SCHEMA);
     await client.query(MAPS_SCHEMA);
     await client.query(USER_ASSETS_SCHEMA);
     // Audit trail for the map/asset moderation actions above (unpublish,
@@ -1550,15 +1552,8 @@ export interface RequestMetadata {
   userAgent?: string | null;
 }
 
-export interface AccountCosmetics {
-  completedQuestIds: string[];
-  mechChromaIds: string[];
-  // Season 1 Armory weapon skins: owned skin ids (granted on Claudium spend,
-  // reconciled from the economy service) and the applied-skin-per-weapon-type
-  // loadout. Account-wide by design; characters never carry either.
-  weaponSkinIds: string[];
-  weaponSkinLoadout: Record<string, string>;
-}
+// One shape for both hosts: the seam type (src/world_api/cosmetics.ts) IS the row type.
+export type { AccountCosmetics };
 
 function uniqueStrings(value: unknown): string[] {
   if (!Array.isArray(value)) return [];

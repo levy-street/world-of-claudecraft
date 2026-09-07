@@ -13379,7 +13379,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Všechny sepsané stránky Relikviáře a jména relikvií, které nesou. Tento seznam uvádí jen jména bez spoilerů: otevři Relikviář ve hře, ať vidíš vlastní postup, počty průchodů a siluety.',
   'guide.reliquaryPage.catalogHeading': 'Katalog stránek',
   'guide.reliquaryPage.howBody':
-    'Otevři Relikviář ve hře (výchozí Shift+X). Každá police nese stránky jedinečných relikvií. Siluetu vyplníš, jakmile daný kus poprvé získáš na této postavě, a stránku iluminuješ, jakmile jsou vyplněné všechny její relikvie. Několik stránek nese označení Vyřazená nebo Osobní: stojí mimo dokončení, takže nikdy neblokují polici ani celý katalog. Živé nálezy se ohlásí a obnoví otevřené okno; postup je vázaný na postavu, s výjimkou vzhledů zbraní, které jsou kosmetikou účtu.',
+    'Otevři Relikviář ve hře (výchozí Shift+X). Každá police obsahuje stránky jedinečných relikvií. Silueta se vyplní, jakmile kterákoli postava na tvém účtu ten kus poprvé získá, a stránka se rozsvítí, když jsou vyplněny všechny relikvie na ní. Několik stránek je označeno Vyřazené nebo Osobní: stojí mimo dokončení, takže nikdy neblokují polici ani celý katalog. Živé nálezy se ohlásí a obnoví otevřené okno; postup sdílejí všechny postavy na účtu, takže relikvie, kterou najde jedna postava, vyplní stránku všem.',
   'guide.reliquaryPage.howHeading': 'Jak sbírka funguje',
   'guide.reliquaryPage.intro':
     'Relikviář je muzeum jedinečné kořisti, kterou jsi zkatalogizoval: vytoužené kousky z dungeonů, profesní trofeje, jezdecká zvířata, vzhledy zbraní a tituly. Ke Knize skutků patří tak, jako patří síň trofejí k knize úspěchů.',

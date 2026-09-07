@@ -46,6 +46,20 @@ const base = {
 };
 
 describe('charSheetRefreshSig', () => {
+  it('moves when the account ledger grows, with no character surface moving', () => {
+    const none = charSheetRefreshSig(base);
+    const empty = charSheetRefreshSig({
+      ...base,
+      accountRelics: { items: [], marks: [], mounts: [], titles: [] },
+    });
+    expect(empty).toBe(none);
+    const grown = charSheetRefreshSig({
+      ...base,
+      accountRelics: { items: ['cryptbone_helm'], marks: [], mounts: [], titles: [] },
+    });
+    expect(grown).not.toBe(none);
+  });
+
   it('is stable for equal input, so an unchanged pass never repaints', () => {
     expect(charSheetRefreshSig(base)).toBe(charSheetRefreshSig({ ...base }));
     const empty = {

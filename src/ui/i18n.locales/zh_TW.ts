@@ -6210,7 +6210,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '聖物庫是你已收錄的獨特戰利品博物館：地城追逐裝備、專業獎盃、坐騎、武器外觀與頭銜。它與功績之書的關係，就像獎盃廳與成就簿的關係。',
   'guide.reliquaryPage.howHeading': '收藏如何運作',
   'guide.reliquaryPage.howBody':
-    '在遊戲中開啟聖物庫（預設 Shift+X）。每個架上有多頁獨特聖物。角色首次獲得該件時填滿剪影；一頁上的聖物全部填滿時點亮該頁。少數頁面標註「絕版」或「專屬」：它們不計入達成，不會阻礙書架或全庫的完成。即時發現會跳出提示並重新整理已開啟的視窗；進度按角色計算，武器外觀除外（帳號外觀）。',
+    '在遊戲中開啟聖物庫（預設 Shift+X）。每個架上有多頁獨特聖物。帳號內任一角色首次獲得該件時填滿剪影；一頁上的聖物全部填滿時點亮該頁。少數頁面標註「絕版」或「專屬」：它們不計入達成，不會阻礙書架或全庫的完成。即時發現會跳出提示並重新整理已開啟的視窗；進度由帳號內所有角色共享，一個角色找到的聖物會為所有角色填滿該頁。',
   'guide.reliquaryPage.ranksHeading': '策展人等級',
   'guide.reliquaryPage.ranksBody':
     '策展人等級隨已收錄的獨特聖物上升，僅授予裝飾性頭銜與邊框。不會提供戰鬥強度、掉落率或保底。帳號武器外觀不計策展人等級，因此聲望保持角色持久。絕版與專屬頁面上的聖物同樣不計入等級。',
@@ -11189,6 +11189,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.completionAria': '已填入聖物：{owned}/{total}',
   'hudChrome.reliquary.curatorRank': '策展人等級 {rank}',
   'hudChrome.reliquary.curatorUnranked': '未評級策展人',
+  'hudChrome.reliquary.accountWide': '帳號內角色共享',
+  'hudChrome.reliquary.accountWideHint': '帳號內任一角色找到的聖物也會在此填滿該頁。',
   'hudChrome.reliquary.recentLabel': '最近發現：',
   'hudChrome.reliquary.nearlyLabel': '即將完成：',
   'hudChrome.reliquary.nearlyJumpAria': '開啟{name}，已填入 {owned}/{total}',

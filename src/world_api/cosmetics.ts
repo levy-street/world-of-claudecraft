@@ -8,6 +8,26 @@ export interface AccountCosmetics {
   // loadout. Both are account state: every character on the account shares them.
   weaponSkinIds: string[];
   weaponSkinLoadout: Record<string, string>;
+  // The account Reliquary ledger (src/sim/reliquary_account.ts): every
+  // catalogued relic any character on the account has ever filled, by kind.
+  // Optional on the wire and in every literal so the pre-ledger shape still
+  // type-checks; absent reads as empty. The offline Sim (one character, one
+  // account) never carries one.
+  reliquary?: AccountReliquaryLedger;
+}
+
+/**
+ * Account-wide Reliquary ownership: catalogued relic ids the account has
+ * filled on ANY character, one sorted, de-duped list per relic kind. Weapon
+ * skins are already account state (weaponSkinIds) and never ride here. This
+ * is ownership only: first-find provenance, obtain tallies, and the recent
+ * ring stay per character. Bounded by the catalog on every host.
+ */
+export interface AccountReliquaryLedger {
+  items: string[];
+  marks: string[];
+  mounts: string[];
+  titles: string[];
 }
 
 export interface IWorldCosmetics {

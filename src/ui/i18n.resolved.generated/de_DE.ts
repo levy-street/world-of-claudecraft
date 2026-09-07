@@ -4433,6 +4433,8 @@ export const de_DE: EnTranslations = {
       "completionAria": "Gefüllte Reliquien: {owned} von {total}",
       "curatorRank": "Kustos-Rang {rank}",
       "curatorUnranked": "Kustos ohne Rang",
+      "accountWide": "Shared across your characters",
+      "accountWideHint": "A relic found by any character on your account fills the page here too.",
       "curatorRankName1": "Kustos-Lehrling",
       "curatorRankName2": "Beutewahrer",
       "curatorRankName3": "Meisterkustos",
@@ -6434,7 +6436,7 @@ export const de_DE: EnTranslations = {
     "reliquaryPage": {
       "intro": "Das Reliquiar ist das Museum der einzigartigen Beute, die du katalogisiert hast: begehrte Einzelstücke aus Dungeons, Berufstrophäen, Reittiere, Waffenoptiken und Titel. Es ergänzt das Buch der Taten so, wie eine Trophäenhalle ein Erfolgsbuch ergänzt.",
       "howHeading": "Wie die Sammlung funktioniert",
-      "howBody": "Öffne Das Reliquiar im Spiel (standardmäßig Umschalt+X). Jedes Regal beherbergt Seiten einzigartiger Reliquien. Du füllst eine Silhouette, sobald du dieses Stück zum ersten Mal auf dem Charakter erhältst, und illuminierst eine Seite, sobald jede Reliquie darauf gefüllt ist. Einige Seiten tragen die Kennzeichnung Ausgemustert oder Persönlich: Sie stehen außerhalb der Vervollständigung und blockieren daher niemals ein Regal oder den gesamten Katalog. Funde erscheinen sofort als Hinweis und aktualisieren das offene Fenster; der Fortschritt gilt pro Charakter, ausgenommen Waffenoptiken, die Kontokosmetik sind.",
+      "howBody": "Öffne Das Reliquiar im Spiel (standardmäßig Umschalt+X). Jedes Regal beherbergt Seiten einzigartiger Reliquien. Eine Silhouette füllt sich, sobald irgendein Charakter deines Kontos dieses Stück zum ersten Mal erhält, und eine Seite wird illuminiert, sobald jede Reliquie darauf gefüllt ist. Einige Seiten tragen die Kennzeichnung Ausgemustert oder Persönlich: Sie stehen außerhalb der Vervollständigung und blockieren daher niemals ein Regal oder den gesamten Katalog. Funde erscheinen sofort als Hinweis und aktualisieren das offene Fenster; der Fortschritt gilt für alle Charaktere des Kontos gemeinsam, sodass eine Reliquie, die ein Charakter findet, die Seite für alle füllt.",
       "ranksHeading": "Kustos-Ränge",
       "ranksBody": "Kustos-Ränge steigen mit jeder katalogisierten einzigartigen Reliquie und gewähren ausschließlich kosmetische Titel und Rahmen. Sie geben niemals Kampfkraft, Beutechance oder einen Pechausgleich. Kontoweite Waffenoptiken zählen nicht für den Kustos-Rang, damit das Ansehen am Charakter haften bleibt, und Reliquien auf ausgemusterten oder persönlichen Seiten zählen ebenfalls nicht dafür.",
       "retiredTag": "Ausgemustert",

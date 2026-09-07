@@ -4433,6 +4433,8 @@ export const id_ID: EnTranslations = {
       "completionAria": "Relik terisi: {owned} dari {total}",
       "curatorRank": "Peringkat Kurator {rank}",
       "curatorUnranked": "Kurator Tanpa Peringkat",
+      "accountWide": "Shared across your characters",
+      "accountWideHint": "A relic found by any character on your account fills the page here too.",
       "curatorRankName1": "Kurator Magang",
       "curatorRankName2": "Penjaga Rampasan",
       "curatorRankName3": "Kurator Ahli",
@@ -6434,7 +6436,7 @@ export const id_ID: EnTranslations = {
     "reliquaryPage": {
       "intro": "Relikuari adalah museum rampasan unik yang telah kamu katalogkan: benda buruan dari ruang bawah tanah, trofi profesi, tunggangan, tampilan senjata, dan gelar. Ia berpasangan dengan Kitab Jasa seperti aula trofi berpasangan dengan buku pencapaian.",
       "howHeading": "Cara kerja koleksinya",
-      "howBody": "Buka Relikuari di dalam game (bawaan Shift+X). Setiap rak memuat halaman berisi relik unik. Kamu mengisi sebuah siluet saat pertama kali memperoleh benda itu pada karakter tersebut, dan menerangi sebuah halaman saat setiap relik di dalamnya sudah terisi. Beberapa halaman berlabel Ditarik atau Pribadi: halaman itu berada di luar penuntasan, jadi tidak pernah mengunci sebuah rak maupun seluruh katalog. Temuan langsung memunculkan pemberitahuan dan menyegarkan jendela yang terbuka; kemajuan bersifat per karakter, kecuali tampilan senjata, yang merupakan kosmetik akun.",
+      "howBody": "Buka Relikuari dalam game (bawaan Shift+X). Setiap rak menampung halaman relik unik. Siluet terisi saat karakter mana pun di akunmu memperoleh benda itu untuk pertama kalinya, dan halaman menyala saat setiap relik di dalamnya terisi. Beberapa halaman berlabel Pensiun atau Pribadi: halaman itu berada di luar penyelesaian, jadi tidak pernah menghalangi rak atau seluruh katalog. Temuan langsung memunculkan pemberitahuan dan menyegarkan jendela yang terbuka; kemajuan dibagi oleh semua karakter di akun, sehingga relik yang ditemukan satu karakter mengisi halaman untuk semuanya.",
       "ranksHeading": "Peringkat Kurator",
       "ranksBody": "Peringkat Kurator naik seiring setiap relik unik yang terkatalog dan hanya memberi gelar serta bingkai kosmetik. Peringkat itu tidak pernah memberi kekuatan tempur, peluang jarahan, atau kompensasi kesialan. Tampilan senjata milik akun tidak menambah peringkat Kurator agar prestise tetap melekat pada karakter, dan relik pada halaman Ditarik atau Pribadi juga tidak menambahnya.",
       "retiredTag": "Ditarik",

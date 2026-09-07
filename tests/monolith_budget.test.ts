@@ -559,7 +559,11 @@ const MONOLITHS: MonolithRow[] = [
     // Nythraxis release merge. Exact merged count remains below both parents.
     // The Drakelands sandbox extraction and dev-freeze additions preserve
     // this exact count after the next release integration.
-    ceiling: 12212,
+    // Lowered to the measured merged count by the account-bound Reliquary
+    // (the four IWorldReliquary completion reads moved to
+    // src/sim/reliquary_reads.ts, one implementation both hosts delegate to,
+    // which paid for the PlayerMeta.accountRelics stamp). Exact merged count.
+    ceiling: 12208,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -711,7 +715,10 @@ const MONOLITHS: MonolithRow[] = [
     // Down 10604 -> 10587 for the per-surface action-bar profiles: the
     // join read, the per-profile merge and the FIFO write moved to
     // server/hotbar_layout.ts (HotbarLayoutStore). Exact count.
-    ceiling: 10587,
+    // Lowered from 10587 by the account-bound Reliquary: the Curator standing
+    // resolution moved to server/account_reliquary.ts (curatorStandingFor) beside
+    // the account-ledger fold, which paid for the three fold call sites.
+    ceiling: 10584,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -791,7 +798,9 @@ const MONOLITHS: MonolithRow[] = [
     // The class-balance ability presentation and release Nythraxis ground
     // telegraph extractions both survive the merge. The combined file is
     // measured at 5842 lines, below both parent pins (5855 and 5843).
-    ceiling: 5842,
+    // Lowered to the measured merged count by the account-bound Reliquary: the
+    // completion reads delegate to src/sim/reliquary_reads.ts. Exact count.
+    ceiling: 5839,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -871,7 +880,9 @@ const MONOLITHS: MonolithRow[] = [
     // log statement (loadGuildBankLogRows, its row shape and its lowered
     // statement timeout) moved to server/guild_bank_log_db.ts when it grew a
     // page cursor and a `more` probe. Exact count.
-    ceiling: 5003,
+    // Lowered from 5003 by the account-bound Reliquary: AccountCosmetics is the
+    // seam type re-exported (src/world_api/cosmetics.ts), no second interface.
+    ceiling: 4998,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {

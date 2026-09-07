@@ -331,6 +331,20 @@ describe('characterSheet: reliquary completion pair + rank', () => {
     expect(json).not.toContain('"count"');
   });
 
+  it('unions the account ledger into the public pair and rank (account-bound Reliquary)', () => {
+    const state = makeState({ reliquary: { firstFind: {}, marks: [], recent: [] } });
+    const alone = sheetReliquaryFromState(state);
+    expect(alone.owned).toBe(0);
+    expect(alone.curatorRank).toBe(0);
+    const ledger = { items: [cataloguedItemIds()[0]], marks: [], mounts: [], titles: [] };
+    const withLedger = sheetReliquaryFromState(state, ledger);
+    expect(withLedger.owned).toBe(1);
+    expect(withLedger.curatorRank).toBe(1);
+    expect(withLedger.total).toBe(alone.total);
+    // The recent strip stays the character's own history: a ledger fill is not a find here.
+    expect(withLedger.recent).toEqual([]);
+  });
+
   it('strips the ring to the newest SHEET_RECENT_RELICS entries, newest first', () => {
     // Literal: the shipped bound re-pinned line-adjacent, so this test's slice
     // arithmetic cannot self-agree with a drifted constant.

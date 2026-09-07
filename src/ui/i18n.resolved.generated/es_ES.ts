@@ -4433,6 +4433,8 @@ export const es_ES: EnTranslations = {
       "completionAria": "Reliquias rellenadas: {owned} de {total}",
       "curatorRank": "Rango de Curador {rank}",
       "curatorUnranked": "Curador sin rango",
+      "accountWide": "Shared across your characters",
+      "accountWideHint": "A relic found by any character on your account fills the page here too.",
       "curatorRankName1": "Curador aprendiz",
       "curatorRankName2": "Guardabotines",
       "curatorRankName3": "Curador maestro",
@@ -6434,7 +6436,7 @@ export const es_ES: EnTranslations = {
     "reliquaryPage": {
       "intro": "El Relicario es el museo de botines únicos que has catalogado: las piezas más codiciadas de las mazmorras, trofeos de profesión, monturas, aspectos de arma y títulos. Acompaña al Libro de Gestas igual que una sala de trofeos acompaña a un libro de logros.",
       "howHeading": "Cómo funciona la colección",
-      "howBody": "Abre El Relicario en el juego (Shift+X por defecto). Cada estante guarda páginas de reliquias únicas. Rellena una silueta cuando obtengas esa pieza por primera vez con el personaje, e ilumina una página cuando todas sus reliquias estén rellenas. Algunas páginas llevan la etiqueta Retirada o Personal: quedan fuera de la finalización, así que nunca bloquean un estante ni el catálogo entero. Los hallazgos en directo lanzan un aviso y refrescan la ventana abierta; el progreso es propio de cada personaje, salvo los aspectos de arma, que son cosméticos de la cuenta.",
+      "howBody": "Abre El Relicario en el juego (Mayús+X por defecto). Cada estante contiene páginas de reliquias únicas. Una silueta se rellena cuando cualquier personaje de tu cuenta obtiene esa pieza por primera vez, y una página se ilumina cuando todas sus reliquias están rellenas. Unas pocas páginas se marcan como Retirada o Personal: quedan fuera de la compleción, así que nunca bloquean un estante ni el catálogo entero. Los hallazgos en vivo lanzan un aviso y refrescan la ventana abierta; el progreso lo comparten todos los personajes de la cuenta, de modo que una reliquia que encuentra un personaje rellena la página para todos.",
       "ranksHeading": "Rangos de Curador",
       "ranksBody": "Los rangos de Curador suben con cada reliquia única catalogada y solo otorgan títulos y bordes cosméticos. Nunca dan poder de combate, probabilidad de botín ni compensación por mala suerte. Los aspectos de arma de cuenta no puntúan para el rango de Curador, de modo que el prestigio sigue siendo propio del personaje, y las reliquias de páginas Retiradas o Personales tampoco puntúan para él.",
       "retiredTag": "Retirada",

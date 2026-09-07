@@ -15,6 +15,7 @@
 // fill chain builds its ownership snapshot ONCE and threads it, rather than
 // rescanning inventory + bank for owned mounts at every step.
 
+import type { AccountReliquaryLedger } from '../world_api/cosmetics';
 import {
   isCataloguedRelicItem,
   isCataloguedRelicMark,
@@ -1007,7 +1008,7 @@ function buildCatalogIndex(pages: readonly ReliquaryPageDef[]): ReliquaryCatalog
   };
 }
 
-function catalogIndexFor(pages: readonly ReliquaryPageDef[]): ReliquaryCatalogIndex {
+export function catalogIndexFor(pages: readonly ReliquaryPageDef[]): ReliquaryCatalogIndex {
   const cached = catalogIndexByPages.get(pages);
   if (cached !== undefined) return cached;
   const built = buildCatalogIndex(pages);
@@ -1259,6 +1260,9 @@ export function reliquaryOwnershipOpts(input: {
   ownedMounts?: readonly string[] | OwnedIdLookup;
   weaponSkinIds?: readonly string[] | OwnedIdLookup;
   deedsEarned?: OwnedIdLookup;
+  /** The account ledger (accountCosmetics.reliquary online, PlayerMeta.accountRelics
+   *  in the sim): unioned into every surface but skins. Absent or empty offline. */
+  accountRelics?: AccountReliquaryLedger;
 }): {
   itemsDiscovered: OwnedIdLookup;
   marks?: OwnedIdLookup;
@@ -1266,18 +1270,57 @@ export function reliquaryOwnershipOpts(input: {
   weaponSkins?: OwnedIdLookup;
   deedsEarned?: OwnedIdLookup;
 } {
+  return withAccountRelics(
+    {
+      itemsDiscovered: input.itemsDiscovered,
+      marks: input.marks,
+      ownedMounts: asOwnedLookup(input.ownedMounts),
+      weaponSkins: asOwnedLookup(input.weaponSkinIds),
+      deedsEarned: input.deedsEarned,
+    },
+    input.accountRelics,
+  );
+}
+
+/** `own` OR any of `ids`; returns `own` itself when there is nothing to add. */
+function unionOwnedLookup(own: OwnedIdLookup, ids: readonly string[] | undefined): OwnedIdLookup {
+  if (!ids || ids.length === 0) return own;
+  const set = new Set(ids);
+  return { has: (id) => own.has(id) || set.has(id) };
+}
+
+const NONE: OwnedIdLookup = { has: () => false };
+
+/**
+ * Ownership surfaces that answer for the whole ACCOUNT: the character's own
+ * surfaces unioned with the account ledger (src/sim/reliquary_account.ts).
+ * Weapon skins are already account state and pass through untouched. With an
+ * absent or empty ledger the input object is returned as it is, so the
+ * offline Sim (one character, one account) pays nothing. This is THE union
+ * every completion read and every grant path applies; there is no second one.
+ */
+export function withAccountRelics<
+  T extends { itemsDiscovered: OwnedIdLookup } & Partial<ReliquaryOwnershipSurfaces>,
+>(surfaces: T, ledger: AccountReliquaryLedger | undefined): T {
+  if (
+    !ledger ||
+    (ledger.items.length | ledger.marks.length | ledger.mounts.length | ledger.titles.length) === 0
+  ) {
+    return surfaces;
+  }
   return {
-    itemsDiscovered: input.itemsDiscovered,
-    marks: input.marks,
-    ownedMounts: asOwnedLookup(input.ownedMounts),
-    weaponSkins: asOwnedLookup(input.weaponSkinIds),
-    deedsEarned: input.deedsEarned,
+    ...surfaces,
+    itemsDiscovered: unionOwnedLookup(surfaces.itemsDiscovered, ledger.items),
+    marks: unionOwnedLookup(surfaces.marks ?? NONE, ledger.marks),
+    ownedMounts: unionOwnedLookup(surfaces.ownedMounts ?? NONE, ledger.mounts),
+    deedsEarned: unionOwnedLookup(surfaces.deedsEarned ?? NONE, ledger.titles),
   };
 }
 
 /**
- * Character-scoped ownership for mutation paths and join sync: items, marks,
- * live ownedMounts (bags+bank reins), and deedsEarned. Weapon skins are
+ * Account-wide ownership for mutation paths and join sync: the character's
+ * items, marks, live ownedMounts (bags+bank reins), and deedsEarned, each
+ * unioned with the account ledger. Weapon skins are
  * account cosmetics and are not on PlayerMeta; hosts pass them separately
  * for page/Overview fills only (never rank grants).
  */
@@ -1289,12 +1332,21 @@ export interface ReliquaryOwnershipSurfaces {
 }
 
 export function characterReliquaryOwnership(meta: PlayerMeta): ReliquaryOwnershipSurfaces {
-  return {
-    itemsDiscovered: meta.deedStats.itemsDiscovered,
-    marks: meta.reliquary.marks,
-    ownedMounts: new Set(ownedMountKeys(meta)),
-    deedsEarned: meta.deedsEarned,
-  };
+  // The Reliquary counts for the ACCOUNT: every surface answers for the
+  // character's own fills OR the account ledger (meta.accountRelics, a
+  // live-only server stamp, empty offline). This is THE union every grant path
+  // reads (rank deeds, completion deeds, illumination, the wire standing), so
+  // a relic another character on the account found scores here exactly as
+  // one this character found.
+  return withAccountRelics(
+    {
+      itemsDiscovered: meta.deedStats.itemsDiscovered,
+      marks: meta.reliquary.marks,
+      ownedMounts: new Set(ownedMountKeys(meta)),
+      deedsEarned: meta.deedsEarned,
+    },
+    meta.accountRelics,
+  );
 }
 
 function asOwnedLookup(

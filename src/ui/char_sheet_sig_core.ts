@@ -75,6 +75,9 @@
  * fixed six-element array through JSON.stringify), so a latch comparing two
  * signatures moves exactly when one of the six moves.
  */
+import { accountReliquaryLedgerSize } from '../sim/reliquary_account';
+import type { AccountReliquaryLedger } from '../world_api/cosmetics';
+
 export function charSheetRefreshSig(parts: {
   activeTitle: string | null;
   activeBorder: string | null;
@@ -86,6 +89,10 @@ export function charSheetRefreshSig(parts: {
   marks: number;
   /** ownedMounts().length: Horizons mount relics behind the pair. */
   mounts: number;
+  /** accountCosmetics.reliquary, folded to its size here: fills other
+   *  characters on the account made, which move the pair without moving any
+   *  of the four character surfaces above. */
+  accountRelics?: AccountReliquaryLedger;
 }): string {
   return JSON.stringify([
     parts.activeTitle,
@@ -94,5 +101,6 @@ export function charSheetRefreshSig(parts: {
     parts.itemsDiscovered,
     parts.marks,
     parts.mounts,
+    accountReliquaryLedgerSize(parts.accountRelics),
   ]);
 }

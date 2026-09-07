@@ -226,9 +226,14 @@ describe('painter hygiene', () => {
       expect(src, name).toContain('ownedMounts: this.ownedMounts()');
       expect(src, name).toContain('weaponSkinIds: this.accountCosmetics.weaponSkinIds');
       expect(src, name).toMatch(/deedsEarned: this\.(primary\.)?deedsEarned/);
-      // Rank excludes skins via catalogRankOwned (aligned with grant path).
-      expect(src, name).toContain('catalogRankOwned');
+      // Account-bound: the ledger rides the same opts (PlayerMeta stamp offline,
+      // the cosmetics mirror online), so every read unions it in one place.
+      expect(src, name).toContain('accountRelics: this.accountCosmetics.reliquary');
+      // Rank delegates to the shared host reads, which exclude skins via
+      // catalogRankOwned (aligned with grant path).
+      expect(src, name).toContain('reliquaryCuratorRankFor');
     }
+    expect(read('../src/sim/reliquary_reads.ts')).toContain('catalogRankOwned');
   });
 
   it('shows the source lines on missing cells only, in tooltip AND label', () => {

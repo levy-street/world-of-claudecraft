@@ -40,6 +40,8 @@ import type {
   GuildLeaderboardEntry,
   LeaderboardEntry,
 } from '../src/world_api';
+import type { AccountReliquaryLedger } from '../src/world_api/cosmetics';
+import { loadAccountReliquary } from './account_reliquary_db';
 import { characterSheet, SHEET_RECENT_DEEDS, type SheetRank } from './character_sheet';
 import {
   type ArenaLeaderRow,
@@ -424,6 +426,7 @@ interface PublicSheetDb {
   guildNameForCharacter(characterId: number): Promise<string | null>;
   lifetimeXpRankForCharacter(characterId: number): Promise<{ rank: number; total: number } | null>;
   recentDeedsForCharacter(characterId: number, limit: number): Promise<RecentDeedRow[]>;
+  loadAccountReliquary(accountId: number): Promise<AccountReliquaryLedger>;
 }
 
 /** The non-DB inputs the public sheet needs (realm, share origin, rank shaper). */
@@ -448,10 +451,12 @@ export async function readPublicSheet(
   if (!target) return { status: 404, body: { error: 'character not found' } };
   const row = await db.getCharacterById(target.characterId);
   if (!row) return { status: 404, body: { error: 'character not found' } };
-  const [guild, rank, deedsRecent] = await Promise.all([
+  const [guild, rank, deedsRecent, accountRelics] = await Promise.all([
     db.guildNameForCharacter(row.id),
     db.lifetimeXpRankForCharacter(row.id),
     db.recentDeedsForCharacter(row.id, SHEET_RECENT_DEEDS),
+    // Cosmetic aggregate: a failed ledger read degrades to the character's own fills.
+    db.loadAccountReliquary(row.account_id).catch(() => undefined),
   ]);
   return {
     status: 200,
@@ -460,6 +465,7 @@ export async function readPublicSheet(
       visibility: 'public',
       realm: deps.realm,
       origin: deps.origin,
+      accountRelics,
       guild,
       rank: deps.toSheetRank(rank),
       deedsRecent,
@@ -483,6 +489,7 @@ const REAL_DB_READS = {
   guildNameForCharacter,
   lifetimeXpRankForCharacter,
   recentDeedsForCharacter,
+  loadAccountReliquary,
 };
 let dbReads = REAL_DB_READS;
 

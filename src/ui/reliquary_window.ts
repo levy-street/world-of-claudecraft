@@ -792,6 +792,7 @@ export class ReliquaryWindow {
     return {
       pages: RELIQUARY_PAGES,
       itemsDiscovered: world.deedStats.itemsDiscovered,
+      accountRelics: world.accountCosmetics.reliquary,
       marks: world.reliquaryMarks,
       recent: world.reliquaryRecent,
       nav: this.nav,
@@ -937,6 +938,10 @@ export class ReliquaryWindow {
       `<span class="reliquary-rank" data-rank="${p.curatorRank}">` +
       `<span class="reliquary-rank-seal" aria-hidden="true"></span>` +
       `${esc(rankLabel)}</span>` +
+      // Scope chip: the Reliquary counts for the ACCOUNT (docs/design/reliquary.md,
+      // "Account scope"); its hint rides the shared tooltip seam in wire().
+      `<span class="reliquary-scope" data-scope-chip tabindex="0">` +
+      `${esc(t('hudChrome.reliquary.accountWide'))}</span>` +
       `<span class="reliquary-pct" role="img" aria-label="${esc(t('hudChrome.reliquary.completionAria', { owned, total }))}">` +
       this.barHtml(pct) +
       ` ${esc(pctText)}</span>` +
@@ -1900,6 +1905,13 @@ export class ReliquaryWindow {
     // rebuild so the icon, pressed state, and hint all follow. The action hint
     // rides the shared tooltip (never a native title, a pinned contract) and
     // re-reads the live state so it flips with the toggle.
+    const scopeChip = el.querySelector<HTMLElement>('[data-scope-chip]');
+    if (scopeChip) {
+      this.deps.attachTooltip(
+        scopeChip,
+        () => `<div class="tt-name">${esc(t('hudChrome.reliquary.accountWideHint'))}</div>`,
+      );
+    }
     const trackerToggle = el.querySelector<HTMLElement>('[data-tracker-toggle]');
     if (trackerToggle) {
       this.deps.attachTooltip(trackerToggle, () => {
