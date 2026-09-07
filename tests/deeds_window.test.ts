@@ -148,8 +148,10 @@ describe('hud wiring', () => {
     // which drive the painter with a descriptor the call site builds here: drop
     // either line and the picker changes nothing on screen with every test green.
     expect(hud).toContain('playerFrame.borderSlug = deedBorderSlug(sim.activeBorder);');
-    expect(hud).toContain(
-      'targetFrame.borderSlug = deedTargetBorderSlug(target.kind, target.border ?? null);',
+    // The target fill lives in src/ui/target_frame_descriptor.ts (called from hud.ts).
+    expect(hud).toContain('const targetFrame = fillTargetFrameDescriptor(');
+    expect(read('../src/ui/target_frame_descriptor.ts')).toContain(
+      'd.borderSlug = deedTargetBorderSlug(target.kind, target.border ?? null);',
     );
     // The painter can only write the ring on a frame it was handed.
     expect(hud).toContain("private pfPortraitWrapEl = $('#pf-portrait-wrap');");

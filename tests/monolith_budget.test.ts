@@ -301,7 +301,11 @@ const MONOLITHS: MonolithRow[] = [
     // captured home and the dead body class left applyAuraAnchor for
     // restoreFrameHome (src/ui/interface_unlock.ts), and Reset Frame Positions
     // re-applies the anchor in one line. Exact merged count.
-    ceiling: 18851,
+    // Lowered 18851 -> 18820 by the target-frame raid marker: the target
+    // descriptor fill moved to src/ui/target_frame_descriptor.ts and the Hud
+    // now passes it the marker plus one badge element and its url resolver
+    // into the family painter. Exact merged count.
+    ceiling: 18820,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

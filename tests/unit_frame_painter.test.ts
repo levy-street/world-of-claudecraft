@@ -314,6 +314,78 @@ describe('UnitFramePainter: the portrait repaint gate (lastPortraitTarget path)'
   });
 });
 
+describe('UnitFramePainter: the raid-marker badge (target frame)', () => {
+  const BADGE = { tag: 'raidMarker' } as unknown as HTMLElement;
+  const MARKED_ELEMENTS: UnitFrameElements = { ...FULL_ELEMENTS, raidMarker: BADGE };
+  const urlFor = (marker: number) => `data:marker-${marker}`;
+
+  it('paints the resolved symbol url and shows the badge for a marked unit', () => {
+    const calls = paint(playerDescriptor({ raidMarker: 5 }), MARKED_ELEMENTS, {
+      raidMarkerUrl: urlFor,
+    });
+    const badge = calls.filter((c) => c.args[0] === BADGE);
+    expect(badge).toEqual([
+      { m: 'setStyleProp', args: [BADGE, 'background-image', 'url(data:marker-5)'] },
+      { m: 'setDisplay', args: [BADGE, 'block'] },
+    ]);
+  });
+
+  it('hides the badge and clears the image for an unmarked unit', () => {
+    const calls = paint(playerDescriptor({ raidMarker: null }), MARKED_ELEMENTS, {
+      raidMarkerUrl: urlFor,
+    });
+    const badge = calls.filter((c) => c.args[0] === BADGE);
+    expect(badge).toEqual([
+      { m: 'setDisplay', args: [BADGE, 'none'] },
+      { m: 'setStyleProp', args: [BADGE, 'background-image', ''] },
+    ]);
+  });
+
+  it('hides the badge when no url resolver is wired, even for a marked unit', () => {
+    const calls = paint(playerDescriptor({ raidMarker: 2 }), MARKED_ELEMENTS);
+    const badge = calls.filter((c) => c.args[0] === BADGE);
+    expect(badge.some((c) => c.m === 'setDisplay' && c.args[1] === 'block')).toBe(false);
+    expect(badge.some((c) => c.m === 'setDisplay' && c.args[1] === 'none')).toBe(true);
+  });
+
+  it('resolves the symbol url once per marker change, never per repeated frame', () => {
+    const { calls, writers } = recordingFacet();
+    const resolver = vi.fn(urlFor);
+    const painter = new UnitFramePainter(writers, MARKED_ELEMENTS, { raidMarkerUrl: resolver });
+    painter.paint(unitFrameView(playerDescriptor({ raidMarker: 4 })));
+    painter.paint(unitFrameView(playerDescriptor({ raidMarker: 4 })));
+    painter.paint(unitFrameView(playerDescriptor({ raidMarker: 4 })));
+    expect(resolver).toHaveBeenCalledTimes(1);
+    painter.paint(unitFrameView(playerDescriptor({ raidMarker: 1 })));
+    expect(resolver).toHaveBeenCalledTimes(2);
+    const urls = calls
+      .filter((c) => c.args[0] === BADGE && c.m === 'setStyleProp')
+      .map((c) => c.args[2]);
+    expect(urls).toEqual([
+      'url(data:marker-4)',
+      'url(data:marker-4)',
+      'url(data:marker-4)',
+      'url(data:marker-1)',
+    ]);
+  });
+
+  it('an instance without the badge element pays zero marker writes (player, party)', () => {
+    const calls = paint(playerDescriptor({ raidMarker: 2 }), FULL_ELEMENTS, {
+      raidMarkerUrl: urlFor,
+    });
+    expect(calls.some((c) => c.args[0] === BADGE)).toBe(false);
+    expect(calls.some((c) => c.args[1] === 'background-image')).toBe(false);
+  });
+
+  it('writes nothing for the badge while the unit is absent (the family contract)', () => {
+    const calls = paint(playerDescriptor({ present: false, raidMarker: 2 }), MARKED_ELEMENTS, {
+      shownDisplay: 'flex',
+      raidMarkerUrl: urlFor,
+    });
+    expect(calls).toEqual([{ m: 'setDisplay', args: [FRAME, 'none'] }]);
+  });
+});
+
 describe('UnitFramePainter: no raw DOM writes, no magic values', () => {
   const src = readFileSync(new URL('../src/ui/unit_frame_painter.ts', import.meta.url), 'utf8');
   const code = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');

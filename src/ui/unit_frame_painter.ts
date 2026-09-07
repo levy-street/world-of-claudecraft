@@ -119,6 +119,11 @@ export interface UnitFrameElements {
   /** The joint seal and name-header reveal. Omitted with `portraitBorder` by
    *  non-player frame instances. */
   heraldry?: UnitFrameHeraldryElements;
+  /** The raid-marker badge beside the portrait, written from the view's
+   *  `raidMarker` index through `opts.raidMarkerUrl`; omitted by frames with no
+   *  marker surface (player, party, target-of-target), which then pay zero
+   *  writes. Hidden (display none) while the unit is unmarked. */
+  raidMarker?: HTMLElement;
   /** The absorb-shield overlay; omitted by a frame with no shield bar (party). */
   absorb?: HTMLElement;
   /** The resource bar group; omitted by a frame with no resource bar (target). */
@@ -143,12 +148,22 @@ export interface UnitFrameOptions {
    *  formatter (fixed decimals) so its bars keep their inline `.toFixed(3)`
    *  precision, which also stabilizes the write-elision cache key. */
   formatScaleX?: (frac: number) => string;
+  /** Resolve a raid-marker index (0..7) to the CSS image url the badge paints
+   *  (the Hud passes icons.ts raidMarkerDataUrl, the same symbol the nameplate
+   *  floats over the mob). The painter never touches a canvas itself; an
+   *  instance that supplies `raidMarker` without this resolver paints no badge. */
+  raidMarkerUrl?: (marker: number) => string;
 }
 
 export class UnitFramePainter {
   // The portrait identity last painted; the gate repaints only on change. Starts
   // null so the first present frame paints once (target's lastPortraitTarget gate).
   private lastPortraitKey: string | null = null;
+  // The raid-marker index last composed into a `url(...)` string, and that
+  // string: the upstream resolve + composition run only when the index changes,
+  // so a repeated identical frame allocates nothing before the elided writes.
+  private lastRaidMarker: number | null = null;
+  private lastRaidMarkerUrl = '';
 
   constructor(
     private readonly writers: PainterHostWriters,
@@ -181,6 +196,7 @@ export class UnitFramePainter {
     if (this.el.hpText) this.writers.setText(this.el.hpText, view.hpText);
     this.paintAbsorb(view);
     this.paintResource(view);
+    this.paintRaidMarker(view);
     if (this.opts.stateClasses) {
       this.writers.toggleClass(this.el.frame, DEAD_CLASS, view.dead);
       this.writers.toggleClass(this.el.frame, OUT_OF_RANGE_CLASS, view.outOfRange);
@@ -220,6 +236,27 @@ export class UnitFramePainter {
     if (!absorb) return;
     this.writers.setTransform(absorb, this.barScaleX(view.absorbFrac));
     this.writers.toggleClass(absorb, OVERSHIELD_CLASS, view.absorbOvershield);
+  }
+
+  // The raid-marker badge: shown (display block + the marker's image url) while
+  // the unit carries a party mark, hidden otherwise. Both writes ride the elided
+  // writers, so an unchanged mark costs no DOM mutation per frame. Skipped for a
+  // frame with no badge element.
+  private paintRaidMarker(view: UnitFrameView): void {
+    const badge = this.el.raidMarker;
+    if (!badge) return;
+    if (view.raidMarker !== this.lastRaidMarker) {
+      this.lastRaidMarker = view.raidMarker;
+      const url = view.raidMarker === null ? '' : this.opts.raidMarkerUrl?.(view.raidMarker);
+      this.lastRaidMarkerUrl = url ? `url(${url})` : '';
+    }
+    if (!this.lastRaidMarkerUrl) {
+      this.writers.setDisplay(badge, 'none');
+      this.writers.setStyleProp(badge, 'background-image', '');
+      return;
+    }
+    this.writers.setStyleProp(badge, 'background-image', this.lastRaidMarkerUrl);
+    this.writers.setDisplay(badge, 'block');
   }
 
   // The resource bar: the mutually-exclusive type class (folds the former raw

@@ -818,9 +818,17 @@ describe('client HTML shell', () => {
     // character-bound) through toggleClass. No raw classList/style write on either
     // frame survives (those silently collapse the hot-DOM skip rate).
     expect(hudTs).toContain('const targetRank = targetRankView(targetTemplate);');
-    // Written into the reused target descriptor rather than a per-frame object
+    // Written into the reused target descriptor by the extracted fill
+    // (src/ui/target_frame_descriptor.ts) rather than a per-frame object
     // literal; the routing this test guards is unchanged.
-    expect(hudTs).toContain('targetFrame.levelText = String(target.level);');
+    expect(hudTs).toContain('const targetFrame = fillTargetFrameDescriptor(');
+    // The party raid marker rides the fill as its fourth argument; the field is
+    // optional downstream (raidMarker ?? null), so a dropped argument would
+    // silently read "never marked" with every unit test green.
+    expect(hudTs).toContain('sim.markerFor(target.id),');
+    expect(
+      readFileSync(new URL('../src/ui/target_frame_descriptor.ts', import.meta.url), 'utf8'),
+    ).toContain('d.levelText = String(target.level);');
     expect(hudTs).toContain(
       "this.toggleClass(this.targetFrameEl, 'elite', targetUsesEliteFrame(targetRank));",
     );

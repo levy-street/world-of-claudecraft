@@ -243,6 +243,11 @@
           </svg>
         </span>
         <div class="level-chip" id="tf-level"></div>
+        <!-- The party raid marker on the target (the same symbol the nameplate floats
+             over the mob), so a player can tell which of several stacked same-name
+             mobs they hold. The unit_frame painter shows/hides it and paints the
+             symbol image; decorative (the name is announced by #target-live). -->
+        <div class="uf-raid-marker" id="tf-raid-marker" aria-hidden="true"></div>
         <div id="tf-elite-tag" data-i18n="hud.core.elite">ELITE</div>
       </div>
       <div class="uf-bars">

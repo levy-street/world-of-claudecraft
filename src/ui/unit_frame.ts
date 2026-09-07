@@ -120,6 +120,13 @@ export interface UnitFrameDescriptor {
   /** The unit is beyond party range (a party member past PARTY_FRAME_RANGE_YD);
    *  the painter dims the frame. The player and a target are always in range. */
   outOfRange: boolean;
+  /** The party-scoped raid target marker on this unit (IWorld.markerFor: index
+   *  0..7, or null for an unmarked unit), read at the call site. Optional and
+   *  absent for instances without a marker surface (player, party); absent means
+   *  unmarked. The target frame shows it beside the portrait so a player can tell
+   *  WHICH of several stacked same-name mobs they hold, the same symbol the
+   *  nameplate floats over the mob in the world. */
+  raidMarker?: number | null;
 }
 
 /** The values the painter writes, derived from a descriptor by unitFrameView. */
@@ -157,6 +164,9 @@ export interface UnitFrameView {
   absorbOvershield: boolean;
   dead: boolean;
   outOfRange: boolean;
+  /** The raid marker index (0..7) to show beside the portrait, or null when the
+   *  unit is unmarked or the instance has no marker surface. */
+  raidMarker: number | null;
 }
 
 export interface UnitFrameBuffer {
@@ -189,6 +199,7 @@ const HIDDEN: UnitFrameView = {
   absorbOvershield: false,
   dead: false,
   outOfRange: false,
+  raidMarker: null,
 };
 
 // The no-shield absorb result, matching absorbBarView's shape for a null entity.
@@ -245,6 +256,7 @@ export function unitFrameView(d: UnitFrameDescriptor): UnitFrameView {
     absorbOvershield: absorb.overshield,
     dead: d.dead,
     outOfRange: d.outOfRange,
+    raidMarker: d.raidMarker ?? null,
   };
 }
 
@@ -271,6 +283,7 @@ export function newUnitFrameBuffer(): UnitFrameBuffer {
       absorbOvershield: false,
       dead: false,
       outOfRange: false,
+      raidMarker: null,
     },
     absorb: {
       total: 0,
@@ -311,6 +324,7 @@ export function unitFrameViewInto(buffer: UnitFrameBuffer, d: UnitFrameDescripto
     out.absorbOvershield = false;
     out.dead = false;
     out.outOfRange = false;
+    out.raidMarker = null;
     return out;
   }
 
@@ -343,5 +357,6 @@ export function unitFrameViewInto(buffer: UnitFrameBuffer, d: UnitFrameDescripto
   out.absorbOvershield = absorb.overshield;
   out.dead = d.dead;
   out.outOfRange = d.outOfRange;
+  out.raidMarker = d.raidMarker ?? null;
   return out;
 }

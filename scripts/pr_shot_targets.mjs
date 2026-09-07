@@ -6691,6 +6691,81 @@ export const TARGETS = [
     },
   },
   {
+    key: 'target-frame-raid-marker',
+    label: 'Raid marker badge on the target frame for a party-marked mob',
+    when: ['ui/target_frame_descriptor', 'ui/unit_frame_painter', 'ui/unit_frame.ts'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedClassicOnLowPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedClassicOnLowPreset },
+    ],
+    async capture(page) {
+      await sweepOverlays(page);
+      const staged = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const p = sim?.player;
+        if (!game || !sim || !p) return { ok: false, reason: 'offline world is unavailable' };
+        // Raid markers are party-scoped: form a party with a spawned peer first
+        // (the peer accepts its own invite through the same seam a client uses).
+        const peerId = sim.addPlayer('priest', 'Maelis');
+        sim.partyInvite(peerId);
+        sim.partyAccept(peerId);
+        if (!sim.partyOf(p.id)) return { ok: false, reason: 'party did not form' };
+        const peer = sim.entities.get(peerId);
+        if (peer) {
+          peer.pos.x = p.pos.x - 3;
+          peer.pos.y = p.pos.y;
+          peer.pos.z = p.pos.z;
+          sim.rebucket?.(peer);
+        }
+        // Stage IN PLACE (no far teleport, so the loading veil never re-arms):
+        // the mob stands a few yards ahead of the player so its nameplate
+        // marker and the frame badge share the shot.
+        const mob = [...sim.entities.values()].find(
+          (e) => e.kind === 'mob' && e.hostile && !e.dead && e.ownerId === null,
+        );
+        if (!mob) return { ok: false, reason: 'no hostile mob fixture available' };
+        mob.pos.x = p.pos.x + Math.sin(game.input.camYaw) * 6;
+        mob.pos.z = p.pos.z + Math.cos(game.input.camYaw) * 6;
+        mob.pos.y = sim.groundPos ? sim.groundPos(mob.pos.x, mob.pos.z).y : p.pos.y;
+        mob.spawnPos = { ...mob.pos };
+        mob.leashAnchor = { ...mob.pos };
+        sim.rebucket?.(mob);
+        // Star (index 0) on the mob, then target it: the frame badge reads
+        // IWorld.markerFor exactly as the nameplate does.
+        sim.setMarker(mob.id, 0);
+        sim.targetEntity(mob.id);
+        return {
+          ok: true,
+          mobId: mob.id,
+          marker: sim.markerFor(mob.id),
+          targeted: p.targetId === mob.id,
+        };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+      if (staged.marker !== 0 || !staged.targeted) {
+        throw new Error(`raid marker staging failed: ${JSON.stringify(staged)}`);
+      }
+      await wait(1500);
+      // Forming the party opens Loot Settings, and the shore NPC greets on
+      // approach; neither is the subject, so hide both before the frame.
+      await sweepOverlays(page, 4);
+      await page.evaluate(() => {
+        for (const id of ['loot-settings-window', 'quest-dialog']) {
+          const el = document.getElementById(id);
+          if (el instanceof HTMLElement) el.style.display = 'none';
+        }
+      });
+      await wait(500);
+      const shown = await page.evaluate(() => {
+        const badge = document.querySelector('#tf-raid-marker');
+        return badge instanceof HTMLElement && getComputedStyle(badge).display !== 'none';
+      });
+      if (!shown) throw new Error('target frame raid marker badge is not visible');
+      return {};
+    },
+  },
+  {
     key: 'deed-border-picker',
     label: 'Book of Deeds Deed Heraldry seals, materials, and interaction preview',
     when: ['ui/deed_border_view', 'ui/deeds_window'],

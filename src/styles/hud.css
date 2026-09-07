@@ -2308,6 +2308,25 @@
     text-shadow: 1px 1px 1px #000;
     z-index: 3;
   }
+  /* The target's raid marker badge (index.html #tf-raid-marker): the party mark
+     symbol at the portrait's top-right, mirroring the level chip's bottom-left
+     corner so the two never contend. The unit_frame painter writes the symbol
+     image url and toggles display; hidden by default so an unmarked target
+     shows no empty well. z-index 3 sits with the chip, above the deed ring. */
+  .uf-raid-marker {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 26px;
+    height: 26px;
+    display: none;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    filter: drop-shadow(0 1px calc(2px * var(--fx-shadow, 1)) #000c);
+    pointer-events: none;
+    z-index: 3;
+  }
   /* painted combat-status crest on the player portrait (classic style) */
   .combat-flash {
     position: absolute;

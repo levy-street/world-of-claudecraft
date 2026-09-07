@@ -105,7 +105,26 @@ describe('unitFrameView: the present / hidden gate', () => {
       absorbOvershield: false,
       dead: false,
       outOfRange: false,
+      raidMarker: null,
     });
+  });
+});
+
+describe('unitFrameView: the raid marker (target frame)', () => {
+  it('passes the party mark index through, null for an unmarked unit', () => {
+    expect(unitFrameView(playerDescriptor({ raidMarker: 0 })).raidMarker).toBe(0);
+    expect(unitFrameView(playerDescriptor({ raidMarker: 7 })).raidMarker).toBe(7);
+    expect(unitFrameView(playerDescriptor({ raidMarker: null })).raidMarker).toBeNull();
+  });
+
+  it('an instance without a marker surface (descriptor field absent) reads unmarked', () => {
+    expect(unitFrameView(playerDescriptor()).raidMarker).toBeNull();
+  });
+
+  it('the buffered path fills the same value and blanks it when the unit is absent', () => {
+    const buffer = newUnitFrameBuffer();
+    expect(unitFrameViewInto(buffer, playerDescriptor({ raidMarker: 3 })).raidMarker).toBe(3);
+    expect(unitFrameViewInto(buffer, playerDescriptor({ present: false })).raidMarker).toBeNull();
   });
 });
 

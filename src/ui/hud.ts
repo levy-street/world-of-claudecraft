@@ -193,7 +193,6 @@ import {
   resolvePlayerSocialFlags,
   serializeIgnoreList,
 } from './chat_ignore_core';
-import { cheaterTagLabel } from './cheater_tag';
 import { wireChromeFocus } from './chrome_focus_wiring';
 import { ClaudiumLauncherBalance } from './claudium_launcher_balance_core';
 import { createClaudiumPurchaseFacet } from './claudium_purchase_bridge';
@@ -250,7 +249,7 @@ import { DailyRewardsLauncherPoll } from './daily_rewards_launcher_core';
 import { DailyRewardsWindow, type StoreSpendResult } from './daily_rewards_window';
 import { deathRecapFeedback } from './death_recap_feedback';
 import { decorativeArtImg } from './decorative_art';
-import { deedBorderSlug, deedTargetBorderSlug } from './deed_border_view';
+import { deedBorderSlug } from './deed_border_view';
 import {
   deedBroadcastRendered,
   deedName,
@@ -786,6 +785,7 @@ import { SwingTimerBars } from './swing_timer_bars';
 import { TalentsWindow } from './talents_window';
 import { targetAuraSourceName } from './target_auras_view';
 import { TargetAurasWindow } from './target_auras_window';
+import { fillTargetFrameDescriptor } from './target_frame_descriptor';
 import { targetOfTargetId } from './target_of_target';
 import { targetPortraitSourceId, targetPortraitUrl } from './target_portrait_view';
 import { targetRankView, targetUsesEliteFrame } from './target_rank_view';
@@ -4713,6 +4713,7 @@ export class Hud {
       hpFill: this.targetHpEl,
       hpText: this.targetHpTextEl,
       absorb: this.targetAbsorbEl,
+      raidMarker: $('#tf-raid-marker'),
       portraitBorder: this.targetPortraitWrapEl,
       heraldry: {
         nameHeader: $('#tf-name-header'),
@@ -4728,6 +4729,7 @@ export class Hud {
     {
       shownDisplay: 'flex',
       repaintPortrait: () => this.drawTargetPortrait(),
+      raidMarkerUrl: raidMarkerDataUrl,
     },
   );
   // The target-of-target frame is the THIRD instance of the unit_frame family (after
@@ -9121,47 +9123,14 @@ export class Hud {
           this.lastTargetTitleSig = titleSig;
           this.targetTitleDecoration = titledNameDecoration(target.title ?? null);
         }
-        const targetFrame = this.targetFrameDescriptor;
-        targetFrame.present = true;
-        targetFrame.hpFrac = target.hp / Math.max(1, target.maxHp);
-        targetFrame.hpText = target.dead
-          ? t('hud.core.dead')
-          : unitFrameCurrentMaxText(target.hp, target.maxHp);
-        targetFrame.showAbsorbText = !target.dead;
-        // The target's power bar (classic target frame): players and caster
-        // mobs show their mana/rage/energy; a resource-less target (a plain
-        // beast, rtype null) maps to 'none' EXPLICITLY (unitResourceClass
-        // buckets null with mana), so every type class turns off and the
-        // rail renders EMPTY (zero fill, no text) but stays visible, the
-        // classic look where the frame never changes height. Dead: same.
-        targetFrame.resourceKind =
-          target.dead || !target.resourceType ? 'none' : target.resourceType;
-        targetFrame.resFrac =
-          target.dead || !target.resourceType
-            ? 0
-            : target.resource / Math.max(1, target.maxResource);
-        targetFrame.resText =
-          target.dead || !target.resourceType
-            ? ''
-            : unitFrameCurrentMaxText(Math.round(target.resource), target.maxResource);
-        targetFrame.levelText = String(target.level);
-        targetFrame.name = entityDisplayName(target);
-        targetFrame.titlePre = this.targetTitleDecoration.pre;
-        targetFrame.titlePost = this.targetTitleDecoration.post;
-        // The operator-applied Cheater tag (src/sim/moderation/). Resolved every
-        // gated paint rather than memoized behind a signature like the title:
-        // cheaterTagLabel is a field read plus one t() lookup, so a memo would
-        // cost more than it saves and would need its own language key.
-        targetFrame.cheaterTag = cheaterTagLabel(target);
-        // Explicit player-kind gate: stale/malformed NPC or mob identity data
-        // must never inherit a player reward surface.
-        targetFrame.borderSlug = deedTargetBorderSlug(target.kind, target.border ?? null);
-        // id-keyed gate, byte-faithful to the old lastPortraitTarget !== target.id;
-        // the painter resets it on hide so an id reused by a new mob still redraws.
-        targetFrame.portraitKey = String(target.id);
-        targetFrame.absorb = target.dead ? null : target;
-        targetFrame.dead = false;
-        targetFrame.outOfRange = false;
+        // The descriptor fill lives in target_frame_descriptor.ts; the raid
+        // marker is the party mark the nameplate also floats over the mob.
+        const targetFrame = fillTargetFrameDescriptor(
+          this.targetFrameDescriptor,
+          target,
+          this.targetTitleDecoration,
+          sim.markerFor(target.id),
+        );
         this.targetFramePainter.paint(unitFrameViewInto(this.targetFrameBuffer, targetFrame));
       }
       // Target-only sub-parts the family frame does not express, each routed through
