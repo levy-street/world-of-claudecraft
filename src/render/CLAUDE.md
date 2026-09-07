@@ -75,9 +75,14 @@ Everything else is a sibling module in one of these families:
 - `view_create_retry.ts`: bounded cooldown state for fail-soft character builds
   in per-frame paths, including required targets, form swaps, and visual-key
   swaps (`tests/view_create_retry.test.ts`).
-- `self_motion.ts`/`facing_smooth.ts`: pure display-only self layers (bounded
-  online pose extrapolation + rate-limited self yaw; never touch world state,
-  see `src/net/CLAUDE.md`).
+- `self_prediction.ts`/`self_prediction_core.ts`/`self_render_position_core.ts`/
+  `client_player_motion.ts`/`facing_smooth.ts`: the pure display-only self
+  layers (the local player's predicted pose replayed through the shared kernel,
+  the per-frame display pose and its bounded handoff to the interpolated
+  fallback, the client-side `PlayerMotionDeps` that kernel runs against, and
+  rate-limited self yaw). They never touch world state; the prediction contract
+  is `src/net/CLAUDE.md` and the design authority is
+  `docs/design/movement-reconciliation.md`.
 - `step_smooth_core.ts`/`ground_tilt_core.ts`: the grounded-presentation pair
   the entity loop drives per body. The first eases the vertical step the
   physics solver takes inside one tick (leashed to a step, exact while
