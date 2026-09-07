@@ -17,7 +17,6 @@ export interface MovementOverrideSignature {
 
 export interface MovementOverrideSessionState {
   pid: number;
-  movementWireVersion: 1 | 2;
   movementOverrideSignature: MovementOverrideSignature | null;
   movementOverrideEpoch: number;
   movementOverrideActive: boolean;
@@ -130,7 +129,6 @@ export function updateMovementOverrideEpochs(
   sessions: Iterable<MovementOverrideSessionState>,
 ): void {
   for (const session of sessions) {
-    if (session.movementWireVersion !== 2) continue;
     const entity = sim.entities.get(session.pid);
     const meta = sim.meta(session.pid);
     if (!entity || !meta) continue;

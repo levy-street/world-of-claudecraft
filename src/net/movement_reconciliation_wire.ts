@@ -40,10 +40,8 @@ function finiteNumber(value: unknown): value is number {
 export function applyReconSelfWire(
   target: ReconWireState,
   self: MovementReconciliationSelfWire,
-  movementWireVersion: 1 | 2,
 ): void {
   if (
-    movementWireVersion !== 2 ||
     !finiteNumber(self.rpx) ||
     !finiteNumber(self.rpy) ||
     !finiteNumber(self.rpz) ||

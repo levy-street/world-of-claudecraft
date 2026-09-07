@@ -5,6 +5,9 @@ export interface MovementFrameV2 {
   ct: number;
   mi: MoveInput;
   facing: number | null;
+  /** Dungeon-entry generation acknowledgement. The server's entry fence strips
+   *  facing until a packet echoes the generation it forced. */
+  de?: number;
 }
 
 export interface MovementFrameSocket {
@@ -14,6 +17,10 @@ export interface MovementFrameSocket {
 
 // Six frames align with the server timeline, with two more for transport headroom.
 export const MOVEMENT_FRAME_V2_PENDING_CAP = 8;
+
+/** How often the outbox is drained of frames held back by transport
+ *  backpressure, in ms. Sampling itself runs at the fixed sim tick. */
+export const MOVEMENT_OUTBOX_FLUSH_INTERVAL_MS = 50;
 
 export interface MovementFrameV2SendResult {
   accepted: boolean;
@@ -106,7 +113,7 @@ export function sendMovementFrameV2(
   if (!canSend || (!bypassBackpressure && isInputSendBackpressured(socket.bufferedAmount))) {
     return false;
   }
-  const { ct, mi, facing } = frame;
+  const { ct, mi, facing, de } = frame;
   const msg: Record<string, unknown> = {
     t: 'input',
     seq,
@@ -127,6 +134,7 @@ export function sendMovementFrameV2(
     (msg.mi as Record<string, number>).ss = mi.swimSteer;
   }
   if (facing !== null) msg.facing = facing;
+  if (de !== undefined) msg.de = de;
   socket.send(JSON.stringify(msg));
   return true;
 }

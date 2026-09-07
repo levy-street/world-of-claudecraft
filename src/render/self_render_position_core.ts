@@ -1,19 +1,14 @@
-// The local player's DISPLAY pose, one frame at a time: the intent-driven
-// predictor while it owns the position, the lead-smoothed authoritative
+// The local player's DISPLAY pose, one frame at a time: the reconciled
+// prediction while it owns the position, the lead-smoothed authoritative
 // interpolation otherwise, and the one-time offset that hands them over
 // without a camera step. Pure ({x,y,z} in and out, no Three), so the renderer
 // is a thin consumer and a headless latency harness can drive the same math.
 
 import type { Entity } from '../sim/types';
-import {
-  type SelfMotionFrame,
-  SelfMotionPredictor,
-  updateSelfRenderFallback,
-  type Vec3Like,
-} from './self_motion';
+import { updateSelfRenderFallback, type Vec3Like } from './self_motion';
 
-// Decay rate of the one-time offset captured when the self-motion predictor
-// takes over from the lead-smoothing path (gone in ~0.3 s, no camera step).
+// Decay rate of the one-time offset captured when local prediction takes over
+// from the lead-smoothing path (gone in ~0.3 s, no camera step).
 const SELF_MOTION_HANDOFF_RATE = 15;
 export const MAX_SELF_REWIND_YD_PER_SEC = 12;
 
@@ -30,12 +25,9 @@ function decayOffset(offset: Vec3Like, dt: number, maxDistance = Number.POSITIVE
 }
 
 export interface ReconciledSelfPrediction {
-  kind: 'reconciled';
   position: Vec3Like;
   residual: Vec3Like | null;
 }
-
-export type SelfRenderPrediction = SelfMotionFrame | ReconciledSelfPrediction;
 
 export function selfSnapshotAlpha(alpha: number, lead: number): number {
   return Math.min(1.25, alpha + Math.max(0, lead));
@@ -46,12 +38,11 @@ export interface SelfRenderPositionState {
    *  pass the THREE.Vector3 the camera and the entity loop already read (and
    *  keep writing, as the step-smoothing pass does). */
   position: Vec3Like;
-  /** Predictor-handoff gap, captured once and decayed to zero. */
+  /** Prediction-handoff gap, captured once and decayed to zero. */
   offset: Vec3Like;
   ready: boolean;
   active: boolean;
   lastSelfId: number | null;
-  predictor: SelfMotionPredictor | null;
 }
 
 export function createSelfRenderPositionState(
@@ -63,7 +54,6 @@ export function createSelfRenderPositionState(
     ready: false,
     active: false,
     lastSelfId: null,
-    predictor: null,
   };
 }
 
@@ -76,7 +66,7 @@ export function noteSelfIdentity(state: SelfRenderPositionState, selfId: number)
   if (state.lastSelfId === selfId) return false;
   state.lastSelfId = selfId;
   state.ready = false;
-  // A still-decaying predictor-handoff offset belongs to the previous
+  // A still-decaying prediction-handoff offset belongs to the previous
   // character; leaking it would displace the new one for a few frames.
   state.offset.x = 0;
   state.offset.y = 0;
@@ -87,59 +77,46 @@ export function noteSelfIdentity(state: SelfRenderPositionState, selfId: number)
 export function updateSelfRenderPosition(
   state: SelfRenderPositionState,
   p: Entity,
-  seed: number,
   alpha: number,
   dt: number,
   selfAlphaLead: number,
-  selfMotion: SelfRenderPrediction | null,
+  selfMotion: ReconciledSelfPrediction | null,
   authoritativeDiscontinuity: boolean,
-  riftCollisionToken = 0,
 ): Vec3Like {
-  // Online intent-driven extrapolation: when active it owns the position and
-  // the lead-smoothing path below becomes the fallback (both write the same
+  // Online local prediction: when active it owns the position and the
+  // lead-smoothing path below becomes the fallback (both write the same
   // position, so enable/disable hands off without a pop, absorbed by the
   // snap/smooth rules on the next frame).
   if (selfMotion) {
-    const reconciled = selfMotion as Partial<ReconciledSelfPrediction>;
-    let predicted = reconciled.position ?? null;
-    if (reconciled.kind !== 'reconciled') {
-      if (!state.predictor) state.predictor = new SelfMotionPredictor(seed, riftCollisionToken);
-      predicted = state.predictor.step(
-        p,
-        selfMotion as SelfMotionFrame,
-        authoritativeDiscontinuity,
-      );
+    const predicted = selfMotion.position;
+    // Follow the prediction output exactly (it is already continuous;
+    // smoothing it again would re-add the display lag this exists to
+    // remove). The only discontinuity is the handoff frame from the
+    // lead-smoothing path below: capture that gap once as an offset and
+    // decay it, so the camera glides instead of stepping.
+    if (authoritativeDiscontinuity) {
+      state.offset.x = 0;
+      state.offset.y = 0;
+      state.offset.z = 0;
+    } else if (state.ready && !state.active) {
+      state.offset.x = state.position.x - predicted.x;
+      state.offset.y = state.position.y - predicted.y;
+      state.offset.z = state.position.z - predicted.z;
     }
-    if (predicted) {
-      // Follow the predictor output exactly (it is already continuous;
-      // smoothing it again would re-add the display lag this exists to
-      // remove). The only discontinuity is the handoff frame from the
-      // lead-smoothing path below: capture that gap once as an offset and
-      // decay it, so the camera glides instead of stepping.
-      if (authoritativeDiscontinuity) {
-        state.offset.x = 0;
-        state.offset.y = 0;
-        state.offset.z = 0;
-      } else if (state.ready && !state.active) {
-        state.offset.x = state.position.x - predicted.x;
-        state.offset.y = state.position.y - predicted.y;
-        state.offset.z = state.position.z - predicted.z;
-      }
-      if (reconciled.kind === 'reconciled' && reconciled.residual) {
-        state.offset.x += reconciled.residual.x;
-        state.offset.y += reconciled.residual.y;
-        state.offset.z += reconciled.residual.z;
-      }
-      decayOffset(state.offset, dt);
-      state.position.x = predicted.x + state.offset.x;
-      state.position.y = predicted.y + state.offset.y;
-      state.position.z = predicted.z + state.offset.z;
-      state.ready = true;
-      state.active = true;
-      return state.position;
+    if (selfMotion.residual) {
+      state.offset.x += selfMotion.residual.x;
+      state.offset.y += selfMotion.residual.y;
+      state.offset.z += selfMotion.residual.z;
     }
+    decayOffset(state.offset, dt);
+    state.position.x = predicted.x + state.offset.x;
+    state.position.y = predicted.y + state.offset.y;
+    state.position.z = predicted.z + state.offset.z;
+    state.ready = true;
+    state.active = true;
+    return state.position;
   }
-  const predictorWasActive = state.active;
+  const predictionWasActive = state.active;
   state.active = false;
   const playerAlpha = selfSnapshotAlpha(alpha, selfAlphaLead);
   const px = p.prevPos.x + (p.pos.x - p.prevPos.x) * playerAlpha;
@@ -149,14 +126,14 @@ export function updateSelfRenderPosition(
     state.offset.x = 0;
     state.offset.y = 0;
     state.offset.z = 0;
-  } else if (state.ready && predictorWasActive) {
+  } else if (state.ready && predictionWasActive) {
     state.offset.x = state.position.x - px;
     state.offset.y = state.position.y - py;
     state.offset.z = state.position.z - pz;
   }
   if (
     !authoritativeDiscontinuity &&
-    (predictorWasActive || state.offset.x !== 0 || state.offset.y !== 0 || state.offset.z !== 0)
+    (predictionWasActive || state.offset.x !== 0 || state.offset.y !== 0 || state.offset.z !== 0)
   ) {
     const previousX = state.position.x;
     const previousY = state.position.y;

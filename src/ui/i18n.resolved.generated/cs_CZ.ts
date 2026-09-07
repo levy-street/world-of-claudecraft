@@ -1732,7 +1732,6 @@ export const cs_CZ: EnTranslations = {
         "fps01Low": "0,1 % low",
         "ping": "Ping",
         "jitter": "Jitter",
-        "predLead": "Náskok predikce",
         "snapshot": "Frekvence snapshotů",
         "serverTick": "Frekvence tiků serveru",
         "connection": "Připojení",
