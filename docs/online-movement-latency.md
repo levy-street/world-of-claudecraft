@@ -20,8 +20,8 @@ exact-match replay reconciliation. Its design authority is
 harness this report calls for exists as
 `tests/movement_latency_baseline.test.ts` (strict mode is the feel bar). The
 client-authoritative option below remains rejected; the display-extrapolator
-constraints this report frames stay in force only for the retained legacy v1
-path. The note below describes the earlier Option 1/2 rollout this report
+constraints this report frames governed the Option 2 path that the rework
+replaced. The note below describes the earlier Option 1/2 rollout this report
 originally shipped with.
 
 ## Implementation note (what actually shipped)
@@ -41,23 +41,22 @@ here so the survey is not read as the as-built spec:
   channel mouselook has always owned, with the turn flags zeroed on the wire
   (engage-edge excepted for /follow and anti-AFK). Only input-derived headings
   ever go on the wire.
-- **The position extrapolator's corrector is a delay-aligned servo**, not the
-  simple blend the survey sketched: the authoritative pose is compared against
+- **The position extrapolator's corrector was a delay-aligned servo**, not the
+  simple blend the survey sketched: the authoritative pose was compared against
   the display's own pose one measured echo ago (history ring), with the gain
-  bounded by the delay so the loop cannot ring, and the leash clamping the pose
-  only. See the header of `src/render/self_motion.ts`. A long render frame is
-  the one sanctioned exception to both halves: it freezes the anchor and then
-  delivers a burst, so the leash lends the block's own ground (bounded by
-  `BLOCK_EPISODE_MAX_MS`) and the servo sits out the resume sweep, pinned by
-  `describe('long render frames')` in `tests/self_motion.test.ts`.
+  bounded by the delay so the loop could not ring, and the leash clamping the
+  pose only. A long render frame was the one sanctioned exception to both
+  halves: it froze the anchor and then delivered a burst, so the leash lent the
+  block's own ground and the servo sat out the resume sweep. That extrapolator
+  was retired by the reconciliation rework
+  (`docs/design/movement-reconciliation.md`).
 - **The extrapolation cap landed at 350 ms**, not the surveyed 150 to 200:
-  below the real RTT the display rides the leash and steering feels gluey.
-- **The rule amendment has three parts**, not two (`src/net/CLAUDE.md`):
-  outcome prediction still banned; display-layer pose extrapolation sanctioned
-  under four constraints (applies to `src/render/self_motion.ts`); the heading
-  reclassified as client-authoritative input, to which the "never sent"
-  constraint deliberately does not apply. Constraints (a) and (b) carry the
-  long-frame exception recorded above and in `src/net/CLAUDE.md`.
+  below the real RTT the display rode the leash and steering felt gluey.
+- **The rule amendment had three parts**, not two: outcome prediction still
+  banned; display-layer pose extrapolation sanctioned under four constraints;
+  the heading reclassified as client-authoritative input, to which the "never
+  sent" constraint deliberately does not apply. The live wording of that rule
+  is the local-player movement prediction entry in `src/net/CLAUDE.md`.
 - Also shipped: the adaptive render lead (`src/game/self_alpha_lead.ts`), the
   shared kernel (`src/sim/player_motion.ts`, bit-for-bit parity-tested), and
   hysteresis fixes for pre-existing animation flicker the smoother display made
@@ -71,14 +70,13 @@ key press there showed the full round trip, which read as "rifts feel
 noticeably heavier than the overworld." Rifts are now predicted the same as
 regular dungeons. The gap was wiring, not data: the online client already
 receives the rift floor descriptor and regenerates identical geometry from it
-with the same pure generator the server runs, so the fix is registering that
-geometry under a real `riftCollisionToken` (`src/net/online.ts`) and having
-the predictor strip/reapply the raised-tier lift around its kernel step
-(`src/render/self_motion_rift_lift.ts`), instead of predicting a flat floor
+with the same pure generator the server runs, so the fix was registering that
+geometry under a real `riftCollisionToken` (`src/net/online.ts`) and resolving
+the prediction against that raised floor, instead of predicting a flat one
 against a server pose that is not one. Delves remain excluded (a separate,
 still-open gap: their per-run door and prop state is not mirrored
-client-side). See `src/net/CLAUDE.md`'s locomotion-anticipation entry for the
-constraint-by-constraint detail.
+client-side). See `src/net/CLAUDE.md`'s local-player movement prediction entry
+for the constraint-by-constraint detail.
 
 ## Executive Read
 
@@ -105,8 +103,8 @@ just deleted.
 The online pipeline for the local player is a full round trip with no local anticipation:
 
 1. **Input capture and send.** `Input.readMoveInput()` is polled per frame; the online
-   client sends `{t:'input', seq, mi, facing?}` within 16 ms of any change and at 20 Hz
-   otherwise (`src/net/online.ts`, `sendInput`). Cost: 0 to 16 ms.
+   client sent `{t:'input', seq, mi, facing?}` within 16 ms of any change and at 20 Hz
+   otherwise (`src/net/online.ts`). Cost: 0 to 16 ms.
 2. **Uplink.** Half the RTT.
 3. **Server queueing.** The intent is not applied on receipt. It is copied onto the
    session's held `moveInput` state and consumed by the next `sim.tick()`

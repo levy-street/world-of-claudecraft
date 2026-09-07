@@ -32,7 +32,7 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
 |---|---|
 | `main.ts` | HTTP server + the prefix-ladder dispatch (`routeHttpRequest` sends `/api` `/admin/api` `/oauth` `/internal` to four flag-gated entries) + the RETAINED legacy handler ladder, WS `/ws` upgrade wiring (builds the `createWsAuth` deps bag), boot/shutdown, leaderboard cache (migrated routes live behind `server/http/`, see its `CLAUDE.md`) |
 | `game.ts` | `GameServer`: owns the `Sim`, the 50 ms loop, interest-scoped snapshots, command dispatch, chat. **Largest file; extract beside it, never grow it** (Module-first above) |
-| `ws_auth.ts` | the whole WS auth handshake behind an injected deps bag (`createWsAuth`): strict first-frame `ONLINE_WORLD_AUTH_TYPE` check before credential or DB work, moderation/character checks, per-IP cap, the realm admission cap (`MAX_PLAYERS_PER_REALM`, default 5000, explicit 0 disables; checked with an in-flight admission counter so racing handshakes cannot admit past it; resumes and admins exempt), lease acquire, `game.join`. Unit-testable without a DB or HTTP server. Its rejection literals are wire contract the client matches verbatim (`src/ui/api_error_i18n.ts`): change one and the matcher in the SAME commit. Every refusal sends an `{t:'error'}` frame before closing (never a bare close code): the client classifies the literal, so a frameless refusal turns into a silent retry loop |
+| `ws_auth.ts` | the whole WS auth handshake behind an injected deps bag (`createWsAuth`): strict first-frame `ONLINE_WORLD_AUTH_TYPE` check plus the required `movementWire` capability before credential or DB work, moderation/character checks, per-IP cap, the realm admission cap (`MAX_PLAYERS_PER_REALM`, default 5000, explicit 0 disables; checked with an in-flight admission counter so racing handshakes cannot admit past it; resumes and admins exempt), lease acquire, `game.join`. Unit-testable without a DB or HTTP server. Its rejection literals are wire contract the client matches verbatim (`src/ui/api_error_i18n.ts`): change one and the matcher in the SAME commit. Every refusal sends an `{t:'error'}` frame before closing (never a bare close code): the client classifies the literal, so a frameless refusal turns into a silent retry loop |
 | `msg_rate_limit.ts` / `msg_lanes.ts` / `list_read_guard.ts` | the inbound WS flood defense: the pre-parse gate (frame + byte buckets and the shared abuse window that kicks), the post-parse per-class lanes, and the ignore/block list-readout meter (see "Inbound WS flood defense") |
 | `ws_backpressure.ts` | the OUTBOUND counterpart to the flood defense: terminates a session whose `ws.bufferedAmount` climbs past the hard limit. `ws.send()` never blocks and a non-draining client's socket stays OPEN, so without this one frozen tab or deliberately non-reading attacker accumulates an unbounded write buffer and can OOM the realm; `readyState` checks do not catch it |
 | `linkdead.ts` | pure session-lifecycle decision core: `planJoin` (resume/reject/join) + `LINKDEAD_GRACE_MS` (see Persistence) |
@@ -77,7 +77,7 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
   method, keep that guarding when you add a command.
 - **Wire protocol lockstep with `src/net/online.ts`.** Server sends `hello` /
   `snap` (with `self`/`ents`/`keep`) / `events` / `social` / `censor` / `error`; client
-  first sends `{ t: ONLINE_WORLD_AUTH_TYPE, token, character }`. The versioned discriminator
+  first sends `{ t: ONLINE_WORLD_AUTH_TYPE, token, character, movementWire }`. The versioned discriminator
   rejects mixed built-in world layouts in both rolling-deploy directions before admission.
   Any wire change must land in both files together.
 - **No browser/render/ui imports.** This bundles for Node, import only from
@@ -195,10 +195,16 @@ Three seams keep it flat; use them, never re-invent them.
 
 ## Inbound WS flood defense (`msg_rate_limit.ts`, `msg_lanes.ts`, `list_read_guard.ts`)
 Three pure metering modules (injected `nowSec`, no `Date.now`; unit-tested without a
-server) verdict every inbound frame; `game.ts` is a thin consumer. The design record is
-`docs/design/player-performance/packet-3-input-cadence.md`.
+server) verdict every inbound frame; `game.ts` is a thin consumer.
+`docs/design/player-performance/packet-3-input-cadence.md` is the HISTORICAL sizing
+record: it describes the retired v1 send cadence these limits were sized against. The
+live cadence is the fixed 20 Hz sampler (`src/game/input_tick_sampler.ts`) plus the
+outbox (`src/net/movement_frame_v2_wire.ts`), which sends strictly less; the numeric
+limits were deliberately left as sized.
 - **Order and placement are load-bearing.** The pre-parse gate (frame ceiling + byte
-  budget, sized against the real client cadence model in `src/net/input_send_cadence.ts`)
+  budget, sized against the real client send cadence: the fixed 20 Hz sampler
+  `src/game/input_tick_sampler.ts` plus the outbox drain in
+  `src/net/movement_frame_v2_wire.ts`)
   verdicts ABOVE `JSON.parse`, so a flooder buys token math, never parse CPU. The
   per-class lanes (movement / command / chat / name-screen, the last for the two
   commands that run the obscenity matcher on player text ahead of any sim gate) are

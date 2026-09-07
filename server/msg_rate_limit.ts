@@ -8,22 +8,22 @@
 // defer: queueing a frame and releasing it later would shift its receive time,
 // which the bot detector's timing strategies are calibrated against.
 //
-// Sizing follows the MEASURED client send cadence, not a documented 20 Hz.
-// src/net/online.ts sends input from two paths sharing one sendInput: an
-// unconditional 50 ms interval timer (20/s, no change check) and a
-// changed-only rAF flush (flushInput) gated at 16 ms since the last send from
-// either path. A held turn changes facing every frame, so the rAF arm sends
-// every whole frame the gate allows on high-Hz displays; every timer send also
-// resets the shared gate clock and suppresses the next flush inside 16 ms, so
-// measured steady rates sit around 60 to 64/s with an analytic hard cap of
-// about 82.5/s (1000 / 16, plus the 20/s timer). Commands, chat, and telemetry
-// ride the same socket on top of that input stream.
+// Sizing follows the client send cadence, which is the sim tick itself.
+// src/game/input_tick_sampler.ts samples exactly one movement frame per fixed
+// 20 Hz client tick and ClientWorld.sendMovementFrame hands it to the outbox
+// in src/net/movement_frame_v2_wire.ts, which writes through immediately
+// unless the local uplink is backed up and otherwise drains on its own 50 ms
+// interval. Steady state is therefore about 20 input frames/s, with short
+// bursts when a stalled render loop advances several ticks at once (bounded by
+// the sampler's catch-up cap) or a drained outbox releases its held frames
+// (bounded by its pending cap). Commands, chat, and telemetry ride the same
+// socket on top of that input stream.
 //
 // The abuse score is shaped by the stall-then-flush constraint: a network
 // stall shorter than the keepalive termination window (WS_KEEPALIVE_PING_MS,
-// server/game.ts) leaves the client buffering sends at up to 80/s and TCP
-// delivers the whole backlog in one burst on recovery, thousands of frames
-// inside about one receive-time second.
+// server/game.ts) leaves the client's own socket buffer holding everything it
+// wrote meanwhile, and TCP delivers the whole backlog in one burst on
+// recovery, many frames inside about one receive-time second.
 // Any score that integrates total drops would kick that legitimate client, so
 // abuse is counted in whole receive-time seconds instead: a burst can make at
 // most one or two seconds abusive, far under the kick requirement, while a
@@ -33,8 +33,8 @@
 // Pure state + functions (no ClientSession/WebSocket import, injected nowSec)
 // so the gate math is unit-testable without a live server.
 
-// Frame ceiling: the refill sits about 1.45x above the 82.5/s input-stream
-// hard cap, leaving standing headroom for command mashing plus chat plus
+// Frame ceiling: the refill sits far above the input stream's own rate,
+// leaving standing headroom for command mashing plus chat plus
 // telemetry on top of a maxed input stream. Burst preserves the
 // 1.5-seconds-of-refill shape for the reconnect catch-up spike (session
 // resume deliberately keeps the existing bucket, benign at this refill).
@@ -44,8 +44,9 @@ export const MSG_RATE_BURST = 180; // bucket capacity, in frames (tokens)
 // Byte budget: beside the per-frame ws maxPayload cap (WS_MAX_PAYLOAD_BYTES,
 // server/main.ts) this bounds SUSTAINED parse exposure per connection,
 // measured on raw.length (the UTF-16 code-unit proxy for bytes). Legitimate
-// steady traffic is about 10 KB/s worst case (input frames serialize to 74 to
-// 106 bytes, so 80/s costs about 8.5 KB/s, plus chat), roughly 6x headroom.
+// steady traffic stays well inside 10 KB/s (input frames serialize to 74 to
+// 106 bytes, so the 20/s stream costs about 2 KB/s, plus command and chat
+// traffic on top), leaving the budget wide headroom.
 export const MSG_BYTE_REFILL_PER_SECOND = 64 * 1024; // sustained refill, bytes per second
 export const MSG_BYTE_BURST = 128 * 1024; // byte bucket capacity, in bytes
 

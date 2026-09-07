@@ -106,11 +106,15 @@ See `server/CLAUDE.md` for server conventions; read `server/game.ts` directly fo
   soft-profanity word list; an `error` frame ends the session (subject to
   `reconnect_policy.ts`).
 - **Client to server**: versioned world auth (`ONLINE_WORLD_AUTH_TYPE`, built by
-  `buildWebSocketAuthMessage`), `input` (move intent via
-  `sendInput`: an unconditional interval timer plus a changed-only gated flush; the
-  cadence constants and gate predicate live in `input_send_cadence.ts`, kept in
-  lockstep with the server contract by `tests/input_cadence_model.test.ts`), `cmd`
-  (every IWorld action via the private `cmd()` helper).
+  `buildWebSocketAuthMessage`), `input` (one per-tick movement frame via
+  `sendMovementFrame`: the fixed 20 Hz sampler `src/game/input_tick_sampler.ts`
+  drives it through `src/game/movement_wire_glue.ts`; the outbox and its
+  `MOVEMENT_OUTBOX_FLUSH_INTERVAL_MS` constant live in
+  `movement_frame_v2_wire.ts`, and the 50 ms `setInterval` that drains it is
+  `ClientWorld`'s own `sendTimer` in `online.ts`, kept in lockstep with the
+  server contract by
+  `tests/input_cadence_model.test.ts`), `cmd` (every IWorld action via the
+  private `cmd()` helper).
 - **Snapshot decode** (`applySnapshot`): `snap.ents` (others) + `snap.self`
   (extended state) go through `applyWire`; `snap.keep` = ids alive-but-unchanged,
   protected from the prune at the end. Encoder is server `wireEntity`; fields are
@@ -242,8 +246,8 @@ failure, kept as stable English that `main.ts` re-localizes.
   wins within a bounded window (`tests/target_echo_client.test.ts` pins the
   target one).
 - **Local-player movement prediction is the one sanctioned prediction**, and it
-  lives OUTSIDE `net/` (`src/render/self_prediction.ts` + `self_prediction_core.ts`
-  on movement wire v2; design authority `docs/design/movement-reconciliation.md`):
+  lives OUTSIDE `net/` (`src/render/self_prediction.ts` + `self_prediction_core.ts`;
+  design authority `docs/design/movement-reconciliation.md`):
   the drawn pose is the shared kernel stepped over the SAME per-tick input
   frames the client actually sent, reconciled exact-match against the acked
   authoritative pose (`ackCt` + `rpx/rpy/rpz/rpf`). Its constraints: (a) prediction
@@ -255,17 +259,13 @@ failure, kept as stable English that `main.ts` re-localizes.
   the display absorbs them through the handoff offset bounded by
   `MAX_SELF_REWIND_YD_PER_SEC`; (d) the feel bar is
   `tests/movement_latency_baseline.test.ts` in strict mode, and any change here
-  must keep it green. Changing this model is a maintainer decision. The legacy
-  display extrapolator (`src/render/self_motion.ts`, leash + servo + block
-  episode, pinned by `tests/self_motion.test.ts`) is only the mid-deploy v1
-  fallback under its original latency-cap constraints. Both the v2 exact-match
-  predictor and the v1 fallback use the per-`ClientWorld` `riftCollisionToken`
-  registered on `riftState` for rift wall resolution, and v1 also strips and
-  reapplies the raised-tier lift via `self_motion_rift_lift.ts`. Delves stay
-  excluded because their portcullis clamps are not mirrored client-side. On v2,
-  gated states and `?nopredict` use the plain interpolated fallback in
-  `src/render/self_render_position_core.ts`, with the rewind-clamped handoff.
-  The legacy extrapolator is deleted when v1 is retired, not before.
+  must keep it green. Changing this model is a maintainer decision. The
+  predictor resolves rift walls through the per-`ClientWorld`
+  `riftCollisionToken` registered on `riftState`; delves stay excluded because
+  their portcullis clamps are not mirrored client-side. Gated states
+  (`src/game/self_motion_gate.ts`) and the `?nopredict` kill switch draw the
+  plain interpolated fallback in `src/render/self_render_position_core.ts`,
+  with the handoff back into prediction bounded by `MAX_SELF_REWIND_YD_PER_SEC`.
 - **The heading is NOT predicted, it is client-authoritative input.** The facing
   channel (`input.facing`, applied outright when the player may turn)
   has always been client-driven for mouselook; `src/game/keyboard_turn_facing.ts`

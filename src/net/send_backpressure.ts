@@ -2,9 +2,9 @@
 // (issue #2943). `ws.send()` never blocks: when the local uplink cannot drain
 // as fast as the client writes, bytes queue in the browser's own outbound
 // buffer, surfaced as `ws.bufferedAmount`. Two players sharing one saturated
-// residential connection hit exactly this: each client keeps calling
-// `sendInput`'s unconditional 50 ms timer at full rate regardless of whether
-// the previous frame drained, so intent frames pile up instead of being
+// residential connection hit exactly this: each client keeps emitting one
+// movement frame per fixed 20 Hz client tick regardless of whether the
+// previous frame drained, so intent frames pile up instead of being
 // shed. WebSocket rides one ordered TCP stream, so the server's keepalive
 // pong (`WS_KEEPALIVE_PING_MS`, server/game.ts) queues behind that same
 // backlog; once a session misses one whole keepalive interval the server
