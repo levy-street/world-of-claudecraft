@@ -1059,13 +1059,16 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the 2026-09-05 release/v0.42.0 sync into the shader-warm branch:
 // the Realm Builder monument (PR #3695) and this branch's renderer changes
 // land together on the merged tree. No capture was retaken.
+// Re-minted for the movement wire v1 removal (issue 3649) on top of
+// release/v0.42.0: renderer.ts lost the legacy predictor lead getter and its
+// onGround arm. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'bd53b31882af899715dcc7bb4a2d9159fa63b5ac1eb5b4ff3b342d2f63b76a08';
+  '32030c5fc7a23d9c2f91a3cccc977b01731a0eea4eb892e7b10681b6edf4745c';
 // Re-minted at the release/v0.42.0 sync of PR #3439: renderer.ts moved for the
 // mount lifecycle seam (mount_lifecycle.ts) and the rickshaw hooks it absorbed.
 // Re-minted again for the PR #3695 review fixes (the impostor fragment tail).
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '3a5b183e08a217c7421c7fecd4b61e43598b3a081fe8b07ba7fdabed559d0f7b';
+  'bf3138348101ed343c8bb57ad8b8002228016fbdf197003a06c9112b40be1584';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2238,7 +2241,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // Re-minted for the 2026-09-05 release/v0.42.0 sync into the shader-warm branch:
       // the Realm Builder monument (PR #3695) and this branch's renderer changes
       // land together on the merged tree. No capture was retaken.
-    ).toBe('7691517f80fb2fc7620a55adcfc2e5fbfb6ded72bb5f0d77ca4e050c90dfe9ff');
+      // Re-minted for the movement wire v1 removal: same order, the composite
+      // first, then this seal. No capture was retaken.
+    ).toBe('57a0602b264267ea7d26dccbf6740ab44e4893263e654257c88d54836fcf6c3b');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

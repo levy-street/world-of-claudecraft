@@ -16,9 +16,7 @@ const args = (over: Partial<KeyboardTurnArgs> = {}): KeyboardTurnArgs => ({
   sentFacing: null,
   serverFacing: 0,
   releaseCommitAcknowledged: false,
-  echoMs: 0,
   snapshotIntervalMs: 50,
-  movementWireVersion: 1,
   frameDt: FRAME_60,
   ...over,
 });
@@ -81,20 +79,16 @@ describe('stepKeyboardTurnFacing', () => {
     const st = newKeyboardTurnState();
     seedKeyboardTurnRelease(st, 0.8);
 
-    const v2 = { movementWireVersion: 2 as const, frameDt: 0.025 };
-    expect(stepKeyboardTurnFacing(st, args({ ...v2, serverFacing: 0.801 }))).toBe(0.8);
-    expect(stepKeyboardTurnFacing(st, args({ ...v2, serverFacing: 0.79 }))).toBe(0.8);
-    expect(stepKeyboardTurnFacing(st, args({ ...v2, serverFacing: 0.801 }))).toBe(0.8);
+    const slowFrame = { frameDt: 0.025 };
+    expect(stepKeyboardTurnFacing(st, args({ ...slowFrame, serverFacing: 0.801 }))).toBe(0.8);
+    expect(stepKeyboardTurnFacing(st, args({ ...slowFrame, serverFacing: 0.79 }))).toBe(0.8);
+    expect(stepKeyboardTurnFacing(st, args({ ...slowFrame, serverFacing: 0.801 }))).toBe(0.8);
     expect(st.facing).not.toBeNull();
-    expect(stepKeyboardTurnFacing(st, args({ ...v2, serverFacing: 0.801 }))).toBeCloseTo(0.801, 12);
+    expect(stepKeyboardTurnFacing(st, args({ ...slowFrame, serverFacing: 0.801 }))).toBeCloseTo(
+      0.801,
+      12,
+    );
     expect(st.facing).toBeNull();
-  });
-
-  it('keeps the legacy v1 seam glide', () => {
-    const st = newKeyboardTurnState();
-    seedKeyboardTurnRelease(st, 0.8);
-
-    expect(stepKeyboardTurnFacing(st, args({ serverFacing: 0.79 }))).toBeLessThan(0.8);
   });
 
   it('NEVER rewinds toward the lagging server facing on release (the nausea bug)', () => {
@@ -277,38 +271,6 @@ describe('stepKeyboardTurnFacing', () => {
     },
   );
 
-  it('holds a persistent residual through the grace window, then glides it out gently', () => {
-    const st = newKeyboardTurnState();
-    for (let i = 0; i < 30; i++) {
-      stepKeyboardTurnFacing(st, args({ turnLeft: true, serverFacing: 0 }));
-    }
-    const held = st.facing as number;
-    const committed = held;
-    // the server never catches up (stun landed mid-turn): facing stays behind
-    const serverFacing = held - 0.15;
-    // during the grace window the display holds perfectly still
-    for (let i = 0; i < 18; i++) {
-      // 300ms < grace
-      expect(
-        stepKeyboardTurnFacing(st, args({ serverFacing, releaseCommitAcknowledged: true })),
-      ).toBeCloseTo(committed, 9);
-    }
-    // past the grace window it glides back, far slower than TURN_SPEED
-    let prev = committed;
-    let f: number | null = committed;
-    let frames = 0;
-    while (f !== null && frames < 600) {
-      f = stepKeyboardTurnFacing(st, args({ serverFacing, releaseCommitAcknowledged: true }));
-      if (f !== null) {
-        const step = Math.abs(f - prev);
-        expect(step).toBeLessThan((TURN_SPEED / 2) * FRAME_60); // gentle, not a snap
-        prev = f;
-      }
-      frames++;
-    }
-    expect(st.facing).toBeNull(); // eventually converged and handed off
-  });
-
   it('holds instead of integrating while turning is not allowed (stun family)', () => {
     const st = newKeyboardTurnState();
     stepKeyboardTurnFacing(st, args({ turnLeft: true, serverFacing: 0 }));
@@ -317,7 +279,7 @@ describe('stepKeyboardTurnFacing', () => {
       st,
       args({ turnLeft: true, turnAllowed: false, serverFacing: 0 }),
     );
-    // no further integration, and no immediate rewind either (grace window)
+    // no further integration, and no rewind toward the lagging mirror either
     expect(f).toBeCloseTo(engaged, 9);
   });
 
@@ -375,7 +337,7 @@ describe('stepKeyboardTurnFacing', () => {
       if (arrived !== null) lastApplied = arrived;
       f = stepKeyboardTurnFacing(
         st,
-        args({ serverFacing: lastApplied, releaseCommitAcknowledged: true, echoMs: 280 }),
+        args({ serverFacing: lastApplied, releaseCommitAcknowledged: true }),
       );
       if (f !== null) {
         totalTravel += Math.abs(f - prev);
@@ -384,45 +346,6 @@ describe('stepKeyboardTurnFacing', () => {
     }
     expect(st.facing).toBeNull(); // handed off, not spinning forever
     expect(totalTravel).toBeLessThan(Math.PI); // bounded settle, no full circles
-  });
-
-  it('scales the release grace with the measured echo', () => {
-    const st = newKeyboardTurnState();
-    for (let i = 0; i < 30; i++) {
-      stepKeyboardTurnFacing(st, args({ turnLeft: true, serverFacing: 0 }));
-    }
-    const held = st.facing as number;
-    const committed = held;
-    const serverFacing = held - 0.3; // mirror never catches up
-    // echo 400ms -> grace 720ms; at ~500ms the heading must still be held
-    for (let i = 0; i < 30; i++) {
-      stepKeyboardTurnFacing(
-        st,
-        args({ serverFacing, releaseCommitAcknowledged: true, echoMs: 400 }),
-      );
-    }
-    expect(st.facing).toBeCloseTo(committed, 9);
-  });
-
-  it('never streams a mirror-derived heading if echo rises again mid-glide', () => {
-    const st = newKeyboardTurnState();
-    for (let i = 0; i < 30; i++) {
-      stepKeyboardTurnFacing(st, args({ turnLeft: true, serverFacing: 0 }));
-    }
-    const held = st.facing as number;
-    const stalledMirror = held - 0.4;
-    for (let i = 0; i < 29; i++) {
-      stepKeyboardTurnFacing(
-        st,
-        args({ serverFacing: stalledMirror, releaseCommitAcknowledged: true }),
-      );
-    }
-    const giveback = Math.abs(held - (st.facing as number));
-    expect(giveback).toBeCloseTo(0.225, 12);
-
-    stepKeyboardTurnFacing(st, args({ serverFacing: stalledMirror, echoMs: 400 }));
-
-    expect(st.wireFacing, `mirror-derived giveback was ${giveback} rad`).toBeNull();
   });
 
   it('returns null and stays inactive when idle', () => {

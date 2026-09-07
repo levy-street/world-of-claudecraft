@@ -26,6 +26,7 @@ vi.mock('../server/db', () => ({
 import { releaseCharacterLease } from '../server/db';
 import { type ClientSession, GameServer } from '../server/game';
 import { LINKDEAD_GRACE_MS, planJoin } from '../server/linkdead';
+import { consumeMovementFramesV2 } from '../server/movement_input_timeline_v2';
 import {
   isTransientReconnectRejection,
   isTransientTimeoutRejection,
@@ -163,10 +164,18 @@ describe('linkdead grace lifecycle', () => {
     const server = new GameServer();
     const ws = fakeWs();
     const session = expectJoined(server.join(ws, 11, 101, 'Runner', 'warrior', null));
+    // The held intent reaches meta.moveInput only when the per-tick timeline
+    // consumes the frame, so the drive step is what arms this test.
     server.handleMessage(
       session,
-      JSON.stringify({ t: 'input', seq: 1, mi: { f: 1, b: 0, tl: 0, tr: 0, sl: 0, sr: 0, j: 0 } }),
+      JSON.stringify({
+        t: 'input',
+        seq: 1,
+        ct: 0,
+        mi: { f: 1, b: 0, tl: 0, tr: 0, sl: 0, sr: 0, j: 0 },
+      }),
     );
+    consumeMovementFramesV2(server.sim, [session]);
     expect(server.sim.meta(session.pid)?.moveInput.forward).toBe(true);
 
     dropSocket(server, session, ws);

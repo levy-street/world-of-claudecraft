@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 // the two character-lease functions, so the handshake drives with no live
 // database and no module mock: the lease fns are vi.fn spies on the deps object.
 import { createWsAuth } from '../server/ws_auth';
-import { ONLINE_WORLD_AUTH_TYPE } from '../src/world_api';
+import { MOVEMENT_WIRE_VERSION, ONLINE_WORLD_AUTH_TYPE } from '../src/world_api';
 
 const ALREADY_IN_WORLD = 'character already in world';
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
@@ -28,8 +28,16 @@ function fakeWs() {
   };
 }
 
+// movementWire is a REQUIRED capability (server/ws_auth.ts rejects a handshake
+// without it before any admission work), so the frame mints it exactly as
+// buildWebSocketAuthMessage does.
 const authFrame = (character: number) =>
-  JSON.stringify({ t: ONLINE_WORLD_AUTH_TYPE, token: 'tok', character });
+  JSON.stringify({
+    t: ONLINE_WORLD_AUTH_TYPE,
+    token: 'tok',
+    character,
+    movementWire: MOVEMENT_WIRE_VERSION,
+  });
 const fakeReq = () => ({}) as any;
 
 // Build a full WsAuthDeps bag whose cheap checks all pass, so a handshake reaches
