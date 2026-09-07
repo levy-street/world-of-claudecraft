@@ -166,10 +166,10 @@ const SWIM_LOOK_UP = 0.05;
 // Ends of each ramp, in camPitch radians (the clamps are the natural ends).
 const SWIM_DIVE_FULL = 1.25;
 const SWIM_SURFACE_FULL = -0.3;
-// Quantised, because the steer rides the SAME change-detected input frame as
-// the movement keys (net/online.ts inputSignature): a continuous float would
-// resend on every mouse-move, where steps resend only when the band changes.
-// Six steps is finer than the eye reads on a 3.2 yd/s descent.
+// Quantised, so the wire carries a small stable set of rates instead of a
+// fresh float every mouse-move: the per-tick frame omits `ss` entirely at
+// full rate (net/movement_frame_v2_wire.ts) and only a band change puts it
+// back on. Six steps is finer than the eye reads on a 3.2 yd/s descent.
 const SWIM_STEER_STEPS = 6;
 // Hysteresis on the threshold itself. Without it, a camera resting exactly on
 // the line chatters the dive bit (and its input frame) at mouse-jitter rate.

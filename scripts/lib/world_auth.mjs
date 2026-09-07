@@ -11,8 +11,16 @@ export const ONLINE_WORLD_AUTH_TYPE = 'auth-world-29';
 export const ONLINE_WORLD_INCOMPATIBLE_MESSAGE =
   'Game and server versions are incompatible. Reload or update, then try again.';
 
+// The movement wire is a REQUIRED capability: server/ws_auth.ts refuses a
+// handshake that does not offer this exact number with the incompatible message
+// above, BEFORE it looks at the token. Keep it in lockstep with
+// MOVEMENT_WIRE_VERSION in src/world_api.ts (same freshness contract as the
+// discriminator). Omitting it here would reject every Node client, and would
+// make the OTA layout preflight read a healthy server as an epoch mismatch.
+export const MOVEMENT_WIRE_VERSION = 2;
+
 export function worldAuthMessage(token, character) {
-  return { t: ONLINE_WORLD_AUTH_TYPE, token, character };
+  return { t: ONLINE_WORLD_AUTH_TYPE, token, character, movementWire: MOVEMENT_WIRE_VERSION };
 }
 
 // Chat, and every "/dev ..." cheat that rides it, is a COMMAND, not a frame

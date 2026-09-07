@@ -1752,7 +1752,6 @@ export const pl_PL: EnTranslations = {
         "fps01Low": "Min. 0,1%",
         "ping": "Ping",
         "jitter": "Drżenie",
-        "predLead": "Wyprzedzenie predykcji",
         "snapshot": "Częstotliwość migawek",
         "serverTick": "Częstotliwość tików serwera",
         "connection": "Połączenie",

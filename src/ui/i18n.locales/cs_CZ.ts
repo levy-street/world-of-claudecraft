@@ -3141,7 +3141,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.professions.intro':
     'Kromě boje a úkolů tě svět odměňuje i za práci na poli a u výhně: za sběr surovin, jejich proměnu ve výbavu a zboží napříč deseti výrobními řemesly a za přijetí identity jednoho z deseti archetypů, které tato řemesla představují.',
   'hudChrome.mobile.dailyRewards': 'Obchod',
-  'hudChrome.perf.labels.predLead': 'Náskok predikce',
   'hudChrome.perf.labels.serverTick': 'Frekvence tiků serveru',
   'hudChrome.townFocus.budgetLabel': 'Zbývající body: {remaining} / {budget}',
   'hudChrome.townFocus.decreaseAria': 'Snížit zaměření na {component}',

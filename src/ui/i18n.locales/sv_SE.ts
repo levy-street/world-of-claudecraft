@@ -3167,7 +3167,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.professions.intro':
     'Bortom strider och uppdrag belönar världen dig för att bruka jorden och smedjan: samla råmaterial, förvandla dem till utrustning och varor genom tio hantverksyrken, och slå dig till ro i en identitet som en av de tio arketyper yrkena representerar.',
   'hudChrome.mobile.dailyRewards': 'Butik',
-  'hudChrome.perf.labels.predLead': 'Prediktionsförsprång',
   'hudChrome.townFocus.budgetLabel': 'Poäng kvar: {remaining} / {budget}',
   'hudChrome.townFocus.decreaseAria': 'Minska fokus på {component}',
   'hudChrome.townFocus.hint':

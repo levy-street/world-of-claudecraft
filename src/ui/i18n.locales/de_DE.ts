@@ -3239,7 +3239,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.professions.intro':
     'Jenseits von Kampf und Quests belohnt dich die Welt für die Arbeit an Land und Esse: Rohstoffe sammeln, sie über zehn Handwerksgewerbe hinweg zu Ausrüstung und Waren verarbeiten und in eine Identität als einer der zehn Archetypen hineinwachsen, für die diese Gewerbe stehen.',
   'hudChrome.mobile.dailyRewards': 'Shop',
-  'hudChrome.perf.labels.predLead': 'Prädiktionsvorlauf',
   'hudChrome.townFocus.budgetLabel': 'Verbleibende Punkte: {remaining} / {budget}',
   'hudChrome.townFocus.decreaseAria': 'Fokus auf {component} verringern',
   'hudChrome.townFocus.hint':

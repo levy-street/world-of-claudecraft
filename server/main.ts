@@ -3897,7 +3897,9 @@ export async function startServer(): Promise<http.Server> {
     console.log(`World of ClaudeCraft server listening on http://localhost:${config.port}`);
     if (banlist.file) console.log(usernameBanlistBootLine(banlist));
     console.log(`  REST: /api/register /api/login /api/characters /api/status`);
-    console.log(`  WS:   /ws, then first message {t:"${ONLINE_WORLD_AUTH_TYPE}",token,character}`);
+    console.log(
+      `  WS:   /ws, then first message {t:"${ONLINE_WORLD_AUTH_TYPE}",token,character,movementWire}`,
+    );
   });
   bankLedgerGrowthMonitor.start();
 

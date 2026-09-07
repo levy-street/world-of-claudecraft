@@ -2,8 +2,7 @@ import type { MoveInput } from '../sim/types';
 import { type InputTickFrame, InputTickSampler } from './input_tick_sampler';
 
 export interface MovementWireClient {
-  movementWireVersion: 1 | 2;
-  onMovementWireNegotiated: ((version: 1 | 2, now: number) => void) | null;
+  onMovementWireNegotiated: ((now: number) => void) | null;
   onMovementWireNeutral: ((now: number) => boolean) | null;
   movementWireIsOpen(): boolean;
   sendMovementFrame(frame: InputTickFrame, now: number, bypassBackpressure?: boolean): boolean;
@@ -11,7 +10,7 @@ export interface MovementWireClient {
 
 export class MovementWireGlue {
   onFrame: ((frame: InputTickFrame) => void) | null = null;
-  onNegotiated: ((version: 1 | 2) => void) | null = null;
+  onNegotiated: (() => void) | null = null;
   private readonly sampler = new InputTickSampler();
   private paused = false;
   private pendingTurnEngage: { turnLeft: boolean; turnRight: boolean } | null = null;
@@ -21,15 +20,13 @@ export class MovementWireGlue {
   }
 
   connect(client: MovementWireClient, now: number): void {
-    client.onMovementWireNegotiated = (version, negotiatedAt) =>
-      this.negotiated(version, negotiatedAt);
+    client.onMovementWireNegotiated = (negotiatedAt) => this.negotiated(negotiatedAt);
     client.onMovementWireNeutral = (now) => this.emitNeutralFrame(client, now);
-    this.negotiated(client.movementWireVersion, now);
+    this.negotiated(now);
   }
 
-  negotiated(version: 1 | 2, now: number): void {
-    this.onNegotiated?.(version);
-    if (version !== 2) return;
+  negotiated(now: number): void {
+    this.onNegotiated?.();
     this.sampler.reset(now);
     this.paused = false;
     this.pendingTurnEngage = null;
@@ -40,7 +37,7 @@ export class MovementWireGlue {
   }
 
   emitNeutralFrame(client: MovementWireClient, now: number): boolean {
-    if (client.movementWireVersion !== 2 || !client.movementWireIsOpen()) return false;
+    if (!client.movementWireIsOpen()) return false;
     const frame = this.sampler.emitNeutralFrame(now);
     this.pendingTurnEngage = null;
     try {
@@ -60,9 +57,7 @@ export class MovementWireGlue {
     now: number,
     turnEngageEdge = false,
   ): boolean {
-    if (client.movementWireVersion !== 2 || this.paused || !client.movementWireIsOpen()) {
-      return false;
-    }
+    if (this.paused || !client.movementWireIsOpen()) return false;
     if (turnEngageEdge) {
       this.pendingTurnEngage = { turnLeft: mi.turnLeft, turnRight: mi.turnRight };
     }

@@ -3335,7 +3335,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'guide.professions.intro':
     'Más allá del combate y las misiones, el mundo te recompensa por trabajar la tierra y la fragua: recolectar materias primas, convertirlas en equipo y bienes a lo largo de diez oficios de artesanía, y asentarte en una identidad como uno de los diez arquetipos que esos oficios representan.',
   'hudChrome.mobile.dailyRewards': 'Tienda',
-  'hudChrome.perf.labels.predLead': 'Adelanto de predicción',
   'hudChrome.townFocus.budgetLabel': 'Puntos restantes: {remaining} / {budget}',
   'hudChrome.townFocus.decreaseAria': 'Reducir el enfoque en {component}',
   'hudChrome.townFocus.hint':

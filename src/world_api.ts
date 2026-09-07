@@ -223,6 +223,11 @@ export const ONLINE_WORLD_INCOMPATIBLE_MESSAGE =
 export const STABLE_TIMER_WIRE_VERSION = 3 as const;
 export type StableTimerWireVersion = typeof STABLE_TIMER_WIRE_VERSION;
 
+// Movement wire capability. Unlike the negotiated capabilities around it this
+// one is REQUIRED: a handshake that does not offer it is rejected with the
+// incompatible-client error, so client and server mint the literal from here.
+export const MOVEMENT_WIRE_VERSION = 2 as const;
+
 // Warlock pet-bar signature command capability. It is negotiated independently
 // from the world-layout epoch so rolling deploys fail closed for this optional
 // behavior without disconnecting otherwise compatible clients.

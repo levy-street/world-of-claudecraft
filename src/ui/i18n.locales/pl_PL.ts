@@ -3273,7 +3273,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.professions.intro':
     'Poza walką i zadaniami świat nagradza pracę na roli i przy kuźni: zbieranie surowców, przekuwanie ich w ekwipunek i towary w dziesięciu rzemiosłach oraz wrastanie w tożsamość jednego z dziesięciu archetypów, które te fachy reprezentują.',
   'hudChrome.mobile.dailyRewards': 'Sklep',
-  'hudChrome.perf.labels.predLead': 'Wyprzedzenie predykcji',
   'hudChrome.townFocus.budgetLabel': 'Pozostałe punkty: {remaining} / {budget}',
   'hudChrome.townFocus.decreaseAria': 'Zmniejsz priorytet: {component}',
   'hudChrome.townFocus.hint':

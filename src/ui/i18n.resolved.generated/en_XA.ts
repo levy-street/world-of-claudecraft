@@ -1752,7 +1752,6 @@ export const en_XA: EnTranslations = {
         "fps01Low": "[0.1% Ļóŵ]",
         "ping": "[Þíñĝ]",
         "jitter": "[Ĵíţţéŕ]",
-        "predLead": "[Þŕéðíçţíóñ Ļéáð]",
         "snapshot": "[Šñáþšĥóţ Ŕáţé]",
         "serverTick": "[Šéŕʋéŕ Ţíçķ Ŕáţé]",
         "connection": "[Çóññéçţíóñ]",

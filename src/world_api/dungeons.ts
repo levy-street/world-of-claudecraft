@@ -65,7 +65,7 @@ export interface IWorldDungeons {
   // never this ClientWorld member; that route was never inert online. This
   // member instead feeds the client's OWN two consumers: click-to-move
   // (findPlayerPath/resolvePlayerDestination in src/main.ts) and the
-  // display-only self-motion predictor (src/render/self_motion.ts), both of
+  // display-only self predictor (src/render/self_prediction.ts), both of
   // which treat a rift wall as solid instead of open floor. Movement
   // resolution itself stays server-authoritative online either way; the
   // ONLINE client registers a region under this token purely so those two

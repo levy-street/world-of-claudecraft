@@ -1549,7 +1549,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.labels.fps01Low': '0.1% 低帧',
   'hudChrome.perf.labels.ping': '延迟',
   'hudChrome.perf.labels.jitter': '抖动',
-  'hudChrome.perf.labels.predLead': '预测提前量',
   'hudChrome.perf.labels.snapshot': '快照频率',
   'hudChrome.perf.labels.serverTick': '服务器刻率',
   'hudChrome.perf.labels.connection': '连接',

@@ -174,7 +174,6 @@ import { kickCharacterPreloadStream, runPostEntryWarmups } from './game/post_ent
 import { newPresentationGateInput, presentationGate } from './game/presentation_gate';
 import { startRealmBuilderRollLoad } from './game/realm_builder_boot';
 import { adaptiveSelfAlphaLead } from './game/self_alpha_lead';
-import { SelfMotionFrameBuffer } from './game/self_motion_frame_buffer';
 import {
   isMovementFrozen,
   isPlayerImmobilized,
@@ -561,8 +560,8 @@ const CLICK_MOVE_LATENCY_STOP_MAX_EXTRA = 1.6; // yards; cap high-latency stop p
 const CLICK_MOVE_LATENCY_WAYPOINT_MAX_EXTRA = 0.8; // yards; helps online A* corners roll through despite input echo delay
 const ATTACK_MOVE_MELEE_STOP = 3.5; // yards; how close an attack-move approach stops from its target (inside melee)
 const ATTACK_MOVE_ACQUIRE_RANGE = 12; // yards; an attack-move toward open ground auto-targets a hostile this near
-// Live-ops escape hatch for v2 prediction: ?nopredict uses interpolated display
-// without prediction. The v1 fallback keeps its legacy extrapolator.
+// Live-ops escape hatch: ?nopredict draws the interpolated display pose with
+// no local prediction.
 const SELF_MOTION_DISABLED = new URLSearchParams(location.search).has('nopredict');
 const IMMOBILE_NOTE_THROTTLE_MS = 1200; // min gap between "Can't move!" floats while held
 const HOMEPAGE_MUSIC_MUTED_KEY = 'woc_homepage_music_muted';
@@ -3960,9 +3959,7 @@ async function startGame(
     sentFacing: null,
     serverFacing: 0,
     releaseCommitAcknowledged: false,
-    echoMs: 0,
     snapshotIntervalMs: 50,
-    movementWireVersion: 1,
     frameDt: 0,
   };
   const selfMotionGateArgs: SelfMotionGateArgs = {
@@ -4291,7 +4288,6 @@ async function startGame(
     getEntityCount: () => world.entities.size,
     getEchoMs: () => inputEcho.echoMs,
     getJitterMs: () => inputEcho.jitterMs,
-    getPredLeadMs: () => renderer.selfMotionLeadMs,
     getApm: () => inputMeter.apm(performance.now()),
   });
   function visualFacingFor(
@@ -4306,7 +4302,6 @@ async function startGame(
     lastSnapAge: -1,
     alpha: 0,
   };
-  const selfMotionFrameBuffer = new SelfMotionFrameBuffer();
   const movementPrediction = new MovementPredictionPipeline(
     world.cfg.seed,
     world.riftCollisionToken,
@@ -4632,9 +4627,7 @@ async function startGame(
       (!movementFrozen() ? (renderFacing ?? controllerFacing) : null) ?? resolved.facing;
     kbTurnArgs.serverFacing = interpServerFacing;
     kbTurnArgs.releaseCommitAcknowledged = net.inputFacingAcknowledged(kbTurn.pendingReleaseCommit);
-    kbTurnArgs.echoMs = inputEcho.echoMs;
     kbTurnArgs.snapshotIntervalMs = net.snapInterval;
-    kbTurnArgs.movementWireVersion = net.movementWireVersion;
     kbTurnArgs.frameDt = frameDt;
     const kbFacing = stepKeyboardTurnFacing(kbTurn, kbTurnArgs);
     const netFacing = foreignFacing ?? kbTurn.wireFacing;
@@ -4668,7 +4661,7 @@ async function startGame(
       performance.now(),
       turnEngageEdge,
     );
-    // On v2 this duration includes the fixed-tick sampler phase before the frame is emitted.
+    // This duration includes the fixed-tick sampler phase before the frame is emitted.
     if (movementFrameEmitted) perf.markInputSent(performance.now());
     if (movementFrameEmitted) pendingReleaseFacing = null;
     const echoSamples = net.consumeInputEchoSamples();
@@ -4740,23 +4733,7 @@ async function startGame(
     const netPipeline = net.netPipeline();
     netPipeline.onAnimationFrame(now);
     perf.setNetPipelineSource(netPipeline);
-    const selfMotion =
-      net.movementWireVersion === 2
-        ? movementPrediction.display()
-        : SELF_MOTION_DISABLED
-          ? null
-          : selfMotionFrameBuffer.write(
-              net.connected && selfPredictionEnabled,
-              resolved.mi,
-              netFacing ?? interpServerFacing,
-              inputEcho.echoMs,
-              inputEcho.jitterMs,
-              alpha,
-              frameDt,
-              Math.max(0, cameraLastSnapAge),
-              net.snapInterval,
-              net.riftFloor,
-            );
+    const selfMotion = movementPrediction.display();
     traceStart = perf.startTrace();
     try {
       updateCamera(frameDt, kbFacing ?? interpServerFacing);

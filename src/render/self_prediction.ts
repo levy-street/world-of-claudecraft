@@ -88,7 +88,6 @@ export class MovementPredictionPipeline {
   private lastPredictedClientTick = -1;
   private pendingResidual: ReconciledSelfPrediction['residual'] = null;
   private readonly displayOutput: ReconciledSelfPrediction = {
-    kind: 'reconciled',
     position: { x: 0, y: 0, z: 0 },
     residual: null,
   };
@@ -205,7 +204,7 @@ export class MovementPredictionPipeline {
   private canPredict(): boolean {
     return (
       this.enabled &&
-      this.wire?.movementWireVersion === 2 &&
+      this.wire !== null &&
       !this.wire.reconOverrideActive &&
       hasAuthoritativePose(this.wire)
     );

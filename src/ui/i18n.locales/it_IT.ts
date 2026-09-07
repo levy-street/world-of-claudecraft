@@ -3257,7 +3257,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.professions.intro':
     "Oltre al combattimento e alle missioni, il mondo ti ricompensa per il lavoro della terra e della forgia: raccogliere materie prime, trasformarle in equipaggiamento e beni attraverso dieci mestieri artigiani e assumere un'identità come uno dei dieci archetipi che quei mestieri rappresentano.",
   'hudChrome.mobile.dailyRewards': 'Negozio',
-  'hudChrome.perf.labels.predLead': 'Anticipo di predizione',
   'hudChrome.townFocus.budgetLabel': 'Punti rimanenti: {remaining} / {budget}',
   'hudChrome.townFocus.decreaseAria': 'Riduci la priorità di {component}',
   'hudChrome.townFocus.hint':

@@ -3259,7 +3259,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.professions.intro':
     'Di luar pertempuran dan misi, dunia mengganjarmu karena menggarap tanah dan tempaan: mengumpulkan bahan mentah, mengolahnya menjadi perlengkapan dan barang lewat sepuluh kerajinan, dan menetap dalam identitas sebagai salah satu dari sepuluh arketipe yang diwakili kerajinan-kerajinan itu.',
   'hudChrome.mobile.dailyRewards': 'Toko',
-  'hudChrome.perf.labels.predLead': 'Jarak Prediksi',
   'hudChrome.townFocus.budgetLabel': 'Sisa poin: {remaining} / {budget}',
   'hudChrome.townFocus.decreaseAria': 'Kurangi fokus pada {component}',
   'hudChrome.townFocus.hint':

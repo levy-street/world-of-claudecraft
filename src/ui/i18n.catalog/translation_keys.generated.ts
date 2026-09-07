@@ -10960,7 +10960,6 @@ export type TranslationKeyFlat =
   | 'hudChrome.perf.labels.jitter'
   | 'hudChrome.perf.labels.memory'
   | 'hudChrome.perf.labels.ping'
-  | 'hudChrome.perf.labels.predLead'
   | 'hudChrome.perf.labels.programs'
   | 'hudChrome.perf.labels.renderScale'
   | 'hudChrome.perf.labels.serverTick'

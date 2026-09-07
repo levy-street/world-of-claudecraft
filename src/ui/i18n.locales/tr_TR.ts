@@ -3260,7 +3260,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.professions.intro':
     'Dünya seni savaşın ve görevlerin ötesinde, toprağı ve ocağı işlediğin için de ödüllendirir: ham madde toplamak, on ayrı zanaat kolunda onları teçhizata ve mallara dönüştürmek ve bu zanaatların temsil ettiği on arketipten birinin kimliğine yerleşmek.',
   'hudChrome.mobile.dailyRewards': 'Mağaza',
-  'hudChrome.perf.labels.predLead': 'Tahmin Avansı',
   'hudChrome.townFocus.budgetLabel': 'Kalan puan: {remaining} / {budget}',
   'hudChrome.townFocus.decreaseAria': '{component} odağını azalt',
   'hudChrome.townFocus.hint':

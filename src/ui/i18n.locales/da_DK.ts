@@ -3165,7 +3165,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.professions.intro':
     'Ud over kamp og opdrag belønner verden dig for at arbejde med jorden og essen: at samle råmaterialer, forvandle dem til udstyr og varer på tværs af ti håndværksfag og finde sig til rette i en identitet som en af de ti arketyper, fagene står for.',
   'hudChrome.mobile.dailyRewards': 'Butik',
-  'hudChrome.perf.labels.predLead': 'Forudsigelsesforspring',
   'hudChrome.townFocus.budgetLabel': 'Point tilbage: {remaining} / {budget}',
   'hudChrome.townFocus.decreaseAria': 'Sænk fokus på {component}',
   'hudChrome.townFocus.hint':

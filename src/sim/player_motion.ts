@@ -7,7 +7,7 @@
 // the held MoveInput, the world seed, and the PlayerMotionDeps callbacks. The
 // live Sim binds the deps to its own methods (fiesta-aware moveSpeedMult,
 // delve-aware resolveMove, real cancelCast/standUp/dealDamage); the online
-// client's display-only self extrapolator (src/render/self_motion.ts) binds
+// client's display-only self predictor (src/render/client_player_motion.ts) binds
 // pure/no-op equivalents, so the SAME math animates both hosts and stays in
 // lockstep by construction (tests/player_motion.test.ts runs the client dep
 // shape against a live Sim every CI run).

@@ -3276,7 +3276,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.professions.intro':
     'Naast gevecht en quests beloont de wereld je voor het bewerken van het land en de smidse: grondstoffen verzamelen, ze in tien ambachtsvakken tot uitrusting en goederen maken, en een identiteit aannemen als een van de tien archetypen die deze vakken vertegenwoordigen.',
   'hudChrome.mobile.dailyRewards': 'Winkel',
-  'hudChrome.perf.labels.predLead': 'Predictievoorsprong',
   'hudChrome.townFocus.budgetLabel': 'Punten over: {remaining} / {budget}',
   'hudChrome.townFocus.decreaseAria': 'Verminder de focus op {component}',
   'hudChrome.townFocus.hint':

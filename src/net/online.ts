@@ -211,8 +211,6 @@ import { dungeonEntrySnapshotFacing } from './dungeon_entry_facing';
 import { applyGroundTelegraphSnapshot } from './ground_telegraph_wire';
 import { GuildBankLogMirror } from './guild_bank_log_mirror';
 import { foldInputAck } from './input_ack';
-import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
-import { inputSignature } from './input_signature';
 import { copyPos, wrapAngle } from './interp_math';
 import { applyMaterialInventoryWire } from './material_inventory_wire';
 import {
@@ -221,9 +219,9 @@ import {
   type MountRaceMirror,
 } from './mount_race_wire';
 import {
+  MOVEMENT_OUTBOX_FLUSH_INTERVAL_MS,
   type MovementFrameV2,
   MovementFrameV2Outbox,
-  trackPendingInputSequence,
   trackPendingInputSequenceRange,
 } from './movement_frame_v2_wire';
 import { applyReconSelfWire, ReconWireState } from './movement_reconciliation_wire';
@@ -238,7 +236,6 @@ import {
 import { applyProfessionsSelfMirror } from './professions_self_mirror';
 import { optimisticQuestState } from './quest_state_optimistic';
 import { isTransientReconnectRejection, isTransientTimeoutRejection } from './reconnect_policy';
-import { isInputSendBackpressured } from './send_backpressure';
 import { snapshotAlpha } from './snapshot_alpha';
 import {
   type SnapshotTimerWireMode,
@@ -258,16 +255,8 @@ export { buildWebSocketAuthMessage } from './world_auth_message';
 // biome-ignore lint/suspicious/noExplicitAny: legacy wire JSON is intentionally loose at the boundary.
 type LooseJson = any;
 
-type InputSendMode = 'periodic' | 'changed' | 'forced-neutral' | 'forced-facing';
-
 const inputFacingsMatch = (a: number, b: number): boolean =>
   Math.abs(Math.atan2(Math.sin(a - b), Math.cos(a - b))) <= 1e-12;
-
-interface PendingTransientInput {
-  jump: boolean;
-  turnLeft: boolean;
-  turnRight: boolean;
-}
 
 // ---------------------------------------------------------------------------
 // REST
@@ -1660,7 +1649,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // A real per-ClientWorld token (issue #3479): applyRiftStateEvent registers the
   // mirrored floor's colliders under it (the same pure generator + layoutColliders
   // the server ran, so no geometry travels the wire), which is what lets the
-  // self-motion predictor (src/render/self_motion.ts) resolve rift walls locally
+  // self predictor (src/render/self_prediction.ts) resolve rift walls locally
   // instead of rendering the full echo latency, and also feeds
   // findPlayerPath/resolvePlayerDestination and the swept-landing crest re-resolve
   // (see below) real rift geometry for the first time. The token itself is a fixed
@@ -1885,7 +1874,6 @@ export class ClientWorld extends ReconWireState implements IWorld {
   serverTickHz: number | null = null;
   // False until a negotiated server snapshot advertises support.
   petSpecialCommandsSupported = false;
-  movementWireVersion: 1 | 2 = 1;
   // Stable timer-wire decode state. These stay separate from the public
   // remaining-time mirrors so an omitted v2 field can be re-derived from the
   // server simulation clock without accumulating client-frame drift.
@@ -1993,19 +1981,16 @@ export class ClientWorld extends ReconWireState implements IWorld {
   private worldInteractionRequests: WorldInteractionRequests | undefined;
   private mouselookFacing: number | null = null;
   private sendTimer: number | undefined;
-  private lastInputSentAt = 0;
-  private lastInputSig = '';
   private lastInputFacingSent: number | null = null;
   private lastInputFacingSentSeq = 0;
   private inputSeq = 0;
   private pendingInputSeqSentAt = new Map<number, number>();
   private movementFrameOutbox: MovementFrameV2Outbox | undefined;
-  onMovementWireNegotiated: ((version: 1 | 2, now: number) => void) | null = null;
+  onMovementWireNegotiated: ((now: number) => void) | null = null;
   onMovementWireNeutral: ((now: number) => boolean) | null = null;
   // No initializer on purpose: bare ClientWorld test fixtures skip field
   // initializers, and the lazy accessor below keeps that construction idiom
   // equivalent to a real instance.
-  private pendingTransientInput: PendingTransientInput | undefined;
   private ackedInputSeq = 0;
   private inputEchoSamples: number[] = [];
   private spectateFacingPending = false;
@@ -2024,11 +2009,11 @@ export class ClientWorld extends ReconWireState implements IWorld {
     // seeded from the shipped constant so the two can never silently diverge.
     this.cfg = { seed: WORLD_SEED, playerClass: cls };
     this.openSocket();
-    // unconditional input stream beat; constants + gate shared with the
-    // cadence-model matrix via input_send_cadence.ts (R13)
+    // Drains frames the transport held back; sampling runs at the fixed sim
+    // tick (src/game/input_tick_sampler.ts).
     this.sendTimer = window.setInterval(
       () => this.sendMovementTimerTick(),
-      INPUT_SEND_TIMER_INTERVAL_MS,
+      MOVEMENT_OUTBOX_FLUSH_INTERVAL_MS,
     );
     if (typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', this.handleVisibilityChange);
@@ -2292,9 +2277,6 @@ export class ClientWorld extends ReconWireState implements IWorld {
     );
   }
 
-  flushInput(now = performance.now()): boolean {
-    return this.sendInput(now, 'changed');
-  }
   movementWireIsOpen(): boolean {
     return (
       typeof this.spectating !== 'string' && this.connected && this.ws.readyState === WebSocket.OPEN
@@ -2305,8 +2287,12 @@ export class ClientWorld extends ReconWireState implements IWorld {
     now = performance.now(),
     bypassBackpressure = false,
   ): boolean {
+    // The server's dungeon-entry fence strips facing until a packet echoes the
+    // entry generation it forced, so every frame carries the live one.
+    frame.de = this.dungeonEntrySeq ?? undefined;
     const firstSeq = this.inputSeq + 1;
     this.movementFrameOutbox ??= new MovementFrameV2Outbox();
+    const droppedBefore = this.movementFrameOutbox.droppedOldest;
     const result = this.movementFrameOutbox.send(
       this.ws,
       this.movementWireIsOpen(),
@@ -2314,6 +2300,11 @@ export class ClientWorld extends ReconWireState implements IWorld {
       this.inputSeq,
       bypassBackpressure,
     );
+    // A frame the outbox had to drop is the one real shed on this path: the
+    // rest are held and replayed by the drain.
+    if (this.movementFrameOutbox.droppedOldest !== droppedBefore) {
+      this.netPipeline().noteInputBackpressure(this.ws.bufferedAmount);
+    }
     this.inputSeq = result.lastSeq;
     trackPendingInputSequenceRange(this.pendingInputSeqSentAt, firstSeq, result.lastSeq, now);
     if (!result.accepted) return false;
@@ -2332,7 +2323,6 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
 
   private sendMovementTimerTick(now = performance.now()): void {
-    if (this.movementWireVersion !== 2) return void this.sendInput(now);
     const firstSeq = this.inputSeq + 1;
     const result = this.movementFrameOutbox?.flush(
       this.ws,
@@ -2351,10 +2341,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     // On an open socket the forced path admits exactly one neutral frame
     // despite a saturated browser buffer. The accepted neutral frame consumes
     // any pre-pause engagement intent without putting it on the wire.
-    if (this.movementWireVersion === 2) {
-      return this.onMovementWireNeutral?.(now) ?? false;
-    }
-    return this.sendInput(now, 'forced-neutral');
+    return this.onMovementWireNeutral?.(now) ?? false;
   }
 
   consumeInputEchoSamples(): number[] {
@@ -2373,106 +2360,6 @@ export class ClientWorld extends ReconWireState implements IWorld {
     const facing = this.pendingDungeonEntryFacing ?? null;
     this.pendingDungeonEntryFacing = null;
     return facing;
-  }
-
-  private pendingTransientInputState(): PendingTransientInput {
-    this.pendingTransientInput ??= { jump: false, turnLeft: false, turnRight: false };
-    return this.pendingTransientInput;
-  }
-
-  private retainTransientInput(): void {
-    const pending = this.pendingTransientInputState();
-    pending.jump ||= this.moveInput.jump;
-    pending.turnLeft ||= this.moveInput.turnLeft;
-    pending.turnRight ||= this.moveInput.turnRight;
-  }
-
-  private hasPendingTransientInput(): boolean {
-    return (
-      this.pendingTransientInput?.jump === true ||
-      this.pendingTransientInput?.turnLeft === true ||
-      this.pendingTransientInput?.turnRight === true
-    );
-  }
-
-  private sendInput(now = performance.now(), mode: InputSendMode = 'periodic'): boolean {
-    // The forced-facing arm reaches here from applyWire, which snapshot-driven
-    // harnesses (and the reconnect teardown window) run with no socket at all,
-    // so the socket existence check must come before its readyState.
-    if (
-      typeof this.spectating === 'string' ||
-      !this.connected ||
-      !this.ws ||
-      this.ws.readyState !== WebSocket.OPEN
-    ) {
-      return false;
-    }
-    // Shed ordinary input under backpressure, retaining one-shot jump and turn
-    // edges. The two bounded forced modes each admit one required frame.
-    if (!mode.startsWith('forced-') && isInputSendBackpressured(this.ws.bufferedAmount)) {
-      this.retainTransientInput();
-      this.netPipeline().noteInputBackpressure(this.ws.bufferedAmount);
-      return false;
-    }
-    const sig = inputSignature(this.moveInput, this.mouselookFacing);
-    const hasPendingTransientInput = this.hasPendingTransientInput();
-    if (mode === 'changed') {
-      if (!hasPendingTransientInput && sig === this.lastInputSig) return false;
-      if (!inputFlushGateOpen(now, this.lastInputSentAt)) return false;
-    }
-    const mi = this.moveInput;
-    const includePendingTransientInput = mode !== 'forced-neutral';
-    const msg: Record<string, unknown> = {
-      t: 'input',
-      mv: 2,
-      mt: now,
-      seq: ++this.inputSeq,
-      mi: {
-        f: mi.forward ? 1 : 0,
-        b: mi.back ? 1 : 0,
-        tl:
-          mi.turnLeft ||
-          (includePendingTransientInput && this.pendingTransientInput?.turnLeft === true)
-            ? 1
-            : 0,
-        tr:
-          mi.turnRight ||
-          (includePendingTransientInput && this.pendingTransientInput?.turnRight === true)
-            ? 1
-            : 0,
-        sl: mi.strafeLeft ? 1 : 0,
-        sr: mi.strafeRight ? 1 : 0,
-        j:
-          mi.jump || (includePendingTransientInput && this.pendingTransientInput?.jump === true)
-            ? 1
-            : 0,
-        dv: mi.dive ? 1 : 0,
-        sf: mi.surface ? 1 : 0,
-      },
-    };
-    // Swim camera steer is sparse: absent means full rate and preserves the
-    // legacy land-frame wire shape.
-    if (mi.swimSteer !== undefined && mi.swimSteer !== 1) {
-      (msg.mi as Record<string, number>).ss = mi.swimSteer;
-    }
-    if (this.mouselookFacing !== null) msg.facing = this.mouselookFacing;
-    if (this.dungeonEntrySeq !== null) msg.de = this.dungeonEntrySeq;
-    this.ws.send(JSON.stringify(msg));
-    this.pendingTransientInput = undefined;
-    this.lastInputSentAt = now;
-    this.lastInputSig = sig;
-    if (this.mouselookFacing === null) {
-      this.lastInputFacingSent = null;
-      this.lastInputFacingSentSeq = 0;
-    } else if (
-      typeof this.lastInputFacingSent !== 'number' ||
-      !inputFacingsMatch(this.mouselookFacing, this.lastInputFacingSent)
-    ) {
-      this.lastInputFacingSent = this.mouselookFacing;
-      this.lastInputFacingSentSeq = this.inputSeq;
-    }
-    trackPendingInputSequence(this.pendingInputSeqSentAt, this.inputSeq, now);
-    return true;
   }
 
   private canSendCommand(): boolean {
@@ -2543,9 +2430,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
     // else falls through unchanged.
     if (this.requests().onMessage(msg)) return;
     if (msg.t === 'hello') {
-      this.movementWireVersion = msg.movementWire === 2 ? 2 : 1;
       this.movementFrameOutbox?.reset();
-      this.onMovementWireNegotiated?.(this.movementWireVersion, performance.now());
+      this.onMovementWireNegotiated?.(performance.now());
       this.playerId = msg.pid;
       this.ownPlayerId = msg.pid;
       this.cfg.seed = msg.seed;
@@ -2564,11 +2450,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
         this.conflictRejections = 0;
         this.timeoutRejections = 0;
         this.inputSeq = 0;
-        this.lastInputSig = '';
-        this.lastInputSentAt = 0;
         this.lastInputFacingSent = null;
         this.lastInputFacingSentSeq = 0;
-        this.pendingTransientInput = undefined;
         this.pendingInputSeqSentAt.clear();
         this.ackedInputSeq = 0;
         this.inputEchoSamples = [];
@@ -3102,7 +2985,6 @@ export class ClientWorld extends ReconWireState implements IWorld {
           this.moveInput.turnLeft = false;
           this.moveInput.turnRight = false;
           this.pendingDungeonEntryFacing = w.f;
-          this.sendInput(now, 'forced-facing');
         } else if (dungeonAt(w.x) === null) this.pendingDungeonEntryFacing = null;
       }
       const wasDead = e.dead;
@@ -3253,7 +3135,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     const s = snap.self;
     const e = s ? applyWire(s, true) : null;
     if (s && e) {
-      applyReconSelfWire(this, s, this.movementWireVersion);
+      applyReconSelfWire(this, s);
       const counterfangRemaining =
         typeof s.opRem === 'number' && Number.isFinite(s.opRem)
           ? Math.min(5, Math.max(0, s.opRem))

@@ -3186,7 +3186,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.professions.intro':
     'Ngoài chiến đấu và nhiệm vụ, thế giới còn tưởng thưởng cho bạn khi cày cuốc và rèn đúc: thu thập nguyên liệu thô, biến chúng thành trang bị và hàng hóa qua mười nghề chế tác, và an cư trong một danh phận là một trong mười hình mẫu mà các nghề ấy đại diện.',
   'hudChrome.mobile.dailyRewards': 'Cửa hàng',
-  'hudChrome.perf.labels.predLead': 'Độ Sớm Dự Đoán',
   'hudChrome.townFocus.budgetLabel': 'Điểm còn lại: {remaining} / {budget}',
   'hudChrome.townFocus.decreaseAria': 'Giảm trọng tâm cho {component}',
   'hudChrome.townFocus.hint':

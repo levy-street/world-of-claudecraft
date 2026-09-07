@@ -3698,7 +3698,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.professions.intro':
     "Au-delà des combats et des quêtes, le monde vous récompense de travailler la terre et la forge : récolter des matières premières, les transformer en équipement et en biens à travers dix métiers d'artisanat, et vous installer dans une identité, celle de l'un des dix archétypes que ces métiers incarnent.",
   'hudChrome.mobile.dailyRewards': 'Boutique',
-  'hudChrome.perf.labels.predLead': 'Avance de prédiction',
   'hudChrome.townFocus.budgetLabel': 'Points restants : {remaining} / {budget}',
   'hudChrome.townFocus.decreaseAria': 'Réduire la priorité de {component}',
   'hudChrome.townFocus.hint':

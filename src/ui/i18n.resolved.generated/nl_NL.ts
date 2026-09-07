@@ -1752,7 +1752,6 @@ export const nl_NL: EnTranslations = {
         "fps01Low": "0,1% Laag",
         "ping": "Ping",
         "jitter": "Jitter",
-        "predLead": "Predictievoorsprong",
         "snapshot": "Snapshotfrequentie",
         "serverTick": "Servertickfrequentie",
         "connection": "Verbinding",

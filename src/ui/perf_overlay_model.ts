@@ -31,7 +31,6 @@ export type PerfMetricKey =
   | 'snapshot'
   | 'serverTick'
   | 'connection'
-  | 'predLead'
   | 'drawCalls'
   | 'triangles'
   | 'geometries'
@@ -59,8 +58,6 @@ export interface MetricsSample {
   connected: boolean;
   pingMs: number | null;
   jitterMs: number | null;
-  /** Latency hidden by the self-motion extrapolation; null when inactive. */
-  predLeadMs: number | null;
   snapshotHz: number | null;
   /** Server-measured achieved sim tick rate (Hz); null offline or unreported. */
   serverTickHz: number | null;
@@ -299,15 +296,6 @@ export const METRIC_REGISTRY: readonly MetricDef[] = [
     defaultOn: false,
     read: (s) => (s.online && s.jitterMs != null ? { kind: 'ms', v: s.jitterMs, digits: 0 } : null),
     severity: (s) => (s.online && s.jitterMs != null ? lowerBetter(s.jitterMs, 8, 20) : NONE),
-  },
-  {
-    key: 'predLead',
-    labelKey: 'hudChrome.perf.labels.predLead',
-    group: 'network',
-    defaultOn: false,
-    read: (s) =>
-      s.online && s.predLeadMs != null ? { kind: 'ms', v: s.predLeadMs, digits: 0 } : null,
-    severity: () => NONE,
   },
   {
     key: 'snapshot',

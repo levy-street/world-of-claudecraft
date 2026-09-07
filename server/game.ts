@@ -960,7 +960,8 @@ export interface ClientSession extends MovementInputSessionState, HotbarLayoutSt
   rememberedChat: RememberedChat;
   lastInputSeq: number;
   dungeonEntryFacing: entryFacing.DungeonEntryFacingFence;
-  // sim time of the last movement input frame, used to clear stale held input
+  // sim time of the last movement input frame CONSUMED off the timeline, used
+  // to clear stale held input
   lastInputAt: number;
   // Sim time of the next inspectCorpseHarvest throttle this session may pass.
   nextCorpseHarvestInspectAt?: number;
@@ -2869,9 +2870,12 @@ export class GameServer {
       // and the activity window (windowSecs) equals LINKDEAD_GRACE_MS exactly (both
       // 5 minutes), so without this guard a player who gave input any time in the 5
       // minutes before the socket dropped keeps passing the idle check for the
-      // entire grace and banks a durable grant while offline. Guarding here rather
-      // than rewinding lastInputAt on drop: resumeSession resets it to sim.time on
-      // resume, and other consumers (idle sweep, daily activity) read it too.
+      // entire grace and banks a durable grant while offline. The clock is stamped
+      // at CONSUMPTION (consumeMovementFramesV2), so a drop can even advance it a
+      // few ticks while the timeline drains its buffered frames. Guarding here
+      // rather than rewinding lastInputAt on drop: resumeSession resets it to
+      // sim.time on resume, and other consumers (idle sweep, daily activity) read
+      // it too.
       if (session.linkdead) continue; // disconnected: no playtime credit during grace
       if (this.sim.time - session.lastInputAt > windowSecs) continue; // idle: skip
       const last = this.lastPlaytimeGrantAt.get(session.accountId);
@@ -3464,7 +3468,6 @@ export class GameServer {
         dungeonEntryFacingWireVersion?: entryFacing.WireVersion;
         timerWireVersion?: 1 | StableTimerWireVersion;
         petSpecialWireVersion?: 0 | PetSpecialWireVersion;
-        movementWireVersion?: 1 | 2;
         generalChatRateLimit?: GeneralChatRateLimit | null;
         // Server-recomputed bank bonus slots (ws_auth.ts, fresh-join arm) stamped into
         // the character state via addPlayer. Absent on a resume and for callers that
@@ -3653,7 +3656,7 @@ export class GameServer {
       lastInputSeq: 0,
       dungeonEntryFacing: entryFacing.forEntity(player, meta.dungeonEntryFacingWireVersion),
       lastInputAt: this.sim.time,
-      ...createMovementInputSessionState(meta.movementWireVersion),
+      ...createMovementInputSessionState(),
       lastSent: {},
       needsVarkhulPortalReplay: false,
       timerWireVersion:
@@ -3786,7 +3789,6 @@ export class GameServer {
       // Epoch ms of an active chat mute, or null. Lets the client show status
       // at login; sending is still gated server-side regardless.
       chatMutedUntil: session.chatMutedUntil ?? null,
-      movementWire: session.movementWireVersion,
     });
     // Only the entering player sees their own world-entry notice; we don't
     // broadcast it to everyone (and likewise don't broadcast departures below).
@@ -3905,7 +3907,7 @@ export class GameServer {
     }
     session.lastInputSeq = 0;
     session.lastInputAt = this.sim.time;
-    resetMovementInputSessionState(session, meta.movementWireVersion);
+    resetMovementInputSessionState(session);
     // Load-bearing for every revision/cadence gate: sent.X === undefined forces
     // a rebuild on the next snapshot, so stale market/mail/corder/vault/cvault
     // trackers need no reset. Preserving lastSent here would require resetting
@@ -3946,7 +3948,6 @@ export class GameServer {
       admin: session.isAdmin,
       softWords: this.chatFilter.softWords(),
       chatMutedUntil: session.chatMutedUntil ?? null,
-      movementWire: session.movementWireVersion,
     });
     // No self "entered the world" notice here: on a seamless reconnect the
     // player never saw themselves leave (and friends never got a presence
@@ -6370,7 +6371,7 @@ export class GameServer {
       const meta = sim.meta(pid);
       const e = sim.entities.get(pid);
       if (!meta || !e) return;
-      const frame = applyMovementInputFrame(session, meta, e, msg, sim.time, sim.ctx);
+      const frame = applyMovementInputFrame(session, e, msg);
       if (typeof msg.seq === 'number' && Number.isFinite(msg.seq) && msg.seq > 0) {
         const seq = Math.floor(msg.seq);
         // R9: the client seq is a per-send increment on an ordered socket, so

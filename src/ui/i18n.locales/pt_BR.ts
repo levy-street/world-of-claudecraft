@@ -3240,7 +3240,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.professions.intro':
     'Além do combate e das missões, o mundo recompensa quem trabalha a terra e a forja: coletando matérias-primas, transformando-as em equipamento e bens ao longo de dez ofícios de criação e assumindo uma identidade como um dos dez arquétipos que esses ofícios representam.',
   'hudChrome.mobile.dailyRewards': 'Loja',
-  'hudChrome.perf.labels.predLead': 'Avanço da Predição',
   'hudChrome.townFocus.budgetLabel': 'Pontos restantes: {remaining} / {budget}',
   'hudChrome.townFocus.decreaseAria': 'Diminuir o foco em {component}',
   'hudChrome.townFocus.hint':

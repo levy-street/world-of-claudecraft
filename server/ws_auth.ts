@@ -18,6 +18,7 @@ import type { WebSocket, WebSocketServer } from 'ws';
 import {
   type BankBonusSource,
   DUNGEON_ENTRY_FACING_WIRE_VERSION,
+  MOVEMENT_WIRE_VERSION,
   ONLINE_WORLD_AUTH_TYPE,
   ONLINE_WORLD_INCOMPATIBLE_MESSAGE,
   PET_SPECIAL_WIRE_VERSION,
@@ -32,7 +33,6 @@ import type {
   TokenScope,
 } from './db';
 import type { GameServer } from './game';
-import { negotiateMovementWireVersion } from './movement_wire_version';
 import { kickStoragePurchaseRecovery } from './storage_purchases';
 import type { HandshakeFlushMode } from './ws_buffer';
 
@@ -272,6 +272,13 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
       );
       return;
     }
+    // Required capability, checked before any database work so an incompatible
+    // client costs nothing. Exact numeric equality, like the optional
+    // negotiators below.
+    if (msg.movementWire !== MOVEMENT_WIRE_VERSION) {
+      rejectHandshake(ws, WS_AUTH_ERROR.incompatibleWorldLayout);
+      return;
+    }
 
     const token = typeof msg.token === 'string' ? msg.token : '';
     const characterId = Number(msg.character ?? 'NaN');
@@ -282,7 +289,6 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
       msg.timerWire === STABLE_TIMER_WIRE_VERSION ? STABLE_TIMER_WIRE_VERSION : 1;
     const petSpecialWireVersion: 0 | typeof PET_SPECIAL_WIRE_VERSION =
       msg.petSpecialWire === PET_SPECIAL_WIRE_VERSION ? PET_SPECIAL_WIRE_VERSION : 0;
-    const movementWireVersion = negotiateMovementWireVersion(msg.movementWire);
     const dungeonEntryFacingWireVersion: 0 | typeof DUNGEON_ENTRY_FACING_WIRE_VERSION =
       msg.dungeonEntryFacingWire === DUNGEON_ENTRY_FACING_WIRE_VERSION
         ? DUNGEON_ENTRY_FACING_WIRE_VERSION
@@ -361,7 +367,6 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
         dungeonEntryFacingWireVersion,
         timerWireVersion,
         petSpecialWireVersion,
-        movementWireVersion,
         // The character's stored action-bar layout, sent once to the owning client
         // so it restores at login on any device (game.join re-validates it).
         hotbarLayout: character.hotbar_layout ?? null,

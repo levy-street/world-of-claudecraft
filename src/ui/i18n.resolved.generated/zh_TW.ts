@@ -1752,7 +1752,6 @@ export const zh_TW: EnTranslations = {
         "fps01Low": "0.1% 最低",
         "ping": "延遲",
         "jitter": "抖動",
-        "predLead": "預測提前量",
         "snapshot": "快照速率",
         "serverTick": "伺服器刻率",
         "connection": "連線",

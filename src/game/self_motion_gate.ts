@@ -1,4 +1,4 @@
-// Whether the display-only self extrapolation (src/render/self_motion.ts) may
+// Whether display-only self prediction (src/render/self_prediction.ts) may
 // drive the local player this frame. Pure, so a headless latency harness can
 // answer the same question the render loop does without a DOM.
 //

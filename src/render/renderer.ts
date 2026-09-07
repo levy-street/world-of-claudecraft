@@ -647,7 +647,7 @@ import { drapeRingLocalY } from './selection_ring';
 import {
   createSelfRenderPositionState,
   noteSelfIdentity,
-  type SelfRenderPrediction,
+  type ReconciledSelfPrediction,
   updateSelfRenderPosition,
 } from './self_render_position_core';
 import { SelfSpiritPrewarmer } from './self_spirit_prewarm';
@@ -1495,19 +1495,10 @@ export class Renderer {
     sitting: false,
   };
   private selfRenderPosition = new THREE.Vector3();
-  // Display-pose state the pure core owns (predictor, handoff offset, ready /
-  // active / identity), writing straight into the Vector3 above. Online
-  // extrapolation itself lives in src/render/self_motion.ts, and its predictor
-  // is lazy: offline never passes a SelfMotionFrame, so it is never built.
+  // Display-pose state the pure core owns (handoff offset, ready / active /
+  // identity), writing straight into the Vector3 above. The predicted pose
+  // itself is produced by src/render/self_prediction.ts.
   private selfRender = createSelfRenderPositionState(this.selfRenderPosition);
-
-  /** Perf-overlay telemetry: ms of latency the self-motion extrapolation is
-   *  currently hiding, or null while the predictor is inactive. */
-  get selfMotionLeadMs(): number | null {
-    return this.selfRender.active && this.selfRender.predictor
-      ? this.selfRender.predictor.leadMs
-      : null;
-  }
 
   // Last yaw applied to the local player while the camera was driving its facing
   // (mouselook / mouse-camera). Null when the override is disengaged, so the next
@@ -9839,7 +9830,7 @@ export class Renderer {
     dt: number,
     renderFacingOverride: number | null,
     selfAlphaLead = 0,
-    selfMotion: SelfRenderPrediction | null = null,
+    selfMotion: ReconciledSelfPrediction | null = null,
     selfAuthoritativeDiscontinuity = false,
     // False while the window is hidden: everything below still runs (view
     // lifecycle, mixers, uTime, the viewport poll) so coming back costs no
@@ -9920,13 +9911,11 @@ export class Renderer {
     updateSelfRenderPosition(
       this.selfRender,
       p,
-      sim.cfg.seed,
       alpha,
       dt,
       selfAlphaLead,
       selfMotion,
       selfAuthoritativeDiscontinuity,
-      sim.riftCollisionToken,
     );
     const selfPos = this.selfRenderPosition;
     phaseStart = this.markRendererPhase(framePhaseMs, 'setup', phaseStart);
@@ -10833,12 +10822,7 @@ export class Renderer {
       } else {
         v.airborneHeurFrames = 0;
       }
-      const airborne =
-        !visuallyDead &&
-        !swimming &&
-        (animFromDisplay && this.selfRender.predictor && !inRift
-          ? !this.selfRender.predictor.onGround
-          : !e.onGround || v.airborneHeurFrames >= 2);
+      const airborne = !visuallyDead && !swimming && (!e.onGround || v.airborneHeurFrames >= 2);
       // Grounded presentation polish, both display-only (see the cores).
       // Vertical smoothing absorbs the step-up the solver performs inside a
       // single tick, so the body strides onto a kerb instead of teleporting up

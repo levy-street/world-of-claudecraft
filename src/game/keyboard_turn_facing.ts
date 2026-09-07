@@ -16,29 +16,13 @@
 // quantization, in-flight overshoot, and every release stutter they caused
 // are gone by construction). On release the local facing is HELD while the
 // mirrored server facing catches up over the last round trip, and the module
-// hands off once it has settled within eps. The grace-then-gentle-glide
-// correction remains only as the backstop for a facing the server refuses
-// (a corpse) or a genuine misprediction.
+// hands off once it has settled within eps.
 
 import { TURN_SPEED } from '../sim/types';
 import { wrapAngle } from './camera_follow';
 
-// Within this of the server facing the display starts seaming: the wire
-// rounds facing to 0.01 rad, so the mirror can sit ~0.3deg away from the held
-// heading forever, and any one-frame jump onto it reads as a tiny end-of-turn
-// tick. Inside the seam band the last fraction of a degree is eased at
-// SEAM_RATE instead (sub-perceptual, ~0.33deg per 60fps frame).
-const HANDOFF_EPS = 0.02; // rad (~1.1 degrees)
-const SEAM_RATE = 0.35; // rad/s
 // Fully handed off once within this (sub-pixel at any camera distance).
 export const HANDOFF_DONE_EPS = 0.002; // rad (~0.1 degrees)
-// How long a release-time disagreement may stand before we start correcting.
-// Sized to cover a generous input echo plus a couple of snapshots, so the
-// normal catch-up always wins the race and no correction ever shows.
-const RELEASE_GRACE_MS = 350;
-// Gentle glide for a persistent residual (tick quantization is at most one
-// server tick of turning, ~0.16 rad); a fraction of TURN_SPEED on purpose.
-const RELEASE_CORRECT_RATE = 1.5; // rad/s
 // Matches the main loop's frame clamp: the heading is authoritative input, so
 // every millisecond a key was genuinely held must be credited even through a
 // load hitch, or low-framerate hardware would turn slower than everyone else
@@ -48,7 +32,6 @@ const MAX_FRAME_DT = 0.25;
 
 export interface KeyboardTurnState {
   facing: number | null; // null = inactive (the server facing owns the display)
-  releaseMs: number; // time spent in the release phase
   pendingReleaseCommit: number | null;
   handoffStableMs: number;
   /**
@@ -83,7 +66,6 @@ export interface KeyboardTurnState {
 export function newKeyboardTurnState(): KeyboardTurnState {
   return {
     facing: null,
-    releaseMs: 0,
     pendingReleaseCommit: null,
     handoffStableMs: 0,
     wireFacing: null,
@@ -100,19 +82,11 @@ export function newKeyboardTurnState(): KeyboardTurnState {
  */
 export function seedKeyboardTurnRelease(state: KeyboardTurnState, facing: number): void {
   state.facing = facing;
-  state.releaseMs = 0;
   state.handoffStableMs = 0;
   state.wireFacing = null;
   state.mirrorDerived = true;
   state.suppressTurnFlags = false;
   state.wasTurning = false;
-}
-
-function approachAngle(current: number, target: number, maxStep: number): number {
-  const step = Math.max(0, maxStep);
-  const d = wrapAngle(target - current);
-  if (Math.abs(d) <= step) return target;
-  return current + Math.sign(d) * step;
 }
 
 export interface KeyboardTurnArgs {
@@ -130,12 +104,8 @@ export interface KeyboardTurnArgs {
   serverFacing: number;
   /** Whether the server acknowledged the pending final keyboard heading. */
   releaseCommitAcknowledged: boolean;
-  /** Measured input echo (ms); scales the release grace so a high-RTT link
-   *  gets its full round trip of holding before any correction starts. */
-  echoMs: number;
   /** Current measured interval between authoritative snapshots. */
   snapshotIntervalMs: number;
-  movementWireVersion: 1 | 2;
   frameDt: number;
 }
 
@@ -174,7 +144,6 @@ function stepFacing(state: KeyboardTurnState, args: KeyboardTurnArgs): number | 
     const dir = (args.turnLeft ? 1 : 0) - (args.turnRight ? 1 : 0);
     const base = state.facing ?? args.serverFacing;
     state.facing = wrapAngle(base + dir * TURN_SPEED * dt);
-    state.releaseMs = 0;
     state.pendingReleaseCommit = null;
     state.handoffStableMs = 0;
     state.wireFacing = state.facing; // input-derived: safe to stream
@@ -189,7 +158,6 @@ function stepFacing(state: KeyboardTurnState, args: KeyboardTurnArgs): number | 
   }
 
   if (state.wasTurning && !args.turnLeft && !args.turnRight) {
-    state.releaseMs = 0;
     state.pendingReleaseCommit = state.facing;
     state.wireFacing = state.facing;
   }
@@ -226,33 +194,6 @@ function stepFacing(state: KeyboardTurnState, args: KeyboardTurnArgs): number | 
     return args.serverFacing;
   }
   state.handoffStableMs = 0;
-  if (args.movementWireVersion === 2) {
-    state.wireFacing = state.mirrorDerived ? null : state.facing;
-    return state.facing;
-  }
-  if (Math.abs(gap) <= HANDOFF_EPS) {
-    // Seam band: ease the last fraction of a degree (mostly wire rounding)
-    // onto the mirror instead of stepping it in a single frame. Mirror-derived
-    // motion: never streamed (see wireFacing).
-    state.facing = approachAngle(state.facing, args.serverFacing, SEAM_RATE * dt);
-    state.wireFacing = null;
-    state.mirrorDerived = true;
-    return state.facing;
-  }
-  state.releaseMs += dt * 1000;
-  // The grace scales with the measured echo: the mirror cannot possibly show
-  // the held heading before one full round trip, so correcting earlier on a
-  // slow link would fight in-flight state.
-  const graceMs = Math.max(RELEASE_GRACE_MS, args.echoMs * 1.5 + 120);
-  if (state.releaseMs >= graceMs) {
-    // The server never caught up (stun mid-turn, dropped input, quantization):
-    // glide the residual out gently instead of snapping at TURN_SPEED. Mirror-
-    // derived motion: never streamed.
-    state.facing = approachAngle(state.facing, args.serverFacing, RELEASE_CORRECT_RATE * dt);
-    state.wireFacing = null;
-    state.mirrorDerived = true;
-  } else {
-    state.wireFacing = state.mirrorDerived ? null : state.facing;
-  }
+  state.wireFacing = state.mirrorDerived ? null : state.facing;
   return state.facing;
 }
