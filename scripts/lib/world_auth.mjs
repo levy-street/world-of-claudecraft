@@ -32,3 +32,63 @@ export function worldAuthMessage(token, character) {
 export function chatCommandMessage(text) {
   return { t: 'cmd', cmd: 'chat', text };
 }
+
+/** The fixed client tick the real client samples on (src/game/input_tick_sampler.ts). */
+export const MOVEMENT_FRAME_INTERVAL_MS = 50;
+
+/**
+ * A Node client's movement send path. The server consumes movement off a
+ * per-tick timeline keyed on `ct` (server/movement_input_timeline_v2.ts): a
+ * frame WITHOUT `ct` is parsed, counted against the rate limits, and then never
+ * enqueued, so a bare `{ t: 'input', mi }` moves nobody and never advances
+ * `lastInputAt`. Node clients therefore stream the same shape the real client
+ * does: one frame per fixed tick, carrying a monotone `ct` from 0.
+ *
+ * The stream HOLDS the last intent and heading, so a held intent keeps the bot
+ * moving until `set({})` or `stop()`, exactly like the client's unconditional
+ * per-tick frames. `set` also emits at once so a latency-sensitive script keeps
+ * its timing, and restarts the tick phase from that instant so the steady rate
+ * stays one frame per tick rather than doubling on every change.
+ *
+ * `send` is the script's own frame sender (its `send`/`ws.send` wrapper).
+ */
+export function createMovementInputStream(send) {
+  let clientTick = 0;
+  let moveInput = {};
+  let facing;
+  let timer = null;
+  const emit = () => {
+    send({
+      t: 'input',
+      ct: clientTick++,
+      mi: moveInput,
+      ...(facing !== undefined ? { facing } : {}),
+    });
+  };
+  const arm = () => {
+    timer = setInterval(emit, MOVEMENT_FRAME_INTERVAL_MS);
+    // Never hold the process open: a script that is done must be able to exit
+    // without an explicit stop() on every path out.
+    timer.unref?.();
+  };
+  return {
+    start() {
+      if (timer) return;
+      arm();
+    },
+    set(nextMoveInput = {}, nextFacing = undefined) {
+      moveInput = nextMoveInput;
+      facing = nextFacing;
+      emit();
+      if (timer) {
+        clearInterval(timer);
+        arm();
+      }
+    },
+    stop() {
+      if (!timer) return;
+      clearInterval(timer);
+      timer = null;
+    },
+  };
+}

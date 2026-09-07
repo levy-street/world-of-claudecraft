@@ -4,7 +4,7 @@
 // boss mechanics and group xp over the real server.
 // Requires the server running with ALLOW_DEV_COMMANDS=1.
 import WebSocket from 'ws';
-import { worldAuthMessage } from './lib/world_auth.mjs';
+import { createMovementInputStream, worldAuthMessage } from './lib/world_auth.mjs';
 
 const BASE = process.env.SERVER_URL ?? 'http://localhost:8787';
 const WS_BASE = BASE.replace(/^http/, 'ws');
@@ -83,6 +83,8 @@ class Bot {
     this.self = null;
     this.ents = new Map();
     this.events = [];
+    // Movement rides this bot's own frame sender, exactly as input() did.
+    this.movement = createMovementInputStream((frame) => this.ws.send(JSON.stringify(frame)));
   }
 
   async join() {
@@ -108,6 +110,7 @@ class Bot {
         const msg = JSON.parse(String(data));
         if (msg.t === 'hello') {
           this.pid = msg.pid;
+          this.movement.start();
           clearTimeout(to);
           resolve();
         } else if (msg.t === 'snap') {
@@ -124,7 +127,7 @@ class Bot {
     this.ws.send(JSON.stringify({ t: 'cmd', ...payload }));
   }
   input(mi, facing) {
-    this.ws.send(JSON.stringify({ t: 'input', mi, ...(facing !== undefined ? { facing } : {}) }));
+    this.movement.set(mi, facing);
   }
 
   mobs() {
@@ -367,7 +370,10 @@ async function main() {
     JSON.stringify(bots.map((b) => ({ n: b.name, hp: b.self?.hp, dead: b.self?.dead }))),
   );
 
-  for (const b of bots) b.ws.close();
+  for (const b of bots) {
+    b.movement.stop();
+    b.ws.close();
+  }
   console.log(`\n${pass} passed, ${fail} failed`);
   process.exit(fail > 0 ? 1 : 0);
 }

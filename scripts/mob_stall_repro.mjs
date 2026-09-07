@@ -118,7 +118,7 @@ import {
   parseSimline,
 } from './lib/mob_stall_parse.mjs';
 import { sanitizeBaseUrl } from './lib/prof_load_util.mjs';
-import { worldAuthMessage } from './lib/world_auth.mjs';
+import { createMovementInputStream, worldAuthMessage } from './lib/world_auth.mjs';
 
 try {
   process.loadEnvFile?.();
@@ -419,6 +419,11 @@ class Bot {
     this.lastStageAt = 0;
     this.lastKeepAliveAt = 0;
     this.lastRespawnAt = 0;
+    // Movement rides the same guarded sender input() used, so a closed socket
+    // still drops the frame in silence.
+    this.movement = createMovementInputStream((frame) => {
+      if (this.ws?.readyState === WebSocket.OPEN) this.ws.send(JSON.stringify(frame));
+    });
   }
 
   connect() {
@@ -450,6 +455,7 @@ class Bot {
           if (settled) return;
           settled = true;
           this.connected = true;
+          this.movement.start();
           clearTimeout(timeout);
           resolve(this);
           return;
@@ -491,9 +497,8 @@ class Bot {
   }
 
   input(mi, facing) {
-    if (this.ws?.readyState !== WebSocket.OPEN) return;
     this.facing = facing;
-    this.ws.send(JSON.stringify({ t: 'input', mi, facing }));
+    this.movement.set(mi, facing);
   }
 
   dist(pos) {
@@ -606,6 +611,7 @@ class Bot {
   }
 
   close() {
+    this.movement.stop();
     this.ws?.close();
   }
 }

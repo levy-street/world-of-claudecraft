@@ -2,9 +2,11 @@
 // Layout-epoch preflight for an OTA publish (docs/ota-updates.md).
 //
 // An OTA bundle replaces the web layer on a phone while the authoritative server
-// keeps running untouched, so the ONE thing that must agree between the two is
-// the world-layout epoch: src/world_api.ts encodes it in the first WebSocket
-// frame's discriminator and the server refuses any other discriminator outright.
+// keeps running untouched, so two things must agree between the two: the
+// world-layout epoch (src/world_api.ts encodes it in the first WebSocket frame's
+// discriminator) and the movement wire capability the same frame must offer. The
+// server refuses either mismatch outright, with the same message, so the probe
+// sends BOTH and any refusal it reads is a real "this bundle cannot connect".
 // Publishing a bundle from a different epoch than the running server would leave
 // every updated device unable to connect until it picked up a corrected bundle.
 //

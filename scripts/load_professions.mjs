@@ -63,7 +63,7 @@ import {
   sanitizeBaseUrl,
   terminalAwareGapMax,
 } from './lib/prof_load_util.mjs';
-import { worldAuthMessage } from './lib/world_auth.mjs';
+import { createMovementInputStream, worldAuthMessage } from './lib/world_auth.mjs';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const BASE = (process.env.SERVER_URL ?? 'http://localhost:8787').replace(/\/+$/, '');
@@ -349,6 +349,11 @@ class Bot {
     // fish spot state
     this.spot = null;
     this.spotRotations = 0;
+    // Movement rides the same guarded sender input() used, so a closed socket
+    // still drops the frame in silence.
+    this.movement = createMovementInputStream((frame) => {
+      if (this.ws?.readyState === 1) this.ws.send(JSON.stringify(frame));
+    });
   }
 
   async join() {
@@ -398,6 +403,9 @@ class Bot {
         if (msg.t === 'hello') {
           this.pid = msg.id ?? msg.pid;
           this.alive = true;
+          // Before seedSession(), which already parks a fish bot on its spot
+          // with input().
+          this.movement.start();
           clearTimeout(to);
           ws.off('message', onJoinMessage);
           // Guarded too: frames from an abandoned socket would otherwise be
@@ -529,10 +537,10 @@ class Bot {
     if (this.ws?.readyState === 1) this.ws.send(JSON.stringify({ t: 'cmd', ...p }));
   }
   input(mi, facing) {
-    if (this.ws?.readyState === 1)
-      this.ws.send(JSON.stringify({ t: 'input', mi, ...(facing !== undefined ? { facing } : {}) }));
+    this.movement.set(mi, facing);
   }
   close() {
+    this.movement.stop();
     try {
       // clean leave (lane-exempt) so a scenario's fleet does not linger as
       // 1,000 linkdead entities under the next scenario's measurement

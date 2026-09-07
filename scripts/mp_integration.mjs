@@ -2,7 +2,7 @@
 // Covers: register, login, character CRUD, two clients in one world seeing
 // each other, movement sync, combat, chat, persistence across reconnect.
 import WebSocket from 'ws';
-import { worldAuthMessage } from './lib/world_auth.mjs';
+import { createMovementInputStream, worldAuthMessage } from './lib/world_auth.mjs';
 
 const BASE = process.env.SERVER_URL ?? 'http://localhost:8787';
 const WS_BASE = BASE.replace(/^http/, 'ws');
@@ -78,6 +78,8 @@ class Client {
     this.self = null;
     this.pid = -1;
     this.entities = new Map();
+    // Movement rides this client's own frame sender, exactly as input() did.
+    this.movement = createMovementInputStream((frame) => this.send(frame));
   }
 
   connect(token, characterId) {
@@ -91,6 +93,7 @@ class Client {
         const msg = JSON.parse(String(data));
         if (msg.t === 'hello') {
           this.pid = msg.pid;
+          this.movement.start();
           clearTimeout(timeout);
           resolve(msg);
         } else if (msg.t === 'snap') {
@@ -118,9 +121,10 @@ class Client {
     this.send({ t: 'cmd', ...payload });
   }
   input(mi, facing) {
-    this.send({ t: 'input', mi, ...(facing !== undefined ? { facing } : {}) });
+    this.movement.set(mi, facing);
   }
   close() {
+    this.movement.stop();
     this.ws?.close();
   }
 }

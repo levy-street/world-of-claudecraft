@@ -35,7 +35,7 @@ import WebSocket from 'ws';
 import { BROWSER_PATH } from './browser_path.mjs';
 import { evaluateCrowdRun, parseCeilingEnv } from './lib/bench_gate.mjs';
 import { assertLoopbackUrl } from './lib/loopback_guard.mjs';
-import { worldAuthMessage } from './lib/world_auth.mjs';
+import { createMovementInputStream, worldAuthMessage } from './lib/world_auth.mjs';
 
 // Stream every sampled row to a file immediately, so a kill/timeout (the render
 // client + dozens of bots can outrun a foreground budget) never loses results.
@@ -129,6 +129,8 @@ class Bot {
     this.name = `Cr${alpha}${li}`;
     this.pid = -1;
     this.self = null;
+    // Movement rides this bot's own frame sender, exactly as input() did.
+    this.movement = createMovementInputStream((frame) => this.ws?.send(JSON.stringify(frame)));
   }
   async join() {
     const xff = `172.16.${Math.floor(this.i / 254)}.${(this.i % 254) + 1}`;
@@ -170,6 +172,7 @@ class Bot {
         const msg = JSON.parse(String(data));
         if (msg.t === 'hello') {
           this.pid = msg.pid;
+          this.movement.start();
           clearTimeout(to);
           resolve();
         } else if (msg.t === 'snap' && msg.self) this.self = { ...this.self, ...msg.self };
@@ -181,7 +184,7 @@ class Bot {
     this.ws?.send(JSON.stringify({ t: 'cmd', ...payload }));
   }
   input(mi, facing) {
-    this.ws?.send(JSON.stringify({ t: 'input', mi, ...(facing !== undefined ? { facing } : {}) }));
+    this.movement.set(mi, facing);
   }
   place(x, z) {
     const a = this.i * 2.39996; // golden-angle spiral so they fan out, not stack
@@ -190,6 +193,7 @@ class Bot {
     this.cmd({ cmd: 'dev_teleport', x: x + Math.cos(a) * r, z: z + Math.sin(a) * r });
   }
   close() {
+    this.movement.stop();
     try {
       this.ws?.close();
     } catch {

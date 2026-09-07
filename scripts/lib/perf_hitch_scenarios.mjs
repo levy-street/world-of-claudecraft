@@ -41,7 +41,7 @@ import {
   resolveSoakAppearance,
 } from './perf_hitch_soak.mjs';
 import { SCENARIO_SPECS } from './perf_hitch_store.mjs';
-import { worldAuthMessage } from './world_auth.mjs';
+import { createMovementInputStream, worldAuthMessage } from './world_auth.mjs';
 
 try {
   process.loadEnvFile?.();
@@ -450,6 +450,11 @@ export class HitchBot {
     // Fail closed on a fresh connection until the same recent-personal-damage
     // window used by the online HUD has elapsed without another combat event.
     this.lastCombatEventAt = now();
+    // Movement rides the same guarded sender input() used, so a closed socket
+    // still drops the frame in silence.
+    this.movement = createMovementInputStream((frame) => {
+      if (this.ws?.readyState === WebSocket.OPEN) this.ws.send(JSON.stringify(frame));
+    });
   }
 
   async connect() {
@@ -479,6 +484,7 @@ export class HitchBot {
         }
         if (message.t === 'hello') {
           this.pid = Number(message.pid ?? message.id);
+          this.movement.start();
           if (!settled) {
             settled = true;
             clearTimeout(timer);
@@ -542,9 +548,7 @@ export class HitchBot {
   }
 
   input(mi, facing) {
-    if (this.ws?.readyState === WebSocket.OPEN) {
-      this.ws.send(JSON.stringify({ t: 'input', mi, facing }));
-    }
+    this.movement.set(mi, facing);
   }
 
   teleport(x, z) {
@@ -552,6 +556,7 @@ export class HitchBot {
   }
 
   async logout() {
+    this.movement.stop();
     if (this.ws?.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify({ t: 'logout' }));
       await sleep(40);

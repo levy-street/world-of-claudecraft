@@ -1,7 +1,7 @@
 // Trade + duel over the real wire: two bots trade items/copper atomically,
 // then duel to first-blood (1hp), verifying winner/loser and no deaths.
 import WebSocket from 'ws';
-import { worldAuthMessage } from './lib/world_auth.mjs';
+import { createMovementInputStream, worldAuthMessage } from './lib/world_auth.mjs';
 
 const BASE = process.env.SERVER_URL ?? 'http://localhost:8787';
 const WS_BASE = BASE.replace(/^http/, 'ws');
@@ -57,6 +57,8 @@ class Bot {
     this.cls = cls;
     this.self = null;
     this.events = [];
+    // Movement rides this bot's own frame sender, exactly as input() did.
+    this.movement = createMovementInputStream((frame) => this.ws.send(JSON.stringify(frame)));
   }
   async join() {
     const reg = await api('/api/register', {
@@ -79,6 +81,7 @@ class Bot {
         const msg = JSON.parse(String(data));
         if (msg.t === 'hello') {
           this.pid = msg.pid;
+          this.movement.start();
           clearTimeout(to);
           resolve();
         } else if (msg.t === 'snap') this.self = mergeSelf(this.self, msg.self);
@@ -91,7 +94,7 @@ class Bot {
     this.ws.send(JSON.stringify({ t: 'cmd', ...p }));
   }
   input(mi, facing) {
-    this.ws.send(JSON.stringify({ t: 'input', mi, ...(facing !== undefined ? { facing } : {}) }));
+    this.movement.set(mi, facing);
   }
 }
 
@@ -174,6 +177,8 @@ async function main() {
   );
   check('loser survives at >= 1 hp', (b.self?.hp ?? 0) >= 1 && !b.self?.dead, `hp=${b.self?.hp}`);
 
+  a.movement.stop();
+  b.movement.stop();
   a.ws.close();
   b.ws.close();
   console.log(`\n${pass} passed, ${fail} failed`);

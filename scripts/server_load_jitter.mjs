@@ -27,7 +27,7 @@
 import fs from 'node:fs';
 import WebSocket from 'ws';
 import { evaluateJitterRun, gapStats, parseCeilingEnv, pct } from './lib/bench_gate.mjs';
-import { worldAuthMessage } from './lib/world_auth.mjs';
+import { createMovementInputStream, worldAuthMessage } from './lib/world_auth.mjs';
 
 const BASE = process.env.SERVER_URL ?? 'http://localhost:8787';
 const WS_BASE = BASE.replace(/^http/, 'ws');
@@ -134,6 +134,11 @@ class Client {
     this.snapTimes = [];
     this.snapBytes = 0;
     this.snapCount = 0;
+    // Movement rides the same guarded sender input() used, so a closed socket
+    // still drops the frame in silence.
+    this.movement = createMovementInputStream((frame) => {
+      if (this.ws?.readyState === 1) this.ws.send(JSON.stringify(frame));
+    });
   }
 
   async join() {
@@ -170,6 +175,7 @@ class Client {
         const msg = JSON.parse(raw);
         if (msg.t === 'hello') {
           this.pid = msg.pid;
+          this.movement.start();
           clearTimeout(to);
           resolve();
         } else if (msg.t === 'snap') {
@@ -196,8 +202,7 @@ class Client {
     if (this.ws?.readyState === 1) this.ws.send(JSON.stringify({ t: 'cmd', ...p }));
   }
   input(mi, facing) {
-    if (this.ws?.readyState === 1)
-      this.ws.send(JSON.stringify({ t: 'input', mi, ...(facing !== undefined ? { facing } : {}) }));
+    this.movement.set(mi, facing);
   }
   pos() {
     return this.self ? { x: this.self.x, z: this.self.z } : { x: 0, z: 0 };
@@ -206,6 +211,7 @@ class Client {
     return [...this.ents.values()].filter((e) => e.k === 'mob' && !e.dead && e.h);
   }
   close() {
+    this.movement.stop();
     try {
       this.ws?.close();
     } catch {

@@ -20,3 +20,22 @@ export interface ChatCommandMessage {
 }
 
 export function chatCommandMessage(text: string): ChatCommandMessage;
+
+export const MOVEMENT_FRAME_INTERVAL_MS: 50;
+
+export interface MovementInputFrame {
+  readonly t: 'input';
+  readonly ct: number;
+  readonly mi: Record<string, number>;
+  readonly facing?: number;
+}
+
+export interface MovementInputStream {
+  start(): void;
+  set(moveInput?: Record<string, number>, facing?: number): void;
+  stop(): void;
+}
+
+export function createMovementInputStream(
+  send: (frame: MovementInputFrame) => void,
+): MovementInputStream;

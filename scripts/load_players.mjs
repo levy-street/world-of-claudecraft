@@ -20,7 +20,7 @@ import pg from 'pg';
 import WebSocket from 'ws';
 import { assertLoopbackDatabaseUrl, assertLoopbackUrl } from './lib/loopback_guard.mjs';
 import { sanitizeBaseUrl } from './lib/prof_load_util.mjs';
-import { worldAuthMessage } from './lib/world_auth.mjs';
+import { createMovementInputStream, worldAuthMessage } from './lib/world_auth.mjs';
 
 try {
   process.loadEnvFile?.();
@@ -273,6 +273,11 @@ class LoadBot {
     this.lastRespawnAt = 0;
     this.lastPatrolTurnAt = 0;
     this.patrolFacing = 0;
+    // Movement rides the same guarded sender input() used, so a closed socket
+    // still drops the frame in silence.
+    this.movement = createMovementInputStream((frame) => {
+      if (this.ws?.readyState === WebSocket.OPEN) this.ws.send(JSON.stringify(frame));
+    });
   }
 
   connect() {
@@ -305,6 +310,7 @@ class LoadBot {
           settled = true;
           this.pid = msg.id;
           this.connected = true;
+          this.movement.start();
           clearTimeout(timeout);
           resolve(this);
           return;
@@ -354,8 +360,7 @@ class LoadBot {
   }
 
   input(mi = {}, facing = undefined) {
-    if (this.ws?.readyState !== WebSocket.OPEN) return;
-    this.ws.send(JSON.stringify({ t: 'input', mi, facing }));
+    this.movement.set(mi, facing);
   }
 
   powerUp() {
@@ -454,6 +459,7 @@ class LoadBot {
   }
 
   close() {
+    this.movement.stop();
     this.ws?.close();
   }
 }

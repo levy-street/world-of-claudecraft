@@ -15,7 +15,7 @@
 import puppeteer from 'puppeteer-core';
 import WebSocket from 'ws';
 import { BROWSER_PATH } from './browser_path.mjs';
-import { worldAuthMessage } from './lib/world_auth.mjs';
+import { createMovementInputStream, worldAuthMessage } from './lib/world_auth.mjs';
 
 const BASE = process.env.GAME_URL ?? 'http://localhost:8787';
 const WS_BASE = BASE.replace(/^http/, 'ws');
@@ -58,6 +58,11 @@ class Bot {
     this.ip = ipFor(i + 1);
     this.pid = -1;
     this.self = null;
+    // Movement rides the same guarded sender input() used, so a closed socket
+    // still drops the frame in silence.
+    this.movement = createMovementInputStream((frame) => {
+      if (this.ws?.readyState === 1) this.ws.send(JSON.stringify(frame));
+    });
   }
   async join() {
     const name = `Crowd${lettersOf(this.i)}${uniq.replace(/[0-9]/g, (d) => L[Number(d)])}`.slice(
@@ -91,6 +96,7 @@ class Bot {
         const m = JSON.parse(String(d));
         if (m.t === 'hello') {
           this.pid = m.pid;
+          this.movement.start();
           clearTimeout(to);
           resolve();
         } else if (m.t === 'snap') this.self = { ...this.self, ...m.self };
@@ -105,13 +111,13 @@ class Bot {
     if (this.ws?.readyState === 1) this.ws.send(JSON.stringify({ t: 'cmd', ...p }));
   }
   input(mi, facing) {
-    if (this.ws?.readyState === 1)
-      this.ws.send(JSON.stringify({ t: 'input', mi, ...(facing !== undefined ? { facing } : {}) }));
+    this.movement.set(mi, facing);
   }
   teleport(x, z) {
     this.cmd({ cmd: 'dev_teleport', x, z });
   }
   close() {
+    this.movement.stop();
     try {
       this.ws?.close();
     } catch {

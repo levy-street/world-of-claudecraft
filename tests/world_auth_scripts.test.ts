@@ -1,9 +1,12 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   chatCommandMessage,
+  createMovementInputStream,
+  MOVEMENT_FRAME_INTERVAL_MS,
+  type MovementInputFrame,
   MOVEMENT_WIRE_VERSION as SCRIPT_MOVEMENT_WIRE_VERSION,
   ONLINE_WORLD_AUTH_TYPE as SCRIPT_WORLD_AUTH_TYPE,
   ONLINE_WORLD_INCOMPATIBLE_MESSAGE as SCRIPT_WORLD_INCOMPATIBLE_MESSAGE,
@@ -44,14 +47,17 @@ const AUTHENTICATED_NODE_CLIENTS = [
   },
   {
     path: 'scripts/client_perf_under_load.mjs',
+    inputSend: 'this.movement.set(mi, facing);',
     authSend: 'this.ws.send(JSON.stringify(worldAuthMessage(reg.body.token, ch.body.id)))',
   },
   {
     path: 'scripts/crowd_fps_bench.mjs',
+    inputSend: 'this.movement.set(mi, facing);',
     authSend: 'this.ws.send(JSON.stringify(worldAuthMessage(this.token, this.charId)))',
   },
   {
     path: 'scripts/crypt_raid.mjs',
+    inputSend: 'this.movement.set(mi, facing);',
     authSend: 'this.ws.send(JSON.stringify(worldAuthMessage(this.token, this.charId)));',
   },
   {
@@ -78,10 +84,12 @@ const AUTHENTICATED_NODE_CLIENTS = [
   },
   {
     path: 'scripts/lib/perf_hitch_scenarios.mjs',
+    inputSend: 'this.movement.set(mi, facing);',
     authSend: 'ws.send(JSON.stringify(worldAuthMessage(this.token, this.characterId)))',
   },
   {
     path: 'scripts/load_players.mjs',
+    inputSend: 'this.movement.set(mi, facing);',
     authSend: 'ws.send(JSON.stringify(worldAuthMessage(this.token, this.characterId)));',
   },
   {
@@ -94,6 +102,7 @@ const AUTHENTICATED_NODE_CLIENTS = [
     // passes ITS OWN token and character id (never another bot's) through the
     // shared helper, with the capability spread beside them.
     path: 'scripts/load_professions.mjs',
+    inputSend: 'this.movement.set(mi, facing);',
     authSend: '...worldAuthMessage(this.token, this.characterId), ...authExtra',
     // The payload core above cannot prove the frame is ever SENT (the
     // fix-round audit: a built-but-never-sent payload stayed green once the
@@ -106,10 +115,12 @@ const AUTHENTICATED_NODE_CLIENTS = [
   },
   {
     path: 'scripts/mob_stall_repro.mjs',
+    inputSend: 'this.movement.set(mi, facing);',
     authSend: 'ws.send(JSON.stringify(worldAuthMessage(this.token, this.characterId)));',
   },
   {
     path: 'scripts/mp_integration.mjs',
+    inputSend: 'this.movement.set(mi, facing);',
     authSend: 'this.send(worldAuthMessage(token, characterId));',
   },
   {
@@ -118,10 +129,12 @@ const AUTHENTICATED_NODE_CLIENTS = [
   },
   {
     path: 'scripts/server_load_jitter.mjs',
+    inputSend: 'this.movement.set(mi, facing);',
     authSend: 'this.ws.send(JSON.stringify(worldAuthMessage(this.token, this.charId)))',
   },
   {
     path: 'scripts/social_e2e.mjs',
+    inputSend: 'this.movement.set(mi, facing);',
     authSend: 'this.ws.send(JSON.stringify(worldAuthMessage(reg.body.token, char.body.id)));',
   },
   {
@@ -220,6 +233,7 @@ describe('standalone world WebSocket auth', () => {
     (row) => {
       const { path, authSend } = row;
       const tightSend = 'tightSend' in row ? row.tightSend : undefined;
+      const inputSend = 'inputSend' in row ? row.inputSend : undefined;
       const source = readFileSync(join(ROOT, path), 'utf8');
       const helperPath = path.startsWith('scripts/profiler/')
         ? '../lib/world_auth.mjs'
@@ -239,9 +253,37 @@ describe('standalone world WebSocket auth', () => {
       // Rows sitting at the wrap width carry a second, fully-despaced pin
       // that survives any re-wrap while still proving the SEND itself.
       if (tightSend) expect(source.replace(/\s+/g, '')).toContain(tightSend);
+      // Movement senders drive the SHARED per-tick stream. A bare
+      // { t: 'input', mi } has no client tick, and the server's timeline
+      // (server/movement_input_timeline_v2.ts) parses such a frame and then
+      // never enqueues it: the bot joins, is counted against the rate limits,
+      // and never moves. Pin the whole lifecycle, not just the send.
+      if (inputSend) {
+        expect(source).toMatch(
+          new RegExp(
+            `import \\{[^}]*\\bcreateMovementInputStream\\b[^}]*\\} from '${helperPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}';`,
+          ),
+        );
+        expect(normalizedSource).toContain(inputSend);
+        expect(normalizedSource).toContain('this.movement.start();');
+        expect(normalizedSource).toMatch(/\bmovement\.stop\(\);/);
+      }
       expect(source).not.toMatch(LEGACY_AUTH_LITERAL);
     },
   );
+
+  it('leaves no bare client-tick-less input frame in any Node WebSocket client', () => {
+    // The exact shape the ten movement scripts used to send. Without `ct` the
+    // server parses the frame and drops it, so the bot never moves and its
+    // lastInputAt never advances: a silent, load-bearing no-op.
+    const bare = /\bt\s*:\s*['"]input['"]/;
+    const offenders = nodeWebSocketSources()
+      .filter(([, source]) => bare.test(source))
+      .map(([path]) => path);
+    expect(offenders).toEqual([]);
+    // The scan is worthless if it cannot see a violation.
+    expect(bare.test("send(JSON.stringify({ t: 'input', mi, facing }))")).toBe(true);
+  });
 
   it('never sends chat (and the /dev cheats behind it) as a top-level frame type', () => {
     // The server's `case 'chat'` lives in the COMMAND switch, so a top-level
@@ -286,6 +328,103 @@ describe('standalone world WebSocket auth', () => {
         codeWithoutLineComments("send(JSON.stringify({ t: 'chat', text })); // the offense"),
       ),
     ).toBe(true);
+  });
+
+  describe('createMovementInputStream', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('streams one frame per client tick with a monotone tick from zero', () => {
+      const sent: MovementInputFrame[] = [];
+      const stream = createMovementInputStream((frame) => sent.push(frame));
+      stream.start();
+
+      vi.advanceTimersByTime(MOVEMENT_FRAME_INTERVAL_MS * 3);
+
+      expect(sent.map((frame) => frame.ct)).toEqual([0, 1, 2]);
+      expect(sent.every((frame) => frame.t === 'input')).toBe(true);
+      stream.stop();
+    });
+
+    it('holds the intent and heading until the next set', () => {
+      const sent: MovementInputFrame[] = [];
+      const stream = createMovementInputStream((frame) => sent.push(frame));
+      stream.start();
+      stream.set({ f: 1 }, 0.5);
+      vi.advanceTimersByTime(MOVEMENT_FRAME_INTERVAL_MS * 2);
+
+      // A held intent keeps the bot moving, exactly like the client's
+      // unconditional per-tick frames; nothing re-sends it per beat.
+      expect(sent).toHaveLength(3);
+      expect(sent.every((frame) => (frame.mi as Record<string, number>).f === 1)).toBe(true);
+      expect(sent.every((frame) => frame.facing === 0.5)).toBe(true);
+      stream.stop();
+    });
+
+    it('emits immediately on set so a latency-sensitive script keeps its timing', () => {
+      const sent: MovementInputFrame[] = [];
+      const stream = createMovementInputStream((frame) => sent.push(frame));
+      stream.start();
+      stream.set({ f: 1 });
+
+      expect(sent).toHaveLength(1);
+      expect(sent[0]).toMatchObject({ t: 'input', ct: 0, mi: { f: 1 } });
+      // ...and the tick phase restarts from that instant, so the steady rate
+      // stays one frame per tick rather than doubling on every change.
+      vi.advanceTimersByTime(MOVEMENT_FRAME_INTERVAL_MS - 1);
+      expect(sent).toHaveLength(1);
+      vi.advanceTimersByTime(1);
+      expect(sent).toHaveLength(2);
+      stream.stop();
+    });
+
+    it('omits facing entirely when it is undefined', () => {
+      const sent: MovementInputFrame[] = [];
+      const stream = createMovementInputStream((frame) => sent.push(frame));
+      stream.set({ f: 1 });
+      expect(sent[0]).not.toHaveProperty('facing');
+      stream.set({ f: 1 }, 1.25);
+      expect(sent[1]).toHaveProperty('facing', 1.25);
+      // An explicit undefined clears it again: the server reads a missing
+      // facing as UNCHANGED, never as zero.
+      stream.set({ f: 1 });
+      expect(sent[2]).not.toHaveProperty('facing');
+    });
+
+    it('stops the timer on stop and can be started again', () => {
+      const sent: MovementInputFrame[] = [];
+      const stream = createMovementInputStream((frame) => sent.push(frame));
+      stream.start();
+      vi.advanceTimersByTime(MOVEMENT_FRAME_INTERVAL_MS);
+      expect(sent).toHaveLength(1);
+
+      stream.stop();
+      vi.advanceTimersByTime(MOVEMENT_FRAME_INTERVAL_MS * 5);
+      expect(sent).toHaveLength(1);
+      expect(vi.getTimerCount()).toBe(0);
+
+      stream.start();
+      vi.advanceTimersByTime(MOVEMENT_FRAME_INTERVAL_MS);
+      // The tick counter never rewinds: the server timeline discards a frame
+      // whose ct it has already consumed.
+      expect(sent.map((frame) => frame.ct)).toEqual([0, 1]);
+      stream.stop();
+    });
+
+    it('is idempotent on a double start, so one bot never runs two timers', () => {
+      const sent: MovementInputFrame[] = [];
+      const stream = createMovementInputStream((frame) => sent.push(frame));
+      stream.start();
+      stream.start();
+      vi.advanceTimersByTime(MOVEMENT_FRAME_INTERVAL_MS);
+      expect(sent).toHaveLength(1);
+      stream.stop();
+      expect(vi.getTimerCount()).toBe(0);
+    });
   });
 
   it('leaves no legacy auth discriminator in any standalone Node script', () => {
