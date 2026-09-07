@@ -744,6 +744,7 @@ export const RELIQUARY_HEROIC_GEAR = {
     'forgefathers_warhammer',
     'anvilguard_blade',
     'springtouched_crozier',
+    'wand_of_quenched_sparks',
   ],
   varkhul_forgefather_of_the_last_flame: [
     'bulwark_of_the_inner_crucible',
@@ -752,6 +753,8 @@ export const RELIQUARY_HEROIC_GEAR = {
     'heart_of_the_end_greatblade',
     'forgefire_spire',
     'staff_of_the_last_spring',
+    'orb_of_the_last_spring',
+    'cinder_of_the_first_design',
   ],
 } as const;
 
@@ -1636,7 +1639,6 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     relics: items(
       'cinderfang_kris',
       'slagrender_cleaver',
-      'wand_of_quenched_sparks',
       'pendant_of_the_first_tempering',
       'ignivars_ember_choker',
       'locket_of_the_last_flame',
@@ -1674,8 +1676,6 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     // source, so it pages with its recipe chain.
     sourceDefault: fromBoss('varkhul_forgefather_of_the_last_flame'),
     relics: items(
-      'orb_of_the_last_spring',
-      'cinder_of_the_first_design',
       'seal_of_the_forgewall',
       'band_of_marked_strikes',
       'circle_of_cinders',
@@ -1696,7 +1696,7 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     id: 'conquerors_varkhul_heroic',
     shelf: 'conquerors',
     name: 'Heroic Inner Crucible',
-    desc: 'Heroic-only shields and weapons from Varkhul, Forgefather of the Last Flame.',
+    desc: 'Heroic-only shields, held offhands and weapons from Varkhul, Forgefather of the Last Flame.',
     clearSource: { kind: 'dungeon', dungeonId: 'ignivar_inner_crucible', difficulty: 'heroic' },
     sourceDefault: fromBoss('varkhul_forgefather_of_the_last_flame'),
     relics: items(...RELIQUARY_HEROIC_GEAR.varkhul_forgefather_of_the_last_flame),

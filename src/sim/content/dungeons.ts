@@ -119,7 +119,7 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     // Ilvl-35 loot per docs/prd/ignivar-raid-loot.md "Boss loot tables": ONE
     // item per five raiders per kill (two on the 10-player raid). Slot one is
     // the merged sigil partition (legging + helm), slot two the Normal-only
-    // feet / held / ring partition; a heroic claim skips slot two
+    // feet / ring partition; a heroic claim skips slot two
     // (LootEntry.normalOnly) and the HEROIC_BOSS_LOOT exclusive slot pays in
     // its place, so Heroic pays the same count at the same ilvl 35 (this raid
     // has NO heroic item-level layer) and differs only in WHICH items drop.
@@ -140,24 +140,25 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       { itemId: 'sigil_ember_helmet', chance: 0.16, rollGroup: 'varkhul_sigils' },
       { itemId: 'sigil_tempest_helmet', chance: 0.17, rollGroup: 'varkhul_sigils' },
       // The rings keep the half of this slot their own group used to own
-      // outright (0.50); the feet and held offhands split the other half
-      // 0.3125 / 0.1875. Every weight is a binary fraction (1/8, 1/32, 3/32)
-      // so the partition sums to EXACTLY 1.00 in floating point: the roller's
+      // outright (0.50); the ten feet share the other half at 0.05 each. Both
+      // held offhands moved to the Heroic exclusive partition in the
+      // 2026-09-07 redistribution (neither carries hit, so the Normal hit lane
+      // is untouched). Ten times 0.05 plus four times 0.125 sums to EXACTLY
+      // 1.00 in floating point in this row order (tests/ignivar_loot.test.ts
+      // pins the sum with toBe(1), not toBeCloseTo): the roller's
       // `roll < cumulative` walk and the at-or-below-100% guard in
       // tests/loot_roll.test.ts both read the float sum, and decimal weights
       // like 0.035 drift past 1 by an ulp.
-      normalOnlyRow('varkhul_offset', 'cindersoaked_slippers', 0.03125),
-      normalOnlyRow('varkhul_offset', 'steps_of_quiet_water', 0.03125),
-      normalOnlyRow('varkhul_offset', 'ashenbark_treads', 0.03125),
-      normalOnlyRow('varkhul_offset', 'ashrunner_boots', 0.03125),
-      normalOnlyRow('varkhul_offset', 'scorchgrove_striders', 0.03125),
-      normalOnlyRow('varkhul_offset', 'dewfall_moccasins', 0.03125),
-      normalOnlyRow('varkhul_offset', 'anvilstance_sabatons', 0.03125),
-      normalOnlyRow('varkhul_offset', 'furnace_march_greaves', 0.03125),
-      normalOnlyRow('varkhul_offset', 'thundershock_treads', 0.03125),
-      normalOnlyRow('varkhul_offset', 'springwarden_sabatons', 0.03125),
-      normalOnlyRow('varkhul_offset', 'orb_of_the_last_spring', 0.09375),
-      normalOnlyRow('varkhul_offset', 'cinder_of_the_first_design', 0.09375),
+      normalOnlyRow('varkhul_offset', 'cindersoaked_slippers', 0.05),
+      normalOnlyRow('varkhul_offset', 'steps_of_quiet_water', 0.05),
+      normalOnlyRow('varkhul_offset', 'ashenbark_treads', 0.05),
+      normalOnlyRow('varkhul_offset', 'ashrunner_boots', 0.05),
+      normalOnlyRow('varkhul_offset', 'scorchgrove_striders', 0.05),
+      normalOnlyRow('varkhul_offset', 'dewfall_moccasins', 0.05),
+      normalOnlyRow('varkhul_offset', 'anvilstance_sabatons', 0.05),
+      normalOnlyRow('varkhul_offset', 'furnace_march_greaves', 0.05),
+      normalOnlyRow('varkhul_offset', 'thundershock_treads', 0.05),
+      normalOnlyRow('varkhul_offset', 'springwarden_sabatons', 0.05),
       // Neither legendary drops on Normal. Emberward's 3 percent roll lives
       // in Varkhul's heroic-only exclusive group; Forgebreaker remains reserved
       // for the crafting professions until its recipe chain lands.
@@ -307,7 +308,7 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     // Ilvl-35 loot per docs/prd/ignivar-raid-loot.md "Boss loot tables": ONE
     // item per five raiders per kill (two on the 10-player raid). Slot one is
     // the merged sigil partition (mantle + grip), slot two the Normal-only
-    // neck / waist / smaller-weapon partition; a heroic claim skips slot two
+    // neck / waist / melee-hit-weapon partition; a heroic claim skips slot two
     // (LootEntry.normalOnly) and the HEROIC_BOSS_LOOT exclusive slot pays in
     // its place, so Heroic pays the same count at the same ilvl 35 (this raid
     // has NO heroic item-level layer) and differs only in WHICH items drop.
@@ -324,9 +325,14 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       { itemId: 'sigil_ember_gloves', chance: 0.16, rollGroup: 'ignivar_sigils' },
       { itemId: 'sigil_tempest_gloves', chance: 0.17, rollGroup: 'ignivar_sigils' },
       // The necks keep the half of this slot their own group used to own
-      // outright (0.50); the waists and the three smaller weapons split the
-      // other half 0.3125 / 0.1875. Every weight is a binary fraction (1/8,
-      // 1/32, 1/16) so the partition sums to EXACTLY 1.00 in floating point:
+      // outright (0.50); the waists and the two melee hit weapons split the
+      // other half 0.3125 / 0.1875. The Wand of Quenched Sparks moved to the
+      // Heroic exclusive partition in the 2026-09-07 redistribution: casters
+      // reach the spell hit cap from a waist plus two rings alone, while the
+      // melee cap needs a weapon, so the Kris and the Cleaver stay as the
+      // Normal melee hit lane (tests/ignivar_loot.test.ts). Every weight is a
+      // binary fraction (1/8, 1/32, 3/32) so the partition sums to EXACTLY
+      // 1.00 in floating point:
       // the roller's `roll < cumulative` walk and the at-or-below-100% guard in
       // tests/loot_roll.test.ts both read the float sum, and decimal weights
       // like 0.035 drift past 1 by an ulp.
@@ -344,9 +350,8 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       normalOnlyRow('ignivar_offset', 'warforged_waistguard', 0.03125),
       normalOnlyRow('ignivar_offset', 'stormkindled_chain', 0.03125),
       normalOnlyRow('ignivar_offset', 'tidebinder_links', 0.03125),
-      normalOnlyRow('ignivar_offset', 'cinderfang_kris', 0.0625),
-      normalOnlyRow('ignivar_offset', 'slagrender_cleaver', 0.0625),
-      normalOnlyRow('ignivar_offset', 'wand_of_quenched_sparks', 0.0625),
+      normalOnlyRow('ignivar_offset', 'cinderfang_kris', 0.09375),
+      normalOnlyRow('ignivar_offset', 'slagrender_cleaver', 0.09375),
       // The professions fast-follow's core reagent starts dropping AHEAD of
       // its recipes (maintainer staging call): the classic molten-core band,
       // one guaranteed plus a 50 percent second, so crafters bank cores

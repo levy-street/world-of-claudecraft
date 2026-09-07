@@ -769,30 +769,41 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
   // plus one weapon group per boss, plus Varkhul's shield group); from here the
   // partition is APPEND-only, never reorder.
   [IGNIVAR_BOSS_ID]: [
-    // Robes 0.50 / marquee weapons 0.50; Anvil 0.34 / Ember 0.33 / Tempest 0.33.
+    // Robes 0.50 / weapons 0.50; Anvil 0.34 / Ember 0.33 / Tempest 0.33. The
+    // weapon half splits evenly across the three marquee weapons and the Wand
+    // of Quenched Sparks, redistributed here from Ignivar's Normal off-set
+    // partition on 2026-09-07 (docs/prd/ignivar-raid-loot.md, "Heroic
+    // redistribution"): every caster weapon of the tier is now a Heroic drop.
     { itemId: 'sigil_anvil_chest', chance: 0.17, rollGroup: 'ignivar_h_exclusive' },
     { itemId: 'sigil_ember_chest', chance: 0.17, rollGroup: 'ignivar_h_exclusive' },
     { itemId: 'sigil_tempest_chest', chance: 0.16, rollGroup: 'ignivar_h_exclusive' },
     // Three weapons, not four: the Emberflight Longbow was pulled from the
     // tier (bows wait for the hunter ranged-slot rework; maintainer decision
     // 2026-08-28), and the hunter ranged marquee returns with that rework.
-    { itemId: 'forgefathers_warhammer', chance: 0.17, rollGroup: 'ignivar_h_exclusive' },
-    { itemId: 'anvilguard_blade', chance: 0.17, rollGroup: 'ignivar_h_exclusive' },
-    { itemId: 'springtouched_crozier', chance: 0.16, rollGroup: 'ignivar_h_exclusive' },
+    { itemId: 'forgefathers_warhammer', chance: 0.125, rollGroup: 'ignivar_h_exclusive' },
+    { itemId: 'anvilguard_blade', chance: 0.125, rollGroup: 'ignivar_h_exclusive' },
+    { itemId: 'springtouched_crozier', chance: 0.125, rollGroup: 'ignivar_h_exclusive' },
+    { itemId: 'wand_of_quenched_sparks', chance: 0.125, rollGroup: 'ignivar_h_exclusive' },
   ],
   [VARKHUL_BOSS_ID]: [
-    // Robes 0.35 / shields 0.30 / marquee weapons 0.35. Emberward keeps its
-    // ABSOLUTE 3 percent per heroic kill inside the shield share (the two epic
-    // shields split the remaining 0.27 evenly), so the legendary's odds did not
-    // move with the re-cut and the group still adds no extra heroic rng draw.
+    // Robes 0.35 / shields 0.30 / marquee weapons 0.25 / held offhands 0.10.
+    // Emberward keeps its ABSOLUTE 3 percent per heroic kill inside the shield
+    // share (the two epic shields split the remaining 0.27 evenly), so the
+    // legendary's odds did not move with the re-cut or the 2026-09-07
+    // redistribution, and the group still adds no extra heroic rng draw. The
+    // held offhands came over from Varkhul's Normal off-set partition and took
+    // their 0.10 from the marquee weapons; the Robe share is unchanged so the
+    // 5-piece chase pays exactly as before.
     { itemId: 'sigil_anvil_chest', chance: 0.12, rollGroup: 'varkhul_h_exclusive' },
     { itemId: 'sigil_ember_chest', chance: 0.12, rollGroup: 'varkhul_h_exclusive' },
     { itemId: 'sigil_tempest_chest', chance: 0.11, rollGroup: 'varkhul_h_exclusive' },
     { itemId: 'bulwark_of_the_inner_crucible', chance: 0.135, rollGroup: 'varkhul_h_exclusive' },
     { itemId: 'ember_wardens_barrier', chance: 0.135, rollGroup: 'varkhul_h_exclusive' },
     { itemId: 'varkhul_emberward', chance: 0.03, rollGroup: 'varkhul_h_exclusive' },
-    { itemId: 'heart_of_the_end_greatblade', chance: 0.12, rollGroup: 'varkhul_h_exclusive' },
-    { itemId: 'forgefire_spire', chance: 0.12, rollGroup: 'varkhul_h_exclusive' },
-    { itemId: 'staff_of_the_last_spring', chance: 0.11, rollGroup: 'varkhul_h_exclusive' },
+    { itemId: 'heart_of_the_end_greatblade', chance: 0.09, rollGroup: 'varkhul_h_exclusive' },
+    { itemId: 'forgefire_spire', chance: 0.08, rollGroup: 'varkhul_h_exclusive' },
+    { itemId: 'staff_of_the_last_spring', chance: 0.08, rollGroup: 'varkhul_h_exclusive' },
+    { itemId: 'orb_of_the_last_spring', chance: 0.05, rollGroup: 'varkhul_h_exclusive' },
+    { itemId: 'cinder_of_the_first_design', chance: 0.05, rollGroup: 'varkhul_h_exclusive' },
   ],
 };

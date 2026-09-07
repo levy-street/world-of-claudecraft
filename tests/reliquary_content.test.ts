@@ -395,8 +395,9 @@ describe('Reliquary Conqueror catalog structure', () => {
     // and the flag keeps each whole page out of owned AND total (the dedicated
     // vault and riftbound pins in this file and tests/reliquary_state.test.ts
     // hold both sides), so neither page moves these two literals.
-    // The four Crucible raid pages add 41 distinct new item ids (17 arena
-    // epics, 16 wing epics, 3 + 5 heroic-only weapons and shields), on top of
+    // The four Crucible raid pages add 41 distinct new item ids (16 arena
+    // epics, 14 wing epics, 4 + 7 heroic-only weapons, held offhands and
+    // shields after the 2026-09-07 Heroic redistribution), on top of
     // the batch's own page: 340 + 1 + 45, plus the two developer mount slots
     // (Lanternback Troll, Chimeglass Tortoise): 388, plus the Cluckwork Mech
     // Bird store mount on Horizons: 389.
@@ -438,7 +439,9 @@ describe('Reliquary Conqueror catalog structure', () => {
     const slots = RELIQUARY_PAGES.reduce((n, page) => n + page.relics.length, 0);
     // Diagnostic names the per-page breakdown, so a red here says WHICH page
     // moved instead of only that the sum did. The four Crucible raid pages
-    // add 41 slots (17 + 3 + 16 + 5) on top of the 375 measured before them,
+    // add 41 slots (16 + 4 + 14 + 7 since the 2026-09-07 Heroic
+    // redistribution moved three relics between pages) on top of the 375
+    // measured before them,
     // and the raid's flawless title joins the titles page, plus the two
     // Varkhul legendary slots reached 419; then 418 when the maintainer
     // pulled Forgebreaker to route it through crafting. Moving Emberward
@@ -1584,8 +1587,10 @@ const EQUALITY_PAGES: Record<string, { pageId: string; floor: number }> = {
   // The Crucible raid rooms (per-boss pages). The derivation excludes the
   // sigil redemption tokens by kind; the token-liveness arm below proves the
   // filter excludes something real.
-  ignivar_raid_arena: { pageId: 'conquerors_ignivar', floor: 17 },
-  ignivar_inner_crucible: { pageId: 'conquerors_varkhul', floor: 15 },
+  // Floors lowered 2026-09-07 when the wand and both held offhands moved to
+  // the heroic pages with their drops (the Heroic redistribution).
+  ignivar_raid_arena: { pageId: 'conquerors_ignivar', floor: 16 },
+  ignivar_inner_crucible: { pageId: 'conquerors_varkhul', floor: 14 },
 };
 
 describe('Reliquary dungeon and raid pages derive from live mob loot', () => {

@@ -6094,6 +6094,68 @@ export const TARGETS = [
     },
   },
   {
+    // The Crucible raid's Reliquary pages are the one in-game surface that
+    // lists WHICH items each difficulty drops (the Normal pages derive from the
+    // bosses' normalOnly partitions, the Heroic pages from HEROIC_BOSS_LOOT),
+    // so a loot redistribution between the two difficulties is shot here.
+    key: 'crucible-loot-pages',
+    label: 'The Reliquary: Crucible of the Last Spring Normal and Heroic pages',
+    when: ['sim/content/heroic_loot', 'prd/ignivar-raid-loot'],
+    variants: [
+      {
+        key: 'ignivar-heroic',
+        pageId: 'conquerors_ignivar_heroic',
+        beforeLoad: seedLowGraphicsPreset,
+      },
+      {
+        key: 'varkhul-heroic',
+        pageId: 'conquerors_varkhul_heroic',
+        beforeLoad: seedLowGraphicsPreset,
+      },
+      { key: 'ignivar-normal', pageId: 'conquerors_ignivar', beforeLoad: seedLowGraphicsPreset },
+      { key: 'varkhul-normal', pageId: 'conquerors_varkhul', beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page, variant) {
+      await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+      });
+      await clearReliquaryPins(page);
+      await openReliquaryConquerorsShelf(page);
+      // The Proving Shore greeting note would otherwise sit over the grid.
+      await page.evaluate(() => {
+        document.getElementById('tutorial-greeting')?.remove();
+      });
+      // Enter the page once to learn its relic ids, mark every one discovered
+      // (the live itemsDiscovered set, exactly what a find does minus the
+      // event) so the grid paints art instead of silhouettes, then re-enter so
+      // the repaint shows the owned state.
+      for (let pass = 0; pass < 2; pass++) {
+        await page.evaluate((id) => {
+          document.querySelector(`#reliquary-window [data-page="${id}"]`)?.click();
+        }, variant.pageId);
+        await wait(300);
+        if (pass === 0) {
+          await page.evaluate(() => {
+            const discovered = window.__game?.sim?.deedStats?.itemsDiscovered;
+            for (const cell of document.querySelectorAll('#reliquary-window .reliquary-cell')) {
+              if (cell.dataset.cellKind === 'item' && cell.dataset.cellId)
+                discovered?.add(cell.dataset.cellId);
+            }
+            document.querySelector('#reliquary-window [data-back]')?.click();
+          });
+          await wait(250);
+        }
+      }
+      const entered = await page.evaluate(
+        () => document.querySelectorAll('#reliquary-window .reliquary-cell').length > 0,
+      );
+      if (!entered) throw new Error(`reliquary page ${variant.pageId} did not open`);
+      await wait(400);
+      return { clip: '#reliquary-window' };
+    },
+  },
+  {
     key: 'reliquary-window',
     label: 'The Reliquary: Overview shelf with completion and Curator rank',
     when: [
