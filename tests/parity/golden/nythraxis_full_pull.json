@@ -1826,7 +1826,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 1011,
-      "state": "79e68e6f",
+      "state": "cb927929",
       "events": "591e9098",
       "rng": {
         "draws": 72,
@@ -1837,7 +1837,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1011,
-      "state": "a15bad9a",
+      "state": "30067a9a",
       "events": "c42e19d1",
       "rng": {
         "draws": 135,
@@ -1848,7 +1848,7 @@
       "tick": 64,
       "time": 3.2,
       "nextId": 1011,
-      "state": "52b55031",
+      "state": "74ff671f",
       "events": "194d186e",
       "rng": {
         "draws": 180,
@@ -2573,6 +2573,7 @@
               "school": "shadow",
               "sourceId": 1004,
               "unbreakableControl": true,
+              "value": 0.08,
               "value2": 1009
             }
           ],
@@ -2636,6 +2637,7 @@
               "school": "shadow",
               "sourceId": 1004,
               "unbreakableControl": true,
+              "value": 0.08,
               "value2": 1010
             }
           ],
@@ -15463,7 +15465,7 @@
       "tick": 1130,
       "time": 56.5,
       "nextId": 1014,
-      "state": "9c88fcb5",
+      "state": "5487b193",
       "events": "09a42b05",
       "rng": {
         "draws": 9870,
@@ -15474,7 +15476,7 @@
       "tick": 1140,
       "time": 57,
       "nextId": 1014,
-      "state": "ddea0b77",
+      "state": "b8fc514f",
       "events": "b8364313",
       "rng": {
         "draws": 9939,
@@ -15485,7 +15487,7 @@
       "tick": 1150,
       "time": 57.5,
       "nextId": 1014,
-      "state": "162ac01c",
+      "state": "36b9bfda",
       "events": "dec93dfd",
       "rng": {
         "draws": 10028,
@@ -15496,7 +15498,7 @@
       "tick": 1160,
       "time": 58,
       "nextId": 1014,
-      "state": "8d8d5833",
+      "state": "5da418ff",
       "events": "b8364313",
       "rng": {
         "draws": 10114,
@@ -15507,7 +15509,7 @@
       "tick": 1170,
       "time": 58.5,
       "nextId": 1014,
-      "state": "086bb9ee",
+      "state": "f858b14a",
       "events": "8ebd41ce",
       "rng": {
         "draws": 10210,
@@ -15518,7 +15520,7 @@
       "tick": 1180,
       "time": 59,
       "nextId": 1014,
-      "state": "c5254351",
+      "state": "43c686cf",
       "events": "e8795835",
       "rng": {
         "draws": 10293,
@@ -15529,7 +15531,7 @@
       "tick": 1190,
       "time": 59.5,
       "nextId": 1014,
-      "state": "f961d120",
+      "state": "bae1ddba",
       "events": "a764d6e2",
       "rng": {
         "draws": 10369,
@@ -15540,7 +15542,7 @@
       "tick": 1200,
       "time": 60,
       "nextId": 1014,
-      "state": "99c14c5f",
+      "state": "feceae37",
       "events": "e8795835",
       "rng": {
         "draws": 10463,
@@ -15551,7 +15553,7 @@
       "tick": 1210,
       "time": 60.5,
       "nextId": 1014,
-      "state": "1b4a2cef",
+      "state": "fea40957",
       "events": "13794017",
       "rng": {
         "draws": 10567,
@@ -15562,7 +15564,7 @@
       "tick": 1220,
       "time": 61,
       "nextId": 1014,
-      "state": "7f619e23",
+      "state": "7a6d5065",
       "events": "c2e9106c",
       "rng": {
         "draws": 10645,
@@ -15573,7 +15575,7 @@
       "tick": 1230,
       "time": 61.5,
       "nextId": 1014,
-      "state": "6c5fc60c",
+      "state": "3407c0b2",
       "events": "98f80410",
       "rng": {
         "draws": 10734,
@@ -15584,7 +15586,7 @@
       "tick": 1240,
       "time": 62,
       "nextId": 1014,
-      "state": "588d6535",
+      "state": "f2435961",
       "events": "491a1337",
       "rng": {
         "draws": 10828,
@@ -15595,7 +15597,7 @@
       "tick": 1247,
       "time": 62.35,
       "nextId": 1014,
-      "state": "4c7ec63b",
+      "state": "2c5308c1",
       "events": "1327a351",
       "rng": {
         "draws": 10893,
@@ -16292,6 +16294,7 @@
               "school": "shadow",
               "sourceId": 1004,
               "unbreakableControl": true,
+              "value": 0.08,
               "value2": 1012
             }
           ],
@@ -16406,6 +16409,7 @@
               "school": "shadow",
               "sourceId": 1004,
               "unbreakableControl": true,
+              "value": 0.08,
               "value2": 1013
             }
           ],
