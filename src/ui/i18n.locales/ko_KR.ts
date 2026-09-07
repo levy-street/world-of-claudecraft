@@ -2189,8 +2189,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'character.renameRequired': '이름 변경 필요',
   'character.delete': '삭제',
   'character.redesign': '재디자인',
-  'character.redesignHint':
-    '이 캐릭터는 새 캐릭터 편집기 이전에 생성되었습니다. 무료 재디자인 기회가 1회 있으며, 저장할 때 사용됩니다.',
+  'character.redesignHint': '이 캐릭터는 무료 재디자인을 한 번 사용할 수 있습니다. 저장하면 소모됩니다.',
   'character.redesignTitle': '{name} 재디자인',
   'character.redesignSave': '새 외형 저장',
   'character.redesignCancel': '현재 외형 유지',

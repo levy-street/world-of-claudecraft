@@ -4330,7 +4330,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'character.delete': 'Radera',
   'character.redesign': 'Omforma',
   'character.redesignHint':
-    'Den här rollfiguren skapades före den nya figurskaparen. Du har en gratis omformning; den används när du sparar.',
+    'Den här rollfiguren har en gratis omformning tillgänglig; den används när du sparar.',
   'character.redesignTitle': 'Omforma {name}',
   'character.redesignSave': 'Spara nytt utseende',
   'character.redesignCancel': 'Behåll nuvarande utseende',

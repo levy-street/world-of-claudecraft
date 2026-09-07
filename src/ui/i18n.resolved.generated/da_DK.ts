@@ -8994,7 +8994,7 @@ export const da_DK: EnTranslations = {
     "sortRecent": "Senest spillet",
     "sortPlaytime": "Spilletid",
     "redesign": "Omdesign",
-    "redesignHint": "Denne figur blev skabt før den nye figureditor. Du har ét gratis omdesign; det bruges, når du gemmer.",
+    "redesignHint": "Denne figur har ét gratis omdesign tilgængeligt; det bruges, når du gemmer.",
     "redesignTitle": "Omdesign {name}",
     "redesignSave": "Gem nyt udseende",
     "redesignCancel": "Behold nuværende udseende"

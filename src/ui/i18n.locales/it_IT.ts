@@ -5165,7 +5165,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'character.delete': 'Elimina',
   'character.redesign': 'Ridisegna',
   'character.redesignHint':
-    'Questo personaggio è precedente al nuovo creatore di personaggi. Hai un ridisegno gratuito; viene usato al salvataggio.',
+    'Questo personaggio ha un ridisegno gratuito disponibile; viene usato al salvataggio.',
   'character.redesignTitle': 'Ridisegna {name}',
   'character.redesignSave': 'Salva nuovo aspetto',
   'character.redesignCancel': 'Mantieni aspetto attuale',

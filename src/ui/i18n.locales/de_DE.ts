@@ -5199,7 +5199,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'character.delete': 'Löschen',
   'character.redesign': 'Umgestalten',
   'character.redesignHint':
-    'Diese Figur stammt aus der Zeit vor dem neuen Charaktereditor. Ihr habt eine kostenlose Umgestaltung; sie wird beim Speichern verbraucht.',
+    'Diese Figur hat eine kostenlose Umgestaltung verfügbar; sie wird beim Speichern verbraucht.',
   'character.redesignTitle': '{name} umgestalten',
   'character.redesignSave': 'Neues Aussehen speichern',
   'character.redesignCancel': 'Aktuelles Aussehen behalten',

@@ -8994,7 +8994,7 @@ export const pt_BR: EnTranslations = {
     "sortRecent": "Jogados recentemente",
     "sortPlaytime": "Tempo de jogo",
     "redesign": "Redesenhar",
-    "redesignHint": "Este personagem é anterior ao novo criador de personagens. Você tem um redesenho gratuito; ele é usado ao salvar.",
+    "redesignHint": "Este personagem tem um redesenho gratuito disponível; ele é usado ao salvar.",
     "redesignTitle": "Redesenhar {name}",
     "redesignSave": "Salvar novo visual",
     "redesignCancel": "Manter visual atual"

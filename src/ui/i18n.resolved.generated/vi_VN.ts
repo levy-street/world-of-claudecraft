@@ -8994,7 +8994,7 @@ export const vi_VN: EnTranslations = {
     "sortRecent": "Chơi Gần Đây",
     "sortPlaytime": "Thời Gian Chơi",
     "redesign": "Thiết Kế Lại",
-    "redesignHint": "Nhân vật này có trước trình tạo nhân vật mới. Bạn có một lần thiết kế lại miễn phí; nó được dùng khi bạn lưu.",
+    "redesignHint": "Nhân vật này có một lần thiết kế lại miễn phí; nó được dùng khi bạn lưu.",
     "redesignTitle": "Thiết Kế Lại {name}",
     "redesignSave": "Lưu Diện Mạo Mới",
     "redesignCancel": "Giữ Diện Mạo Hiện Tại"

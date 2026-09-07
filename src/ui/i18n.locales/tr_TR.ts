@@ -4453,7 +4453,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'character.delete': 'Sil',
   'character.redesign': 'Yeniden Tasarla',
   'character.redesignHint':
-    'Bu karakter yeni karakter oluşturucudan önce yaratıldı. Bir ücretsiz yeniden tasarım hakkınız var; kaydettiğinizde kullanılır.',
+    'Bu karakterin bir ücretsiz yeniden tasarım hakkı var; kaydettiğinizde kullanılır.',
   'character.redesignTitle': '{name} karakterini yeniden tasarla',
   'character.redesignSave': 'Yeni Görünümü Kaydet',
   'character.redesignCancel': 'Mevcut Görünümü Koru',

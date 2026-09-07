@@ -20,13 +20,13 @@ import { readFileSync } from 'node:fs';
 import type * as http from 'node:http';
 import { resolve } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { CURRENT_APPEARANCE_REROLL_GRANT } from '../../server/appearance_reroll_grants';
 import {
   CharacterDeleteClientGone,
   CharacterDeleteQueueSaturated,
   CharacterStoragePurchaseOpen,
 } from '../../server/character_delete_db';
 import {
-  APPEARANCE_REROLL_CUTOFF,
   type CharactersRuntime,
   configureCharactersRuntime,
   purgeDeletedCharacterWorldState,
@@ -999,8 +999,12 @@ describe('free-redesign window', () => {
     return Object.fromEntries(body.characters.map((c) => [c.name, c.appearanceRerollAvailable]));
   }
 
-  const before = new Date(APPEARANCE_REROLL_CUTOFF.getTime() - 60_000).toISOString();
-  const after = new Date(APPEARANCE_REROLL_CUTOFF.getTime() + 60_000).toISOString();
+  const before = new Date(
+    CURRENT_APPEARANCE_REROLL_GRANT.createdBefore.getTime() - 60_000,
+  ).toISOString();
+  const after = new Date(
+    CURRENT_APPEARANCE_REROLL_GRANT.createdBefore.getTime() + 60_000,
+  ).toISOString();
   const look = { gender: 'female' };
 
   it('gives a free redesign to every character created inside the window', async () => {
@@ -1030,7 +1034,24 @@ describe('free-redesign window', () => {
     expect(tokens).toEqual({ Oldclient: true });
   });
 
-  it('a spent token beats both arms', async () => {
+  it('a spent launch token (the legacy boolean) is eligible again for the current grant', async () => {
+    // The whole point of grant 2: a character that used its one-shot redesign
+    // when the creator shipped gets another one, because the outfit colorway
+    // preview it saved under was a no-op. The boolean reads as grant 1 spent.
+    const tokens = await tokensFor([
+      charRow({
+        id: 7,
+        name: 'Regranted',
+        created_at: before,
+        appearance: look,
+        appearance_reroll_used: true,
+        appearance_reroll_grant: null,
+      }),
+    ]);
+    expect(tokens).toEqual({ Regranted: true });
+  });
+
+  it('a spent current grant beats both arms', async () => {
     const tokens = await tokensFor([
       charRow({
         id: 5,
@@ -1038,6 +1059,7 @@ describe('free-redesign window', () => {
         created_at: before,
         appearance: look,
         appearance_reroll_used: true,
+        appearance_reroll_grant: CURRENT_APPEARANCE_REROLL_GRANT.id,
       }),
       charRow({
         id: 6,
@@ -1045,6 +1067,7 @@ describe('free-redesign window', () => {
         created_at: after,
         appearance: null,
         appearance_reroll_used: true,
+        appearance_reroll_grant: CURRENT_APPEARANCE_REROLL_GRANT.id,
       }),
     ]);
     expect(tokens).toEqual({ Spent: false, SpentBare: false });
@@ -1136,8 +1159,8 @@ describe('appearance reroll handler', () => {
     const bounded = { gender: 'female', hair: 'highbun' };
     expect(res.status).toBe(200);
     expect(res.body).toEqual({ ok: true, appearance: bounded, helmHidden: null });
-    const [accountId, characterId, stored, helmHidden, cutoff] = consumeAppearanceReroll.mock
-      .calls[0] as [number, number, Record<string, unknown>, boolean, Date];
+    const [accountId, characterId, stored, helmHidden, grant] = consumeAppearanceReroll.mock
+      .calls[0] as [number, number, Record<string, unknown>, boolean, unknown];
     expect(accountId).toBe(7);
     expect(characterId).toBe(5);
     expect(stored).toEqual(bounded);
@@ -1145,9 +1168,9 @@ describe('appearance reroll handler', () => {
     // made the UPDATE run `state - 'helmHidden'`, un-hiding a helm the player
     // had hidden in world. Null leaves the blob alone.
     expect(helmHidden).toBeNull();
-    // The free window rides through to the UPDATE, which is what decides
-    // eligibility; the handler never compares dates itself.
-    expect(cutoff).toBe(APPEARANCE_REROLL_CUTOFF);
+    // The current grant rides through to the UPDATE, which is what decides
+    // eligibility; the handler never compares dates or grant ids itself.
+    expect(grant).toBe(CURRENT_APPEARANCE_REROLL_GRANT);
   });
 
   it('persists the editor helm toggle and pushes it onto a live session', async () => {

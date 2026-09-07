@@ -3838,7 +3838,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'character.delete': 'Smazat',
   'character.redesign': 'Přetvořit',
   'character.redesignHint':
-    'Tato postava vznikla před novým editorem postav. Máte jedno bezplatné přetvoření; použije se při uložení.',
+    'Tato postava má k dispozici jedno bezplatné přetvoření; použije se při uložení.',
   'character.redesignTitle': 'Přetvořit postavu {name}',
   'character.redesignSave': 'Uložit nový vzhled',
   'character.redesignCancel': 'Ponechat současný vzhled',

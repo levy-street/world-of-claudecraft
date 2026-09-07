@@ -4576,7 +4576,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'character.delete': 'Verwijderen',
   'character.redesign': 'Herontwerpen',
   'character.redesignHint':
-    'Dit personage stamt van vóór de nieuwe personagemaker. Je hebt één gratis herontwerp; het wordt gebruikt zodra je opslaat.',
+    'Dit personage heeft één gratis herontwerp beschikbaar; het wordt gebruikt zodra je opslaat.',
   'character.redesignTitle': '{name} herontwerpen',
   'character.redesignSave': 'Nieuw uiterlijk opslaan',
   'character.redesignCancel': 'Huidig uiterlijk behouden',

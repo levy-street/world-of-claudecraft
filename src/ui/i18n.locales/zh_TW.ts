@@ -2119,8 +2119,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'character.renameRequired': '需要更名',
   'character.delete': '刪除',
   'character.redesign': '重新設計',
-  'character.redesignHint':
-    '此角色建立於新角色編輯器之前。你有一次免費重新設計的機會，儲存時即會消耗。',
+  'character.redesignHint': '此角色有一次免費重新設計的機會，儲存時即會消耗。',
   'character.redesignTitle': '重新設計{name}',
   'character.redesignSave': '儲存新外觀',
   'character.redesignCancel': '保留目前外觀',

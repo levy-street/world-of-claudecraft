@@ -8994,7 +8994,7 @@ export const sv_SE: EnTranslations = {
     "sortRecent": "Senast spelad",
     "sortPlaytime": "Speltid",
     "redesign": "Omforma",
-    "redesignHint": "Den här rollfiguren skapades före den nya figurskaparen. Du har en gratis omformning; den används när du sparar.",
+    "redesignHint": "Den här rollfiguren har en gratis omformning tillgänglig; den används när du sparar.",
     "redesignTitle": "Omforma {name}",
     "redesignSave": "Spara nytt utseende",
     "redesignCancel": "Behåll nuvarande utseende"

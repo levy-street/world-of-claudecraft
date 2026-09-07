@@ -4501,7 +4501,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'character.delete': 'Usuń',
   'character.redesign': 'Przeprojektuj',
   'character.redesignHint':
-    'Ta postać powstała przed nowym kreatorem postaci. Masz jedno darmowe przeprojektowanie; zostanie użyte przy zapisie.',
+    'Ta postać ma dostępne jedno darmowe przeprojektowanie; zostanie użyte przy zapisie.',
   'character.redesignTitle': 'Przeprojektuj postać {name}',
   'character.redesignSave': 'Zapisz nowy wygląd',
   'character.redesignCancel': 'Zachowaj obecny wygląd',

@@ -8994,7 +8994,7 @@ export const id_ID: EnTranslations = {
     "sortRecent": "Baru Dimainkan",
     "sortPlaytime": "Waktu Bermain",
     "redesign": "Desain Ulang",
-    "redesignHint": "Karakter ini dibuat sebelum pembuat karakter baru. Anda punya satu desain ulang gratis; terpakai saat Anda menyimpan.",
+    "redesignHint": "Karakter ini punya satu desain ulang gratis yang tersedia; terpakai saat Anda menyimpan.",
     "redesignTitle": "Desain Ulang {name}",
     "redesignSave": "Simpan Tampilan Baru",
     "redesignCancel": "Pertahankan Tampilan Saat Ini"

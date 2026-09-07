@@ -4338,7 +4338,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'character.delete': 'Slet',
   'character.redesign': 'Omdesign',
   'character.redesignHint':
-    'Denne figur blev skabt før den nye figureditor. Du har ét gratis omdesign; det bruges, når du gemmer.',
+    'Denne figur har ét gratis omdesign tilgængeligt; det bruges, når du gemmer.',
   'character.redesignTitle': 'Omdesign {name}',
   'character.redesignSave': 'Gem nyt udseende',
   'character.redesignCancel': 'Behold nuværende udseende',

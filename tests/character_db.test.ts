@@ -19,6 +19,7 @@ vi.mock('../server/admin_guilds_read', () => ({
   bustAdminGuildListReads: dbMock.bustGuildList,
 }));
 
+import { consumeAppearanceReroll } from '../server/appearance_reroll_db';
 import {
   CHARACTER_DELETE_PERMIT_SUB_CAP,
   CHARACTER_DELETE_VERIFY_LOCK_TIMEOUT_MS,
@@ -35,7 +36,6 @@ import { configureCommunityTestAccounts } from '../server/community_test_account
 import {
   backfillAccountEmailIfEmpty,
   bankBonusFactsForAccount,
-  consumeAppearanceReroll,
   createAccount,
   createCharacterCapped,
   deleteCharacter,
@@ -44,6 +44,7 @@ import {
   loadAccountCosmetics,
   markAccountQuestComplete,
   openPlaySession,
+  pool,
   reclaimDeactivatedName,
   renameCharacter,
   SCHEMA,
@@ -865,28 +866,37 @@ describe('consumeAppearanceReroll', () => {
   // pattern: every eligibility predicate inside the SQL, asserted as SQL.
   const LOOK = { gender: 'female' as const };
   const CUTOFF = new Date('2026-08-17T00:00:00Z');
+  const GRANT = { id: 2, createdBefore: CUTOFF, reason: 'test' };
+  const consume = (helm: boolean | null) => consumeAppearanceReroll(pool, 7, 42, LOOK, helm, GRANT);
 
-  it('decides everything inside the one UPDATE: ownership, realm, window-or-never-designed, unspent token', async () => {
+  it('decides everything inside the one UPDATE: ownership, realm, window-or-never-designed, unspent grant', async () => {
     dbMock.query.mockResolvedValueOnce({ rows: [], rowCount: 1 } as any);
-    await consumeAppearanceReroll(7, 42, LOOK, true, CUTOFF);
+    await consume(true);
 
     const [sql, params] = dbMock.query.mock.calls.at(-1)!;
     expect(sql).toMatch(/UPDATE characters/i);
-    // the atomic one-shot: the token burns in the same statement as the look
+    // the atomic one-shot: the grant is recorded in the same statement as the
+    // look, and the legacy boolean still flips for a rolled-back reader
     expect(sql).toMatch(/appearance_reroll_used\s*=\s*TRUE/i);
-    expect(sql).toMatch(/appearance_reroll_used\s*=\s*FALSE/i);
+    expect(sql).toMatch(/appearance_reroll_grant\s*=\s*\$7::integer/i);
+    // the spent check reads the legacy boolean as grant 1, so a launch-token
+    // spender is eligible for grant 2 and refused a second grant 1
+    expect(sql).toMatch(
+      /COALESCE\(appearance_reroll_grant,\s*CASE WHEN appearance_reroll_used THEN 1 ELSE 0 END\)\s*<\s*\$7::integer/i,
+    );
+    expect(sql).not.toMatch(/appearance_reroll_used\s*=\s*FALSE/i);
     // the free window OR the never-designed safety net, disjoined in SQL so
     // two racing submits cannot both land whichever arm admits them
     expect(sql).toMatch(/created_at\s*<\s*\$6\s+OR\s+appearance\s+IS\s+NULL/i);
     // BOLA scoping, the getCharacter trio
     expect(sql).toMatch(/account_id\s*=\s*\$2/);
     expect(sql).toMatch(/realm\s*=\s*\$4/);
-    expect(params).toEqual([42, 7, JSON.stringify(LOOK), REALM, true, CUTOFF]);
+    expect(params).toEqual([42, 7, JSON.stringify(LOOK), REALM, true, CUTOFF, 2]);
   });
 
   it('edits the ONE helm key in the state blob, guarded on an actual change', async () => {
     dbMock.query.mockResolvedValueOnce({ rows: [], rowCount: 1 } as any);
-    await consumeAppearanceReroll(7, 42, LOOK, true, CUTOFF);
+    await consume(true);
     const [sql] = dbMock.query.mock.calls.at(-1)!;
     // jsonb_set / minus-key, never a whole-blob rewrite from an HTTP route...
     expect(sql).toMatch(/jsonb_set\(state,\s*'\{helmHidden\}'/);
@@ -902,9 +912,9 @@ describe('consumeAppearanceReroll', () => {
 
   it('maps rowCount to the applied/refused boolean the route answers with', async () => {
     dbMock.query.mockResolvedValueOnce({ rows: [], rowCount: 1 } as any);
-    expect(await consumeAppearanceReroll(7, 42, LOOK, null, CUTOFF)).toBe(true);
+    expect(await consume(null)).toBe(true);
     dbMock.query.mockResolvedValueOnce({ rows: [], rowCount: 0 } as any);
-    expect(await consumeAppearanceReroll(7, 42, LOOK, null, CUTOFF)).toBe(false);
+    expect(await consume(null)).toBe(false);
   });
 });
 

@@ -8994,7 +8994,7 @@ export const cs_CZ: EnTranslations = {
     "sortRecent": "Nedávno hrané",
     "sortPlaytime": "Čas hraní",
     "redesign": "Přetvořit",
-    "redesignHint": "Tato postava vznikla před novým editorem postav. Máte jedno bezplatné přetvoření; použije se při uložení.",
+    "redesignHint": "Tato postava má k dispozici jedno bezplatné přetvoření; použije se při uložení.",
     "redesignTitle": "Přetvořit postavu {name}",
     "redesignSave": "Uložit nový vzhled",
     "redesignCancel": "Ponechat současný vzhled"

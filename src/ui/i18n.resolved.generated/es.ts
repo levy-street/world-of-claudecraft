@@ -8994,7 +8994,7 @@ export const es: EnTranslations = {
     "sortRecent": "Jugados recientemente",
     "sortPlaytime": "Tiempo de juego",
     "redesign": "Rediseñar",
-    "redesignHint": "Este personaje es anterior al nuevo creador de personajes. Tienes un rediseño gratuito; se consume al guardar.",
+    "redesignHint": "Este personaje tiene un rediseño gratuito disponible; se consume al guardar.",
     "redesignTitle": "Rediseñar a {name}",
     "redesignSave": "Guardar nuevo aspecto",
     "redesignCancel": "Conservar aspecto actual"

@@ -8994,7 +8994,7 @@ export const nl_NL: EnTranslations = {
     "sortRecent": "Onlangs gespeeld",
     "sortPlaytime": "Speeltijd",
     "redesign": "Herontwerpen",
-    "redesignHint": "Dit personage stamt van vóór de nieuwe personagemaker. Je hebt één gratis herontwerp; het wordt gebruikt zodra je opslaat.",
+    "redesignHint": "Dit personage heeft één gratis herontwerp beschikbaar; het wordt gebruikt zodra je opslaat.",
     "redesignTitle": "{name} herontwerpen",
     "redesignSave": "Nieuw uiterlijk opslaan",
     "redesignCancel": "Huidig uiterlijk behouden"

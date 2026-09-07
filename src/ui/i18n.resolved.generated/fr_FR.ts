@@ -8994,7 +8994,7 @@ export const fr_FR: EnTranslations = {
     "sortRecent": "Joués récemment",
     "sortPlaytime": "Temps de jeu",
     "redesign": "Remodeler",
-    "redesignHint": "Ce personnage est antérieur au nouveau créateur de personnage. Vous disposez d’un remodelage gratuit ; il est utilisé lors de la sauvegarde.",
+    "redesignHint": "Ce personnage dispose d’un remodelage gratuit ; il est utilisé lors de la sauvegarde.",
     "redesignTitle": "Remodeler {name}",
     "redesignSave": "Enregistrer la nouvelle apparence",
     "redesignCancel": "Conserver l’apparence actuelle"

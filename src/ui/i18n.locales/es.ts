@@ -5215,7 +5215,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'character.delete': 'Eliminar',
   'character.redesign': 'Rediseñar',
   'character.redesignHint':
-    'Este personaje es anterior al nuevo creador de personajes. Tienes un rediseño gratuito; se consume al guardar.',
+    'Este personaje tiene un rediseño gratuito disponible; se consume al guardar.',
   'character.redesignTitle': 'Rediseñar a {name}',
   'character.redesignSave': 'Guardar nuevo aspecto',
   'character.redesignCancel': 'Conservar aspecto actual',

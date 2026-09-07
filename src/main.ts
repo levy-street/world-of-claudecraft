@@ -6842,8 +6842,8 @@ async function refreshCharacters(): Promise<void> {
       const inWorldHint = c.online
         ? `<span class="char-inworld-hint">${esc(t('character.inWorldHint'))}</span>`
         : '';
-      // One-shot redesign token (server-decided: pre-creator character, token
-      // unspent). Rendered on every action arm; gone for good once spent.
+      // Redesign grant (server-decided: inside the current grant's window and
+      // not yet spent). Rendered on every action arm; gone once spent.
       const rerollBtn = c.appearanceRerollAvailable
         ? `<button type="button" class="btn reroll-char-btn" title="${esc(t('character.redesignHint'))}" aria-label="${esc(t('character.redesignTitle', { name: c.name }))}">${esc(t('character.redesign'))}</button>`
         : '';

@@ -8994,7 +8994,7 @@ export const tr_TR: EnTranslations = {
     "sortRecent": "Son Oynanan",
     "sortPlaytime": "Oynama Süresi",
     "redesign": "Yeniden Tasarla",
-    "redesignHint": "Bu karakter yeni karakter oluşturucudan önce yaratıldı. Bir ücretsiz yeniden tasarım hakkınız var; kaydettiğinizde kullanılır.",
+    "redesignHint": "Bu karakterin bir ücretsiz yeniden tasarım hakkı var; kaydettiğinizde kullanılır.",
     "redesignTitle": "{name} karakterini yeniden tasarla",
     "redesignSave": "Yeni Görünümü Kaydet",
     "redesignCancel": "Mevcut Görünümü Koru"

@@ -2235,7 +2235,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'character.renameRequired': 'требуется переименование',
   'character.delete': 'Удалить',
   'character.redesign': 'Переделать',
-  'character.redesignHint': 'Этот персонаж создан до появления нового редактора внешности. У вас есть одна бесплатная переделка; она расходуется при сохранении.',
+  'character.redesignHint': 'У этого персонажа есть одна бесплатная переделка внешности; она расходуется при сохранении.',
   'character.redesignTitle': 'Переделать: {name}',
   'character.redesignSave': 'Сохранить новый облик',
   'character.redesignCancel': 'Оставить текущий облик',

@@ -5639,7 +5639,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'character.delete': 'Supprimer',
   'character.redesign': 'Remodeler',
   'character.redesignHint':
-    'Ce personnage est antérieur au nouveau créateur de personnage. Vous disposez d’un remodelage gratuit ; il est utilisé lors de la sauvegarde.',
+    'Ce personnage dispose d’un remodelage gratuit ; il est utilisé lors de la sauvegarde.',
   'character.redesignTitle': 'Remodeler {name}',
   'character.redesignSave': 'Enregistrer la nouvelle apparence',
   'character.redesignCancel': 'Conserver l’apparence actuelle',

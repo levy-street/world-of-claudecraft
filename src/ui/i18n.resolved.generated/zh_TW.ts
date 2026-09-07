@@ -8994,7 +8994,7 @@ export const zh_TW: EnTranslations = {
     "sortRecent": "最近遊玩",
     "sortPlaytime": "遊戲時間",
     "redesign": "重新設計",
-    "redesignHint": "此角色建立於新角色編輯器之前。你有一次免費重新設計的機會，儲存時即會消耗。",
+    "redesignHint": "此角色有一次免費重新設計的機會，儲存時即會消耗。",
     "redesignTitle": "重新設計{name}",
     "redesignSave": "儲存新外觀",
     "redesignCancel": "保留目前外觀"

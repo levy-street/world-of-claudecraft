@@ -8994,7 +8994,7 @@ export const pl_PL: EnTranslations = {
     "sortRecent": "Ostatnio grane",
     "sortPlaytime": "Czas gry",
     "redesign": "Przeprojektuj",
-    "redesignHint": "Ta postać powstała przed nowym kreatorem postaci. Masz jedno darmowe przeprojektowanie; zostanie użyte przy zapisie.",
+    "redesignHint": "Ta postać ma dostępne jedno darmowe przeprojektowanie; zostanie użyte przy zapisie.",
     "redesignTitle": "Przeprojektuj postać {name}",
     "redesignSave": "Zapisz nowy wygląd",
     "redesignCancel": "Zachowaj obecny wygląd"

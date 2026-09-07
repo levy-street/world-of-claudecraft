@@ -14,6 +14,7 @@ import { ACCOUNT_WEALTH_SCHEMA } from './account_wealth_db';
 import { AD_SPEND_SCHEMA } from './ad_spend_db';
 import { bustAdminGuildListReads } from './admin_guilds_read';
 import { ADMIN_GUILDS_SCHEMA } from './admin_guilds_schema';
+import { APPEARANCE_REROLL_SCHEMA } from './appearance_reroll_db';
 import { APPLE_AUTH_SCHEMA } from './apple_auth_db';
 import { ACCOUNT_ATTRIBUTION_SCHEMA, accountAttributionForExport } from './attribution_db';
 import { validCharName } from './auth';
@@ -428,10 +429,9 @@ ALTER TABLE characters ADD COLUMN IF NOT EXISTS hotbar_layout JSONB;
 -- reroll. NULL = authored before the modular creator shipped; such a
 -- character renders the legacy class rig everywhere.
 ALTER TABLE characters ADD COLUMN IF NOT EXISTS appearance JSONB;
--- One-shot redesign token for characters authored before the modular creator
--- shipped (created_at earlier than the reroll cutoff). Flipped TRUE by the
--- reroll endpoint in the same statement that writes the new appearance, so a
--- token can never be spent twice.
+-- Legacy one-shot redesign flag (grant 1 of server/appearance_reroll_grants.ts).
+-- Still flipped TRUE by every reroll spend, beside the numbered grant column
+-- APPEARANCE_REROLL_SCHEMA adds, so a rolled-back build sees the token spent.
 ALTER TABLE characters ADD COLUMN IF NOT EXISTS appearance_reroll_used BOOLEAN NOT NULL DEFAULT FALSE;
 -- Max-Level XP Overflow leaderboard: indexed lifetime-XP sort key. The first
 -- index serves the realm-scoped in-game panel; the second serves the global
@@ -1298,6 +1298,9 @@ export async function ensureSchema(): Promise<void> {
     // them" column, so it runs after SCHEMA. Bounded at one row a month and
     // deliberately keep-forever: deleting an old row erases a real award.
     await client.query(REALM_BUILDER_SCHEMA);
+    // The numbered appearance-redesign grant column on characters, so it runs
+    // after SCHEMA (server/appearance_reroll_db.ts owns the column and its spend).
+    await client.query(APPEARANCE_REROLL_SCHEMA);
     await client.query(SOCIAL_SCHEMA);
     await client.query(ADMIN_GUILDS_SCHEMA);
     await client.query(SEEKER_ENTITLEMENT_SCHEMA);
@@ -2999,9 +3002,13 @@ export interface CharacterRow {
   // The authored modular-creator look (own JSONB column, hotbar_layout's
   // pattern). Normalized at write; NULL = pre-creator character (legacy rig).
   appearance?: Record<string, unknown> | null;
-  // One-shot redesign token spent (see the reroll endpoint). Selected by the
-  // list path only.
+  // Legacy one-shot redesign flag (TRUE = grant 1 spent; kept for rollback
+  // safety). Selected by the list path only.
   appearance_reroll_used?: boolean;
+  // Highest redesign grant spent (NULL = only the legacy flag speaks; see
+  // spentAppearanceRerollGrant in server/appearance_reroll_grants.ts). Selected
+  // by the list path only.
+  appearance_reroll_grant?: number | null;
   // Selected by the list path only, for the reroll-cutoff check and the
   // char-select payload.
   created_at?: Date | string | null;
@@ -3038,7 +3045,7 @@ export async function highestCharacterForAccount(accountId: number): Promise<Cha
 export async function listCharacters(accountId: number): Promise<CharacterRow[]> {
   const res = await pool.query(
     `SELECT c.id, c.account_id, c.name, c.class, c.level, c.state, c.is_gm, c.force_rename,
-            c.appearance, c.appearance_reroll_used, c.created_at,
+            c.appearance, c.appearance_reroll_used, c.appearance_reroll_grant, c.created_at,
             GREATEST(ps.last_played, totals.last_played) AS last_played,
             (COALESCE(ps.playtime_seconds, 0) + COALESCE(totals.playtime_seconds, 0))::bigint AS playtime_seconds
        FROM characters c
@@ -3106,77 +3113,6 @@ export async function setCharacterHotbarLayout(
     characterId,
     JSON.stringify(layout),
   ]);
-}
-
-/** Spend a character's one-shot appearance reroll: write the new look and burn
- *  the token in ONE statement, so two concurrent rerolls cannot both succeed.
- *  All eligibility lives in the WHERE arm: ownership + realm (BOLA, matching
- *  getCharacter's scoping), inside the free window or never designed, and the
- *  unspent token, and the row is only touched when every check passes. Returns
- *  whether the reroll was applied; false = not owned / outside the window with a
- *  look already / already spent, which the route maps to its error body. The appearance is already normalized by the
- *  caller (untrusted client input, hotbar_layout's contract).
- *
- *  Two ways into the WHERE arm, and the unspent token is what keeps it one-shot
- *  either way. `created_at < $6` is the PRODUCT rule: every character that
- *  existed before the cutoff gets one redesign on the house, whether or not it
- *  already carries an authored look. `appearance IS NULL` is the safety net
- *  under it, and it is why the date alone is not enough: a cutoff strands every
- *  character created after it by a client too old to post an appearance, which
- *  would then have neither a look nor any way to choose one. The OR can only
- *  ever widen eligibility, so the window stays exactly what it says.
- *
- *  The helm preference rides the SAME statement, because the redesign editor's
- *  helmet toggle is the creation toggle: a standing wardrobe choice, not a
- *  turntable view. It is sim state, so it patches the one key inside the state
- *  blob rather than rewriting it (a whole-blob write from an HTTP route would
- *  clobber a live session's progress), and follows the sim's zero-default
- *  omission convention: hidden writes the key, shown removes it, and BOTH
- *  arms are guarded on an actual change, because jsonb_set and `-` each mint a
- *  whole new datum: an unguarded write detoasts, re-serializes and re-TOASTs
- *  the entire state blob even when the value is identical, leaving dead chunks
- *  behind for autovacuum. A NULL
- *  helmHidden means the client did not offer the toggle at all and the blob is
- *  left untouched: defaulting that to false would actively UN-hide a helm the
- *  player had hidden in world. A character that has never been saved (state IS
- *  NULL) is likewise left alone; its blob is written
- *  fresh on first entry. A LIVE session still holds the old value in memory and
- *  would autosave over this, which is what the route's setHelmHiddenForCharacter
- *  push exists to prevent.
- *
- *  Unlike characterUpdateStatement, this write carries no character_leases fence.
- *  That is deliberate, not an oversight: the UPDATE only ever patches the single
- *  helmHidden key inside the state blob (never the whole thing), so a takeover
- *  racing this cannot tear it the way a full state write could, and the
- *  applyAppearanceForCharacter/setHelmHiddenForCharacter push onto the live
- *  session right after is what reconciles an online character with the row it
- *  just wrote. */
-export async function consumeAppearanceReroll(
-  accountId: number,
-  characterId: number,
-  appearance: Record<string, unknown>,
-  helmHidden: boolean | null,
-  createdBefore: Date,
-): Promise<boolean> {
-  const res = await pool.query(
-    `UPDATE characters
-        SET appearance = $3::jsonb,
-            appearance_reroll_used = TRUE,
-            state = CASE
-                      WHEN state IS NULL OR $5::boolean IS NULL THEN state
-                      WHEN $5::boolean AND state->'helmHidden' IS DISTINCT FROM 'true'::jsonb
-                        THEN jsonb_set(state, '{helmHidden}', 'true'::jsonb, true)
-                      WHEN NOT $5::boolean AND state ? 'helmHidden'
-                        THEN state - 'helmHidden'
-                      ELSE state
-                    END,
-            updated_at = now()
-      WHERE id = $1 AND account_id = $2 AND realm = $4
-        AND (created_at < $6 OR appearance IS NULL)
-        AND appearance_reroll_used = FALSE`,
-    [characterId, accountId, JSON.stringify(appearance), REALM, helmHidden, createdBefore],
-  );
-  return (res.rowCount ?? 0) > 0;
 }
 
 // Active character names on this realm for the public character sitemap, ranked

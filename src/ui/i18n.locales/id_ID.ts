@@ -4469,7 +4469,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'character.delete': 'Hapus',
   'character.redesign': 'Desain Ulang',
   'character.redesignHint':
-    'Karakter ini dibuat sebelum pembuat karakter baru. Anda punya satu desain ulang gratis; terpakai saat Anda menyimpan.',
+    'Karakter ini punya satu desain ulang gratis yang tersedia; terpakai saat Anda menyimpan.',
   'character.redesignTitle': 'Desain Ulang {name}',
   'character.redesignSave': 'Simpan Tampilan Baru',
   'character.redesignCancel': 'Pertahankan Tampilan Saat Ini',

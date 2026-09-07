@@ -8994,7 +8994,7 @@ export const zh_CN: EnTranslations = {
     "sortRecent": "最近游玩",
     "sortPlaytime": "游戏时长",
     "redesign": "重新设计",
-    "redesignHint": "该角色创建于新角色编辑器之前。你有一次免费重新设计的机会，保存时即会消耗。",
+    "redesignHint": "该角色有一次免费重新设计的机会，保存时即会消耗。",
     "redesignTitle": "重新设计{name}",
     "redesignSave": "保存新外观",
     "redesignCancel": "保留当前外观"

@@ -633,6 +633,22 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS realm_builder_honours');
   });
 
+  it('applies the appearance redesign grant column after the core characters DDL', async () => {
+    // APPEARANCE_REROLL_SCHEMA (server/appearance_reroll_db.ts) adds the
+    // numbered-grant column listCharacters selects. tests/character_db.test.ts
+    // and tests/server/characters.test.ts fake the db seam, so without this
+    // pin deleting the ensureSchema line in server/db.ts would fail nowhere
+    // until the first roster read on a fresh database. It ALTERs characters,
+    // so it must run after the core SCHEMA creates the table.
+    await ensureSchema();
+    const applied = h.calls.join('\n');
+    const column = applied.indexOf(
+      'ALTER TABLE characters ADD COLUMN IF NOT EXISTS appearance_reroll_grant INTEGER',
+    );
+    expect(column).toBeGreaterThan(-1);
+    expect(applied.indexOf('CREATE TABLE IF NOT EXISTS characters')).toBeLessThan(column);
+  });
+
   it('applies the $WOC Exchange schema (listings plus a dependent table)', async () => {
     // WOC_MARKET_SCHEMA (server/woc_market_db.ts) backs every marketplace
     // table. Same defined-but-unwired hazard as the DISCORD_SCHEMA lesson:

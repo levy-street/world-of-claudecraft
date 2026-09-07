@@ -4411,7 +4411,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'character.closeProfile': 'Đóng hồ sơ',
   'character.delete': 'Xóa',
   'character.redesign': 'Thiết Kế Lại',
-  'character.redesignHint': 'Nhân vật này có trước trình tạo nhân vật mới. Bạn có một lần thiết kế lại miễn phí; nó được dùng khi bạn lưu.',
+  'character.redesignHint':
+    'Nhân vật này có một lần thiết kế lại miễn phí; nó được dùng khi bạn lưu.',
   'character.redesignTitle': 'Thiết Kế Lại {name}',
   'character.redesignSave': 'Lưu Diện Mạo Mới',
   'character.redesignCancel': 'Giữ Diện Mạo Hiện Tại',

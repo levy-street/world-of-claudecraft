@@ -871,7 +871,13 @@ const MONOLITHS: MonolithRow[] = [
     // log statement (loadGuildBankLogRows, its row shape and its lowered
     // statement timeout) moved to server/guild_bank_log_db.ts when it grew a
     // page cursor and a `more` probe. Exact count.
-    ceiling: 5003,
+    // Down 5003 -> 4939 for the numbered appearance-redesign grants: the
+    // reroll UPDATE moved to server/appearance_reroll_db.ts beside the grant
+    // column's schema (the pool-as-parameter realm_builder_db shape), and the
+    // rule itself is pure in server/appearance_reroll_grants.ts; what remains
+    // here is the schema import, the one apply line, and the row field. Exact
+    // count, zero slack.
+    ceiling: 4939,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {
