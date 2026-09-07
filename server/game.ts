@@ -103,6 +103,7 @@ import {
   type CommandName,
   type DungeonFinderBoard,
   isOverheadEmoteId,
+  MOVEMENT_WIRE_VERSION,
   PET_SPECIAL_WIRE_VERSION,
   type PetSpecialWireVersion,
   STABLE_TIMER_WIRE_VERSION,
@@ -960,8 +961,7 @@ export interface ClientSession extends MovementInputSessionState, HotbarLayoutSt
   rememberedChat: RememberedChat;
   lastInputSeq: number;
   dungeonEntryFacing: entryFacing.DungeonEntryFacingFence;
-  // sim time of the last movement input frame CONSUMED off the timeline, used
-  // to clear stale held input
+  // sim time of the last movement frame CONSUMED, to clear stale held input
   lastInputAt: number;
   // Sim time of the next inspectCorpseHarvest throttle this session may pass.
   nextCorpseHarvestInspectAt?: number;
@@ -2866,16 +2866,12 @@ export class GameServer {
   private async grantPlaytimePoints(): Promise<void> {
     const windowSecs = PLAYTIME_GRANT_MS / 1000;
     for (const session of this.clients.values()) {
-      // A linkdead session is held in this.clients for the whole disconnect grace,
-      // and the activity window (windowSecs) equals LINKDEAD_GRACE_MS exactly (both
-      // 5 minutes), so without this guard a player who gave input any time in the 5
-      // minutes before the socket dropped keeps passing the idle check for the
-      // entire grace and banks a durable grant while offline. The clock is stamped
-      // at CONSUMPTION (consumeMovementFramesV2), so a drop can even advance it a
-      // few ticks while the timeline drains its buffered frames. Guarding here
-      // rather than rewinding lastInputAt on drop: resumeSession resets it to
-      // sim.time on resume, and other consumers (idle sweep, daily activity) read
-      // it too.
+      // A linkdead session is held in this.clients for the whole disconnect grace, and the
+      // activity window (windowSecs) equals LINKDEAD_GRACE_MS exactly (both 5 minutes), so
+      // without this guard a player who gave input in the 5 minutes before the drop keeps
+      // passing the idle check for the whole grace and banks a durable grant while offline.
+      // lastInputAt is stamped at CONSUMPTION, so a drop even advances it while the timeline
+      // drains; guarding here beats rewinding it, which resume and the idle sweep also read.
       if (session.linkdead) continue; // disconnected: no playtime credit during grace
       if (this.sim.time - session.lastInputAt > windowSecs) continue; // idle: skip
       const last = this.lastPlaytimeGrantAt.get(session.accountId);
@@ -3789,6 +3785,8 @@ export class GameServer {
       // Epoch ms of an active chat mute, or null. Lets the client show status
       // at login; sending is still gated server-side regardless.
       chatMutedUntil: session.chatMutedUntil ?? null,
+      // Shipped 0.41.x clients pick their send path from THIS echo.
+      movementWire: MOVEMENT_WIRE_VERSION,
     });
     // Only the entering player sees their own world-entry notice; we don't
     // broadcast it to everyone (and likewise don't broadcast departures below).
@@ -3948,6 +3946,7 @@ export class GameServer {
       admin: session.isAdmin,
       softWords: this.chatFilter.softWords(),
       chatMutedUntil: session.chatMutedUntil ?? null,
+      movementWire: MOVEMENT_WIRE_VERSION,
     });
     // No self "entered the world" notice here: on a seamless reconnect the
     // player never saw themselves leave (and friends never got a presence

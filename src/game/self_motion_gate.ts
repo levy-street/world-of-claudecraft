@@ -5,7 +5,8 @@
 // Off while spectating, corpse-frozen, or CC'd (playerImmobilized covers
 // stun/root/incapacitate/polymorph, and fear is a fear_incap incapacitate aura;
 // the fear steer and the charge/follow modes run server-side only), and inside a
-// delve (the portcullis door clamps are not mirrored client-side).
+// delve (the portcullis door clamps are not mirrored client-side), and while a
+// rift ice slide is carrying the player.
 
 import { isDelvePos, isRiftPos } from '../sim/data';
 import type { Aura } from '../sim/types';
@@ -38,6 +39,8 @@ export interface SelfMotionGateArgs {
   posX: number;
   climbing: boolean | undefined;
   riftFloor?: RiftFloorView | null;
+  /** Server-driven rift ice slide; unmirrored, so the kernel cannot reproduce it. */
+  riftSliding?: boolean;
 }
 
 export function selfMotionPredictionEnabled(args: SelfMotionGateArgs): boolean {
@@ -54,6 +57,10 @@ export function selfMotionPredictionEnabled(args: SelfMotionGateArgs): boolean {
     // A ledge climb is a server-owned scripted move the client does
     // not re-simulate: predicting a fall through it would fight the
     // authoritative pull-up and show the correction as a stutter.
-    args.climbing !== true
+    args.climbing !== true &&
+    // Same shape: the rift ice slide moves the player with no input behind it,
+    // so a kernel stepping the held intent would predict a standstill and
+    // reconcile against the slide every tick.
+    args.riftSliding !== true
   );
 }

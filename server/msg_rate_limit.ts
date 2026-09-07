@@ -33,9 +33,10 @@
 // Pure state + functions (no ClientSession/WebSocket import, injected nowSec)
 // so the gate math is unit-testable without a live server.
 
-// Frame ceiling: the refill sits far above the input stream's own rate,
-// leaving standing headroom for command mashing plus chat plus
-// telemetry on top of a maxed input stream. Burst preserves the
+// Frame ceiling: the refill is 6x the movement stream's own rate (120/s against
+// the fixed 20 Hz sampler's one frame per client tick), so five sixths of the
+// budget stays free for command mashing plus chat plus telemetry on top of a
+// maxed input stream. Burst preserves the
 // 1.5-seconds-of-refill shape for the reconnect catch-up spike (session
 // resume deliberately keeps the existing bucket, benign at this refill).
 export const MSG_RATE_REFILL_PER_SECOND = 120; // sustained refill, frames (tokens) per second

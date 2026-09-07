@@ -1,10 +1,12 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { stripComments } from './helpers/strip_comments';
 
-const mainSource = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
-const wireGlueSource = readFileSync(
-  new URL('../src/game/movement_wire_glue.ts', import.meta.url),
-  'utf8',
+// Comments are stripped first: a commented-out line leaves its text in place and
+// would keep every raw substring pin below falsely green.
+const mainSource = stripComments(readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8'));
+const wireGlueSource = stripComments(
+  readFileSync(new URL('../src/game/movement_wire_glue.ts', import.meta.url), 'utf8'),
 );
 
 describe('online self-motion lifecycle wiring', () => {

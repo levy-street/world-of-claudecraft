@@ -4649,6 +4649,7 @@ async function startGame(
     selfMotionGateArgs.posX = pe.pos.x;
     selfMotionGateArgs.climbing = pe.climbing;
     selfMotionGateArgs.riftFloor = net.riftFloor;
+    selfMotionGateArgs.riftSliding = pe.riftSliding;
     const selfPredictionEnabled =
       !SELF_MOTION_DISABLED && selfMotionPredictionEnabled(selfMotionGateArgs);
     movementPrediction.prepare(net, pe, selfPredictionEnabled);

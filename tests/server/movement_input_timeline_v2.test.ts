@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { createDungeonEntryFacingFence } from '../../server/dungeon_entry_facing';
 import {
+  applyMovementInputFrame,
   consumeMovementFramesV2,
   createMovementInputSessionState,
   MOVEMENT_CT_SANITY_BOUND_TICKS,
@@ -197,6 +198,51 @@ describe('MovementInputTimeline', () => {
     expect(timeline.consumed).toBe(2);
     expect(timeline.extrapolated).toBe(1);
     expect(timeline.starved).toBe(1);
+  });
+
+  it('never enqueues a frame without a client tick, so it moves and faces nobody', () => {
+    const timeline = new MovementInputTimeline();
+    const session = {
+      pid: 1,
+      lastInputAt: 7,
+      ...createMovementInputSessionState(),
+      dungeonEntryFacing: createDungeonEntryFacingFence(0, false),
+      movementTimeline: timeline,
+    };
+    const meta = { moveInput: emptyMoveInput() };
+    // The entry fence reads the pose, so this arm needs a positioned body.
+    const entity = {
+      auras: [],
+      dead: false,
+      facing: 0.25,
+      ghost: false,
+      pos: { x: 0, y: 0, z: 0 },
+      dungeonEntrySeq: 0,
+    };
+    const sim = {
+      time: 99,
+      meta: () => meta,
+      entities: new Map([[1, entity]]),
+    };
+
+    // The fence still runs and the frame is still parsed and returned (the rate
+    // limiter, the seq metric and the bot detector all read it), but with no
+    // client tick there is nothing to place on the timeline.
+    const frame = applyMovementInputFrame(session as never, entity as never, {
+      t: 'input',
+      mi: { f: 1 },
+      facing: 1.5,
+    });
+    expect(frame.ct).toBeNull();
+    expect(frame.moveInput.forward).toBe(true);
+    expect(timeline.consumed).toBe(0);
+
+    consumeMovementFramesV2(sim as never, [session]);
+
+    expect(meta.moveInput).toEqual(emptyMoveInput());
+    expect(entity.facing).toBe(0.25);
+    expect(session.lastInputAt).toBe(7);
+    expect(session.lastConsumedCt).toBe(-1);
   });
 
   it('does not require battleground state when consuming a lightweight sim', () => {

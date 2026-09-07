@@ -82,6 +82,7 @@ describe('selfMotionPredictionEnabled', () => {
       { movementFrozen: true },
       { playerImmobilized: true },
       { climbing: true },
+      { riftSliding: true },
     ];
     for (const over of cases) {
       expect(selfMotionPredictionEnabled(enabledArgs(over)), JSON.stringify(over)).toBe(false);
@@ -105,5 +106,21 @@ describe('selfMotionPredictionEnabled', () => {
   it('treats only an explicit climbing:true as a climb', () => {
     expect(selfMotionPredictionEnabled(enabledArgs({ climbing: false }))).toBe(true);
     expect(selfMotionPredictionEnabled(enabledArgs({ climbing: undefined }))).toBe(true);
+  });
+
+  it('is off while a rift ice slide carries the player, on the rift floor otherwise', () => {
+    // The slide is server-driven and unmirrored: the kernel steps the held
+    // intent, so predicting through one reconciles against the slide every tick.
+    expect(
+      selfMotionPredictionEnabled(enabledArgs({ posX: RIFT_X_MIN, riftFloor, riftSliding: true })),
+    ).toBe(false);
+    expect(
+      selfMotionPredictionEnabled(enabledArgs({ posX: RIFT_X_MIN, riftFloor, riftSliding: false })),
+    ).toBe(true);
+    expect(
+      selfMotionPredictionEnabled(
+        enabledArgs({ posX: RIFT_X_MIN, riftFloor, riftSliding: undefined }),
+      ),
+    ).toBe(true);
   });
 });

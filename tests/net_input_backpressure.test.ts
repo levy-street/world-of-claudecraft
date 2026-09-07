@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { MovementInputTimeline } from '../server/movement_input_timeline_v2';
+import { type MovementWireClient, MovementWireGlue } from '../src/game/movement_wire_glue';
 import { MOVEMENT_FRAME_V2_PENDING_CAP } from '../src/net/movement_frame_v2_wire';
 import { ClientWorld } from '../src/net/online';
 import { INPUT_SEND_BACKPRESSURE_LIMIT_BYTES } from '../src/net/send_backpressure';
 import { parseMoveInputFrame } from '../src/sim/move_input';
+import { emptyMoveInput } from '../src/sim/types';
 
 function makeClient(bufferedAmount: number) {
   const sent: string[] = [];
@@ -146,6 +148,84 @@ describe('ClientWorld input send backpressure gate', () => {
       peakBufferedBytes: INPUT_SEND_BACKPRESSURE_LIMIT_BYTES + 1,
     });
     expect(ws.bufferedAmount).toBe(INPUT_SEND_BACKPRESSURE_LIMIT_BYTES + 1);
+  });
+
+  it('loses the evicted frame outright and replays the rest in client tick order', () => {
+    // What congestion actually costs on this path, stated as bytes on the wire.
+    // The outbox holds frames rather than shedding them, so nothing is lost
+    // until the cap evicts the OLDEST: a one-shot edge (a jump) that was in
+    // that frame is gone, and every retained frame still arrives in ct order.
+    const { client, ws, sent } = makeClient(INPUT_SEND_BACKPRESSURE_LIMIT_BYTES + 1);
+    withWebSocketStub(() => {
+      client.sendMovementFrame(
+        { ct: 0, mi: { ...client.moveInput, jump: true }, facing: null },
+        1_000,
+      );
+      for (let ct = 1; ct <= MOVEMENT_FRAME_V2_PENDING_CAP; ct++) {
+        client.sendMovementFrame({ ct, mi: client.moveInput, facing: null }, 1_000 + ct);
+      }
+      expect(sent).toHaveLength(0);
+
+      ws.bufferedAmount = 0;
+      client.sendMovementFrame(
+        { ct: MOVEMENT_FRAME_V2_PENDING_CAP + 1, mi: client.moveInput, facing: null },
+        2_000,
+      );
+    });
+
+    const frames = sent.map((payload) => sentInput([payload]));
+    // Client tick 0 carried the jump and was the one evicted; 1..cap+1 land in
+    // order behind it, and no frame on the wire carries the lost edge.
+    expect(frames.map((frame) => frame.ct)).toEqual(
+      Array.from({ length: MOVEMENT_FRAME_V2_PENDING_CAP + 1 }, (_, index) => index + 1),
+    );
+    expect(frames.some((frame) => frame.mi.j === 1)).toBe(false);
+    expect(frames.map((frame) => frame.seq)).toEqual(
+      Array.from({ length: MOVEMENT_FRAME_V2_PENDING_CAP + 1 }, (_, index) => index + 1),
+    );
+  });
+
+  it('re-emits the held turn engage edge on the first frame that reaches the wire', () => {
+    // The engage edge is the one frame the server may integrate a manual turn
+    // from, so it must survive a frame that never reached the wire: the glue
+    // holds it until a frame carrying it is actually accepted.
+    const sentFrames: { ct: number; turnLeft: boolean; turnRight: boolean }[] = [];
+    let accepting = false;
+    const wireClient: MovementWireClient = {
+      onMovementWireNegotiated: null,
+      onMovementWireNeutral: null,
+      movementWireIsOpen: () => true,
+      sendMovementFrame: (frame) => {
+        if (!accepting) return false;
+        sentFrames.push({
+          ct: frame.ct,
+          turnLeft: frame.mi.turnLeft,
+          turnRight: frame.mi.turnRight,
+        });
+        return true;
+      },
+    };
+    const glue = new MovementWireGlue();
+    glue.connect(wireClient, 0);
+    const engaging = { ...emptyMoveInput(), forward: true, turnLeft: true };
+    // What main.ts streams once the local heading owns the channel: the raw
+    // turn flags are zeroed, so a turnLeft on the wire can ONLY be the edge.
+    const steady = { ...emptyMoveInput(), forward: true };
+
+    glue.advance(wireClient, 0.05, engaging, null, 50, true);
+    expect(sentFrames).toEqual([]);
+
+    accepting = true;
+    glue.advance(wireClient, 0.05, steady, null, 100);
+    expect(sentFrames.length).toBeGreaterThanOrEqual(1);
+    expect(sentFrames[0]).toMatchObject({ turnLeft: true, turnRight: false });
+    // Exactly once: every later frame carries the zeroed steady flags.
+    expect(sentFrames.slice(1).every((frame) => !frame.turnLeft && !frame.turnRight)).toBe(true);
+
+    const afterResume = sentFrames.length;
+    glue.advance(wireClient, 0.05, steady, null, 150);
+    expect(sentFrames.length).toBeGreaterThan(afterResume);
+    expect(sentFrames.slice(afterResume).every((frame) => !frame.turnLeft)).toBe(true);
   });
 
   it('does not gate cmd frames on backpressure: only the idempotent-latest input path is held', () => {

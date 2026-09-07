@@ -519,6 +519,7 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
     selfMotionGateArgs.posX = pe.pos.x;
     selfMotionGateArgs.climbing = pe.climbing;
     selfMotionGateArgs.riftFloor = client.riftFloor;
+    selfMotionGateArgs.riftSliding = pe.riftSliding;
     const predictionEnabled = selfMotionPredictionEnabled(selfMotionGateArgs);
     movementPrediction.prepare(client, pe, predictionEnabled);
     // ClientWorld's own 50 ms timer runs beside this, draining only frames the

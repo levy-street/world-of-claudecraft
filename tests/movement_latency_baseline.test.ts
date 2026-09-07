@@ -1325,9 +1325,11 @@ describe('movement latency baseline', () => {
     const sampledAdvance = helperAt('sampler.advance(');
     // updateSelfRenderPosition itself lives in the renderer (src/render/
     // self_render_position_core.ts, called from renderer.sync); main.ts's half
-    // of the contract is that the drawn pose is produced AFTER the frame the
-    // predictor reads was built.
-    const draw = source.indexOf('renderer.sync(', predictionDisplay);
+    // of the contract is that the drawn pose is produced AFTER the display pose
+    // it draws. Anchored at the echo fold, not at the display pose itself:
+    // searching from predictionDisplay would make the ordering assertion below
+    // true by construction.
+    const draw = source.indexOf('renderer.sync(', fold);
     const note = 'update tests/helpers/online_harness.ts stepFrame to match';
     expect(
       draw,

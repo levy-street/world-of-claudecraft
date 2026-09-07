@@ -21,4 +21,15 @@ describe('interpolatedOnlineSelfFacing', () => {
 
     expect(interpolatedOnlineSelfFacing(wire, entity, 0.5)).toBeCloseTo(0.5, 12);
   });
+
+  it('falls back when only the CURRENT reconciliation facing is missing', () => {
+    // The other arm of the same AND: a half-populated pair must not mix a
+    // full-precision previous with the rounded snapshot facing.
+    const wire = {
+      reconPreviousAuthoritativeFacing: 0.45,
+      reconAuthoritativeFacing: null,
+    };
+
+    expect(interpolatedOnlineSelfFacing(wire, entity, 0.5)).toBeCloseTo(0.5, 12);
+  });
 });

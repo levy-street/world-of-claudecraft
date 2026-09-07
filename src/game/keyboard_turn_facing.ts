@@ -37,14 +37,13 @@ export interface KeyboardTurnState {
   /**
    * The heading the caller may put on the wire this frame, or null. Only ever
    * carries values DERIVED FROM INPUT (the live turn integration, the constant
-   * held heading): never a value derived from the mirrored server facing. The
-   * fallback glide corrections move the display TOWARD the mirror, and streaming
-   * them back would make the server chase its own delayed echo, a closed
-   * feedback loop that at high RTT never converges (the character visibly
-   * spins on its own at the glide rate until the player intervenes).
+   * held heading): never a value derived from the mirrored server facing.
+   * Streaming a mirror-derived heading back would make the server chase its own
+   * delayed echo, a closed feedback loop that at high RTT never converges.
    */
   wireFacing: number | null;
-  /** True once release correction has incorporated mirrored server state. */
+  /** True while the held heading came from the mirror rather than from input:
+   *  set only by seedKeyboardTurnRelease, and it withholds wireFacing. */
   mirrorDerived: boolean;
   /**
    * True when the caller must ZERO the turn flags on the wire this frame
@@ -92,7 +91,8 @@ export function seedKeyboardTurnRelease(state: KeyboardTurnState, facing: number
 export interface KeyboardTurnArgs {
   turnLeft: boolean;
   turnRight: boolean;
-  /** False while turning is blocked (stun family / corpse): hold, then correct. */
+  /** False while turning is blocked (stun family / corpse): the local heading is
+   *  held where it is, never integrated further and never rewound. */
   turnAllowed: boolean;
   /**
    * The facing the client streams to the server this frame (mouselook,

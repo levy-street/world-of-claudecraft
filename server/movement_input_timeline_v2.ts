@@ -11,6 +11,10 @@ import {
   type MovementOverrideSessionState,
 } from './movement_override_epoch';
 
+// Assigned from on every starved tick of every session, so it is minted once
+// rather than per session per tick. Frozen: it is only ever a copy SOURCE.
+const NEUTRAL_MOVE_INPUT: Readonly<MoveInput> = Object.freeze(emptyMoveInput());
+
 export const MOVEMENT_INPUT_TIMELINE_DEPTH = 6;
 export const STARVE_RESYNC_TICKS = 3;
 // Sixty seconds at 20 Hz is twice the 30 second keepalive window. A real gap
@@ -93,7 +97,7 @@ export function consumeMovementFramesV2(
     const frame = session.movementTimeline.consumeNext();
     if (!frame) {
       noteBattlegroundWallPressure(sim.ctx, meta, entity);
-      Object.assign(meta.moveInput, emptyMoveInput());
+      Object.assign(meta.moveInput, NEUTRAL_MOVE_INPUT);
       continue;
     }
     noteBattlegroundWallPressure(sim.ctx, meta, entity);

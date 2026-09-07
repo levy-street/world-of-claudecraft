@@ -1,3 +1,7 @@
+> Historical record of the RETIRED v1 client send cadence. The live cadence is the
+> fixed 20 Hz sampler in `src/game/input_tick_sampler.ts` plus the outbox in
+> `src/net/movement_frame_v2_wire.ts`.
+
 # Packet 3: Input cadence contract
 
 Program: Player Performance Overhaul (brainstorm.md revision 2; decisions resolved

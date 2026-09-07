@@ -22,10 +22,12 @@ vi.mock('../server/db', () => ({
   releaseAllCharacterLeases: vi.fn(async () => {}),
 }));
 
+import { GameServer } from '../server/game';
 import { consumeMovementFramesV2 } from '../server/movement_input_timeline_v2';
 import { type MovementWireClient, MovementWireGlue } from '../src/game/movement_wire_glue';
 import { emptyMoveInput } from '../src/sim/types';
-import { bareClient } from './helpers/bare_client';
+import { MOVEMENT_WIRE_VERSION } from '../src/world_api';
+import { bareClient, fakeWs, joinServer } from './helpers/bare_client';
 import type { LatencyLinkConfig } from './helpers/latency_link';
 import { joinGroundTruthCharacter } from './helpers/movement_ground_truth';
 import { createOnlineHarness } from './helpers/online_harness';
@@ -232,5 +234,26 @@ describe('movement wire v2', () => {
     } finally {
       harness.dispose();
     }
+  });
+
+  it('echoes the movement wire version on BOTH hello arms', () => {
+    // A shipped 0.41.x client offers movementWire at auth (so it passes the
+    // handshake gate) but picks its SEND path from this echo. Drop the field and
+    // it falls back to the retired ct-less frame, which the timeline discards:
+    // the player joins, chats, and silently never moves. Both arms must carry it,
+    // because a reconnect during a deploy takes the resume arm.
+    const server = new GameServer();
+    const client = fakeWs();
+    const session = joinServer(server, client, 909, 'Hello Echo');
+    const freshHello = client.sent.find((frame) => frame.t === 'hello');
+    expect(freshHello?.movementWire).toBe(MOVEMENT_WIRE_VERSION);
+
+    session.linkdead = true;
+    const resumedClient = fakeWs();
+    const resumed = server.join(resumedClient.ws, 909, 909, 'Hello Echo', 'warrior', null, false);
+    if ('error' in resumed) throw new Error(resumed.error);
+    expect(resumed).toBe(session);
+    const resumeHello = resumedClient.sent.find((frame) => frame.t === 'hello');
+    expect(resumeHello?.movementWire).toBe(MOVEMENT_WIRE_VERSION);
   });
 });

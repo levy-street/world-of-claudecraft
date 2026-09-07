@@ -76,11 +76,13 @@ Everything else is a sibling module in one of these families:
   in per-frame paths, including required targets, form swaps, and visual-key
   swaps (`tests/view_create_retry.test.ts`).
 - `self_prediction.ts`/`self_prediction_core.ts`/`self_render_position_core.ts`/
-  `client_player_motion.ts`/`facing_smooth.ts`: the pure display-only self
-  layers (the local player's predicted pose replayed through the shared kernel,
-  the per-frame display pose and its bounded handoff to the interpolated
-  fallback, the client-side `PlayerMotionDeps` that kernel runs against, and
-  rate-limited self yaw). They never touch world state; the prediction contract
+  `client_player_motion.ts`/`self_motion.ts`/`facing_smooth.ts`: the pure
+  display-only self layers (the local player's predicted pose replayed through
+  the shared kernel, the per-frame display pose and its bounded handoff to the
+  interpolated fallback, the client-side `PlayerMotionDeps` that kernel runs
+  against, the fallback smoothing rule itself in `self_motion.ts`
+  (`updateSelfRenderFallback`, `SELF_MOTION_SNAP_DIST_SQ`,
+  `hasAuthoritativeSelfPositionDiscontinuity`), and rate-limited self yaw). They never touch world state; the prediction contract
   is `src/net/CLAUDE.md` and the design authority is
   `docs/design/movement-reconciliation.md`.
 - `step_smooth_core.ts`/`ground_tilt_core.ts`: the grounded-presentation pair
