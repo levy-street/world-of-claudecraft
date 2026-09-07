@@ -4,15 +4,25 @@
 // and a sigil floating over the head (a spinning torus with a crossed blade
 // inside it) so a marked raider can be found across the room. Both turn from
 // red to green the moment another mark is inside the ring: green means stay,
-// red means move. Everything actionable here is tier-independent; the pulse
-// and spin are the only cosmetics and reduced motion holds them.
+// red means move. That answer also rides a SECOND, colour-free channel: a
+// stacked marker grows an inner concentric ring, so one ring means move and
+// two rings mean stay whatever a player's colour vision does with red against
+// green (state in nythraxis_soul_rend_marker_core.ts). Everything actionable
+// here is tier-independent; the pulse and spin are the only cosmetics and
+// reduced motion holds them.
 
 import * as THREE from 'three';
+import {
+  type NythraxisArenaPresenceWorld,
+  nythraxisArenaPresent,
+} from './nythraxis_arena_presence_core';
 import {
   NYTHRAXIS_SOUL_REND_MARKER_GROUND_LIFT,
   NYTHRAXIS_SOUL_REND_MARKER_RADIUS,
   NYTHRAXIS_SOUL_REND_SIGIL_BOB,
   NYTHRAXIS_SOUL_REND_SIGIL_HEIGHT,
+  NYTHRAXIS_SOUL_REND_STACKED_RING_RADIUS_FRACTION,
+  NYTHRAXIS_SOUL_REND_STACKED_RING_WIDTH_FRACTION,
   type NythraxisSoulRendEntityLike,
   type NythraxisSoulRendMarkerPalette,
   nythraxisSoulRendMarkedInto,
@@ -20,10 +30,12 @@ import {
   nythraxisSoulRendPalette,
   nythraxisSoulRendPartners,
   nythraxisSoulRendPulse,
+  nythraxisSoulRendStackedRing,
 } from './nythraxis_soul_rend_marker_core';
 
 export const NYTHRAXIS_SOUL_REND_MARKER_NAME = 'nythraxis-soul-rend-marker';
 export const NYTHRAXIS_SOUL_REND_RING_NAME = 'nythraxis-soul-rend-ring';
+export const NYTHRAXIS_SOUL_REND_STACKED_RING_NAME = 'nythraxis-soul-rend-stacked-ring';
 export const NYTHRAXIS_SOUL_REND_FILL_NAME = 'nythraxis-soul-rend-fill';
 export const NYTHRAXIS_SOUL_REND_SIGIL_NAME = 'nythraxis-soul-rend-sigil';
 export const NYTHRAXIS_SOUL_REND_SIGIL_RING_NAME = 'nythraxis-soul-rend-sigil-ring';
@@ -45,6 +57,15 @@ const RING_GEOMETRY = new THREE.RingGeometry(
 ).rotateX(-Math.PI / 2);
 const FILL_GEOMETRY = new THREE.CircleGeometry(
   NYTHRAXIS_SOUL_REND_MARKER_RADIUS - RING_WIDTH,
+  RING_SEGMENTS,
+).rotateX(-Math.PI / 2);
+// The second channel's ring, well inside the stack ring so the two never touch.
+const STACKED_RING_OUTER =
+  NYTHRAXIS_SOUL_REND_MARKER_RADIUS * NYTHRAXIS_SOUL_REND_STACKED_RING_RADIUS_FRACTION;
+const STACKED_RING_GEOMETRY = new THREE.RingGeometry(
+  STACKED_RING_OUTER -
+    NYTHRAXIS_SOUL_REND_MARKER_RADIUS * NYTHRAXIS_SOUL_REND_STACKED_RING_WIDTH_FRACTION,
+  STACKED_RING_OUTER,
   RING_SEGMENTS,
 ).rotateX(-Math.PI / 2);
 const SIGIL_RING_GEOMETRY = new THREE.TorusGeometry(SIGIL_RADIUS, 0.05, 8, 32);
@@ -69,6 +90,8 @@ function markerMaterial(
 interface MarkerVisual {
   group: THREE.Group;
   ring: THREE.Mesh<THREE.BufferGeometry, THREE.MeshBasicMaterial>;
+  /** The colour-free second channel: drawn only while the mark is stacked. */
+  stackedRing: THREE.Mesh<THREE.BufferGeometry, THREE.MeshBasicMaterial>;
   fill: THREE.Mesh<THREE.BufferGeometry, THREE.MeshBasicMaterial>;
   sigil: THREE.Group;
   sigilRing: THREE.Mesh<THREE.BufferGeometry, THREE.MeshBasicMaterial>;
@@ -95,6 +118,16 @@ export function buildNythraxisSoulRendMarker(): THREE.Group {
   ring.renderOrder = 16;
   ring.userData.actionable = true;
   group.add(ring);
+
+  // Shares the outer ring's material on purpose: one colour, one pulse, one
+  // dispose, and no second program for a mesh that is the same material twice.
+  const stackedRing = new THREE.Mesh(STACKED_RING_GEOMETRY, ring.material);
+  stackedRing.name = NYTHRAXIS_SOUL_REND_STACKED_RING_NAME;
+  stackedRing.position.y = NYTHRAXIS_SOUL_REND_MARKER_GROUND_LIFT + 0.011;
+  stackedRing.renderOrder = 16;
+  stackedRing.userData.actionable = true;
+  stackedRing.visible = nythraxisSoulRendStackedRing(0).shown;
+  group.add(stackedRing);
 
   const fill = new THREE.Mesh(
     FILL_GEOMETRY,
@@ -126,6 +159,7 @@ export function buildNythraxisSoulRendMarker(): THREE.Group {
   group.add(sigil);
 
   group.userData.ring = ring;
+  group.userData.stackedRing = stackedRing;
   group.userData.fill = fill;
   group.userData.sigil = sigil;
   group.userData.sigilRing = sigilRing;
@@ -133,14 +167,18 @@ export function buildNythraxisSoulRendMarker(): THREE.Group {
   return group;
 }
 
-function applyPalette(visual: MarkerVisual, palette: NythraxisSoulRendMarkerPalette): void {
+/** Both stacked channels at once: the hue swap and the inner ring's presence. */
+function applyMarkState(visual: MarkerVisual, partners: number): void {
+  const palette = nythraxisSoulRendPalette(partners);
   if (visual.palette === palette) return;
   visual.palette = palette;
   visual.ring.material.color.setHex(palette.ring);
   visual.fill.material.color.setHex(palette.fill);
   visual.sigilRing.material.color.setHex(palette.sigil);
   visual.sigilBlade.material.color.setHex(palette.sigil);
-  visual.group.userData.stacked = palette !== nythraxisSoulRendPalette(0);
+  const stacked = nythraxisSoulRendStackedRing(partners).shown;
+  visual.stackedRing.visible = stacked;
+  visual.group.userData.stacked = stacked;
 }
 
 function disposeVisual(visual: MarkerVisual): void {
@@ -150,6 +188,10 @@ function disposeVisual(visual: MarkerVisual): void {
   visual.sigilRing.material.dispose();
   visual.sigilBlade.material.dispose();
   visual.group.removeFromParent();
+}
+
+export interface NythraxisSoulRendMarkerWorld extends NythraxisArenaPresenceWorld {
+  entities: ReadonlyMap<number, NythraxisSoulRendEntityLike>;
 }
 
 export class NythraxisSoulRendMarkers {
@@ -163,7 +205,12 @@ export class NythraxisSoulRendMarkers {
   ) {}
 
   /** One marker per marked raider: follows the raider, recolours by who is inside the ring. */
-  syncWorld(world: { entities: ReadonlyMap<number, NythraxisSoulRendEntityLike> }): void {
+  syncWorld(world: NythraxisSoulRendMarkerWorld): void {
+    // Collecting the marked reads EVERY entity's auras, and this runs from the
+    // mechanic facade on every frame in every zone. Nothing is marked outside
+    // the crypt, so the roster walk only happens with the arena live or a
+    // marker still standing (which keeps its own teardown exact).
+    if (this.visuals.size === 0 && !nythraxisArenaPresent(world)) return;
     const marked = nythraxisSoulRendMarkedInto(this.marked, world.entities.values());
     if (marked.length === 0 && this.visuals.size === 0) return;
     this.seen.clear();
@@ -178,6 +225,7 @@ export class NythraxisSoulRendMarkers {
         visual = {
           group,
           ring: group.userData.ring as MarkerVisual['ring'],
+          stackedRing: group.userData.stackedRing as MarkerVisual['stackedRing'],
           fill: group.userData.fill as MarkerVisual['fill'],
           sigil: group.userData.sigil as THREE.Group,
           sigilRing: group.userData.sigilRing as MarkerVisual['sigilRing'],
@@ -205,7 +253,7 @@ export class NythraxisSoulRendMarkers {
       visual.remaining = mark.remaining;
       visual.duration = mark.duration;
       visual.group.userData.partners = visual.partners;
-      applyPalette(visual, nythraxisSoulRendPalette(visual.partners));
+      applyMarkState(visual, visual.partners);
     }
     for (const [id, visual] of this.visuals) {
       if (this.seen.has(id)) continue;

@@ -9,14 +9,23 @@ import {
   NYTHRAXIS_SOFT_FIRE_INSET,
   NYTHRAXIS_SOFT_FIRE_RAMPS,
   NYTHRAXIS_SOFT_FIRE_SHAPES,
+  NYTHRAXIS_SOFT_FIRE_SPRITE_BUDGET,
+  NythraxisSoftFireBudget,
   type NythraxisSoftFireKind,
   nythraxisGraveFlameSpriteCount,
   nythraxisGravefireSpotInto,
   nythraxisGravefireSpriteCount,
+  nythraxisGravefireSpritesPerYard,
   nythraxisSoftFireDiscSpotInto,
   nythraxisSoftFireSeed,
+  nythraxisSoftFireSpriteCountUnderBudget,
 } from '../src/render/nythraxis_soft_fire_core';
-import { NYTHRAXIS_GRAVEFIRE_LENGTH } from '../src/sim/nythraxis_gravefire';
+import { NYTHRAXIS_GRAVE_FLAME_CAP } from '../src/sim/nythraxis_grave_eruption';
+import {
+  NYTHRAXIS_GRAVEFIRE_CAP,
+  NYTHRAXIS_GRAVEFIRE_LENGTH,
+} from '../src/sim/nythraxis_gravefire';
+import { NYTHRAXIS_SOULFIRE_CAP } from '../src/sim/nythraxis_soulfire';
 
 const KINDS: NythraxisSoftFireKind[] = ['grave', 'soul', 'gravefire'];
 
@@ -54,6 +63,99 @@ describe('nythraxis soft fire core', () => {
       NYTHRAXIS_GRAVEFIRE_SPRITES_PER_YARD * NYTHRAXIS_GRAVEFIRE_LENGTH,
     );
     expect(nythraxisGravefireSpriteCount(10)).toBe(NYTHRAXIS_GRAVEFIRE_SPRITES_PER_YARD * 10);
+    expect(nythraxisGravefireSpriteCount(10, 2)).toBe(20);
+  });
+
+  it('holds every live emitter under one global sprite ceiling, never below the floor', () => {
+    const wanted = NYTHRAXIS_GRAVE_FLAME_SPRITES_MAX;
+    const budget = 1000;
+    // Headroom: an emitter that fits keeps its authored density exactly.
+    expect(nythraxisSoftFireSpriteCountUnderBudget(wanted, 0, budget)).toBe(wanted);
+    expect(nythraxisSoftFireSpriteCountUnderBudget(wanted, budget - wanted, budget)).toBe(wanted);
+
+    // Taper: past the ceiling the grant falls monotonically toward the floor.
+    let previous = wanted;
+    for (let live = budget - wanted + 1; live <= budget; live += 1) {
+      const granted = nythraxisSoftFireSpriteCountUnderBudget(wanted, live, budget);
+      expect(granted).toBeLessThanOrEqual(previous);
+      expect(granted).toBeGreaterThanOrEqual(NYTHRAXIS_GRAVE_FLAME_SPRITES_MIN);
+      previous = granted;
+    }
+    expect(previous).toBeLessThan(wanted);
+
+    // Floor: saturated, and well past saturated, an emitter still burns.
+    expect(nythraxisSoftFireSpriteCountUnderBudget(wanted, budget, budget)).toBe(
+      NYTHRAXIS_GRAVE_FLAME_SPRITES_MIN,
+    );
+    expect(nythraxisSoftFireSpriteCountUnderBudget(wanted, budget * 10, budget)).toBe(
+      NYTHRAXIS_GRAVE_FLAME_SPRITES_MIN,
+    );
+    // A patch that already wants no more than the floor is never inflated or cut.
+    expect(
+      nythraxisSoftFireSpriteCountUnderBudget(
+        NYTHRAXIS_GRAVE_FLAME_SPRITES_MIN,
+        budget * 10,
+        budget,
+      ),
+    ).toBe(NYTHRAXIS_GRAVE_FLAME_SPRITES_MIN);
+
+    // The shipped ceiling sits under what the sim's own caps could ask for.
+    expect(NYTHRAXIS_SOFT_FIRE_SPRITE_BUDGET).toBeGreaterThan(0);
+    const uncapped =
+      NYTHRAXIS_GRAVE_FLAME_CAP * nythraxisGraveFlameSpriteCount(3) +
+      NYTHRAXIS_SOULFIRE_CAP * nythraxisGraveFlameSpriteCount(4) +
+      NYTHRAXIS_GRAVEFIRE_CAP * nythraxisGravefireSpriteCount();
+    expect(NYTHRAXIS_SOFT_FIRE_SPRITE_BUDGET).toBeLessThan(uncapped);
+  });
+
+  it('thins a line by its sprites-per-yard rate so the far end still burns', () => {
+    const full = nythraxisGravefireSpriteCount();
+    expect(nythraxisGravefireSpritesPerYard(full)).toBe(NYTHRAXIS_GRAVEFIRE_SPRITES_PER_YARD);
+    // Never above the authored rate, whatever the grant says.
+    expect(nythraxisGravefireSpritesPerYard(full * 4)).toBe(NYTHRAXIS_GRAVEFIRE_SPRITES_PER_YARD);
+    // Never below one per yard: the last yards of a lit window keep their fire.
+    expect(nythraxisGravefireSpritesPerYard(0)).toBe(1);
+    expect(nythraxisGravefireSpritesPerYard(NYTHRAXIS_GRAVE_FLAME_SPRITES_MIN)).toBe(1);
+    const thinned = nythraxisGravefireSpritesPerYard(Math.floor(full / 2));
+    expect(thinned).toBeGreaterThanOrEqual(1);
+    expect(thinned).toBeLessThan(NYTHRAXIS_GRAVEFIRE_SPRITES_PER_YARD);
+    // Whatever the rate, every yard of the line owns at least one sprite.
+    const spot = { along: 0, across: 0 };
+    const count = nythraxisGravefireSpriteCount(NYTHRAXIS_GRAVEFIRE_LENGTH, thinned);
+    const yards = new Set<number>();
+    for (let index = 0; index < count; index++) {
+      nythraxisGravefireSpotInto(spot, index, 1.5, thinned);
+      yards.add(Math.floor(spot.along));
+    }
+    expect(yards.size).toBe(NYTHRAXIS_GRAVEFIRE_LENGTH);
+  });
+
+  it('books and hands back sprites through the shared ledger', () => {
+    const budget = new NythraxisSoftFireBudget(200);
+    expect(budget.live).toBe(0);
+    expect(budget.grant(96)).toBe(96);
+    expect(budget.reserve(96)).toBe(96);
+    expect(budget.live).toBe(96);
+    expect(budget.reserve(budget.grant(96))).toBe(96);
+    expect(budget.live).toBe(192);
+    // Saturated: the next emitter is sized to the floor, and still built.
+    const squeezed = budget.grant(96);
+    expect(squeezed).toBeGreaterThanOrEqual(NYTHRAXIS_GRAVE_FLAME_SPRITES_MIN);
+    expect(squeezed).toBeLessThan(96);
+    budget.reserve(squeezed);
+    expect(budget.live).toBe(192 + squeezed);
+
+    // Release round-trips exactly, and the headroom comes back with it.
+    budget.release(squeezed);
+    budget.release(96);
+    budget.release(96);
+    expect(budget.live).toBe(0);
+    expect(budget.grant(96)).toBe(96);
+    // Never negative, whatever a double release or a junk count says.
+    budget.release(500);
+    expect(budget.live).toBe(0);
+    budget.reserve(-5);
+    expect(budget.live).toBe(0);
   });
 
   it('seats disc sprites inside the inset circle, deterministically', () => {

@@ -72,8 +72,101 @@ export function nythraxisGraveFlameSpriteCount(radius: number): number {
 }
 
 /** Sprite budget for a line: enough for its whole possible length. */
-export function nythraxisGravefireSpriteCount(length: number = NYTHRAXIS_GRAVEFIRE_LENGTH): number {
-  return NYTHRAXIS_GRAVEFIRE_SPRITES_PER_YARD * length;
+export function nythraxisGravefireSpriteCount(
+  length: number = NYTHRAXIS_GRAVEFIRE_LENGTH,
+  perYard: number = NYTHRAXIS_GRAVEFIRE_SPRITES_PER_YARD,
+): number {
+  return perYard * length;
+}
+
+/**
+ * The GLOBAL sprite ceiling across every live soft-fire emitter in the crypt.
+ *
+ * Each patch and each line is its own emitter with its own instanced geometry
+ * and shader material, and the sim's caps allow them together: 24 Grave Flame
+ * patches (NYTHRAXIS_GRAVE_FLAME_CAP, 3 yd radius, 40 sprites each), 12
+ * Soulfire pools (NYTHRAXIS_SOULFIRE_CAP, 4 yd radius, 71 sprites each) and 6
+ * Gravefire lines (NYTHRAXIS_GRAVEFIRE_CAP, 40 yd at 5 sprites a yard, 200
+ * each). That is 42 emitters and 3,012 sprites at full authored density, with
+ * nothing bounding the total but those three independent caps.
+ *
+ * 2,400 is the ceiling: about four fifths of that worst case, so an ordinary
+ * fight never touches it and only a genuine pile-up sheds. Emitters that fit
+ * under it keep their authored density; the ones after it taper toward the
+ * per-emitter minimum instead of adding another full cloud.
+ *
+ * FAIRNESS: a thinner cloud is cosmetic richness only. The hazard's footprint
+ * is separate geometry (the patch fill/rim/ember rings, the Gravefire strip),
+ * it is never sized from this, and no emitter is ever taken to zero, so a
+ * budgeted patch burns at exactly the position, radius and timing of an
+ * unbudgeted one.
+ */
+export const NYTHRAXIS_SOFT_FIRE_SPRITE_BUDGET = 2400;
+
+/**
+ * Sprites a new emitter that wants `wanted` may have, given `liveSprites`
+ * already burning. Full density while the ledger has room for it, then a
+ * linear taper down to `minimum` as the headroom closes. Never below the
+ * minimum and never zero.
+ */
+export function nythraxisSoftFireSpriteCountUnderBudget(
+  wanted: number,
+  liveSprites: number,
+  budget: number = NYTHRAXIS_SOFT_FIRE_SPRITE_BUDGET,
+  minimum: number = NYTHRAXIS_GRAVE_FLAME_SPRITES_MIN,
+): number {
+  const floor = Math.max(1, Math.min(wanted, minimum));
+  if (wanted <= floor) return wanted;
+  const headroom = Math.max(0, budget - Math.max(0, liveSprites));
+  if (headroom >= wanted) return wanted;
+  return Math.max(floor, Math.round(floor + (wanted - floor) * (headroom / wanted)));
+}
+
+/**
+ * Sprites per yard that fits `count` sprites over a `length` yard line, at
+ * least one so the fire still reaches the far end of the footprint (a raw
+ * count cut would leave the last yards of a lit line with no sprites at all,
+ * since nythraxisGravefireSpotInto seats sprite `index` in yard
+ * `floor(index / perYard)`). Never above the authored rate.
+ */
+export function nythraxisGravefireSpritesPerYard(
+  count: number,
+  length: number = NYTHRAXIS_GRAVEFIRE_LENGTH,
+): number {
+  const perYard = Math.floor(count / Math.max(1, length));
+  return Math.max(1, Math.min(NYTHRAXIS_GRAVEFIRE_SPRITES_PER_YARD, perYard));
+}
+
+/**
+ * The live sprite ledger, owned by the mechanic facade and shared by every
+ * emitter-building painter: `grant` sizes a new emitter against what is
+ * already burning, `reserve` books what was actually built, and `release`
+ * hands it back when the emitter is disposed.
+ */
+export class NythraxisSoftFireBudget {
+  private total = 0;
+
+  constructor(private readonly budget: number = NYTHRAXIS_SOFT_FIRE_SPRITE_BUDGET) {}
+
+  /** Sprites burning across every emitter booked against this ledger. */
+  get live(): number {
+    return this.total;
+  }
+
+  /** What a new emitter wanting `wanted` sprites may have. Books nothing. */
+  grant(wanted: number): number {
+    return nythraxisSoftFireSpriteCountUnderBudget(wanted, this.total, this.budget);
+  }
+
+  /** Book an emitter's actual sprite count; returns it so a call site can chain. */
+  reserve(count: number): number {
+    this.total += Math.max(0, count);
+    return count;
+  }
+
+  release(count: number): void {
+    this.total = Math.max(0, this.total - Math.max(0, count));
+  }
 }
 
 export interface NythraxisSoftFireDiscSpot {

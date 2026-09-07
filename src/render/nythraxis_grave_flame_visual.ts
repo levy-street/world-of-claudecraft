@@ -38,6 +38,7 @@ import { buildNythraxisBindingSigilPrewarmVisual } from './nythraxis_sigil_visua
 import { NythraxisSoftFire } from './nythraxis_soft_fire';
 import {
   NYTHRAXIS_SOFT_FIRE_SHAPES,
+  type NythraxisSoftFireBudget,
   type NythraxisSoftFireDiscSpot,
   nythraxisGraveFlameSpriteCount,
   nythraxisSoftFireDiscSpotInto,
@@ -83,17 +84,18 @@ interface GraveFlameVisual {
   phase: number;
 }
 
-/** The soft fire over one patch: every sprite seated at its fixed spot inside the circle. */
+/** The soft fire over one patch: every sprite seated at its fixed spot inside
+ *  the circle. With a ledger the sprite count is sized from what is already
+ *  burning in the room; without one it is the authored density (the prewarm
+ *  twin, which books nothing because it never joins the live set). */
 function buildPatchFire(
   kind: ActiveNythraxisGraveFlame['kind'],
   radius: number,
+  budget?: NythraxisSoftFireBudget,
 ): NythraxisSoftFire {
-  const fire = new NythraxisSoftFire(
-    kind,
-    nythraxisGraveFlameSpriteCount(radius),
-    NYTHRAXIS_GRAVE_FLAME_FIRE_NAME,
-    13,
-  );
+  const wanted = nythraxisGraveFlameSpriteCount(radius);
+  const count = budget ? budget.reserve(budget.grant(wanted)) : wanted;
+  const fire = new NythraxisSoftFire(kind, count, NYTHRAXIS_GRAVE_FLAME_FIRE_NAME, 13);
   for (let index = 0; index < fire.count; index++) {
     const spot = nythraxisSoftFireDiscSpotInto(DISC_SPOT, index, radius);
     fire.setSpot(index, spot.dx, 0, spot.dz);
@@ -110,6 +112,7 @@ function buildPatchFire(
 export function buildNythraxisGraveFlamePatch(
   row: ActiveNythraxisGraveFlame,
   groundY: number,
+  budget?: NythraxisSoftFireBudget,
 ): THREE.Group {
   const plan: NythraxisGraveFlamePlan = { id: '', sourceId: 0, x: 0, y: 0, z: 0, radius: 0 };
   nythraxisGraveFlamePlanInto(plan, row, groundY);
@@ -162,7 +165,7 @@ export function buildNythraxisGraveFlamePatch(
   embers.renderOrder = 12;
   group.add(embers);
 
-  const fire = buildPatchFire(row.kind, plan.radius);
+  const fire = buildPatchFire(row.kind, plan.radius, budget);
   group.add(fire.mesh);
 
   group.userData.fillMaterial = fillMaterial;
@@ -173,12 +176,13 @@ export function buildNythraxisGraveFlamePatch(
   return group;
 }
 
-function disposeVisual(visual: GraveFlameVisual): void {
+function disposeVisual(visual: GraveFlameVisual, budget?: NythraxisSoftFireBudget): void {
   for (const child of visual.group.children) {
     if (child === visual.fire.mesh) continue;
     const mesh = child as THREE.Mesh;
     if (mesh.isMesh) mesh.geometry.dispose();
   }
+  budget?.release(visual.fire.count);
   visual.fire.dispose();
   visual.fillMaterial.dispose();
   visual.rimMaterial.dispose();
@@ -195,6 +199,7 @@ export class NythraxisGraveFlameVisuals {
   constructor(
     private readonly scene: THREE.Scene,
     private readonly groundY: (x: number, z: number) => number,
+    private readonly softFireBudget?: NythraxisSoftFireBudget,
   ) {}
 
   /** Reconciles the authoritative rows by stable id: a new id builds a patch,
@@ -205,7 +210,11 @@ export class NythraxisGraveFlameVisuals {
     for (const row of rows) {
       this.activeIds.add(row.id);
       if (this.visuals.has(row.id)) continue;
-      const group = buildNythraxisGraveFlamePatch(row, this.groundY(row.x, row.z));
+      const group = buildNythraxisGraveFlamePatch(
+        row,
+        this.groundY(row.x, row.z),
+        this.softFireBudget,
+      );
       const visual: GraveFlameVisual = {
         group,
         fillMaterial: group.userData.fillMaterial as THREE.MeshBasicMaterial,
@@ -221,7 +230,7 @@ export class NythraxisGraveFlameVisuals {
     }
     for (const [id, visual] of this.visuals) {
       if (this.activeIds.has(id)) continue;
-      disposeVisual(visual);
+      disposeVisual(visual, this.softFireBudget);
       this.visuals.delete(id);
     }
   }
@@ -248,7 +257,7 @@ export class NythraxisGraveFlameVisuals {
   }
 
   dispose(): void {
-    for (const visual of this.visuals.values()) disposeVisual(visual);
+    for (const visual of this.visuals.values()) disposeVisual(visual, this.softFireBudget);
     this.visuals.clear();
     this.activeIds.clear();
   }

@@ -9,8 +9,11 @@ export const NYTHRAXIS_SIGIL_GROUND_LIFT = 0.065;
 export const NYTHRAXIS_SIGIL_SWEEP_SEGMENTS = 64;
 
 export const NYTHRAXIS_SIGIL_PALETTE = {
-  // Owner call 2026-09-04: blue, so the ring reads apart from the green Grave
-  // Flame floor and the red Soulfire pools it shares the room with.
+  // Owner call 2026-09-04: blue, so the ring reads apart from the fire it
+  // shares the room with. Grave Flame and Soulfire are both purple-family now
+  // (blue-violet and magenta-violet, NYTHRAXIS_GRAVE_FLAME_PALETTE and
+  // NYTHRAXIS_SOUL_FLAME_PALETTE in nythraxis_grave_core.ts), so blue is the
+  // one friendly hue no hazard in the crypt burns in.
   rim: 0x7fc0ff,
   fill: 0x0f2f5a,
   sweep: 0xcfe8ff,

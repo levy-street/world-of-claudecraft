@@ -29,13 +29,17 @@ import {
 } from '../src/render/nythraxis_gravefire_visual';
 import type { NythraxisSoftFire } from '../src/render/nythraxis_soft_fire';
 import {
+  NYTHRAXIS_GRAVEFIRE_SPRITES_PER_YARD,
   NYTHRAXIS_SOFT_FIRE_RAMPS,
+  NythraxisSoftFireBudget,
   nythraxisGravefireSpotInto,
   nythraxisGravefireSpriteCount,
 } from '../src/render/nythraxis_soft_fire_core';
 import {
   type ActiveNythraxisGravefire,
+  NYTHRAXIS_GRAVEFIRE_CAP,
   NYTHRAXIS_GRAVEFIRE_CAST_ID,
+  NYTHRAXIS_GRAVEFIRE_LENGTH,
 } from '../src/sim/nythraxis_gravefire';
 import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 
@@ -247,6 +251,57 @@ describe('Nythraxis Gravefire rendering', () => {
       litSpriteCount(moved) +
         (litSpriteCount(LINE) - litSpriteCount({ ...LINE, tail: 3, head: 8 })),
     );
+  });
+
+  it('thins a saturated room line by line, footprint and full-length coverage intact', () => {
+    const scene = new THREE.Scene();
+    const full = nythraxisGravefireSpriteCount();
+    // A ceiling two lines wide, so the rest of the cap has to shed.
+    const budget = new NythraxisSoftFireBudget(full * 2);
+    const visuals = new NythraxisGravefireVisuals(scene, () => 0, budget);
+    const wide = { ...LINE, tail: 0, head: NYTHRAXIS_GRAVEFIRE_LENGTH };
+    const rows: ActiveNythraxisGravefire[] = [];
+    for (let index = 0; index < NYTHRAXIS_GRAVEFIRE_CAP; index++) {
+      rows.push({ ...wide, id: `42:gfl:${index}`, z: 20 + index * 6 });
+    }
+    visuals.sync(rows);
+
+    const roots = scene.children.filter((c) => c.name === NYTHRAXIS_GRAVEFIRE_VISUAL_NAME);
+    expect(roots).toHaveLength(NYTHRAXIS_GRAVEFIRE_CAP);
+    const counts = roots.map((root) => fireOf(root).count);
+    expect(counts[0]).toBe(full);
+    expect(counts[counts.length - 1]).toBeLessThan(full);
+    expect(budget.live).toBe(counts.reduce((sum, count) => sum + count, 0));
+
+    for (const [index, root] of roots.entries()) {
+      // FOOTPRINT INTACT: the strip is the authored half-width and window,
+      // whatever the sprite budget did to the cloud above it.
+      expect(root.userData.halfWidth).toBe(wide.halfWidth);
+      const strip = stripOf(root);
+      expect(strip.geometry.getAttribute('position').count).toBe(
+        stripOf(roots[0]).geometry.getAttribute('position').count,
+      );
+      // COVERAGE INTACT: a thinned line still seats a sprite in every yard, so
+      // the fire reaches the far end of the window instead of stopping short.
+      const fire = fireOf(root);
+      const perYard = fire.count / NYTHRAXIS_GRAVEFIRE_LENGTH;
+      expect(Number.isInteger(perYard)).toBe(true);
+      expect(perYard).toBeGreaterThanOrEqual(1);
+      expect(perYard).toBeLessThanOrEqual(NYTHRAXIS_GRAVEFIRE_SPRITES_PER_YARD);
+      const yards = new Set<number>();
+      for (let sprite = 0; sprite < fire.count; sprite++) {
+        yards.add(Math.floor(fire.spotAlong(sprite)));
+      }
+      expect(yards.size, `line ${index} must burn every yard`).toBe(NYTHRAXIS_GRAVEFIRE_LENGTH);
+    }
+
+    // Expiring rows hand their sprites back, so a later line is full again.
+    visuals.sync([]);
+    expect(budget.live).toBe(0);
+    visuals.sync([wide]);
+    expect(fireOf(scene.children[0]).count).toBe(full);
+    visuals.dispose();
+    expect(budget.live).toBe(0);
   });
 
   it('caches one-yard ground samples until the head reaches a new yard', () => {

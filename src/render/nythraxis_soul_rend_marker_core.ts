@@ -6,6 +6,12 @@
 // the stacked test, and the fuse pulse live here without Three, DOM, or clocks;
 // the painter (nythraxis_soul_rend_marker.ts) owns the meshes.
 //
+// Stacked is carried on TWO channels, because red against green is the one
+// pair a red/green-deficient player cannot separate and this read decides
+// whether they move. Beside the hue swap, a stacked marker grows a second
+// concentric ring inside the stack ring: one ring means move, two rings mean
+// stay, and that answer survives with no colour vision at all.
+//
 // Node-only (RENDER_PURE_CORES): no three.js, no DOM, no randomness.
 
 import { NYTHRAXIS_SOUL_REND_STACK_RANGE } from '../sim/encounters/nythraxis';
@@ -90,6 +96,40 @@ export function nythraxisSoulRendPartners(
 
 export function nythraxisSoulRendPalette(partners: number): NythraxisSoulRendMarkerPalette {
   return partners > 0 ? NYTHRAXIS_SOUL_REND_STACKED_PALETTE : NYTHRAXIS_SOUL_REND_ALONE_PALETTE;
+}
+
+/**
+ * The second, colour-free channel: the inner ring a stacked marker adds.
+ * `shown` is the whole read (one ring alone, two rings stacked); the fractions
+ * place it well inside the stack ring so the two never touch and the outer
+ * ring keeps owning the exact stack range.
+ */
+export interface NythraxisSoulRendStackedRing {
+  readonly shown: boolean;
+  /** Outer radius, as a fraction of NYTHRAXIS_SOUL_REND_MARKER_RADIUS. */
+  readonly radiusFraction: number;
+  /** Ring thickness, as a fraction of the same radius. */
+  readonly widthFraction: number;
+}
+
+export const NYTHRAXIS_SOUL_REND_STACKED_RING_RADIUS_FRACTION = 0.55;
+export const NYTHRAXIS_SOUL_REND_STACKED_RING_WIDTH_FRACTION = 0.09;
+
+// Two frozen states, so reading the channel allocates nothing.
+const STACKED_RING_HIDDEN: NythraxisSoulRendStackedRing = Object.freeze({
+  shown: false,
+  radiusFraction: NYTHRAXIS_SOUL_REND_STACKED_RING_RADIUS_FRACTION,
+  widthFraction: NYTHRAXIS_SOUL_REND_STACKED_RING_WIDTH_FRACTION,
+});
+const STACKED_RING_SHOWN: NythraxisSoulRendStackedRing = Object.freeze({
+  shown: true,
+  radiusFraction: NYTHRAXIS_SOUL_REND_STACKED_RING_RADIUS_FRACTION,
+  widthFraction: NYTHRAXIS_SOUL_REND_STACKED_RING_WIDTH_FRACTION,
+});
+
+/** The inner ring's state for a raider with this many partners in range. */
+export function nythraxisSoulRendStackedRing(partners: number): NythraxisSoulRendStackedRing {
+  return partners > 0 ? STACKED_RING_SHOWN : STACKED_RING_HIDDEN;
 }
 
 /**

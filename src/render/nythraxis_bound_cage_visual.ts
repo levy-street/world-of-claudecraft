@@ -8,6 +8,10 @@
 import * as THREE from 'three';
 import { NYTHRAXIS_BOSS_ID } from '../sim/types';
 import {
+  type NythraxisArenaPresenceWorld,
+  nythraxisArenaPresent,
+} from './nythraxis_arena_presence_core';
+import {
   type NythraxisCageBossLike,
   type NythraxisCageFootprint,
   nythraxisBoundStunOf,
@@ -124,8 +128,15 @@ function disposeCage(cage: CageVisual): void {
   cage.group.removeFromParent();
 }
 
+export interface NythraxisBoundCageWorld extends NythraxisArenaPresenceWorld {
+  entities: ReadonlyMap<number, NythraxisCageBossLike>;
+}
+
 export class NythraxisBoundCageVisuals {
   private readonly cages = new Map<number, CageVisual>();
+  // Per-frame scratch, reused: this sync runs every frame in every zone, so it
+  // must not mint a Set to hold at most one boss id.
+  private readonly seen = new Set<number>();
 
   constructor(
     private readonly scene: THREE.Scene,
@@ -133,8 +144,14 @@ export class NythraxisBoundCageVisuals {
   ) {}
 
   /** One cage per Bound boss; a boss whose stun ended keeps its cage while it sinks. */
-  syncWorld(world: { entities: ReadonlyMap<number, NythraxisCageBossLike> }): void {
-    const seen = new Set<number>();
+  syncWorld(world: NythraxisBoundCageWorld): void {
+    // Finding the boss reads EVERY entity, and the mechanic facade fans this
+    // out on every frame in every zone. Nythraxis is only ever in his own
+    // crypt, so the roster walk only happens with the arena live or a cage
+    // still standing (which keeps its own teardown exact).
+    if (this.cages.size === 0 && !nythraxisArenaPresent(world)) return;
+    const seen = this.seen;
+    seen.clear();
     for (const entity of world.entities.values()) {
       if (entity.templateId !== NYTHRAXIS_BOSS_ID) continue;
       const stun = nythraxisBoundStunOf(entity);
@@ -206,6 +223,7 @@ export class NythraxisBoundCageVisuals {
   dispose(): void {
     for (const cage of this.cages.values()) disposeCage(cage);
     this.cages.clear();
+    this.seen.clear();
   }
 }
 

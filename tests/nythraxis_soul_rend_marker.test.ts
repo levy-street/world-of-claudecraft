@@ -1,6 +1,10 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
+import {
+  NYTHRAXIS_INTERIOR_ID,
+  nythraxisArenaPresent,
+} from '../src/render/nythraxis_arena_presence_core';
 import { buildNythraxisGravePrewarmVisual } from '../src/render/nythraxis_grave_flame_visual';
 import {
   buildNythraxisSoulRendMarker,
@@ -10,7 +14,9 @@ import {
   NYTHRAXIS_SOUL_REND_SIGIL_BLADE_NAME,
   NYTHRAXIS_SOUL_REND_SIGIL_NAME,
   NYTHRAXIS_SOUL_REND_SIGIL_RING_NAME,
+  NYTHRAXIS_SOUL_REND_STACKED_RING_NAME,
   NythraxisSoulRendMarkers,
+  type NythraxisSoulRendMarkerWorld,
 } from '../src/render/nythraxis_soul_rend_marker';
 import {
   NYTHRAXIS_SOUL_REND_ALONE_PALETTE,
@@ -24,7 +30,9 @@ import {
   nythraxisSoulRendPalette,
   nythraxisSoulRendPartners,
   nythraxisSoulRendPulse,
+  nythraxisSoulRendStackedRing,
 } from '../src/render/nythraxis_soul_rend_marker_core';
+import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import { NYTHRAXIS_SOUL_REND_STACK_RANGE } from '../src/sim/encounters/nythraxis';
 import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 
@@ -53,10 +61,28 @@ function raider(
   };
 }
 
-function world(...entities: NythraxisSoulRendEntityLike[]): {
-  entities: Map<number, NythraxisSoulRendEntityLike>;
-} {
-  return { entities: new Map(entities.map((entity) => [entity.id, entity])) };
+/** A player standing in the real Nythraxis crypt instance, and one who is not. */
+function arenaPlayer(): { pos: { x: number; y: number; z: number } } {
+  const dungeon = Object.values(DUNGEONS).find((d) => d.interior === NYTHRAXIS_INTERIOR_ID);
+  if (!dungeon) throw new Error('no dungeon uses the Nythraxis interior');
+  const origin = instanceOrigin(dungeon.index, 0);
+  return { pos: { x: origin.x, y: 0, z: origin.z } };
+}
+const OUTSIDE_PLAYER = { pos: { x: 0, y: 0, z: 0 } };
+
+function world(...entities: NythraxisSoulRendEntityLike[]): NythraxisSoulRendMarkerWorld {
+  return {
+    player: arenaPlayer(),
+    entities: new Map(entities.map((entity) => [entity.id, entity])),
+  };
+}
+
+/** The same roster, seen from a player standing anywhere but the crypt. */
+function worldOutside(...entities: NythraxisSoulRendEntityLike[]): NythraxisSoulRendMarkerWorld {
+  return {
+    player: OUTSIDE_PLAYER,
+    entities: new Map(entities.map((entity) => [entity.id, entity])),
+  };
 }
 
 type MarkerMesh = THREE.Mesh<THREE.BufferGeometry, THREE.MeshBasicMaterial>;
@@ -119,6 +145,17 @@ describe('Soul Rend marker core', () => {
     };
     expect(crossings(0.5)).toBeGreaterThan(crossings(8));
     expect(nythraxisSoulRendPulse(1.23, 4, 8, true)).toBe(0.5);
+    // The stacked read also rides a channel that is not colour at all.
+    expect(nythraxisSoulRendStackedRing(0).shown).toBe(false);
+    expect(nythraxisSoulRendStackedRing(1).shown).toBe(true);
+    expect(nythraxisSoulRendStackedRing(3).shown).toBe(true);
+    const ring = nythraxisSoulRendStackedRing(1);
+    expect(ring.radiusFraction).toBeGreaterThan(0);
+    expect(ring.radiusFraction).toBeLessThan(1);
+    expect(ring.widthFraction).toBeGreaterThan(0);
+    expect(ring.widthFraction).toBeLessThan(ring.radiusFraction);
+    // Allocation-free: the same partner count hands back the same record.
+    expect(nythraxisSoulRendStackedRing(2)).toBe(nythraxisSoulRendStackedRing(5));
     for (let t = 0; t < 3; t += 0.1) {
       const pulse = nythraxisSoulRendPulse(t, 2, 8, false);
       expect(pulse).toBeGreaterThanOrEqual(0);
@@ -223,6 +260,64 @@ describe('Soul Rend marker visual', () => {
     expect(sigilRing.rotation.z).toBe(heldSpin);
     markers.update(0.5, false);
     expect(sigilRing.rotation.z).not.toBe(heldSpin);
+  });
+
+  it('signals stacked on a second, colour-free channel: an inner ring appears', () => {
+    const scene = new THREE.Scene();
+    const markers = new NythraxisSoulRendMarkers(scene, () => 0);
+    const a = raider(1, 0, 0, true);
+    const b = raider(2, 40, 0, true);
+    markers.syncWorld(world(a, b));
+    const markerA = scene.children.find((child) => child.userData.entityId === 1) as THREE.Group;
+    const inner = markerA.getObjectByName(NYTHRAXIS_SOUL_REND_STACKED_RING_NAME) as MarkerMesh;
+    const outer = markerA.getObjectByName(NYTHRAXIS_SOUL_REND_RING_NAME) as MarkerMesh;
+    expect(inner).toBeDefined();
+
+    // Partners 0: one ring on the floor. This is the read a red/green-deficient
+    // player has to make, so it is asserted on geometry and visibility, never
+    // on the palette or userData.stacked.
+    expect(markerA.userData.partners).toBe(0);
+    expect(inner.visible).toBe(false);
+
+    // Partners 1: a second concentric ring, strictly inside the stack ring so
+    // the outer ring still owns the exact range.
+    b.pos.x = 2;
+    markers.syncWorld(world(a, b));
+    expect(markerA.userData.partners).toBe(1);
+    expect(inner.visible).toBe(true);
+    expect(maxRadiusOf(inner)).toBeLessThan(maxRadiusOf(outer));
+    expect(maxRadiusOf(inner)).toBeGreaterThan(0);
+    // Actionable, and not a second material to pulse out of step with the ring.
+    expect(inner.userData.actionable).toBe(true);
+    expect(inner.material).toBe(outer.material);
+
+    // And back: walking apart drops the channel again.
+    b.pos.x = 40;
+    markers.syncWorld(world(a, b));
+    expect(inner.visible).toBe(false);
+    markers.dispose();
+  });
+
+  it('walks no roster outside the arena, and keeps walking while a marker stands', () => {
+    expect(nythraxisArenaPresent({ player: arenaPlayer() })).toBe(true);
+    expect(nythraxisArenaPresent({ player: OUTSIDE_PLAYER })).toBe(false);
+
+    const scene = new THREE.Scene();
+    const markers = new NythraxisSoulRendMarkers(scene, () => 0);
+    const idle = worldOutside(raider(1, 0, 0, true));
+    const walked = vi.spyOn(idle.entities, 'values');
+    for (let frame = 0; frame < 5; frame++) markers.syncWorld(idle);
+    // The early-out fires BEFORE the aura walk, so no entity's auras are read.
+    expect(walked).not.toHaveBeenCalled();
+    expect(markers.count).toBe(0);
+
+    markers.syncWorld(world(raider(1, 0, 0, true)));
+    expect(markers.count).toBe(1);
+    const live = worldOutside(raider(1, 0, 0, true));
+    const walkedLive = vi.spyOn(live.entities, 'values');
+    markers.syncWorld(live);
+    expect(walkedLive).toHaveBeenCalled();
+    markers.dispose();
   });
 
   it('rides the shared mechanic facade and is staged at the crypt prewarm', () => {

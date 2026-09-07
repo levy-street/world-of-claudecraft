@@ -26,14 +26,17 @@ import {
   NythraxisGraveFlameVisuals,
 } from '../src/render/nythraxis_grave_flame_visual';
 import {
+  NYTHRAXIS_GRAVE_FLAME_SPRITES_MIN,
   NYTHRAXIS_SOFT_FIRE_INSET,
   NYTHRAXIS_SOFT_FIRE_RAMPS,
   NYTHRAXIS_SOFT_FIRE_SHAPES,
+  NythraxisSoftFireBudget,
   nythraxisGraveFlameSpriteCount,
 } from '../src/render/nythraxis_soft_fire_core';
 import {
   type ActiveNythraxisGraveFlame,
   NYTHRAXIS_GRAVE_ERUPTION_RADIUS,
+  NYTHRAXIS_GRAVE_FLAME_CAP,
 } from '../src/sim/nythraxis_grave_eruption';
 import { NYTHRAXIS_SOULFIRE_CAST_ID } from '../src/sim/nythraxis_soulfire';
 import { codeWithoutLineComments } from './helpers/code_without_line_comments';
@@ -272,6 +275,54 @@ describe('Nythraxis Grave Flame rendering', () => {
     expect(fire.material.uniforms.uTime.value).toBeCloseTo(heldTime + 1.2, 6);
     // The fire's opacity rides the same pulse as the footprint.
     expect(fire.material.uniforms.uOpacity.value).toBeGreaterThan(0);
+  });
+
+  it('builds every patch of a saturated room, footprint intact, later clouds thinner', () => {
+    const scene = new THREE.Scene();
+    // A deliberately small ceiling so the taper is reached inside the sim's cap.
+    const wanted = nythraxisGraveFlameSpriteCount(NYTHRAXIS_GRAVE_ERUPTION_RADIUS);
+    const budget = new NythraxisSoftFireBudget(wanted * 4);
+    const visuals = new NythraxisGraveFlameVisuals(scene, () => 0, budget);
+    const rows: ActiveNythraxisGraveFlame[] = [];
+    for (let index = 0; index < NYTHRAXIS_GRAVE_FLAME_CAP; index++) {
+      rows.push({ ...FLAME, id: `42:gf:${index}`, x: index * 8, z: -5 });
+    }
+    visuals.sync(rows);
+
+    const patches = scene.children.filter((c) => c.name === NYTHRAXIS_GRAVE_FLAME_VISUAL_NAME);
+    expect(patches).toHaveLength(NYTHRAXIS_GRAVE_FLAME_CAP);
+    // FOOTPRINT INTACT: every row keeps its own position and authored radius,
+    // and its rim geometry is the exact circle the sim burns.
+    for (const [index, patch] of patches.entries()) {
+      expect(patch.userData.flameId).toBe(rows[index].id);
+      expect(patch.position.x).toBe(rows[index].x);
+      expect(patch.userData.radius).toBe(FLAME.radius);
+      const rim = patch.getObjectByName(NYTHRAXIS_GRAVE_FLAME_RIM_NAME) as THREE.Mesh;
+      const positions = rim.geometry.getAttribute('position');
+      let outer = 0;
+      for (let i = 0; i < positions.count; i++) {
+        outer = Math.max(outer, Math.hypot(positions.getX(i), positions.getZ(i)));
+      }
+      expect(outer).toBeCloseTo(FLAME.radius, 5);
+    }
+
+    // COSMETIC SHED: the first emitters burn at authored density, the later
+    // ones are thinner, and none of them is empty.
+    const counts = patches.map((patch) => fireOf(patch).geometry.instanceCount);
+    expect(counts[0]).toBe(wanted);
+    expect(counts[counts.length - 1]).toBeLessThan(wanted);
+    for (const count of counts)
+      expect(count).toBeGreaterThanOrEqual(NYTHRAXIS_GRAVE_FLAME_SPRITES_MIN);
+    expect(budget.live).toBe(counts.reduce((sum, count) => sum + count, 0));
+
+    // The ledger hands the sprites back as rows expire, so a later pull is
+    // sized from what is actually burning, not from a high-water mark.
+    visuals.sync([]);
+    expect(budget.live).toBe(0);
+    visuals.sync([FLAME]);
+    expect(fireOf(scene.children[0]).geometry.instanceCount).toBe(wanted);
+    visuals.dispose();
+    expect(budget.live).toBe(0);
   });
 
   it('syncs the world projection field the renderer hands it', () => {

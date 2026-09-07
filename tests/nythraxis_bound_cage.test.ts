@@ -1,5 +1,9 @@
 import * as THREE from 'three';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import {
+  NYTHRAXIS_INTERIOR_ID,
+  nythraxisArenaPresent,
+} from '../src/render/nythraxis_arena_presence_core';
 import {
   NYTHRAXIS_CAGE_BASE_RADIUS,
   NYTHRAXIS_CAGE_MIN_RADIUS,
@@ -18,16 +22,27 @@ import {
   NYTHRAXIS_CAGE_FALLBACK_NAME,
   NYTHRAXIS_CAGE_VISUAL_NAME,
   NythraxisBoundCageVisuals,
+  type NythraxisBoundCageWorld,
 } from '../src/render/nythraxis_bound_cage_visual';
 import { buildNythraxisGravePrewarmVisual } from '../src/render/nythraxis_grave_flame_visual';
 import {
   nythraxisPropAsset,
   nythraxisPropAssetInternalsForTest,
 } from '../src/render/nythraxis_prop_assets';
+import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import { NYTHRAXIS_BOUND_STUN_AURA_ID } from '../src/sim/nythraxis_binding_sigil';
 import { NYTHRAXIS_BOSS_ID } from '../src/sim/types';
 
 const FLOOR = 1.5;
+
+/** A player standing in the real Nythraxis crypt instance, and one who is not. */
+function arenaPlayer(): { pos: { x: number; y: number; z: number } } {
+  const dungeon = Object.values(DUNGEONS).find((d) => d.interior === NYTHRAXIS_INTERIOR_ID);
+  if (!dungeon) throw new Error('no dungeon uses the Nythraxis interior');
+  const origin = instanceOrigin(dungeon.index, 0);
+  return { pos: { x: origin.x, y: 0, z: origin.z } };
+}
+const OUTSIDE_PLAYER = { pos: { x: 0, y: 0, z: 0 } };
 
 function boss(overrides: Partial<NythraxisCageBossLike> = {}): NythraxisCageBossLike {
   return {
@@ -48,10 +63,19 @@ function bound(remaining = 10, duration = 10): NythraxisCageBossLike['auras'] {
   ];
 }
 
-function world(...entities: NythraxisCageBossLike[]): {
-  entities: Map<number, NythraxisCageBossLike>;
-} {
-  return { entities: new Map(entities.map((entity) => [entity.id, entity])) };
+function world(...entities: NythraxisCageBossLike[]): NythraxisBoundCageWorld {
+  return {
+    player: arenaPlayer(),
+    entities: new Map(entities.map((entity) => [entity.id, entity])),
+  };
+}
+
+/** The same roster, seen from a player standing anywhere but the crypt. */
+function worldOutside(...entities: NythraxisCageBossLike[]): NythraxisBoundCageWorld {
+  return {
+    player: OUTSIDE_PLAYER,
+    entities: new Map(entities.map((entity) => [entity.id, entity])),
+  };
 }
 
 afterEach(() => {
@@ -222,6 +246,44 @@ describe('nythraxis bound cage visual', () => {
     expect(painter.count).toBe(0);
     expect(scene.children).toHaveLength(0);
     expect(disposed).toBeGreaterThan(0);
+  });
+
+  it('walks no roster outside the arena, and keeps walking while a cage still stands', () => {
+    // The presence gate is the player's own instance frame, not a renderer field.
+    expect(nythraxisArenaPresent({ player: arenaPlayer() })).toBe(true);
+    expect(nythraxisArenaPresent({ player: OUTSIDE_PLAYER })).toBe(false);
+
+    const scene = new THREE.Scene();
+    const painter = new NythraxisBoundCageVisuals(scene, () => FLOOR);
+    const idle = worldOutside(boss({ auras: bound() }));
+    const walked = vi.spyOn(idle.entities, 'values');
+    for (let frame = 0; frame < 5; frame++) painter.syncWorld(idle);
+    // Outside the crypt the roster is never touched, so no cage is built either.
+    expect(walked).not.toHaveBeenCalled();
+    expect(painter.count).toBe(0);
+
+    // Inside the crypt it walks, and it keeps walking once a cage is live so
+    // teardown stays exact wherever the player then stands.
+    painter.syncWorld(world(boss({ auras: bound() })));
+    expect(painter.count).toBe(1);
+    const live = worldOutside(boss({ auras: bound() }));
+    const walkedLive = vi.spyOn(live.entities, 'values');
+    painter.syncWorld(live);
+    expect(walkedLive).toHaveBeenCalled();
+    painter.dispose();
+  });
+
+  it('reuses one scratch set across frames instead of minting one per sync', () => {
+    const scene = new THREE.Scene();
+    const painter = new NythraxisBoundCageVisuals(scene, () => FLOOR);
+    const seen = (painter as unknown as { seen: Set<number> }).seen;
+    expect(seen).toBeInstanceOf(Set);
+    for (let frame = 0; frame < 5; frame++) painter.syncWorld(world(boss({ auras: bound() })));
+    expect((painter as unknown as { seen: Set<number> }).seen).toBe(seen);
+    // It holds only the ids of the last sync, never a frame's worth of garbage.
+    expect(seen.size).toBe(1);
+    painter.dispose();
+    expect(seen.size).toBe(0);
   });
 
   it('is staged by the crypt prewarm alongside the other grave programs', () => {

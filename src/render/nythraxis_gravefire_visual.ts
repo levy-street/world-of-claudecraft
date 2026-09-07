@@ -31,8 +31,10 @@ import { NythraxisSoftFire } from './nythraxis_soft_fire';
 import {
   NYTHRAXIS_SOFT_FIRE_SHAPES,
   type NythraxisGravefireSpot,
+  type NythraxisSoftFireBudget,
   nythraxisGravefireSpotInto,
   nythraxisGravefireSpriteCount,
+  nythraxisGravefireSpritesPerYard,
 } from './nythraxis_soft_fire_core';
 
 export const NYTHRAXIS_GRAVEFIRE_VISUAL_NAME = 'nythraxis-gravefire';
@@ -65,6 +67,8 @@ interface GravefireVisual {
   edgeMaterial: THREE.MeshBasicMaterial;
   headMaterial: THREE.MeshBasicMaterial;
   fire: NythraxisSoftFire;
+  /** The line's sprite density, which the global budget may have thinned. */
+  spritesPerYard: number;
   /** Per sprite: its fixed spot along/across the line (yards, world units). */
   spotAlong: Float32Array;
   spotAcross: Float32Array;
@@ -268,7 +272,7 @@ const SPOT: NythraxisGravefireSpot = { along: 0, across: 0 };
 /** Seat every sprite's fixed spot along and across the line (the axis is known; heights come later). */
 function seatSpots(visual: GravefireVisual): void {
   for (let index = 0; index < visual.fire.count; index++) {
-    const spot = nythraxisGravefireSpotInto(SPOT, index, visual.halfWidth);
+    const spot = nythraxisGravefireSpotInto(SPOT, index, visual.halfWidth, visual.spritesPerYard);
     visual.spotAlong[index] = spot.along;
     visual.spotAcross[index] = spot.across;
   }
@@ -317,9 +321,11 @@ function visualFromGroup(
   group: THREE.Group,
   groundY: (x: number, z: number) => number,
   row: ActiveNythraxisGravefire,
+  spritesPerYard: number,
 ): GravefireVisual {
   const fire = group.userData.fire as NythraxisSoftFire;
   const visual: GravefireVisual = {
+    spritesPerYard,
     group,
     mesh: group.userData.mesh as GravefireVisual['mesh'],
     positions: group.userData.positions as Float32Array,
@@ -362,6 +368,7 @@ function visualFromGroup(
 export function buildNythraxisGravefireStrip(
   row: ActiveNythraxisGravefire,
   groundY: (x: number, z: number) => number,
+  budget?: NythraxisSoftFireBudget,
 ): THREE.Group {
   const group = new THREE.Group();
   group.name = NYTHRAXIS_GRAVEFIRE_VISUAL_NAME;
@@ -390,12 +397,16 @@ export function buildNythraxisGravefireStrip(
   mesh.userData.actionable = true;
   group.add(mesh);
 
-  const fire = new NythraxisSoftFire(
-    'gravefire',
-    nythraxisGravefireSpriteCount(),
-    NYTHRAXIS_GRAVEFIRE_FIRE_NAME,
-    15,
-  );
+  // The global ledger thins a line by its sprites-per-yard rate, never by a
+  // raw count: a line seats sprite `index` in yard floor(index / perYard), so
+  // cutting the count alone would leave the far end of a lit window with no
+  // fire on it at all. One per yard is the floor, and the strip below carries
+  // the footprint either way.
+  const wanted = nythraxisGravefireSpriteCount();
+  const spritesPerYard = nythraxisGravefireSpritesPerYard(budget ? budget.grant(wanted) : wanted);
+  const spriteCount = nythraxisGravefireSpriteCount(NYTHRAXIS_GRAVEFIRE_LENGTH, spritesPerYard);
+  budget?.reserve(spriteCount);
+  const fire = new NythraxisSoftFire('gravefire', spriteCount, NYTHRAXIS_GRAVEFIRE_FIRE_NAME, 15);
   fire.setOpacity(opacity.tongue);
   group.add(fire.mesh);
 
@@ -406,7 +417,7 @@ export function buildNythraxisGravefireStrip(
   group.userData.edgeMaterial = edgeMaterial;
   group.userData.headMaterial = headMaterial;
   group.userData.fire = fire;
-  const visual = visualFromGroup(group, groundY, row);
+  const visual = visualFromGroup(group, groundY, row, spritesPerYard);
   group.userData.visual = visual;
   rewriteStrip(visual);
   placeFire(visual);
@@ -440,12 +451,13 @@ function applyRow(visual: GravefireVisual, row: ActiveNythraxisGravefire): boole
   return true;
 }
 
-function disposeVisual(visual: GravefireVisual): void {
+function disposeVisual(visual: GravefireVisual, budget?: NythraxisSoftFireBudget): void {
   visual.mesh.geometry.dispose();
   visual.underlayMaterial.dispose();
   visual.glowMaterial.dispose();
   visual.edgeMaterial.dispose();
   visual.headMaterial.dispose();
+  budget?.release(visual.fire.count);
   visual.fire.dispose();
   visual.group.removeFromParent();
 }
@@ -458,6 +470,7 @@ export class NythraxisGravefireVisuals {
   constructor(
     private readonly scene: THREE.Scene,
     private readonly groundY: (x: number, z: number) => number,
+    private readonly softFireBudget?: NythraxisSoftFireBudget,
   ) {}
 
   sync(rows: readonly ActiveNythraxisGravefire[]): void {
@@ -472,13 +485,13 @@ export class NythraxisGravefireVisuals {
         applyRow(existing, row);
         continue;
       }
-      const group = buildNythraxisGravefireStrip(row, this.groundY);
+      const group = buildNythraxisGravefireStrip(row, this.groundY, this.softFireBudget);
       this.scene.add(group);
       this.visuals.set(row.id, group.userData.visual as GravefireVisual);
     }
     for (const [id, visual] of this.visuals) {
       if (this.activeIds.has(id)) continue;
-      disposeVisual(visual);
+      disposeVisual(visual, this.softFireBudget);
       this.visuals.delete(id);
     }
   }
@@ -502,7 +515,7 @@ export class NythraxisGravefireVisuals {
   }
 
   dispose(): void {
-    for (const visual of this.visuals.values()) disposeVisual(visual);
+    for (const visual of this.visuals.values()) disposeVisual(visual, this.softFireBudget);
     this.visuals.clear();
     this.activeIds.clear();
   }
