@@ -555,9 +555,7 @@ function measureSpectateTransition(): SpectateCell {
   const harness = createOnlineHarness({ latency: ADVERSARIAL_PROFILE });
   try {
     const targetClient = rawFakeWs();
-    const joined = harness.server.join(targetClient.ws, 2, 2, 'Observed', 'rogue', null, false, {
-      movementWireVersion: 2,
-    });
+    const joined = harness.server.join(targetClient.ws, 2, 2, 'Observed', 'rogue', null, false);
     if ('error' in joined) throw new Error(joined.error);
     joined.blockListLoaded = true;
     const target = harness.server.sim.entities.get(joined.pid);
@@ -1297,7 +1295,7 @@ describe('movement latency baseline', () => {
     // A source-order pin, not a behavior test: the harness (tests/helpers/
     // online_harness.ts stepFrame) hand-rolls main.ts's online arm, and the
     // ORDER is load-bearing (alpha before the echo fold, the fold before the
-    // frame build, the drawn pose last). Nothing else would notice main.ts
+    // display pose, the drawn pose last). Nothing else would notice main.ts
     // resequencing those calls, and the harness would keep measuring a
     // pipeline the client no longer runs.
     const source = stripComments(readFileSync(MAIN_TS, 'utf8'));
@@ -1314,7 +1312,6 @@ describe('movement latency baseline', () => {
     const fold = at('inputEcho.fold(');
     const drain = at('net.drainEvents()');
     const discontinuity = at('hasAuthoritativeSelfPositionDiscontinuity(');
-    const frameBuild = at('selfMotionFrameBuffer.write(');
     const predictionPrepare = at('movementPrediction.prepare(');
     const predictionDisplay = at('movementPrediction.display(');
     const keyboardFacing = at('stepKeyboardTurnFacing(');
@@ -1325,20 +1322,20 @@ describe('movement latency baseline', () => {
       return found;
     };
     const setFacing = helperAt('client.setMouselookFacing(');
-    const legacyFlush = helperAt('client.flushInput(');
     const sampledAdvance = helperAt('sampler.advance(');
     // updateSelfRenderPosition itself lives in the renderer (src/render/
     // self_render_position_core.ts, called from renderer.sync); main.ts's half
     // of the contract is that the drawn pose is produced AFTER the frame the
     // predictor reads was built.
-    const draw = source.indexOf('renderer.sync(', frameBuild);
+    const draw = source.indexOf('renderer.sync(', predictionDisplay);
     const note = 'update tests/helpers/online_harness.ts stepFrame to match';
-    expect(draw, `src/main.ts has no renderer.sync after the frame build: ${note}`).toBeGreaterThan(
-      -1,
-    );
+    expect(
+      draw,
+      `src/main.ts has no renderer.sync after the display pose: ${note}`,
+    ).toBeGreaterThan(-1);
     expect(
       source.indexOf('renderer.sync(', draw + 1),
-      `src/main.ts has two renderer.sync calls after the frame build: ${note}`,
+      `src/main.ts has two renderer.sync calls after the display pose: ${note}`,
     ).toBe(-1);
     expect(alpha, `alpha must be read before the echo fold: ${note}`).toBeLessThan(consumeEcho);
     expect(movementFrame, `the wire write must precede the echo read: ${note}`).toBeLessThan(
@@ -1353,27 +1350,20 @@ describe('movement latency baseline', () => {
     expect(visualFacing, `visual facing precedes the wire write: ${note}`).toBeLessThan(
       movementFrame,
     );
-    expect(setFacing, `facing must be stored before either wire lane: ${note}`).toBeLessThan(
-      legacyFlush,
-    );
-    expect(legacyFlush, `the legacy lane precedes sampled v2 advance: ${note}`).toBeLessThan(
+    expect(setFacing, `facing must be stored before the wire lane: ${note}`).toBeLessThan(
       sampledAdvance,
     );
     expect(consumeEcho, `samples are consumed then folded: ${note}`).toBeLessThan(fold);
-    expect(fold, `the fold must precede the frame build: ${note}`).toBeLessThan(frameBuild);
+    expect(fold, `the fold must precede the display pose: ${note}`).toBeLessThan(predictionDisplay);
     expect(drain, `events are drained before the discontinuity read: ${note}`).toBeLessThan(
       discontinuity,
-    );
-    expect(discontinuity, `the discontinuity is read before the frame build: ${note}`).toBeLessThan(
-      frameBuild,
     );
     expect(discontinuity, `reconciliation follows event drain: ${note}`).toBeLessThan(
       predictionDisplay,
     );
-    expect(draw, `the drawn pose follows v2 reconciliation: ${note}`).toBeGreaterThan(
+    expect(draw, `the drawn pose follows reconciliation: ${note}`).toBeGreaterThan(
       predictionDisplay,
     );
-    expect(draw, `the drawn pose comes after the frame build: ${note}`).toBeGreaterThan(frameBuild);
   });
 
   it('pins the movement-feel target sets', () => {

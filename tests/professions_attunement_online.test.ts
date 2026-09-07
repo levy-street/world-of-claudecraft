@@ -420,8 +420,6 @@ function snapshotClient(pid: number): ClientWorld {
   c.connected = true;
   c.eventQueue = [];
   c.mouselookFacing = null;
-  c.lastInputSentAt = 0;
-  c.lastInputSig = '';
   c.inputSeq = 0;
   c.pendingInputSeqSentAt = new Map();
   c.ackedInputSeq = 0;

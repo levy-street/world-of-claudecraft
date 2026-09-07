@@ -33,7 +33,6 @@ function sample(over: Partial<MetricsSample> = {}): MetricsSample {
     connected: true,
     pingMs: 40,
     jitterMs: 5,
-    predLeadMs: 90,
     snapshotHz: 20,
     serverTickHz: 19.8,
     connectionType: '4g',
@@ -120,14 +119,7 @@ describe('perf metric grouping', () => {
     expect(grouped.map((g) => g.group.id)).toEqual(PERF_METRIC_GROUPS.map((g) => g.id));
     const byId = Object.fromEntries(grouped.map((g) => [g.group.id, g.chips.map((c) => c.key)]));
     expect(byId.frame).toEqual(['fps', 'frameTime', 'fps1Low', 'fps01Low', 'hitches']);
-    expect(byId.network).toEqual([
-      'ping',
-      'jitter',
-      'predLead',
-      'snapshot',
-      'serverTick',
-      'connection',
-    ]);
+    expect(byId.network).toEqual(['ping', 'jitter', 'snapshot', 'serverTick', 'connection']);
     expect(byId.renderer).toEqual([
       'drawCalls',
       'triangles',

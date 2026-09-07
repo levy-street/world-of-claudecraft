@@ -19,7 +19,7 @@ movement, speed changes), and those are signaled explicitly and smoothed.
 Non-goals: client-authoritative position (rejected in
 `docs/online-movement-latency.md`); raising the 20 Hz tick; changing `IWorld`
 reads (targeting, click-to-move, quest triggers keep reading the authoritative
-mirror in v1 of this rework).
+mirror in this iteration of the rework).
 
 ## Why the old model could not be fixed in place
 
@@ -44,8 +44,8 @@ too, which makes prediction exact rather than approximate.
 
 ### Client input ticks
 
-The client runs a fixed 20 Hz input tick (an accumulator on the render loop,
-the same discipline `SelfMotionPredictor` already uses). Each client tick k:
+The client runs a fixed 20 Hz input tick on an absolute deadline
+(`InputTickSampler`, `src/game/input_tick_sampler.ts`). Each client tick k:
 
 - samples the resolved `MoveInput` and wire facing at that instant;
 - records frame k in the local input history ring;
@@ -62,8 +62,11 @@ extrapolates intent beyond holding the last consumed frame during starvation.
 Server to client, in the self record of the ordinary snapshot: `ackCt` (the
 highest client tick CONSUMED by the sim tick this snapshot reflects, stamped at
 consumption, not receipt) and an `override` epoch counter (below). Version
-negotiation rides join metadata like `timerWireVersion`; the legacy v1 arm
-stays accepted so mid-deploy sessions degrade instead of breaking.
+negotiation rides join metadata like `timerWireVersion`; a handshake whose
+`movementWire` is not `MOVEMENT_WIRE_VERSION` (`src/world_api.ts`) is rejected
+at world auth (`server/ws_auth.ts`) with the standard incompatible-client error
+frame (`ONLINE_WORLD_INCOMPATIBLE_MESSAGE`), so every live session speaks this
+one wire.
 
 ### Server consumption: the input timeline
 
@@ -113,11 +116,12 @@ each snapshot:
   short window. Replay cost is bounded by RTT (about 7 ticks at 400 ms) and
   the kernel is cheap.
 
-The drawn pose is the predicted pose plus the decaying residual. The leash,
-the divergence servo, and the measure-window machinery in
-`src/render/self_motion.ts` are deleted for the predicted path; the fallback
-interpolation remains for states where prediction is off (spectate, delves,
-climbing, CC, and the `?nopredict` kill switch).
+The drawn pose is the predicted pose plus the decaying residual. There is no
+leash, divergence servo, or measure-window machinery anywhere in the client:
+states where prediction is off (spectate, delves, climbing, CC, and the
+`?nopredict` kill switch) draw the plain interpolated fallback in
+`src/render/self_render_position_core.ts`, and the handoff back into prediction
+is bounded by `MAX_SELF_REWIND_YD_PER_SEC`.
 
 A stronger future refinement is to retain input history across prediction
 suspension and resume by replaying unacknowledged frames from the authoritative
@@ -157,10 +161,8 @@ to be justified by that number, not assumed.
 
 Phase 2 lands the protocol and the server timeline behind negotiation, with
 the old display path untouched (feel unchanged, wire ready). Phase 3 lands the
-client prediction ring, reconciliation, and the override epochs; v2 sessions
-route around the legacy servo/leash machinery, which remains intact for v1
-sessions, gated states, and the kill switch, and is deleted only when v1 is
-retired. Phase 4 makes strict targets the default in
+client prediction ring, reconciliation, and the override epochs. Phase 4 makes
+strict targets the default in
 `tests/movement_latency_baseline.test.ts` (all 40 cells green as of the flip),
 re-pins the baseline table to the measured numbers, and updates
 `docs/online-movement-latency.md` and `src/net/CLAUDE.md` to describe this

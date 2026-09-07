@@ -40,9 +40,21 @@ import {
   filterDungeonEntryFacing,
 } from '../../server/dungeon_entry_facing';
 import { type ClientSession, GameServer } from '../../server/game';
+import { consumeMovementFramesV2 } from '../../server/movement_input_timeline_v2';
 import { DUNGEONS, instanceOrigin } from '../../src/sim/data';
 import { DUNGEON_ENTRY_FACING_WIRE_VERSION } from '../../src/world_api';
 import { bareClient, broadcast, fakeWs, joinServer, lastSnap } from '../helpers/bare_client';
+
+// Every movement frame is a per-tick v2 frame: the fence still decides at
+// RECEIVE time, but the intent and the heading only reach the entity when the
+// server consumes that client tick. One send plus one consumption is one tick.
+function inputSender(server: GameServer, session: ClientSession) {
+  let ct = 0;
+  return (payload: Record<string, unknown>): void => {
+    server.handleMessage(session, JSON.stringify({ t: 'input', ct: ct++, ...payload }));
+    consumeMovementFramesV2(server.sim, [session]);
+  };
+}
 
 describe('server dungeon entry facing fence', () => {
   it('requires the exact entry token and accepts it after the client starts turning', () => {
@@ -119,10 +131,8 @@ describe('server dungeon entry facing fence', () => {
     broadcast(server);
     expect(lastSnap(client.sent).self.de).toBe(1);
 
-    server.handleMessage(
-      session,
-      JSON.stringify({ t: 'input', seq: 1, mi: { f: 1, tl: 1 }, facing: 0 }),
-    );
+    const sendBeforeResume = inputSender(server, session);
+    sendBeforeResume({ seq: 1, mi: { f: 1, tl: 1 }, facing: 0 });
     expect(entity.facing).toBe(0);
     expect(meta.moveInput).toMatchObject({ forward: true, turnLeft: false });
 
@@ -144,24 +154,17 @@ describe('server dungeon entry facing fence', () => {
     broadcast(server);
     expect(lastSnap(resumedClient.sent).self.de).toBe(1);
 
-    server.handleMessage(
-      session,
-      JSON.stringify({ t: 'input', seq: 2, mi: { f: 1, tr: 1 }, facing: Math.PI }),
-    );
+    // A resume mints a fresh timeline, so the client tick counter restarts.
+    const send = inputSender(server, session);
+    send({ seq: 2, mi: { f: 1, tr: 1 }, facing: Math.PI });
     expect(entity.facing).toBe(0);
     expect(meta.moveInput).toMatchObject({ forward: true, turnRight: false });
 
-    server.handleMessage(
-      session,
-      JSON.stringify({ t: 'input', seq: 3, mi: { f: 1, tr: 1 }, facing: Math.PI, de: 1 }),
-    );
+    send({ seq: 3, mi: { f: 1, tr: 1 }, facing: Math.PI, de: 1 });
     expect(entity.facing).toBe(0);
     expect(meta.moveInput).toMatchObject({ forward: true, turnRight: false });
 
-    server.handleMessage(
-      session,
-      JSON.stringify({ t: 'input', seq: 4, mi: { f: 1, tr: 1 }, facing: 1.25 }),
-    );
+    send({ seq: 4, mi: { f: 1, tr: 1 }, facing: 1.25 });
     expect(entity.facing).toBe(1.25);
     expect(meta.moveInput).toMatchObject({ forward: true, turnRight: true });
   });
@@ -178,10 +181,7 @@ describe('server dungeon entry facing fence', () => {
     entity.pos = { ...entity.pos, x: origin.x + crypt.entry.x, z: origin.z + crypt.entry.z };
     entity.dungeonEntrySeq = 1;
 
-    server.handleMessage(
-      session,
-      JSON.stringify({ t: 'input', seq: 1, mi: { f: 1, tl: 1 }, facing: Math.PI }),
-    );
+    inputSender(server, session)({ seq: 1, mi: { f: 1, tl: 1 }, facing: Math.PI });
     expect(entity.facing).toBe(Math.PI);
     expect(meta.moveInput).toMatchObject({ forward: true, turnLeft: true });
     broadcast(server);
@@ -201,18 +201,13 @@ describe('server dungeon entry facing fence', () => {
     const origin = instanceOrigin(crypt.index, 0);
     entity.pos = { ...entity.pos, x: origin.x + crypt.entry.x, z: origin.z + crypt.entry.z };
     entity.dungeonEntrySeq = 1;
-    server.handleMessage(
-      session,
-      JSON.stringify({ t: 'input', seq: 1, mi: { tr: 1 }, facing: Math.PI }),
-    );
+    const send = inputSender(server, session);
+    send({ seq: 1, mi: { tr: 1 }, facing: Math.PI });
     expect(session.dungeonEntryFacing.requiredEntrySeq).toBe(1);
     expect(meta.moveInput.turnRight).toBe(false);
 
     entity.pos = { ...entity.pos, x: crypt.doorPos.x, z: crypt.doorPos.z };
-    server.handleMessage(
-      session,
-      JSON.stringify({ t: 'input', seq: 2, mi: { tr: 1 }, facing: Math.PI }),
-    );
+    send({ seq: 2, mi: { tr: 1 }, facing: Math.PI });
     expect(session.dungeonEntryFacing.requiredEntrySeq).toBeNull();
     expect(entity.facing).toBe(Math.PI);
     expect(meta.moveInput.turnRight).toBe(true);
@@ -231,10 +226,7 @@ describe('server dungeon entry facing fence', () => {
     const origin = instanceOrigin(crypt.index, 0);
     entity.pos = { ...entity.pos, x: origin.x + crypt.entry.x, z: origin.z + crypt.entry.z };
     entity.dungeonEntrySeq = 1;
-    server.handleMessage(
-      session,
-      JSON.stringify({ t: 'input', seq: 1, mi: { tr: 1 }, facing: Math.PI }),
-    );
+    inputSender(server, session)({ seq: 1, mi: { tr: 1 }, facing: Math.PI });
     expect(session.dungeonEntryFacing.requiredEntrySeq).toBe(1);
 
     session.linkdead = true;
@@ -253,10 +245,7 @@ describe('server dungeon entry facing fence', () => {
     expect(resumed).toBe(session);
     expect(session.dungeonEntryFacing.enabled).toBe(false);
 
-    server.handleMessage(
-      session,
-      JSON.stringify({ t: 'input', seq: 2, mi: { tr: 1 }, facing: Math.PI }),
-    );
+    inputSender(server, session)({ seq: 2, mi: { tr: 1 }, facing: Math.PI });
     expect(entity.facing).toBe(Math.PI);
     expect(meta.moveInput.turnRight).toBe(true);
     broadcast(server);
@@ -294,10 +283,7 @@ describe('server dungeon entry facing fence', () => {
     expect(lastSnap(capableClient.sent).self.de).toBe(1);
 
     entity.dungeonEntrySeq = 2;
-    server.handleMessage(
-      session,
-      JSON.stringify({ t: 'input', seq: 1, mi: { tr: 1 }, facing: Math.PI }),
-    );
+    inputSender(server, session)({ seq: 1, mi: { tr: 1 }, facing: Math.PI });
     expect(session.dungeonEntryFacing.requiredEntrySeq).toBe(2);
     expect(meta.moveInput.turnRight).toBe(false);
   });

@@ -16,14 +16,14 @@
 //     InputEchoTracker, selfMotionPredictionEnabled, updateSelfRenderPosition)
 //     driven in the ORDER src/main.ts's online arm drives them, which is
 //     load-bearing: alpha is read before this frame's echo samples are folded,
-//     the fold happens before the SelfMotionFrame is built, and the drawn pose
+//     the fold happens before the display pose is built, and the drawn pose
 //     comes out of the same updateSelfRenderPosition call renderer.ts makes.
 //
 // The ground-truth convention, stated once because every measurement rests on
 // it: the reference trajectory is what the server would do RECEIVING EACH WIRE
 // FRAME AT ITS SEND INSTANT with zero latency. Not the per-frame held intent:
-// the client's flush gate (src/net/input_send_cadence.ts) admits only some of
-// those frames to the wire, so scoring against the held intent would compare
+// the fixed 20 Hz sampler (src/game/input_tick_sampler.ts) puts only one frame
+// per client tick on the wire, so scoring against the held intent would compare
 // the server under test to a twin steering on a finer timeline than any server
 // ever received, and charge the difference to latency. The timeline is
 // therefore recorded where the frames enter the link and parsed with the
@@ -51,7 +51,6 @@ import { mouselookReleaseFacing } from '../../src/game/mouselook_release';
 import { diagonalMovementVisualFacing } from '../../src/game/movement_visual';
 import { interpolatedOnlineSelfFacing } from '../../src/game/online_facing_mirror';
 import { adaptiveSelfAlphaLead } from '../../src/game/self_alpha_lead';
-import { SelfMotionFrameBuffer } from '../../src/game/self_motion_frame_buffer';
 import {
   isMovementFrozen,
   isPlayerImmobilized,
@@ -187,7 +186,6 @@ export interface HarnessRun {
 
 export interface OnlineHarnessOptions {
   latency: LatencyLinkConfig;
-  movementWire?: 1 | 2;
   frameMs?: number;
   playerClass?: PlayerClass;
   /** Virtual ms of idle world before a scenario starts, so the mirror is
@@ -310,7 +308,6 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
   // A frame may omit `facing` (mouselookFacing null), which means UNCHANGED on
   // the server, so the wire heading is carried forward rather than defaulted.
   let wireFacing = startFacing;
-  const movementWireVersion = opts.movementWire ?? 2;
 
   /** Record one outgoing frame as the server's own parser would read it. */
   function noteClientFrame(payload: string): void {
@@ -322,7 +319,7 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
     }
     if (typeof parsed !== 'object' || parsed === null) return;
     if ((parsed as { t?: unknown }).t !== 'input') return;
-    if (movementWireVersion === 2 && !Number.isSafeInteger((parsed as { ct?: unknown }).ct)) return;
+    if (!Number.isSafeInteger((parsed as { ct?: unknown }).ct)) return;
     const frame = parseMoveInputFrame(parsed);
     if (frame.facing !== null) wireFacing = frame.facing;
     wireIntent = frame.moveInput;
@@ -336,7 +333,7 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
     });
   }
 
-  const joined = joinGroundTruthCharacter(1, opts.playerClass ?? 'warrior', movementWireVersion);
+  const joined = joinGroundTruthCharacter(1, opts.playerClass ?? 'warrior');
   const { server, session, pid } = joined;
   // The frames join() already wrote (hello, the entry notice, the social
   // snapshot) were captured raw by rawFakeWs. Virtual time has not moved since,
@@ -396,7 +393,6 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
   // Client frame state, one instance per harness exactly as main.ts holds one
   // per session.
   const inputEcho = new InputEchoTracker();
-  const selfMotionFrameBuffer = new SelfMotionFrameBuffer();
   const movementPrediction = new MovementPredictionPipeline(client.cfg.seed);
   movementPrediction.connect(client);
   const selfRender = createSelfRenderPositionState({ x: 0, y: 0, z: 0 });
@@ -420,9 +416,7 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
     sentFacing: null,
     serverFacing: startFacing,
     releaseCommitAcknowledged: false,
-    echoMs: 0,
     snapshotIntervalMs: SERVER_TICK_MS,
-    movementWireVersion,
     frameDt: 0,
   };
   let pendingReleaseFacing: number | null = null;
@@ -502,9 +496,7 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
       kbTurnArgs.releaseCommitAcknowledged = client.inputFacingAcknowledged(
         kbTurn.pendingReleaseCommit,
       );
-      kbTurnArgs.echoMs = inputEcho.echoMs;
       kbTurnArgs.snapshotIntervalMs = client.snapInterval;
-      kbTurnArgs.movementWireVersion = client.movementWireVersion;
       kbTurnArgs.frameDt = frameDt;
       const kbFacing = stepKeyboardTurnFacing(kbTurn, kbTurnArgs);
       netFacing = foreignFacing ?? kbTurn.wireFacing;
@@ -529,20 +521,19 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
     selfMotionGateArgs.riftFloor = client.riftFloor;
     const predictionEnabled = selfMotionPredictionEnabled(selfMotionGateArgs);
     movementPrediction.prepare(client, pe, predictionEnabled);
-    // The unconditional 50 ms lane runs beside this from ClientWorld's own timer.
+    // ClientWorld's own 50 ms timer runs beside this, draining only frames the
+    // transport held back; it never samples input of its own.
     Object.assign(client.moveInput, wireMi);
     client.setMouselookFacing(netFacing);
-    let movementFrameEmitted = client.movementWireVersion !== 2 ? client.flushInput(now) : false;
     const firstSampledCommand = commands.length;
-    movementFrameEmitted =
-      movementPrediction.advance(
-        client,
-        frameDt,
-        client.moveInput,
-        netFacing,
-        now,
-        turnEngageEdge,
-      ) || movementFrameEmitted;
+    const movementFrameEmitted = movementPrediction.advance(
+      client,
+      frameDt,
+      client.moveInput,
+      netFacing,
+      now,
+      turnEngageEdge,
+    );
     if (opts.keyTimeline && movementFrameEmitted) pendingReleaseFacing = null;
     const samplerInterpolationAlpha = movementPrediction.interpolationAlpha;
     for (let i = firstSampledCommand; i < commands.length; i++) {
@@ -555,23 +546,8 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
     const drainedEvents = client.drainEvents();
     const discontinuity = hasAuthoritativeSelfPositionDiscontinuity(drainedEvents, client.playerId);
 
-    // 5) the display frame selected by the negotiated movement wire.
-    const cameraLastSnapAge = client.lastSnapAt > 0 ? now - client.lastSnapAt : -1;
-    const selfMotion =
-      client.movementWireVersion === 2
-        ? movementPrediction.display()
-        : selfMotionFrameBuffer.write(
-            predictionEnabled,
-            mi,
-            netFacing ?? interpServerFacing,
-            inputEcho.echoMs,
-            inputEcho.jitterMs,
-            alpha,
-            frameDt,
-            Math.max(0, cameraLastSnapAge),
-            client.snapInterval,
-            client.riftFloor,
-          );
+    // 5) the display frame.
+    const selfMotion = movementPrediction.display();
 
     let drawnYaw = interpServerFacing;
     if (onlineRenderFacing !== null) {
@@ -586,8 +562,8 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
       selfFacingOverride = released.done ? null : released.facing;
       selfFacingLastTarget = released.lastTarget;
     }
-    const reconciled =
-      selfMotion && 'kind' in selfMotion && selfMotion.residual !== null ? selfMotion : null;
+    // A residual is exactly what a replay leaves behind, so it is the replay signal.
+    const reconciled = selfMotion && selfMotion.residual !== null ? selfMotion : null;
     const residualYd = reconciled
       ? Math.hypot(reconciled.residual?.x ?? 0, reconciled.residual?.z ?? 0)
       : 0;
@@ -602,7 +578,6 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
     const drawn = updateSelfRenderPosition(
       selfRender,
       pe,
-      client.cfg.seed,
       alpha,
       frameDt,
       selfAlphaLead,

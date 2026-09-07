@@ -1,9 +1,7 @@
 import type { MoveInput } from '../sim/types';
 
 export interface OnlineMovementFrameClient {
-  movementWireVersion: 1 | 2;
   setMouselookFacing(facing: number | null): void;
-  flushInput(now: number): boolean;
 }
 
 export interface MovementFrameSampler<Client> {
@@ -27,6 +25,5 @@ export function sendOnlineMovementFrame<Client>(
   turnEngageEdge: boolean,
 ): boolean {
   client.setMouselookFacing(facing);
-  const legacyEmitted = client.movementWireVersion !== 2 && client.flushInput(now);
-  return sampler.advance(client, frameDtSec, mi, facing, now, turnEngageEdge) || legacyEmitted;
+  return sampler.advance(client, frameDtSec, mi, facing, now, turnEngageEdge);
 }

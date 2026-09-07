@@ -2,8 +2,7 @@
 // A late release may then disagree for one tick, and client reconciliation absorbs that correction.
 import { isStunned } from '../src/sim/combat/cc';
 import { type MoveInputFrame, parseMoveInputFrame } from '../src/sim/move_input';
-import type { PlayerMeta, Sim } from '../src/sim/sim';
-import type { SimContext } from '../src/sim/sim_context';
+import type { Sim } from '../src/sim/sim';
 import { type Entity, emptyMoveInput, type MoveInput } from '../src/sim/types';
 import { noteBattlegroundWallPressure } from '../src/sim/unstuck';
 import { type DungeonEntryFacingFence, decideDungeonEntryInput } from './dungeon_entry_facing';
@@ -27,8 +26,7 @@ export interface MovementInputFrameV2 {
 export interface MovementInputSessionState extends MovementOverrideSessionState {
   pid: number;
   lastInputAt: number;
-  movementWireVersion: 1 | 2;
-  movementTimeline: MovementInputTimeline | null;
+  movementTimeline: MovementInputTimeline;
   lastConsumedCt: number;
   // The dungeon-entry heading fence. Deliberately NOT minted by
   // createMovementInputSessionState: a resume must carry the armed fence
@@ -36,40 +34,32 @@ export interface MovementInputSessionState extends MovementOverrideSessionState 
   dungeonEntryFacing: DungeonEntryFacingFence;
 }
 
-export function createMovementInputSessionState(
-  movementWireVersion: unknown,
-): Omit<MovementInputSessionState, 'pid' | 'lastInputAt' | 'dungeonEntryFacing'> {
-  const version = movementWireVersion === 2 ? 2 : 1;
+export function createMovementInputSessionState(): Omit<
+  MovementInputSessionState,
+  'pid' | 'lastInputAt' | 'dungeonEntryFacing'
+> {
   return {
-    movementWireVersion: version,
-    movementTimeline: version === 2 ? new MovementInputTimeline() : null,
+    movementTimeline: new MovementInputTimeline(),
     lastConsumedCt: -1,
     ...createMovementOverrideSessionState(),
   };
 }
 
-export function resetMovementInputSessionState(
-  session: MovementInputSessionState,
-  movementWireVersion: unknown,
-): void {
-  Object.assign(session, createMovementInputSessionState(movementWireVersion));
+export function resetMovementInputSessionState(session: MovementInputSessionState): void {
+  Object.assign(session, createMovementInputSessionState());
 }
 
 export function applyMovementInputFrame(
   session: MovementInputSessionState,
-  meta: PlayerMeta,
   entity: Entity,
   raw: unknown,
-  simTime: number,
-  ctx?: SimContext,
 ): MoveInputFrame {
   const parsed = parseMoveInputFrame(raw);
-  // The dungeon-entry heading fence runs at RECEIVE time, so it covers both
-  // wire versions from one place. What it checks is a property of THIS packet
-  // (does its `de` acknowledge the entry generation the server forced?), not of
-  // the tick the input eventually drives, so deciding here is sound; a v2 frame
-  // then carries the already-fenced moveInput and facing into the timeline and
-  // the deferred apply needs no fence state of its own.
+  // The dungeon-entry heading fence runs at RECEIVE time. What it checks is a
+  // property of THIS packet (does its `de` acknowledge the entry generation the
+  // server forced?), not of the tick the input eventually drives, so the frame
+  // carries the already-fenced moveInput and facing into the timeline and the
+  // deferred apply needs no fence state of its own.
   const decision = decideDungeonEntryInput(
     session.dungeonEntryFacing,
     entity,
@@ -82,22 +72,12 @@ export function applyMovementInputFrame(
     moveInput: decision.moveInput,
     facing: decision.facing,
   };
-  if (session.movementWireVersion === 2) {
-    if (frame.ct !== null) {
-      session.movementTimeline?.enqueue({
-        ct: frame.ct,
-        mi: frame.moveInput,
-        facing: frame.facing,
-      });
-    }
-    return frame;
-  }
-  if (ctx) noteBattlegroundWallPressure(ctx, meta, entity);
-  Object.assign(meta.moveInput, frame.moveInput);
-  if (ctx) noteBattlegroundWallPressure(ctx, meta, entity);
-  session.lastInputAt = simTime;
-  if (frame.facing !== null && (!entity.dead || entity.ghost) && !isStunned(entity)) {
-    entity.facing = frame.facing;
+  if (frame.ct !== null) {
+    session.movementTimeline.enqueue({
+      ct: frame.ct,
+      mi: frame.moveInput,
+      facing: frame.facing,
+    });
   }
   return frame;
 }
@@ -107,7 +87,6 @@ export function consumeMovementFramesV2(
   sessions: Iterable<MovementInputSessionState>,
 ): void {
   for (const session of sessions) {
-    if (session.movementWireVersion !== 2 || !session.movementTimeline) continue;
     const meta = sim.meta(session.pid);
     const entity = sim.entities.get(session.pid);
     if (!meta || !entity) continue;

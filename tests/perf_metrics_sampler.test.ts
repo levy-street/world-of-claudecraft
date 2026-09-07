@@ -66,15 +66,12 @@ describe('createMetricsSampler', () => {
     const sample = createMetricsSampler(
       makeDeps({
         getOnline: () => null,
-        // even with an active predictor source, offline must not surface it
-        getPredLeadMs: () => 87,
       }),
     )();
     expect(sample.online).toBe(false);
     expect(sample.connected).toBe(true); // offline world is "connected" to itself
     expect(sample.pingMs).toBeNull();
     expect(sample.jitterMs).toBeNull();
-    expect(sample.predLeadMs).toBeNull();
     expect(sample.snapshotHz).toBeNull();
     expect(sample.serverTickHz).toBeNull();
   });
@@ -85,28 +82,14 @@ describe('createMetricsSampler', () => {
         getOnline: () => ({ connected: true, snapInterval: 50, serverTickHz: 19.5 }),
         getEchoMs: () => 42,
         getJitterMs: () => 6,
-        getPredLeadMs: () => 87,
       }),
     )();
     expect(sample.online).toBe(true);
     expect(sample.connected).toBe(true);
     expect(sample.pingMs).toBe(42);
     expect(sample.jitterMs).toBe(6);
-    expect(sample.predLeadMs).toBe(87); // the sampler wires the predictor source
     expect(sample.snapshotHz).toBe(20); // 1000 / 50ms
     expect(sample.serverTickHz).toBe(19.5);
-  });
-
-  it('nulls predLead when the predictor is inactive or the dep is absent', () => {
-    const online = {
-      getOnline: () => ({ connected: true, snapInterval: 50, serverTickHz: null }),
-    };
-    // predictor inactive (lead-smoothing fallback, ?nopredict, delve, CC)
-    const inactive = createMetricsSampler(makeDeps({ ...online, getPredLeadMs: () => null }))();
-    expect(inactive.predLeadMs).toBeNull();
-    // hosts without the predictor omit the optional dep entirely
-    const absent = createMetricsSampler(makeDeps(online))();
-    expect(absent.predLeadMs).toBeNull();
   });
 
   it('hides ping/jitter until an echo is measured (echo <= 0) but keeps snapshot', () => {

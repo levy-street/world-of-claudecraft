@@ -23,7 +23,6 @@ vi.mock('../server/db', () => ({
 }));
 
 import { consumeMovementFramesV2 } from '../server/movement_input_timeline_v2';
-import { negotiateMovementWireVersion } from '../server/movement_wire_version';
 import { type MovementWireClient, MovementWireGlue } from '../src/game/movement_wire_glue';
 import { emptyMoveInput } from '../src/sim/types';
 import { bareClient } from './helpers/bare_client';
@@ -82,20 +81,10 @@ describe('movement wire v2', () => {
     expect(source.indexOf("lap('movementV2');", secondMovementLap + 1)).toBe(-1);
   });
 
-  it.each([
-    ['accepted v2', 2, 2],
-    ['absent offer', undefined, 1],
-    ['garbage future offer', 3, 1],
-    ['garbage string offer', '2', 1],
-  ] as const)('negotiates %s', (_name, offered, expected) => {
-    expect(negotiateMovementWireVersion(offered)).toBe(expected);
-  });
-
-  it('does not advance while disconnected and resets client ticks on v2 renegotiation', () => {
+  it('does not advance while disconnected and resets client ticks on renegotiation', () => {
     const sent: number[] = [];
     let open = false;
     const client: MovementWireClient = {
-      movementWireVersion: 2,
       onMovementWireNegotiated: null,
       onMovementWireNeutral: null,
       movementWireIsOpen: () => open,
@@ -111,7 +100,7 @@ describe('movement wire v2', () => {
     open = true;
     glue.advance(client, 0.05, { ...emptyMoveInput(), forward: true }, null, 50);
     glue.advance(client, 0.05, { ...emptyMoveInput(), forward: true }, null, 100);
-    client.onMovementWireNegotiated?.(2, 100);
+    client.onMovementWireNegotiated?.(100);
     glue.advance(client, 0.05, { ...emptyMoveInput(), forward: true }, null, 150);
 
     expect(sent).toEqual([0, 1, 0]);
@@ -121,7 +110,6 @@ describe('movement wire v2', () => {
     let sentFrame: object | null = null;
     let predictedFrame: object | null = null;
     const client: MovementWireClient = {
-      movementWireVersion: 2,
       onMovementWireNegotiated: null,
       onMovementWireNeutral: null,
       movementWireIsOpen: () => true,
@@ -144,7 +132,6 @@ describe('movement wire v2', () => {
   it('reports whether a non-tick advance emitted an accepted frame', () => {
     const sent: number[] = [];
     const client: MovementWireClient = {
-      movementWireVersion: 2,
       onMovementWireNegotiated: null,
       onMovementWireNeutral: null,
       movementWireIsOpen: () => true,
@@ -161,9 +148,9 @@ describe('movement wire v2', () => {
     expect(sent).toEqual([0]);
   });
 
-  it('forces neutral v2 input into the next server consumption before pausing', () => {
-    const { server, session } = joinGroundTruthCharacter(2, 'warrior', 2);
-    const client = bareClient(session.pid, { movementWireVersion: 2 });
+  it('forces neutral input into the next server consumption before pausing', () => {
+    const { server, session } = joinGroundTruthCharacter(2, 'warrior');
+    const client = bareClient(session.pid);
     const previousWebSocket = globalThis.WebSocket;
     Object.defineProperty(globalThis, 'WebSocket', { configurable: true, value: { OPEN: 1 } });
     (client as any).ws = {
@@ -181,8 +168,8 @@ describe('movement wire v2', () => {
       expect(client.neutralizeInputForClientPause(100)).toBe(true);
       consumeMovementFramesV2(server.sim, [session]);
       expect(server.sim.meta(session.pid)?.moveInput).toEqual(emptyMoveInput());
-      expect(session.movementTimeline?.consumed).toBe(2);
-      expect(session.movementTimeline?.starved).toBe(0);
+      expect(session.movementTimeline.consumed).toBe(2);
+      expect(session.movementTimeline.starved).toBe(0);
     } finally {
       Object.defineProperty(globalThis, 'WebSocket', {
         configurable: true,
@@ -192,10 +179,9 @@ describe('movement wire v2', () => {
   });
 
   it('consumes one frame per tick at steady RTT 150', () => {
-    const harness = createOnlineHarness({ latency: link(150, 20), movementWire: 2 });
+    const harness = createOnlineHarness({ latency: link(150, 20) });
     try {
       const timeline = harness.session.movementTimeline;
-      if (!timeline) throw new Error('movement v2 did not create an input timeline');
       const before = {
         consumed: timeline.consumed,
         starved: timeline.starved,
@@ -223,8 +209,8 @@ describe('movement wire v2', () => {
     }
   });
 
-  it('sends no client-tick-less input frames during a v2 harness run', () => {
-    const harness = createOnlineHarness({ latency: link(50, 0), movementWire: 2 });
+  it('sends no client-tick-less input frames during a harness run', () => {
+    const harness = createOnlineHarness({ latency: link(50, 0) });
     const receivedInputs: Record<string, unknown>[] = [];
     const handleMessage = harness.server.handleMessage.bind(harness.server);
     harness.server.handleMessage = (receivedSession, payload) => {
@@ -243,23 +229,6 @@ describe('movement wire v2', () => {
 
       expect(receivedInputs.length).toBeGreaterThanOrEqual(15);
       expect(receivedInputs.every((frame) => Number.isSafeInteger(frame.ct))).toBe(true);
-    } finally {
-      harness.dispose();
-    }
-  });
-
-  it('keeps the harness option to force the legacy v1 display path', () => {
-    const harness = createOnlineHarness({ latency: link(50, 0), movementWire: 1 });
-    try {
-      const run = harness.runScript({
-        durationMs: 1000,
-        script: [{ atMs: 0, mi: { forward: true }, facing: 0 }],
-      });
-
-      expect(harness.client.movementWireVersion).toBe(1);
-      expect(harness.session.movementWireVersion).toBe(1);
-      expect(run.frames.some((frame) => frame.predictorActive)).toBe(true);
-      expect(run.frames.at(-1)?.z).toBeGreaterThan(run.frames[0].z);
     } finally {
       harness.dispose();
     }

@@ -60,7 +60,6 @@ export class MovementInputTimelineTickStats {
     let resyncs = 0;
     for (const session of sessions) {
       const timeline = session.movementTimeline;
-      if (session.movementWireVersion !== 2 || !timeline) continue;
       let previous = this.previousByTimeline.get(timeline);
       if (!previous) {
         previous = {

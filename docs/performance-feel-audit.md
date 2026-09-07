@@ -69,9 +69,9 @@ Asset startup timing is now recorded by type (`gltf`, `hdr`, `texture`) with cou
 
 The asset timing snapshot also includes the full successful loaded-file list, which lets the perf tour derive static byte totals for the actual boot path. This is separate from the repo-wide asset budget: mobile can now fail a release gate for loading too many GLBs/textures/HDRs before first play even if the total asset library is still within budget.
 
-Online input now flushes movement/facing changes immediately, throttled to roughly one packet per frame, while keeping the old 50 ms interval as a heartbeat. This removes up to one sim tick of avoidable timer-phase latency from camera/mouselook and movement changes.
+Online input is sampled on a fixed 20 Hz client tick and one frame per tick goes straight to the wire, with a 50 ms timer that only drains frames the transport held back. Movement and facing therefore reach the server on the tick they happen, without the timer-phase latency the old interval scheme added.
 
-Input feel now has first-class perf samples: key/mouse/touch movement and look intents record time to next frame-loop pickup, time to sim/network consumption, time from sent input packet to authoritative snapshot echo, and time to the next rendered frame. Online sends are counted only when `flushInput()` actually writes a changed packet, and snapshots echo the last processed input sequence, so the report can distinguish input throttling, server/snapshot delay, and render delay.
+Input feel now has first-class perf samples: key/mouse/touch movement and look intents record time to next frame-loop pickup, time to sim/network consumption, time from sent input packet to authoritative snapshot echo, and time to the next rendered frame. Online sends are counted only when a movement frame actually reaches the wire, and snapshots echo the last processed input sequence, so the report can distinguish input throttling, server/snapshot delay, and render delay.
 
 Camera follow now keeps the existing one-to-one interpolation for server/keyboard turns, but settles behind the character more aggressively while moving and snaps very large behind-camera offsets instead of easing a 180-degree turn across multiple frames. The follow math is covered by unit tests so future camera tuning can be deliberate instead of subjective.
 

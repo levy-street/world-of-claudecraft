@@ -4,34 +4,29 @@ import { sendOnlineMovementFrame } from '../src/game/online_movement_frame';
 import { emptyMoveInput } from '../src/sim/types';
 import { stripComments } from './helpers/strip_comments';
 
-function client(version: 1 | 2, flushResult: boolean) {
-  return {
-    movementWireVersion: version,
-    setMouselookFacing: vi.fn(),
-    flushInput: vi.fn(() => flushResult),
-  };
+function client() {
+  return { setMouselookFacing: vi.fn() };
 }
 
 describe('sendOnlineMovementFrame', () => {
-  it('reports a sampled v2 frame and skips the legacy flush', () => {
-    const online = client(2, false);
+  it('mirrors the facing onto the wire and reports the sampled frame', () => {
+    const online = client();
     const sampler = { advance: vi.fn(() => true) };
     const mi = emptyMoveInput();
 
     expect(sendOnlineMovementFrame(online, sampler, 0.016, mi, 0.8, 50, true)).toBe(true);
     expect(online.setMouselookFacing).toHaveBeenCalledWith(0.8);
-    expect(online.flushInput).not.toHaveBeenCalled();
     expect(sampler.advance).toHaveBeenCalledWith(online, 0.016, mi, 0.8, 50, true);
   });
 
-  it('reports an accepted legacy flush when the sampler is inactive', () => {
-    const online = client(1, true);
+  it('still mirrors the facing when the sampler emits nothing this frame', () => {
+    const online = client();
     const sampler = { advance: vi.fn(() => false) };
 
     expect(sendOnlineMovementFrame(online, sampler, 0.016, emptyMoveInput(), null, 50, false)).toBe(
-      true,
+      false,
     );
-    expect(online.flushInput).toHaveBeenCalledWith(50);
+    expect(online.setMouselookFacing).toHaveBeenCalledWith(null);
   });
 
   it('marks input telemetry only after the online frame path reports an emission', () => {

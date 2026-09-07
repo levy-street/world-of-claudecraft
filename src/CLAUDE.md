@@ -40,7 +40,8 @@ lets the same `sim/` run offline, on the server, and headless.
   to "not `sim/`": (a) `render/` may import **pure, deterministic** sim geometry/data
   helpers so it shares the sim's terrain/movement math instead of re-deriving it
   (exemplars: `sim/world` terrain heights, `sim/player_motion` run by the
-  display-only self extrapolator `render/self_motion.ts`, `sim/data`, and the
+  display-only self predictor `render/self_prediction.ts` through the
+  client-side deps in `render/client_player_motion.ts`, `sim/data`, and the
   placement readouts for anything the sim COLLIDES with, so the mesh and the
   collider come from one list: `colliders.bankerChestSpots`,
   `colliders.streetlampPlacements` + its `sim/streetlamp_layout`/`streetlamp_style`

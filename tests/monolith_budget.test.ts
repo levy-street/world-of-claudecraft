@@ -419,7 +419,9 @@ const MONOLITHS: MonolithRow[] = [
     // branch: the release arm's Realm Builder monument lines (PR #3695) land
     // beside this branch's extractions, so the merged file sits below both
     // parent pins. Measured on the merged tree. Exact merged count, zero headroom.
-    ceiling: 13085,
+    // Lowered by the movement-wire-v1 removal (issue 3649): the legacy predictor
+    // lead getter and its onGround arm left with the v1 arm. Exact count, zero slack.
+    ceiling: 13069,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -584,7 +586,9 @@ const MONOLITHS: MonolithRow[] = [
     // Ratcheted 11516 -> 11462 when the landing page $WOC contract address box
     // and its click-to-copy wiring (wireContractAddressCopy) were removed.
     // Measured with wc -l. Exact count, zero headroom.
-    ceiling: 11462,
+    // Lowered by the movement-wire-v1 removal (issue 3649): the frame buffer, the
+    // display ternary and the perf-lead source left with it. Exact count, zero slack.
+    ceiling: 11439,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -674,7 +678,9 @@ const MONOLITHS: MonolithRow[] = [
     // Down 10604 -> 10587 for the per-surface action-bar profiles: the
     // join read, the per-profile merge and the FIFO write moved to
     // server/hotbar_layout.ts (HotbarLayoutStore). Exact count.
-    ceiling: 10587,
+    // Movement-wire-v1 removal (issue 3649): the session wire state shrank and the
+    // consumption comments grew, net plus one. Exact count, zero slack.
+    ceiling: 10588,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -751,7 +757,9 @@ const MONOLITHS: MonolithRow[] = [
     // src/net/guild_bank_log_mirror.ts (GuildBankLogMirror); what stays is
     // the two one-line IWorld arms that put its requests on the wire. Exact
     // count.
-    ceiling: 5856,
+    // Lowered by the movement-wire-v1 removal (issue 3649): sendInput, the flush
+    // gate and the transient-input retention left with it. Exact count, zero slack.
+    ceiling: 5738,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

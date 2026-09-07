@@ -44,6 +44,7 @@ vi.mock('../server/db', () => ({
 import { bankLedgerIdle } from '../server/bank_ledger';
 import { insertBankLedgerRows, saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer } from '../server/game';
+import { consumeMovementFramesV2 } from '../server/movement_input_timeline_v2';
 import { REALM } from '../server/realm';
 import type { ClientWorld } from '../src/net/online';
 import { recipeById } from '../src/sim/content/recipes';
@@ -371,8 +372,12 @@ describe('the ccast self fragment round-trips a running batch craft', () => {
     expect(mirror.craftCastBatchTotal).toBe(3);
 
     // A real movement frame on the movement lane, not a hand-set cast field.
+    // It carries a client tick and is drained by the same consumption step the
+    // server loop runs before each sim tick: the intent reaches meta.moveInput
+    // at CONSUMPTION, never on arrival.
     mark = fc.sent.length;
-    server.handleMessage(session, JSON.stringify({ t: 'input', seq: 1, mi: { f: 1 } }));
+    server.handleMessage(session, JSON.stringify({ t: 'input', seq: 1, ct: 0, mi: { f: 1 } }));
+    consumeMovementFramesV2(server.sim, [session]);
     routeTick(server);
     broadcast(server);
 

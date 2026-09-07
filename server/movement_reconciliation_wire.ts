@@ -1,7 +1,6 @@
 import type { Entity } from '../src/sim/types';
 
 export interface MovementReconciliationSessionWireState {
-  movementWireVersion: 1 | 2;
   lastConsumedCt: number;
   movementOverrideEpoch: number;
   movementOverrideActive: boolean;
@@ -14,7 +13,6 @@ export function reconciliationSelfWire(
   session: MovementReconciliationSessionWireState,
   entity: Entity,
 ): Record<string, number> {
-  if (session.movementWireVersion !== 2) return {};
   // Full precision for rpx/rpy/rpz/rpf is LOAD-BEARING for exact-match reconciliation.
   // Rounding makes every acknowledged pose mismatch and forces a replay.
   // The r-prefix keeps this self-only pose outside wireEntity's terse-key namespace.
