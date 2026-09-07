@@ -176,7 +176,7 @@ describe('MovementInputTimeline', () => {
     const session = {
       pid: 1,
       lastInputAt: 0,
-      ...createMovementInputSessionState(2),
+      ...createMovementInputSessionState(),
       dungeonEntryFacing: createDungeonEntryFacingFence(0, false),
       movementTimeline: timeline,
     };
@@ -204,7 +204,7 @@ describe('MovementInputTimeline', () => {
     const session = {
       pid: 1,
       lastInputAt: 0,
-      ...createMovementInputSessionState(2),
+      ...createMovementInputSessionState(),
       dungeonEntryFacing: createDungeonEntryFacingFence(0, false),
       movementTimeline: timeline,
     };
@@ -227,7 +227,7 @@ describe('MovementInputTimeline', () => {
     const session = {
       pid: 1,
       lastInputAt: 0,
-      ...createMovementInputSessionState(2),
+      ...createMovementInputSessionState(),
       dungeonEntryFacing: createDungeonEntryFacingFence(0, false),
       movementTimeline: timeline,
     };
@@ -285,16 +285,16 @@ describe('MovementInputTimeline', () => {
     const session = {
       pid: 1,
       lastInputAt: 10,
-      ...createMovementInputSessionState(2),
+      ...createMovementInputSessionState(),
       dungeonEntryFacing: createDungeonEntryFacingFence(0, false),
     };
-    session.movementTimeline?.enqueue(frame(5));
-    expect(session.movementTimeline?.consumeNext()).toBeNull();
+    session.movementTimeline.enqueue(frame(5));
+    expect(session.movementTimeline.consumeNext()).toBeNull();
 
-    resetMovementInputSessionState(session, 2);
+    resetMovementInputSessionState(session);
     expect(session.lastConsumedCt).toBe(-1);
-    expect(session.movementTimeline?.enqueue(frame(0, true))).toBe(true);
-    expect(session.movementTimeline?.consumeNext()).toEqual(frame(0, true));
-    expect(session.movementTimeline?.starved).toBe(0);
+    expect(session.movementTimeline.enqueue(frame(0, true))).toBe(true);
+    expect(session.movementTimeline.consumeNext()).toEqual(frame(0, true));
+    expect(session.movementTimeline.starved).toBe(0);
   });
 });

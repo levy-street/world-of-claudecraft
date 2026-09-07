@@ -33,7 +33,7 @@ import { setCharacterHotbarLayout } from '../server/db';
 import { type ClientSession, GameServer } from '../server/game';
 import { HotbarLayoutStore, mergeHotbarLayoutSave } from '../server/hotbar_layout';
 import { createWsAuth } from '../server/ws_auth';
-import { ONLINE_WORLD_AUTH_TYPE } from '../src/world_api';
+import { MOVEMENT_WIRE_VERSION, ONLINE_WORLD_AUTH_TYPE } from '../src/world_api';
 import type { ActionBarLayout, ActionBarLayoutProfiles } from '../src/world_api/action_bar';
 
 interface FakeClient {
@@ -521,7 +521,13 @@ describe('the auth handshake: a queued write that settles between the row reads 
     const auth = createWsAuth(authDeps(server, getCharacter));
     await auth.authenticateWebSocket(
       client.ws as any,
-      JSON.stringify({ t: ONLINE_WORLD_AUTH_TYPE, token: 'tok', character: 23 }),
+      JSON.stringify({
+        t: ONLINE_WORLD_AUTH_TYPE,
+        token: 'tok',
+        character: 23,
+        // Required capability: ws_auth refuses a handshake without it.
+        movementWire: MOVEMENT_WIRE_VERSION,
+      }),
       {} as any,
     );
     expect(reads).toBe(2);
@@ -566,7 +572,13 @@ describe('the auth handshake: a queued write that settles between the row reads 
     const auth = createWsAuth(authDeps(server, getCharacter));
     await auth.authenticateWebSocket(
       fakeAuthWs().ws as any,
-      JSON.stringify({ t: ONLINE_WORLD_AUTH_TYPE, token: 'tok', character: 23 }),
+      JSON.stringify({
+        t: ONLINE_WORLD_AUTH_TYPE,
+        token: 'tok',
+        character: 23,
+        // Required capability: ws_auth refuses a handshake without it.
+        movementWire: MOVEMENT_WIRE_VERSION,
+      }),
       {} as any,
     );
     const session = [...server.clients.values()].find((s) => s.characterId === 23);

@@ -43,7 +43,7 @@ import {
 } from '../../server/storage_purchases';
 import { createWsAuth, type WsAuthDeps } from '../../server/ws_auth';
 import { bufferHandshakeMessages } from '../../server/ws_buffer';
-import { ONLINE_WORLD_AUTH_TYPE } from '../../src/world_api';
+import { MOVEMENT_WIRE_VERSION, ONLINE_WORLD_AUTH_TYPE } from '../../src/world_api';
 
 const CHARACTER = 7;
 
@@ -159,10 +159,14 @@ function setup() {
   return { ws, game, session, deps, req: {} as http.IncomingMessage };
 }
 
+// movementWire is a REQUIRED capability (server/ws_auth.ts rejects a handshake
+// without it before any admission work), so the frame mints it exactly as
+// buildWebSocketAuthMessage does.
 const authRaw = JSON.stringify({
   t: ONLINE_WORLD_AUTH_TYPE,
   token: 'tok',
   character: CHARACTER,
+  movementWire: MOVEMENT_WIRE_VERSION,
 });
 
 /** Drive one admission and report the hold as seen from BOTH observation points:

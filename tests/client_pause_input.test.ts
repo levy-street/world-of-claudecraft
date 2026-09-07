@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { MovementWireGlue } from '../src/game/movement_wire_glue';
 import { ClientWorld } from '../src/net/online';
 import { INPUT_SEND_BACKPRESSURE_LIMIT_BYTES } from '../src/net/send_backpressure';
 
@@ -24,12 +25,12 @@ describe('ClientWorld neutralizeInputForClientPause', () => {
         bufferedAmount: INPUT_SEND_BACKPRESSURE_LIMIT_BYTES + 1,
         send: (payload: string) => sent.push(payload),
       },
-      lastInputSentAt: 999,
-      lastInputSig: '0,0,0,0,0,0,0,',
       inputSeq: 4,
       pendingInputSeqSentAt: new Map<number, number>(),
-      pendingTransientInput: { jump: true, turnLeft: true, turnRight: true },
     });
+    // The neutral frame is minted by the wire glue the game loop installs, so
+    // the pause path exercises the real onMovementWireNeutral seam.
+    new MovementWireGlue().connect(client, 0);
     const previousWebSocket = globalThis.WebSocket;
     Object.defineProperty(globalThis, 'WebSocket', {
       configurable: true,
@@ -55,16 +56,15 @@ describe('ClientWorld neutralizeInputForClientPause', () => {
       dive: false,
       surface: false,
     });
+    expect((client as unknown as { mouselookFacing: number | null }).mouselookFacing).toBeNull();
+    // Saturated browser buffer and all: the pause frame bypasses backpressure
+    // rather than queueing in the outbox behind a backlog that is not moving.
     expect(sent).toHaveLength(1);
     expect(JSON.parse(sent[0])).toEqual({
       t: 'input',
-      mv: 2,
-      mt: 1000,
       seq: 5,
+      ct: 0,
       mi: { f: 0, b: 0, tl: 0, tr: 0, sl: 0, sr: 0, j: 0, dv: 0, sf: 0 },
     });
-    expect(
-      (client as unknown as { pendingTransientInput?: unknown }).pendingTransientInput,
-    ).toBeUndefined();
   });
 });

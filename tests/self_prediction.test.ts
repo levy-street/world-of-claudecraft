@@ -16,8 +16,7 @@ interface SendRecord {
 }
 
 class FakeSelfPredictionWire implements SelfPredictionWire {
-  movementWireVersion: 1 | 2 = 2;
-  onMovementWireNegotiated: ((version: 1 | 2, now: number) => void) | null = null;
+  onMovementWireNegotiated: ((now: number) => void) | null = null;
   onMovementWireNeutral: ((now: number) => boolean) | null = null;
   reconAuthoritativeX: number | null = 12;
   reconAuthoritativeY: number | null = groundHeight(12, 18, SEED);

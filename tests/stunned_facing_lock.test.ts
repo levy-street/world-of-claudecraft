@@ -44,6 +44,7 @@ vi.mock('../server/db', () => ({
 
 import { describe, expect, it, vi } from 'vitest';
 import { GameServer } from '../server/game';
+import { consumeMovementFramesV2 } from '../server/movement_input_timeline_v2';
 import type { Aura } from '../src/sim/types';
 
 function joinSession(server: any, id: number, name: string) {
@@ -53,8 +54,13 @@ function joinSession(server: any, id: number, name: string) {
   return session;
 }
 
-function sendFacing(server: any, session: any, seq: number, facing: number): void {
-  server.handleMessage(session, JSON.stringify({ t: 'input', seq, mi: {}, facing }));
+// A client heading only reaches the entity when the per-tick timeline CONSUMES
+// the frame, so every send drives one consumption step. The stun predicate is
+// evaluated there too: the lock is a consumption-time rule, not a receive-time
+// one. Client ticks start at 0 on a fresh session and increment by one.
+function sendFacing(server: any, session: any, ct: number, facing: number): void {
+  server.handleMessage(session, JSON.stringify({ t: 'input', seq: ct + 1, ct, mi: {}, facing }));
+  consumeMovementFramesV2(server.sim, [session]);
 }
 
 function stunAura(sourceId: number): Aura {
@@ -78,7 +84,7 @@ describe('stunned facing lock (issue #2426)', () => {
     const startFacing = e.facing;
 
     e.auras.push(stunAura(e.id));
-    sendFacing(server, session, 1, startFacing + 1.5);
+    sendFacing(server, session, 0, startFacing + 1.5);
 
     expect(e.facing).toBe(startFacing); // the stun held the heading in place
   });
@@ -90,11 +96,11 @@ describe('stunned facing lock (issue #2426)', () => {
     const startFacing = e.facing;
 
     e.auras.push(stunAura(e.id));
-    sendFacing(server, session, 1, startFacing + 1.5);
+    sendFacing(server, session, 0, startFacing + 1.5);
     expect(e.facing).toBe(startFacing);
 
     e.auras.length = 0; // the stun expires
-    sendFacing(server, session, 2, startFacing + 1.5);
+    sendFacing(server, session, 1, startFacing + 1.5);
     expect(e.facing).toBeCloseTo(startFacing + 1.5, 5);
   });
 
@@ -106,7 +112,7 @@ describe('stunned facing lock (issue #2426)', () => {
     e.ghost = true;
     const target = e.facing + 1.2;
 
-    sendFacing(server, session, 1, target);
+    sendFacing(server, session, 0, target);
 
     expect(e.facing).toBeCloseTo(target, 5);
   });

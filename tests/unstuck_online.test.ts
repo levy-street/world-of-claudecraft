@@ -25,10 +25,7 @@ vi.mock('../server/unstuck_records', () => ({
 }));
 
 import { type ClientSession, GameServer } from '../server/game';
-import {
-  consumeMovementFramesV2,
-  createMovementInputSessionState,
-} from '../server/movement_input_timeline_v2';
+import { consumeMovementFramesV2 } from '../server/movement_input_timeline_v2';
 import { recordUnstuckEvent } from '../server/unstuck_records';
 import { ClientWorld } from '../src/net/online';
 import { BG_GRAVEYARDS, bgFieldPlanWalls } from '../src/sim/battleground_layout';
@@ -375,7 +372,6 @@ describe('online unstuck command wiring', () => {
   it('the Settings command keeps wall-contact eligibility when ESC neutral input wins the race', () => {
     const server = new GameServer();
     const { session } = join(server, 26);
-    Object.assign(session, createMovementInputSessionState(2));
     const { match, pid } = activeBattlegroundForSession(server, session);
     const player = forceIntoBgWallContact(server, match, pid);
     const meta = must(server.sim.meta(pid), 'wall-contact player meta');

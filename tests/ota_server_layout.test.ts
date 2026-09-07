@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
+  MOVEMENT_WIRE_VERSION,
   ONLINE_WORLD_AUTH_TYPE,
   ONLINE_WORLD_INCOMPATIBLE_MESSAGE,
 } from '../scripts/lib/world_auth.mjs';
@@ -32,7 +33,14 @@ describe('the server literals the probe depends on', () => {
 
 describe('buildProbeFrame', () => {
   it('sends this checkout discriminator with no usable credentials', () => {
-    expect(buildProbeFrame()).toEqual({ t: ONLINE_WORLD_AUTH_TYPE, token: '', character: 0 });
+    expect(buildProbeFrame()).toEqual({
+      t: ONLINE_WORLD_AUTH_TYPE,
+      token: '',
+      character: 0,
+      // Required capability: without it the server refuses BEFORE the token
+      // check and the probe could never reach its 'not authenticated' signal.
+      movementWire: MOVEMENT_WIRE_VERSION,
+    });
     // Load-bearing: an empty token can never authenticate, which is what makes
     // the probe safe to run against production without credentials.
     expect(buildProbeFrame().token).toBe('');

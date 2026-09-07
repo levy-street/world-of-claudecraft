@@ -153,7 +153,7 @@ describe('ClientWorld visibilitychange reconnect (mobile background/foreground)'
     });
   });
 
-  it('clears shed transient input intent when a fresh transport is established', () => {
+  it('drops movement frames stranded in the outbox when a fresh transport is established', () => {
     withDomStubs((_doc, harness) => {
       const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
       const wire = world as unknown as {
@@ -163,12 +163,12 @@ describe('ClientWorld visibilitychange reconnect (mobile background/foreground)'
       const first = StubWebSocket.instances[0];
       wire.onMessage(JSON.stringify({ t: 'hello', pid: 1, seed: 42 }));
 
+      // Congested socket: the frame is accepted into the outbox but never
+      // reaches the wire before the transport dies under it.
       first.bufferedAmount = INPUT_SEND_BACKPRESSURE_LIMIT_BYTES + 1;
-      world.moveInput.jump = true;
-      world.moveInput.turnLeft = true;
-      expect(world.flushInput(1_000)).toBe(false);
-      world.moveInput.jump = false;
-      world.moveInput.turnLeft = false;
+      const stranded = { ...world.moveInput, jump: true, turnLeft: true };
+      expect(world.sendMovementFrame({ ct: 0, mi: stranded, facing: null }, 1_000)).toBe(true);
+      expect(first.sent.filter((raw) => raw.includes('"t":"input"'))).toEqual([]);
 
       first.readyState = StubWebSocket.CLOSED;
       first.onclose?.();
@@ -177,11 +177,17 @@ describe('ClientWorld visibilitychange reconnect (mobile background/foreground)'
       const second = StubWebSocket.instances[1];
       wire.onMessage(JSON.stringify({ t: 'hello', pid: 1, seed: 42 }));
 
-      expect(world.flushInput(2_000)).toBe(true);
-      const input = JSON.parse(second.sent.at(-1) ?? '{}') as {
-        mi?: { j?: number; tl?: number; tr?: number };
-      };
-      expect(input.mi).toMatchObject({ j: 0, tl: 0, tr: 0 });
+      expect(
+        world.sendMovementFrame({ ct: 0, mi: { ...world.moveInput }, facing: null }, 2_000),
+      ).toBe(true);
+      const inputs = second.sent
+        .filter((raw) => raw.includes('"t":"input"'))
+        .map((raw) => JSON.parse(raw) as { seq: number; mi: Record<string, number> });
+      // Exactly the fresh frame: the pre-drop backlog died with the old socket,
+      // and the server restarts input acking at 0 so the seq restarts too.
+      expect(inputs).toHaveLength(1);
+      expect(inputs[0].seq).toBe(1);
+      expect(inputs[0].mi).toMatchObject({ j: 0, tl: 0, tr: 0 });
       world.close();
     });
   });

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { dungeonEntrySnapshotFacing } from '../src/net/dungeon_entry_facing';
 import type { ClientWorld } from '../src/net/online';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
-import { emptyMoveInput } from '../src/sim/types';
+import { emptyMoveInput, type MoveInput } from '../src/sim/types';
 import { bareClient } from './helpers/bare_client';
 
 function selfWire(
@@ -36,6 +36,19 @@ function applySelf(client: ClientWorld, wire: Record<string, unknown>): void {
   });
 }
 
+/** Send one per-tick frame carrying the client's current held intent and mouselook
+ *  heading, so a case can read back what the wire actually carried. */
+function sendFrame(client: ClientWorld, ct: number): boolean {
+  const internals = client as unknown as {
+    moveInput: MoveInput;
+    mouselookFacing: number | null;
+  };
+  return client.sendMovementFrame(
+    { ct, mi: { ...internals.moveInput }, facing: internals.mouselookFacing },
+    ct * 50,
+  );
+}
+
 describe('online dungeon entry facing fence', () => {
   it('replaces queued Mouse Camera facing synchronously during snapshot decode', () => {
     const id = 42;
@@ -47,40 +60,39 @@ describe('online dungeon entry facing fence', () => {
       moveInput: { ...emptyMoveInput(), forward: true, turnLeft: true, turnRight: true },
       ws: {
         readyState: WebSocket.OPEN,
-        bufferedAmount: Number.MAX_SAFE_INTEGER,
+        bufferedAmount: 0,
         send: (raw: string) => sent.push(raw),
       },
     });
     applySelf(client, selfWire(id, raid.doorPos.x, raid.doorPos.z, Math.PI, 0));
+    // Every frame carries the generation the server last advertised, so the
+    // fence can tell an echo of the forced landing from a stale packet.
+    expect(sendFrame(client, 0)).toBe(true);
+    expect(JSON.parse(sent.at(-1) ?? '{}')).toMatchObject({ de: 0 });
 
     applySelf(client, selfWire(id, origin.x + raid.entry.x, origin.z + raid.entry.z, 0, 1));
 
     expect((client as unknown as { mouselookFacing: number | null }).mouselookFacing).toBe(0);
+    expect(sendFrame(client, 1)).toBe(true);
     expect(JSON.parse(sent.at(-1) ?? '{}')).toMatchObject({
       facing: 0,
       de: 1,
       mi: { f: 1, tl: 0, tr: 0 },
     });
-    const internals = client as unknown as {
-      ws: { bufferedAmount: number };
-      sendInput(now?: number): boolean;
-    };
-    internals.ws.bufferedAmount = 0;
-    expect(internals.sendInput(10_000)).toBe(true);
+    expect(sendFrame(client, 2)).toBe(true);
     expect(JSON.parse(sent.at(-1) ?? '{}')).toMatchObject({ de: 1, mi: { tl: 0, tr: 0 } });
     expect(client.consumeDungeonEntryFacing()).toBe(0);
     expect(client.consumeDungeonEntryFacing()).toBeNull();
 
     (client as unknown as { mouselookFacing: number | null }).mouselookFacing = 1.25;
-    const sentAfterAck = sent.length;
     applySelf(client, selfWire(id, origin.x + raid.entry.x + 1, origin.z + raid.entry.z, 1.25));
-    expect(sent).toHaveLength(sentAfterAck);
     expect((client as unknown as { mouselookFacing: number | null }).mouselookFacing).toBe(1.25);
     expect(client.consumeDungeonEntryFacing()).toBeNull();
 
     applySelf(client, selfWire(id, origin.x + raid.entry.x + 2, origin.z + raid.entry.z, 1.25, 1));
-    expect(sent).toHaveLength(sentAfterAck);
     expect((client as unknown as { mouselookFacing: number | null }).mouselookFacing).toBe(1.25);
+    expect(sendFrame(client, 3)).toBe(true);
+    expect(JSON.parse(sent.at(-1) ?? '{}')).toMatchObject({ facing: 1.25, de: 1 });
 
     const wire = client as unknown as {
       reconnectAttempts: number;
@@ -88,18 +100,15 @@ describe('online dungeon entry facing fence', () => {
     };
     wire.reconnectAttempts = 1;
     wire.onMessage(JSON.stringify({ t: 'hello', pid: id, seed: 20061 }));
-    const sentAfterHello = sent.length;
     applySelf(client, selfWire(id, origin.x + raid.entry.x + 3, origin.z + raid.entry.z, 0, 1));
-    expect(sent).toHaveLength(sentAfterHello + 1);
+    expect(sendFrame(client, 4)).toBe(true);
     expect(JSON.parse(sent.at(-1) ?? '{}')).toMatchObject({ facing: 0, de: 1 });
     expect(client.consumeDungeonEntryFacing()).toBe(0);
 
     (client as unknown as { mouselookFacing: number | null }).mouselookFacing = 1.25;
     wire.reconnectAttempts = 1;
     wire.onMessage(JSON.stringify({ t: 'hello', pid: id, seed: 20061 }));
-    const sentBeforeOutsideResume = sent.length;
     applySelf(client, selfWire(id, raid.doorPos.x, raid.doorPos.z, 1.25, 1));
-    expect(sent).toHaveLength(sentBeforeOutsideResume);
     expect((client as unknown as { mouselookFacing: number | null }).mouselookFacing).toBe(1.25);
     expect(client.consumeDungeonEntryFacing()).toBeNull();
   });
@@ -113,13 +122,14 @@ describe('online dungeon entry facing fence', () => {
       mouselookFacing: Math.PI,
       ws: {
         readyState: WebSocket.OPEN,
-        bufferedAmount: Number.MAX_SAFE_INTEGER,
+        bufferedAmount: 0,
         send: (raw: string) => sent.push(raw),
       },
     });
 
     applySelf(client, selfWire(id, origin.x + crypt.entry.x, origin.z + crypt.entry.z, 0, 4));
 
+    expect(sendFrame(client, 0)).toBe(true);
     expect(JSON.parse(sent.at(-1) ?? '{}')).toMatchObject({ facing: 0, de: 4 });
     expect(client.consumeDungeonEntryFacing()).toBe(0);
   });
@@ -139,11 +149,10 @@ describe('online dungeon entry facing fence', () => {
       },
     });
     applySelf(client, selfWire(id, crypt.doorPos.x, crypt.doorPos.z, Math.PI));
-    const sentAtDoor = sent.length;
 
     applySelf(client, selfWire(id, origin.x + crypt.entry.x, origin.z + crypt.entry.z, 0));
 
-    expect(sent).toHaveLength(sentAtDoor + 1);
+    expect(sendFrame(client, 0)).toBe(true);
     expect(JSON.parse(sent.at(-1) ?? '{}')).toMatchObject({ facing: 0, mi: { f: 1 } });
     expect(JSON.parse(sent.at(-1) ?? '{}')).not.toHaveProperty('de');
     expect(client.consumeDungeonEntryFacing()).toBe(0);

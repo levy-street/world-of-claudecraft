@@ -543,14 +543,7 @@ describe('tick perf capture lifecycle', () => {
     // call, swapping its aggro/threat arguments, or inverting its capturing gate
     // reddens this test.
     const server = new GameServer();
-    const movementSession = joinServer(
-      server,
-      fakeWs(),
-      990_403,
-      'MovementStatsTarget',
-      'warrior',
-      { movementWireVersion: 2 },
-    );
+    const movementSession = joinServer(server, fakeWs(), 990_403, 'MovementStatsTarget', 'warrior');
     server.handleMessage(
       movementSession,
       JSON.stringify({ t: 'input', seq: 1, ct: 0, mi: { f: 1 } }),

@@ -90,7 +90,6 @@ export interface JoinedGroundTruth {
 export function joinGroundTruthCharacter(
   characterId = 1,
   playerClass: PlayerClass = 'warrior',
-  movementWireVersion: 1 | 2 = 1,
 ): JoinedGroundTruth {
   const server = new GameServer();
   const client = rawFakeWs();
@@ -102,7 +101,6 @@ export function joinGroundTruthCharacter(
     playerClass,
     null,
     false,
-    { movementWireVersion },
   );
   if ('error' in session) throw new Error(session.error);
   session.blockListLoaded = true;

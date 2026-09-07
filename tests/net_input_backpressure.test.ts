@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { MovementInputTimeline } from '../server/movement_input_timeline_v2';
+import { MOVEMENT_FRAME_V2_PENDING_CAP } from '../src/net/movement_frame_v2_wire';
 import { ClientWorld } from '../src/net/online';
 import { INPUT_SEND_BACKPRESSURE_LIMIT_BYTES } from '../src/net/send_backpressure';
 import { parseMoveInputFrame } from '../src/sim/move_input';
@@ -28,8 +29,6 @@ function makeClient(bufferedAmount: number) {
     connected: true,
     spectating: null,
     ws,
-    lastInputSentAt: 0,
-    lastInputSig: '',
     inputSeq: 0,
     pendingInputSeqSentAt: new Map<number, number>(),
   });
@@ -62,28 +61,20 @@ describe('ClientWorld input send backpressure gate', () => {
   it('sends normally while the local socket is draining', () => {
     const { client, sent } = makeClient(0);
     withWebSocketStub(() => {
-      expect(client.flushInput(1_000)).toBe(true);
+      expect(client.sendMovementFrame({ ct: 0, mi: client.moveInput, facing: null }, 1_000)).toBe(
+        true,
+      );
     });
     expect(sent).toHaveLength(1);
   });
 
-  it('sheds the send once the local unflushed buffer is backed up past the limit', () => {
+  it('keeps the frame off the wire once the local unflushed buffer is backed up past the limit', () => {
     const { client, sent } = makeClient(INPUT_SEND_BACKPRESSURE_LIMIT_BYTES + 1);
     withWebSocketStub(() => {
-      expect(client.flushInput(1_000)).toBe(false);
-    });
-    expect(sent).toHaveLength(0);
-    expect(client.netPipeline().summary().inputBackpressure).toEqual({
-      sheds: 1,
-      peakBufferedBytes: INPUT_SEND_BACKPRESSURE_LIMIT_BYTES + 1,
-    });
-  });
-
-  it('preserves periodic input shedding above the client-local threshold', () => {
-    const { client, sent } = makeClient(INPUT_SEND_BACKPRESSURE_LIMIT_BYTES + 1);
-    withWebSocketStub(() => {
-      expect((client as unknown as { sendInput(now?: number): boolean }).sendInput(1_000)).toBe(
-        false,
+      // Accepted into the outbox, but nothing is written behind a backlog that
+      // is not draining.
+      expect(client.sendMovementFrame({ ct: 0, mi: client.moveInput, facing: null }, 1_000)).toBe(
+        true,
       );
     });
     expect(sent).toHaveLength(0);
@@ -92,96 +83,76 @@ describe('ClientWorld input send backpressure gate', () => {
   it('resumes sending as soon as the buffer drains back under the limit', () => {
     const { client, ws, sent } = makeClient(INPUT_SEND_BACKPRESSURE_LIMIT_BYTES + 1);
     withWebSocketStub(() => {
-      expect(client.flushInput(1_000)).toBe(false);
+      expect(client.sendMovementFrame({ ct: 0, mi: client.moveInput, facing: null }, 1_000)).toBe(
+        true,
+      );
+      expect(sent).toHaveLength(0);
       ws.bufferedAmount = 0;
-      expect(client.flushInput(2_000)).toBe(true);
+      expect(client.sendMovementFrame({ ct: 1, mi: client.moveInput, facing: null }, 2_000)).toBe(
+        true,
+      );
     });
-    expect(sent).toHaveLength(1);
+    expect(sent.map((payload) => sentInput([payload]).ct)).toEqual([0, 1]);
   });
 
-  it('delivers a jump press exactly once after press and release both occur during congestion', () => {
+  it('consumes a queued frame only after WebSocket.send accepts it', () => {
     const { client, ws, sent } = makeClient(INPUT_SEND_BACKPRESSURE_LIMIT_BYTES + 1);
     withWebSocketStub(() => {
-      client.moveInput.jump = true;
-      expect(client.flushInput(1_000)).toBe(false);
-      client.moveInput.jump = false;
-      expect(client.flushInput(1_100)).toBe(false);
-
-      ws.bufferedAmount = 0;
-      expect(client.flushInput(2_000)).toBe(true);
-      expect(client.flushInput(2_100)).toBe(false);
-    });
-
-    expect(sent).toHaveLength(1);
-    expect(sentInput(sent).mi.j).toBe(1);
-  });
-
-  it.each([
-    ['left', 'turnLeft', 'tl'],
-    ['right', 'turnRight', 'tr'],
-  ] as const)(
-    'delivers the manual-turn %s engagement edge exactly once after it is suppressed during congestion',
-    (_direction, inputKey, wireKey) => {
-      const { client, ws, sent } = makeClient(INPUT_SEND_BACKPRESSURE_LIMIT_BYTES + 1);
-      withWebSocketStub(() => {
-        client.moveInput[inputKey] = true;
-        expect(client.flushInput(1_000)).toBe(false);
-        // keyboard_turn_facing suppresses the raw turn flag after the engage
-        // frame; the edge still has to survive until the socket drains.
-        client.moveInput[inputKey] = false;
-        expect(client.flushInput(1_100)).toBe(false);
-
-        ws.bufferedAmount = 0;
-        expect(client.flushInput(2_000)).toBe(true);
-        expect(client.flushInput(2_100)).toBe(false);
-      });
-
-      expect(sent).toHaveLength(1);
-      expect(sentInput(sent).mi[wireKey]).toBe(1);
-    },
-  );
-
-  it('recovers only the latest persistent state while retaining transient intent', () => {
-    const { client, ws, sent } = makeClient(INPUT_SEND_BACKPRESSURE_LIMIT_BYTES + 1);
-    withWebSocketStub(() => {
-      client.moveInput.jump = true;
-      expect(client.flushInput(1_000)).toBe(false);
-      client.moveInput.jump = false;
-      client.moveInput.forward = false;
-      client.moveInput.back = true;
-      expect(client.flushInput(1_100)).toBe(false);
-
-      ws.bufferedAmount = 0;
-      expect(client.flushInput(2_000)).toBe(true);
-    });
-
-    expect(sentInput(sent).mi).toMatchObject({ f: 0, b: 1, j: 1 });
-  });
-
-  it('consumes retained transient intent only after WebSocket.send accepts a real frame', () => {
-    const { client, ws, sent } = makeClient(INPUT_SEND_BACKPRESSURE_LIMIT_BYTES + 1);
-    withWebSocketStub(() => {
-      client.moveInput.jump = true;
-      expect(client.flushInput(1_000)).toBe(false);
-      client.moveInput.jump = false;
+      client.sendMovementFrame(
+        { ct: 0, mi: { ...client.moveInput, jump: true }, facing: null },
+        1_000,
+      );
       ws.bufferedAmount = 0;
       ws.send = () => {
         throw new Error('socket closed during send');
       };
-      expect(() => client.flushInput(2_000)).toThrow('socket closed during send');
+      expect(() =>
+        client.sendMovementFrame({ ct: 1, mi: client.moveInput, facing: null }, 2_000),
+      ).toThrow('socket closed during send');
 
       ws.send = (payload: string) => sent.push(payload);
-      expect(client.flushInput(3_000)).toBe(true);
+      expect(client.sendMovementFrame({ ct: 2, mi: client.moveInput, facing: null }, 3_000)).toBe(
+        true,
+      );
     });
 
-    expect(sent).toHaveLength(1);
+    expect(sent.map((payload) => sentInput([payload]).ct)).toEqual([0, 2]);
     expect(sentInput(sent).mi.j).toBe(1);
   });
 
-  it('does not gate cmd frames on backpressure: only the idempotent-latest input path is shed', () => {
+  it('books a backpressure shed only once the outbox has to drop a queued frame', () => {
     const { client, ws, sent } = makeClient(INPUT_SEND_BACKPRESSURE_LIMIT_BYTES + 1);
     withWebSocketStub(() => {
-      expect(client.flushInput(1_000)).toBe(false);
+      // Filling the outbox to its cap holds every frame without losing one, so
+      // nothing is shed yet.
+      for (let ct = 0; ct < MOVEMENT_FRAME_V2_PENDING_CAP; ct++) {
+        client.sendMovementFrame({ ct, mi: client.moveInput, facing: null }, 1_000 + ct);
+      }
+      expect(client.netPipeline().summary().inputBackpressure).toEqual({
+        sheds: 0,
+        peakBufferedBytes: 0,
+      });
+
+      // The frame past the cap evicts the oldest: that eviction is the shed.
+      client.sendMovementFrame(
+        { ct: MOVEMENT_FRAME_V2_PENDING_CAP, mi: client.moveInput, facing: null },
+        2_000,
+      );
+    });
+
+    expect(sent).toHaveLength(0);
+    expect(client.netPipeline().summary().inputBackpressure).toEqual({
+      sheds: 1,
+      peakBufferedBytes: INPUT_SEND_BACKPRESSURE_LIMIT_BYTES + 1,
+    });
+    expect(ws.bufferedAmount).toBe(INPUT_SEND_BACKPRESSURE_LIMIT_BYTES + 1);
+  });
+
+  it('does not gate cmd frames on backpressure: only the idempotent-latest input path is held', () => {
+    const { client, ws, sent } = makeClient(INPUT_SEND_BACKPRESSURE_LIMIT_BYTES + 1);
+    withWebSocketStub(() => {
+      client.sendMovementFrame({ ct: 0, mi: client.moveInput, facing: null }, 1_000);
+      expect(sent).toHaveLength(0);
       // rawCmd's own gate is only connected + readyState; it never reads
       // ws.bufferedAmount, so a saturated socket still lets a command through.
       (client as unknown as { rawCmd: (payload: Record<string, unknown>) => void }).rawCmd({
@@ -193,9 +164,8 @@ describe('ClientWorld input send backpressure gate', () => {
     expect(JSON.parse(sent[0])).toEqual({ t: 'cmd', cmd: 'chat' });
   });
 
-  it('queues a v2 jump edge and flushes it in client tick order on recovery', () => {
+  it('queues a jump edge and flushes it in client tick order on recovery', () => {
     const { client, ws, sent } = makeClient(INPUT_SEND_BACKPRESSURE_LIMIT_BYTES + 1);
-    client.movementWireVersion = 2;
     withWebSocketStub(() => {
       expect(
         client.sendMovementFrame(
@@ -217,10 +187,9 @@ describe('ClientWorld input send backpressure gate', () => {
     expect(sentInput(sent, 1).mi.j).toBe(0);
   });
 
-  it('drops the oldest v2 queue frame and lets the server timeline resync', () => {
+  it('drops the oldest queued frame and lets the server timeline resync', () => {
     const { client, ws, sent } = makeClient(INPUT_SEND_BACKPRESSURE_LIMIT_BYTES + 1);
     const timeline = new MovementInputTimeline();
-    client.movementWireVersion = 2;
     ws.send = (payload: string) => {
       sent.push(payload);
       const raw = JSON.parse(payload) as { ct: number };
@@ -245,9 +214,8 @@ describe('ClientWorld input send backpressure gate', () => {
     expect(timeline.consumeNext()?.ct).toBe(1);
   });
 
-  it('uses the v2 timer only to flush queued frames, never to send legacy input', () => {
+  it('uses the outbox timer only to flush queued frames, never to mint one of its own', () => {
     const { client, ws, sent } = makeClient(INPUT_SEND_BACKPRESSURE_LIMIT_BYTES + 1);
-    client.movementWireVersion = 2;
     withWebSocketStub(() => {
       expect(client.sendMovementFrame({ ct: 0, mi: client.moveInput, facing: null }, 1_000)).toBe(
         true,

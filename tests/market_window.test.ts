@@ -904,8 +904,6 @@ describe('ClientWorld: reconnect re-push of session preferences (#2723 review)',
       client.conflictRejections = 0;
       client.timeoutRejections = 0;
       client.inputSeq = 0;
-      client.lastInputSig = '';
-      client.lastInputSentAt = 0;
       client.ackedInputSeq = 0;
       client.lastSnapAt = 0;
 

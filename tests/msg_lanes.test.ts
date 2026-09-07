@@ -43,6 +43,10 @@ vi.mock('../server/db', () => ({
 
 import { type ClientSession, GameServer } from '../server/game';
 import {
+  consumeMovementFramesV2,
+  MOVEMENT_INPUT_TIMELINE_DEPTH,
+} from '../server/movement_input_timeline_v2';
+import {
   classifyMsgLane,
   consumeLaneToken,
   createMsgLanes,
@@ -333,8 +337,18 @@ function sinkDetector(server: GameServer): DetectorSink {
   return sink;
 }
 
-function sendInput(server: GameServer, session: ClientSession, seq: number, facing = 0.25): void {
-  server.handleMessage(session, JSON.stringify({ t: 'input', seq, mi: { f: 1 }, facing }));
+// `ct` is optional because most arms here only need the frame COUNTED: the
+// rate gate, the lanes and the abuse window all verdict a frame whether or not
+// it carries a client tick. Only an arm that reads the entity back needs one,
+// since a frame without `ct` is parsed and then never enqueued on the timeline.
+function sendInput(
+  server: GameServer,
+  session: ClientSession,
+  seq: number,
+  facing = 0.25,
+  ct?: number,
+): void {
+  server.handleMessage(session, JSON.stringify({ t: 'input', seq, ct, mi: { f: 1 }, facing }));
 }
 
 function sendCast(server: GameServer, session: ClientSession): void {
@@ -591,15 +605,24 @@ describe('dispatchMessage lane wiring at the R5 placements', () => {
     const session = join(server);
     const sink = sinkDetector(server);
 
-    // One hundred twenty-one input frames at one instant: the last is
-    // lane-dropped BEFORE the sim assignment and BEFORE observeInput
-    // (drop-before-observe, R5), so neither its seq nor its facing lands.
-    for (let i = 1; i <= 120; i++) sendInput(server, session, i, 0.25);
-    sendInput(server, session, 121, 0.9);
+    // One hundred twenty-one input frames at one instant, each carrying its own
+    // client tick: the last is lane-dropped BEFORE the timeline enqueue and
+    // BEFORE observeInput (drop-before-observe, R5), so neither its seq nor its
+    // facing lands. An accepted frame reaches the entity only when the timeline
+    // CONSUMES it, so the facing half is read by draining the whole window: the
+    // dropped frame would sit at its tail (client tick 120) and land on the
+    // final step, so a heading that never leaves 0.25 and a consumed cursor
+    // that stops at 119 are together what prove it was never enqueued.
+    for (let i = 1; i <= 120; i++) sendInput(server, session, i, 0.25, i - 1);
+    sendInput(server, session, 121, 0.9, 120);
 
     expect(sink.inputs).toBe(120);
     expect(session.lastInputSeq).toBe(120);
-    expect(server.sim.entities.get(session.pid)?.facing).toBe(0.25);
+    for (let i = 0; i < MOVEMENT_INPUT_TIMELINE_DEPTH; i++) {
+      consumeMovementFramesV2(server.sim, [session]);
+      expect(server.sim.entities.get(session.pid)?.facing).toBe(0.25);
+    }
+    expect(session.lastConsumedCt).toBe(119);
     expect(session.msgRate.dropsThisSecond).toBe(1);
   });
 

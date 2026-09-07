@@ -4,11 +4,13 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
   chatCommandMessage,
+  MOVEMENT_WIRE_VERSION as SCRIPT_MOVEMENT_WIRE_VERSION,
   ONLINE_WORLD_AUTH_TYPE as SCRIPT_WORLD_AUTH_TYPE,
   ONLINE_WORLD_INCOMPATIBLE_MESSAGE as SCRIPT_WORLD_INCOMPATIBLE_MESSAGE,
   worldAuthMessage,
 } from '../scripts/lib/world_auth.mjs';
 import {
+  MOVEMENT_WIRE_VERSION,
   ONLINE_WORLD_AUTH_TYPE,
   ONLINE_WORLD_INCOMPATIBLE_MESSAGE,
   ONLINE_WORLD_LAYOUT_VERSION,
@@ -184,10 +186,19 @@ describe('standalone world WebSocket auth', () => {
     expect(readFileSync(join(ROOT, 'scripts/lib/world_auth.d.mts'), 'utf8')).toContain(
       `export const ONLINE_WORLD_INCOMPATIBLE_MESSAGE: '${ONLINE_WORLD_INCOMPATIBLE_MESSAGE}';`,
     );
+    // The movement wire travels with the discriminator: the server refuses a
+    // handshake that does not offer this exact number BEFORE it reads the
+    // token, so a Node client missing it is rejected outright and the OTA
+    // layout preflight reads a healthy server as an epoch mismatch.
+    expect(SCRIPT_MOVEMENT_WIRE_VERSION).toBe(MOVEMENT_WIRE_VERSION);
+    expect(readFileSync(join(ROOT, 'scripts/lib/world_auth.d.mts'), 'utf8')).toContain(
+      `export const MOVEMENT_WIRE_VERSION: ${MOVEMENT_WIRE_VERSION};`,
+    );
     expect(worldAuthMessage('token-1', 42)).toEqual({
       t: ONLINE_WORLD_AUTH_TYPE,
       token: 'token-1',
       character: 42,
+      movementWire: MOVEMENT_WIRE_VERSION,
     });
   });
 

@@ -15,7 +15,6 @@ function fixture(): { sim: Sim; session: MovementOverrideSessionState } {
     sim,
     session: {
       pid: sim.playerId,
-      movementWireVersion: 2,
       ...createMovementOverrideSessionState(),
     },
   };
@@ -171,14 +170,6 @@ describe('updateMovementOverrideEpochs', () => {
     entity.pos.z += 1;
     updateMovementOverrideEpochs(sim, [session]);
     expect(session.movementOverrideEpoch).toBe(2);
-  });
-
-  it('leaves movement v1 session state untouched', () => {
-    const { sim, session } = fixture();
-    session.movementWireVersion = 1;
-    sim.player.chargeTargetId = 2;
-    updateMovementOverrideEpochs(sim, [session]);
-    expect(session).toMatchObject(createMovementOverrideSessionState());
   });
 
   it('reuses the stored signature and authoritative position objects', () => {

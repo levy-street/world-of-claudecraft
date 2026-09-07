@@ -17,7 +17,11 @@ import { GeneralChatRateLimitLiveState } from '../../server/general_chat_quota';
 import { isConnectionRefused as realIsConnectionRefused } from '../../server/ip_block';
 import { createWsAuth, type WsAuthDeps } from '../../server/ws_auth';
 import { bufferHandshakeMessages } from '../../server/ws_buffer';
-import { DUNGEON_ENTRY_FACING_WIRE_VERSION, ONLINE_WORLD_AUTH_TYPE } from '../../src/world_api';
+import {
+  DUNGEON_ENTRY_FACING_WIRE_VERSION,
+  MOVEMENT_WIRE_VERSION,
+  ONLINE_WORLD_AUTH_TYPE,
+} from '../../src/world_api';
 
 // A fake socket: real EventEmitter wiring (on/once/off/emit) so the handshake
 // buffer and the post-join ws.on('message'|'close'|'error') handlers work, plus
@@ -150,8 +154,16 @@ function joinedMeta(game: ReturnType<typeof setup>['game']): Record<string, unkn
   return calls[0][7] as Record<string, unknown>;
 }
 
+// Mirrors buildWebSocketAuthMessage: movementWire is REQUIRED, so the default
+// carries it and a case that drops it is testing the rejection deliberately.
 const authRaw = (over: Record<string, unknown> = {}) =>
-  JSON.stringify({ t: ONLINE_WORLD_AUTH_TYPE, token: 'tok', character: 7, ...over });
+  JSON.stringify({
+    t: ONLINE_WORLD_AUTH_TYPE,
+    token: 'tok',
+    character: 7,
+    movementWire: MOVEMENT_WIRE_VERSION,
+    ...over,
+  });
 
 const errorFrame = (error: string) => JSON.stringify({ t: 'error', error });
 
@@ -348,6 +360,47 @@ describe('createWsAuth: authenticateWebSocket reject paths', () => {
       expectNoAdmissionWork(fixture);
     },
   );
+
+  it.each([
+    ['absent', undefined],
+    ['the retired version 1', 1],
+    ['a string 2', '2'],
+    ['a future version', 3],
+  ])(
+    '2f. rejects a handshake whose movementWire is %s before all admission work',
+    async (_name, movementWire) => {
+      const fixture = setup();
+      const { ws, deps, req } = fixture;
+      const raw = JSON.stringify({
+        t: ONLINE_WORLD_AUTH_TYPE,
+        token: 'tok',
+        character: 7,
+        ...(movementWire === undefined ? {} : { movementWire }),
+      });
+
+      await createWsAuth(deps).authenticateWebSocket(asWs(ws), raw, req);
+
+      expectSendThenClose(
+        ws,
+        errorFrame('Game and server versions are incompatible. Reload or update, then try again.'),
+      );
+      expectNoAdmissionWork(fixture);
+    },
+  );
+
+  it('2g. admits a handshake that offers the exact movement wire version', async () => {
+    const fixture = setup();
+    await createWsAuth(fixture.deps).authenticateWebSocket(
+      asWs(fixture.ws),
+      authRaw({ movementWire: 2 }),
+      fixture.req,
+    );
+
+    expect(MOVEMENT_WIRE_VERSION).toBe(2);
+    expect(fixture.game.join).toHaveBeenCalledTimes(1);
+    expect(fixture.ws.send).not.toHaveBeenCalled();
+    expect(fixture.ws.close).not.toHaveBeenCalled();
+  });
 
   it('2e. admits the exact current world discriminator for both fresh and resume joins', async () => {
     const fresh = setup();

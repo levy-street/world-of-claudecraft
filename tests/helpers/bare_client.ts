@@ -74,7 +74,6 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   };
   c.accountAdmin = false;
   c.petSpecialCommandsSupported = false;
-  c.movementWireVersion = 1;
   c.reconAuthoritativeX = null;
   c.reconAuthoritativeY = null;
   c.reconAuthoritativeZ = null;

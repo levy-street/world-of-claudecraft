@@ -4,14 +4,13 @@ import { MovementInputTimelineTickStats } from '../../server/movement_input_time
 import {
   createMovementInputSessionState,
   type MovementInputSessionState,
-  type MovementInputTimeline,
 } from '../../server/movement_input_timeline_v2';
 
 function session(pid: number): MovementInputSessionState {
   return {
     pid,
     lastInputAt: 0,
-    ...createMovementInputSessionState(2),
+    ...createMovementInputSessionState(),
     dungeonEntryFacing: createDungeonEntryFacingFence(0, false),
   };
 }
@@ -21,8 +20,8 @@ describe('movement input timeline tick stats', () => {
     const stats = new MovementInputTimelineTickStats();
     const first = session(1);
     const second = session(2);
-    const firstTimeline = first.movementTimeline as MovementInputTimeline;
-    const secondTimeline = second.movementTimeline as MovementInputTimeline;
+    const firstTimeline = first.movementTimeline;
+    const secondTimeline = second.movementTimeline;
     firstTimeline.consumed = 2;
     firstTimeline.starved = 1;
     firstTimeline.extrapolated = 1;
@@ -73,7 +72,7 @@ describe('movement input timeline tick stats', () => {
   it('does not recount unchanged cumulative counters and resets capture totals only', () => {
     const stats = new MovementInputTimelineTickStats();
     const active = session(1);
-    const timeline = active.movementTimeline as MovementInputTimeline;
+    const timeline = active.movementTimeline;
     timeline.consumed = 4;
     timeline.starved = 5;
     timeline.extrapolated = 3;

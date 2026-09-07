@@ -365,7 +365,6 @@ describe('self talent wire decode (IWorldTalents facet)', () => {
 describe('spectate client POV', () => {
   it('clears movement reconciliation state when the observed identity changes', () => {
     const client = bareClient(1, {
-      movementWireVersion: 2,
       reconAuthoritativeX: 1,
       reconAuthoritativeY: 2,
       reconAuthoritativeZ: 3,
@@ -1431,15 +1430,28 @@ describe('delta snapshots', () => {
     server.handleMessage(session, JSON.stringify({ t: 'input', seq: 7, mi: { f: 1 } }));
     broadcast(server);
     const snap = lastSnap(fc.sent);
+    // `ack` is the receive-time seq high-water, so it moves the moment the
+    // frame lands. This frame carries no client tick, so it is never enqueued
+    // on the movement timeline and `ackCt` stays at its pre-consumption -1:
+    // the two acks answer different questions, and only the seq one is a
+    // receive-time fact.
+    expect({ ack: snap.self.ack, ackCt: snap.self.ackCt }).toEqual({ ack: 7, ackCt: -1 });
+    // Every non-spectating self record carries the reconciliation pose; only
+    // the omit-when-default members stay off the wire at rest.
+    const entity = server.sim.entities.get(session.pid)!;
     expect({
-      ack: snap.self.ack,
-      ...('ackCt' in snap.self ? { ackCt: snap.self.ackCt } : {}),
-    }).toEqual({ ack: 7 });
-    expect(snap.self).not.toHaveProperty('rpx');
-    expect(snap.self).not.toHaveProperty('rpy');
-    expect(snap.self).not.toHaveProperty('rpz');
-    expect(snap.self).not.toHaveProperty('rpf');
-    expect(snap.self).not.toHaveProperty('ovE');
+      rpx: snap.self.rpx,
+      rpy: snap.self.rpy,
+      rpz: snap.self.rpz,
+      rpf: snap.self.rpf,
+      ovE: snap.self.ovE,
+    }).toEqual({
+      rpx: entity.pos.x,
+      rpy: entity.pos.y,
+      rpz: entity.pos.z,
+      rpf: entity.facing,
+      ovE: 0,
+    });
     expect(snap.self).not.toHaveProperty('ovA');
     expect(snap.self).not.toHaveProperty('msm');
 
@@ -1449,12 +1461,10 @@ describe('delta snapshots', () => {
     expect(lastSnap(fc.sent).self.ack).toBe(7);
   });
 
-  it('adds the consumed client tick beside the legacy ack only for movement v2', () => {
+  it('adds the consumed client tick beside the legacy ack once the timeline consumes', () => {
     const v2Server = new GameServer();
     const v2Client = fakeWs();
-    const v2Session = joinServer(v2Server, v2Client, 2, 'Ticked', 'warrior', {
-      movementWireVersion: 2,
-    });
+    const v2Session = joinServer(v2Server, v2Client, 2, 'Ticked', 'warrior');
     const meta = v2Server.sim.meta(v2Session.pid)!;
     const entity = v2Server.sim.entities.get(v2Session.pid)!;
     const facingBeforeArrival = entity.facing;
@@ -1506,7 +1516,7 @@ describe('delta snapshots', () => {
       f: 0.45,
     });
 
-    const client = bareClient(v2Session.pid, { movementWireVersion: 2 });
+    const client = bareClient(v2Session.pid);
     client.reconMoveSpeedMult = 2;
     (client as any).applySnapshot(lastSnap(v2Client.sent));
     expect({
@@ -1567,13 +1577,11 @@ describe('delta snapshots', () => {
     expect(client.reconMoveSpeedMult).toBe(1.5);
   });
 
-  it('omits movement reconciliation fields from a spectating v2 self record', () => {
+  it('omits movement reconciliation fields from a spectating self record', () => {
     const spectateServer = new GameServer();
     const moderatorWs = fakeWs();
     const targetWs = fakeWs();
-    const moderator = joinServer(spectateServer, moderatorWs, 4, 'Moderator', 'warrior', {
-      movementWireVersion: 2,
-    });
+    const moderator = joinServer(spectateServer, moderatorWs, 4, 'Moderator', 'warrior');
     const target = joinServer(spectateServer, targetWs, 5, 'Observed');
     (spectateServer as any).enterSpectate(moderator, target);
     moderatorWs.sent.length = 0;
@@ -1592,20 +1600,11 @@ describe('delta snapshots', () => {
     ['released ghost', true, true, false, true],
     ['stunned player', false, false, true, false],
   ] as const)(
-    'applies v2 facing guards at consumption for a %s',
+    'applies facing guards at consumption for a %s',
     (_name, dead, ghost, stunned, appliesFacing) => {
       const facingServer = new GameServer();
       const facingClient = fakeWs();
-      const facingSession = joinServer(
-        facingServer,
-        facingClient,
-        3,
-        `Facing ${_name}`,
-        'warrior',
-        {
-          movementWireVersion: 2,
-        },
-      );
+      const facingSession = joinServer(facingServer, facingClient, 3, `Facing ${_name}`, 'warrior');
       const entity = facingServer.sim.entities.get(facingSession.pid)!;
       entity.facing = 0.25;
       entity.dead = dead;
@@ -2262,14 +2261,19 @@ describe('online movement input lifetime', () => {
     const fc = fakeWs();
     const session = joinServer(server, fc, 1, 'Spinner');
 
+    // The held turn reaches meta.moveInput at CONSUMPTION, and consumption is
+    // also what stamps session.lastInputAt, so the staleness clock this test
+    // ages out starts at the drive step below, not at the frame's arrival.
     server.handleMessage(
       session,
       JSON.stringify({
         t: 'input',
         seq: 1,
+        ct: 0,
         mi: { f: 0, b: 0, tl: 1, tr: 0, sl: 0, sr: 0, j: 0, dv: 0, sf: 0 },
       }),
     );
+    consumeMovementFramesV2(server.sim, [session]);
     const meta = server.sim.meta(session.pid)!;
     expect(meta.moveInput.turnLeft).toBe(true);
 
@@ -2829,60 +2833,8 @@ describe('client-side delta merge', () => {
     }
   });
 
-  it('flushes changed movement immediately without resending unchanged frames', () => {
+  it('sends movement frames with client ticks and nullable facing', () => {
     const client = bareClient(1);
-    const sent: any[] = [];
-    (client as any).ws = {
-      readyState: 1,
-      send: (payload: string) => sent.push(JSON.parse(payload)),
-    };
-    const oldWebSocket = (globalThis as any).WebSocket;
-    (globalThis as any).WebSocket = { OPEN: 1 };
-    try {
-      Object.assign(client.moveInput, {
-        forward: true,
-        back: false,
-        turnLeft: false,
-        turnRight: false,
-        strafeLeft: false,
-        strafeRight: false,
-        jump: false,
-        dive: false,
-        surface: false,
-      });
-      expect(client.flushInput(100)).toBe(true);
-      expect(sent).toEqual([
-        {
-          t: 'input',
-          seq: 1,
-          mv: 2,
-          mt: 100,
-          mi: { f: 1, b: 0, tl: 0, tr: 0, sl: 0, sr: 0, j: 0, dv: 0, sf: 0 },
-        },
-      ]);
-
-      expect(client.flushInput(105)).toBe(false);
-      expect(sent).toHaveLength(1);
-
-      Object.assign(client.moveInput, { forward: false, strafeRight: true });
-      expect(client.flushInput(115)).toBe(false);
-      expect(sent).toHaveLength(1);
-
-      expect(client.flushInput(120)).toBe(true);
-      expect(sent.at(-1)).toEqual({
-        t: 'input',
-        seq: 2,
-        mv: 2,
-        mt: 120,
-        mi: { f: 0, b: 0, tl: 0, tr: 0, sl: 0, sr: 1, j: 0, dv: 0, sf: 0 },
-      });
-    } finally {
-      (globalThis as any).WebSocket = oldWebSocket;
-    }
-  });
-
-  it('sends movement v2 frames with client ticks and nullable facing', () => {
-    const client = bareClient(1, { movementWireVersion: 2 });
     const sent: any[] = [];
     (client as any).ws = {
       readyState: 1,
@@ -2924,8 +2876,8 @@ describe('client-side delta merge', () => {
     }
   });
 
-  it('bounds movement v2 input echo telemetry to the legacy window', () => {
-    const client = bareClient(1, { movementWireVersion: 2 });
+  it('bounds movement input echo telemetry to the legacy window', () => {
+    const client = bareClient(1);
     (client as any).ws = {
       readyState: 1,
       bufferedAmount: 0,
@@ -2953,31 +2905,33 @@ describe('client-side delta merge', () => {
     const sent: any[] = [];
     (client as any).ws = {
       readyState: 1,
+      bufferedAmount: 0,
       send: (payload: string) => sent.push(JSON.parse(payload)),
     };
     const oldWebSocket = (globalThis as any).WebSocket;
     (globalThis as any).WebSocket = { OPEN: 1 };
     try {
       const last = () => sent[sent.length - 1].mi;
+      const sample = (ct: number, now: number) =>
+        client.sendMovementFrame({ ct, mi: { ...client.moveInput }, facing: null }, now);
+
       Object.assign(client.moveInput, { forward: true });
-      expect(client.flushInput(100)).toBe(true);
+      expect(sample(0, 100)).toBe(true);
       expect(last().ss).toBeUndefined(); // walking: unchanged payload
 
       Object.assign(client.moveInput, { dive: true, swimSteer: 1 });
-      expect(client.flushInput(200)).toBe(true);
+      expect(sample(1, 200)).toBe(true);
       expect(last().dv).toBe(1);
       expect(last().ss).toBeUndefined(); // full rate is the default
 
       Object.assign(client.moveInput, { swimSteer: 0.5 });
-      expect(client.flushInput(300)).toBe(true);
+      expect(sample(2, 300)).toBe(true);
       expect(last().ss).toBe(0.5); // ...and a feathered one is carried
 
-      // A steer CHANGE is a movement change: the signature has to notice, or
-      // the rate would stick at whatever the last sent frame said.
-      Object.assign(client.moveInput, { swimSteer: 0.5 });
-      expect(client.flushInput(400)).toBe(false);
+      // Back to full rate: the graded field LEAVES the wire again, so the far
+      // side reads the default instead of sticking at the last graded value.
       Object.assign(client.moveInput, { swimSteer: 1 });
-      expect(client.flushInput(500)).toBe(true);
+      expect(sample(3, 400)).toBe(true);
       expect(last().ss).toBeUndefined();
     } finally {
       (globalThis as any).WebSocket = oldWebSocket;

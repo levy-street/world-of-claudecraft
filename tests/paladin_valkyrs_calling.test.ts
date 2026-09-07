@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { SelfMotionPredictor } from '../src/render/self_motion';
 import {
   advanceValkyrsCalling,
   VALKYRS_CALLING_APPROACH_DURATION,
@@ -13,7 +12,7 @@ import { createMob } from '../src/sim/entity';
 import { activateDivineAscension, grantDevotion, MAX_DEVOTION } from '../src/sim/paladin_devotion';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
-import { DT, type Entity, type SimEvent } from '../src/sim/types';
+import type { Entity, SimEvent } from '../src/sim/types';
 
 type TestSim = Sim & {
   nextId: number;
@@ -310,45 +309,6 @@ describe("Paladin Retribution: Valkyr's Calling", () => {
     expect(sim.player.valkyrsCalling).toBeNull();
     expect(sim.player.auras.some((aura) => aura.id === VALKYRS_CALLING_FLIGHT_AURA_ID)).toBe(false);
     expect(target.hp).toBe(target.maxHp);
-  });
-
-  it('disables grounded online prediction so the rendered self follows the authoritative flight', () => {
-    const sim = makeRet();
-    targetAt(sim, 18);
-    const predictor = new SelfMotionPredictor(sim.cfg.seed);
-    const frame = {
-      enabled: true,
-      moveInput: {
-        forward: false,
-        back: false,
-        turnLeft: false,
-        turnRight: false,
-        strafeLeft: false,
-        strafeRight: false,
-        jump: false,
-        dive: false,
-        surface: false,
-      },
-      displayFacing: sim.player.facing,
-      echoMs: 100,
-      jitterMs: 0,
-      alpha: 1,
-      frameDt: 1 / 60,
-      snapAgeMs: 0,
-      snapIntervalMs: 50,
-      riftFloor: null,
-    };
-
-    expect(predictor.step(sim.player, frame)).not.toBeNull();
-    sim.castAbility('valkyrs_calling');
-
-    const flightAura = sim.player.auras.find((aura) => aura.id === VALKYRS_CALLING_FLIGHT_AURA_ID);
-    expect(flightAura?.remaining).toBe(VALKYRS_CALLING_FLIGHT_DURATION + DT);
-    expect(predictor.step(sim.player, frame)).toBeNull();
-
-    land(sim);
-    expect(sim.player.auras.some((aura) => aura.id === VALKYRS_CALLING_FLIGHT_AURA_ID)).toBe(false);
-    expect(predictor.step(sim.player, frame)).not.toBeNull();
   });
 
   it('deals more damage during Amanecer and consumes exactly one Ascension charge', () => {
