@@ -3023,7 +3023,30 @@ export const ko_KR: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "자리비움",
       "cheaterTag": "< 부정행위자 >",
-      "pledgeTag": "{guild} 서약자"
+      "pledgeTag": "{guild} 서약자",
+      "npcRoleTag": "<{role}>",
+      "npcRole": {
+        "auctioneer": "경매인",
+        "banker": "은행원",
+        "riftForgemaster": "균열 대장장이",
+        "cardMaster": "카드 마스터",
+        "crucibleQuartermaster": "도가니 병참장교",
+        "heroicQuartermaster": "영웅 병참장교",
+        "pvpVendor": "PvP 상인",
+        "weaponsmithTrainer": "대장기술 교관",
+        "cookingTrainer": "요리 교관",
+        "tailoringTrainer": "재봉 교관",
+        "engineeringTrainer": "기계공학 교관",
+        "leatherworkingTrainer": "가죽세공 교관",
+        "alchemyTrainer": "연금술 교관",
+        "weaponVendor": "무기 상인",
+        "armorVendor": "방어구 상인",
+        "armsDealer": "무구 상인",
+        "foodVendor": "음식 및 음료 상인",
+        "potionVendor": "물약 상인",
+        "stableMaster": "마구간지기",
+        "generalGoods": "잡화 상인"
+      }
     },
     "mobTooltip": {
       "levelFamily": "{level}레벨 {family}",

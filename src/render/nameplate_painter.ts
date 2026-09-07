@@ -56,6 +56,7 @@ import {
   isProjectedNameplateAnchorVisible,
 } from './nameplate_projection';
 import { type NameplatePlan, nameplatePlanInto, newNameplatePlan } from './nameplate_view';
+import { npcRoleLabel } from './npc_role_label';
 import { FRIENDLY, isFriendlyPet, mobNameColor } from './reaction';
 import type { EntityView } from './renderer';
 
@@ -583,6 +584,17 @@ export class NameplatePainter {
           ? npcDisplayName(entity.templateId)
           : tEntity({ kind: 'mob', id: entity.templateId, field: 'name' });
       state.nameColor = FRIENDLY;
+      // The role line: what this NPC DOES, on the same line a player's
+      // `<Guild>` uses (npc_role.ts owns the rule; the tag wrapper is the
+      // catalog VALUE so a locale owns its brackets). Built here, never in the
+      // per-frame draw path, the same cadence contract as guildLabel.
+      if (entity.kind === 'npc') {
+        const roleLabel = npcRoleLabel(entity.templateId);
+        if (roleLabel) {
+          state.guild = roleLabel;
+          state.guildLabel = t('hudChrome.nameplate.npcRoleTag', { role: roleLabel });
+        }
+      }
       const questMarker = this.questMarker(entity);
       state.marker = questMarker.marker;
       state.markerTone = questMarker.tone;

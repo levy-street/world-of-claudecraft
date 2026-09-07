@@ -3023,7 +3023,30 @@ export const ja_JP: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "退席",
       "cheaterTag": "< チーター >",
-      "pledgeTag": "{guild}への誓約者"
+      "pledgeTag": "{guild}への誓約者",
+      "npcRoleTag": "<{role}>",
+      "npcRole": {
+        "auctioneer": "競売人",
+        "banker": "銀行員",
+        "riftForgemaster": "裂け目の鍛冶頭",
+        "cardMaster": "カードマスター",
+        "crucibleQuartermaster": "るつぼの補給官",
+        "heroicQuartermaster": "英雄の補給官",
+        "pvpVendor": "PvP商人",
+        "weaponsmithTrainer": "鍛冶の教官",
+        "cookingTrainer": "料理の教官",
+        "tailoringTrainer": "裁縫の教官",
+        "engineeringTrainer": "工学の教官",
+        "leatherworkingTrainer": "革細工の教官",
+        "alchemyTrainer": "錬金術の教官",
+        "weaponVendor": "武器商人",
+        "armorVendor": "防具商人",
+        "armsDealer": "武具商人",
+        "foodVendor": "飲食物商人",
+        "potionVendor": "ポーション商人",
+        "stableMaster": "厩舎長",
+        "generalGoods": "雑貨商人"
+      }
     },
     "mobTooltip": {
       "levelFamily": "レベル{level} {family}",

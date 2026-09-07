@@ -3023,7 +3023,30 @@ export const zh_TW: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "暫離",
       "cheaterTag": "< 作弊者 >",
-      "pledgeTag": "{guild}的宣誓者"
+      "pledgeTag": "{guild}的宣誓者",
+      "npcRoleTag": "<{role}>",
+      "npcRole": {
+        "auctioneer": "拍賣師",
+        "banker": "銀行職員",
+        "riftForgemaster": "裂隙鍛造大師",
+        "cardMaster": "牌局大師",
+        "crucibleQuartermaster": "熔爐軍需官",
+        "heroicQuartermaster": "英雄軍需官",
+        "pvpVendor": "PvP商人",
+        "weaponsmithTrainer": "鍛造訓練師",
+        "cookingTrainer": "烹飪訓練師",
+        "tailoringTrainer": "裁縫訓練師",
+        "engineeringTrainer": "工程學訓練師",
+        "leatherworkingTrainer": "製皮訓練師",
+        "alchemyTrainer": "煉金術訓練師",
+        "weaponVendor": "武器商人",
+        "armorVendor": "護甲商人",
+        "armsDealer": "軍械商人",
+        "foodVendor": "食物和飲料商人",
+        "potionVendor": "藥水商人",
+        "stableMaster": "馬廄管理員",
+        "generalGoods": "雜貨商人"
+      }
     },
     "mobTooltip": {
       "levelFamily": "等級 {level} {family}",

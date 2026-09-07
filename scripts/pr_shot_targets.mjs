@@ -850,6 +850,49 @@ const dotsOffSeed = async (page) => {
 
 export const TARGETS = [
   {
+    key: 'npc-role-tags',
+    label: 'NPC nameplates: the <role> line that says what an NPC does',
+    when: ['sim/npc_role', 'render/npc_role_label', 'render/nameplate_painter'],
+    // Eastbrook's market row: the Provisioner and the World Market keeper stand
+    // eleven yards apart along z, so one frame from the plus-x side carries a
+    // copper vendor's tag and a service tag side by side (and, on the base
+    // checkout, the same two bare names).
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await sweepOverlays(page, 10);
+      const staged = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!game || !sim || !player) return { ok: false, reason: 'offline world is unavailable' };
+        const wilkes = [...sim.entities.values()].find(
+          (e) => e.kind === 'npc' && e.templateId === 'trader_wilkes',
+        );
+        const merchant = [...sim.entities.values()].find(
+          (e) => e.kind === 'npc' && e.templateId === 'the_merchant',
+        );
+        if (!wilkes || !merchant) return { ok: false, reason: 'the market row is unavailable' };
+        player.pos.x = wilkes.pos.x + 9;
+        player.pos.y = wilkes.pos.y;
+        player.pos.z = (wilkes.pos.z + merchant.pos.z) / 2;
+        player.prevPos = { ...player.pos };
+        // Face down minus x, straight at the row, and swing the chase camera
+        // onto the same heading so both plates are in frame.
+        player.facing = -Math.PI / 2;
+        game.input.camYaw = player.facing;
+        game.input.camDist = 8;
+        sim.rebucket?.(player);
+        return { ok: true };
+      });
+      if (!staged.ok) return { skip: staged.reason };
+      await wait(1500);
+      await awaitWorldPainted(page);
+      await sweepOverlays(page, 8);
+      await wait(800);
+      return {};
+    },
+  },
+  {
     key: 'target-dots',
     label: 'Target dots: the player-only tracker frame and the nameplate dot row',
     // Committed frames live in docs/screenshots/target-dots/ (before- and after-

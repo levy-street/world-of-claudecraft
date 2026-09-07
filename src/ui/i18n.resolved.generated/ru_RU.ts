@@ -3023,7 +3023,30 @@ export const ru_RU: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
       "cheaterTag": "< Читер >",
-      "pledgeTag": "Присяга: {guild}"
+      "pledgeTag": "Присяга: {guild}",
+      "npcRoleTag": "<{role}>",
+      "npcRole": {
+        "auctioneer": "Аукционист",
+        "banker": "Банкир",
+        "riftForgemaster": "Кузнец Разлома",
+        "cardMaster": "Мастер карт",
+        "crucibleQuartermaster": "Интендант Горнила",
+        "heroicQuartermaster": "Героический интендант",
+        "pvpVendor": "Торговец PvP",
+        "weaponsmithTrainer": "Учитель кузнечного дела",
+        "cookingTrainer": "Учитель кулинарии",
+        "tailoringTrainer": "Учитель портняжного дела",
+        "engineeringTrainer": "Учитель инженерного дела",
+        "leatherworkingTrainer": "Учитель кожевничества",
+        "alchemyTrainer": "Учитель алхимии",
+        "weaponVendor": "Торговец оружием",
+        "armorVendor": "Торговец доспехами",
+        "armsDealer": "Торговец вооружением",
+        "foodVendor": "Торговец едой и напитками",
+        "potionVendor": "Торговец зельями",
+        "stableMaster": "Смотритель стойл",
+        "generalGoods": "Товары общего назначения"
+      }
     },
     "mobTooltip": {
       "levelFamily": "Уровень {level} {family}",

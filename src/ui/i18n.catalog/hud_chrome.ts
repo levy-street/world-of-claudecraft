@@ -4039,6 +4039,35 @@ export const hudChromeStrings = {
     // is the VALUE (no wrapper added in code), so a locale owns its own shape.
     // Wordy (M16), so the five non-Latin fills ship in this same change.
     pledgeTag: 'Pledge of {guild}',
+    // The functional role line under an NPC's name (src/sim/npc_role.ts): the
+    // classic `<Weapon Vendor>` tag that says what the NPC DOES, drawn on the
+    // same line a player's `<Guild>` uses. The wrapper is the VALUE (the
+    // cheaterTag precedent) so a locale owns its own brackets; {role} is one of
+    // the npcRole.* labels below, or the authored flavor title when an NPC has
+    // no functional role. Wordy (M16): the five non-Latin fills ship here too.
+    npcRoleTag: '<{role}>',
+    npcRole: {
+      auctioneer: 'Auctioneer',
+      banker: 'Banker',
+      riftForgemaster: 'Rift Forgemaster',
+      cardMaster: 'Card Master',
+      crucibleQuartermaster: 'Crucible Quartermaster',
+      heroicQuartermaster: 'Heroic Quartermaster',
+      pvpVendor: 'PvP Vendor',
+      weaponsmithTrainer: 'Blacksmithing Trainer',
+      cookingTrainer: 'Cooking Trainer',
+      tailoringTrainer: 'Tailoring Trainer',
+      engineeringTrainer: 'Engineering Trainer',
+      leatherworkingTrainer: 'Leatherworking Trainer',
+      alchemyTrainer: 'Alchemy Trainer',
+      weaponVendor: 'Weapon Vendor',
+      armorVendor: 'Armor Vendor',
+      armsDealer: 'Arms Dealer',
+      foodVendor: 'Food & Drink Vendor',
+      potionVendor: 'Potion Vendor',
+      stableMaster: 'Stable Master',
+      generalGoods: 'General Goods',
+    },
   },
   // World mouseover tooltip shown when hovering a mob (mob_tooltip_view.ts):
   // name (colored by the nameplate con-color), then "Level N <type>" ({family}

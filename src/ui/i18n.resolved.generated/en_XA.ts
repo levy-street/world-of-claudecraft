@@ -3023,7 +3023,30 @@ export const en_XA: EnTranslations = {
       "mobEliteLevel": "[{level}+]",
       "afkTag": "[ÁƑĶ]",
       "cheaterTag": "[< Çĥéáţéŕ >]",
-      "pledgeTag": "[Þļéðĝé óƒ {guild}]"
+      "pledgeTag": "[Þļéðĝé óƒ {guild}]",
+      "npcRoleTag": "[<{role}>]",
+      "npcRole": {
+        "auctioneer": "[Áúçţíóñééŕ]",
+        "banker": "[Ɓáñķéŕ]",
+        "riftForgemaster": "[Ŕíƒţ Ƒóŕĝéɱášţéŕ]",
+        "cardMaster": "[Çáŕð Ɱášţéŕ]",
+        "crucibleQuartermaster": "[Çŕúçíƀļé Ɋúáŕţéŕɱášţéŕ]",
+        "heroicQuartermaster": "[Ĥéŕóíç Ɋúáŕţéŕɱášţéŕ]",
+        "pvpVendor": "[ÞʋÞ Ʋéñðóŕ]",
+        "weaponsmithTrainer": "[Ɓļáçķšɱíţĥíñĝ Ţŕáíñéŕ]",
+        "cookingTrainer": "[Çóóķíñĝ Ţŕáíñéŕ]",
+        "tailoringTrainer": "[Ţáíļóŕíñĝ Ţŕáíñéŕ]",
+        "engineeringTrainer": "[Éñĝíñééŕíñĝ Ţŕáíñéŕ]",
+        "leatherworkingTrainer": "[Ļéáţĥéŕŵóŕķíñĝ Ţŕáíñéŕ]",
+        "alchemyTrainer": "[Áļçĥéɱý Ţŕáíñéŕ]",
+        "weaponVendor": "[Ŵéáþóñ Ʋéñðóŕ]",
+        "armorVendor": "[Áŕɱóŕ Ʋéñðóŕ]",
+        "armsDealer": "[Áŕɱš Ðéáļéŕ]",
+        "foodVendor": "[Ƒóóð & Ðŕíñķ Ʋéñðóŕ]",
+        "potionVendor": "[Þóţíóñ Ʋéñðóŕ]",
+        "stableMaster": "[Šţáƀļé Ɱášţéŕ]",
+        "generalGoods": "[Ĝéñéŕáļ Ĝóóðš]"
+      }
     },
     "mobTooltip": {
       "levelFamily": "[Ļéʋéļ {level} {family}]",
