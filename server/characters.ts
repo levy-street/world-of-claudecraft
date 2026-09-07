@@ -388,7 +388,7 @@ export function buildCharacterList(
       mainhandItemId: c.state?.equipment?.mainhand ?? null,
       offhandItemId: c.state?.equipment?.offhand ?? null,
       // The account's active Armory weapon skin for THIS character's class and
-      // held mainhand (the same shared rule the world and paperdoll use), so
+      // held hands (the same shared rule the world and paperdoll use), so
       // the char-select turntable matches the in-world render. Loadout is
       // account state; resolution is per character.
       weaponSkinId: resolveActiveWeaponSkin(
@@ -396,6 +396,7 @@ export function buildCharacterList(
         c.state?.equipment?.mainhand ?? null,
         weaponSkinLoadout,
         c.state?.skinCatalog === 'mech' ? 'mech' : 'class',
+        c.state?.equipment?.offhand ?? null,
       ),
       // The authored modular look (null = pre-creator character, legacy rig).
       // Re-validated here the same way the join path does (ws_auth.ts

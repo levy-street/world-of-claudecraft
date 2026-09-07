@@ -597,6 +597,7 @@ export function recalcPlayerStats(
     e.mainhandItemId,
     e.weaponSkinLoadout,
     e.skinCatalog,
+    e.offhandItemId,
   );
   // Render-only mirror of the full worn set, copied so a later mutation of the
   // owning PlayerMeta.equipment never aliases into the entity. Synced in the

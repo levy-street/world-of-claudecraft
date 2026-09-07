@@ -521,14 +521,12 @@ export class DailyRewardsWindow {
   private showStoreDecision(options: Omit<StoreDecisionPromptOptions, 'closeText'>): boolean {
     return this.storeRuntime.openDecision(options);
   }
-
   private showStoreResult(tone: 'success' | 'failure', text: string): void {
     this.storeRuntime.showResult(tone, text);
   }
 
-  /** Re-project the Season 1 Armory sections from the last service snapshot plus
-   *  the live account cosmetics and equipped weapon (both change without a new
-   *  fetch: purchases, applies, and gear swaps all reflect immediately). */
+  /** Re-project the Season 1 Armory sections from the last service snapshot plus the live
+   *  account cosmetics and held hands (purchases, applies, gear swaps reflect at once). */
   private rebuildArmorySections(): void {
     const world = this.deps.world();
     const player = world.player;
@@ -536,6 +534,7 @@ export class DailyRewardsWindow {
       cosmetics: world.accountCosmetics,
       cls: player.templateId,
       mainhandItemId: player.mainhandItemId,
+      offhandItemId: player.offhandItemId ?? null,
       skinCatalog: player.skinCatalog,
     });
     this.storeSpend.mounts.rebuild(this.storeBalance, this.storeItems, world.ownedMounts());
@@ -732,6 +731,7 @@ export class DailyRewardsWindow {
             skin: player.skin,
             skinCatalog: player.skinCatalog,
             mainhandItemId: player.mainhandItemId,
+            offhandItemId: player.offhandItemId ?? null,
           };
         },
         requestBuy: (target) => this.storeSpend.armory.request(target),

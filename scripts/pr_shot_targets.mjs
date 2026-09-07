@@ -1684,6 +1684,75 @@ export const TARGETS = [
     },
   },
   {
+    key: 'weapon-skin-offhand',
+    label: 'Armory skin on an offhand-held weapon type (rogue dagger + offhand mace, mace skin)',
+    when: ['sim/content/weapon_skin_rules'],
+    variants: [
+      { key: 'desktop', charClass: 'rogue', charName: 'Vesper', beforeLoad: lowGraphicsSeed },
+      {
+        key: 'mobile',
+        mobile: true,
+        charClass: 'rogue',
+        charName: 'Vesper',
+        beforeLoad: lowGraphicsSeed,
+      },
+    ],
+    async capture(page) {
+      await page.waitForFunction(
+        () => {
+          const loading = document.querySelector('#loading-screen');
+          return (
+            document.body.classList.contains('game-active') &&
+            !!loading &&
+            !loading.classList.contains('visible')
+          );
+        },
+        { timeout: 90000, polling: 200 },
+      );
+      // Stage the reported setup on the LOCAL player: a rogue keeps the dagger
+      // mainhand and holds Forgefather's Warhammer (a mace) in the offhand; the
+      // account owns the legendary mace skin and applies it through the real
+      // IWorld action, so BEFORE (rules read the mainhand alone) leaves the
+      // hammer bare and AFTER dresses the offhand. Ownership is seeded
+      // directly: the store cannot grant offline, and the apply gate is the
+      // rule under test, not the purchase.
+      const staged = await page.evaluate(async () => {
+        document.getElementById('tutorial-greeting')?.remove();
+        const game = window.__game;
+        const sim = game?.sim;
+        const world = game?.world;
+        if (!game || !sim || !world) return { ok: false, reason: 'offline world is unavailable' };
+        const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+        world.chat('/dev level 30');
+        await sleep(300);
+        world.chat('/dev give forgefathers_warhammer');
+        await sleep(300);
+        world.equipItemToSlot('forgefathers_warhammer', 'offhand');
+        await sleep(300);
+        sim.accountCosmetics = { ...sim.accountCosmetics, weaponSkinIds: ['starfall_mace'] };
+        world.changeWeaponSkin('starfall_mace');
+        game.hud.closeAll?.();
+        game.hud.toggleChar();
+        return {
+          ok: true,
+          offhand: sim.player.offhandItemId,
+          skin: sim.player.weaponSkinId,
+        };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+      if (staged.offhand !== 'forgefathers_warhammer')
+        throw new Error(`offhand did not take the warhammer: ${staged.offhand}`);
+      // The skin GLB streams on demand; give the paperdoll turntable and the
+      // world rig time to swap it in (a bare hammer after this hold is the
+      // honest BEFORE frame, not a capture defect).
+      await wait(7000);
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      return {};
+    },
+  },
+  {
     key: 'weapon-vfx-shed',
     label: 'Weapon-skin VFX fade with wearer distance (a legendary skin worn by another player)',
     when: ['render/weapon_vfx', 'render/characters/visual.ts'],

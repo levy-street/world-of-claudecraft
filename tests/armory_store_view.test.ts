@@ -18,6 +18,7 @@ describe('buildArmorySections', () => {
       cosmetics: noCosmetics,
       cls: 'warrior',
       mainhandItemId: 'worn_sword',
+      offhandItemId: null,
       skinCatalog: 'class',
     });
     expect(sections.map((s) => s.rarity)).toEqual(['legendary', 'epic', 'rare', 'uncommon']);
@@ -42,6 +43,7 @@ describe('buildArmorySections', () => {
       cosmetics: noCosmetics,
       cls: 'warrior',
       mainhandItemId: 'worn_sword',
+      offhandItemId: null,
       skinCatalog: 'class',
     });
     const ice = sections.flatMap((s) => s.rows).find((r) => r.skin.id === 'ice_fang_sword');
@@ -56,6 +58,7 @@ describe('buildArmorySections', () => {
       cosmetics: noCosmetics,
       cls: 'warrior',
       mainhandItemId: 'worn_sword',
+      offhandItemId: null,
       skinCatalog: 'class',
     });
     const solheim = sections.flatMap((s) => s.rows).find((r) => r.skin.id === 'solheim_sword');
@@ -71,6 +74,7 @@ describe('buildArmorySections', () => {
       },
       cls: 'warrior',
       mainhandItemId: 'worn_sword',
+      offhandItemId: null,
       skinCatalog: 'class',
     });
     const rows = sections.flatMap((s) => s.rows);
@@ -94,6 +98,7 @@ describe('buildArmorySections', () => {
       cosmetics: owned,
       cls: 'warrior',
       mainhandItemId: 'rusty_hatchet',
+      offhandItemId: null,
       skinCatalog: 'class',
     }).flatMap((s) => s.rows);
     expect(asWarrior.find((r) => r.skin.id === 'glaciersplit_axe')?.canApplyNow).toBe(true);
@@ -102,6 +107,7 @@ describe('buildArmorySections', () => {
       cosmetics: owned,
       cls: 'hunter',
       mainhandItemId: 'rusty_hatchet',
+      offhandItemId: null,
       skinCatalog: 'class',
     }).flatMap((s) => s.rows);
     expect(asHunter.find((r) => r.skin.id === 'glaciersplit_axe')?.canApplyNow).toBe(false);
@@ -117,6 +123,7 @@ describe('buildArmorySections', () => {
       cosmetics: owned,
       cls: 'hunter',
       mainhandItemId: 'rusty_hatchet',
+      offhandItemId: null,
       skinCatalog: 'mech',
     }).flatMap((s) => s.rows);
     // The axe becomes applicable (it was not on the class rig, one test above),
@@ -132,6 +139,7 @@ describe('buildArmorySections', () => {
       cosmetics: noCosmetics,
       cls: 'warrior',
       mainhandItemId: 'worn_sword',
+      offhandItemId: null,
       skinCatalog: 'class',
     }).flatMap((s) => s.rows);
     expect(rows.every((r) => r.eligibleClasses.length > 0)).toBe(true);
@@ -205,5 +213,26 @@ describe('buildStoreMountRows (the store Mounts strip)', () => {
       [],
     );
     expect(rows[0].costClaudium).toBeNull(); // nothing matched the reins SKU
+  });
+});
+
+describe('buildArmorySections with an offhand-held weapon type', () => {
+  it('lets a rogue with a dagger mainhand and a mace offhand apply an owned mace skin', () => {
+    const owned = { weaponSkinIds: ['starfall_mace', 'astravyr_dagger'], weaponSkinLoadout: {} };
+    const rows = (offhandItemId: string | null) =>
+      buildArmorySections(0, [], {
+        cosmetics: owned,
+        cls: 'rogue',
+        mainhandItemId: 'rusty_dagger',
+        offhandItemId,
+        skinCatalog: 'class',
+      })
+        .flatMap((s) => s.rows)
+        .filter((r) => r.owned);
+    const withMace = rows('forgefathers_warhammer');
+    expect(withMace.find((r) => r.skin.id === 'starfall_mace')?.canApplyNow).toBe(true);
+    expect(withMace.find((r) => r.skin.id === 'astravyr_dagger')?.canApplyNow).toBe(true);
+    // No offhand: the mace skin stays owned but not applicable, exactly as before.
+    expect(rows(null).find((r) => r.skin.id === 'starfall_mace')?.canApplyNow).toBe(false);
   });
 });

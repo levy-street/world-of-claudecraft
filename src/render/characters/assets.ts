@@ -15,7 +15,10 @@ import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
-import { offhandMirrorsWeaponSkin } from '../../sim/content/weapon_skin_rules';
+import {
+  mainhandShowsWeaponSkin,
+  offhandMirrorsWeaponSkin,
+} from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import { retryDelayMs as gltfRetryDelayMs } from '../assets/load_retry';
 import { loadGltf, loadKtx2Texture, loadTexture } from '../assets/loader';
@@ -450,8 +453,12 @@ function swapAttachDef(
   // body that a hunter can wear, so a drawn bow must move to the left handslot
   // (the front arm) on it exactly as it does on the hunter rig. Keyed off the
   // RESIDENT skin url, so a skin still streaming leaves the equipped item's
-  // model in its authored hand rather than relocating a sword.
-  const skinUrl = residentOrEnsure(weaponSkinModelUrl(weaponSkinId));
+  // model in its authored hand rather than relocating a sword. A melee skin
+  // dresses this hand only while it holds the skin's weapon type (the pure
+  // rule): a dagger mainhand beside a skinned offhand mace keeps its dagger.
+  const skinUrl = mainhandShowsWeaponSkin(weaponSkinId, weaponItemId)
+    ? residentOrEnsure(weaponSkinModelUrl(weaponSkinId))
+    : null;
   if (skinUrl) {
     const skin = weaponSkinId ? WEAPON_SKINS[weaponSkinId] : null;
     const bone = skin ? weaponSkinAttachBone(weaponSkinHandling(skin), base.bone) : base.bone;
@@ -1696,8 +1703,12 @@ function attachAllProps(
   // A skin mirrored onto the offhand rides the same rarity-VFX + material path as
   // the mainhand skin, so its payload joins the returned set (the caller runs the
   // VFX/isolation pass over these). A plain offhand (shield/held-offhand/different
-  // -type weapon) stays out, untouched.
+  // -type weapon) stays out, untouched. The mainhand joins that set only while it
+  // shows the skin itself (a melee skin held in the offhand alone leaves the
+  // mainhand's own item model out of the VFX pass); a bare rig with no skin
+  // keeps returning every weapon payload, as before.
   const offhandSkinned = offhandMirrorsWeaponSkin(weaponSkinId, offhandItemId);
+  const mainhandSkinned = !weaponSkinId || mainhandShowsWeaponSkin(weaponSkinId, weaponItemId);
   const payloads: THREE.Object3D[] = [];
   for (let i = 0; i < attachments.length; i++) {
     const base = attachments[i];
@@ -1714,7 +1725,7 @@ function attachAllProps(
     if (!bone) continue;
     const swapKind = isOffhandSwap ? 'offhand' : isWeapon ? 'mainhand' : null;
     const payload = attachProp(root, bone, att, swapKind, stowed);
-    if (isWeapon || (isOffhandSwap && offhandSkinned)) payloads.push(payload);
+    if ((isWeapon && mainhandSkinned) || (isOffhandSwap && offhandSkinned)) payloads.push(payload);
   }
   return payloads;
 }

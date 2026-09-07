@@ -16899,13 +16899,13 @@ export class Hud {
       look,
       mainhand,
       offhand: this.sim.equipment.offhand ?? null,
-      // The paperdoll wears the same Armory skin the world renders: resolved
-      // through the one shared rule (class + equipped mainhand + loadout).
+      // The paperdoll wears the world's Armory skin: one shared rule (class + hands + loadout).
       weaponSkinId: resolveActiveWeaponSkin(
         cls,
         mainhand,
         this.sim.accountCosmetics.weaponSkinLoadout,
         this.sim.player.skinCatalog ?? 'class',
+        this.sim.equipment.offhand ?? null,
       ),
       framing: 'sheet',
     });

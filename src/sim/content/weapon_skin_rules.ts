@@ -176,7 +176,12 @@ export function weaponTypeForItem(itemId: string | null | undefined): ItemWeapon
 /**
  * Skin types the player may apply right now, in RESOLUTION ORDER (the first
  * entry present in the loadout is the one displayed). Requires an equipped
- * mainhand weapon.
+ * weapon in at least one hand: the mainhand's type comes first, then the
+ * offhand's when a dual-wielder holds a DIFFERENT weapon type there (a rogue
+ * with a dagger mainhand and a mace offhand may apply a mace skin, which then
+ * shows on the offhand alone; see mainhandShowsWeaponSkin). Reported from live
+ * play: the rules once read the mainhand only, so an offhand-held mace could
+ * never take the mace skin the account owned.
  *
  * Which types apply depends on the BODY, not just the class, because the body
  * decides what the hand actually shows. The hunter rig displays a fixed ranged
@@ -195,34 +200,99 @@ export function skinnableWeaponTypesFor(
   cls: string,
   mainhandItemId: string | null | undefined,
   skinCatalog: SkinCatalog,
+  offhandItemId: string | null | undefined = null,
 ): WeaponSkinType[] {
-  if (!mainhandItemId) return [];
-  const held = weaponTypeForItem(mainhandItemId);
-  const item: WeaponSkinType[] = !held || held === 'polearm' ? [] : [held];
+  // Empty hands apply nothing. A bare mainhand beside an offhand WEAPON still
+  // counts (a rogue who unequipped the dagger keeps the mace); a shield or held
+  // offhand alone does not. The hunter arm keeps its exact old answer: it
+  // needs a mainhand (hunters never dual-wield, so the offhand is never a
+  // weapon there anyway).
+  if (!mainhandItemId && (cls === 'hunter' || !weaponTypeForItem(offhandItemId))) return [];
+  const item = heldWeaponSkinTypes(mainhandItemId, offhandItemId);
   // Crossbow before bow: they share the one ranged display slot, so with both
   // in the loadout the crossbow skin wins resolution deterministically.
   if (cls !== 'hunter') return item;
   return skinCatalog === 'mech' ? ['crossbow', 'bow', ...item] : ['crossbow', 'bow'];
 }
 
+/** The skinnable weapon types actually held, mainhand first, offhand second,
+ *  deduplicated (two daggers count once). Polearms and non-weapons contribute
+ *  nothing. Pure and host-agnostic. */
+function heldWeaponSkinTypes(
+  mainhandItemId: string | null | undefined,
+  offhandItemId: string | null | undefined,
+): WeaponSkinType[] {
+  const out: WeaponSkinType[] = [];
+  for (const id of [mainhandItemId, offhandItemId]) {
+    const held = weaponTypeForItem(id);
+    if (!held || held === 'polearm' || out.includes(held)) continue;
+    out.push(held);
+  }
+  return out;
+}
+
 /**
- * The skin the player's held weapon should show right now: the first loadout
- * entry whose weapon type is applicable to the equipped mainhand (and whose
- * skin still targets that type), or null. Pure; both hosts and the renderer
- * preview rely on this exact resolution.
+ * The skin the player's held weapons should show right now: the first loadout
+ * entry whose weapon type is applicable to the equipped hands (and whose skin
+ * still targets that type), or null. Pure; both hosts and the renderer
+ * preview rely on this exact resolution. One skin id rides the wire; each hand
+ * then shows it only when its own weapon type matches (mainhandShowsWeaponSkin
+ * and offhandMirrorsWeaponSkin).
  */
 export function resolveActiveWeaponSkin(
   cls: string,
   mainhandItemId: string | null | undefined,
   loadout: WeaponSkinLoadout | null | undefined,
   skinCatalog: SkinCatalog,
+  offhandItemId: string | null | undefined = null,
 ): string | null {
   if (!loadout) return null;
-  for (const t of skinnableWeaponTypesFor(cls, mainhandItemId, skinCatalog)) {
+  for (const t of skinnableWeaponTypesFor(cls, mainhandItemId, skinCatalog, offhandItemId)) {
     const skinId = loadout[t];
     if (skinId && WEAPON_SKINS[skinId]?.weaponType === t) return skinId;
   }
   return null;
+}
+
+/** The held-hands view resolveActiveWeaponSkin reads off a player entity (the
+ *  Sim entity and the ClientWorld mirror both carry exactly these fields). */
+export interface WeaponSkinBearer {
+  templateId: string;
+  mainhandItemId: string | null;
+  offhandItemId: string | null;
+  weaponSkinLoadout: WeaponSkinLoadout;
+  /** Absent on a ClientWorld mirror entity that has not received `cat`: class body. */
+  skinCatalog?: SkinCatalog;
+}
+
+/** resolveActiveWeaponSkin over a player entity's own fields. For player
+ *  entities templateId is the class id (createPlayer). */
+export function resolveEntityWeaponSkin(e: WeaponSkinBearer): string | null {
+  return resolveActiveWeaponSkin(
+    e.templateId,
+    e.mainhandItemId,
+    e.weaponSkinLoadout,
+    e.skinCatalog ?? 'class',
+    e.offhandItemId,
+  );
+}
+
+/**
+ * True when the active weapon skin renders on the MAINHAND: a ranged skin
+ * always does (it replaces the hunter rig's fixed ranged attach, or takes the
+ * Combat Mech's swap slot, whatever the hand holds), a melee skin only while
+ * the mainhand holds a weapon of the skin's type. A dagger mainhand beside a
+ * skinned offhand mace keeps its own dagger model. Mirror of
+ * offhandMirrorsWeaponSkin for the other hand; pure and cosmetic-only.
+ */
+export function mainhandShowsWeaponSkin(
+  skinId: string | null | undefined,
+  mainhandItemId: string | null | undefined,
+): boolean {
+  const def = skinId ? WEAPON_SKINS[skinId] : null;
+  if (!def) return false;
+  if (def.weaponType === 'bow' || def.weaponType === 'crossbow') return true;
+  return weaponTypeForItem(mainhandItemId) === def.weaponType;
 }
 
 /**
@@ -247,15 +317,18 @@ export function offhandMirrorsWeaponSkin(
   return weaponTypeForItem(offhandItemId) === def.weaponType;
 }
 
-/** True when `skinType` may be applied with the given class, mainhand item and
+/** True when `skinType` may be applied with the given class, held items and
  *  displayed body. */
 export function weaponSkinTypeMatches(
   cls: string,
   mainhandItemId: string | null | undefined,
   skinType: WeaponSkinType,
   skinCatalog: SkinCatalog,
+  offhandItemId: string | null | undefined = null,
 ): boolean {
-  return skinnableWeaponTypesFor(cls, mainhandItemId, skinCatalog).includes(skinType);
+  return skinnableWeaponTypesFor(cls, mainhandItemId, skinCatalog, offhandItemId).includes(
+    skinType,
+  );
 }
 
 /**

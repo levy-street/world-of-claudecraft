@@ -187,7 +187,7 @@ import {
   type TalentRowLevel,
 } from './content/talents';
 import {
-  resolveActiveWeaponSkin,
+  resolveEntityWeaponSkin,
   weaponSkinTypeMatches,
   withWeaponSkinApplied,
 } from './content/weapon_skin_rules';
@@ -4086,12 +4086,7 @@ export class Sim {
     // mainhand, the hunter rig its fixed ranged attach), so a catalog change
     // re-resolves. Without this the new body's skin stays dark, and the old
     // body's stays resolved, until an unrelated gear change recomputes it.
-    e.weaponSkinId = resolveActiveWeaponSkin(
-      e.templateId,
-      e.mainhandItemId,
-      e.weaponSkinLoadout,
-      catalog,
-    );
+    e.weaponSkinId = resolveEntityWeaponSkin(e);
     deedsMod.markDeedsDirty(this.ctx, meta.entityId); // col_true_colors reads the skin state
     return true;
   }
@@ -4200,8 +4195,7 @@ export class Sim {
       if (def && def.weaponType === t) next[def.weaponType] = skinId;
     }
     e.weaponSkinLoadout = next;
-    // For player entities templateId is the class id (createPlayer).
-    e.weaponSkinId = resolveActiveWeaponSkin(e.templateId, e.mainhandItemId, next, e.skinCatalog);
+    e.weaponSkinId = resolveEntityWeaponSkin(e);
     this.mirrorWeaponSkinLoadout(pid, e);
   }
 
@@ -4228,7 +4222,15 @@ export class Sim {
     if (skinId !== null) {
       const def = WEAPON_SKINS[skinId];
       if (!def) return false;
-      if (!weaponSkinTypeMatches(cls, e.mainhandItemId, def.weaponType, e.skinCatalog))
+      if (
+        !weaponSkinTypeMatches(
+          cls,
+          e.mainhandItemId,
+          def.weaponType,
+          e.skinCatalog,
+          e.offhandItemId,
+        )
+      )
         return false;
       e.weaponSkinLoadout = withWeaponSkinApplied(e.weaponSkinLoadout, skinId) ?? {};
     } else {
@@ -4238,12 +4240,7 @@ export class Sim {
       delete next[t];
       e.weaponSkinLoadout = next;
     }
-    e.weaponSkinId = resolveActiveWeaponSkin(
-      cls,
-      e.mainhandItemId,
-      e.weaponSkinLoadout,
-      e.skinCatalog,
-    );
+    e.weaponSkinId = resolveEntityWeaponSkin(e);
     this.mirrorWeaponSkinLoadout(pid, e);
     return true;
   }

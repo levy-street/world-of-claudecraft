@@ -82,7 +82,10 @@ describe('skinned character GPU layout', () => {
     expect(assets).toMatch(
       /mergeSkinnedParts\(root, animatedNodeNames\(clips\)\);\s+optimizeSkinGpuLayout\(root\);/,
     );
-    expect(visual.match(/configureTightBoneTextures\((?:this\.model|payload)\)/g)).toHaveLength(3);
+    // Five sites: the assembly sweep, the lean offhand swap, the skin tail
+    // (finishWeaponAttach), the excluded hand on a full re-attach, and the
+    // whole-rig sweep on the sheathe swap.
+    expect(visual.match(/configureTightBoneTextures\((?:this\.model|payload)\)/g)).toHaveLength(5);
   });
 
   it('compacts the palette and joint attribute without changing skinned positions', () => {

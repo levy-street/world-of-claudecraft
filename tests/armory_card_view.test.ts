@@ -27,6 +27,7 @@ function sections(balance: number | null, items: readonly WocStoreItemInput[]) {
     cosmetics: noCosmetics,
     cls: 'warrior',
     mainhandItemId: null,
+    offhandItemId: null,
     skinCatalog: {} as never,
   });
 }

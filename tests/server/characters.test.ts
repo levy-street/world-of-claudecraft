@@ -27,6 +27,7 @@ import {
 } from '../../server/character_delete_db';
 import {
   APPEARANCE_REROLL_CUTOFF,
+  buildCharacterList,
   type CharactersRuntime,
   configureCharactersRuntime,
   purgeDeletedCharacterWorldState,
@@ -434,6 +435,33 @@ describe('character list handlers', () => {
     expect(me.body).toEqual(expected);
     // Byte-identical: the two arms share buildCharacterList, so the serialized JSON matches.
     expect(JSON.stringify(me.body)).toBe(JSON.stringify(full.body));
+  });
+});
+
+describe('buildCharacterList weapon skin resolution', () => {
+  it('resolves an Armory skin whose weapon type is held in the offhand', () => {
+    // A rogue with a dagger mainhand and a mace offhand owning the legendary
+    // mace skin: the roster turntable shows it, like the world does.
+    const rows = [
+      charRow({
+        class: 'rogue',
+        state: {
+          equipment: { mainhand: 'rusty_dagger', offhand: 'forgefathers_warhammer' },
+        } as never,
+      }),
+    ];
+    const list = buildCharacterList(rows, () => false, { mace: 'starfall_mace' }) as {
+      characters: { weaponSkinId: string | null; offhandItemId: string | null }[];
+    };
+    expect(list.characters[0].offhandItemId).toBe('forgefathers_warhammer');
+    expect(list.characters[0].weaponSkinId).toBe('starfall_mace');
+    // Without the offhand the mace skin stays parked, exactly as before.
+    const bare = buildCharacterList(
+      [charRow({ class: 'rogue', state: { equipment: { mainhand: 'rusty_dagger' } } as never })],
+      () => false,
+      { mace: 'starfall_mace' },
+    ) as { characters: { weaponSkinId: string | null }[] };
+    expect(bare.characters[0].weaponSkinId).toBeNull();
   });
 });
 

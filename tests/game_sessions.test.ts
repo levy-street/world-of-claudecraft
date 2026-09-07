@@ -1322,6 +1322,33 @@ describe('GameServer weapon skin commands', () => {
     expect(setAccountWeaponSkinLoadout).not.toHaveBeenCalled();
   });
 
+  it('applies an owned skin whose type is held in the OFFHAND only (rogue mace)', async () => {
+    setAccountWeaponSkinLoadout.mockClear();
+    const server = new GameServer();
+    // Reported from live play: a rogue's mace lands in the offhand, and the
+    // owned legendary mace skin could never apply because the type gate read
+    // the mainhand alone.
+    const session = expectJoined(
+      server.join(fakeWs(), 11, 101, 'Offhander', 'rogue', null, false, {
+        ...ownedSkins(['starfall_mace']),
+      }),
+    );
+    server.sim.setPlayerLevel(30, session.pid);
+    server.sim.addItem('forgefathers_warhammer', 1, session.pid);
+    server.sim.equipItemToSlot('forgefathers_warhammer', 'offhand', session.pid);
+    const e = server.sim.entities.get(session.pid);
+    expect(e?.mainhandItemId).toBe('rusty_dagger');
+    expect(e?.offhandItemId).toBe('forgefathers_warhammer');
+
+    changeSkin(server, session, 'starfall_mace', 'mace');
+
+    expect(e?.weaponSkinId).toBe('starfall_mace');
+    expect(session.accountCosmetics.weaponSkinLoadout).toEqual({ mace: 'starfall_mace' });
+    await vi.waitFor(() => {
+      expect(setAccountWeaponSkinLoadout).toHaveBeenCalledWith(11, { mace: 'starfall_mace' });
+    });
+  });
+
   it('rejects an owned skin whose type does not match the equipped weapon', () => {
     setAccountWeaponSkinLoadout.mockClear();
     const server = new GameServer();

@@ -43,6 +43,7 @@ function firstArmoryRow(cost: number) {
     cosmetics: { weaponSkinIds: [], weaponSkinLoadout: {} },
     cls: 'warrior',
     mainhandItemId: null,
+    offhandItemId: null,
     skinCatalog: {} as never,
   })[0]?.rows[0]?.skin.id;
   if (!skinId) throw new Error('the shipped catalog projected no armory row');
@@ -57,6 +58,7 @@ function firstArmoryRow(cost: number) {
     cosmetics: { weaponSkinIds: [], weaponSkinLoadout: {} },
     cls: 'warrior',
     mainhandItemId: null,
+    offhandItemId: null,
     skinCatalog: {} as never,
   })
     .flatMap((section) => section.rows)
