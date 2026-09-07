@@ -15,10 +15,10 @@ import { describe, expect, it } from 'vitest';
 import { CASTLE } from '../src/sim/castle_layout';
 import { isBlocked } from '../src/sim/colliders';
 import { GROUND_OBJECTS } from '../src/sim/data';
-import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
+import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from '../src/sim/pathfind';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
-import { groundHeight, terrainHeight } from '../src/sim/world';
+import { groundHeight, terrainHeight, waterLevelAt } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
 // A pickup deliberately authored onto a walkable structure would go here, as
@@ -174,5 +174,109 @@ describe('authored ground pickups stand on reachable natural ground', () => {
       // the client renders and what the interact range measures against.
       expect(c.pos.y).toBeCloseTo(terrainHeight(c.pos.x, c.pos.z, sim.cfg.seed), 5);
     }
+  });
+});
+
+// The other way verbatim placement strands a pickup: DOWN, under a declared
+// water body. The Bridgemere moat is authored as a ring of lake pools, and the
+// first Sunken Toll-Chest of Toll and Tangle sat at the exact centre of one
+// (lake -324,361 r11 vs chest -324,360), 3.1yd below the surface: nothing to
+// see from the bank, nothing to click, and a three-chest objective stuck on
+// two. The cut mooring lines of Mind the Moorings ring the same moat and two
+// of them had gone under with it; a Sprung Fen Trap lay on the Shiverfen pool
+// floor the same way.
+//
+// The line is the swim gate, not a fresh number: a player over ground deeper
+// than PLAYER_SWIM_DEPTH under the local surface is swimming, and a pickup
+// down there is a murk-hidden click target rather than a thing lying in the
+// shallows. Ground ABOVE that line inside a lake's blend ring is legitimate
+// (a lantern bobbing at the waterline, a line snagged on the bank), so the
+// arm is deliberately "not swim-deep", not "dry" (the stricter freeboard rule
+// belongs to props seated on the heightfield: tests/gather_node_placement).
+describe('authored ground pickups lie within wading depth of any declared water', () => {
+  // The swim gate is a policy line, so it gets the same literal pin the seed
+  // does: raising it must be a decision that reddens this guard, not a silent
+  // loosening of every arm that reads it.
+  it('the swim gate is pinned to its literal', () => {
+    expect(PLAYER_SWIM_DEPTH).toBe(0.8);
+  });
+
+  it('places no pickup at swim depth under the local water surface', () => {
+    const sim = makeSim();
+    const seed = sim.cfg.seed;
+    const stranded: string[] = [];
+    let swept = 0;
+    for (const def of GROUND_OBJECTS) {
+      for (const p of def.positions) {
+        swept++;
+        const depth = waterLevelAt(p.x, p.z, seed) - groundHeight(p.x, p.z, seed);
+        if (depth > PLAYER_SWIM_DEPTH) {
+          stranded.push(`${def.itemId} at ${p.x},${p.z} lies ${depth.toFixed(1)}yd under water`);
+        }
+      }
+    }
+    // The sweep must have a population, or an emptied table passes vacuously;
+    // the two moved non-chest families are pinned to their authored counts too.
+    expect(swept).toBeGreaterThan(0);
+    expect(GROUND_OBJECTS.find((g) => g.itemId === 'fenway_mooring_line')?.positions.length).toBe(
+      4,
+    );
+    expect(GROUND_OBJECTS.find((g) => g.itemId === 'sprung_trap')?.positions.length).toBe(4);
+    expect(stranded, stranded.join('; ')).toEqual([]);
+  });
+
+  // The objective needs all three, so every chest must be one a player can
+  // walk up to: this proves the interact objective finishes from the three
+  // authored spots (the geometry arm above is what fails when one of them
+  // sinks again). The sprite cull is left owed on purpose, so the quest is
+  // not driven to 'ready' here.
+  it('credits all three toll-chests of Toll and Tangle', () => {
+    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior' });
+    const player = sim.player;
+    const meta = sim.ctx.resolve(undefined)?.meta;
+    expect(meta, 'the primary player resolves').toBeTruthy();
+    if (!meta) throw new Error('unreachable');
+    sim.setPlayerLevel(19); // the quest's minLevel
+    meta.questsDone.add('q_wf_eels_for_the_smokehouse'); // its requiresQuest
+    const maris = [...sim.entities.values()].find((e) => e.templateId === 'netter_maris') as Entity;
+    expect(maris, 'Netter Maris spawns').toBeTruthy();
+    const place = (x: number, z: number): void => {
+      player.pos.x = x;
+      player.pos.z = z;
+      player.pos.y = sim.groundPos(x, z).y;
+      player.prevPos = { ...player.pos };
+      player.onGround = true;
+      sim.rebucket(player);
+    };
+    place(maris.pos.x, maris.pos.z);
+    sim.acceptQuest('q_wf_toll_and_tangle');
+    const qp = meta.questLog.get('q_wf_toll_and_tangle');
+    expect(qp?.state, 'the quest accepted').toBe('active');
+    if (!qp) throw new Error('unreachable');
+    const chests = [...sim.entities.values()].filter(
+      (e) => e.kind === 'object' && e.objectItemId === 'bridgemere_toll_chest',
+    );
+    expect(chests.length).toBe(3);
+    for (const chest of chests) {
+      // The player stands ON the chest's spot: if that spot is swim-deep the
+      // walk-up premise of this test is false, so pin it here too.
+      expect(
+        waterLevelAt(chest.pos.x, chest.pos.z, sim.cfg.seed) - chest.pos.y,
+        `the chest at ${chest.pos.x},${chest.pos.z} is reachable on foot`,
+      ).toBeLessThanOrEqual(PLAYER_SWIM_DEPTH);
+      // A chest nudged ashore can land in a prop or scatter collider just as
+      // silently as it sank: the walk-up premise needs the spot open too.
+      expect(
+        isBlocked(sim.cfg.seed, chest.pos.x, chest.pos.z, PLAYER_BODY_RADIUS),
+        `the chest at ${chest.pos.x},${chest.pos.z} is inside a collider`,
+      ).toBe(false);
+      place(chest.pos.x, chest.pos.z);
+      expect(
+        sim.pickUpObject(chest.id),
+        `the chest at ${chest.pos.x},${chest.pos.z} accepts the interact`,
+      ).toBe(true);
+    }
+    expect(qp.counts[1], 'all three chests credited').toBe(3);
+    expect(qp.counts[0], 'the sprite cull is still owed').toBe(0);
   });
 });
