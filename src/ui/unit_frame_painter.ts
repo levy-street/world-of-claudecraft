@@ -27,6 +27,7 @@
 // are never touched here, so folding the resource-type class into toggleClass does
 // not clobber the low-power pulse.
 
+import { absorbSegmentTransform } from './absorb_bar';
 import {
   type BorderAccent,
   borderAccent,
@@ -212,13 +213,18 @@ export class UnitFramePainter {
     this.writers.setStyleProp(host, DEED_HERALDRY_WELL_PROP, accent ? DEED_HERALDRY_WELL_FILL : '');
   }
 
-  // The shield overlay: a scaleX transform to (hp + absorb)/maxHp plus the
-  // overshield class. Folds the former raw updateAbsorb('#pf-absorb', p) onto the
-  // elided writers; skipped for a frame with no shield bar.
+  // The shield overlay: a SEGMENT transform from the current-health edge spanning
+  // only the shield width (absorbSegmentTransform), plus the overshield class.
+  // Folds the former raw updateAbsorb('#pf-absorb', p) onto the elided writers;
+  // skipped for a frame with no shield bar. The old left-anchored scaleX(fillFrac)
+  // hatched the ENTIRE health fill even with no shield up (the "striped hp bar").
   private paintAbsorb(view: UnitFrameView): void {
     const absorb = this.el.absorb;
     if (!absorb) return;
-    this.writers.setTransform(absorb, this.barScaleX(view.absorbFrac));
+    this.writers.setTransform(
+      absorb,
+      absorbSegmentTransform(view.absorbStartFrac, view.absorbSizeFrac, this.barScaleX),
+    );
     this.writers.toggleClass(absorb, OVERSHIELD_CLASS, view.absorbOvershield);
   }
 
@@ -239,9 +245,8 @@ export class UnitFramePainter {
   // `scaleX(<frac>)` (the player / target write the raw number); an instance can
   // override formatScaleX to quantize the precision (a party frame keeps its
   // `.toFixed(3)`), which also stabilizes the elided cache key.
-  private barScaleX(frac: number): string {
-    return this.opts.formatScaleX ? this.opts.formatScaleX(frac) : `scaleX(${frac})`;
-  }
+  private readonly barScaleX = (frac: number): string =>
+    this.opts.formatScaleX ? this.opts.formatScaleX(frac) : `scaleX(${frac})`;
 
   // Repaint the portrait canvas only when the identity key changes; a no-op when no
   // repaint callback is wired (the player's portrait is drawn at character setup).

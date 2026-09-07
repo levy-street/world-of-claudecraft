@@ -540,8 +540,11 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
           call.m === 'toggleClass' && call.args[0] === 'pf-hide-auras' && call.args[1] === true,
       ),
     ).toBe(true);
+    // showAbsorbs off: a zero-width segment in the row's quantized form.
     expect(
-      calls.some((call) => call.m === 'setTransform' && call.args[0] === 'scaleX(0.000)'),
+      calls.some(
+        (call) => call.m === 'setTransform' && call.args[0] === 'translateX(0%) scaleX(0.000)',
+      ),
     ).toBe(true);
   });
 
@@ -658,11 +661,14 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     // A combat member is NOT also dead (dead wins), so its combat is on but dead off.
     // The hp bar keeps the inline .toFixed(3) precision via formatScaleX.
     expect(has('setTransform', (c) => /^scaleX\(\d\.\d{3}\)$/.test(String(c.args[0])))).toBe(true);
-    // Party frames reuse the shared UnitFramePainter's classic absorb overlay (a
-    // left-origin scaleX to (hp + absorb) / maxHp), matching the player and target
-    // frames, so there is no positioned --absorb-start segment here.
+    // Party frames reuse the shared UnitFramePainter's absorb SEGMENT (a translate
+    // to the health edge plus a quantized scaleX of the shield width), matching the
+    // player and target frames, so there is no positioned --absorb-start segment
+    // here and the hatch never covers the health fill itself (hp 50 + shield 25 of
+    // 100 hatches 50%..75%, not 0%..75%).
     expect(has('setStyleProp', (c) => c.args[0] === '--absorb-start')).toBe(false);
-    expect(has('setTransform', (c) => c.args[0] === 'scaleX(0.750)')).toBe(true);
+    expect(has('setTransform', (c) => c.args[0] === 'translateX(50%) scaleX(0.250)')).toBe(true);
+    expect(has('setTransform', (c) => c.args[0] === 'scaleX(0.750)')).toBe(false);
     // The compact party row never appends the absorb total to the HP text (that is a
     // player/target-frame affordance), so "(25)" must not appear.
     expect(has('setText', (c) => String(c.args[0]).includes('(25)'))).toBe(false);
@@ -678,6 +684,13 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     // each show at least once across the three members.
     expect(has('setDisplay', (c) => c.args[0] === '')).toBe(true);
     expect(has('setDisplay', (c) => c.args[0] === 'none')).toBe(true);
+  });
+
+  it('quantizes a non-round shield segment so the elided transform key is stable', () => {
+    painter.sync([member({ pid: 2, hp: 37, mhp: 100, absorb: 11 })], 2, false);
+    expect(
+      calls.some((c) => c.m === 'setTransform' && c.args[0] === 'translateX(37%) scaleX(0.110)'),
+    ).toBe(true);
   });
 
   it('emits a visually-hidden "Group n" raid label per member only in raid mode', () => {
