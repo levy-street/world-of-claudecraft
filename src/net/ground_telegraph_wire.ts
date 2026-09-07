@@ -14,7 +14,10 @@ import type {
   ActiveNythraxisGraveEruption,
   ActiveNythraxisGraveFlame,
 } from '../sim/nythraxis_grave_eruption';
-import type { ActiveNythraxisGravefire } from '../sim/nythraxis_gravefire';
+import {
+  type ActiveNythraxisGravefire,
+  NYTHRAXIS_GRAVEFIRE_MAX_LIFETIME_SECONDS,
+} from '../sim/nythraxis_gravefire';
 import type { ActiveVarkhulForgestormWarning } from '../sim/varkhul_forgestorm';
 import type {
   ActiveConsecration,
@@ -195,7 +198,9 @@ export function decodeNythraxisGravefires(value: unknown): ActiveNythraxisGravef
         tail: fire.tail as number,
         head: fire.head as number,
         halfWidth: fire.hw as number,
-        remaining: fire.rem as number,
+        // No `dur` on this row (the burn window belongs to the tier), so the
+        // bound is the longest lifetime a line can have on either tier.
+        remaining: Math.min(fire.rem as number, NYTHRAXIS_GRAVEFIRE_MAX_LIFETIME_SECONDS),
       },
     ];
   });

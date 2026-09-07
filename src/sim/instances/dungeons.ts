@@ -37,6 +37,7 @@ import {
   takeCombatExit,
 } from '../instance_exit_memory';
 import { retargetMob } from '../mob/targeting';
+import { clearNythraxisEncounterAuras } from '../nythraxis_bone_spike';
 import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
 import type { InstanceSlot, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -848,6 +849,7 @@ export function leaveDungeon(ctx: SimContext, pid?: number): boolean {
       if (inst) scrubInstanceThreat(ctx, inst, p.id);
       if (dungeon.id === IGNIVAR_RAID_ARENA_ID) clearIgnivarEncounterAuras(p);
       if (dungeon.id === IGNIVAR_SECOND_WING_ID) clearVarkhulEncounterAuras(p);
+      if (dungeon.id === 'nythraxis_boss_arena') clearNythraxisEncounterAuras(p);
       return true;
     }
   }
@@ -892,6 +894,7 @@ export function detachFromDungeon(ctx: SimContext, p: Entity): { x: number; z: n
   if (inst) scrubInstanceThreat(ctx, inst, p.id);
   if (dungeon.id === IGNIVAR_RAID_ARENA_ID) clearIgnivarEncounterAuras(p);
   if (dungeon.id === IGNIVAR_SECOND_WING_ID) clearVarkhulEncounterAuras(p);
+  if (dungeon.id === 'nythraxis_boss_arena') clearNythraxisEncounterAuras(p);
   cancelProfessionSessionOnDisplacement(ctx, p);
   const drop = dungeon.leaveOffset ?? { x: 0, z: -DUNGEON_DOOR_RETURN_INSET };
   return { x: dungeon.doorPos.x + drop.x, z: dungeon.doorPos.z + drop.z };

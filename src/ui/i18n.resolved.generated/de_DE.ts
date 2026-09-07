@@ -2792,7 +2792,7 @@ export const de_DE: EnTranslations = {
       "varkhulForgeLink": "Fange einen aktiven Pfeilerstrahl ab, bevor er die Schmiede erreicht. Offene Strahlen fügen pro Sekunde 6% Hitze hinzu. In Normal kühlen geblockte Strahlen und inaktive Pfeiler die Schmiede ab; in Heroisch sinkt die Hitze nie. Bei 100% erleidet die Schmiede eine tödliche Kernschmelze.",
       "varkhulCrucibleExposure": "Das Blocken eines Schmelztiegelstrahls verursacht jede Sekunde steigenden Schaden an der maximalen Gesundheit. Die Stapel setzen sich in Normal 10 Sekunden und in Heroisch 60 Sekunden nach dem Verlassen eines Strahls zurück.",
       "nythraxisDreadCurse": "Each stack increases damage taken from Nythraxis by {perStack}% for {duration} sec: {stacks} of {max} stacks now, {pct}% more damage. Every {every} sec his next hit on his target deals {hit}% of maximum health and adds a stack. Tanks should swap at {swap} stacks.",
-      "nythraxisImpaled": "Impaled on a Bone Spike: you cannot act and lose {normal}% of your maximum health every {interval} sec ({heroic}% on Heroic) until the raid destroys the spike.",
+      "nythraxisImpaled": "Impaled on a Bone Spike: you cannot act and lose {pct}% of your maximum health every {interval} sec until the raid destroys the spike.",
       "nythraxisAscension": "Deathless Ascension: {stacks} stacks, {pct}% more damage and attack speed. Drag Nythraxis onto the Binding Sigil to purge it.",
       "nythraxisBound": "Bound by the old wards: Nythraxis takes {pct}% more damage for {duration} sec.",
       "nythraxisUnbound": "Unbound: Nythraxis deals {pct}% more damage until a Binding Sigil holds him.",

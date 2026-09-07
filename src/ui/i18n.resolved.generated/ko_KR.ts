@@ -2792,7 +2792,7 @@ export const ko_KR: EnTranslations = {
       "varkhulForgeLink": "활성화된 기둥의 광선이 용광로에 닿기 전에 가로막으세요. 열린 광선은 초당 열기를 6% 올립니다. 일반에서는 차단된 광선과 꺼진 기둥이 용광로를 식히지만, 영웅에서는 열기가 절대 감소하지 않습니다. 100%가 되면 치명적인 용광로 용융이 발생합니다.",
       "varkhulCrucibleExposure": "도가니 광선을 막으면 매초 최대 생명력 기반 피해가 증가합니다. 광선을 벗어난 뒤 일반에서는 10초, 영웅에서는 60초 후 중첩이 초기화됩니다.",
       "nythraxisDreadCurse": "중첩당 나이트락시스에게 받는 피해가 {duration}초 동안 {perStack}% 증가합니다: 현재 {stacks}/{max}중첩, 피해 {pct}% 증가 중. {every}초마다 대상에게 가하는 다음 일격이 최대 생명력의 {hit}%를 입히고 중첩을 추가합니다. 탱커는 {swap}중첩에서 교대하세요.",
-      "nythraxisImpaled": "뼈가시에 꿰뚫림: 행동할 수 없으며 공격대가 가시를 파괴할 때까지 {interval}초마다 최대 생명력의 {normal}%(영웅 {heroic}%)를 잃습니다.",
+      "nythraxisImpaled": "뼈가시에 꿰뚫림: 행동할 수 없으며 공격대가 가시를 파괴할 때까지 {interval}초마다 최대 생명력의 {pct}%를 잃습니다.",
       "nythraxisAscension": "불사의 상승: {stacks}중첩, 피해량과 공격 속도가 {pct}% 증가. 결속의 인장 위로 나이트락시스를 끌고 가면 정화됩니다.",
       "nythraxisBound": "옛 결계에 결속됨: 나이트락시스가 {duration}초 동안 {pct}% 더 큰 피해를 받습니다.",
       "nythraxisUnbound": "결속 해제: 결속의 인장이 그를 붙잡을 때까지 나이트락시스가 {pct}% 더 큰 피해를 입힙니다.",

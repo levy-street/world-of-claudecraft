@@ -2792,7 +2792,7 @@ export const sv_SE: EnTranslations = {
       "varkhulForgeLink": "Avled en aktiv pelarstråle innan den når smedjan. Öppna strålar lägger till 6% hetta per sekund. I Normal svalnar smedjan av blockerade strålar och inaktiva pelare; i Heroisk sjunker hettan aldrig. Vid 100% drabbas smedjan av en dödlig Smedjekollaps.",
       "varkhulCrucibleExposure": "Att blockera en Degelstråle ger stigande skada baserad på maximal hälsa varje sekund. Staplarna återställs 10 sekunder efter att du lämnat en stråle i Normal, och efter 60 sekunder i Heroisk.",
       "nythraxisDreadCurse": "Each stack increases damage taken from Nythraxis by {perStack}% for {duration} sec: {stacks} of {max} stacks now, {pct}% more damage. Every {every} sec his next hit on his target deals {hit}% of maximum health and adds a stack. Tanks should swap at {swap} stacks.",
-      "nythraxisImpaled": "Impaled on a Bone Spike: you cannot act and lose {normal}% of your maximum health every {interval} sec ({heroic}% on Heroic) until the raid destroys the spike.",
+      "nythraxisImpaled": "Impaled on a Bone Spike: you cannot act and lose {pct}% of your maximum health every {interval} sec until the raid destroys the spike.",
       "nythraxisAscension": "Deathless Ascension: {stacks} stacks, {pct}% more damage and attack speed. Drag Nythraxis onto the Binding Sigil to purge it.",
       "nythraxisBound": "Bound by the old wards: Nythraxis takes {pct}% more damage for {duration} sec.",
       "nythraxisUnbound": "Unbound: Nythraxis deals {pct}% more damage until a Binding Sigil holds him.",

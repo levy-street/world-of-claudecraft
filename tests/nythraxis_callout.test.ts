@@ -3,6 +3,11 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { finderActivity } from '../src/sim/content/dungeon_finder';
 import { NYTHRAXIS_DREAD_CURSE_TANK_SWAP_STACKS } from '../src/sim/nythraxis_dread_curse';
+import {
+  NYTHRAXIS_ENRAGE_SECONDS_HEROIC,
+  NYTHRAXIS_ENRAGE_SECONDS_NORMAL,
+} from '../src/sim/nythraxis_enrage_clock';
+import { NYTHRAXIS_PHASE_THREE_HP } from '../src/sim/nythraxis_kings_wrath';
 import type { SimEvent } from '../src/sim/types';
 import {
   dispatchNythraxisCalloutSfx,
@@ -252,6 +257,17 @@ describe('Nythraxis dungeon finder blurbs', () => {
       `swap at ${NYTHRAXIS_DREAD_CURSE_TANK_SWAP_STACKS} stacks`,
     );
     expect(hudChromeStrings.finder.mech.dread_curse).not.toMatch(/heroic only/i);
+  });
+
+  it('spells the phase 3 threshold and both enrage clocks from the encounter constants', () => {
+    const clock = (seconds: number) =>
+      `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
+    expect(hudChromeStrings.finder.mech.kings_wrath).toContain(
+      `${Math.round(NYTHRAXIS_PHASE_THREE_HP * 100)}%`,
+    );
+    expect(hudChromeStrings.finder.mech.crown_endures).toContain(
+      `at ${clock(NYTHRAXIS_ENRAGE_SECONDS_NORMAL)}, heroic ${clock(NYTHRAXIS_ENRAGE_SECONDS_HEROIC)}`,
+    );
   });
 
   it('has a blurb for every mechanic key both raid previews list', () => {

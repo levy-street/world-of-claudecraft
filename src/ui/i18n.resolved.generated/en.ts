@@ -2792,7 +2792,7 @@ export const en: EnTranslations = {
       "varkhulForgeLink": "Intercept an active pillar beam before it reaches the forge. Open beams add 6% heat per second. In Normal, blocked beams and inactive pillars cool the forge; in Heroic, heat never falls. At 100%, the forge suffers a lethal Meltdown.",
       "varkhulCrucibleExposure": "Blocking a Crucible Beam deals increasing maximum-health damage every second. The stacks reset 10 seconds after leaving a beam in Normal and after 60 seconds in Heroic.",
       "nythraxisDreadCurse": "Each stack increases damage taken from Nythraxis by {perStack}% for {duration} sec: {stacks} of {max} stacks now, {pct}% more damage. Every {every} sec his next hit on his target deals {hit}% of maximum health and adds a stack. Tanks should swap at {swap} stacks.",
-      "nythraxisImpaled": "Impaled on a Bone Spike: you cannot act and lose {normal}% of your maximum health every {interval} sec ({heroic}% on Heroic) until the raid destroys the spike.",
+      "nythraxisImpaled": "Impaled on a Bone Spike: you cannot act and lose {pct}% of your maximum health every {interval} sec until the raid destroys the spike.",
       "nythraxisAscension": "Deathless Ascension: {stacks} stacks, {pct}% more damage and attack speed. Drag Nythraxis onto the Binding Sigil to purge it.",
       "nythraxisBound": "Bound by the old wards: Nythraxis takes {pct}% more damage for {duration} sec.",
       "nythraxisUnbound": "Unbound: Nythraxis deals {pct}% more damage until a Binding Sigil holds him.",

@@ -93,6 +93,16 @@ export function nythraxisGravefireLifetime(burnSeconds: number): number {
   return NYTHRAXIS_GRAVEFIRE_LENGTH / NYTHRAXIS_GRAVEFIRE_SPEED + burnSeconds;
 }
 
+/**
+ * The longest any line lives on either tier. The wire row carries no duration
+ * (the burn window is the tier's, not the line's), so the client decoder
+ * bounds a row's `remaining` here instead, the way the other families clamp
+ * to their own `duration`.
+ */
+export const NYTHRAXIS_GRAVEFIRE_MAX_LIFETIME_SECONDS = nythraxisGravefireLifetime(
+  Math.max(NYTHRAXIS_GRAVEFIRE_BURN_SECONDS_NORMAL, NYTHRAXIS_GRAVEFIRE_BURN_SECONDS_HEROIC),
+);
+
 export function nythraxisGravefireId(bossId: number, seq: number): string {
   return `${bossId}:gfl:${seq}`;
 }

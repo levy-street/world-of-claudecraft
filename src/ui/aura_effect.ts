@@ -62,7 +62,6 @@ import {
 } from '../sim/nythraxis_binding_sigil';
 import {
   NYTHRAXIS_IMPALED_AURA_ID,
-  NYTHRAXIS_IMPALED_TICK_MAX_HP_HEROIC,
   NYTHRAXIS_IMPALED_TICK_MAX_HP_NORMAL,
   NYTHRAXIS_IMPALED_TICK_SECONDS,
 } from '../sim/nythraxis_bone_spike';
@@ -302,13 +301,14 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
     };
   }
   if (a.id === NYTHRAXIS_IMPALED_AURA_ID) {
-    // Unbreakable encounter stun with a per-second max-health drain the aura does
-    // not carry (the driver reads the difficulty); both tiers are spelled.
+    // Unbreakable encounter stun. The per-second max-health drain rides the
+    // aura's value (nythraxis_bone_spike.ts nythraxisImpaledAuraFor), so the
+    // tooltip resolves to the pull's tier; a mirror that has not carried the
+    // value yet falls back to the normal-mode drain.
     return {
       key: `${KEY}.nythraxisImpaled`,
       nums: {
-        normal: pctFromFrac(NYTHRAXIS_IMPALED_TICK_MAX_HP_NORMAL),
-        heroic: pctFromFrac(NYTHRAXIS_IMPALED_TICK_MAX_HP_HEROIC),
+        pct: pctFromFrac(a.value > 0 ? a.value : NYTHRAXIS_IMPALED_TICK_MAX_HP_NORMAL),
         interval: NYTHRAXIS_IMPALED_TICK_SECONDS,
       },
     };

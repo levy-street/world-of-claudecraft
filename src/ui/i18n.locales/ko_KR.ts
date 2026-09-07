@@ -14558,7 +14558,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.varkhulMoltenCore':
     '이 핵을 용광로로 운반하세요. 용융물의 무게는 {interval}초마다 최대 생명력의 {min}%에서 {max}%까지 증가하는 피해를 입힙니다.',
   'hudChrome.auraEffect.nythraxisDreadCurse': '중첩당 나이트락시스에게 받는 피해가 {duration}초 동안 {perStack}% 증가합니다: 현재 {stacks}/{max}중첩, 피해 {pct}% 증가 중. {every}초마다 대상에게 가하는 다음 일격이 최대 생명력의 {hit}%를 입히고 중첩을 추가합니다. 탱커는 {swap}중첩에서 교대하세요.',
-  'hudChrome.auraEffect.nythraxisImpaled': '뼈가시에 꿰뚫림: 행동할 수 없으며 공격대가 가시를 파괴할 때까지 {interval}초마다 최대 생명력의 {normal}%(영웅 {heroic}%)를 잃습니다.',
+  'hudChrome.auraEffect.nythraxisImpaled': '뼈가시에 꿰뚫림: 행동할 수 없으며 공격대가 가시를 파괴할 때까지 {interval}초마다 최대 생명력의 {pct}%를 잃습니다.',
   'hudChrome.auraEffect.nythraxisAscension': '불사의 상승: {stacks}중첩, 피해량과 공격 속도가 {pct}% 증가. 결속의 인장 위로 나이트락시스를 끌고 가면 정화됩니다.',
   'hudChrome.auraEffect.nythraxisBound': '옛 결계에 결속됨: 나이트락시스가 {duration}초 동안 {pct}% 더 큰 피해를 받습니다.',
   'hudChrome.auraEffect.nythraxisUnbound': '결속 해제: 결속의 인장이 그를 붙잡을 때까지 나이트락시스가 {pct}% 더 큰 피해를 입힙니다.',

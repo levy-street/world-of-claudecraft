@@ -216,14 +216,34 @@ describe('auraEffectDescriptor', () => {
   });
 
   it('explains Impaled as the spike drain instead of the generic stun line', () => {
-    expect(desc({ id: NYTHRAXIS_IMPALED_AURA_ID, kind: 'stun', value: 0, value2: 77 })).toEqual({
+    // The drain rides the aura's value, so the tooltip resolves to the pull's tier.
+    expect(
+      desc({
+        id: NYTHRAXIS_IMPALED_AURA_ID,
+        kind: 'stun',
+        value: NYTHRAXIS_IMPALED_TICK_MAX_HP_HEROIC,
+        value2: 77,
+      }),
+    ).toEqual({
       key: 'hudChrome.auraEffect.nythraxisImpaled',
-      nums: { normal: 8, heroic: 10, interval: 1 },
+      nums: { pct: 10, interval: 1 },
     });
+    expect(
+      desc({
+        id: NYTHRAXIS_IMPALED_AURA_ID,
+        kind: 'stun',
+        value: NYTHRAXIS_IMPALED_TICK_MAX_HP_NORMAL,
+        value2: 77,
+      })?.nums,
+    ).toEqual({ pct: 8, interval: 1 });
+    // A mirror that has not carried the value yet falls back to the normal drain.
+    expect(
+      desc({ id: NYTHRAXIS_IMPALED_AURA_ID, kind: 'stun', value: 0, value2: 77 })?.nums,
+    ).toEqual({ pct: 8, interval: 1 });
     expect(NYTHRAXIS_IMPALED_TICK_MAX_HP_NORMAL).toBe(0.08);
     expect(NYTHRAXIS_IMPALED_TICK_MAX_HP_HEROIC).toBe(0.1);
     expect(hudChromeStrings.auraEffect.nythraxisImpaled).toBe(
-      'Impaled on a Bone Spike: you cannot act and lose {normal}% of your maximum health every {interval} sec ({heroic}% on Heroic) until the raid destroys the spike.',
+      'Impaled on a Bone Spike: you cannot act and lose {pct}% of your maximum health every {interval} sec until the raid destroys the spike.',
     );
     // Any other stun keeps the generic restriction line.
     expect(desc({ id: 'mob_charge_stun', kind: 'stun', value: 0 })).toEqual({

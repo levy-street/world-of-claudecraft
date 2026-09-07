@@ -2792,7 +2792,7 @@ export const it_IT: EnTranslations = {
       "varkhulForgeLink": "Intercetta il raggio attivo di un pilastro prima che raggiunga la forgia. I raggi aperti aggiungono il 6% di calore al secondo. In Normale, i raggi bloccati e i pilastri inattivi raffreddano la forgia; in Eroico, il calore non diminuisce mai. Al 100%, la forgia subisce una Fusione letale.",
       "varkhulCrucibleExposure": "Bloccare un Raggio del Crogiolo infligge danni crescenti basati sulla salute massima ogni secondo. Gli accumuli si azzerano 10 secondi dopo aver lasciato un raggio in Normale e dopo 60 secondi in Eroico.",
       "nythraxisDreadCurse": "Each stack increases damage taken from Nythraxis by {perStack}% for {duration} sec: {stacks} of {max} stacks now, {pct}% more damage. Every {every} sec his next hit on his target deals {hit}% of maximum health and adds a stack. Tanks should swap at {swap} stacks.",
-      "nythraxisImpaled": "Impaled on a Bone Spike: you cannot act and lose {normal}% of your maximum health every {interval} sec ({heroic}% on Heroic) until the raid destroys the spike.",
+      "nythraxisImpaled": "Impaled on a Bone Spike: you cannot act and lose {pct}% of your maximum health every {interval} sec until the raid destroys the spike.",
       "nythraxisAscension": "Deathless Ascension: {stacks} stacks, {pct}% more damage and attack speed. Drag Nythraxis onto the Binding Sigil to purge it.",
       "nythraxisBound": "Bound by the old wards: Nythraxis takes {pct}% more damage for {duration} sec.",
       "nythraxisUnbound": "Unbound: Nythraxis deals {pct}% more damage until a Binding Sigil holds him.",

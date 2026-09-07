@@ -14248,7 +14248,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.varkhulMoltenCore':
     '将核心运到锻炉。熔融重压每 {interval} 秒造成不断提高的伤害，从最大生命值的 {min}% 增至 {max}%。',
   'hudChrome.auraEffect.nythraxisDreadCurse': '每层使受到尼思拉克西斯的伤害提高 {perStack}%，持续 {duration} 秒：当前 {stacks}/{max} 层，伤害提高 {pct}%。每 {every} 秒，他对目标的下一次打击造成 {hit}% 最大生命值的伤害并叠加一层。坦克应在 {swap} 层时更换。',
-  'hudChrome.auraEffect.nythraxisImpaled': '被骨刺穿刺：你无法行动，每 {interval} 秒损失 {normal}% 最大生命值（英雄难度为 {heroic}%），直到团队摧毁骨刺。',
+  'hudChrome.auraEffect.nythraxisImpaled': '被骨刺穿刺：你无法行动，每 {interval} 秒损失 {pct}% 最大生命值，直到团队摧毁骨刺。',
   'hudChrome.auraEffect.nythraxisAscension': '不死飞升：{stacks} 层，伤害与攻击速度提高 {pct}%。把尼思拉克西斯拖上束缚法阵可清除此效果。',
   'hudChrome.auraEffect.nythraxisBound': '受缚于古老结界：尼思拉克西斯受到的伤害提高 {pct}%，持续 {duration} 秒。',
   'hudChrome.auraEffect.nythraxisUnbound': '未受缚：尼思拉克西斯造成的伤害提高 {pct}%，直到被束缚法阵制住。',

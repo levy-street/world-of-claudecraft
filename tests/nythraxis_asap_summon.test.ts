@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import * as nythraxis from '../src/sim/encounters/nythraxis';
 import { Sim } from '../src/sim/sim';
+import type { SimContext } from '../src/sim/sim_context';
 import { type Entity, NYTHRAXIS_ADDS_ENABLED } from '../src/sim/types';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
@@ -43,6 +45,10 @@ function forcePillarCast(sim: Sim, st: NonNullable<Entity['nythraxis']>): void {
 // fields no adds, so the heroic court never rises behind a landed Deathless
 // Rage. The summon channel and spawn helpers stay authored for the day the
 // switch flips back; this suite pins that the encounter loop never reaches them.
+// The switch is a compile-time constant, so the driver-side once-only court
+// gate is DORMANT and cannot be exercised through the loop; the second test
+// drives the channel and spawn helpers directly so the court itself stays
+// green while it waits.
 describe('heroic Nythraxis fields no court while the redo runs without adds', () => {
   const countHeroicAdds = (sim: Sim) =>
     [...sim.entities.values()].filter(
@@ -68,5 +74,27 @@ describe('heroic Nythraxis fields no court while the redo runs without adds', ()
     // A second Deathless Rage cycle changes nothing either.
     forcePillarCast(sim, st);
     expect(countHeroicAdds(sim)).toBe(0);
+  });
+
+  it('still raises the three-add court when the summon channel is driven directly', () => {
+    const sim = new Sim({
+      seed: 4,
+      playerClass: 'warrior',
+      autoEquip: true,
+      devCommands: true,
+      world: EMPTY_TEST_WORLD,
+    });
+    sim.setPlayerLevel(20);
+    const { boss, st } = heroicBoss(sim, sim.playerId);
+    const ctx = (sim as unknown as { ctx: SimContext }).ctx;
+    nythraxis.startNythraxisHeroicSummon(ctx, boss, st);
+    expect(boss.castingAbility).toBe('nythraxis_heroic_summon');
+    for (let i = 0; i < 20 * 30 && (st.heroicSummonChannelRemaining ?? 0) > 0; i++) {
+      nythraxis.updateNythraxisHeroicSummon(ctx, boss, st);
+    }
+    expect(st.heroicSummonChannelRemaining ?? 0).toBe(0);
+    expect(boss.castingAbility).toBeNull();
+    expect(countHeroicAdds(sim)).toBe(HEROIC_ADD_IDS.length);
+    expect(boss.summonedIds).toHaveLength(HEROIC_ADD_IDS.length);
   });
 });

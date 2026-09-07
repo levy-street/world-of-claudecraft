@@ -562,10 +562,14 @@ export function wipeNythraxisEncounter(ctx: SimContext, boss: Entity): void {
 export function updateNythraxisEncounter(ctx: SimContext, boss: Entity): void {
   const st = initNythraxisEncounter(boss);
   const room = playersInNythraxisRoom(ctx, boss);
+  let rosterGrew = false;
   for (const player of room) {
-    if (!st.attemptParticipantIds?.includes(player.id)) st.attemptParticipantIds?.push(player.id);
+    if (st.attemptParticipantIds?.includes(player.id)) continue;
+    st.attemptParticipantIds?.push(player.id);
+    rosterGrew = true;
   }
-  st.attemptParticipantIds?.sort((a, b) => a - b);
+  // Sorted only when someone joined: the roster is stable for whole pulls.
+  if (rosterGrew) st.attemptParticipantIds?.sort((a, b) => a - b);
   if (!st.introSpoken) {
     st.introSpoken = true;
     nythraxisDialogueSet(ctx, boss, [
@@ -1089,7 +1093,10 @@ export function castNythraxisBoneSpike(
       playerId: victim.id,
       tickTimer: NYTHRAXIS_IMPALED_TICK_SECONDS,
     });
-    ctx.applyAura(victim, nythraxisImpaledAuraFor(boss.id, spike.id));
+    ctx.applyAura(
+      victim,
+      nythraxisImpaledAuraFor(boss.id, spike.id, nythraxisImpaledTickMaxHp(difficulty)),
+    );
     ctx.emit({
       type: 'spellfx',
       sourceId: boss.id,

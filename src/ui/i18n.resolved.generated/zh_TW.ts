@@ -2792,7 +2792,7 @@ export const zh_TW: EnTranslations = {
       "varkhulForgeLink": "在啟動的立柱光束抵達鍛爐前將其攔截。未攔截的光束每秒增加6%熱量。普通難度下，已攔截的光束和關閉的立柱會讓鍛爐冷卻；英雄難度下熱量永不降低。達到100%時會觸發致命的鍛爐熔毀。",
       "varkhulCrucibleExposure": "攔截坩堝光束時，每秒受到的最大生命值傷害都會提高。離開光束後，普通難度10秒、英雄難度60秒後重置層數。",
       "nythraxisDreadCurse": "每層都會使受到尼思拉克西斯的傷害提高{perStack}%，持續{duration}秒：目前{stacks}/{max}層，傷害提高{pct}%。每{every}秒，他對目標的下一次攻擊會造成相當於最大生命值{hit}%的傷害並疊加一層。坦克應在{swap}層時換坦。",
-      "nythraxisImpaled": "被骨刺穿刺：你無法行動，且每{interval}秒流失{normal}%最大生命值（英雄難度為{heroic}%），直到團隊摧毀該尖刺。",
+      "nythraxisImpaled": "被骨刺穿刺：你無法行動，且每{interval}秒流失{pct}%最大生命值，直到團隊摧毀該尖刺。",
       "nythraxisAscension": "不死昇華：{stacks}層，傷害與攻擊速度提高{pct}%。將尼思拉克西斯拖上束縛印記即可淨化此效果。",
       "nythraxisBound": "受古老守印束縛：尼思拉克西斯在{duration}秒內多承受{pct}%傷害。",
       "nythraxisUnbound": "未束縛：尼思拉克西斯造成的傷害提高{pct}%，直到被束縛印記困住為止。",

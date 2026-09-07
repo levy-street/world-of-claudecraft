@@ -573,8 +573,12 @@ describe('Nythraxis encounter module (N1)', () => {
       const st = nythraxis.initNythraxisEncounter(boss);
       st.phase = 1;
       const perStack = difficulty === 'heroic' ? 0.45 : 0.35;
+      const hitFrac = difficulty === 'heroic' ? 0.3 : 0.25;
+      const hpBefore = tank.hp;
       st.dreadCurseTimer = 0.01;
       nythraxis.updateNythraxisDreadCurse(ctx, boss, st);
+      // The curse lands as a max-health shadow hit that no armour or absorb shrinks.
+      expect(hpBefore - tank.hp, difficulty).toBe(Math.ceil(tank.maxHp * hitFrac));
       let curse = tank.auras.find((a) => a.id === 'nythraxis_dread_curse');
       expect(curse?.stacks, difficulty).toBe(1);
       expect(curse?.value, difficulty).toBeCloseTo(perStack);

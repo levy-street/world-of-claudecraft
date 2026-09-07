@@ -5,6 +5,7 @@
 
 import { describe, expect, it } from 'vitest';
 import * as nythraxis from '../src/sim/encounters/nythraxis';
+import { detachFromDungeon } from '../src/sim/instances/dungeons';
 import {
   isNythraxisImpaled,
   NYTHRAXIS_BONE_SPIKE_EVERY_HEROIC,
@@ -121,13 +122,14 @@ describe('Nythraxis Bone Spike', () => {
     expect([NYTHRAXIS_IMPALED_TICK_MAX_HP_NORMAL, NYTHRAXIS_IMPALED_TICK_MAX_HP_HEROIC]).toEqual([
       0.08, 0.1,
     ]);
-    const aura = nythraxisImpaledAuraFor(7, 99);
+    const aura = nythraxisImpaledAuraFor(7, 99, NYTHRAXIS_IMPALED_TICK_MAX_HP_HEROIC);
     expect(aura).toMatchObject({
       id: NYTHRAXIS_IMPALED_AURA_ID,
       kind: 'stun',
       unbreakableControl: true,
       encounterOwned: true,
       sourceId: 7,
+      value: 0.1,
       value2: 99,
     });
   });
@@ -137,7 +139,11 @@ describe('Nythraxis Bone Spike', () => {
       { id: 1, dead: false, auras: [] },
       { id: 2, dead: false, auras: [] },
       { id: 3, dead: true, auras: [] },
-      { id: 4, dead: false, auras: [nythraxisImpaledAuraFor(9, 50)] },
+      {
+        id: 4,
+        dead: false,
+        auras: [nythraxisImpaledAuraFor(9, 50, NYTHRAXIS_IMPALED_TICK_MAX_HP_NORMAL)],
+      },
       { id: 5, dead: false, auras: [] },
     ] as unknown as Entity[];
     const picked = nythraxisBoneSpikeCandidates(room, 9, 1, new Set([5]));
@@ -332,6 +338,42 @@ describe('Nythraxis Bone Spike', () => {
     expect(spikes()).toHaveLength(0);
     expect(victims.every((v) => !isNythraxisImpaled(v, boss.id))).toBe(true);
     expect(boss.nythraxis).toBeUndefined();
+  });
+
+  it('frees every impaled raider and drops the spikes when the boss dies, on both tiers', () => {
+    for (const difficulty of ['normal', 'heroic'] as const) {
+      const { ctx, boss, st, room, spikes } = setup({ difficulty });
+      const victims = nythraxis.castNythraxisBoneSpike(ctx, boss, st, room(), difficulty);
+      expect(victims.length, difficulty).toBeGreaterThan(0);
+      expect(spikes().length, difficulty).toBe(victims.length);
+      nythraxis.onBossDeath(ctx, boss);
+      expect(spikes(), difficulty).toHaveLength(0);
+      expect(
+        victims.every((v) => !isNythraxisImpaled(v, boss.id)),
+        difficulty,
+      ).toBe(true);
+      expect(
+        victims.every((v) => !v.auras.some((a) => a.id === NYTHRAXIS_IMPALED_AURA_ID)),
+        difficulty,
+      ).toBe(true);
+    }
+  });
+
+  it('sheds the impale when a raider is detached from the arena, and the spike crumbles', () => {
+    const { ctx, boss, st, room, spikes } = setup();
+    const victims = nythraxis.castNythraxisBoneSpike(ctx, boss, st, room(), 'normal');
+    const leaver = victims[0];
+    expect(isNythraxisImpaled(leaver, boss.id)).toBe(true);
+    // The teleport-out path (leaveDungeon's teardown shares it) sheds the impale
+    // beside the Ignivar and Varkhul encounter clears.
+    expect(detachFromDungeon(ctx, leaver)).not.toBeNull();
+    expect(isNythraxisImpaled(leaver, boss.id)).toBe(false);
+    expect(leaver.auras.some((a) => a.id === NYTHRAXIS_IMPALED_AURA_ID)).toBe(false);
+    // The driver notices the freed victim on its next pass and drops that spike only.
+    nythraxis.updateNythraxisBoneSpikes(ctx, boss, st);
+    expect(spikes()).toHaveLength(victims.length - 1);
+    expect(st.boneSpikes).toHaveLength(victims.length - 1);
+    expect(victims.slice(1).every((v) => isNythraxisImpaled(v, boss.id))).toBe(true);
   });
 
   it('holds a due cast while Deathless Rage is being cast, then fires when it resolves', () => {

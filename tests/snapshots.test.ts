@@ -59,6 +59,7 @@ import { IGNIVAR_JUDGMENT_CAST_ID } from '../src/sim/encounters/ignivar';
 import { createMob } from '../src/sim/entity';
 import { emptySaleLog } from '../src/sim/market_sale_log';
 import { MOUNT_RACE_COUNTDOWN_TICKS } from '../src/sim/mount_race';
+import { NYTHRAXIS_GRAVEFIRE_MAX_LIFETIME_SECONDS } from '../src/sim/nythraxis_gravefire';
 import { petOf, serializePet, summonPet } from '../src/sim/pet/pet_commands';
 import { livePlaytimeSeconds } from '../src/sim/playtime';
 import { noteRelicItemFind, noteRelicObtain } from '../src/sim/reliquary';
@@ -7365,7 +7366,9 @@ describe('Nythraxis Grave Eruption snapshot parity', () => {
         tail: 0,
         head: 12,
         halfWidth: 1.5,
-        remaining: 20,
+        // No dur on a Gravefire row: the decoder bounds rem by the longest
+        // lifetime a line can have on either tier instead.
+        remaining: NYTHRAXIS_GRAVEFIRE_MAX_LIFETIME_SECONDS,
       },
     ]);
     expect(client.activeNythraxisBindingSigils).toEqual([

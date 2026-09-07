@@ -15,6 +15,7 @@ import {
   NYTHRAXIS_BONE_SPIKE_RAGE_LEAD_SECONDS,
   NYTHRAXIS_BONE_SPIKE_RETRY_SECONDS,
   NYTHRAXIS_IMPALED_AURA_ID,
+  NYTHRAXIS_IMPALED_TICK_MAX_HP_NORMAL,
   nythraxisImpaledAuraFor,
 } from '../src/sim/nythraxis_bone_spike';
 import {
@@ -118,6 +119,40 @@ function burnUnder(st: NonNullable<Entity['nythraxis']>, e: Entity): void {
 }
 
 describe('Bone Spike never lands on fire', () => {
+  it('pins the scheduling constants literally', () => {
+    expect(NYTHRAXIS_BONE_SPIKE_FIRE_SETTLE_SECONDS).toBe(3);
+    expect(NYTHRAXIS_BONE_SPIKE_RETRY_SECONDS).toBe(1);
+    expect(NYTHRAXIS_BONE_SPIKE_RAGE_LEAD_SECONDS).toBe(8);
+    expect(NYTHRAXIS_GRAVE_ERUPTION_RADIUS).toBe(3);
+    expect(NYTHRAXIS_GRAVE_ERUPTION_IMPALED_CLEARANCE).toBe(6);
+  });
+
+  it('skips a raider standing in a burning Gravefire yard, on the tier whose burn still reaches them', () => {
+    const { ctx, boss, st, raiders, room } = setup();
+    const ms = nythraxis.nythraxisMechanicState(st);
+    const burning = raiders[3];
+    // A line lit 7 s ago 5 yd short of the raider, travelling through them: the
+    // head passed long ago, and the tail ((elapsed - burn) x speed) has moved
+    // past the raider on normal (burn 6 s) but not yet on heroic (burn 8 s).
+    ms.gravefires.push({
+      seq: ++ms.gravefireSeq,
+      x: burning.pos.x,
+      z: burning.pos.z - 5,
+      dirX: 0,
+      dirZ: 1,
+      elapsed: 7,
+      tickTimer: 1,
+    });
+    expect(nythraxis.nythraxisStandingInFire(st, burning, 'heroic')).toBe(true);
+    expect(nythraxis.nythraxisStandingInFire(st, burning, 'normal')).toBe(false);
+    for (let cast = 0; cast < 12; cast++) {
+      const victims = nythraxis.castNythraxisBoneSpike(ctx, boss, st, room(), 'heroic');
+      expect(victims.length).toBe(3);
+      expect(victims).not.toContain(burning);
+      nythraxis.shatterNythraxisBoneSpikes(ctx, boss);
+    }
+  });
+
   it('skips a raider standing in a burning patch, every cast', () => {
     const { ctx, boss, st, raiders, room } = setup();
     const burning = raiders[3];
@@ -197,7 +232,10 @@ describe('Grave Eruption keeps clear of spikes', () => {
   it('never opens a circle that reaches an impaled raider', () => {
     const { ctx, boss, st, raiders, room } = setup();
     const pinned = raiders[4];
-    ctx.applyAura(pinned, nythraxisImpaledAuraFor(boss.id, 0));
+    ctx.applyAura(
+      pinned,
+      nythraxisImpaledAuraFor(boss.id, 0, NYTHRAXIS_IMPALED_TICK_MAX_HP_NORMAL),
+    );
     // Two neighbours inside the clearance band, one well outside it.
     const near = raiders[3];
     const nearer = raiders[5];
@@ -232,7 +270,10 @@ describe('Grave Eruption keeps clear of spikes', () => {
     for (const difficulty of ['normal', 'heroic'] as const) {
       const { sim, ctx, boss, st, tank, raiders, room } = setup({ difficulty });
       const pinned = raiders[4];
-      ctx.applyAura(pinned, nythraxisImpaledAuraFor(boss.id, 0));
+      ctx.applyAura(
+        pinned,
+        nythraxisImpaledAuraFor(boss.id, 0, NYTHRAXIS_IMPALED_TICK_MAX_HP_NORMAL),
+      );
       // Every OTHER living player -- the tank and the rest of the raid --
       // stacks exactly on the pinned raider's coordinates: `clear` (free
       // raiders outside the impaled-clearance band) is empty, so
@@ -296,16 +337,25 @@ describe('Deathless Rage and the impaled', () => {
     expect(wards.length).toBeGreaterThanOrEqual(3);
     const channeler = raiders[2];
     teleport(sim, channeler, wards[0].pos.x + 1, wards[0].pos.z, wards[0].pos.y);
-    ctx.applyAura(channeler, nythraxisImpaledAuraFor(boss.id, 0));
+    ctx.applyAura(
+      channeler,
+      nythraxisImpaledAuraFor(boss.id, 0, NYTHRAXIS_IMPALED_TICK_MAX_HP_NORMAL),
+    );
     expect(isNythraxisImpaled(channeler, boss.id)).toBe(true);
     expect(isNythraxisWardChannelLocked(channeler, boss.id)).toBe(false);
     // A second impale from another boss id is not this boss's mark: it locks.
-    const other = { ...channeler, auras: [nythraxisImpaledAuraFor(boss.id + 1, 0)] } as Entity;
+    const other = {
+      ...channeler,
+      auras: [nythraxisImpaledAuraFor(boss.id + 1, 0, NYTHRAXIS_IMPALED_TICK_MAX_HP_NORMAL)],
+    } as Entity;
     expect(isNythraxisWardChannelLocked(other, boss.id)).toBe(true);
 
     nythraxis.startNythraxisDeathlessRage(ctx, boss, st);
     // The Rage itself freed the earlier spikes; re-pin the channeler for the test.
-    ctx.applyAura(channeler, nythraxisImpaledAuraFor(boss.id, 0));
+    ctx.applyAura(
+      channeler,
+      nythraxisImpaledAuraFor(boss.id, 0, NYTHRAXIS_IMPALED_TICK_MAX_HP_NORMAL),
+    );
     expect(nythraxis.tryStartNythraxisWardChannel(ctx, wards[0], channeler)).toBe(true);
     const channel = st.wardChannels.find((c) => c.objectId === wards[0].id);
     expect(channel?.playerId).toBe(channeler.id);

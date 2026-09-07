@@ -22,7 +22,10 @@ import type {
   ActiveNythraxisGraveEruption,
   ActiveNythraxisGraveFlame,
 } from '../src/sim/nythraxis_grave_eruption';
-import type { ActiveNythraxisGravefire } from '../src/sim/nythraxis_gravefire';
+import {
+  type ActiveNythraxisGravefire,
+  NYTHRAXIS_GRAVEFIRE_MAX_LIFETIME_SECONDS,
+} from '../src/sim/nythraxis_gravefire';
 
 const EVENT_RADIUS = 90;
 
@@ -381,7 +384,9 @@ describe('Nythraxis snapshot decoders (client)', () => {
     expect(decodeNythraxisGraveFlames([row])).toEqual([]);
   });
 
-  it('decodes a valid Gravefire row without clamping its countdown', () => {
+  it('decodes a valid Gravefire row and bounds its countdown to the longest lifetime', () => {
+    // The row carries no dur (the burn window is the tier's), so the decoder
+    // bounds rem by the longest lifetime a line can have on either tier.
     expect(decodeNythraxisGravefires([GRAVEFIRE_ROW, { ...GRAVEFIRE_ROW, rem: 30 }])).toEqual([
       {
         id: '77:gfl:5',
@@ -405,7 +410,7 @@ describe('Nythraxis snapshot decoders (client)', () => {
         tail: 2,
         head: 20,
         halfWidth: 1.5,
-        remaining: 30,
+        remaining: NYTHRAXIS_GRAVEFIRE_MAX_LIFETIME_SECONDS,
       },
     ]);
   });
@@ -499,6 +504,33 @@ describe('Nythraxis snapshot decoders (client)', () => {
     expect(decodeNythraxisBindingSigils(parsed.nythraxisSigils)).toEqual([
       { ...SIGIL_NEAR, x: 9.13, z: 10.23, remaining: 11.56 },
     ]);
+  });
+});
+
+describe('decodeNythraxisGravefires bounds the remaining time', () => {
+  const row = {
+    id: '77:gfl:3',
+    src: 77,
+    x: 1,
+    z: 2,
+    dx: 0,
+    dz: 1,
+    tail: 0,
+    head: 12,
+    hw: 2.5,
+    rem: 4.56,
+  };
+
+  it('clamps an oversized rem to the longest lifetime a line can have on either tier', () => {
+    // 40 yd at 12 yd/s of head travel plus the longer (heroic, 8 s) burn.
+    expect(NYTHRAXIS_GRAVEFIRE_MAX_LIFETIME_SECONDS).toBeCloseTo(40 / 12 + 8, 6);
+    const [clamped] = decodeNythraxisGravefires([{ ...row, rem: 9999 }]);
+    expect(clamped.remaining).toBe(NYTHRAXIS_GRAVEFIRE_MAX_LIFETIME_SECONDS);
+  });
+
+  it('passes an in-range rem through unchanged', () => {
+    const [plain] = decodeNythraxisGravefires([row]);
+    expect(plain.remaining).toBe(4.56);
   });
 });
 

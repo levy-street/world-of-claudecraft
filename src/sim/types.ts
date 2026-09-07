@@ -7682,7 +7682,11 @@ export const IGNIVAR_BOSS_ID = 'ignivar_herald_of_the_last_flame';
 // task window) clip this circle to the boss slot's own z band; the in-room
 // combat queries (targeting, wipe detection, the transition stun) use the raw
 // circle, whose cross-slot reach is behind arena walls the movement resolver
-// enforces.
+// enforces. The mechanics redo shrank the hall itself to about 100 by 100 yd
+// (dungeon_layout.ts NYTHRAXIS_LAYOUT: x +/-50, z 16..116); this radius is
+// deliberately left over-inclusive so every consumer above keeps covering the
+// whole hall from any boss position with margin. Shrinking it is a maintainer
+// call, since it moves the deed roster and the wipe check.
 export const NYTHRAXIS_ROOM_RADIUS = 260;
 // The Drowned Litany finale boss. Used by the drowned_litany_boss driver.
 export const SISTER_NHALIA_BOSS_ID = 'sister_nhalia_drowned_canticle';

@@ -115,21 +115,40 @@ export function isNythraxisWardChannelLocked(player: Entity, bossId: number): bo
   );
 }
 
-/** The aura an impaled raider carries; value2 is the spike entity that holds them. */
-export function nythraxisImpaledAuraFor(bossId: number, spikeId: number) {
+/**
+ * The aura an impaled raider carries. `value` is the per-tick max-health drain
+ * fraction for the pull's difficulty, so the tooltip spells the resolved
+ * number; `value2` is the spike entity that holds them.
+ */
+export function nythraxisImpaledAuraFor(bossId: number, spikeId: number, tickMaxHp: number) {
   return {
     id: NYTHRAXIS_IMPALED_AURA_ID,
     name: NYTHRAXIS_IMPALED_AURA_NAME,
     kind: 'stun' as const,
     remaining: NYTHRAXIS_IMPALED_AURA_SECONDS,
     duration: NYTHRAXIS_IMPALED_AURA_SECONDS,
-    value: 0,
+    value: tickMaxHp,
     value2: spikeId,
     sourceId: bossId,
     school: 'shadow' as const,
     unbreakableControl: true as const,
     encounterOwned: true as const,
   };
+}
+
+/**
+ * Shed the encounter-owned aura a raider must not carry out of the arena: the
+ * impale, which no timer ever removes (600 s of unbreakable control). The
+ * dungeon leave and detach paths call this beside the Ignivar and Varkhul
+ * clears; the spike that held the leaver crumbles on the driver's next pass
+ * once it sees the victim is no longer impaled.
+ */
+export function clearNythraxisEncounterAuras(player: Entity, sourceId?: number): void {
+  player.auras = player.auras.filter(
+    (aura) =>
+      aura.id !== NYTHRAXIS_IMPALED_AURA_ID ||
+      (sourceId !== undefined && aura.sourceId !== sourceId),
+  );
 }
 
 /**

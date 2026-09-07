@@ -14764,7 +14764,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.varkhulMoltenCore':
     'Отнесите ядро к горну. Бремя расплава каждые {interval} сек. наносит возрастающий урон от {min}% до {max}% максимального здоровья.',
   'hudChrome.auraEffect.nythraxisDreadCurse': 'Каждый заряд увеличивает урон, получаемый от Нитраксиса, на {perStack}% в течение {duration} сек.: сейчас {stacks} из {max} зарядов, урон выше на {pct}%. Каждые {every} сек. следующий удар Нитраксиса по цели наносит {hit}% максимального здоровья и добавляет заряд. Танкам следует меняться при {swap} зарядах.',
-  'hudChrome.auraEffect.nythraxisImpaled': 'Пронзены Костяным шипом: вы не можете действовать и теряете {normal}% максимального здоровья каждые {interval} сек. ({heroic}% на героическом), пока рейд не уничтожит шип.',
+  'hudChrome.auraEffect.nythraxisImpaled': 'Пронзены Костяным шипом: вы не можете действовать и теряете {pct}% максимального здоровья каждые {interval} сек., пока рейд не уничтожит шип.',
   'hudChrome.auraEffect.nythraxisAscension': 'Бессмертное восхождение: {stacks} зарядов, урон и скорость атаки выше на {pct}%. Затащите Нитраксиса на Печать связывания, чтобы снять эффект.',
   'hudChrome.auraEffect.nythraxisBound': 'Связан древними оберегами: Нитраксис получает на {pct}% больше урона в течение {duration} сек.',
   'hudChrome.auraEffect.nythraxisUnbound': 'Не связан: Нитраксис наносит на {pct}% больше урона, пока его не удержит Печать связывания.',

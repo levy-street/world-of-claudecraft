@@ -14554,7 +14554,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.varkhulMoltenCore':
     'このコアを炉へ運ぶ。溶融の重荷は{interval}秒ごとに最大体力の{min}%から{max}%まで増加するダメージを与える。',
   'hudChrome.auraEffect.nythraxisDreadCurse': 'スタックごとにナイスラクシスから受けるダメージが{duration}秒間{perStack}%増加する：{stacks}/{max}スタック、ダメージ増加{pct}%。{every}秒ごとに対象への次の一撃が最大体力の{hit}%を与え、スタックを追加する。タンクは{swap}スタックで交代すべき。',
-  'hudChrome.auraEffect.nythraxisImpaled': '骨の棘に串刺しにされている：行動不能になり、レイドが棘を破壊するまで{interval}秒ごとに最大体力の{normal}%を失う（英雄で{heroic}%）。',
+  'hudChrome.auraEffect.nythraxisImpaled': '骨の棘に串刺しにされている：行動不能になり、レイドが棘を破壊するまで{interval}秒ごとに最大体力の{pct}%を失う。',
   'hudChrome.auraEffect.nythraxisAscension': '不死の高揚：{stacks}スタック、ダメージと攻撃速度が{pct}%上昇。拘束の印の上へナイスラクシスを引きずり込めば解除できる。',
   'hudChrome.auraEffect.nythraxisBound': '旧き結界に拘束されている：ナイスラクシスは{duration}秒間、受けるダメージが{pct}%増加する。',
   'hudChrome.auraEffect.nythraxisUnbound': '未拘束：拘束の印に捕らえられるまで、ナイスラクシスの与えるダメージが{pct}%増加する。',

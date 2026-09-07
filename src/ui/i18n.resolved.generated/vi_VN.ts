@@ -2792,7 +2792,7 @@ export const vi_VN: EnTranslations = {
       "varkhulForgeLink": "Chặn một tia trụ cột đang hoạt động trước khi nó chạm tới lò rèn. Tia còn mở cộng thêm 6% nhiệt mỗi giây. Ở độ Thường, tia bị chặn và trụ cột không hoạt động sẽ làm nguội lò rèn; ở độ Anh Hùng, nhiệt không bao giờ giảm. Ở mức 100%, lò rèn hứng chịu một cơn Sụp Lò chí mạng.",
       "varkhulCrucibleExposure": "Chặn một Tia Vạc Luyện gây sát thương theo máu tối đa tăng dần mỗi giây. Số tầng cộng dồn được đặt lại 10 giây sau khi rời khỏi tia ở độ Thường và 60 giây ở độ Anh Hùng.",
       "nythraxisDreadCurse": "Each stack increases damage taken from Nythraxis by {perStack}% for {duration} sec: {stacks} of {max} stacks now, {pct}% more damage. Every {every} sec his next hit on his target deals {hit}% of maximum health and adds a stack. Tanks should swap at {swap} stacks.",
-      "nythraxisImpaled": "Impaled on a Bone Spike: you cannot act and lose {normal}% of your maximum health every {interval} sec ({heroic}% on Heroic) until the raid destroys the spike.",
+      "nythraxisImpaled": "Impaled on a Bone Spike: you cannot act and lose {pct}% of your maximum health every {interval} sec until the raid destroys the spike.",
       "nythraxisAscension": "Deathless Ascension: {stacks} stacks, {pct}% more damage and attack speed. Drag Nythraxis onto the Binding Sigil to purge it.",
       "nythraxisBound": "Bound by the old wards: Nythraxis takes {pct}% more damage for {duration} sec.",
       "nythraxisUnbound": "Unbound: Nythraxis deals {pct}% more damage until a Binding Sigil holds him.",
