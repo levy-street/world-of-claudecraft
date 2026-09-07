@@ -580,6 +580,7 @@ const RENDER_PURE_CORES = [
   'src/render/wall_backface_cull_core.ts',
   'src/render/dungeon_banner_core.ts',
   'src/render/dungeon_tile_kind_core.ts',
+  'src/render/rift_platform_core.ts',
   'src/render/ignivar_dressing_plan_core.ts',
   'src/render/nythraxis_bound_cage_core.ts',
   'src/render/nythraxis_grave_core.ts',

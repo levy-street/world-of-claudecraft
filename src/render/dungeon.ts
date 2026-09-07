@@ -112,6 +112,7 @@ import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
 import type { FireLightSink } from './point_light_budget';
 import { buildInfernalDecor, ensureInfernalDecorAssets } from './rift_decor';
+import { riftPlatformSlabs } from './rift_platform_core';
 import { markSharedGeometry, markSharedMaterial, markSharedTexture } from './shared_resource';
 import { radialGlowTexture } from './textures';
 import { addTorchGlowDecal } from './torch_glow_decal';
@@ -1232,29 +1233,20 @@ export class DungeonInteriors {
     layout: DungeonLayout,
     platform: { rampZ0: number; rampZ1: number; height: number },
   ): void {
-    const { rampZ0, rampZ1, height } = platform;
-    const halfW = Math.min((layout.wallX ?? 18) - 0.5, 22);
-    const mat = new THREE.MeshLambertMaterial({ color: 0x4a4652, emissive: 0x0a0a12 });
-    // Raised rear deck: a solid riser from the floor up to the platform surface.
-    const deckDepth = Math.max(2, layout.zMax - rampZ1);
-    const deck = new THREE.Mesh(new THREE.BoxGeometry(halfW * 2, height, deckDepth), mat);
-    deck.position.set(0, height / 2, rampZ1 + deckDepth / 2);
+    // Slab plan lives in rift_platform_core.ts (each slab out to the room's own wall
+    // face); one shared material, so the slabs merge into ONE geometry / draw call.
+    const parts = riftPlatformSlabs(layout, platform).map((s) =>
+      new THREE.BoxGeometry(s.halfW * 2, s.top, s.depth).translate(0, s.top / 2, s.z),
+    );
+    const merged = mergeGeometries(parts, false);
+    for (const g of parts) g.dispose();
+    if (!merged) return;
+    const deck = new THREE.Mesh(
+      merged,
+      new THREE.MeshLambertMaterial({ color: 0x4a4652, emissive: 0x0a0a12 }),
+    );
     deck.receiveShadow = true;
     group.add(deck);
-    // Full-width staircase rising 0 to height; each step's top approximates the
-    // linear lift at its centre (the tiny sub-step mismatch is imperceptible). Step
-    // count scales with the ramp length (~2yd tread) so both a short steep sanctum
-    // and a long gentle climb read as proper stairs, not a few giant blocks.
-    const rampLen = rampZ1 - rampZ0;
-    const steps = Math.max(5, Math.min(20, Math.round(rampLen / 2.2)));
-    const stepDepth = rampLen / steps;
-    for (let i = 0; i < steps; i++) {
-      const topY = (height * (i + 1)) / steps;
-      const step = new THREE.Mesh(new THREE.BoxGeometry(halfW * 2, topY, stepDepth + 0.05), mat);
-      step.position.set(0, topY / 2, rampZ0 + (i + 0.5) * stepDepth);
-      step.receiveShadow = true;
-      group.add(step);
-    }
   }
 
   private placeAquaticDressing(group: THREE.Group, layout: DungeonLayout): void {
