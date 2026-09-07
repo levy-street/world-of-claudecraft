@@ -466,11 +466,15 @@ export class ActionBarController {
     // useItem dispatch a potion rides (src/sim/items.ts -> summonMountItem), so
     // reins are placeable for the same reason a potion is. Without this arm the
     // bag drag never writes a hotbar payload and the bar cannot accept them.
+    // Elixirs: same useItem dispatch (kind 'elixir' -> applyAura), usable in
+    // combat with no shared potion cooldown, so they are placeable exactly
+    // like a potion; the view paints no cooldown swipe on their slot.
     const item = ITEMS[itemId];
     return (
       item?.kind === 'food' ||
       item?.kind === 'drink' ||
       item?.kind === 'potion' ||
+      item?.kind === 'elixir' ||
       item?.kind === 'mount' ||
       item?.use?.type === 'fishing' ||
       item?.use?.type === 'gatherTool'
