@@ -80,6 +80,9 @@ export type GroundAoE = {
   // near) instead of damaging hostiles; min/max are ignored and the pulse
   // draws NO rng (the damage roll is skipped entirely).
   allyBuffPct?: number;
+  /** Presentation identity only; generic ground expiry and pulses remain authoritative. */
+  runeOfPower?: { id: string; duration: number };
+  blizzard?: { id: string; duration: number };
   // Meteor: Ignite each struck enemy for this fraction of the resolved pulse
   // damage (fire_mage.applyIgnite copies the number; no re-roll).
   igniteFrac?: number;
@@ -104,6 +107,9 @@ export type GroundAoE = {
   // Hunter trap (combat/hunter_trap.ts): placed at the owner's feet, arms
   // after armRemaining, freezes the first enemy contact, then is consumed.
   hunterTrap?: {
+    id: string;
+    duration: number;
+    armTime: number;
     abilityId: string;
     armRemaining: number;
     freezeDuration: number;

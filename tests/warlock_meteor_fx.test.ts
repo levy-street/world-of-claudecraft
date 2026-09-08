@@ -60,7 +60,7 @@ describe('Warlock fel meteor visuals', () => {
       'utf8',
     );
     expect(painterSource).toMatch(
-      /registerDeferredPreload\(\(\) =>\s*loadTexture\(POWERFUL_FEL_METEOR_TEXTURE_URL, \{ srgb: true \}\)\.then\(\(texture\) => \{\s*powerfulFelMeteorTexture = texture/,
+      /registerDeferredPreload\(\s*\(\) =>\s*loadTexture\(POWERFUL_FEL_METEOR_TEXTURE_URL, \{ srgb: true \}\)\.then\(\(texture\) => \{\s*powerfulFelMeteorTexture = texture/,
     );
     expect(painterSource).toMatch(
       /powerfulImpactTexture: THREE\.Texture \| null = powerfulFelMeteorTexture/,

@@ -112,6 +112,10 @@ describe('cliff scree renderer', () => {
     const renderer = readFileSync(path.join(__dirname, '../src/render/renderer.ts'), 'utf8');
     expect(renderer).toContain('this.cliffScree = buildCliffScree(this.sim.cfg.seed);');
     expect(renderer).toContain('this.scene.add(this.cliffScree.group);');
-    expect(renderer).toContain('this.cliffScree.update(p.pos.x, p.pos.z);');
+    expect(renderer).toContain(
+      'updateRendererScenery(this, p, dt, projectionPixels, worldPhaseMs, worldStart)',
+    );
+    const scenery = readFileSync(path.join(__dirname, '../src/render/renderer_scenery.ts'), 'utf8');
+    expect(scenery).toContain('host.cliffScree.update(p.pos.x, p.pos.z);');
   });
 });

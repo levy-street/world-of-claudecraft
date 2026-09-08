@@ -95,6 +95,7 @@ export function resolveHostileSpellResist(
     crit: false,
     school: ability.school,
     ability: ability.name,
+    abilityId: ability.id,
     kind: 'resist',
   });
   // A resisted cast never reaches runEffects, but the player still pressed the

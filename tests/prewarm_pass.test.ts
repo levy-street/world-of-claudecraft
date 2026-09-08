@@ -363,20 +363,25 @@ describe('runBackgroundPrewarm', () => {
       zoneMethod.indexOf('this.scene.add(mobGroup, npcGroup)'),
     );
     expect(zoneMethod).not.toContain('Promise.race');
-    expect(compileMethod).toContain('if (!this.post) await compileAtTarget(null)');
-    expect(compileMethod).toContain('if (this.post || includeOffscreenVariant)');
-    const setTargetAt = compileMethod.indexOf('this.webgl.setRenderTarget(target)');
-    const compileAt = compileMethod.indexOf('compilePromise = this.webgl.compileAsync(');
-    const restoreAt = compileMethod.indexOf(
-      'this.webgl.setRenderTarget(previousTarget)',
-      compileAt,
+    expect(compileMethod).toContain('await compileColorVariants(');
+    expect(compileMethod).toMatch(
+      /this.webgl,\s*this.camera,\s*this.scene,\s*root,\s*this.prewarmRenderTarget,\s*!!this.post,\s*offscreen,/,
     );
-    const awaitAt = compileMethod.indexOf('await compilePromise', restoreAt);
+    const compileDriver = readFileSync(
+      new URL('../src/render/prewarm_color_programs.ts', import.meta.url),
+      'utf8',
+    );
+    expect(compileDriver).toContain('if (!composer) await compileAtTarget(null)');
+    expect(compileDriver).toContain('if (composer || includeOffscreen)');
+    const setTargetAt = compileDriver.indexOf('webgl.setRenderTarget(target)');
+    const compileAt = compileDriver.indexOf('pending = webgl.compileAsync(');
+    const restoreAt = compileDriver.indexOf('webgl.setRenderTarget(previousTarget)', compileAt);
+    const awaitAt = compileDriver.indexOf('await pending', restoreAt);
     expect(setTargetAt).toBeGreaterThan(-1);
     expect(compileAt).toBeGreaterThan(setTargetAt);
     expect(restoreAt).toBeGreaterThan(compileAt);
     expect(awaitAt).toBeGreaterThan(restoreAt);
-    expect(compileMethod).toContain('await compileAtTarget(this.prewarmRenderTarget)');
+    expect(compileDriver).toContain('await compileAtTarget(offscreenTarget)');
     expect(boundedMethod).toContain('boundedPrewarmVisibility(entry.visible, keepVisible)');
     expect(boundedMethod).toContain('this.webgl.shadowMap.autoUpdate = false');
     expect(boundedMethod).not.toContain('if (!this.post)');

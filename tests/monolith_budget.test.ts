@@ -377,7 +377,8 @@ const MONOLITHS: MonolithRow[] = [
     // literal like the noticeboard arm beside it; tests/realm_builder_monument
     // pins the literal to the constant). They land exactly on the pin above,
     // so the ceiling does not move but the slack is now zero.
-    ceiling: 13214,
+    // Studio reset and scenery setup moved into their owned modules.
+    ceiling: 13075,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

@@ -185,7 +185,22 @@ interface TrailSlot {
   seed: number; // per-slot phase for head shimmer/writhe
 }
 
+export interface PathMotion {
+  x: number;
+  y: number;
+  z: number;
+  duration: number;
+  delay: number;
+  onArrive?: () => void;
+}
+
 interface ArcSlot {
+  refill: ((pts: THREE.Vector3[]) => number) | null;
+  motion: PathMotion | null;
+  brushed: boolean;
+  samplePrimed: boolean;
+  sampleClock: number;
+  sample: ((out: THREE.Vector3) => boolean) | null;
   active: boolean;
   age: number;
   life: number;
@@ -207,6 +222,8 @@ export interface RibbonPoint {
 }
 
 export class AbilityVfxRibbons {
+  private readonly arcCurve = new THREE.CatmullRomCurve3();
+  private readonly arcSmooth = allocPts(34);
   private geo = new THREE.BufferGeometry();
   private pos = new Float32Array(MAX_VERTS * 3);
   private col = new Float32Array(MAX_VERTS * 3);
@@ -240,6 +257,7 @@ export class AbilityVfxRibbons {
   private ordered: THREE.Vector3[] = allocPts(TRAIL_PTS + 1); // scratch, holds refs only
   private coilScratch: THREE.Vector3[] = allocPts(COIL_PTS); // reused for both helices
   private shadowHeadScratch: THREE.Vector3[] = allocPts(3); // directional fang, reused per trail
+  private heldColor = new THREE.Color();
   private disposed = false;
 
   constructor(
@@ -283,7 +301,12 @@ export class AbilityVfxRibbons {
         void main() {
           vec4 base = texture2D(uMap, vUv);
           float flow = 0.6 + 0.9 * texture2D(uNoise, vec2(vUv.x * 1.1 - uTime * 1.8, vUv.y * 0.4)).r;
-          gl_FragColor = vec4(vColor * flow, base.a * min(flow, 1.1));
+          // A narrow hot filament over a coloured shoulder retains hue when
+          // several trails overlap; the existing bloom owns the outer halo.
+          float crossSection = abs(vUv.y * 2.0 - 1.0);
+          float filament = pow(max(0.0, 1.0 - crossSection), 10.0);
+          float edge = 1.0 - smoothstep(0.72, 1.0, crossSection);
+          gl_FragColor = vec4(vColor * (0.48 + flow * 0.46 + filament * 0.38), base.a * edge * min(flow, 1.0));
         }`,
       transparent: true,
       blending: THREE.AdditiveBlending,
@@ -356,6 +379,12 @@ export class AbilityVfxRibbons {
     }
     for (let i = 0; i < ARC_SLOTS; i++) {
       this.arcs.push({
+        refill: null,
+        motion: null,
+        brushed: false,
+        samplePrimed: false,
+        sampleClock: 0,
+        sample: null,
         active: false,
         age: 0,
         life: 0,
@@ -434,18 +463,51 @@ export class AbilityVfxRibbons {
     width: number,
     life: number,
     fill: (pts: THREE.Vector3[]) => number,
-  ): void {
-    const slot = this.arcs.find((a) => !a.active) ?? this.arcs[0];
+    brushed = false,
+    motion: PathMotion | null = null,
+    preserveActive = false,
+    follow = false,
+  ): boolean {
+    const slot = this.arcs.find((a) => !a.active) ?? (preserveActive ? null : this.arcs[0]);
+    if (!slot) return false;
+    slot.sample = null;
+    slot.motion = motion;
+    slot.refill = follow ? fill : null;
+    slot.brushed = brushed;
     const count = Math.min(ARC_PTS, Math.max(0, fill(slot.pts)));
-    if (count < 2) return;
+    if (count < 2) return false;
     // pad the unwritten tail onto the last point so the strip stays degenerate
     for (let i = count; i < ARC_PTS; i++) slot.pts[i].copy(slot.pts[count - 1]);
     slot.active = true;
-    slot.age = 0;
+    slot.age = -(motion?.delay ?? 0);
     slot.life = life;
     slot.width = width;
-    slot.core.setHex(colorHex).lerp(WHITE, 0.5);
+    slot.core.setHex(colorHex).lerp(WHITE, 0.28);
     slot.glow.setHex(colorHex);
+    return true;
+  }
+
+  spawnTrackedPath(
+    color: number,
+    width: number,
+    life: number,
+    sample: (out: THREE.Vector3) => boolean,
+  ): void {
+    const slot = this.arcs.find((a) => !a.active) ?? this.arcs[0];
+    if (!sample(slot.pts[0])) return;
+    for (let i = 1; i < ARC_PTS; i++) slot.pts[i].copy(slot.pts[0]);
+    slot.sample = sample;
+    slot.motion = null;
+    slot.refill = null;
+    slot.brushed = true;
+    slot.active = true;
+    slot.age = 0;
+    slot.samplePrimed = true;
+    slot.sampleClock = 0;
+    slot.life = life;
+    slot.width = width;
+    slot.core.setHex(color).lerp(WHITE, 0.2);
+    slot.glow.setHex(color);
   }
 
   // A comet trail chasing the pooled Vfx projectile: advances with the same
@@ -650,6 +712,10 @@ export class AbilityVfxRibbons {
     width: number,
   ): void {
     const slot = this.arcs.find((a) => !a.active) ?? this.arcs[0];
+    slot.sample = null;
+    slot.motion = null;
+    slot.refill = null;
+    slot.brushed = false;
     slot.active = true;
     slot.age = 0;
     slot.life = life;
@@ -680,11 +746,15 @@ export class AbilityVfxRibbons {
     width: number,
   ): void {
     const slot = this.arcs.find((a) => !a.active) ?? this.arcs[0];
+    slot.sample = null;
+    slot.motion = null;
+    slot.refill = null;
+    slot.brushed = false;
     slot.active = true;
     slot.age = 0;
     slot.life = life;
     slot.width = width;
-    slot.core.setHex(colorHex).lerp(WHITE, 0.5);
+    slot.core.setHex(colorHex).lerp(WHITE, 0.28);
     slot.glow.setHex(colorHex);
     // side axis perpendicular to the camera ray on XZ, so the arc always shows
     // its face
@@ -705,7 +775,7 @@ export class AbilityVfxRibbons {
     }
   }
 
-  update(dt: number, camPos: THREE.Vector3, reducedMotion = false): void {
+  update(dt: number, camPos: THREE.Vector3, reducedMotion = false, drawHeld?: () => void): void {
     this.time += dt;
     this.camPos.copy(camPos);
     this.v = 0;
@@ -861,17 +931,82 @@ export class AbilityVfxRibbons {
 
     for (const a of this.arcs) {
       if (!a.active) continue;
+      const previousAge = a.age;
       a.age += dt;
+      if (a.age < 0) continue;
+      if (a.refill && a.refill(a.pts) < 2) { a.active = false; a.refill = null; continue; }
+      if (a.motion) {
+        const m = a.motion;
+        const elapsed =
+          Math.min(m.duration, a.age) - Math.max(0, Math.min(m.duration, previousAge));
+        const travel = m.duration > 0 ? elapsed / m.duration : 0;
+        for (const p of a.pts) {
+          p.x += m.x * travel;
+          p.y += m.y * travel;
+          p.z += m.z * travel;
+        }
+        if (previousAge < m.duration && a.age >= m.duration) m.onArrive?.();
+      }
       if (a.age >= a.life) {
         a.active = false;
+        a.sample = null;
+        a.motion = null;
+      a.refill = null;
         continue;
       }
+      if (a.sample && dt > 0) {
+        if (!a.sample(this.a1)) {
+          a.active = false;
+          a.sample = null;
+          continue;
+        }
+        // Reset on a teleport; a long line across the arena is never a swing.
+        const distance = this.a1.distanceToSquared(a.pts[ARC_PTS - 1]);
+        if (!a.samplePrimed || distance > 16) {
+          for (const p of a.pts) p.copy(this.a1);
+          a.samplePrimed = true;
+        } else {
+          a.sampleClock += dt;
+          const steps = Math.min(ARC_PTS, Math.floor(a.sampleClock * 60 + 1e-8));
+          a.sampleClock -= steps / 60;
+          this.a2.copy(a.pts[ARC_PTS - 1]);
+          for (let step = 0; step < steps; step++) {
+            for (let i = 0; i < ARC_PTS - 1; i++) a.pts[i].copy(a.pts[i + 1]);
+            a.pts[ARC_PTS - 1].lerpVectors(this.a2, this.a1, (step + 1) / steps);
+          }
+        }
+      }
       const k = (1 - a.age / a.life) ** 2;
-      this.add(a.pts, ARC_PTS, a.width * 2.4, a.glow, 1.1 * k, 0.9);
-      this.add(a.pts, ARC_PTS, a.width, a.core, 2.4 * k, 0.9);
+      if (a.brushed) {
+        // Resample existing control points into one reusable scratch strip.
+        // The vertex and arc pool budgets remain unchanged.
+        this.arcCurve.points = a.pts;
+        for (let i = 0; i < this.arcSmooth.length; i++)
+          this.arcCurve.getPoint(i / (this.arcSmooth.length - 1), this.arcSmooth[i]);
+        this.add(this.arcSmooth, this.arcSmooth.length, a.width * 2.8, a.glow, 0.55 * k, 1);
+        this.add(this.arcSmooth, this.arcSmooth.length, a.width * 0.38, a.core, 0.95 * k, 1);
+      } else {
+        this.add(a.pts, ARC_PTS, a.width * 2.4, a.glow, 1.1 * k, 0.9);
+        this.add(a.pts, ARC_PTS, a.width, a.core, 2.4 * k, 0.9);
+      }
     }
 
+    // Transient attacks own the buffer first. Held decoration uses remaining
+    // vertices only, without occupying or restarting any timed effect slot.
+    drawHeld?.();
     this.commit();
+  }
+
+  /** Immediate held geometry, valid only inside update's drawHeld callback. */
+  appendHeld(
+    points: THREE.Vector3[],
+    count: number,
+    width: number,
+    color: number,
+    light: number,
+  ): void {
+    this.heldColor.setHex(color);
+    this.add(points, count, width, this.heldColor, light, 0.1, 1);
   }
 
   clear(): void {
@@ -881,7 +1016,12 @@ export class AbilityVfxRibbons {
       t.onArrive = null;
       t.onTerminate = null;
     }
-    for (const a of this.arcs) a.active = false;
+    for (const a of this.arcs) {
+      a.active = false;
+      a.sample = null;
+      a.motion = null;
+      a.refill = null;
+    }
     this.geo.setDrawRange(0, 0);
     this.wasEmpty = true;
   }
@@ -1159,6 +1299,10 @@ export class AbilityVfxRibbons {
   // ribbon from the launch point to the impact, on an arc slot.
   private spawnTracer(t: TrailSlot, x: number, y: number, z: number): void {
     const slot = this.arcs.find((a) => !a.active) ?? this.arcs[0];
+    slot.sample = null;
+    slot.motion = null;
+    slot.refill = null;
+    slot.brushed = false;
     slot.active = true;
     slot.age = 0;
     slot.life = 1.1;

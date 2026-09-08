@@ -18,6 +18,8 @@
 // single-event, "no music, no speech" where it matters. Footsteps/impacts are ONE
 // hit (the engine pitch-randomizes and alternates to avoid repetition).
 
+import MASTERWORK_SFX from './masterwork_sfx.json' with { type: 'json' };
+import { SIGNATURE_SFX } from './signature_sfx.mjs';
 import { UI_SFX_CATALOG } from './ui_sfx.mjs';
 
 // UI cues in the baked-tone generator's list that already have a real
@@ -84,6 +86,8 @@ const mob = (family, who, aggro, attack, death, hurt, idle) => {
 };
 
 export const SFX = [
+  ...SIGNATURE_SFX,
+  ...MASTERWORK_SFX,
   // --- Movement & footsteps -------------------------------------------------
   FOOT('foot_grass', 'on soft grass and dry leaves, light leather boot'),
   FOOT('foot_dirt', 'in wet mud and soft dirt, faint squelch'),

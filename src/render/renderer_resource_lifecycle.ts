@@ -10,6 +10,8 @@ export interface RendererPrewarmAndGroundFxOwner<T extends RendererDisposable> {
   warlockMeteorFx?: RendererDisposable;
   vfx?: RendererDisposable;
   abilityVfxFx?: RendererDisposable;
+  hunterTrapVisuals?: RendererDisposable;
+  temporalHourglassGroundVisuals?: RendererDisposable;
 }
 
 /**
@@ -27,6 +29,8 @@ export function disposeRendererPrewarmAndGroundFx(
   bestEffort(() => resources.mageGroundFx?.dispose());
   bestEffort(() => resources.warlockMeteorFx?.dispose());
   bestEffort(() => resources.abilityVfxFx?.dispose());
+  bestEffort(() => resources.hunterTrapVisuals?.dispose());
+  bestEffort(() => resources.temporalHourglassGroundVisuals?.dispose());
   bestEffort(() => resources.vfx?.dispose());
   // The occluder-fade gate and its twins were linked on this renderer's
   // context; a later renderer installs its own (occluder_fade_gate.ts).

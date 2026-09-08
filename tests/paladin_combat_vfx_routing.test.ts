@@ -6,6 +6,7 @@ describe('Paladin combat VFX routing', () => {
   it('executes each Paladin spellfx route against the renderer collaborators', () => {
     const triggerAttack = vi.fn();
     const pulseAt = vi.fn();
+    const solarExecution = vi.fn();
     const vfx = {
       paladinHolyShock: vi.fn(),
       paladinSunwardDisc: vi.fn(),
@@ -24,6 +25,7 @@ describe('Paladin combat VFX routing', () => {
       triggerAttack,
       pulseAt,
       vfx,
+      abilityVfxFx: { solarExecution },
       // The spec-registry gate runs before the paladin switch; none of these fx
       // names are registry casts, so the real painter returns false too.
       abilityVfx: { handleSpellfx: vi.fn(() => false) },
@@ -115,5 +117,6 @@ describe('Paladin combat VFX routing', () => {
       school: 'holy',
     });
     expect(vfx.paladinFinalEdict).toHaveBeenCalledWith(1, 2);
+    expect(solarExecution).toHaveBeenCalledWith(1, 2);
   });
 });

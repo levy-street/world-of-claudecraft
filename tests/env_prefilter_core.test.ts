@@ -25,7 +25,10 @@ describe('resolveEnvironmentPrefilterPlan', () => {
   });
 
   it('drives the renderer without a deferred PMREM timer', () => {
-    const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const source = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replaceAll('\r\n', '\n');
     expect(source).toContain(
       'resolveEnvironmentPrefilterPlan(GFX.constrainedMemory, initialBiome)',
     );

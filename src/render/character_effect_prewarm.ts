@@ -40,6 +40,10 @@ import {
   characterEffectProgramKey,
 } from './character_effect_prewarm_core';
 import { createGhostEffectMaterial } from './characters/effect_materials';
+import {
+  createSurfaceResponseMaterial,
+  surfaceResponseUniforms,
+} from './characters/surface_response';
 
 /** userData marker on a twin, so a later scan never shadows a shadow. */
 const PREWARM_MARKER = 'wocCharacterEffectPrewarm';
@@ -207,6 +211,18 @@ export function buildCharacterEffectPrewarmGroup(root: THREE.Object3D): THREE.Gr
     if (seen.has(key)) {
       // Another material already links this program: a redundant twin would
       // only be a second cache hit, and it would pin a duplicate clone alive.
+      clone.dispose();
+      continue;
+    }
+    seen.add(key);
+    group.add(buildTwin(target, clone));
+  }
+  for (const target of collectCharacterEffectTargets(root)) {
+    const material = target.material as THREE.MeshStandardMaterial & THREE.MeshLambertMaterial;
+    if (!material.isMeshStandardMaterial && !material.isMeshLambertMaterial) continue;
+    const clone = createSurfaceResponseMaterial(target.material, surfaceResponseUniforms());
+    const key = characterEffectProgramKey(characterEffectDrawPath(target, clone));
+    if (seen.has(key)) {
       clone.dispose();
       continue;
     }

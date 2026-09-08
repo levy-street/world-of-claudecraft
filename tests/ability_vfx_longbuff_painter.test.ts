@@ -18,6 +18,8 @@ function makePainter(now: () => number = () => 12.5) {
     windup: vi.fn().mockReturnValue(false),
     holdShell: vi.fn(),
     holdGroundAura: vi.fn().mockReturnValue(true),
+    holdQueuedWeapon: vi.fn().mockReturnValue(true),
+    holdControlSignals: vi.fn(),
     orbit: vi.fn().mockReturnValue(true),
     bodyGlow: vi.fn(),
     sleepEntity: vi.fn(),
@@ -198,18 +200,18 @@ describe('everything else keeps its held read', () => {
     expect(fx.holdGroundAura).not.toHaveBeenCalled();
   });
 
-  it('a victim-worn debuff band still paints (its ability grants no long buff aura)', () => {
+  it('a physical slow retains its control tell without a generic orbit', () => {
     const { painter, fx, vfx } = makePainter();
 
-    // Precondition, so the reader sees the gate is not what this exercises:
-    // hamstring grants no >= 300s buff aura, so the policy holds its VFX and
-    // the victim-worn band reads through the debuff block as before. No
-    // content today authors BOTH a debuff block and a long buff aura.
+    // The long-buff policy does not suppress this real victim-worn slow.
     expect(holdsBuffVfxWhileWorn('hamstring', ABILITY_VFX_FULL_SPECS.hamstring)).toBe(true);
 
-    painter.syncEntity(ent(['hamstring_slow']));
+    const subject = ent([]);
+    subject.auras = [{ id: 'hamstring_slow', kind: 'slow', remaining: 2 }];
+    painter.syncEntity(subject);
 
-    expect(fx.orbit).toHaveBeenCalledTimes(1);
+    expect(fx.holdControlSignals).toHaveBeenCalledWith(subject);
+    expect(fx.orbit).not.toHaveBeenCalled();
     expect(vfx.buffSwirl).not.toHaveBeenCalled();
   });
 });
@@ -234,6 +236,7 @@ describe('silenced buffs free their band and disc slots', () => {
       ent(['arcane_intellect', 'power_word_fortitude', 'mark_of_the_wild'], 7, 'heroic_strike'),
     );
 
-    expect(fx.orbit).toHaveBeenCalledTimes(1);
+    expect(fx.holdQueuedWeapon).toHaveBeenCalledWith(7, expect.any(Number), expect.any(Number));
+    expect(fx.orbit).not.toHaveBeenCalled();
   });
 });

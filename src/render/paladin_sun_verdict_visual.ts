@@ -37,9 +37,10 @@ function sunTexture(segment: number | null): THREE.DataTexture {
 
       const outerRing = Math.abs(radius - 28) < 1.8;
       const innerRing = Math.abs(radius - 8) < 1.4;
-      const rayBand = radius >= 32 && radius <= 41;
+      const rayBand = radius >= 31 && radius <= 43;
       const rayAngle = ((angle + Math.PI / 12) / TAU) * 12;
-      const ray = rayBand && Math.abs(rayAngle - Math.round(rayAngle)) < 0.09;
+      const ray = rayBand && Math.abs(rayAngle - Math.round(rayAngle)) < (43 - radius) * 0.018;
+      const engraving = radius > 28 && radius < 32 && Math.cos(angle * 36) > 0.35;
       const separatorAngle = (angle / TAU) * SEGMENT_COUNT;
       const separator =
         radius >= 8 &&
@@ -47,7 +48,7 @@ function sunTexture(segment: number | null): THREE.DataTexture {
         Math.abs(separatorAngle - Math.round(separatorAngle)) < 0.025;
       const dimSegment = radius >= 8 && radius <= 27;
       const core = radius < 6;
-      if (outerRing || innerRing || ray || separator || core) {
+      if (outerRing || innerRing || ray || separator || core || engraving) {
         setPixel(data, x, y, core ? SUN_WHITE : SUN_GOLD, core ? 245 : 220);
       } else if (dimSegment) {
         setPixel(data, x, y, SUN_DARK, 95);
@@ -94,6 +95,15 @@ export class PaladinSunVerdictVisual {
     sprite(texture, 1, 21 + index, THREE.AdditiveBlending),
   );
   private elapsed = 0;
+  private readonly judgments = new THREE.Group();
+  private readonly bladeGeometry = new THREE.OctahedronGeometry(0.3, 0);
+  private readonly bladeMaterial = new THREE.MeshBasicMaterial({
+    color: SUN_WHITE,
+    transparent: true,
+    opacity: 0.85,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+  });
 
   constructor(characterHeight: number) {
     this.group.name = 'paladin-sun-verdict-visual';
@@ -101,6 +111,16 @@ export class PaladinSunVerdictVisual {
     this.group.visible = false;
     this.base.name = 'paladin-sun-verdict-base';
     this.group.add(this.base);
+    this.judgments.name = 'paladin-verdict-three-sentences';
+    for (let i = 0; i < 3; i++) {
+      const blade = new THREE.Mesh(this.bladeGeometry, this.bladeMaterial);
+      const angle = (i / 3) * TAU;
+      blade.position.set(Math.cos(angle) * 0.9, -0.25, Math.sin(angle) * 0.9);
+      blade.scale.set(0.45, 2.4, 0.45);
+      blade.name = `paladin-verdict-sentence-${i + 1}`;
+      this.judgments.add(blade);
+    }
+    this.group.add(this.judgments);
     for (let index = 0; index < this.segments.length; index++) {
       this.segments[index].name = `paladin-sun-verdict-segment-${index + 1}`;
       this.group.add(this.segments[index]);
@@ -116,6 +136,12 @@ export class PaladinSunVerdictVisual {
     const rotation = reducedMotion ? 0 : this.elapsed * (plan.imminent ? 1.15 : 0.38);
     const pulse = reducedMotion ? 1 : 1 + Math.sin(this.elapsed * (plan.imminent ? 7.5 : 3)) * 0.07;
     this.group.scale.setScalar(pulse);
+    this.judgments.rotation.y = reducedMotion ? 0 : rotation * 0.45;
+    for (let index = 0; index < 3; index++) {
+      const blade = this.judgments.children[index];
+      blade.scale.y = index < plan.charges ? 3.6 : 2.4;
+      blade.position.y = index < plan.charges ? -0.05 : -0.3;
+    }
     this.base.material.rotation = rotation;
     this.base.material.opacity = plan.imminent ? 0.98 : 0.8;
     for (let index = 0; index < this.segments.length; index++) {
@@ -127,6 +153,8 @@ export class PaladinSunVerdictVisual {
   }
 
   dispose(): void {
+    this.bladeGeometry.dispose();
+    this.bladeMaterial.dispose();
     this.base.material.dispose();
     for (const segment of this.segments) segment.material.dispose();
   }

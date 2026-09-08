@@ -131,8 +131,11 @@ describe('Metamorphosis character integration', () => {
       "this.buildFormVisual(e, v, 'form_metamorph', 'metamorphVisual', false)",
     );
     expect(source).toContain('this.createCharacterVisualWithRetry(e, formKey, formKey)');
-    expect(source).toContain('v.metamorphVisual?.setFar(v.isFar && active === v.metamorphVisual);');
-    expect(source).toContain("createCharacterVisual(metamorphEntity, 'form_metamorph')");
+    expect(source).toContain(
+      'applyCharacterFormDetail(v, active, v.isFar, resolvedForm, shadowPlan)',
+    );
+    expect(source).toContain("['warlock', 'form_metamorph'], ['druid', 'form_moonkin']");
+    expect(source).toContain('createCharacterVisual(entity, form)');
     expect(source).toContain('for (const visual of playerPrewarmInstances) visual.dispose();');
     // The per-rig setActive fan-out lives in entity_gate_stand_in_core.ts
     // (applyCharacterFormVisibility), where a pending form's token keeps the
@@ -144,9 +147,7 @@ describe('Metamorphosis character integration', () => {
     );
     expect(core).toContain('rigs.metamorphVisual?.setActive(visibility.metamorph);');
     expect(source).toContain('characterFormShadowPlan(');
-    expect(source).toContain(
-      'v.metamorphVisual?.setProxyShadow(shadowPlan.formProxy && active === v.metamorphVisual)',
-    );
+    expect(core).toContain('rig?.setProxyShadow(shadows.formProxy && active === rig)');
     expect(source).toContain('const displayScale = e.scale;');
     expect(source).not.toContain('setMetamorph(');
     expect(source).not.toContain('LICH_FORM_SCALE');

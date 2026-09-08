@@ -217,23 +217,29 @@ describe('entry detail horizon admission', () => {
       const source = readFileSync('src/render/renderer.ts', 'utf8')
         .replace(/\/\*[\s\S]*?\*\//g, '')
         .replace(/\/\/[^\n]*/g, '');
+      const scenery = readFileSync('src/render/renderer_scenery.ts', 'utf8')
+        .replace(/\/\*[\s\S]*?\*\//g, '')
+        .replace(/\/\/[^\n]*/g, '');
       const prewarmStart = source.indexOf('private prewarmWorldFrame(');
       const prewarmFrame = source.slice(
         prewarmStart,
         source.indexOf('this.fish.update(', prewarmStart),
       );
-      const liveStart = source.indexOf(
-        'const sceneryFar = this.entryDetailHorizon.sceneryCullFar(fogFar);',
+      const liveStart = scenery.indexOf(
+        'const sceneryFar = host.entryDetailHorizon.sceneryCullFar(fogFar);',
       );
-      expect(liveStart).toBeGreaterThan(prewarmStart);
-      const liveFrame = source.slice(liveStart, source.indexOf('this.fish.update(', liveStart));
+      expect(liveStart).toBeGreaterThan(-1);
+      expect(source).toContain(
+        'updateRendererScenery(this, p, dt, projectionPixels, worldPhaseMs, worldStart)',
+      );
+      const liveFrame = scenery.slice(liveStart, scenery.indexOf('host.fish.update(', liveStart));
       const painters = ['propsView', 'eastbrookTownView', 'fenbridgeTownView', 'foliage'];
       for (const painter of painters) {
         const inPrewarm = prewarmFrame.slice(prewarmFrame.indexOf(`this.${painter}.update(`));
         expect(inPrewarm.slice(0, inPrewarm.indexOf(');'))).toContain(
           'this.entryDetailHorizon.sceneryCullFar(fogFar)',
         );
-        const inLive = liveFrame.slice(liveFrame.indexOf(`this.${painter}.update(`));
+        const inLive = liveFrame.slice(liveFrame.indexOf(`host.${painter}.update(`));
         expect(inLive.slice(0, inLive.indexOf(');'))).toContain('sceneryFar');
       }
       // Exactly the four painters, no raw fogFar left in their calls, at each site.
@@ -241,12 +247,16 @@ describe('entry detail horizon admission', () => {
         painters.length,
       );
       expect(liveFrame.split('sceneryFar,').length - 1).toBe(painters.length);
-      // Terrain keeps the wide cull far at both sites: the same literal call, twice.
+      // Terrain keeps the wide cull far in both the prewarm and live helper.
       const terrainCall =
         'this.terrainView.update(this.camera.position.x, this.camera.position.z, fogFar);';
-      expect(source.split(terrainCall).length - 1).toBe(2);
+      expect(source.split(terrainCall).length - 1).toBe(1);
+      expect(scenery.split(terrainCall.replaceAll('this.', 'host.')).length - 1).toBe(1);
       expect(source).not.toContain(
         'this.terrainView.update(this.camera.position.x, this.camera.position.z, sceneryFar',
+      );
+      expect(scenery).not.toContain(
+        'host.terrainView.update(host.camera.position.x, host.camera.position.z, sceneryFar',
       );
     });
   });

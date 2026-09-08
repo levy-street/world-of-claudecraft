@@ -37,9 +37,16 @@ export function isCrescendoArchetype(arch: AbilityVfxArchetype): boolean {
 // fillers inside the same renderer architecture without flattening the visual
 // hierarchy between rotational attacks and finishers.
 export function usesCrescendoScale(
-  spec: Pick<AbilityVfxFullSpec, 'archetype' | 'filler'>,
+  spec: Pick<AbilityVfxFullSpec, 'archetype' | 'filler' | 'physical' | 'ritual' | 'presentation' | 'strike'>,
 ): boolean {
-  return spec.filler !== true && isCrescendoArchetype(spec.archetype);
+  return (
+    spec.strike?.arc !== 'wire' &&
+    !spec.physical &&
+    !spec.ritual &&
+    !spec.presentation &&
+    spec.filler !== true &&
+    isCrescendoArchetype(spec.archetype)
+  );
 }
 
 export const SPECTACLE = {

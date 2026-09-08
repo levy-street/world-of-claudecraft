@@ -13,7 +13,7 @@ import {
   writeFileSync,
 } from 'node:fs';
 import http from 'node:http';
-import { extname, join, relative, resolve } from 'node:path';
+import { extname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   analyzeLoudness,
@@ -180,9 +180,13 @@ async function readJson(req) {
 function safeRealFile(root, relativePath, extensions) {
   const rootReal = realpathSync(root);
   const lexical = resolve(rootReal, relativePath);
-  if (!lexical.startsWith(`${rootReal}/`)) throw new Error('path is outside the allowed root');
+  const withinRoot = (candidate) => {
+    const child = relative(rootReal, candidate);
+    return child !== '' && child !== '..' && !child.startsWith(`..${sep}`) && !isAbsolute(child);
+  };
+  if (!withinRoot(lexical)) throw new Error('path is outside the allowed root');
   const target = realpathSync(lexical);
-  if (!target.startsWith(`${rootReal}/`)) throw new Error('symlink escapes the allowed root');
+  if (!withinRoot(target)) throw new Error('symlink escapes the allowed root');
   if (!statSync(target).isFile()) throw new Error('not a file');
   if (extensions && !extensions.has(extname(target).toLowerCase())) {
     throw new Error('file type is not allowed');

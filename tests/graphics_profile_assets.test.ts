@@ -5,6 +5,8 @@ import type { GfxSettings } from '../src/render/gfx';
 const mocks = vi.hoisted(() => {
   const prepare = () => vi.fn<() => Promise<void>>(() => Promise.resolve());
   return {
+    production: prepare(),
+    simulation: prepare(),
     terrain: prepare(),
     water: prepare(),
     stone: prepare(),
@@ -23,6 +25,13 @@ const mocks = vi.hoisted(() => {
     reset: vi.fn(),
   };
 });
+vi.mock('../src/render/ability_vfx/production_assets', () => ({
+  prepareProductionProfileAssets: mocks.production,
+}));
+
+vi.mock('../src/render/ability_vfx/simulation_assets', () => ({
+  prepareSimulationProfileAssets: mocks.simulation,
+}));
 
 vi.mock('../src/render/terrain', () => ({
   prepareTerrainProfileAssets: mocks.terrain,
@@ -144,6 +153,7 @@ const prepareSpies = [
   mocks.armoury,
   mocks.mailbox,
   mocks.noticeboard,
+  mocks.simulation,
 ];
 
 beforeEach(() => {
@@ -163,6 +173,7 @@ describe('graphics profile asset preparation', () => {
     });
 
     for (const prepare of prepareSpies.slice(0, 9)) expect(prepare).toHaveBeenCalledWith(target);
+    expect(mocks.simulation).toHaveBeenCalledWith(target);
     expect(mocks.sky).toHaveBeenCalledWith(position.x, position.z, target);
     expect(mocks.cliff).toHaveBeenCalledWith(target);
     for (const prepare of [mocks.town, mocks.armoury, mocks.mailbox, mocks.noticeboard]) {

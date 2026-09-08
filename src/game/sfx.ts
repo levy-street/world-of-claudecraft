@@ -14,6 +14,7 @@ import { ABILITIES } from '../sim/data';
 import type { BiomeId } from '../sim/types';
 import { isAbilityMomentRecorded } from './ability_sfx_coverage';
 import { resumeWhenAllowed } from './audio_unlock';
+import { masterworkAudioKey, masterworkLoop } from './masterwork_audio_core';
 import {
   advanceMountEngine,
   type MountEngineEntry,
@@ -26,6 +27,7 @@ import {
   type SfxEntry,
 } from './sfx_manifest.generated';
 import { loadRuntimeSfxPack } from './sfx_runtime_pack';
+import { signatureAccent } from './signature_audio';
 import { type WaterElementalCue, waterElementalSamples } from './water_elemental_audio';
 
 const SAMPLE_GAIN = 0.85; // base level for sampled clips; sfxVolume multiplies this
@@ -266,13 +268,8 @@ class Sfx {
         });
       }
       void this.preloadStartup();
-      // The ability layer is procedural only. An ElevenLabs-generated sample
-      // pack briefly rode on top of it and was dropped (44b928819) for
-      // bypassing the audio contract: scripts/sfx_conform.mjs only sees .mp3,
-      // so its 118 takes shipped with no loudness, bitrate or true-peak check.
-      // Any future sampled layer ships as conformed MP3s through scripts/sfx/
-      // (docs/design/sound_effects.md), and must respect ability_sfx_coverage.ts
-      // so it never doubles a hand-recorded cue the way that pack did.
+      // Signature accents are conformed MP3 material tails in the canonical
+      // manifest. Foreground recorded cues retain their normal routing.
     } catch {
       this.ctx = null;
     }
@@ -777,12 +774,18 @@ class Sfx {
       src.buffer = buf;
       src.loop = true;
       src.playbackRate.value = this.authoredPlaybackRate(key);
+      const authoredLoop = masterworkLoop(key);
+      if (authoredLoop) {
+        src.loopStart = authoredLoop.start;
+        src.loopEnd = authoredLoop.end;
+        src.playbackRate.value = 1;
+      }
       const g = ctx.createGain();
       g.gain.value = 0;
       const panner = positional ? this.makePanner(x, y, z, undefined, maxDistance) : null;
       if (panner) src.connect(g).connect(panner).connect(master);
       else src.connect(g).connect(master);
-      src.start();
+      src.start(0, authoredLoop?.start ?? 0);
       this.commitVariant(key, variantIndex);
       this.pendingLoopVariants.delete(id);
       slot = { key, src, gain: g, panner, target: -1, x, y, z };
@@ -810,7 +813,12 @@ class Sfx {
     if (slot.target !== mixedTarget) {
       slot.target = mixedTarget;
       if (justCreated && immediate) slot.gain.gain.setValueAtTime(mixedTarget, ctx.currentTime);
-      else slot.gain.gain.setTargetAtTime(mixedTarget, ctx.currentTime, 0.25);
+      else
+        slot.gain.gain.setTargetAtTime(
+          mixedTarget,
+          ctx.currentTime,
+          masterworkLoop(key)?.fade ?? 0.25,
+        );
     }
   }
 
@@ -1475,6 +1483,19 @@ class Sfx {
     if (!ctx || !master) return;
     if (this.tooFar(x, z)) return;
     const arch = opts?.archetype ?? '';
+    const authored =
+      kind === 'release' || kind === 'impact' ? masterworkAudioKey(opts?.abilityId, kind) : null;
+    if (authored) {
+      this.playAt(authored, x, y, z, {
+        gain: opts?.lite ? 0.45 : kind === 'impact' ? 0.85 : 0.65,
+        cooldown: kind === 'impact' ? 0.28 : 0.12,
+        rate: 1,
+        jitter: false,
+      });
+      return;
+    }
+    const accent = signatureAccent(kind, opts?.abilityId, opts?.lite === true);
+    if (accent) this.playAt(accent.key, x, y, z, { gain: accent.gain, cooldown: accent.cooldown });
     // A hand-recorded studio cue already sounds several of these moments from
     // src/ui/combat_sfx.ts: proj_<school> at the launch, impact_<school> or a
     // material impact where it lands, combat_crit on a crit, heal_impact,

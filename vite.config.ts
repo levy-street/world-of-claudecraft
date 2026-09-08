@@ -482,6 +482,7 @@ export default defineConfig({
         play: fileURLToPath(new URL('play.html', import.meta.url)),
         guide: fileURLToPath(new URL('guide.html', import.meta.url)),
         editor: fileURLToPath(new URL('editor.html', import.meta.url)),
+        vfxStudio: fileURLToPath(new URL('vfx-studio.html', import.meta.url)),
         walletHandoff: fileURLToPath(new URL('wallet-handoff.html', import.meta.url)),
       },
       output: {

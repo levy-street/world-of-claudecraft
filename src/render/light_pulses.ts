@@ -45,6 +45,13 @@ export class LightPulses {
     }
   }
 
+  clear(): void {
+    for (const slot of this.pool) {
+      slot.remaining = 0;
+      slot.light.intensity = 0;
+    }
+  }
+
   private capacity(): number {
     // Composer-off tiers keep at most one live pulse; richer tiers a few.
     return GFX.composer ? 4 : 1;

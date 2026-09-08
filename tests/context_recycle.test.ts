@@ -40,13 +40,16 @@ function recycleFixture(
       canvas.dispatchEvent(new Event('webglcontextrestored'));
     }),
   };
-  vi.mocked(context.getExtension).mockReturnValue(extension as never);
+  vi.mocked(context.getExtension).mockImplementation(() => (lost ? null : (extension as never)));
   const recycled = { canvas, context } satisfies RecycledRendererContext;
   return {
     calls,
     canvas,
     context,
     extension,
+    setLost: (value: boolean) => {
+      lost = value;
+    },
     get lossDefaultPrevented() {
       return lossDefaultPrevented;
     },
@@ -81,12 +84,32 @@ describe('recycleWebGL2Context', () => {
   });
 
   it('restores an already-lost context without requesting a second loss', async () => {
-    const fixture = recycleFixture({ initiallyLost: true });
-
+    const fixture = recycleFixture();
+    preflightWebGL2ContextRecycle(fixture.context);
+    fixture.setLost(true);
     await expect(recycleWebGL2Context(fixture.recycled)).resolves.toBe(fixture.recycled);
 
     expect(fixture.extension.loseContext).not.toHaveBeenCalled();
     expect(fixture.extension.restoreContext).toHaveBeenCalledTimes(1);
+  });
+
+  it('retries an ignored restoration inside the deadline and cancels retries on success', async () => {
+    vi.useFakeTimers();
+    try {
+      const fixture = recycleFixture();
+      fixture.extension.restoreContext.mockImplementationOnce(() => {});
+      const result = recycleWebGL2Context(fixture.recycled);
+      await vi.advanceTimersByTimeAsync(0);
+      expect(fixture.context.isContextLost()).toBe(true);
+      await vi.advanceTimersByTimeAsync(1_000);
+      await expect(result).resolves.toBe(fixture.recycled);
+      expect(fixture.extension.restoreContext).toHaveBeenCalledTimes(2);
+      await vi.advanceTimersByTimeAsync(20_000);
+      expect(fixture.extension.restoreContext).toHaveBeenCalledTimes(2);
+      expect(vi.getTimerCount()).toBe(0);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('ignores a restore event until the requested loss has been observed', async () => {

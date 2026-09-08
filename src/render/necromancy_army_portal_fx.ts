@@ -438,8 +438,12 @@ export class NecromancyArmyPortalFx {
     }
   }
 
-  dispose(): void {
+  clear(): void {
     while (this.portals.length > 0) this.remove(this.portals.length - 1);
+  }
+
+  dispose(): void {
+    this.clear();
     this.particleTexture.dispose();
   }
 

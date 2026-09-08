@@ -565,7 +565,15 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // because the sim collides with the posts it lays out.)
 // post_bloom_shader_core is the host-agnostic GLSL source patch for the
 // identity tint terms in UnrealBloom's composite shader.
-const RENDER_PURE_CORES = [
+  const RENDER_PURE_CORES = [
+    'src/render/hunter_shellskin_core.ts',
+    'src/render/support_recipient_core.ts',
+    'src/render/hunter_trap_core.ts',
+    'src/render/hourglass_field_core.ts',
+  'src/render/hunter_pet_component_core.ts',
+  'src/render/ability_vfx/physical_choreography_core.ts',
+  'src/render/melee_impact_core.ts',
+  'src/render/ability_vfx/ritual_choreography_core.ts',
   'src/render/arena_wall_occlusion_core.ts',
   'src/render/wall_backface_cull_core.ts',
   'src/render/dungeon_banner_core.ts',
@@ -607,6 +615,13 @@ const RENDER_PURE_CORES = [
   'src/render/character_effect_prewarm_core.ts',
   'src/render/frame_ms_stats_core.ts',
   'src/render/ability_vfx_core.ts',
+  'src/render/ability_vfx/signature_core.ts',
+  'src/render/ability_vfx/elemental_performance_core.ts',
+  'src/game/masterwork_audio_core.ts',
+  'src/render/ability_vfx/material_response_core.ts',
+  'src/render/camera_impact_core.ts',
+  'src/render/combat_status_core.ts',
+  'src/render/ability_vfx_draft_core.ts',
   'src/render/characters/player_look_core.ts',
   'src/render/characters/far_lod_reveal_core.ts',
   'src/render/ability_vfx_longbuff_core.ts',

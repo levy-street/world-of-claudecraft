@@ -1,4 +1,6 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { supportRecipientBits } from '../src/render/support_recipient_core';
+import { petOf, summonPet } from '../src/sim/pet/pet_commands';
 import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
 import { computeTalentModifiers } from '../src/sim/content/talents';
 import { MOBS } from '../src/sim/data';
@@ -43,6 +45,42 @@ function protectionFrom(casterId: number) {
 }
 
 describe('Aegis of the First Dawn', () => {
+  it('shows real protection for nonparty allies but not blocked allies, opponents or pets', () => {
+    const { sim } = setup();
+    const friendId = sim.addPlayer('hunter', 'Nonparty recipient');
+    sim.setPlayerLevel(20, friendId);
+    const friend = sim.entities.get(friendId)!;
+    friend.pos = { ...sim.player.pos };
+    const foeId = sim.addPlayer('rogue', 'Jailed opponent');
+    const foe = sim.entities.get(foeId)!;
+    foe.pos = { ...sim.player.pos };
+    foe.jailed = true;
+    sim.player.jailed = true;
+    summonPet(sim.ctx, friend, 'forest_wolf');
+    const pet = petOf(sim.ctx, friendId)!;
+    pet.pos = { ...sim.player.pos };
+    const los = vi.spyOn(sim.ctx, 'hasLineOfSight');
+    sim.castAbility('aegis_first_dawn');
+    expect(supportRecipientBits(friend.auras, friend.dead, friend.kind)).toBe(
+      2,
+    );
+    expect(supportRecipientBits(foe.auras, foe.dead, foe.kind)).toBe(0);
+    expect(pet.auras.some((a) => a.id.startsWith('aegis_first_dawn_dr:'))).toBe(
+      false,
+    );
+    los.mockImplementation((source, target) => target.id !== friendId);
+    sim.tick();
+    expect(supportRecipientBits(friend.auras, friend.dead, friend.kind)).toBe(
+      0,
+    );
+    los.mockReturnValue(true);
+    sim.tick();
+    expect(supportRecipientBits(friend.auras, friend.dead, friend.kind)).toBe(
+      2,
+    );
+    los.mockRestore();
+  });
+
   it('authors a Holy-only self-centered 5-second support channel', () => {
     expect(ABILITIES.aegis_first_dawn).toMatchObject({
       name: 'Aegis of the First Dawn',
@@ -75,25 +113,32 @@ describe('Aegis of the First Dawn', () => {
       ]),
     );
 
-    const holy = computeTalentModifiers('paladin', { spec: 'holy', ranks: {}, choices: {} }, 20);
+    const holy = computeTalentModifiers(
+      'paladin',
+      { spec: 'holy', ranks: {}, choices: {} },
+      20,
+    );
     const retribution = computeTalentModifiers(
       'paladin',
       { spec: 'retribution', ranks: {}, choices: {} },
       20,
     );
-    expect(abilitiesKnownAt('paladin', 20, holy).map((entry) => entry.def.id)).toContain(
-      'aegis_first_dawn',
-    );
-    expect(abilitiesKnownAt('paladin', 20, retribution).map((entry) => entry.def.id)).not.toContain(
-      'aegis_first_dawn',
-    );
+    expect(
+      abilitiesKnownAt('paladin', 20, holy).map((entry) => entry.def.id),
+    ).toContain('aegis_first_dawn');
+    expect(
+      abilitiesKnownAt('paladin', 20, retribution).map((entry) => entry.def.id),
+    ).not.toContain('aegis_first_dawn');
   });
 
   it('protects only allies currently inside the dome', () => {
     const { sim, ally } = setup();
     sim.castAbility('aegis_first_dawn');
 
-    expect(sim.player).toMatchObject({ castingAbility: 'aegis_first_dawn', channeling: true });
+    expect(sim.player).toMatchObject({
+      castingAbility: 'aegis_first_dawn',
+      channeling: true,
+    });
     expect(ally.auras).toContainEqual(protectionFrom(sim.player.id));
 
     const attacker = hostileNear(sim);
@@ -132,7 +177,9 @@ describe('Aegis of the First Dawn', () => {
 
     for (let i = 0; i < 21; i++) events.push(...sim.tick());
     expect(ally.hp).toBeGreaterThan(1);
-    expect(ally.auras.some((aura) => aura.id === 'aegis_first_dawn_speed')).toBe(false);
+    expect(
+      ally.auras.some((aura) => aura.id === 'aegis_first_dawn_speed'),
+    ).toBe(false);
 
     for (let i = 0; i < 80; i++) events.push(...sim.tick());
     expect(sim.player.castingAbility).toBeNull();
@@ -143,9 +190,31 @@ describe('Aegis of the First Dawn', () => {
         ? [event.amount]
         : [],
     );
-    const tickHeal = 40 + channelTickBonus(sim.player.spellPower, ABILITIES.aegis_first_dawn);
+    const tickHeal =
+      40 + channelTickBonus(sim.player.spellPower, ABILITIES.aegis_first_dawn);
     const finalHeal = 135 + directHealBonus(sim.player.spellPower, 0, true);
-    expect(allyHeals).toEqual([tickHeal, tickHeal, tickHeal, tickHeal, tickHeal, finalHeal]);
+    expect(allyHeals).toEqual([
+      tickHeal,
+      tickHeal,
+      tickHeal,
+      tickHeal,
+      tickHeal,
+      finalHeal,
+    ]);
+    const cues = events.filter(
+      (event) =>
+        event.type === 'spellfxAt' && event.ability === 'aegis_first_dawn',
+    );
+    expect(cues.map((event) => event.type === 'spellfxAt' && event.fx)).toEqual(
+      ['tick', 'tick', 'tick', 'tick', 'tick', 'burst'],
+    );
+    expect(
+      cues.every(
+        (event) =>
+          event.type === 'spellfxAt' && event.sourceId === sim.player.id,
+      ),
+    ).toBe(true);
+    expect(supportRecipientBits(ally.auras, ally.dead, ally.kind)).toBe(4);
     expect(ally.auras).toContainEqual(
       expect.objectContaining({
         id: 'aegis_first_dawn_speed',
@@ -197,11 +266,22 @@ describe('Aegis of the First Dawn', () => {
     });
 
     const postCancelEvents = [...sim.tick()];
+    expect(supportRecipientBits(ally.auras, ally.dead, ally.kind)).toBe(0);
 
     expect(sim.player.castingAbility).toBeNull();
     expect(ally.auras).not.toContainEqual(protectionFrom(sim.player.id));
-    expect(ally.auras.some((aura) => aura.id === 'aegis_first_dawn_speed')).toBe(false);
+    expect(
+      ally.auras.some((aura) => aura.id === 'aegis_first_dawn_speed'),
+    ).toBe(false);
     expect(ally.hp).toBe(earnedHealing);
+    expect(
+      postCancelEvents.some(
+        (event) =>
+          event.type === 'spellfxAt' &&
+          event.ability === 'aegis_first_dawn' &&
+          event.fx === 'burst',
+      ),
+    ).toBe(false);
     for (let i = 0; i < 100; i++) postCancelEvents.push(...sim.tick());
     expect(
       postCancelEvents.some(
@@ -235,7 +315,9 @@ describe('Aegis of the First Dawn', () => {
 
     expect(sim.player.dead).toBe(true);
     expect(ally.auras).not.toContainEqual(protectionFrom(sim.player.id));
-    expect(ally.auras.some((aura) => aura.id === 'aegis_first_dawn_speed')).toBe(false);
+    expect(
+      ally.auras.some((aura) => aura.id === 'aegis_first_dawn_speed'),
+    ).toBe(false);
   });
 
   it('cleans every sourced protection aura through the Fiesta death path', () => {

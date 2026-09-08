@@ -31,7 +31,7 @@ describe('winning Warrior attack animation routing', () => {
       mortal_strike: '2H_Melee_Attack_Chop',
       execute: '2H_Melee_Attack_Chop',
       slam: '2H_Melee_Attack_Chop',
-      red_harvest: '2H_Melee_Attack_Chop',
+      red_harvest: 'Dualwield_Melee_Attack_Chop',
       breachmaker: '2H_Melee_Attack_Chop',
       // Shieldcrack drives the offhand SHIELD arm (synthesized clip,
       // scripts/_add_shield_bash_anim.mjs), never a sword chop.

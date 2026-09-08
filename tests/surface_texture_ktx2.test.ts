@@ -426,7 +426,7 @@ describe('standalone_texture_compression_core: flip, alignment and CLI parsing',
     const a = flippedSourcePath('/p/public/textures/terrain/Rock026_NormalGL.jpg', '/tmp');
     const b = flippedSourcePath('/p/public/textures/structures/Rock026_NormalGL.jpg', '/tmp');
     expect(a).not.toBe(b);
-    expect(a.startsWith('/tmp/')).toBe(true);
+    expect(path.dirname(a)).toBe(path.normalize('/tmp'));
     expect(a.endsWith('.flip.png')).toBe(true);
     expect(path.basename(a)).not.toContain('/');
     // Name determinism WITHIN a directory is fine and keeps failures legible;

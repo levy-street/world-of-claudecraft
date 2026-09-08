@@ -127,6 +127,8 @@ export const KTX2_MIP_EXEMPT_MODEL_ROOTS: readonly string[] = [
   'creatures',
   'mounts',
   'tools',
+  // VFX fragments are shared with Studio preview renderers.
+  'vfx',
   'weapons',
 ];
 

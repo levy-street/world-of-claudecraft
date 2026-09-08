@@ -33,15 +33,19 @@ describe('hollow_gates occluder-fade wiring (source pin)', () => {
 
   it('the renderer drives HollowGatesView.update with the live camera pose every frame', () => {
     const renderer = readFileSync(`${ROOT}src/render/renderer.ts`, 'utf8');
-    const start = renderer.indexOf('this.hollowGates.update(');
+    expect(renderer).toContain(
+      'updateRendererScenery(this, p, dt, projectionPixels, worldPhaseMs, worldStart)',
+    );
+    const scenery = readFileSync(`${ROOT}src/render/renderer_scenery.ts`, 'utf8');
+    const start = scenery.indexOf('host.hollowGates.update(');
     expect(start, 'the renderer never drives the hollow-gate fade').toBeGreaterThan(-1);
-    const call = renderer.slice(start, renderer.indexOf(');', start));
+    const call = scenery.slice(start, scenery.indexOf(');', start));
     expect(call).toContain('camX');
     expect(call).toContain('camY');
     expect(call).toContain('camZ');
     expect(call).toContain('eyeX');
     expect(call).toContain('eyeY');
     expect(call).toContain('eyeZ');
-    expect(call).toContain('this.reducedMotion()');
+    expect(call).toContain('host.reducedMotion()');
   });
 });

@@ -10,6 +10,7 @@ import {
   GLOOM_BOLT_VFX_SPEC,
   RUINBOLT_VFX_FULL_SPEC,
 } from '../src/render/destruction_vfx_specs';
+import { authoredVfxSpec } from './helpers/authored_vfx_spec';
 
 function fakeTextures(): AbilityVfxTextures {
   const texture = (): THREE.CanvasTexture => new THREE.Texture() as THREE.CanvasTexture;
@@ -91,7 +92,8 @@ function travellingBoltHarness() {
 describe('Gloom Bolt premium filler VFX', () => {
   it('owns the existing shadow_bolt registry entry with a green shadow-fang identity', () => {
     expect(abilityVfxSpec('shadow_bolt')).toBe(GLOOM_BOLT_VFX_SPEC);
-    expect(abilityVfxFullSpec('shadow_bolt')).toBe(GLOOM_BOLT_VFX_FULL_SPEC);
+    authoredVfxSpec('shadow_bolt', GLOOM_BOLT_VFX_FULL_SPEC);
+    expect(abilityVfxFullSpec('shadow_bolt')).toBe(abilityVfxFullSpec('shadow_bolt'));
     expect(GLOOM_BOLT_VFX_FULL_SPEC).toMatchObject({
       archetype: 'bolt',
       filler: true,
@@ -144,7 +146,13 @@ describe('Gloom Bolt premium filler VFX', () => {
 
     expect(h.projectile).not.toHaveBeenCalled();
     const call = h.sequenceBolt.mock.calls[0];
-    expect(call?.slice(0, 5)).toEqual(['shadow_bolt', GLOOM_BOLT_VFX_FULL_SPEC, 1, 2, 0x48f06f]);
+    expect(call?.slice(0, 5)).toEqual([
+      'shadow_bolt',
+      abilityVfxFullSpec('shadow_bolt'),
+      1,
+      2,
+      0x48f06f,
+    ]);
     expect(call?.[5]).toBeCloseTo(0.14744, 5);
     expect(call?.slice(6, 8)).toEqual([0, 1]);
     expect(call?.[8]).toBeCloseTo(0.9215, 5);

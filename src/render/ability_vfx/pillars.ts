@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { bindSceneSamples, SCENE_SAMPLE_GLSL } from '../scene_sampling';
 
 // Vertical light pillars (the gallery's shaft/skybeam/pillars read): a tapered
 // additive column that rises, holds, and fades. Fixed slot pool, one shared
@@ -9,7 +10,7 @@ const PILLAR_SLOTS = 10;
 
 interface PillarSlot {
   mesh: THREE.Mesh;
-  mat: THREE.MeshBasicMaterial;
+  mat: THREE.ShaderMaterial;
   age: number;
   dur: number;
   radius: number;
@@ -22,23 +23,46 @@ export class LightPillars {
   private next = 0;
   private readonly geometry: THREE.CylinderGeometry;
   private disposed = false;
+  private readonly unbind: Array<() => void> = [];
 
   constructor(scene: THREE.Scene) {
     // Slight taper reads as a beam falling from above; open-ended so the
     // camera never sees a hard cap disc.
-    this.geometry = new THREE.CylinderGeometry(0.55, 1, 1, 10, 1, true);
+    this.geometry = new THREE.CylinderGeometry(0.55, 1, 1, 20, 1, true);
     this.geometry.translate(0, 0.5, 0); // pivot at the base
     for (let i = 0; i < PILLAR_SLOTS; i++) {
-      const mat = new THREE.MeshBasicMaterial({
-        color: 0xffffff,
+      const mat = new THREE.ShaderMaterial({
+        uniforms: {
+          uColor: { value: new THREE.Color() },
+          uAge: { value: 0 },
+          uOpacity: { value: 0 },
+        },
+        vertexShader: `varying vec2 vUv; varying float vDepth; void main() {
+          vUv=uv; vec4 view=modelViewMatrix*vec4(position,1.0); vDepth=-view.z;
+          gl_Position=projectionMatrix*view;
+        }`,
+        fragmentShader: `${SCENE_SAMPLE_GLSL}
+          uniform vec3 uColor; uniform float uAge,uOpacity;
+          varying vec2 vUv; varying float vDepth;
+          void main() {
+            // Broken longitudinal filaments leave air between the light shafts.
+            float twist=vUv.x*75.3982+sin(vUv.y*7.0-uAge*3.0)*0.45;
+            float veins=pow(max(0.0,sin(twist)),12.0);
+            float drift=0.5+0.5*sin(vUv.y*32.0-uAge*12.0+sin(twist)*2.0);
+            float envelope=smoothstep(0.0,0.035,vUv.y)*(1.0-smoothstep(0.3,1.0,vUv.y));
+            float density=(0.045+veins*(0.4+0.6*drift))*envelope;
+            vec3 colour=uColor*(0.75+veins*1.7);
+            gl_FragColor=vec4(colour,density*uOpacity*sceneSoftness(vDepth,0.2));
+            #include <tonemapping_fragment>
+            #include <colorspace_fragment>
+          }`,
         transparent: true,
-        opacity: 0,
         blending: THREE.AdditiveBlending,
         depthWrite: false,
         side: THREE.DoubleSide,
-        toneMapped: false,
       });
       const mesh = new THREE.Mesh(this.geometry, mat);
+      this.unbind.push(bindSceneSamples(scene, mesh));
       mesh.visible = false;
       mesh.renderOrder = 6;
       mesh.userData.renderCategory = 'vfx';
@@ -56,7 +80,14 @@ export class LightPillars {
     colorHex: number,
     dur: number,
   ): void {
-    if (this.disposed) return;
+    if (
+      this.disposed ||
+      ![x, y, z, radius, height, dur].every(Number.isFinite) ||
+      radius <= 0 ||
+      height <= 0 ||
+      dur <= 0
+    )
+      return;
     const slot = this.slots[this.next];
     this.next = (this.next + 1) % PILLAR_SLOTS;
     slot.active = true;
@@ -64,8 +95,9 @@ export class LightPillars {
     slot.dur = dur;
     slot.radius = radius;
     slot.height = height;
-    slot.mat.color.setHex(colorHex).multiplyScalar(1.7);
-    slot.mat.opacity = 0;
+    slot.mat.uniforms.uColor.value.setHex(colorHex);
+    slot.mat.uniforms.uOpacity.value = 0;
+    slot.mat.uniforms.uAge.value = 0;
     slot.mesh.position.set(x, y, z);
     slot.mesh.visible = true;
   }
@@ -84,7 +116,8 @@ export class LightPillars {
       // fast rise (12%), hold bright, fade with a slight widen
       const rise = Math.min(1, t / 0.12);
       const fade = t < 0.6 ? 1 : 1 - (t - 0.6) / 0.4;
-      slot.mat.opacity = 0.5 * rise * fade;
+      slot.mat.uniforms.uOpacity.value = 0.7 * rise * fade;
+      slot.mat.uniforms.uAge.value = t;
       slot.mesh.scale.set(
         slot.radius * (0.85 + 0.3 * t),
         slot.height * (0.25 + 0.75 * rise),
@@ -104,6 +137,7 @@ export class LightPillars {
     if (this.disposed) return;
     this.disposed = true;
     this.clear();
+    for (const unbind of this.unbind) unbind();
     for (const slot of this.slots) {
       slot.mesh.removeFromParent();
       slot.mat.dispose();

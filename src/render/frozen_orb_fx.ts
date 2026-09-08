@@ -289,6 +289,10 @@ export class FrozenOrbFx {
     orb.z = z;
   }
 
+  clear(): void {
+    while (this.orbs.length) this.remove(this.orbs.length - 1);
+  }
+
   update(dt: number): void {
     for (let i = this.orbs.length - 1; i >= 0; i--) {
       const orb = this.orbs[i];

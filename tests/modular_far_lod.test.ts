@@ -36,6 +36,7 @@ import {
   takeFarBakeBudget,
 } from '../src/render/characters/assets';
 import { DEFAULT_LOOK, MODULAR_WARRIOR_KEY } from '../src/render/characters/modular';
+import { CharacterSurfaceResponse } from '../src/render/characters/surface_response';
 import { CharacterVisual } from '../src/render/characters/visual';
 
 type AssetsModule = typeof import('../src/render/characters/assets');
@@ -372,6 +373,7 @@ describe('buildComposedFar catches a fresh far mesh up on effect state', () => {
       proxyShadowWanted: false,
       disposed: false,
       originalMaterials: new Map(),
+      surfaceResponse: new CharacterSurfaceResponse(),
       farMesh: null,
       farMaterials: null,
       // A ghost is on before this mesh ever existed, the exact scenario the
@@ -501,6 +503,7 @@ describe('attemptComposedFar keeps farBakeTried in step with a refused budget', 
       proxyShadowWanted: false,
       disposed: false,
       originalMaterials: new Map(),
+      surfaceResponse: new CharacterSurfaceResponse(),
       farMesh: null,
       farMaterials: null,
       ghosted: false,

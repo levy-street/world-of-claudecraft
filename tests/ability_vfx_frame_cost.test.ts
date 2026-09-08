@@ -7,6 +7,7 @@ import { OverlaySprites } from '../src/render/ability_vfx/overlay_sprites';
 import { AbilityVfxRibbons } from '../src/render/ability_vfx/ribbons';
 import { ABILITY_VFX_FULL_SPECS } from '../src/render/ability_vfx_full_specs';
 import { createVfxAnchor } from '../src/render/vfx_anchor';
+import { weaponTrailAnchor } from '../src/render/weapon_trail_anchor';
 
 // The steady-state combat cost of the ability-VFX subsystem: anchors resolved
 // every frame must not allocate, and the two immediate-mode buffers must upload
@@ -78,7 +79,187 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
+function queuedWeaponHarness() {
+  installCanvasStub();
+  const root = new THREE.Group();
+  const holder = new THREE.Group();
+  holder.userData.heldPropHolder = true;
+  holder.userData.heldSlot = 0;
+  const weapon = new THREE.Mesh(new THREE.BoxGeometry(0.1, 2, 0.1));
+  weapon.userData.weaponMesh = true;
+  holder.add(weapon);
+  root.add(holder);
+  const resolve = vi.fn((_id: number, hand: 0 | 1) => weaponTrailAnchor(root, hand));
+  const fx = new AbilityVfxFx(
+    new THREE.Scene(),
+    new THREE.PerspectiveCamera(),
+    () => null,
+    () => 0,
+    undefined,
+    resolve,
+  );
+  const probe = fx as unknown as { overlay: OverlaySprites; orbitBandCount: number };
+  const push = vi.spyOn(probe.overlay, 'push');
+  const step = (held = true, dt = 1 / 60, reducedMotion = false) => {
+    push.mockClear();
+    if (held) fx.holdQueuedWeapon(7, 0xffb755);
+    fx.update(dt, reducedMotion);
+  };
+  const dispose = () => {
+    fx.dispose();
+    weapon.geometry.dispose();
+    (weapon.material as THREE.Material).dispose();
+  };
+  return { fx, probe, push, holder, root, resolve, step, dispose };
+}
+
+describe('queued physical weapon readiness', () => {
+  it('retains its sampler when a normal aura feeds the same slot before the held queue', () => {
+    const h = queuedWeaponHarness();
+    try {
+      for (let i = 0; i < 40; i++) {
+        h.fx.orbit(7, 'weaponGlow', 0x00ffff);
+        h.step();
+      }
+      expect(h.resolve).toHaveBeenCalledTimes(1);
+      expect(h.push.mock.calls.every((call) => call[3] === 0xffb755)).toBe(true);
+      h.fx.orbit(7, 'weaponGlow', 0x00ffff);
+      h.step(false);
+      expect(h.push).not.toHaveBeenCalled();
+      h.step();
+      expect(h.resolve).toHaveBeenCalledTimes(2);
+      expect(h.probe.orbitBandCount).toBe(1);
+    } finally {
+      h.dispose();
+    }
+  });
+
+  it('follows the animated weapon without a body anchor, circular motion or recurring lookups', () => {
+    const h = queuedWeaponHarness();
+    try {
+      h.step();
+      expect(h.push).toHaveBeenCalledTimes(2);
+      expect(h.push.mock.calls[0].slice(0, 3)).toEqual([0, 1, 0]);
+      h.holder.rotation.z = Math.PI / 2;
+      for (let i = 0; i < 100; i++) h.step(true, 1 / 60, true);
+      expect(h.push).toHaveBeenCalledTimes(2);
+      expect(h.push.mock.calls[0][0]).toBeCloseTo(-1);
+      expect(h.push.mock.calls[0][1]).toBeCloseTo(0);
+      expect(h.push.mock.calls[0][2]).toBe(0);
+      expect(h.resolve).toHaveBeenCalledTimes(1);
+      expect(h.probe.orbitBandCount).toBe(1);
+      h.step(false);
+      expect(h.push).not.toHaveBeenCalled();
+      expect(h.probe.orbitBandCount).toBe(0);
+      h.step();
+      expect(h.resolve).toHaveBeenCalledTimes(2);
+      h.fx.sleepEntity(7);
+      h.step(false);
+      expect(h.push).not.toHaveBeenCalled();
+      h.step();
+      h.fx.clear();
+      h.step(false);
+      expect(h.push).not.toHaveBeenCalled();
+      expect(h.probe.orbitBandCount).toBe(0);
+    } finally {
+      h.dispose();
+    }
+  });
+
+  it('stays quiet for hidden or detached equipment and retries at a bounded cadence', () => {
+    const h = queuedWeaponHarness();
+    try {
+      h.step();
+      h.holder.visible = false;
+      h.step();
+      expect(h.push).not.toHaveBeenCalled();
+      h.holder.visible = true;
+      for (let i = 0; i < 10; i++) h.step();
+      expect(h.resolve).toHaveBeenCalledTimes(1);
+      h.step(true, 0.3);
+      expect(h.push).toHaveBeenCalledTimes(2);
+      expect(h.resolve).toHaveBeenCalledTimes(2);
+      h.root.remove(h.holder);
+      h.step();
+      expect(h.push).not.toHaveBeenCalled();
+      h.root.add(h.holder);
+      h.step(true, 0.3);
+      expect(h.push).toHaveBeenCalledTimes(2);
+      h.fx.clear();
+      for (let id = 0; id < 50; id++) h.fx.holdQueuedWeapon(id, 0xffffff);
+      expect(h.probe.orbitBandCount).toBe(24);
+    } finally {
+      h.dispose();
+    }
+  });
+});
+
 describe('ability VFX steady-state frame cost', () => {
+  it('keeps defensive charges distinct beside mastery and clears held geometry on aura loss', () => {
+    installCanvasStub();
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera();
+    const { anchor, counts } = countingAnchor(() => 2);
+    const fx = new AbilityVfxFx(scene, camera, anchor, () => 0);
+    const ribbons = (fx as unknown as { ribbons: AbilityVfxRibbons }).ribbons;
+    const geometry = (ribbons as unknown as { geo: THREE.BufferGeometry }).geo;
+    const step = (charges: number, mastery: boolean) => {
+      if (charges > 0) fx.orbit(7, 'wardCharges', 0x7fd6ff, { n: charges });
+      if (mastery) fx.orbit(7, 'conduction', 0x71cce9);
+      fx.update(0.1);
+      return geometry.drawRange.count;
+    };
+    try {
+      const all = step(3, true);
+      expect(all).toBeGreaterThan(0);
+      const two = step(2, true);
+      const one = step(1, true);
+      const mastery = step(0, true);
+      expect(all).toBeGreaterThan(two);
+      expect(two).toBeGreaterThan(one);
+      expect(one).toBeGreaterThan(mastery);
+      expect(mastery).toBeGreaterThan(0);
+      expect(step(0, false)).toBe(0);
+      expect(counts.allocating).toBe(0);
+      fx.clear();
+      expect(geometry.drawRange.count).toBe(0);
+    } finally {
+      fx.dispose();
+    }
+  });
+
+  it('lets held filaments exhaust only spare ribbon capacity while preserving attack vertices', () => {
+    installCanvasStub();
+    const ribbons = new AbilityVfxRibbons(new THREE.Scene(), () => null, abilityVfxTextures());
+    const probe = ribbons as unknown as { geo: THREE.BufferGeometry };
+    const at = new THREE.Vector3(1, 2, 3);
+    ribbons.spawnSlashStyled(at, 0xff6600, 'horizontal', 1);
+    const camera = new THREE.Vector3(0, 3, 8);
+    ribbons.update(0, camera);
+    const count = probe.geo.drawRange.count;
+    expect(count).toBeGreaterThan(0);
+    const position = probe.geo.getAttribute('position') as THREE.BufferAttribute;
+    const before = Array.from(position.array.slice(0, 72));
+    const points = [
+      new THREE.Vector3(10, 0, 0),
+      new THREE.Vector3(10, 1, 0),
+      new THREE.Vector3(10, 2, 0),
+    ];
+    try {
+      ribbons.update(0, camera, false, () => {
+        for (let i = 0; i < 1000; i++) ribbons.appendHeld(points, 3, 0.1, 0x88ccff, 1);
+      });
+      expect(Array.from(position.array.slice(0, 72))).toEqual(before);
+      expect(probe.geo.drawRange.count).toBeGreaterThan(count);
+      expect(probe.geo.drawRange.count).toBeLessThanOrEqual(probe.geo.index?.count ?? 0);
+      expect(position.updateRanges[0].count).toBeLessThanOrEqual(position.array.length);
+      ribbons.update(0, camera);
+      expect(probe.geo.drawRange.count).toBe(count);
+    } finally {
+      ribbons.dispose();
+    }
+  });
+
   it('resolves every per-frame anchor into a scratch vector, allocating none', () => {
     installCanvasStub();
     const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);

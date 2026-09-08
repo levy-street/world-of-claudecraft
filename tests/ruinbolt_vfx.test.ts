@@ -5,6 +5,7 @@ import type { AbilityVfxTextures } from '../src/render/ability_vfx/fx_textures';
 import { AbilityVfx } from '../src/render/ability_vfx/painter';
 import { AbilityVfxRibbons } from '../src/render/ability_vfx/ribbons';
 import { RUINBOLT_VFX_FULL_SPEC, RUINBOLT_VFX_SPEC } from '../src/render/destruction_vfx_specs';
+import { authoredVfxSpec } from './helpers/authored_vfx_spec';
 
 function fakeTextures(): AbilityVfxTextures {
   const texture = (): THREE.CanvasTexture => new THREE.Texture() as THREE.CanvasTexture;
@@ -75,6 +76,14 @@ function liveWindupHarness() {
     groundY: () => 0,
     screenFxQueue: [],
     ribbons: { update: vi.fn(), drawHeads: vi.fn() },
+    water: { update: vi.fn() },
+    details: noopUpdate,
+    forms: noopUpdate,
+    contacts: { advance: vi.fn() },
+    crests: noopUpdate,
+    baked: noopUpdate,
+    fragments: noopUpdate,
+    controlSignals: { update: vi.fn() },
     rings: noopUpdate,
     flipbooks: noopUpdate,
     decals: { update: vi.fn(), setCameraPosition: vi.fn() },
@@ -118,7 +127,7 @@ describe('Ruinbolt premium VFX chain', () => {
     expect(h.sequenceBolt).toHaveBeenCalledOnce();
     expect(h.sequenceBolt).toHaveBeenCalledWith(
       'chaos_bolt',
-      RUINBOLT_VFX_FULL_SPEC,
+      authoredVfxSpec('chaos_bolt', RUINBOLT_VFX_FULL_SPEC),
       1,
       2,
       0x72ff38,
@@ -146,7 +155,7 @@ describe('Ruinbolt premium VFX chain', () => {
     };
 
     h.painter.syncEntity(casting);
-    expect(h.windup).toHaveBeenCalledWith(1, 0x72ff38, 0.5, 'vortex', true, 3, 0xd8ff58);
+    expect(h.windup).toHaveBeenCalledWith(1, 0x72ff38, 0.5, 'occult', true, 3, 0xd8ff58);
 
     h.painter.syncEntity({
       ...casting,
@@ -159,12 +168,12 @@ describe('Ruinbolt premium VFX chain', () => {
   it('draws all three production buildup streams and sweeps them after interruption', () => {
     const h = liveWindupHarness();
 
-    expect(h.fx.windup(1, 0x72ff38, 0.5, 'vortex', true, 3, 0xd8ff58)).toBe(true);
+    expect(h.fx.windup(1, 0x72ff38, 0.5, 'occult', true, 3, 0xd8ff58)).toBe(true);
     h.fx.update(1 / 60);
 
-    expect(h.push).toHaveBeenCalledTimes(11);
+    expect(h.push).toHaveBeenCalledTimes(12);
     expect(h.push.mock.calls.filter((call) => call[3] === 0xd8ff58)).toHaveLength(3);
-    expect(h.push.mock.calls.filter((call) => call[3] === 0x72ff38)).toHaveLength(8);
+    expect(h.push.mock.calls.filter((call) => call[3] === 0x72ff38)).toHaveLength(9);
 
     h.push.mockClear();
     h.fx.update(1 / 60);

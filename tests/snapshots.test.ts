@@ -6909,7 +6909,7 @@ describe('Temporal Hourglass snapshot parity', () => {
       hourglasses: [{ id: '1:20', x: 3, z: 5, r: 1.75, dur: 30, rem: 21.5 }],
     });
     expect(client.activeTemporalHourglasses).toEqual([
-      { id: '1:20', x: 3, z: 5, radius: 1.75, duration: 30, remaining: 21.5 },
+      { id: '1:20', sourceId: null, disposition: 'unknown', x: 3, z: 5, radius: 1.75, duration: 30, remaining: 21.5 },
     ]);
 
     (client as any).applySnapshot({ t: 'snap', ents: [] });

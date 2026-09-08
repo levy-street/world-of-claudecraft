@@ -1,4 +1,5 @@
 import { zoneAt } from '../data';
+import type { TemporalHourglassDisposition } from '../../world_api/combat';
 import type { GroundAoE } from '../entity_roster';
 import type { SimContext } from '../sim_context';
 import { type AbilityEffect, DT, type Entity, type Vec3 } from '../types';
@@ -105,6 +106,20 @@ function validPartyAlly(ctx: SimContext, caster: Entity, target: Entity): boolea
       !target.dead &&
       target.hp > 0,
   );
+}
+
+/** Read-only interpretation of the same eligibility gates used by ground contact.
+ * Source-to-viewer direction matters for asymmetric hostility (the jail). */
+export function temporalHourglassDispositionFor(
+  ctx: SimContext,
+  sourceId: number,
+  viewerId: number,
+): TemporalHourglassDisposition {
+  const source = ctx.entities.get(sourceId),
+    viewer = ctx.entities.get(viewerId);
+  if (!source || source.dead || !viewer || viewer.dead || viewer.hp <= 0) return 'unknown';
+  if (source.id === viewer.id || validPartyAlly(ctx, source, viewer)) return 'protective';
+  return ctx.isHostileTo(source, viewer) ? 'hostile' : 'unknown';
 }
 
 function applyHostileSuspension(

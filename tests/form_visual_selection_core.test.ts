@@ -15,6 +15,21 @@ function maskFor(auras: ReadonlyArray<{ kind: string; id?: string }>): number {
 }
 
 describe('character form visual selection', () => {
+  it('keeps the caster body through Moonwing preparation and returns cleanly on toggle', () => {
+    const base = { root: {} };
+    const owl = { root: {} };
+    const request = requestedCharacterForm(maskFor([{ kind: 'form_moonkin' }]));
+    const pending = characterFormReadyMask(null, null, null, null, null, owl.root, owl);
+    expect(resolvedCharacterForm(request, pending)).toBe('base');
+    const ready = characterFormReadyMask(null, null, null, null, null, null, owl);
+    expect(resolvedCharacterForm(request, ready)).toBe('moonkin');
+    expect(activeCharacterFormVisual('moonkin', base, null, null, null, null, null, owl)).toBe(owl);
+    expect(activeCharacterFormVisual('base', base, null, null, null, null, null, owl)).toBe(base);
+    expect(requestedCharacterForm(maskFor([{ kind: 'form_moonkin' }, { kind: 'polymorph' }]))).toBe(
+      'sheep',
+    );
+  });
+
   it('keeps every asset readiness bit independent', () => {
     expect(CHARACTER_FORM_READY).toEqual({
       sheep: 1,
@@ -22,6 +37,7 @@ describe('character form visual selection', () => {
       cat: 4,
       travel: 8,
       metamorph: 16,
+      moonkin: 32,
     });
     expect(resolvedCharacterForm('metamorph', CHARACTER_FORM_READY.travel)).toBe('base');
     expect(resolvedCharacterForm('travel', CHARACTER_FORM_READY.metamorph)).toBe('base');
@@ -87,6 +103,7 @@ describe('character form visual selection', () => {
     ['cat', { kind: 'form_cat' }, CHARACTER_FORM_READY.cat],
     ['travel', { kind: 'form_travel' }, CHARACTER_FORM_READY.travel],
     ['metamorph', { kind: 'form_lich' }, CHARACTER_FORM_READY.metamorph],
+    ['moonkin', { kind: 'form_moonkin' }, CHARACTER_FORM_READY.moonkin],
   ] as const)('resolves the %s branch only when its visual is ready', (form, aura, ready) => {
     const requested = requestedCharacterForm(maskFor([aura]));
     expect(requested).toBe(form);
@@ -105,6 +122,7 @@ describe('character form visual selection', () => {
       cat: false,
       travel: false,
       metamorph: false,
+      moonkin: false,
     });
   });
 
@@ -135,6 +153,7 @@ describe('character form visual selection', () => {
     ['cat', 'cat'],
     ['travel', 'travel'],
     ['metamorph', 'metamorph'],
+    ['moonkin', 'moonkin'],
   ] as const)('makes only the %s root visible', (form, visibleKey) => {
     const visibility = characterFormVisibility(form);
     expect(visibility).toEqual({
@@ -144,6 +163,7 @@ describe('character form visual selection', () => {
       cat: visibleKey === 'cat',
       travel: visibleKey === 'travel',
       metamorph: visibleKey === 'metamorph',
+      moonkin: visibleKey === 'moonkin',
     });
     expect(Object.values(visibility).filter(Boolean)).toHaveLength(1);
   });
@@ -226,6 +246,7 @@ describe('character form visual selection', () => {
           cat: false,
           travel: false,
           metamorph: true,
+          moonkin: false,
         },
       },
       {
@@ -237,6 +258,7 @@ describe('character form visual selection', () => {
           cat: false,
           travel: false,
           metamorph: false,
+          moonkin: false,
         },
       },
       {
@@ -248,6 +270,7 @@ describe('character form visual selection', () => {
           cat: false,
           travel: false,
           metamorph: true,
+          moonkin: false,
         },
       },
     ]);

@@ -26,12 +26,28 @@
 // material releases the program this entry exists to keep, and every material
 // here is the one the live cast will draw with.
 
-import * as THREE from 'three';
-import { buildCoachTrailStandIn, coachTrailMaterials } from './coach_trail_materials';
-import { FireballTravelVisual, fireballMaterials } from './fireball_travel_visual';
-import { FrostNovaRootVisual, frostRootMaterials } from './frost_nova_root_visual';
-import { IceBlockVisual, iceMaterials } from './ice_block_visual';
-import { TemporalHourglassVisual, temporalHourglassMaterials } from './temporal_hourglass_visual';
+import * as THREE from "three";
+import {
+  buildCoachTrailStandIn,
+  coachTrailMaterials,
+} from "./coach_trail_materials";
+import {
+  FireballTravelVisual,
+  fireballMaterials,
+} from "./fireball_travel_visual";
+import {
+  FrostNovaRootVisual,
+  frostRootMaterials,
+} from "./frost_nova_root_visual";
+import { IceBlockVisual, iceMaterials } from "./ice_block_visual";
+import {
+  TemporalHourglassVisual,
+  temporalHourglassMaterials,
+} from "./temporal_hourglass_visual";
+import {
+  HourglassFieldVisual,
+  hourglassFieldMaterial,
+} from "./hourglass_field_visual";
 
 /** The reference rig height these visuals scale against; the scale reaches the
  *  geometry only, never the materials, so any live body links the same
@@ -58,27 +74,27 @@ export interface AbilityMaterialSource {
  *  the same idiom and fails until it is registered here. */
 export const ABILITY_MATERIAL_SOURCES: readonly AbilityMaterialSource[] = [
   {
-    id: 'frost-nova-root',
-    module: 'frost_nova_root_visual.ts',
+    id: "frost-nova-root",
+    module: "frost_nova_root_visual.ts",
     materials: () => Object.values(frostRootMaterials()),
     build: () => new FrostNovaRootVisual(REFERENCE_CHARACTER_HEIGHT).group,
   },
   {
-    id: 'ice-block',
-    module: 'ice_block_visual.ts',
+    id: "ice-block",
+    module: "ice_block_visual.ts",
     materials: () => Object.values(iceMaterials()),
     build: () => new IceBlockVisual(REFERENCE_CHARACTER_HEIGHT).group,
   },
   {
-    id: 'temporal-hourglass',
-    module: 'temporal_hourglass_visual.ts',
+    id: "temporal-hourglass",
+    module: "temporal_hourglass_visual.ts",
     materials: () => Object.values(temporalHourglassMaterials()),
     // One stand-in per MODE: the hourglass mounts the protective energy
     // material at build and swaps the hostile one in on update(), so a single
     // instance leaves the hostile program to link on the first hostile cast.
     build: () => {
       const group = new THREE.Group();
-      for (const mode of ['protective', 'hostile'] as const) {
+      for (const mode of ["protective", "hostile", "unknown"] as const) {
         const visual = new TemporalHourglassVisual();
         visual.update(mode, 0);
         visual.group.visible = false;
@@ -88,8 +104,25 @@ export const ABILITY_MATERIAL_SOURCES: readonly AbilityMaterialSource[] = [
     },
   },
   {
-    id: 'fireball-travel',
-    module: 'fireball_travel_visual.ts',
+    id: "hourglass-field",
+    module: "hourglass_field_visual.ts",
+    materials: () =>
+      (["protective", "hostile", "unknown"] as const).map(
+        hourglassFieldMaterial,
+      ),
+    build: () => {
+      const group = new THREE.Group();
+      for (const mode of ["protective", "hostile", "unknown"] as const) {
+        const field = new HourglassFieldVisual();
+        field.update(0, 0, 1.75, mode, () => 0);
+        group.add(field.group);
+      }
+      return group;
+    },
+  },
+  {
+    id: "fireball-travel",
+    module: "fireball_travel_visual.ts",
     materials: () => Object.values(fireballMaterials()),
     build: () => new FireballTravelVisual().group,
   },
@@ -98,8 +131,8 @@ export const ABILITY_MATERIAL_SOURCES: readonly AbilityMaterialSource[] = [
     // beam, area ring), the same lazy-cache idiom on the same manifest lane.
     // Its first quest accepted on the island used to link three programs
     // inside a live frame.
-    id: 'coach-trail',
-    module: 'coach_trail_materials.ts',
+    id: "coach-trail",
+    module: "coach_trail_materials.ts",
     materials: () => Object.values(coachTrailMaterials()),
     build: () => buildCoachTrailStandIn(),
   },
@@ -108,7 +141,7 @@ export const ABILITY_MATERIAL_SOURCES: readonly AbilityMaterialSource[] = [
 /** The hidden group the boot manifest stages and the compile lane links. */
 export function buildAbilityMaterialPrewarmGroup(): THREE.Group {
   const group = new THREE.Group();
-  group.name = 'ability-material-prewarm';
+  group.name = "ability-material-prewarm";
   group.visible = false;
   for (const source of ABILITY_MATERIAL_SOURCES) {
     const root = source.build();
@@ -123,12 +156,15 @@ export function buildAbilityMaterialPrewarmGroup(): THREE.Group {
 }
 
 /** Every material the staged group can draw, for the coverage pin. */
-export function abilityMaterialPrewarmMaterials(root: THREE.Object3D): THREE.Material[] {
+export function abilityMaterialPrewarmMaterials(
+  root: THREE.Object3D,
+): THREE.Material[] {
   const found = new Set<THREE.Material>();
   root.traverse((object) => {
     const material = (object as THREE.Mesh).material;
     if (!material) return;
-    for (const entry of Array.isArray(material) ? material : [material]) found.add(entry);
+    for (const entry of Array.isArray(material) ? material : [material])
+      found.add(entry);
   });
   return [...found];
 }

@@ -103,7 +103,19 @@ describe('constrained renderer integration', () => {
   });
 
   it('keys fixed LOW daylight by biome and invalidates it for developer overrides', () => {
-    const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const coordinator = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replaceAll('\r\n', '\n');
+    expect(coordinator).toContain(
+      'updateRendererScenery(this, p, dt, projectionPixels, worldPhaseMs, worldStart)',
+    );
+    const source =
+      coordinator +
+      '\n' +
+      readFileSync(new URL('../src/render/renderer_scenery.ts', import.meta.url), 'utf8')
+        .replaceAll('\r\n', '\n')
+        .replace(/\bhost\./g, 'this.');
     expect(source).toContain('if (this.lowGfx && DAY_ONLY && phaseOverride === null) {');
     expect(source).toContain('if (this.fixedLowDayBiome !== biome) {');
     expect(source).toContain('this.fixedLowDayBiome = biome;');

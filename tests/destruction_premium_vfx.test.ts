@@ -11,6 +11,7 @@ import {
   RAIN_OF_FIRE_VFX_SPEC,
   RUINOUS_BRAND_VFX_FULL_SPEC,
 } from '../src/render/destruction_vfx_specs';
+import { authoredVfxSpec } from './helpers/authored_vfx_spec';
 
 function harness() {
   const sequenceBolt = vi.fn();
@@ -72,7 +73,7 @@ describe('Destruction premium VFX', () => {
     ).toBe(true);
     expect(h.sequenceBolt).toHaveBeenCalledWith(
       ability,
-      spec,
+      authoredVfxSpec(ability, spec),
       1,
       2,
       expect.any(Number),
@@ -119,7 +120,7 @@ describe('Destruction premium VFX', () => {
     ).toBe(true);
     expect(h.sequenceInstant).toHaveBeenCalledWith(
       'ruinous_brand',
-      RUINOUS_BRAND_VFX_FULL_SPEC,
+      authoredVfxSpec('ruinous_brand', RUINOUS_BRAND_VFX_FULL_SPEC),
       1,
       2,
       expect.any(Number),
@@ -143,7 +144,7 @@ describe('Destruction premium VFX', () => {
     ).toBe(true);
     expect(rain.sequenceInstantAt).toHaveBeenCalledWith(
       'rain_of_fire',
-      RAIN_OF_FIRE_VFX_FULL_SPEC,
+      authoredVfxSpec('rain_of_fire', RAIN_OF_FIRE_VFX_FULL_SPEC),
       1,
       7,
       9,
@@ -167,7 +168,7 @@ describe('Destruction premium VFX', () => {
     ).toBe(true);
     expect(infernal.sequenceInstantAt).toHaveBeenCalledWith(
       'summon_infernal',
-      PYRE_COLOSSUS_VFX_FULL_SPEC,
+      authoredVfxSpec('summon_infernal', PYRE_COLOSSUS_VFX_FULL_SPEC),
       1,
       7,
       9,

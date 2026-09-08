@@ -42,7 +42,14 @@ function harness() {
 describe('Abyssal Rift powerful VFX', () => {
   it('authors a final-tier implosion with a full readable eight-yard identity', () => {
     expect(abilityVfxSpec('abyssal_rift')).toBe(ABYSSAL_RIFT_VFX_SPEC);
-    expect(abilityVfxFullSpec('abyssal_rift')).toBe(ABYSSAL_RIFT_VFX_FULL_SPEC);
+    const composed = abilityVfxFullSpec('abyssal_rift');
+    expect(composed?.nova).toBe(ABYSSAL_RIFT_VFX_FULL_SPEC.nova);
+    expect(composed?.motifs).toBe(ABYSSAL_RIFT_VFX_FULL_SPEC.motifs);
+    expect(composed?.impact).toMatchObject({
+      flipbook: false,
+      sparks: ABYSSAL_RIFT_VFX_FULL_SPEC.impact?.sparks,
+      light: 1.9,
+    });
     expect(ABYSSAL_RIFT_VFX_SPEC).toMatchObject({
       p: 'shadow',
       pw: 1.85,
@@ -98,7 +105,7 @@ describe('Abyssal Rift powerful VFX', () => {
     expect(h.spawnAoeRing).toHaveBeenCalledWith(13, -7, 8, 'shadow', 0x5d24a8);
     expect(h.sequenceInstantAt).toHaveBeenCalledWith(
       'abyssal_rift',
-      ABYSSAL_RIFT_VFX_FULL_SPEC,
+      abilityVfxFullSpec('abyssal_rift'),
       1,
       13,
       -7,

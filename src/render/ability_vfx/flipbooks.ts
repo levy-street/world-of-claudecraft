@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { type ContactSheet, contactTexture, isContactSheet } from './contact_assets';
 import { FLIPBOOK_GRID, FLIPBOOK_STYLES, type FlipbookStyle, flipbookSheet } from './fx_textures';
 
 // Camera-facing impact flipbooks, ported from the gallery's spawnFlipbook /
@@ -21,6 +22,9 @@ interface FlipSlot {
   mesh: THREE.Mesh;
   mat: THREE.ShaderMaterial;
   age: number;
+  duration: number;
+  rotation: number;
+  aspect: number;
   size: number;
   active: boolean;
 }
@@ -44,6 +48,7 @@ export class ImpactFlipbooks {
         uOpacity: { value: 1 },
         uTint: { value: new THREE.Color(1, 1, 1) },
         uHdr: { value: 1 },
+        uInset: { value: 0.008 },
       },
       vertexShader: `
         varying vec2 vUv;
@@ -57,12 +62,13 @@ export class ImpactFlipbooks {
         uniform float uOpacity;
         uniform vec3 uTint;
         uniform float uHdr;
+        uniform float uInset;
         varying vec2 vUv;
         vec4 cell(float f) {
           f = clamp(f, 0.0, 63.0);
           float col = mod(f, 8.0);
           float row = floor(f / 8.0);
-          vec2 uv = (vUv + vec2(col, 7.0 - row)) / 8.0;
+          vec2 uv = (clamp(vUv, vec2(uInset), vec2(1.0-uInset)) + vec2(col, 7.0 - row)) / 8.0;
           return texture2D(uMap, uv);
         }
         void main() {
@@ -83,7 +89,16 @@ export class ImpactFlipbooks {
       mesh.renderOrder = 8; // over the shock rings: the sheet IS the impact
       mesh.userData.renderCategory = 'vfx';
       scene.add(mesh);
-      this.slots.push({ mesh, mat, age: 0, size: 1, active: false });
+      this.slots.push({
+        mesh,
+        mat,
+        age: 0,
+        duration: FLIP_DUR,
+        rotation: 0,
+        aspect: 1,
+        size: 1,
+        active: false,
+      });
     }
     proto.dispose();
   }
@@ -95,15 +110,25 @@ export class ImpactFlipbooks {
     size: number,
     colorHex: number,
     hdr: number,
-    style: FlipbookStyle,
+    style: FlipbookStyle | ContactSheet,
+    duration = FLIP_DUR,
+    rotation = 0,
+    aspect = 1,
   ): void {
     if (this.disposed) return;
+    const texture = isContactSheet(style) ? contactTexture(style) : flipbookSheet(style);
+    if (!texture) return;
     const slot = this.slots[this.next];
     this.next = (this.next + 1) % FLIP_SLOTS;
     slot.active = true;
     slot.age = 0;
     slot.size = size;
-    slot.mat.uniforms.uMap.value = flipbookSheet(style);
+    slot.duration = Number.isFinite(duration) ? Math.max(0.05, duration) : FLIP_DUR;
+    slot.rotation = Number.isFinite(rotation) ? rotation : 0;
+    slot.aspect = Number.isFinite(aspect) ? Math.max(0.25, Math.min(4, aspect)) : 1;
+    slot.mat.uniforms.uMap.value = texture;
+    slot.mat.uniforms.uInset.value =
+      4 / Math.max(64, (texture.image as { width?: number })?.width ?? 512);
     (slot.mat.uniforms.uTint.value as THREE.Color).setHex(colorHex);
     slot.mat.uniforms.uHdr.value = hdr;
     slot.mat.uniforms.uFrame.value = 0;
@@ -125,11 +150,13 @@ export class ImpactFlipbooks {
     for (const slot of this.slots) {
       if (!slot.active) continue;
       slot.age += dt;
-      const t = Math.min(1, slot.age / FLIP_DUR);
+      const t = Math.min(1, slot.age / slot.duration);
       slot.mat.uniforms.uFrame.value = t * LAST_FRAME;
       slot.mat.uniforms.uOpacity.value = t > 0.7 ? 1 - (t - 0.7) / 0.3 : 1;
-      slot.mesh.scale.setScalar(slot.size * (0.65 + 0.55 * easeOutCubic(t)));
+      const scale = slot.size * (0.65 + 0.55 * easeOutCubic(t));
+      slot.mesh.scale.set(scale * slot.aspect, scale, scale);
       slot.mesh.quaternion.copy(camQuat);
+      if (slot.rotation) slot.mesh.rotateZ(slot.rotation);
       if (t >= 1) {
         slot.active = false;
         slot.mesh.visible = false;

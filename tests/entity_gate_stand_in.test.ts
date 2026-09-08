@@ -9,6 +9,7 @@ import {
 } from '../src/render/characters/form_visual_selection_core';
 import {
   anyCharacterRigDrawing,
+  applyCharacterFormDetail,
   applyCharacterFormVisibility,
   ENTITY_GATE_STAND_INS,
   type EntityGateStandIn,
@@ -186,6 +187,52 @@ describe('entity gate stand-in registry', () => {
 });
 
 describe('entity gate stand-ins actually stand in', () => {
+  it('gives Moonwing the sole body and shadow while clearing old form detail', () => {
+    const make = () => ({
+      ...rig(false),
+      far: false,
+      proxy: false,
+      setFar(on: boolean) {
+        this.far = on;
+      },
+      setProxyShadow(on: boolean) {
+        this.proxy = on;
+      },
+    });
+    const base = make(),
+      bear = make(),
+      owl = make();
+    const view = {
+      visual: base,
+      bearVisual: bear,
+      moonkinVisual: owl,
+      sheepVisual: null,
+      catVisual: null,
+      travelVisual: null,
+      metamorphVisual: null,
+      fireballTravelVisual: null,
+    };
+    applyCharacterFormVisibility(view, characterFormVisibility('moonkin'), false);
+    expect(anyCharacterRigDrawing(view)).toBe(true);
+    expect(base.root.visible).toBe(false);
+    expect(owl.root.visible).toBe(true);
+    applyCharacterFormDetail(view, owl, true, 'moonkin', {
+      baseProxy: false,
+      formProxy: true,
+      activeArticulated: true,
+    });
+    expect(owl.far && owl.proxy).toBe(true);
+    expect(base.far || base.proxy || bear.far || bear.proxy).toBe(false);
+    applyCharacterFormVisibility(view, characterFormVisibility('base'), false);
+    applyCharacterFormDetail(view, base, false, 'base', {
+      baseProxy: false,
+      formProxy: false,
+      activeArticulated: true,
+    });
+    expect(base.root.visible).toBe(true);
+    expect(owl.root.visible || owl.far || owl.proxy).toBe(false);
+  });
+
   it('arrival gate: no body at all, so the nameplate is forced on', () => {
     // The one gate with no in-world stand-in: it hides the whole group, so
     // entityHasNoBody reports true and nameplatePlanInto overrides the toggles.

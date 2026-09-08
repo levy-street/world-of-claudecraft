@@ -19,7 +19,11 @@
  * surfaces below are structural, so a plain Vitest drives them with stubs.
  */
 
-import type { CharacterFormVisibility } from './characters/form_visual_selection_core';
+import type {
+  CharacterFormShadowPlan,
+  CharacterFormVisibility,
+  CharacterFormVisual,
+} from './characters/form_visual_selection_core';
 
 /** A rig whose whole body the per-frame loop switches on or off. */
 export interface ActivatableRig {
@@ -31,7 +35,7 @@ export interface DrawableRig {
   root: { visible: boolean };
 }
 
-/** The six character rigs one entity view can own. */
+/** The character rigs one entity view can own. */
 export interface CharacterFormRigSlots {
   visual: ActivatableRig | null;
   sheepVisual: ActivatableRig | null;
@@ -39,9 +43,10 @@ export interface CharacterFormRigSlots {
   catVisual: ActivatableRig | null;
   travelVisual: ActivatableRig | null;
   metamorphVisual: ActivatableRig | null;
+  moonkinVisual?: ActivatableRig | null;
 }
 
-/** The same six, plus the one bespoke body that replaces all of them. */
+/** The same rigs, plus the one bespoke body that replaces all of them. */
 export interface EntityRigSlots {
   visual: DrawableRig | null;
   sheepVisual: DrawableRig | null;
@@ -49,6 +54,7 @@ export interface EntityRigSlots {
   catVisual: DrawableRig | null;
   travelVisual: DrawableRig | null;
   metamorphVisual: DrawableRig | null;
+  moonkinVisual?: DrawableRig | null;
   /** the Mage fireball travel form: a bespoke visual that takes every rig out
    *  of the frame, so its presence IS the body for that window */
   fireballTravelVisual: unknown;
@@ -73,6 +79,39 @@ export function applyCharacterFormVisibility(
   rigs.catVisual?.setActive(visibility.cat);
   rigs.travelVisual?.setActive(visibility.travel);
   rigs.metamorphVisual?.setActive(visibility.metamorph);
+  rigs.moonkinVisual?.setActive(visibility.moonkin);
+}
+
+interface DetailRig {
+  setFar(on: boolean): void;
+  setProxyShadow(on: boolean): void;
+}
+const FORM_DETAIL_SLOTS = [
+  'sheepVisual',
+  'bearVisual',
+  'catVisual',
+  'travelVisual',
+  'metamorphVisual',
+  'moonkinVisual',
+] as const;
+
+/** One lifecycle walk keeps hidden form rigs out of both detail and shadow passes. */
+export function applyCharacterFormDetail(
+  rigs: { visual: DetailRig | null } & Partial<
+    Record<(typeof FORM_DETAIL_SLOTS)[number], DetailRig | null>
+  >,
+  active: DetailRig,
+  far: boolean,
+  resolved: CharacterFormVisual,
+  shadows: CharacterFormShadowPlan,
+): void {
+  rigs.visual?.setFar(far && active === rigs.visual && resolved !== 'fireball');
+  rigs.visual?.setProxyShadow(shadows.baseProxy);
+  for (const key of FORM_DETAIL_SLOTS) {
+    const rig = rigs[key];
+    rig?.setFar(far && active === rig);
+    rig?.setProxyShadow(shadows.formProxy && active === rig);
+  }
 }
 
 /** Is any body of this entity actually drawn right now? */
@@ -84,7 +123,8 @@ export function anyCharacterRigDrawing(rigs: EntityRigSlots): boolean {
     rigs.bearVisual?.root.visible ||
     rigs.catVisual?.root.visible ||
     rigs.travelVisual?.root.visible ||
-    rigs.metamorphVisual?.root.visible
+    rigs.metamorphVisual?.root.visible ||
+    rigs.moonkinVisual?.root.visible
   );
 }
 

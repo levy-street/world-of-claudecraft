@@ -14,6 +14,8 @@
 
 import { isFearAura } from '../sim/combat/cc';
 import { ABILITIES } from '../sim/data';
+import type { PhysicalChoreography } from './ability_vfx/physical_choreography_core';
+import type { RitualChoreography } from './ability_vfx/ritual_choreography_core';
 
 // Compact per-ability visual spec (key legend in ability_vfx_specs.ts header):
 // c=color p=palette pw=power sp=sparks rg=ringScale vr=vRing db=debris
@@ -59,6 +61,15 @@ export type AbilityVfxArchetype =
   | 'dash';
 
 export type AbilityVfxWindupStyle =
+  | 'spring'
+  | 'psionic'
+  | 'lunar'
+  | 'quiver'
+  | 'scripture'
+  | 'conduction'
+  | 'bough'
+  | 'solar'
+  | 'occult'
   | 'none'
   | 'stance'
   | 'vortex'
@@ -104,6 +115,7 @@ export interface AbilityVfxImpactSpec {
 }
 
 export interface AbilityVfxBuffSpec {
+  ceremony?: 'spiritCoils' | 'ascend';
   style?: 'raise' | 'morph' | 'veil';
   orbit?: string;
   // While the buff aura (aura id == ability id) is worn, the held mainhand
@@ -144,6 +156,15 @@ export interface AbilityVfxBuffSpec {
 }
 
 export interface AbilityVfxFullSpec {
+  castIdentity?: AbilityVfxWindupStyle;
+  /** Preserve authoritative event.radius independently of decorative shock rings. */
+  areaTelegraph?: boolean;
+  /** Complete physical composition, replacing generic elemental decorations. */
+  physical?: PhysicalChoreography;
+  ritual?: RitualChoreography;
+  presentation?: 'dedicated' | 'passive';
+  /** A real direct hit is this spell's only completion cue. */
+  damageCue?: boolean;
   archetype: AbilityVfxArchetype;
   palette: string;
   power?: number;
@@ -225,6 +246,7 @@ export interface AbilityVfxFullSpec {
   } | null;
   barrier?: boolean;
   shaft?: number | boolean;
+  healStyle?: 'water' | 'bloom' | 'benediction' | 'rewind';
   screenFx?: boolean;
   linger?: number;
   rim?: string;

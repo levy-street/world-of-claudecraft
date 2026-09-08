@@ -63,6 +63,7 @@ export function preloadForSfx(key) {
     category === 'movement' ||
     category === 'combat' ||
     key.startsWith('player_') ||
+    key.startsWith('signature_') ||
     // Quest accept/ready/complete are rare, narrative one-shots (category
     // 'other', since they don't match any prefix rule): the very first one a
     // brand-new player ever triggers is a cold network fetch, and playUi's

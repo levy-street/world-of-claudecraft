@@ -8,7 +8,8 @@ const {
   writeFileSync: nodeWriteFileSync,
 } = require('node:fs');
 const nodeOs = require('node:os');
-const nodePath = require('node:path');
+// These paths belong to Linux/XDG even when policy tests run on another host.
+const nodePath = require('node:path').posix;
 
 // Make the worldofclaudecraft:// deep link resolvable on Linux, which is what carries the
 // Discord login code back from the OS browser into the shell (main.cjs handleDeepLink).

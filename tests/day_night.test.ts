@@ -108,7 +108,12 @@ describe('water follows the cycle (source pins)', () => {
     // the style colour and the grade are kept apart, so they cannot compound
     expect(weather).toContain('this.material.color.copy(this.styleColor);');
     const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
-    expect(renderer).toContain('this.weather.setDayNight(this.dnGrade.fog);');
+    const scenery = readFileSync(
+      new URL('../src/render/renderer_scenery.ts', import.meta.url),
+      'utf8',
+    );
+    expect(renderer).toContain('updateRendererScenery(this, p, dt, projectionPixels');
+    expect(scenery).toContain('host.weather.setDayNight(host.dnGrade.fog);');
   });
 });
 
@@ -130,8 +135,13 @@ describe('the night visibility layers stay outdoors (source pins)', () => {
   });
 
   it('gates the wilderness accents on the outdoor fog state', () => {
-    expect(renderer()).toContain(
-      "this.fogState === 'outdoor' ? wildGlowAmount(this.dnGlobalNight) : 0",
+    const scenery = readFileSync(
+      new URL('../src/render/renderer_scenery.ts', import.meta.url),
+      'utf8',
+    );
+    expect(renderer()).toContain('updateRendererScenery(this, p, dt, projectionPixels');
+    expect(scenery).toContain(
+      "host.fogState === 'outdoor' ? wildGlowAmount(host.dnGlobalNight) : 0",
     );
   });
 

@@ -385,8 +385,12 @@ export class AbyssalRiftFx {
     }
   }
 
-  dispose(): void {
+  clear(): void {
     while (this.rifts.length > 0) this.remove(this.rifts.length - 1);
+  }
+
+  dispose(): void {
+    this.clear();
     this.wispTexture.dispose();
   }
 

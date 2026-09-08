@@ -52,7 +52,9 @@ function harness() {
 describe('Warlock pet signature VFX', () => {
   it('routes Felbolt through its fel-lance projectile and the Emberkin cast clip hook', () => {
     expect(abilityVfxSpec('emberkin_felbolt')).toBe(EMBERKIN_FELBOLT_VFX_SPEC);
-    expect(abilityVfxFullSpec('emberkin_felbolt')).toBe(EMBERKIN_FELBOLT_VFX_FULL_SPEC);
+    const resolved = abilityVfxFullSpec('emberkin_felbolt');
+    expect(resolved).toEqual(EMBERKIN_FELBOLT_VFX_FULL_SPEC);
+    expect(abilityVfxFullSpec('emberkin_felbolt')).toBe(resolved);
     expect(EMBERKIN_FELBOLT_VFX_FULL_SPEC).toMatchObject({
       archetype: 'bolt',
       palette: 'venom',
@@ -75,7 +77,7 @@ describe('Warlock pet signature VFX', () => {
     ).toBe(true);
     expect(h.sequenceBolt).toHaveBeenCalledWith(
       'emberkin_felbolt',
-      EMBERKIN_FELBOLT_VFX_FULL_SPEC,
+      resolved,
       1,
       2,
       expect.any(Number),
@@ -89,9 +91,9 @@ describe('Warlock pet signature VFX', () => {
 
   it('pairs Abyssal Chain with a live tether, target implosion, and cast clip hook', () => {
     expect(abilityVfxSpec('gloomshade_abyssal_chain')).toBe(GLOOMSHADE_ABYSSAL_CHAIN_VFX_SPEC);
-    expect(abilityVfxFullSpec('gloomshade_abyssal_chain')).toBe(
-      GLOOMSHADE_ABYSSAL_CHAIN_VFX_FULL_SPEC,
-    );
+    const resolved = abilityVfxFullSpec('gloomshade_abyssal_chain');
+    expect(resolved).toEqual(GLOOMSHADE_ABYSSAL_CHAIN_VFX_FULL_SPEC);
+    expect(abilityVfxFullSpec('gloomshade_abyssal_chain')).toBe(resolved);
     expect(GLOOMSHADE_ABYSSAL_CHAIN_VFX_FULL_SPEC).toMatchObject({
       archetype: 'burst',
       palette: 'shadow',
@@ -129,7 +131,7 @@ describe('Warlock pet signature VFX', () => {
     ).toBe(true);
     expect(h.sequenceInstant).toHaveBeenCalledWith(
       'gloomshade_abyssal_chain',
-      GLOOMSHADE_ABYSSAL_CHAIN_VFX_FULL_SPEC,
+      resolved,
       1,
       2,
       expect.any(Number),

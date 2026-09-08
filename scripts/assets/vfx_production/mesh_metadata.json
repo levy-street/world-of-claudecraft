@@ -1,0 +1,23 @@
+{
+  "ice_shard": {
+    "triangles": 36,
+    "vertices": 20,
+    "radius": 1.000000006868504,
+    "pivot": "vertex centroid; object translation zero",
+    "axes": "glTF Y-up"
+  },
+  "stone_chip": {
+    "triangles": 80,
+    "vertices": 42,
+    "radius": 1.0000000355666991,
+    "pivot": "vertex centroid; object translation zero",
+    "axes": "glTF Y-up"
+  },
+  "metal_splinter": {
+    "triangles": 16,
+    "vertices": 10,
+    "radius": 1.000000009109499,
+    "pivot": "vertex centroid; object translation zero",
+    "axes": "glTF Y-up"
+  }
+}

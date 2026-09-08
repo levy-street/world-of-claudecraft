@@ -423,7 +423,7 @@ describe('applyPointLightBudget', () => {
 
     // And the warlock meteor fx is actually handed that seam.
     const fxStart = source.indexOf('this.warlockMeteorFx = new WarlockMeteorFx(');
-    const fxEnd = source.indexOf('this.necromancyGroundFx = new NecromancyGroundFx(', fxStart);
+    const fxEnd = source.indexOf('Object.assign(this, createPersistentGroundFx(', fxStart);
     expect(fxStart).toBeGreaterThan(-1);
     expect(fxEnd).toBeGreaterThan(fxStart);
     const construction = source.slice(fxStart, fxEnd);

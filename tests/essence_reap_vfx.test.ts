@@ -17,6 +17,7 @@ import {
   SOUL_LANCE_VFX_FULL_SPEC,
 } from '../src/render/necromancy_vfx_specs';
 import { ABILITIES } from '../src/sim/content/classes';
+import { authoredVfxSpec } from './helpers/authored_vfx_spec';
 
 function fakeTextures(): AbilityVfxTextures {
   const texture = (): THREE.CanvasTexture => new THREE.Texture() as THREE.CanvasTexture;
@@ -156,9 +157,10 @@ describe('Essence Reap premium filler VFX', () => {
     expect(h.projectile).not.toHaveBeenCalled();
     expect(h.lightningProjectile).not.toHaveBeenCalled();
     expect(h.sequenceBolt).toHaveBeenCalledOnce();
+    const runtime = authoredVfxSpec('soul_harvest', ESSENCE_REAP_VFX_FULL_SPEC);
     expect(h.sequenceBolt).toHaveBeenCalledWith(
       'soul_harvest',
-      ESSENCE_REAP_VFX_FULL_SPEC,
+      runtime,
       1,
       2,
       0x6f42b5,
@@ -210,7 +212,7 @@ describe('Essence Reap premium filler VFX', () => {
     };
 
     h.painter.syncEntity(casting);
-    expect(h.windup).toHaveBeenCalledWith(1, 0x6f42b5, 0.75, 'compression', true, 2, 0xd8d0ea);
+    expect(h.windup).toHaveBeenCalledWith(1, 0x6f42b5, 0.75, 'occult', true, 2, 0xd8d0ea);
 
     h.painter.syncEntity({
       ...casting,

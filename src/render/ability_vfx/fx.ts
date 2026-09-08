@@ -11,16 +11,37 @@ import {
   MAX_CC_BANDS,
 } from '../ability_vfx_core';
 import type { AbilityAudioKind, AbilityAudioOpts } from '../audio_sink';
+import type { ControlSubject } from '../combat_status_core';
+import { CombatStatusSignals } from '../combat_status_signals';
+import { drawRestorativeStream } from '../restorative_water';
+import { BakedImpactLayers } from './baked_impact_layers';
+import { drawClassCast, hasClassCast } from './cast_language';
+import { isContactSheet } from './contact_assets';
 import { type DecalStyle, GroundDecals } from './decals';
+import { ElementalForms } from './elemental_forms';
+import { ElementalContactMemory, elementalPerformance } from './elemental_performance_core';
 import { asFlipbookStyle, ImpactFlipbooks } from './flipbooks';
 import { abilityVfxTextures, OVERLAY_CELL } from './fx_textures';
 import { GroundAuras } from './ground_auras';
+import { HeldConduction } from './held_conduction';
 import { OverlaySprites } from './overlay_sprites';
 import { LightPillars } from './pillars';
-import { AbilityVfxRibbons, type BoltTrailStyle, type RibbonAnchor } from './ribbons';
+import type { BakedKind, FragmentKind } from './production_assets';
+import {
+  AbilityVfxRibbons,
+  type BoltTrailStyle,
+  type PathMotion,
+  type RibbonAnchor,
+} from './ribbons';
 import { ShockRings } from './rings';
 import { ArchetypeSequencer, type SeqPoint, type SequencerHost } from './sequencer';
 import { BuffShells } from './shells';
+import { chargeEnvelope, SIGNATURE_CONTACT_TIME, type Substance } from './signature_core';
+import { SignatureCrests } from './signature_crests';
+import { SignatureDetails } from './signature_details';
+import type { CrestKind } from './signature_shapes';
+import { solarExecution } from './solar_execution';
+import { SolidImpactFragments } from './solid_impact_fragments';
 import { SPECTACLE, usesCrescendoScale } from './spectacle';
 import {
   asSpiritPath,
@@ -29,6 +50,7 @@ import {
   type SpiritBuildScheduler,
   type SpiritCompileGate,
 } from './spirits';
+import { RestorativeWaterVolumes } from './water_volumes';
 
 export type { DecalStyle } from './decals';
 
@@ -43,6 +65,7 @@ export type ParticleBurst = (
   count: number,
   power: number,
   kind: ParticleBurstKind,
+  duration?: number,
 ) => void;
 
 const camPosScratch = new THREE.Vector3();
@@ -66,6 +89,7 @@ const hostAnchorScratch = new THREE.Vector3();
 // drops.
 
 export type OrbitStyle =
+  | 'wardCharges'
   | 'halo'
   | 'sparks'
   | 'runes'
@@ -73,10 +97,12 @@ export type OrbitStyle =
   | 'wings'
   | 'heartbeat'
   | 'speedlines'
+  | 'conduction'
   | 'weaponGlow'
   | 'leaves';
 
 const ORBIT_STYLE_SET = new Set<string>([
+  'wardCharges',
   'halo',
   'sparks',
   'runes',
@@ -84,6 +110,7 @@ const ORBIT_STYLE_SET = new Set<string>([
   'wings',
   'heartbeat',
   'speedlines',
+  'conduction',
   'weaponGlow',
   'leaves',
 ]);
@@ -97,6 +124,9 @@ export function asOrbitStyle(v: string | null | undefined): OrbitStyle | null {
 // radius/incline for the circular bands, bpm/ringR for heartbeat, ribs/span/
 // flapRate for wings, density/spread/up for leaves.
 export type OrbitDna = NonNullable<AbilityVfxBuffSpec['o']>;
+// Private identity marker: shares the existing held-band budget, but draws only
+// at the real weapon tip. It never enters the decorative orbit path.
+const QUEUED_WEAPON_DNA: OrbitDna = Object.freeze({ radius: 0, size: 0.16 });
 
 const MAX_ORBITS_PER_ENTITY = 3;
 const MAX_ORBIT_BANDS = 24;
@@ -155,9 +185,20 @@ interface OrbitBand {
   // heartbeat only: the band age of the next chest pulse
   beat: number;
   stamp: number;
+  weaponSample: ((out: THREE.Vector3) => boolean) | null;
+  weaponRetryAt: number;
 }
 
 export type WindupStyle =
+  | 'spring'
+  | 'psionic'
+  | 'lunar'
+  | 'quiver'
+  | 'scripture'
+  | 'conduction'
+  | 'bough'
+  | 'solar'
+  | 'occult'
   | 'none'
   | 'orb'
   | 'runes'
@@ -168,6 +209,15 @@ export type WindupStyle =
   | 'weapon';
 
 const WINDUP_STYLE_SET = new Set<string>([
+  'spring',
+  'psionic',
+  'lunar',
+  'quiver',
+  'scripture',
+  'conduction',
+  'bough',
+  'solar',
+  'occult',
   'none',
   'orb',
   'runes',
@@ -270,6 +320,24 @@ const ORBIT_DNA: Record<
     size: 0.13,
     cell: OVERLAY_CELL.glow,
   },
+  conduction: {
+    n: 4,
+    rate: 2,
+    radius: 0.55,
+    weave: 0,
+    frac: 0.65,
+    size: 0.2,
+    cell: OVERLAY_CELL.spark,
+  },
+  wardCharges: {
+    n: 3,
+    rate: 2,
+    radius: 0.7,
+    weave: 0,
+    frac: 0.65,
+    size: 0.3,
+    cell: OVERLAY_CELL.spark,
+  },
   weaponGlow: {
     n: 1,
     rate: 1,
@@ -318,11 +386,27 @@ const PROJ_STYLE_BY_PALETTE: Record<string, BoltTrailStyle> = {
 
 export class AbilityVfxFx implements SequencerHost {
   private ribbons: AbilityVfxRibbons;
+  private water: RestorativeWaterVolumes;
+  private details: SignatureDetails;
+  private forms: ElementalForms;
+  private readonly contacts = new ElementalContactMemory();
+  private worldLightCb:
+    | ((
+        at: THREE.Vector3,
+        school: string,
+        intensity: number,
+        duration: number,
+        range: number,
+      ) => void)
+    | null = null;
+  private readonly lightPoint = new THREE.Vector3();
+  private crests: SignatureCrests;
   private rings: ShockRings;
   private decals: GroundDecals;
   private overlay: OverlaySprites;
   private pillars: LightPillars;
   private shells: BuffShells;
+  private controlSignals: CombatStatusSignals;
   private groundAuras: GroundAuras;
   private flipbooks: ImpactFlipbooks;
   private spirits: SpiritApparitions;
@@ -366,7 +450,7 @@ export class AbilityVfxFx implements SequencerHost {
   private statSink: ((abilityId: string, n: number) => void) | null = null;
   private applyGlow: ((entityId: number, colorHex: number, intensity: number) => void) | null =
     null;
-  private shakeCb: ((amount: number) => void) | null = null;
+  private shakeCb: ((amount: number, x?: number, y?: number, z?: number) => void) | null = null;
   private bodyLeanCb: ((entityId: number, amount: number) => void) | null = null;
   private screenImpactCb: ((x: number, y: number, z: number, strength: number) => void) | null =
     null;
@@ -397,6 +481,8 @@ export class AbilityVfxFx implements SequencerHost {
   // grants what remains under the cap, so a spam fight can never stack the
   // camera into a constant rumble.
   private shakeRecent = 0;
+  private baked: BakedImpactLayers;
+  private fragments: SolidImpactFragments;
   private sequencer = new ArchetypeSequencer();
   // Body-glow envelopes (the gallery casterGlowV): attack fast while fed each
   // frame, decay 0.9/s for held-shell buffs else 2.2/s once the source drops.
@@ -407,6 +493,31 @@ export class AbilityVfxFx implements SequencerHost {
   // Stable sink for the styled bolt heads (ribbons.drawHeads pushes through
   // it into the frame's overlay batch); one closure for the object's lifetime.
   private disposed = false;
+  private heldConduction = new HeldConduction();
+  private drawHeldConduction = (): void => {
+    for (const [id, bands] of this.orbits) {
+      for (const band of bands) {
+        if (
+          band.stamp !== this.frame ||
+          (band.style !== 'wardCharges' && band.style !== 'conduction')
+        )
+          continue;
+        const at = this.anchor(id, ORBIT_DNA[band.style].frac, anchorScratchA);
+        if (!at) continue;
+        this.heldConduction.draw(
+          this.ribbons,
+          band.style,
+          at,
+          this.facingAt(id) ?? 0,
+          this.reducedMotionActive ? 0 : this.time,
+          band.o?.n ?? 3,
+          band.colorHex,
+          Math.min(1, band.age / 0.25),
+          band.tier === 0,
+        );
+      }
+    }
+  };
   private headSink = (
     x: number,
     y: number,
@@ -439,12 +550,21 @@ export class AbilityVfxFx implements SequencerHost {
      *  screen space. Optional so a host that cannot supply it keeps the old
      *  camera-relative behaviour. */
     private facingOf?: (id: number) => number | null,
+    private weaponAnchor?: (id: number, hand: 0 | 1) => ((out: THREE.Vector3) => boolean) | null,
+    private handSample?: (id: number, hand: 0 | 1, out: {x:number;y:number;z:number}) => boolean,
   ) {
     const tex = abilityVfxTextures();
     this.ribbons = new AbilityVfxRibbons(scene, anchor, tex);
+    this.water = new RestorativeWaterVolumes(scene);
+    this.details = new SignatureDetails(scene);
+    this.forms = new ElementalForms(scene);
+    this.crests = new SignatureCrests(scene);
+    this.baked = new BakedImpactLayers(scene);
+    this.fragments = new SolidImpactFragments(scene);
     this.rings = new ShockRings(scene, tex, groundY);
     this.decals = new GroundDecals(scene, tex, groundY);
     this.overlay = new OverlaySprites(scene, tex);
+    this.controlSignals = new CombatStatusSignals(scene);
     this.pillars = new LightPillars(scene);
     this.shells = new BuffShells(scene);
     this.groundAuras = new GroundAuras(scene, tex);
@@ -487,7 +607,7 @@ export class AbilityVfxFx implements SequencerHost {
     ) => void,
     statSink: (abilityId: string, n: number) => void,
     applyGlow?: (entityId: number, colorHex: number, intensity: number) => void,
-    addShake?: (amount: number) => void,
+    addShake?: (amount: number, x?: number, y?: number, z?: number) => void,
     bodyLean?: (entityId: number, amount: number) => void,
     screenImpact?: (x: number, y: number, z: number, strength: number) => void,
     abilityAudio?: (
@@ -513,6 +633,23 @@ export class AbilityVfxFx implements SequencerHost {
   // SequencerHost audio surface: forwards the sequence's release/impact/
   // spirit/motif moments to the wired spatial audio sink (silent when none
   // is wired).
+  onPresentationMoment:
+    | ((id: string, phase: 'release' | 'impact', sourceId: number) => void)
+    | null = null;
+  presentationMoment(id: string, phase: 'release' | 'impact', sourceId: number): void {
+    this.onPresentationMoment?.(id, phase, sourceId);
+  }
+  onContact: ((sourceId: number, targetId: number, school: string, weight: number, abilityId?: string, beat?: number) => void) | null =
+    null;
+  handPoint(id: number, hand: 0 | 1, out: {x:number;y:number;z:number}): typeof out | null {
+    return this.handSample?.(id,hand,out) ? out : null;
+  }
+  contact(sourceId: number, targetId: number, school: string, weight: number, abilityId?: string, beat?: number): void {
+    if (!this.disposed) this.onContact?.(sourceId, targetId, school, weight, abilityId, beat);
+  }
+  solarExecution(sourceId: number, targetId: number): void {
+    if (!this.disposed) solarExecution(this, sourceId, targetId);
+  }
   abilityAudio(
     kind: AbilityAudioKind,
     palette: string,
@@ -608,8 +745,19 @@ export class AbilityVfxFx implements SequencerHost {
         spec.self === true || spec.archetype === 'nova' || spec.archetype === 'shout'
           ? casterId
           : targetId;
-      this.scheduleScreenFx(windupDelay + 0.15, anchorId, 0, 0, 0, screenFxStrengthOf(spec));
+      this.scheduleScreenFx(
+        windupDelay + SIGNATURE_CONTACT_TIME,
+        anchorId,
+        0,
+        0,
+        0,
+        screenFxStrengthOf(spec),
+      );
     }
+  }
+
+  cancelSequence(casterId: number, abilityId: string): void {
+    this.sequencer.cancelOwned(casterId, abilityId);
   }
 
   // Ground-aimed instant: the whole sequence anchors at the WORLD POINT (the
@@ -634,7 +782,14 @@ export class AbilityVfxFx implements SequencerHost {
       z,
     });
     if (wantsScreenFx(spec, tier))
-      this.scheduleScreenFx(windupDelay + 0.15, -1, x, y, z, screenFxStrengthOf(spec));
+      this.scheduleScreenFx(
+        windupDelay + SIGNATURE_CONTACT_TIME,
+        -1,
+        x,
+        y,
+        z,
+        screenFxStrengthOf(spec),
+      );
   }
 
   // Traveling bolt carrying the full spec's bolt DNA. Without a bolt block
@@ -913,8 +1068,35 @@ export class AbilityVfxFx implements SequencerHost {
   // now, and the flipbook prewarm does the same for the six impact sheets.
   // The prewarm's finally-block clear() hides everything again.
   prewarmSpawn(x: number, y: number, z: number, entityId: number): void {
+    this.forms.spawn('glacier', x, y, z, 1, 1, 0xffffff, 0xffffff, 0, true);
+    this.forms.update(0.08, false);
     if (this.disposed) return;
     const gy = this.groundY(x, z);
+    this.details.spawn(x, y, z, 1, 0xffffff, 0xffffff, 'fire');
+    this.details.update(0.05, this.camera.quaternion, false);
+    for (const kind of [
+      'ice',
+      'water',
+      'fire',
+      'shadow',
+      'light',
+      'nature',
+      'arcane',
+      'hook',
+      'chain',
+    ] as const)
+      this.crests.spawn(x, gy, z, 1, 1, 0xffffff, 0xffffff, kind);
+    this.crests.update(0.05, false);
+    this.bakedAt('smoke', x, y, z, 1, 0xffffff, 0xffffff, 1, 0, 0);
+    this.bakedAt('shockwave', x, gy + 0.08, z, 1, 0xffffff, 0xffffff, 1, 0, 0);
+    for (const kind of ['pyroblast', 'frost_nova', 'chain_heal'] as const)
+      this.bakedAt(kind, x, gy + 0.08, z, 1, 0xffffff, 0xffffff, 1, 0, 0);
+    for (const kind of ['ice_shard', 'stone_chip', 'metal_splinter'] as const)
+      this.fragmentsAt(kind, x, y, z, 0xffffff, 1, 1, 0, 1);
+    this.baked.update(0.1, this.camera.quaternion, false);
+    this.fragments.update(0.1, false);
+    this.water.spawn({ x, y: gy + 0.3, z }, { x: x + 1, y: gy + 1, z }, 0x319cac, 0xbbeee8, 0.15);
+    this.water.update(0.05, false);
     this.rings.spawn(x, gy + 0.15, z, 2, 0.7, 0xffffff, 1, false);
     this.rings.spawn(x, gy + 1.2, z, 1.6, 0.7, 0xffffff, 1, true);
     this.decals.spawn(x, gy, z, 1.5, 0xffffff, 'ember', 1.2);
@@ -937,7 +1119,8 @@ export class AbilityVfxFx implements SequencerHost {
     this.qualityLevel = Math.min(1, Math.max(0, Number.isFinite(q) ? q : 1));
   }
 
-  setViewportScale(heightPx: number, fovDeg: number): void {
+  setViewportScale(heightPx: number, fovDeg: number, cssHeight = heightPx): void {
+    this.controlSignals.setViewportHeight(cssHeight);
     this.overlay.setViewportScale(heightPx / (2 * Math.tan((fovDeg * Math.PI) / 360)));
   }
 
@@ -969,6 +1152,7 @@ export class AbilityVfxFx implements SequencerHost {
   // every update(), before sequencer.update() consults it, so the sequencer
   // always reads the set for the frame it is drawing.
   heldCcBand(targetId: number): boolean {
+    if (this.controlSignals.hasDrawn(targetId)) return true;
     for (let i = 0; i < this.ccPickCount; i++) {
       if (this.ccPickIds[i] === targetId) return true;
     }
@@ -1017,9 +1201,23 @@ export class AbilityVfxFx implements SequencerHost {
     colorHex: number,
     sheet: string,
     hdr: number,
+    duration?: number,
+    rotation?: number,
+    aspect?: number,
   ): void {
     if (this.disposed) return;
-    this.flipbooks.spawn(x, y, z, size, colorHex, hdr * this.intensity(), asFlipbookStyle(sheet));
+    this.flipbooks.spawn(
+      x,
+      y,
+      z,
+      size,
+      colorHex,
+      hdr * this.intensity(),
+      isContactSheet(sheet) ? sheet : asFlipbookStyle(sheet),
+      duration,
+      rotation,
+      aspect,
+    );
   }
 
   pillarAt(
@@ -1060,6 +1258,7 @@ export class AbilityVfxFx implements SequencerHost {
   // offscreen actor consumes no overlay, shell, ground-aura, or glow work.
   sleepEntity(entityId: number): void {
     if (this.disposed) return;
+    this.controlSignals.sleep(entityId);
     this.ccBands.delete(entityId);
     this.windups.delete(entityId);
     const bands = this.orbits.get(entityId);
@@ -1084,9 +1283,10 @@ export class AbilityVfxFx implements SequencerHost {
     count: number,
     power: number,
     kind: ParticleBurstKind,
+    duration?: number,
   ): void {
     if (this.disposed) return;
-    this.particleBurst?.(x, y, z, colorHex, count, power, kind);
+    this.particleBurst?.(x, y, z, colorHex, count, power, kind, duration);
   }
 
   pulseLight(
@@ -1151,9 +1351,230 @@ export class AbilityVfxFx implements SequencerHost {
     width: number,
     life: number,
     fill: (pts: { set(x: number, y: number, z: number): unknown }[]) => number,
-  ): void {
+    brushed = false,
+    motion: PathMotion | null = null,
+    preserveActive = false,
+  ): boolean {
+    if (this.disposed) return false;
+    return this.ribbons.spawnPath(colorHex, width, life, fill, brushed, motion, preserveActive);
+  }
+
+  tetherRibbon(color: number, width: number, life: number,
+    fill: (pts: {set(x:number,y:number,z:number):unknown}[])=>number): void {
+    if (!this.disposed) this.ribbons.spawnPath(color,width,life,fill,false,null,false,true);
+  }
+
+  facingAt(id: number): number | null {
+    return this.facingOf?.(id) ?? null;
+  }
+
+  weaponTrail(id: number, hand: 0 | 1, color: number, width: number, duration: number): void {
     if (this.disposed) return;
-    this.ribbons.spawnPath(colorHex, width, life, fill);
+    const sample = this.weaponAnchor?.(id, hand);
+    if (sample) this.ribbons.spawnTrackedPath(color, width, duration, sample);
+  }
+
+  waterVolume(
+    from: SeqPoint,
+    to: SeqPoint,
+    tint: number,
+    accent: number,
+    width: number,
+    duration = 0.8,
+  ): void {
+    if (!this.disposed) this.water.spawn(from, to, tint, accent, width, duration);
+  }
+
+  bakedAt(
+    kind: BakedKind,
+    x: number,
+    y: number,
+    z: number,
+    size: number,
+    tint: number,
+    hot: number,
+    duration: number,
+    delay: number,
+    heat: number,
+    angle = 0,
+  ): void {
+    this.baked.spawn(
+      kind,
+      x,
+      y,
+      z,
+      size,
+      tint,
+      hot,
+      duration,
+      delay,
+      heat,
+      this.groundY(x, z),
+      angle,
+      this.groundY,
+    );
+  }
+  elementalImpact(
+    id: string,
+    spec: AbilityVfxFullSpec,
+    at: SeqPoint,
+    tier: number,
+    colour: number,
+    accent: number,
+    dx: number,
+    dz: number,
+  ): number {
+    if (this.disposed) return 0;
+    const plan = elementalPerformance(id, spec, tier);
+    if (!plan.enabled) return 0;
+    const floor = this.groundY(at.x, at.z) + 0.085;
+    if (!Number.isFinite(floor)) return 0;
+    let count = this.forms.spawn(
+      plan.form,
+      at.x,
+      floor,
+      at.z,
+      plan.size,
+      plan.duration,
+      colour,
+      accent,
+      Math.atan2(dx, dz),
+      plan.detail,
+    )
+      ? 1
+      : 0;
+    if (tier !== 0) return count;
+    const reaction = this.contacts.touch(at.x, at.z, plan.element);
+    if (reaction === 'steam') {
+      this.bakedAt('smoke', at.x, floor + 1, at.z, 2.8, 0xaaaeb3, 0xcadce3, 1.9, 0.06, 0);
+      this.crestAt(at.x, floor, at.z, 0.7, 0.35, 0x638e9a, 0xbddeea, 'water');
+      count += 2;
+    } else if (reaction === 'conduction') {
+      for (let k = 0; k < 5; k++) {
+        const a = k * 2.399963;
+        this.boltPoints(
+          at.x,
+          floor + 0.08,
+          at.z,
+          at.x + Math.cos(a) * 1.8,
+          floor + 0.08,
+          at.z + Math.sin(a) * 1.8,
+          0xa4ecff,
+          0.35,
+          0.025,
+          0.45,
+        );
+      }
+      this.residueAt(at.x, at.z, 1.3, 0x397d9c, 'water');
+      count += 6;
+    } else if (reaction === 'confluence') {
+      this.forms.spawn(
+        'rift',
+        at.x,
+        floor,
+        at.z,
+        0.8,
+        1.5,
+        0x321548,
+        0xb982e0,
+        Math.atan2(dx, dz) + 0.7,
+        true,
+      );
+      this.bakedAt('smoke', at.x, floor + 0.9, at.z, 2.4, 0x342638, 0x795491, 1.6, 0, 0.02);
+      count += 2;
+    }
+    return count;
+  }
+  fragmentsAt(
+    kind: FragmentKind,
+    x: number,
+    y: number,
+    z: number,
+    tint: number,
+    count: number,
+    power: number,
+    dx: number,
+    dz: number,
+    duration?: number,
+  ): void {
+    this.fragments.burst(kind, x, y, z, tint, count, power, dx, dz, this.groundY, duration);
+  }
+  detailAt(
+    x: number,
+    y: number,
+    z: number,
+    size: number,
+    tint: number,
+    accent: number,
+    substance: Substance,
+    delay = 0,
+    duration = 1.3,
+  ): void {
+    this.details.spawn(x, y, z, size, tint, accent, substance, delay, duration);
+  }
+  residueAt(x: number, z: number, radius: number, tint: number, substance: Substance): void {
+    this.details.residue(x, z, radius, tint, substance, this.groundY);
+  }
+  setWorldLightDelegate(
+    callback:
+      | ((
+          at: THREE.Vector3,
+          school: string,
+          intensity: number,
+          duration: number,
+          range: number,
+        ) => void)
+      | null,
+  ): void {
+    this.worldLightCb = callback;
+  }
+  worldLightAt(
+    x: number,
+    y: number,
+    z: number,
+    palette: string,
+    intensity: number,
+    duration: number,
+  ): void {
+    if (this.disposed || ![x, y, z, intensity, duration].every(Number.isFinite)) return;
+    const school =
+      palette === 'storm'
+        ? 'nature'
+        : palette === 'moon'
+          ? 'arcane'
+          : palette === 'gold'
+            ? 'holy'
+            : palette;
+    this.lightPoint.set(x, y, z);
+    this.worldLightCb?.(
+      this.lightPoint,
+      school,
+      Math.min(6, intensity),
+      Math.min(1.2, duration),
+      8,
+    );
+  }
+  crestAt(
+    x: number,
+    y: number,
+    z: number,
+    radius: number,
+    height: number,
+    tint: number,
+    accent: number,
+    substance: CrestKind,
+    angle = 0,
+    duration = 1.15,
+    pitch = 0,
+  ): void {
+    this.crests.spawn(x, y, z, radius, height, tint, accent, substance, angle, duration, pitch);
+  }
+
+  healStream(sourceId: number, targetId: number): void {
+    if (this.disposed) return;
+    const from = this.anchor(sourceId, 0.62),
+      to = this.anchor(targetId, 0.55);
+    if (from && to) drawRestorativeStream(this, from, to);
   }
 
   pushOverlay(
@@ -1184,8 +1605,16 @@ export class AbilityVfxFx implements SequencerHost {
     // caster anticipation: the body eases back through the ceremony (gallery
     // easeInOutSine ramp); the visual's spring recoils it forward on release
     const p = Math.min(1, Math.max(0, progress));
-    this.bodyLeanCb?.(entityId, WINDUP_LEAN_RAD * (0.5 - 0.5 * Math.cos(Math.PI * p)));
-    this.drawWindup(entityId, s, colorHex, progress, 1, colorHex, this.reducedMotionActive);
+    if (!this.reducedMotionActive) this.bodyLeanCb?.(entityId, WINDUP_LEAN_RAD * chargeEnvelope(p));
+    this.drawWindup(
+      entityId,
+      s,
+      colorHex,
+      chargeEnvelope(progress),
+      1,
+      colorHex,
+      this.reducedMotionActive,
+    );
   }
 
   quality(): number {
@@ -1204,13 +1633,19 @@ export class AbilityVfxFx implements SequencerHost {
   // gone by 50) plus the rolling budget, so only nearby heavy moments kick
   // and a spam fight can never hold the camera shaking.
   shakeAt(x: number, y: number, z: number, amount: number): void {
-    if (!this.shakeCb || amount <= 0) return;
+    if (
+      !this.shakeCb ||
+      this.reducedMotionActive ||
+      ![x, y, z, amount].every(Number.isFinite) ||
+      amount <= 0
+    )
+      return;
     const d = Math.hypot(x - camPosScratch.x, y - camPosScratch.y, z - camPosScratch.z);
     const falloff = d <= 18 ? 1 : Math.max(0, 1 - (d - 18) / 32);
     const granted = Math.min(amount * falloff, Math.max(0, 0.55 - this.shakeRecent));
     if (granted <= 0.01) return;
     this.shakeRecent += granted;
-    this.shakeCb(granted);
+    this.shakeCb(granted, x, y, z);
   }
 
   // Screen-space impact feedback (the gallery distortion ripple + flash),
@@ -1494,9 +1929,16 @@ export class AbilityVfxFx implements SequencerHost {
       age: 0,
       beat: 0,
       stamp: this.frame,
+      weaponSample: null,
+      weaponRetryAt: 0,
     });
     this.orbitBandCount++;
     return true;
+  }
+
+  /** Held readiness cue, sharing the original 24-slot pool and frame cleanup. */
+  holdQueuedWeapon(entityId: number, colorHex: number, tier = 0): boolean {
+    return this.orbit(entityId, 'weaponGlow', colorHex, QUEUED_WEAPON_DNA, tier);
   }
 
   // Holds the persistent CC band on the entity while a worn hard-CC aura
@@ -1518,6 +1960,10 @@ export class AbilityVfxFx implements SequencerHost {
     s.type = type;
     s.remaining = remaining;
     s.stamp = this.frame;
+  }
+
+  holdControlSignals(subject: ControlSubject): void {
+    if (!this.disposed) this.controlSignals.hold(subject);
   }
 
   // One held band (the drawOrbit sibling): the spec's sprite count riding a
@@ -1586,7 +2032,14 @@ export class AbilityVfxFx implements SequencerHost {
     // anything spawns into it. The shock rings deliberately do NOT thin: their
     // footprints are too wide for an interpolated drape to stay honest.
     this.decals.setCameraPosition(camPosScratch.x, camPosScratch.z);
-    this.ribbons.update(dt, camPosScratch, reducedMotion);
+    this.ribbons.update(dt, camPosScratch, reducedMotion, this.drawHeldConduction);
+    this.water.update(dt, reducedMotion);
+    this.details.update(dt, this.camera.quaternion, reducedMotion);
+    this.forms.update(dt, reducedMotion);
+    this.contacts.advance(dt);
+    this.crests.update(dt, reducedMotion);
+    this.baked.update(dt, this.camera.quaternion, reducedMotion);
+    this.fragments.update(dt, reducedMotion);
     this.rings.update(dt, this.camera.quaternion);
     this.flipbooks.update(dt, this.camera.quaternion);
     this.decals.update(dt);
@@ -1603,6 +2056,7 @@ export class AbilityVfxFx implements SequencerHost {
     );
     this.spirits.update(dt);
     this.overlay.beginFrame();
+    this.controlSignals.update(dt, this.anchor);
     // The CC bands draw FIRST in the frame's overlay batch: a hard-CC tell is
     // actionable information, so capacity contention with the decorative
     // sprites that follow must never be able to drop it. The band count is
@@ -1647,7 +2101,9 @@ export class AbilityVfxFx implements SequencerHost {
         this.windups.delete(id);
         continue;
       }
-      this.drawWindup(id, w.style, w.colorHex, w.progress, w.streams, w.accentHex, reducedMotion);
+      const charge = chargeEnvelope(w.progress);
+      if (!reducedMotion) this.bodyLeanCb?.(id, WINDUP_LEAN_RAD * charge);
+      this.drawWindup(id, w.style, w.colorHex, charge, w.streams, w.accentHex, reducedMotion);
     }
     for (const [id, bands] of this.orbits) {
       for (let i = bands.length - 1; i >= 0; i--) {
@@ -1692,6 +2148,13 @@ export class AbilityVfxFx implements SequencerHost {
 
   clear(): void {
     this.ribbons.clear();
+    this.water.clear();
+    this.baked.clear();
+    this.fragments.clear();
+    this.details.clear();
+    this.forms.clear();
+    this.contacts.clear();
+    this.crests.clear();
     this.rings.clear();
     this.flipbooks.clear();
     this.decals.clear();
@@ -1706,6 +2169,7 @@ export class AbilityVfxFx implements SequencerHost {
     this.orbits.clear();
     this.orbitBandCount = 0;
     this.ccBands.clear();
+    this.controlSignals.clear();
     this.ccPickCount = 0;
     for (const s of this.screenFxQueue) s.active = false;
   }
@@ -1719,7 +2183,14 @@ export class AbilityVfxFx implements SequencerHost {
     if (this.disposed) return;
     this.clear();
     this.disposed = true;
+    this.worldLightCb = null;
     this.ribbons.dispose();
+    this.water.dispose();
+    this.baked.dispose();
+    this.fragments.dispose();
+    this.details.dispose();
+    this.forms.dispose();
+    this.crests.dispose();
     this.rings.dispose();
     this.flipbooks.dispose();
     this.decals.dispose();
@@ -1728,6 +2199,7 @@ export class AbilityVfxFx implements SequencerHost {
     this.groundAuras.dispose();
     this.spirits.dispose();
     this.overlay.dispose();
+    this.controlSignals.dispose();
     this.particleBurst = null;
     this.lightPulseCb = null;
     this.statSink = null;
@@ -1736,6 +2208,7 @@ export class AbilityVfxFx implements SequencerHost {
     this.bodyLeanCb = null;
     this.screenImpactCb = null;
     this.abilityAudioCb = null;
+    this.onPresentationMoment = null;
   }
 
   private intensity(): number {
@@ -1763,6 +2236,21 @@ export class AbilityVfxFx implements SequencerHost {
     const p = Math.min(1, Math.max(0, progress));
     const q = 0.75 + 0.25 * this.qualityLevel;
     const pulse = reducedMotion ? 1 : 1 + 0.07 * Math.sin(this.time * 14);
+    if (hasClassCast(style)) {
+      const at = this.anchor(entityId, 0, anchorScratchA);
+      if (at)
+        drawClassCast(
+          this.overlay,
+          style,
+          at,
+          this.facingAt(entityId) ?? 0,
+          colorHex,
+          accentHex,
+          p,
+          q,
+        );
+      return;
+    }
     if (style === 'runes') {
       const feet = this.anchor(entityId, 0.04, anchorScratchA);
       if (!feet) return;
@@ -1929,7 +2417,9 @@ export class AbilityVfxFx implements SequencerHost {
       const streamReach = 0.22 + 1.85 * (1 - p);
       for (let stream = 0; stream < streams; stream++) {
         const baseAngle =
-          this.time * (2.8 + stream * 0.2) + (stream * Math.PI * 2) / streams + entityId * 0.37;
+          (reducedMotion ? 0 : this.time * (2.8 + stream * 0.2)) +
+          (stream * Math.PI * 2) / streams +
+          entityId * 0.37;
         const streamColor = stream % 2 === 0 ? colorHex : accentHex;
         for (let node = 0; node < 3; node++) {
           const along = (node + 1) / 3;
@@ -1940,7 +2430,7 @@ export class AbilityVfxFx implements SequencerHost {
             at.y +
               0.12 +
               (stream - (streams - 1) * 0.5) * 0.16 * (1 - p) +
-              Math.sin(this.time * 6 + stream + node) * 0.05,
+              (reducedMotion ? 0 : Math.sin(this.time * 6 + stream + node) * 0.05),
             at.z + Math.sin(angle) * radius,
             streamColor,
             (0.12 + 0.055 * along) * q,
@@ -1975,6 +2465,27 @@ export class AbilityVfxFx implements SequencerHost {
   // pulse, which rides the pooled shock rings at its authored bpm. buff.o
   // overrides the style DNA so same-band buffs still read as different spells.
   private drawOrbit(entityId: number, band: OrbitBand): void {
+    if (band.o === QUEUED_WEAPON_DNA) {
+      if (!band.weaponSample && this.time >= band.weaponRetryAt) {
+        band.weaponSample = this.weaponAnchor?.(entityId, 0) ?? null;
+        band.weaponRetryAt = this.time + 0.25;
+      }
+      if (!band.weaponSample) return;
+      if (!band.weaponSample(anchorScratchA)) {
+        band.weaponSample = null;
+        band.weaponRetryAt = this.time + 0.25;
+        return;
+      }
+      const { x, y, z } = anchorScratchA;
+      const alpha = Math.min(1, band.age / 0.12);
+      this.overlay.push(x, y, z, band.colorHex, 0.25, OVERLAY_CELL.glow, alpha * 0.55, 1.3);
+      this.overlay.push(x, y, z, band.colorHex, 0.16, OVERLAY_CELL.star, alpha * 0.9, 1.8);
+      return;
+    }
+    // Only the final frame winner invalidates the sampler: an aura may feed
+    // this same slot before the queued cue overwrites it later in syncEntity.
+    band.weaponSample = null;
+    band.weaponRetryAt = 0;
     const dna = ORBIT_DNA[band.style];
     const at = this.anchor(entityId, dna.frac, anchorScratchA);
     if (!at) return;
@@ -2017,6 +2528,53 @@ export class AbilityVfxFx implements SequencerHost {
           1.9,
         );
       }
+      return;
+    }
+    if (band.style === 'conduction' || band.style === 'wardCharges') {
+      const facing = this.facingAt(entityId) ?? 0;
+      const rx = Math.cos(facing),
+        rz = -Math.sin(facing);
+      const stormTime = this.reducedMotionActive ? 0 : t;
+      const pulse = 0.7 + 0.3 * Math.sin(stormTime * 7);
+      if (band.style === 'wardCharges' && o?.n !== undefined) {
+        for (let node = 0; node < o.n; node++) {
+          const d = node === 0 ? -0.7 : node === 1 ? 0.7 : 0;
+          const forward = node === 2 ? 0.72 : 0;
+          const px = at.x + rx * d + Math.sin(facing) * forward;
+          const pz = at.z + rz * d + Math.cos(facing) * forward;
+          const py = at.y + (node === 2 ? -0.15 : 0.32);
+          this.overlay.push(px, py, pz, color, 0.52, OVERLAY_CELL.glow, fade * 0.8, 2.2);
+          for (let j = 0; j < 2; j++) {
+            const a = stormTime * 8 + node * 2.1 + j * 3.1;
+            this.overlay.push(
+              px + Math.cos(a) * 0.13,
+              py + Math.sin(a * 1.7) * 0.11,
+              pz + Math.sin(a) * 0.13,
+              color,
+              0.17,
+              OVERLAY_CELL.spark,
+              fade * pulse,
+              2.8,
+            );
+          }
+        }
+        return;
+      }
+      for (let side = -1; side <= 1; side += 2)
+        for (let j = 0; j < 4; j++) {
+          const d = side * (0.28 + j * 0.13);
+          const lift = Math.sin(j * 2.1 + stormTime * 5) * 0.06;
+          this.overlay.push(
+            at.x + rx * d,
+            at.y + 0.22 - j * 0.12 + lift,
+            at.z + rz * d,
+            color,
+            j === 3 ? 0.26 : 0.17,
+            OVERLAY_CELL.spark,
+            fade * pulse,
+            1.9,
+          );
+        }
       return;
     }
     if (band.style === 'speedlines') {
@@ -2145,10 +2703,10 @@ export class AbilityVfxFx implements SequencerHost {
         const r = 0.35 + spread * 0.55 * ((k * 0.618) % 1);
         this.overlay.push(
           at.x + Math.cos(a) * r,
-          at.y + 0.15 + f * 2.1,
+          at.y + 0.15 + f * (o?.span ?? 2.1),
           at.z + Math.sin(a) * r,
           color,
-          dna.size,
+          o?.size ?? dna.size,
           dna.cell,
           fade * Math.sin(f * Math.PI) * 0.9,
           1.7,

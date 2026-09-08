@@ -1,10 +1,14 @@
+import { runeOfPowerDispositionFor } from './combat/rune_of_power';
 import type {
   AccountCosmetics,
   ActionBarLayout,
   ActionBarLayoutRestore,
   ActiveConsecration,
   ActiveFrostRing,
+  ActiveHunterTrap,
   ActiveTemporalHourglass,
+  ActiveBlizzard,
+  ActiveRuneOfPower,
   BankBonusSource,
   CivicServicePlacement,
   CraftingIdentityView,
@@ -20,6 +24,7 @@ import type {
   ToolEffectSlotView,
 } from '../world_api';
 import type { GroundAimPointXZ } from '../world_api/combat';
+import { temporalHourglassDispositionFor } from './combat/temporal_hourglass';
 import * as bagsMod from './bags';
 import {
   addStacked,
@@ -1967,6 +1972,10 @@ export class Sim {
   private devSandboxIds: number[] = [];
   private pendingMobRespawns: PendingMobRespawn[] = [];
   private groundAoEs: GroundAoE[] = [];
+  get activeHunterTraps(): ActiveHunterTrap[] {
+    return groundAoeReadouts.collectActiveHunterTraps(this.groundAoEs);
+  }
+
   get activeFrostRings(): ActiveFrostRing[] {
     return groundAoeReadouts.collectActiveFrostRings(this.groundAoEs);
   }
@@ -1991,8 +2000,25 @@ export class Sim {
   get activeVarkhulCinderOrbProjectiles(): raidReadouts.ActiveVarkhulCinderOrbProjectile[] {
     return raidReadouts.collectActiveVarkhulCinderOrbProjectiles(this.ctx);
   }
+  get activeBlizzards(): ActiveBlizzard[] {
+    return groundAoeReadouts.collectActiveBlizzards(this.groundAoEs,
+      sourceId => { const source = this.entities.get(sourceId); return !!source && !source.dead; });
+  }
+  get activeRunesOfPower(): ActiveRuneOfPower[] {
+    return groundAoeReadouts.collectActiveRunesOfPower(this.groundAoEs,
+      (sourceId) => this.runeOfPowerDispositionFor(sourceId, this.playerId));
+  }
+
+  runeOfPowerDispositionFor(sourceId: number, viewerId: number) {
+    return runeOfPowerDispositionFor(this.ctx, sourceId, viewerId);
+  }
+
   get activeTemporalHourglasses(): ActiveTemporalHourglass[] {
-    return groundAoeReadouts.collectActiveTemporalHourglasses(this.groundAoEs);
+    return groundAoeReadouts.collectActiveTemporalHourglasses(this.groundAoEs,
+      (sourceId) => this.temporalHourglassDispositionFor(sourceId, this.playerId));
+  }
+  temporalHourglassDispositionFor(sourceId: number, viewerId: number) {
+    return temporalHourglassDispositionFor(this.ctx, sourceId, viewerId);
   }
   get activeConsecrations(): ActiveConsecration[] {
     return groundAoeReadouts.collectActiveConsecrations(this.groundAoEs);

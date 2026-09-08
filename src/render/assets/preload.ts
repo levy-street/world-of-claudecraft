@@ -30,7 +30,9 @@ import { assetLoadStarted, recordPreloadWait } from './stats';
 
 const tasks: Promise<unknown>[] = [];
 const deferredStarters: (() => Promise<unknown>)[] = [];
+const studioStarters = new Set<() => Promise<unknown>>();
 let deferredBegun = false;
+let studioBegun = false;
 
 export function registerPreload(task: Promise<unknown>): void {
   // Store a VALUE-ERASED view of the task. A settled promise pins its resolution
@@ -63,12 +65,33 @@ export function registerPreload(task: Promise<unknown>): void {
  * mid-session) starts immediately, so a late import can
  * never strand its assets behind a gate that has already been lifted.
  */
-export function registerDeferredPreload(start: () => Promise<unknown>): void {
-  if (deferredBegun) {
+export function registerDeferredPreload(start: () => Promise<unknown>, studio = false): void {
+  if (deferredBegun || (studio && studioBegun)) {
     registerPreload(start());
     return;
   }
   deferredStarters.push(start);
+  if (studio) studioStarters.add(start);
+}
+
+/** Open only the production combat-art dependencies used by the review stage.
+ * The remaining world lane stays closed until a real world is requested. */
+export function beginStudioPreloads(): number {
+  if (studioBegun || deferredBegun) return 0;
+  studioBegun = true;
+  const started = studioStarters.size;
+  for (let i = deferredStarters.length - 1; i >= 0; i--) {
+    const start = deferredStarters[i];
+    if (!studioStarters.has(start)) continue;
+    deferredStarters.splice(i, 1);
+    try {
+      registerPreload(start());
+    } catch (error) {
+      registerPreload(Promise.reject(error));
+    }
+  }
+  studioStarters.clear();
+  return started;
 }
 
 /**
@@ -90,6 +113,7 @@ export function beginDeferredPreloads(): number {
     }
   }
   deferredStarters.length = 0;
+  studioStarters.clear();
   return started;
 }
 
@@ -104,6 +128,8 @@ export const preloadInternalsForTest = {
     tasks.length = 0;
     deferredStarters.length = 0;
     deferredBegun = false;
+    studioStarters.clear();
+    studioBegun = false;
   },
 };
 

@@ -627,6 +627,7 @@ describe('category policy', () => {
       'creatures',
       'mounts',
       'tools',
+      'vfx',
       'weapons',
     ]);
   });

@@ -18,6 +18,18 @@ export type {
 } from '../sim/varkhul_cinder_orbs';
 export type { ActiveVarkhulForgestormWarning } from '../sim/varkhul_forgestorm';
 
+/** Server-owned storm footprint. Inactive sources retain the field until expiry. */
+export interface ActiveBlizzard {
+  id: string;
+  sourceId: number | null;
+  active: boolean;
+  x: number;
+  z: number;
+  radius: number;
+  duration: number;
+  remaining: number;
+}
+
 export interface ActiveFrostRing {
   id: string;
   x: number;
@@ -28,8 +40,37 @@ export interface ActiveFrostRing {
   remaining: number;
 }
 
+/** A placed Hunter trap, including its server-owned arming phase. */
+export interface ActiveHunterTrap {
+  id: string;
+  sourceId: number;
+  abilityId: string;
+  x: number;
+  z: number;
+  radius: number;
+  duration: number;
+  remaining: number;
+  armTime: number;
+  armRemaining: number;
+}
+
+export type TemporalHourglassDisposition = 'protective' | 'hostile' | 'unknown';
+export type RuneOfPowerDisposition = 'eligible' | 'opponent' | 'inactive' | 'unknown';
+export interface ActiveRuneOfPower {
+  id: string;
+  sourceId: number | null;
+  disposition: RuneOfPowerDisposition;
+  x: number;
+  z: number;
+  radius: number;
+  duration: number;
+  remaining: number;
+}
 export interface ActiveTemporalHourglass {
   id: string;
+  /** Older snapshots retain the warning with unknown ownership/disposition. */
+  sourceId: number | null;
+  disposition: TemporalHourglassDisposition;
   x: number;
   z: number;
   radius: number;
@@ -55,6 +96,7 @@ export interface IWorldCombat {
   known: ResolvedAbility[];
   /** Server-authored persistent traps currently visible to this world view. */
   activeFrostRings: ActiveFrostRing[];
+  activeHunterTraps: ActiveHunterTrap[];
   activeIgnivarMeteors: ActiveIgnivarMeteorWarning[];
   activeVarkhulForgestormWarnings: ActiveVarkhulForgestormWarning[];
   activeVarkhulAnvilMeteors: ActiveVarkhulAnvilMeteorWarning[];
@@ -62,6 +104,8 @@ export interface IWorldCombat {
   activeVarkhulCinderFires: ActiveVarkhulCinderFire[];
   activeVarkhulCinderOrbProjectiles: ActiveVarkhulCinderOrbProjectile[];
   activeTemporalHourglasses: ActiveTemporalHourglass[];
+  activeRunesOfPower: ActiveRuneOfPower[];
+  activeBlizzards: ActiveBlizzard[];
   activeConsecrations: ActiveConsecration[];
   /** Remaining server-authoritative lifetime of a reactive ability window. */
   reactiveAbilityWindowRemaining(abilityId: string): number;

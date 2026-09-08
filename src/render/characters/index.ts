@@ -104,7 +104,13 @@ export function createMountVisual(visualKey: string): CharacterVisual {
  *  training dummy freeze). */
 export function createCharacterVisual(
   e: Entity,
-  formKey?: 'form_sheep' | 'form_bear' | 'form_cat' | 'form_travel' | 'form_metamorph',
+  formKey?:
+    | 'form_sheep'
+    | 'form_bear'
+    | 'form_cat'
+    | 'form_travel'
+    | 'form_metamorph'
+    | 'form_moonkin',
   opts?: AssembleOptions,
 ): CharacterVisual | null {
   // Forms are their own models. Skins and held weapons

@@ -15,6 +15,7 @@ const gfxSettings = vi.hoisted(() => ({
 
 vi.mock('../src/render/gfx', () => ({
   GFX: gfxSettings,
+  SUN_DIR: { clone: () => new THREE.Vector3(1, 2, 3).normalize() },
   sharedUniforms: {
     uTime: { value: 0 },
   },
@@ -29,6 +30,7 @@ function rendererStub(): THREE.WebGLRenderer {
     capabilities: { isWebGL2: true },
     getDrawingBufferSize: (out: THREE.Vector2) => out.set(1280, 720),
     getPixelRatio: () => 1,
+    initRenderTarget: vi.fn(),
   } as unknown as THREE.WebGLRenderer;
 }
 
@@ -344,5 +346,22 @@ describe('live post pipeline', () => {
 
     for (const dispose of passDisposals) expect(dispose).toHaveBeenCalledTimes(1);
     expect(composerDispose).toHaveBeenCalledTimes(1);
+  });
+  it('releases the remaining pipeline after a capture cleanup failure', async () => {
+    const { buildComposer } = await import('../src/render/post');
+    const scene = new THREE.Scene();
+    const post = buildComposer(rendererStub(), scene, new THREE.PerspectiveCamera(), 1280, 720, {
+      gradeOnly: true,
+    });
+    const capture = scene.getObjectByName('opaqueVfxCapture') as THREE.Mesh;
+    vi.spyOn(capture.geometry, 'dispose').mockImplementation(() => {
+      throw new Error('capture release');
+    });
+    const passDisposals = post.composer.passes.map((pass) => vi.spyOn(pass, 'dispose'));
+    const composerDispose = vi.spyOn(post.composer, 'dispose');
+    expect(() => post.dispose()).toThrow(AggregateError);
+    for (const dispose of passDisposals) expect(dispose).toHaveBeenCalledTimes(1);
+    expect(composerDispose).toHaveBeenCalledTimes(1);
+    expect(() => post.dispose()).not.toThrow();
   });
 });

@@ -146,11 +146,13 @@ const PALADIN_SPRITES: Record<PaladinSpellVfxSprite, number> = {
 
 const spriteImages: (TexImageSource | null)[] = SPRITE_FILES.map(() => null);
 for (let i = 0; i < SPRITE_FILES.length; i++) {
-  registerDeferredPreload(() =>
-    loadTexture(`/vfx/${SPRITE_FILES[i]}.png`, { srgb: true }).then((tex) => {
-      spriteImages[i] = tex.image as TexImageSource;
-      return tex;
-    }),
+  registerDeferredPreload(
+    () =>
+      loadTexture(`/vfx/${SPRITE_FILES[i]}.png`, { srgb: true }).then((tex) => {
+        spriteImages[i] = tex.image as TexImageSource;
+        return tex;
+      }),
+    true,
   );
 }
 
@@ -1504,7 +1506,14 @@ export class Vfx {
     this.spawn(at.x, at.y + 0.4, at.z, 0, 0.8, 0, hot, 2.4, 0.42, 0, SPR.flash);
   }
 
-  burst(at: THREE.Vector3, school: string, count = 18, power = 1, color?: number): void {
+  burst(
+    at: THREE.Vector3,
+    school: string,
+    count = 18,
+    power = 1,
+    color?: number,
+    duration?: number,
+  ): void {
     const c = new THREE.Color(color ?? SCHOOL_COLORS[school] ?? 0xffffff).multiplyScalar(hdr(1.6));
     const isFire = school === 'fire';
     const scaledCount = this.scaledCount(count);
@@ -1513,7 +1522,7 @@ export class Vfx {
       const up = Math.random() * 0.9 + 0.1;
       const sp = (2 + Math.random() * 4.5) * power;
       // fire bursts read as flame puffs; everything else as spark showers
-      const sprite = isFire
+      const sprite = school === 'blood' ? SPR.debris : isFire
         ? i % 3 === 0
           ? SPR.firePuff
           : SPR.flame
@@ -1531,7 +1540,9 @@ export class Vfx {
         Math.cos(a) * sp,
         c,
         0.34 + Math.random() * 0.3 * power,
-        0.45 + Math.random() * 0.35,
+        duration !== undefined && Number.isFinite(duration)
+          ? Math.max(0.05, duration)
+          : 0.45 + Math.random() * 0.35,
         7,
         sprite,
       );

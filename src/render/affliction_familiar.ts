@@ -20,10 +20,12 @@ if (typeof window !== 'undefined') {
   // Deferred, never eager: a module-import registerPreload joins the launch
   // fetch burst and re-opens the WKWebView OOM lane the deferred gate exists
   // to prevent (tests/defer_launcher_preloads.test.ts pins the sanctioned set).
-  registerDeferredPreload(() =>
-    loadGltf(MODEL_URL).then((gltf) => {
-      loadedMaledictEye = gltf.scene;
-    }),
+  registerDeferredPreload(
+    () =>
+      loadGltf(MODEL_URL).then((gltf) => {
+        loadedMaledictEye = gltf.scene;
+      }),
+    true,
   );
 }
 

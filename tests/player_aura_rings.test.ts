@@ -274,7 +274,7 @@ describe('PlayerAuraRings procedural ornaments', () => {
     expect(renderer.match(/supportHeightAt\(seed, px/g)).toHaveLength(1);
     expect(auraSync.match(/groundHeight\(px, pz, seed\)/g)).toHaveLength(1);
     expect(auraSync).toMatch(
-      /if \(playerView && !p\.dead && this\.playerAuraRings\.hasVisibleRings\(\)\) \{[\s\S]*?supportHeightAt\(seed, px[\s\S]*?groundHeight\(px, pz, seed\)[\s\S]*?this\.playerAuraRings\.update\([\s\S]*?\n\s*\} else \{\n\s*this\.playerAuraRings\.update\(false/,
+      /if \(!this\.studioArtView && playerView && !p\.dead && this\.playerAuraRings\.hasVisibleRings\(\)\) \{[\s\S]*?supportHeightAt\(seed, px[\s\S]*?groundHeight\(px, pz, seed\)[\s\S]*?this\.playerAuraRings\.update\([\s\S]*?\n\s*\} else \{\n\s*this\.playerAuraRings\.update\(false/,
     );
     expect(renderer).toMatch(
       /this\.playerAuraRings\.update\([\s\S]*?this\.reducedMotion\(\),[\s\S]*?\);/,

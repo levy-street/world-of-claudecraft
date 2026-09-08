@@ -92,11 +92,11 @@ describe('hunter ability-specific attacks (issue #2889 follow-up batch)', () => 
     // Long Draw names the slow full-draw clip; Volley gets its own barrage.
     expect(map.aimed_shot).toBe('Hunter_Shot_LongDraw');
     expect(map.volley).toBe('Hunter_Shot_Volley');
-    // The three aspects and Fevered Draw share the raw, unbaked Spellcast_Raise.
+    // The aspects keep the raw ceremony; Fevered Draw is a real shot channel.
     expect(map.aspect_of_the_hawk).toBe('Spellcast_Raise');
     expect(map.aspect_of_the_monkey).toBe('Spellcast_Raise');
     expect(map.aspect_of_the_cheetah).toBe('Spellcast_Raise');
-    expect(map.rapid_fire).toBe('Spellcast_Raise');
+    expect(map.rapid_fire).toBe('Hunter_Shot_Snap');
     // Pet-command channels have no combat swing to author.
     expect(map.tame_beast).toBeUndefined();
     expect(map.dismiss_pet).toBeUndefined();

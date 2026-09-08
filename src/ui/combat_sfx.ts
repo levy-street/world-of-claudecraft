@@ -148,6 +148,13 @@ export function groundTickAbilityCue(ability: string | undefined): SfxId | null 
 // Every other fire spell (Fireball, the rest of the bolt/burst family)
 // keeps the shared impact_fire.
 const IMPACT_ABILITY_CUES: Partial<Record<string, SfxId>> = {
+  // Decisive single-hit weapon attacks use the prepared heavy contact take.
+  // Compound hits retain their material cues to avoid stacking that full take.
+  mortal_strike: 'impact_masterwork_execution',
+  execute: 'impact_masterwork_execution',
+  slam: 'impact_masterwork_execution',
+  breachmaker: 'impact_masterwork_execution',
+  shield_slam: 'impact_metal',
   scorch: 'scorch',
   pyroblast: 'pyroblast',
   frozen_orb: 'frozen_orb',

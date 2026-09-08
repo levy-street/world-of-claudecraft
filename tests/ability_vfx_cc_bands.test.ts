@@ -90,6 +90,7 @@ interface FxProbe {
 // vs ankles) can be pinned.
 function makeFx(anchor?: (id: number, frac: number) => THREE.Vector3): {
   fx: AbilityVfxFx;
+  scene: THREE.Scene;
   probe: FxProbe;
   anchorCalls: { id: number; frac: number }[];
 } {
@@ -100,8 +101,9 @@ function makeFx(anchor?: (id: number, frac: number) => THREE.Vector3): {
   camera.updateMatrixWorld();
   const anchorCalls: { id: number; frac: number }[] = [];
   const base = anchor ?? ((id: number) => new THREE.Vector3(id, 1.8, -5));
+  const scene = new THREE.Scene();
   const fx = new AbilityVfxFx(
-    new THREE.Scene(),
+    scene,
     camera,
     (id: number, frac: number) => {
       anchorCalls.push({ id, frac });
@@ -109,7 +111,7 @@ function makeFx(anchor?: (id: number, frac: number) => THREE.Vector3): {
     },
     () => 0,
   );
-  return { fx, probe: fx as unknown as FxProbe, anchorCalls };
+  return { fx, scene, probe: fx as unknown as FxProbe, anchorCalls };
 }
 
 function makePainter() {
@@ -143,7 +145,7 @@ function makePainter() {
     triggerAttack: vi.fn(),
   } as unknown as AbilityVfxDeps;
   const painter = new AbilityVfx(deps, () => 12.5);
-  return { painter, fx };
+  return { painter, fx, deps };
 }
 
 function ent(
@@ -860,6 +862,41 @@ describe('online mirror parity', () => {
 });
 
 describe('sequencer handoff surface', () => {
+  it('feeds simultaneous protected controls through the real painter and FX at minimum quality', () => {
+    const { fx, scene } = makeFx();
+    const { deps } = makePainter();
+    const painter = new AbilityVfx({ ...deps, fx }, () => 12.5);
+    fx.setQuality(0);
+    fx.setViewportScale(2400, 60, 800);
+    for (let id = 1; id <= 12; id++)
+      painter.syncEntity(
+        ent(
+          [
+            { id: 'roots', kind: 'root', remaining: 6 },
+            { id: 'hibernate_incap', kind: 'incapacitate', remaining: 3 },
+            { id: 'silenced', kind: 'silence', remaining: 2 },
+          ],
+          id,
+        ),
+      );
+    fx.update(0.05);
+    const mesh = scene.getObjectByName('combat-status-signals') as THREE.Mesh<
+      THREE.InstancedBufferGeometry,
+      THREE.ShaderMaterial
+    >;
+    expect(mesh.geometry.instanceCount).toBe(36);
+    expect(mesh.material.uniforms.uViewport.value).toBe(800);
+    const data = mesh.geometry.getAttribute('aData');
+    for (let i = 0; i < 12; i++)
+      expect([data.getX(i * 3), data.getX(i * 3 + 1), data.getX(i * 3 + 2)]).toEqual([2, 3, 4]);
+    // Actor 12 survives the legacy eight-band budget and claims the generic
+    // stun-star handoff only while its real protected glyphs are drawn.
+    expect(fx.heldCcBand(12)).toBe(true);
+    fx.update(0.05);
+    expect(mesh.geometry.instanceCount).toBe(0);
+    expect(fx.heldCcBand(12)).toBe(false);
+    fx.dispose();
+  });
   it('heldCcBand reports the drawn pick set, for that entity only, and lapses on release', () => {
     const { fx } = makeFx();
 

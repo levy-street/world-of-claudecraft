@@ -293,6 +293,14 @@ export class GlacialFrontVisual {
     }
   }
 
+  clear(): void {
+    this.preview.visible = false;
+    for (const slot of this.bursts) {
+      slot.elapsed = BURST_LIFETIME;
+      slot.group.visible = false;
+    }
+  }
+
   update(dt: number): void {
     for (const slot of this.bursts) {
       if (slot.elapsed >= BURST_LIFETIME) continue;

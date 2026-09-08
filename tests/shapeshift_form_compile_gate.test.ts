@@ -40,6 +40,7 @@ describe('shapeshift-form compile gate (#2571)', () => {
       ['bear', 'bearVisual'],
       ['cat', 'catVisual'],
       ['travel', 'travelVisual'],
+      ['moonkin', 'moonkinVisual'],
     ]) {
       expect(block, `${slot} gated build`).toContain(
         `this.buildFormVisual(e, v, 'form_${form}', '${slot}', true)`,
@@ -87,7 +88,7 @@ describe('shapeshift-form compile gate (#2571)', () => {
     // now feeds: a pending form is NOT ready, so resolvedCharacterForm stays
     // 'base' and formVisibility.base keeps the body drawing.
     expect(block).toContain('const formReadyMask = characterFormReadyMask(');
-    expect(block).toContain('v.formCompilePending,\n      );');
+    expect(block).toContain('v.formCompilePending,\n        v.moonkinVisual,\n      );');
     expect(block).toContain(
       'const resolvedForm = resolvedCharacterForm(requestedForm, formReadyMask);',
     );

@@ -87,7 +87,9 @@ export function tickPaladinAegis(ctx: SimContext, caster: Entity, res: ResolvedA
     x: caster.pos.x,
     z: caster.pos.z,
     school: 'holy',
-    fx: 'nova',
+    fx: 'tick',
+    sourceId: caster.id,
+    ability: res.def.id,
     radius: effect.radius,
   });
   return true;
@@ -126,7 +128,9 @@ export function completePaladinAegis(
     x: caster.pos.x,
     z: caster.pos.z,
     school: 'holy',
-    fx: 'nova',
+    fx: 'burst',
+    sourceId: caster.id,
+    ability: res.def.id,
     radius: effect.radius,
   });
   return true;

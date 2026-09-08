@@ -21,6 +21,7 @@ const gfxSettings = vi.hoisted(() => ({
 
 vi.mock('../../src/render/gfx', () => ({
   GFX: gfxSettings,
+  SUN_DIR: { clone: () => new THREE.Vector3(1, 2, 3).normalize() },
   sharedUniforms: {
     uTime: { value: 0 },
   },

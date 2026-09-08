@@ -25,6 +25,10 @@ import { addRimGlow, EMISSIVE_GLOW, GFX, type GfxSettings } from '../gfx';
 import { applySurfaceDetail, riggedWornFamilyFor } from '../worn_stone';
 import { type ArmorDyeSpec, attachArmorDye } from './armor_dye';
 import { backGripFor } from './back_grips';
+import { prepareBeastAbilityClips } from './beast_ability_clips';
+import { prepareCasterClips } from './caster_clips';
+import { prepareMeleeClips } from './melee_clips';
+import { prepareNamedActionClips } from './named_action_clips';
 import { dequantizeAttribute } from './dequantize_attribute';
 import { type HandGrip, KAYKIT_SHIELD_ACCESSORIES, KAYKIT_SHIELD_GRIPS } from './held_item_grips';
 import { pruneHeldPropIdles, registerHeldPropIdle } from './held_prop_idle';
@@ -88,6 +92,7 @@ import {
 import { animatedNodeNames, mergeSkinnedParts } from './rig_merge';
 import { attachSharedDepthMaterials, clearSharedDepthMaterials } from './shadow_depth_materials';
 import { characterMeshCastsShadow } from './shadow_policy';
+import { prepareSignatureClips } from './signature_clips';
 import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
 import { optimizeSkinGpuLayout } from './skin_gpu_layout';
 import { primeSkinnedSortSpheres } from './skinned_sort_spheres';
@@ -1674,6 +1679,19 @@ function attachTargetBone(
   return resolveBone(root, stowed && isHandslotBone(att.bone) ? STOW_BONE : att.bone);
 }
 
+/** Prepared class utility blade, using the same loaded GLB/grip as equipment. */
+export function attachHunterMeleeProp(root: THREE.Object3D): THREE.Object3D | null {
+  const att = VISUALS.player_rogue.attach?.[0];
+  const bone = att ? attachTargetBone(root, att, false) : null;
+  if (!att || !bone) return null;
+  const blade = attachProp(root, bone, att);
+  delete blade.userData[HELD_PROP_TAG];
+  blade.name = 'hunterMeleeBlade';
+  blade.userData.meleeGestureBlade = true;
+  blade.visible = false;
+  return blade;
+}
+
 // Attach every authored prop: swappable slots take the equipped item's model (or an
 // applied weapon skin, which wins); the actual offhand slot takes the equipped
 // offhand's model (or the same skin mirrored onto a matching-type weapon,
@@ -2325,6 +2343,11 @@ export function prepareVisual(key: string): PreparedVisual {
     clips.set(PALADIN_BASTION_SWEEP_CLIP, createPaladinBastionSweepClip(sweepBase));
   }
 
+  prepareSignatureClips(clips, def.clips.attackByAbility);
+  prepareMeleeClips(clips, def.clips.attackByAbility);
+  prepareNamedActionClips(key, clips, gltf.scene);
+  prepareCasterClips(key, clips, gltf.scene);
+  prepareBeastAbilityClips(key, clips);
   // Pose a throwaway clone mid-idle, measure it, and bake the static mesh. No
   // face decals on a modular throwaway: the flatten drops them (farBakeMeshes),
   // and the default look's scalp decal would otherwise be minted and thrown

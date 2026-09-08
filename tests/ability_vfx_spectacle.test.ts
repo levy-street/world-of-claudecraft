@@ -129,6 +129,25 @@ describe('spectacle crescendo classification', () => {
 });
 
 describe('sequencer applies the crescendo boosts at the spawn seams', () => {
+  it('notifies authored contact at the instant contact beat or actual projectile arrival', () => {
+    const a = makeHost(),
+      seq = new ArchetypeSequencer(),
+      moments: string[] = [];
+    a.host.presentationMoment = (id, phase, source) => moments.push(`${id}:${phase}:${source}`);
+    seq.start(a.host, 'execute', STRIKE_SPEC, 1, 2, 0xffffff, 0, false);
+    expect(moments).toEqual(['execute:release:1']);
+    step(seq, a.host, 0.1);
+    expect(moments).toHaveLength(1);
+    step(seq, a.host, 0.05);
+    expect(moments).toEqual(['execute:release:1', 'execute:impact:1']);
+    const bolt = seq.start(a.host, 'pyroblast', BOLT_SPEC, 1, 2, 0xffffff, 0, true);
+    step(seq, a.host, 1);
+    expect(moments.filter((m) => m === 'pyroblast:impact:1')).toHaveLength(0);
+    if (!bolt) throw new Error('Missing projectile sequence');
+    seq.triggerImpact(a.host, bolt, 20, 1, 0);
+    seq.triggerImpact(a.host, bolt, 20, 1, 0);
+    expect(moments.filter((m) => m === 'pyroblast:impact:1')).toHaveLength(1);
+  });
   it('bolt impact flipbook scales by SPECTACLE.flipbook; release ring fires at tier 0 only', () => {
     const a = makeHost();
     const seq = new ArchetypeSequencer();

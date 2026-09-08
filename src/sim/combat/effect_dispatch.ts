@@ -2763,6 +2763,12 @@ export function runEffects(
               talentDmgMult,
             ) * thundercallMult,
           allyBuffPct: eff.allyBuffPct,
+          blizzard: ability.id === 'blizzard'
+            ? { id: `blizzard:${p.id}:${ctx.tickCount}`, duration: eff.duration }
+            : undefined,
+          runeOfPower: ability.id === 'rune_of_power'
+            ? { id: `rune:${p.id}:${ctx.tickCount}`, duration: eff.duration }
+            : undefined,
           igniteFrac: eff.igniteFrac,
           slowMult: eff.slowMult,
           slowDuration: eff.slowDuration,
@@ -2820,6 +2826,7 @@ export function runEffects(
             z: zoneCenter.z,
             school: ability.school,
             fx: 'runeCircle',
+            persistentId: groundEffect.runeOfPower?.id,
             radius: eff.radius,
             sourceId: p.id,
             duration: eff.duration,
@@ -2834,6 +2841,8 @@ export function runEffects(
             z: zoneCenter.z,
             school: ability.school,
             fx: 'snowZone',
+            sourceId: p.id,
+            persistentId: groundEffect.blizzard?.id,
             radius: eff.radius,
             duration: eff.duration,
             ability: ability.id,
@@ -4048,6 +4057,16 @@ export function runEffects(
         // and it is gated on hostility rather than on the ability id so any future
         // friendly rush inherits the same rule.
         if (ctx.isFriendlyTo(p, target)) break;
+        // Friendly completion already announces Intervene; hostile Charge
+        // needs its own launch cue for the renderer to follow actual travel.
+        ctx.emit({
+          type: 'spellfx',
+          sourceId: p.id,
+          targetId: target.id,
+          school: ability.school,
+          fx: 'selfCast',
+          ability: ability.id,
+        });
         if (p.resourceType === 'rage') {
           const amount = meta.cls === 'warrior' ? 9 * warriorAbilityRageMult(ctx, p, meta) : 9;
           p.resource = Math.min(p.maxResource, p.resource + amount);

@@ -97,8 +97,11 @@ import {
   type AccountCosmetics,
   type ActiveConsecration,
   type ActiveFrostRing,
+  type ActiveHunterTrap,
   type ActiveIgnivarMeteorWarning,
   type ActiveTemporalHourglass,
+  type ActiveBlizzard,
+  type ActiveRuneOfPower,
   type ActiveVarkhulAnvilMeteorWarning,
   type ActiveVarkhulAssembly,
   type ActiveVarkhulCinderFire,
@@ -186,13 +189,7 @@ import {
   parseDesktopWalletHandoffStatus,
 } from './desktop_wallet_handoff';
 import { dungeonEntrySnapshotFacing } from './dungeon_entry_facing';
-import {
-  decodeConsecrations,
-  decodeFrostRings,
-  decodeIgnivarMeteors,
-  decodeTemporalHourglasses,
-  decodeVarkhulForgestormWarnings,
-} from './ground_telegraph_wire';
+import { applyGroundTelegraphSnapshot } from './ground_snapshot';
 import { decodeGuildBankLogFrame, GUILD_BANK_LOG_TTL_MS } from './guild_bank_log_wire';
 import { foldInputAck } from './input_ack';
 import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
@@ -218,11 +215,6 @@ import {
   stableCooldownRemaining,
   stableDeadlineRemaining,
 } from './snapshot_timer_wire';
-import { decodeVarkhulAnvilMeteors, decodeVarkhulAssemblies } from './varkhul_assembly_wire';
-import {
-  decodeVarkhulCinderFires,
-  decodeVarkhulCinderOrbProjectiles,
-} from './varkhul_cinder_orb_wire';
 import { vaultWithdrawPayload } from './vault_snapshot_wire';
 import { buildWebSocketAuthMessage } from './world_auth_message';
 
@@ -1910,6 +1902,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
   private readonly clientSeed: string;
   private eventQueue: SimEvent[] = [];
   activeFrostRings: ActiveFrostRing[] = [];
+  activeHunterTraps: ActiveHunterTrap[] = [];
   activeIgnivarMeteors: ActiveIgnivarMeteorWarning[] = [];
   activeVarkhulForgestormWarnings: ActiveVarkhulForgestormWarning[] = [];
   activeVarkhulCinderFires: ActiveVarkhulCinderFire[] = [];
@@ -1917,6 +1910,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
   activeVarkhulAnvilMeteors: ActiveVarkhulAnvilMeteorWarning[] = [];
   activeVarkhulAssemblies: ActiveVarkhulAssembly[] = [];
   activeTemporalHourglasses: ActiveTemporalHourglass[] = [];
+  activeRunesOfPower: ActiveRuneOfPower[] = [];
+  activeBlizzards: ActiveBlizzard[] = [];
   activeConsecrations: ActiveConsecration[] = [];
   private counterfangWindowDeadlineMs = 0;
   // inventory deltas arrive in snapshots, separate from the event frames the
@@ -2913,17 +2908,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     if (typeof snap.tickHz === 'number' && Number.isFinite(snap.tickHz) && snap.tickHz > 0) {
       this.serverTickHz = snap.tickHz;
     }
-    this.activeFrostRings = decodeFrostRings(snap.rings);
-    this.activeIgnivarMeteors = decodeIgnivarMeteors(snap.ignivarMeteors);
-    this.activeVarkhulForgestormWarnings = decodeVarkhulForgestormWarnings(snap.varkhulForgestorm);
-    this.activeVarkhulCinderFires = decodeVarkhulCinderFires(snap.varkhulCinderFires);
-    this.activeVarkhulCinderOrbProjectiles = decodeVarkhulCinderOrbProjectiles(
-      snap.varkhulCinderOrbs,
-    );
-    this.activeVarkhulAnvilMeteors = decodeVarkhulAnvilMeteors(snap.varkhulAnvilMeteors);
-    this.activeVarkhulAssemblies = decodeVarkhulAssemblies(snap.varkhulAssemblies);
-    this.activeTemporalHourglasses = decodeTemporalHourglasses(snap.hourglasses);
-    this.activeConsecrations = decodeConsecrations(snap.consecrations);
+    applyGroundTelegraphSnapshot(this, snap);
 
     // lazy init (not the field initializer alone): tests build bare instances
     // via Object.create(ClientWorld.prototype), which skips field initializers

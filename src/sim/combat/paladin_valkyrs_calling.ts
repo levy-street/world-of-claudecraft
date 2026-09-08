@@ -114,12 +114,12 @@ export function armValkyrsCalling(
     school: ability.school,
   });
   ctx.emit({
-    type: 'spellfxAt',
-    x: entity.pos.x,
-    z: entity.pos.z,
+    type: 'spellfx',
+    sourceId: entity.id,
+    targetId: entity.id,
     school: ability.school,
-    fx: 'nova',
-    radius: 3,
+    fx: 'selfCast',
+    ability: 'valkyrs_calling',
   });
 }
 
@@ -156,6 +156,8 @@ export function advanceValkyrsCalling(ctx: SimContext, entity: Entity): boolean 
     x: entity.pos.x,
     z: entity.pos.z,
     school: flight.school,
+    sourceId: entity.id,
+    ability: 'valkyrs_calling_impact',
     fx: 'nova',
     radius: flight.landingAoe.radius,
   });

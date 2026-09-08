@@ -6,6 +6,8 @@ import {
   VARKHUL_SHARED_PYRE_RADIUS,
   VARKHUL_SHARED_PYRE_REQUIRED_NORMAL,
 } from '../sim/varkhul_shared_pyre';
+import { addTelegraphContrast } from './telegraph_contrast';
+import { attachTelegraphHeat, setTelegraphHeatTime } from './telegraph_heat';
 
 export const IGNIVAR_SOAK_VISUAL_NAME = 'ignivarSoakCircle';
 export const IGNIVAR_SOAK_FILL_NAME = 'ignivarSoakFill';
@@ -274,6 +276,7 @@ export function buildIgnivarSoakTelegraph(
   );
   fill.name = IGNIVAR_SOAK_FILL_NAME;
   fill.renderOrder = 2;
+  attachTelegraphHeat(fill.material);
   const rim = new THREE.Mesh(
     radialBandGeometry(VARKHUL_SHARED_PYRE_RADIUS - 0.22, VARKHUL_SHARED_PYRE_RADIUS, 64, 0.064),
     material(0xffcf58, 0.94),
@@ -309,6 +312,7 @@ export function buildIgnivarSoakTelegraph(
   ready.visible = false;
 
   root.add(fill, swirl, arrows, rim, timer, occupancy, callInFlame(), callInBeacon(), ready);
+  addTelegraphContrast(root, fill, rim);
   root.visible = false;
   return root;
 }
@@ -334,6 +338,8 @@ export function syncIgnivarSoakTelegraph(
   root.userData.elapsed = Number(root.userData.elapsed ?? 0) + Math.max(0, dt);
   const elapsed = Number(root.userData.elapsed);
   const motionTime = reducedMotion ? 0 : elapsed;
+  const fill = root.getObjectByName(IGNIVAR_SOAK_FILL_NAME) as THREE.Mesh | undefined;
+  if (fill) setTelegraphHeatTime(fill.material as THREE.Material, motionTime);
   const readyState = Boolean(root.userData.ready);
   const occupancy = root.getObjectByName(IGNIVAR_SOAK_OCCUPANCY_NAME) as THREE.Mesh | undefined;
   const timer = root.getObjectByName(IGNIVAR_SOAK_TIMER_NAME) as THREE.Mesh | undefined;

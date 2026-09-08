@@ -1,3 +1,4 @@
+import { CastLocomotion } from './cast_locomotion';
 // Per-entity character visual: a SkeletonUtils clone of a manifest asset with
 // its own AnimationMixer, a clip-driven state machine fed by renderer-derived
 // state, a baked static idle-pose far LOD, and a shadow-only proxy for the
@@ -6,6 +7,9 @@
 // on the shared tinted-material cache (which disposes a clone only once no
 // visual mounts it).
 import * as THREE from 'three';
+import { ActionProps } from './action_props';
+import { attachHunterMeleeProp } from './assets';
+import type { MeleeImpactProfile } from '../melee_impact_core';
 import { offhandMirrorsWeaponSkin } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import type { OverheadEmoteId } from '../../world_api';
@@ -61,11 +65,11 @@ import {
 } from './assets';
 import { deathGroundingOffset } from './death_grounding_core';
 import {
+  applyGhostEffectStyle,
   createGhostEffectMaterial,
   createMoonkinEffectMaterial,
   createShadowformEffectMaterial,
   type GhostStyle,
-  ghostEffectOpacity,
 } from './effect_materials';
 import { farMeshShown, shadowProxyShown } from './far_lod_reveal_core';
 import { HairSwayDriver } from './hair_sway';
@@ -87,6 +91,12 @@ import {
 import { PaladinTemplarsVerdictFx } from './paladin_templars_verdict_fx';
 import { attachSharedDepthMaterials } from './shadow_depth_materials';
 import { characterMeshCastsShadow } from './shadow_policy';
+import {
+  SIGNATURE_CLIP_NAMES,
+  SIGNATURE_HOLD_POINT,
+  signatureClipName,
+  signatureHoldName,
+} from './signature_clips';
 import { SkeletonUpdateCache, type SkeletonUpdateStats } from './skeleton_update_cache';
 import {
   type OneShotKind,
@@ -100,6 +110,7 @@ import { configureTightBoneTextures } from './skin_gpu_layout';
 import { applySoulRendOverlay } from './soul_rend_overlay';
 import { soulRendPrewarmTargets } from './soul_rend_prewarm_core';
 import { createStowTransition, forceStow, requestStow, tickStow } from './stow_transition';
+import { CharacterSurfaceResponse, SURFACE_RESPONSE_PROGRAM } from './surface_response';
 import { SPIN_ATTACK_VISUAL_DURATION, weaponAttackStyle } from './weapon_attack_style_core';
 import {
   disposeOwnedWeaponSkinMaterials,
@@ -629,6 +640,7 @@ export class CharacterVisual {
   private pendingFarClaims: TintedMaterialClaims | null = null;
   private casters: THREE.Mesh[] = [];
   private originalMaterials = new Map<THREE.Mesh, THREE.Material | THREE.Material[]>();
+  private actionProps: ActionProps | null = null;
   /** The halo's build-time shared additive material. Re-snapshots after a
    *  swap must record THIS handle, not the live material: a swap under an
    *  active overlay (ghost/shadowform/...) would otherwise capture the
@@ -672,6 +684,7 @@ export class CharacterVisual {
   // once per original because base materials are SHARED per-asset caches;
   // writing emissive on those would leak the glow across every same-skin rig.
   private auraGlowMaterials = new Map<THREE.Material, THREE.Material>();
+  private readonly surfaceResponse = new CharacterSurfaceResponse();
   private auraGlowColor = 0xffffff;
   private auraGlowIntensity = 0;
 
@@ -701,6 +714,7 @@ export class CharacterVisual {
   /** The ability driving the cast base state, mirrored from AnimState so the
    *  aim pin can tell a drawn shot from a pet utility cast. */
   private castingAbility: string | null = null;
+  private castLocomotion: CastLocomotion | null = null;
   /** which ability's cast clip the current cast-state base action was chosen
    *  for; lets chained casts refresh their per-ability override */
   private castClipAbility: string | null = null;
@@ -834,6 +848,7 @@ export class CharacterVisual {
     // No-op for a fixed rig.
     try {
       configureTightBoneTextures(this.model);
+      this.actionProps = new ActionProps(this.model, key === 'player_hunter' || key === 'player_hunter_modular' ? attachHunterMeleeProp(this.model) : null);
       timeBuildSpan('view-part:materials', () =>
         applyMaterials(
           this.model,
@@ -945,8 +960,14 @@ export class CharacterVisual {
 
       const mixerStarted = performance.now();
       this.mixer = new THREE.AnimationMixer(this.model);
+      this.castLocomotion = new CastLocomotion(this.model, prep.clips, this.def);
       this.skeletonUpdates = new SkeletonUpdateCache(this.model);
-      for (const name of [...clipNamesOf(prep.def), ...SKIN_ATTACK_CLIP_NAMES]) {
+      for (const name of [
+        ...clipNamesOf(prep.def),
+        ...SKIN_ATTACK_CLIP_NAMES,
+        ...SIGNATURE_CLIP_NAMES,
+        ...Array.from(prep.clips.keys()).filter((name) => name.startsWith('Signature_')),
+      ]) {
         const clip = prep.clips.get(name);
         if (clip) this.actions.set(name, this.mixer.clipAction(clip));
       }
@@ -999,6 +1020,7 @@ export class CharacterVisual {
   /** `animate=false` skips mixer integration (distance throttling); state
    *  edges still latch so the pose catches up when the entity nears. */
   update(dt: number, s: AnimState, animate: boolean, reducedMotion = false): void {
+    if (this.surfaceResponse.update(dt, this.root, this.height)) this.applyVisualMaterials();
     // A transparent effect whose clones finished linking: swap them in HERE,
     // on the per-frame path, never in the gate callback (see effectSwapSettled).
     if (this.effectSwapSettled) this.commitPendingEffectSwap();
@@ -1118,6 +1140,13 @@ export class CharacterVisual {
               ? this.def.clips.castTimeScaleByAbility?.[this.castingAbility]
               : undefined) ?? 1;
           this.current.timeScale = castScale;
+          if (this.current.getClip().name.startsWith('Signature_Hold_')) {
+            this.current.timeScale = 1;
+            if (this.current.time >= SIGNATURE_HOLD_POINT) {
+              this.current.time = SIGNATURE_HOLD_POINT;
+              this.current.paused = true;
+            }
+          }
           const holdPoint = this.def.clips.castHoldPointSeconds;
           const genericCast = this.action(this.def.clips.cast);
           // The freeze covers ONLY the generic cast clip: a per-ability
@@ -1200,15 +1229,17 @@ export class CharacterVisual {
     // windup lean/recoil spring: while fed (setWindupLean each ceremony frame)
     // the body eases back toward the target; when feeding stops (the release)
     // it snaps forward through a small recoil, then settles to neutral
-    if (this.leanFeed > 0) {
+    if (reducedMotion || s.dead) {
+      this.lean = this.leanFeed = this.leanRecoil = this.leanTarget = this.holdT = 0;
+    } else if (this.leanFeed > 0) {
       this.leanFeed -= dt;
-      this.lean += (this.leanTarget - this.lean) * Math.min(1, dt * 10);
+      this.lean += (this.leanTarget - this.lean) * (1 - Math.exp(-Math.max(0, dt) * 10));
       if (this.leanFeed <= 0) this.leanRecoil = LEAN_RECOIL_S;
     } else if (this.leanRecoil > 0) {
       this.leanRecoil -= dt;
-      this.lean += (-this.leanTarget * 0.45 - this.lean) * Math.min(1, dt * 22);
+      this.lean += (-this.leanTarget * 0.45 - this.lean) * (1 - Math.exp(-Math.max(0, dt) * 22));
     } else if (this.lean !== 0) {
-      this.lean += -this.lean * Math.min(1, dt * 9);
+      this.lean += -this.lean * (1 - Math.exp(-Math.max(0, dt) * 9));
       if (Math.abs(this.lean) < 1e-3) this.lean = 0;
     }
     // Ledge climb rides the SAME pose channels rather than fighting them:
@@ -1264,6 +1295,7 @@ export class CharacterVisual {
       // and frozen times are mixer INPUTS, unlike the additive lifts below).
       this.driveClimbClips();
       this.updateMixer(animationDt);
+      this.castLocomotion?.update(animationDt, s);
       // Held props with their own looping clip (the Ignivar legendaries'
       // engine idles) advance on the same hitstop-aware dt as the rig.
       // Gated on the far mesh ACTUALLY standing in, like updateWeaponVfx:
@@ -1672,16 +1704,25 @@ export class CharacterVisual {
   get isMidOneShot(): boolean {
     return this.currentIsOneShot;
   }
+  get isPerformingAbility(): boolean {
+    return this.currentIsOneShot && this.current?.getClip().name.startsWith('Signature_') === true;
+  }
 
   /** A channel-start event can arrive just before its authoritative entity
    * snapshot. Enter the looping cast pose immediately and interrupt any short
    * projectile one-shot that would otherwise mask the first part of the channel. */
-  beginCastChannel(): void {
+  beginCastChannel(abilityId?: string): void {
     if (this.deadLock) return;
     this.baseState = 'cast';
+    this.castLocomotion?.restart();
+    if (abilityId) this.castingAbility = abilityId;
+    this.castClipAbility = this.castingAbility;
     this.currentIsOneShot = false;
     this.currentOneShotIsEmote = false;
-    this.fadeTo(this.action(this.def.clips.cast) ?? this.action(this.def.clips.idle), FADE, false);
+    const action = this.baseAction();
+    // A queued cast can use the same ID and cached clip as its predecessor.
+    if (action === this.current) action?.reset();
+    this.fadeTo(action, FADE, false);
   }
 
   /** An authored per-ability one-shot exists on this rig (attackByAbility
@@ -1689,12 +1730,20 @@ export class CharacterVisual {
    *  cast gestures on this, so a heal/blessing cue can never fall back to a
    *  weapon swing on a rig without the authored clip. */
   hasAttackClipOverride(abilityId: string): boolean {
+    if (this.action(signatureClipName(abilityId))) return true;
     const override = this.def.clips.attackByAbility?.[abilityId];
     return override !== undefined && this.action(override) !== null;
   }
 
   playAttack(abilityId?: string): void {
     if (this.deadLock) return;
+    if (abilityId === 'fire_blast' && this.castingAbility && this.castLocomotion?.triggerFlick()) return;
+    const signature = abilityId ? signatureClipName(abilityId) : null;
+    if (signature && this.action(signature)) {
+      this.playOneShot(signature, 1);
+      this.currentOneShotIsAttack = true;
+      return;
+    }
     // Resolved against THIS rig's bound clips: a rig without the substitute
     // (every body but the hunter) keeps its own authored attack instead of
     // swinging with no animation at all.
@@ -1707,7 +1756,7 @@ export class CharacterVisual {
     // melee abilities (raptor_strike, mongoose_bite, wing_clip) play a
     // bespoke Hunter_Melee_* swing regardless of a displayed bow, since a bow
     // skin never changes how a melee hit is thrown, and the self-buff aspect
-    // toggles / Fevered Draw (rapid_fire) play the class's own baked
+    // toggles play the class's own baked
     // Spellcast_Raise raise/buff ceremony through this same playAttack path
     // (the ability-VFX painter triggers non-contact authored gestures here
     // too), never a draw-shot. Both are identified by their clip-name
@@ -1757,7 +1806,7 @@ export class CharacterVisual {
   }
 
   playHit(): void {
-    if (this.deadLock || this.currentIsOneShot || this.hitCooldown > 0) return;
+    if (this.deadLock || this.castingAbility || this.currentIsOneShot || this.hitCooldown > 0) return;
     const clips = this.def.clips.hit;
     if (!clips || clips.length === 0) return;
     this.hitCooldown = HIT_REACT_COOLDOWN;
@@ -1770,7 +1819,8 @@ export class CharacterVisual {
    *  post-hold refractory swallows rapid re-triggers, so stacking strikes can
    *  never chain the rig into visible slow motion. */
   holdFrame(scale: number, dur: number): void {
-    if (this.deadLock || dur <= 0) return;
+    if (this.deadLock || !Number.isFinite(scale) || !Number.isFinite(dur) || dur <= 0) return;
+    dur = Math.min(0.16, dur);
     if (this.holdT > 0) {
       this.holdT = Math.max(this.holdT, dur);
       this.holdScale = Math.min(this.holdScale, Math.max(0.02, scale));
@@ -1786,7 +1836,7 @@ export class CharacterVisual {
    *  stops (the release moment) the spring snaps through a small forward
    *  recoil back to neutral. Rig-group rotation only, no bone surgery. */
   setWindupLean(amount: number): void {
-    if (this.deadLock) return;
+    if (this.deadLock || !Number.isFinite(amount)) return;
     this.leanTarget = -Math.min(LEAN_MAX_RAD, Math.max(0, amount));
     this.leanFeed = LEAN_FEED_S;
   }
@@ -2078,6 +2128,11 @@ export class CharacterVisual {
     this.gateFarMint();
   }
 
+  /** Actual shown body, after the far-mesh compile/reveal gate has settled. */
+  get displayedFarBody(): THREE.Object3D | null {
+    return this.farMesh?.visible ? this.farMesh : null;
+  }
+
   get isFar(): boolean {
     return this.far;
   }
@@ -2102,6 +2157,15 @@ export class CharacterVisual {
     if (on !== wasOn) this.applyVisualMaterials();
     if (!on) return;
     for (const glow of this.auraGlowMaterials.values()) this.writeAuraGlow(glow);
+  }
+  respondToElement(school: string, strength = 0.75, contact?: MeleeImpactProfile): void {
+    if (this.disposed || this.deadLock) return;
+    if (this.surfaceResponse.trigger(school, strength, contact)) this.applyVisualMaterials();
+  }
+  clearElementResponse(): void {
+    const active = this.surfaceResponse.active;
+    this.surfaceResponse.clear();
+    if (active && !this.disposed) this.applyVisualMaterials();
   }
 
   private writeAuraGlow(material: THREE.Material): void {
@@ -2264,8 +2328,8 @@ export class CharacterVisual {
 
   /**
    * The clone/source-mesh pairs this effect state would mount whose program is
-   * not known linked yet. Only clones that flip `transparent` qualify: every
-   * other overlay (ferocity, ascension, rune tint, aura glow) keeps the source's
+   * not known linked yet. Transparency and the marked surface-response shader
+   * qualify. The other overlays (ferocity, ascension, rune tint, aura glow) keep the source's
    * program cache key through cloneMaterialWithHooks, so it costs no link and
    * must not be delayed. Empty without a gate, which keeps previews, tests and
    * hosts with no async compile on the immediate path.
@@ -2286,7 +2350,11 @@ export class CharacterVisual {
     const consider = (mesh: THREE.Mesh | null, source: THREE.Material): void => {
       if (!mesh?.geometry) return;
       const next = this.effectSingleMaterial(source);
-      if (next === source || next.transparent === source.transparent) return;
+      if (
+        next === source ||
+        (next.transparent === source.transparent && !next.userData[SURFACE_RESPONSE_PROGRAM])
+      )
+        return;
       if (this.linkedEffectMaterials.has(next)) return;
       staged.push({ source: mesh, material: next });
     };
@@ -2682,6 +2750,7 @@ export class CharacterVisual {
    *  re-pin skin orientation, re-run the material pass, re-snapshot originals,
    *  and rebuild the skin VFX on the payloads that now exist. */
   private finishWeaponAttach(payloads: THREE.Object3D[]): void {
+    this.actionProps?.refresh();
     for (const payload of payloads) configureTightBoneTextures(payload);
     // Ranged skins take a root-relative orientation pin (position always rides
     // the hand): a bow aims upright WHILE the shot one-shot plays (the string
@@ -3059,6 +3128,7 @@ export class CharacterVisual {
       this.moonkinMaterials,
       this.runeTintMaterials,
       this.auraGlowMaterials,
+      this.surfaceResponse.materials,
     ]);
   }
 
@@ -3075,6 +3145,7 @@ export class CharacterVisual {
       ...this.ascensionMaterials.values(),
       ...this.runeTintMaterials.values(),
       ...this.auraGlowMaterials.values(),
+      ...this.surfaceResponse.materials.values(),
     ]);
     for (const material of materials) material.dispose();
     this.ghostMaterials.clear();
@@ -3085,6 +3156,7 @@ export class CharacterVisual {
     this.ascensionMaterials.clear();
     this.runeTintMaterials.clear();
     this.auraGlowMaterials.clear();
+    this.surfaceResponse.materials.clear();
   }
 
   /** Move every held prop between the hands and the sheathed on-back pose (the
@@ -3182,6 +3254,7 @@ export class CharacterVisual {
   }
 
   dispose(): void {
+    this.actionProps?.restore();
     this.disposed = true;
     disposeHeldPropIdles(this.model);
     this.bastionSweepFx?.dispose();
@@ -3274,6 +3347,7 @@ export class CharacterVisual {
   }
 
   private updateMixer(dt: number): void {
+    this.castLocomotion?.restore();
     this.mixer.update(dt);
     this.skeletonUpdates.markPoseChanged();
   }
@@ -3317,6 +3391,7 @@ export class CharacterVisual {
     if (this.ferocityStage > 0) return this.ferocityMaterial(material, this.ferocityStage);
     if (this.ascended) return this.ascensionMaterial(material);
     if (this.runeTint !== null) return this.runeTintMaterial(material, this.runeTint);
+    if (this.surfaceResponse.active) return this.surfaceResponse.material(material);
     // lowest priority: the ability VFX buff/cast body glow
     if (this.auraGlowIntensity > 0.01) return this.auraGlowMaterial(material);
     return material;
@@ -3377,12 +3452,9 @@ export class CharacterVisual {
   }
 
   private ghostMaterial(material: THREE.Material): THREE.Material {
-    const opacity = ghostEffectOpacity(this.ghostStyle);
     const cached = this.ghostMaterials.get(material);
     if (cached) {
-      // one cache serves both flavors; rewrite the opacity on style flips
-      // (stealth -> die -> ghost run reuses the same clones)
-      cached.opacity = opacity;
+      applyGhostEffectStyle(cached, material, this.ghostStyle);
       return cached;
     }
     const ghost = createGhostEffectMaterial(material, this.ghostStyle);
@@ -3456,6 +3528,8 @@ export class CharacterVisual {
         // every other weapon keeps the rig's authored cast.
         return (
           this.action(weaponSkinCastClip(this.weaponSkinId, this.castingAbility) ?? undefined) ??
+          this.action(this.castingAbility ? 'Signature_Channel_' + this.castingAbility : undefined) ??
+          this.action(this.castingAbility ? signatureHoldName(this.castingAbility) : undefined) ??
           this.action(this.castingAbility ? c.castByAbility?.[this.castingAbility] : undefined) ??
           this.action(c.cast) ??
           this.action(c.idle)
@@ -3547,6 +3621,7 @@ export class CharacterVisual {
     prev: THREE.AnimationAction | null,
     fade: number,
   ): void {
+    this.actionProps?.action(next.getClip().name);
     // A transition can interrupt a crossfade still in flight (the stow gesture
     // racing the waterline's base-state edge is the common case: auto-sheathe
     // fires the moment the swim latch flips). The action that was FADING IN at

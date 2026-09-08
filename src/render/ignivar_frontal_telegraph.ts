@@ -3,6 +3,8 @@
 
 import * as THREE from 'three';
 import { IGNIVAR_FRONTAL_HALF_ANGLE, IGNIVAR_FRONTAL_RANGE } from '../sim/ignivar_arena';
+import { addTelegraphContrast } from './telegraph_contrast';
+import { attachTelegraphHeat, setTelegraphHeatTime } from './telegraph_heat';
 
 export const IGNIVAR_FRONTAL_VISUAL_NAME = 'ignivarFrontalTelegraph';
 export const IGNIVAR_FRONTAL_FILL_NAME = 'ignivarFrontalFill';
@@ -163,6 +165,7 @@ export function buildIgnivarFrontalTelegraph(): THREE.Group {
   );
   fill.name = IGNIVAR_FRONTAL_FILL_NAME;
   fill.renderOrder = 2;
+  attachTelegraphHeat(fill.material);
   const border = new THREE.Mesh(borderGeometry(), material(0xff9b2f, 0.88));
   border.name = IGNIVAR_FRONTAL_BORDER_NAME;
   border.renderOrder = 4;
@@ -174,6 +177,7 @@ export function buildIgnivarFrontalTelegraph(): THREE.Group {
   flameCurtains.renderOrder = 6;
 
   root.add(fill, heatBands, border, flameCurtains);
+  addTelegraphContrast(root, fill, border);
   root.visible = false;
   return root;
 }
@@ -184,6 +188,7 @@ export function syncIgnivarFrontalTelegraph(
   progress: number,
   inverseEntityScale: number,
   dt: number,
+  reducedMotion = false,
 ): void {
   root.visible = visible;
   root.scale.setScalar(inverseEntityScale);
@@ -191,14 +196,18 @@ export function syncIgnivarFrontalTelegraph(
   if (!visible) return;
   root.userData.elapsed = Number(root.userData.elapsed ?? 0) + Math.max(0, dt);
   const clamped = root.userData.progress as number;
-  const pulse = 0.5 + Math.sin(Number(root.userData.elapsed) * (5 + clamped * 5)) * 0.5;
+  const motionTime = reducedMotion ? 0 : Number(root.userData.elapsed);
+  const pulse = 0.5 + Math.sin(motionTime * (5 + clamped * 5)) * 0.5;
   const fill = root.getObjectByName(IGNIVAR_FRONTAL_FILL_NAME) as THREE.Mesh | undefined;
   const border = root.getObjectByName(IGNIVAR_FRONTAL_BORDER_NAME) as THREE.Mesh | undefined;
   const heatBands = root.getObjectByName(IGNIVAR_FRONTAL_HEAT_BANDS_NAME) as THREE.Mesh | undefined;
   const flameCurtains = root.getObjectByName(IGNIVAR_FRONTAL_FLAME_CURTAINS_NAME) as
     | THREE.Mesh
     | undefined;
-  if (fill) (fill.material as THREE.Material).opacity = 0.2 + clamped * 0.16;
+  if (fill) {
+    (fill.material as THREE.Material).opacity = 0.2 + clamped * 0.16;
+    setTelegraphHeatTime(fill.material as THREE.Material, motionTime);
+  }
   if (border) (border.material as THREE.Material).opacity = 0.88 + clamped * 0.1;
   if (heatBands) {
     (heatBands.material as THREE.Material).opacity = 0.34 + clamped * 0.22 + pulse * 0.08;

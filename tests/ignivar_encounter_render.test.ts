@@ -46,7 +46,12 @@ import {
   IGNIVAR_FORGE_WAVE_VISUAL_NAME,
   IGNIVAR_FORGE_WAVE_WALL_NAME,
 } from '../src/render/ignivar_forge_wave';
-import { IGNIVAR_FRONTAL_FILL_NAME } from '../src/render/ignivar_frontal_telegraph';
+import {
+  IGNIVAR_FRONTAL_BORDER_NAME,
+  IGNIVAR_FRONTAL_FILL_NAME,
+  IGNIVAR_FRONTAL_FLAME_CURTAINS_NAME,
+  IGNIVAR_FRONTAL_HEAT_BANDS_NAME,
+} from '../src/render/ignivar_frontal_telegraph';
 import {
   attachIgnivarModelVfx,
   IGNIVAR_CHEST_FIRE_NAME,
@@ -582,8 +587,23 @@ describe('Ignivar encounter renderer', () => {
   });
 
   it('builds explicit cone and personal-space telegraphs', () => {
-    expect(buildIgnivarFrontalTelegraph().name).toBe(IGNIVAR_FRONTAL_VISUAL_NAME);
-    expect(buildIgnivarFrontalTelegraph().children).toHaveLength(4);
+    const frontal = buildIgnivarFrontalTelegraph();
+    expect(frontal.name).toBe(IGNIVAR_FRONTAL_VISUAL_NAME);
+    expect(frontal.children.map((child) => child.name)).toEqual([
+      IGNIVAR_FRONTAL_FILL_NAME,
+      IGNIVAR_FRONTAL_HEAT_BANDS_NAME,
+      IGNIVAR_FRONTAL_BORDER_NAME,
+      IGNIVAR_FRONTAL_FLAME_CURTAINS_NAME,
+      `${IGNIVAR_FRONTAL_FILL_NAME}Contrast`,
+    ]);
+    const frontalFill = frontal.getObjectByName(IGNIVAR_FRONTAL_FILL_NAME) as THREE.Mesh;
+    const contrast = frontal.getObjectByName(`${IGNIVAR_FRONTAL_FILL_NAME}Contrast`) as THREE.Mesh;
+    const frontalBorder = frontal.getObjectByName(IGNIVAR_FRONTAL_BORDER_NAME) as THREE.Mesh;
+    expect(contrast.geometry.getAttribute('position').array).toEqual(
+      frontalFill.geometry.getAttribute('position').array,
+    );
+    expect(contrast.position.y).toBeCloseTo(frontalFill.position.y - 0.001);
+    expect((frontalBorder.material as THREE.Material).blending).toBe(THREE.NormalBlending);
     expect(buildIgnivarBrandCircle().name).toBe(IGNIVAR_BRAND_VISUAL_NAME);
     expect(buildIgnivarBrandCircle().children).toHaveLength(5);
     const skyfire = buildIgnivarSkyfireTelegraph();

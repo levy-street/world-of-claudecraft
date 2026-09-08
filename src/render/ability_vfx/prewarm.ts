@@ -19,8 +19,19 @@
 // first real spawn. Renderer.prewarmInitialScene turns these steps into
 // PrewarmResumeUnits (see prewarm_resume.ts).
 
-import type * as THREE from 'three';
+import * as THREE from 'three';
+import { HunterShellskinVisual, shellskinMaterial } from '../hunter_shellskin_visual';
+import { hunterTrapMaterial } from '../hunter_trap_geometry';
+import { HunterTrapVisuals } from '../hunter_trap_visual';
+import { SupportRecipientVisual } from '../support_recipient_visual';
+import { PaladinAegisVisual } from '../paladin_aegis_visual';
+import { RuneOfPowerVisual } from '../rune_of_power_visual';
+import { syncPaladinAvengingWrathVisual } from '../paladin_avenging_wrath_visual';
+import { CONTACT_SHEETS, contactTexture } from './contact_assets';
 import { abilityVfxTextures, FLIPBOOK_STYLES, flipbookSheet } from './fx_textures';
+import { bakedTexture } from './production_assets';
+import { signatureTexture } from './signature_texture';
+import { liquidSurfaceMaps } from './simulation_assets';
 
 export interface AbilityVfxPrewarmTextureStep {
   id: string;
@@ -31,6 +42,78 @@ export interface AbilityVfxPrewarmTextureStep {
 export interface AbilityVfxCompileTarget {
   id: string;
   object: THREE.Object3D;
+}
+
+// Retain one invisible set so its linked programs stay cached between casts.
+let persistentWarm: THREE.Group | null = null;
+const shellskinWarmVariants = new Map<string, HunterShellskinVisual>();
+const trapWarmVariants = new Map<string, HunterTrapVisuals>();
+export function persistentClassVfxPrewarmGroup(): THREE.Group {
+  persistentClassVfxCompileTargets();
+  if (!persistentWarm) throw new Error('Persistent class prewarm group was not prepared');
+  persistentWarm.visible = false;
+  return persistentWarm;
+}
+export function persistentClassVfxCompileTargets(): AbilityVfxCompileTarget[] {
+  if (!persistentWarm) {
+    persistentWarm = new THREE.Group();
+    persistentWarm.add(new PaladinAegisVisual().group);
+    const recipient = new SupportRecipientVisual();
+    recipient.update(7, 1.8, null);
+    persistentWarm.add(recipient.group);
+    const rune = new RuneOfPowerVisual();
+    rune.sync({ id: 'prewarm', sourceId: 1, disposition: 'eligible', x: 0, z: 0,
+      radius: 8, duration: 15, remaining: 15 }, () => 0);
+    persistentWarm.add(rune.group);
+    syncPaladinAvengingWrathVisual(null, persistentWarm, 1.8, true, 0, true);
+  }
+  // surfaceMat has distinct Standard/Lambert variants. Prepare the active
+  // variant on every renderer entry, retaining already warmed variants.
+  const carapaceMaterial = shellskinMaterial();
+  const previous = shellskinWarmVariants.get(carapaceMaterial.type);
+  if (previous?.plates.material !== carapaceMaterial) {
+    previous?.dispose();
+    const hunter = new HunterShellskinVisual();
+    hunter.update(
+      { id: 'shellskin', kind: 'shield_wall', value: 0.6, remaining: 7, duration: 8 },
+      1.8,
+      null,
+    );
+    persistentWarm.add(hunter.group);
+    shellskinWarmVariants.set(carapaceMaterial.type, hunter);
+  }
+  const targets: AbilityVfxCompileTarget[] = [];
+  const trapMaterial = hunterTrapMaterial();
+  const previousTrap = trapWarmVariants.get(trapMaterial.type);
+  if (previousTrap?.jaws.material !== trapMaterial) {
+    previousTrap?.dispose();
+    const trap = new HunterTrapVisuals(persistentWarm, () => 0);
+    trap.sync([
+      {
+        id: 'prewarm',
+        sourceId: 1,
+        abilityId: 'frostjaw_trap',
+        x: 0,
+        z: 0,
+        radius: 4,
+        duration: 30,
+        remaining: 29,
+        armTime: 0.75,
+        armRemaining: 0,
+      },
+    ]);
+    trapWarmVariants.set(trapMaterial.type, trap);
+  }
+  const keys = new Set<string>();
+  persistentWarm.traverse((object) => {
+    const mesh = object as THREE.Mesh;
+    if (!mesh.material || Array.isArray(mesh.material)) return;
+    const key = `${object.type}:${!!(mesh as THREE.InstancedMesh).isInstancedMesh}:${!!(mesh as THREE.InstancedMesh).instanceColor}:${programIdentity(mesh.material)}`;
+    if (keys.has(key)) return;
+    keys.add(key);
+    targets.push({ id: `class-state-prepared:${targets.length}`, object });
+  });
+  return targets;
 }
 
 /**
@@ -44,6 +127,37 @@ export function abilityVfxTexturePrewarmSteps(): AbilityVfxPrewarmTextureStep[] 
     id: `flipbook:${style}`,
     build: () => [flipbookSheet(style)],
   }));
+  for (const kind of CONTACT_SHEETS)
+    steps.push({
+      id: kind,
+      build: () => {
+        const texture = contactTexture(kind);
+        return texture ? [texture] : [];
+      },
+    });
+  steps.push({
+    id: 'signature-atlas',
+    build: () => {
+      const texture = signatureTexture();
+      return texture ? [texture] : [];
+    },
+  });
+  for (const key of ['normal', 'motion', 'lighting'] as const)
+    steps.push({
+      id: `liquid-surface:${key}`,
+      build: () => {
+        const maps = liquidSurfaceMaps();
+        return maps ? [maps[key]] : [];
+      },
+    });
+  for (const kind of ['smoke', 'shockwave', 'pyroblast', 'frost_nova', 'chain_heal'] as const)
+    steps.push({
+      id: `production:${kind}`,
+      build: () => {
+        const texture = bakedTexture(kind);
+        return texture ? [texture] : [];
+      },
+    });
   steps.push({
     id: 'shared-canvases',
     // ~140 KB of small canvases built in one memoized call, so they stay one

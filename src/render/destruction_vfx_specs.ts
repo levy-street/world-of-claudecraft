@@ -363,9 +363,9 @@ export const RAIN_OF_FIRE_VFX_FULL_SPEC = {
   screenFx: true,
   linger: 5.8,
   impact: {
-    flipbook: true,
+    flipbook: false,
     ring: 1.7,
-    vRing: 1.25,
+    vRing: false,
     sparks: 50,
     debris: true,
     smoke: true,

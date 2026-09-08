@@ -2,6 +2,9 @@
 // full-body one-shot keep ownership of the rig while ordinary melee damage is
 // still allowed to resolve underneath them.
 
+import { isBleedContinuation } from '../melee_impact_core';
+import { attackAbilityId } from './weapon_attack_style_core';
+import { hunterPetComponent } from '../hunter_pet_component_core';
 import { playerRangedAttackAlreadyStarted } from './skin_attack';
 
 export interface DamageAttackAnimationContext {
@@ -17,13 +20,19 @@ export function shouldStartDamageAttackAnimation({
   castingAbility,
   authoredCastOwnsBody,
 }: DamageAttackAnimationContext): boolean {
-  if (playerRangedAttackAlreadyStarted(sourceKind, attackAnimationStarted)) return false;
-  return !(sourceKind === 'mob' && castingAbility !== null && authoredCastOwnsBody);
+  if (playerRangedAttackAlreadyStarted(sourceKind, attackAnimationStarted))
+    return false;
+  return !(
+    sourceKind === 'mob' &&
+    castingAbility !== null &&
+    authoredCastOwnsBody
+  );
 }
 
 /** A character visual's authored-clip lookup (CharacterVisual, structurally). */
 export interface AttackClipOverrideSource {
   hasAttackClipOverride(abilityId: string): boolean;
+  readonly isPerformingAbility?: boolean;
 }
 
 /**
@@ -36,7 +45,25 @@ export function damageEventStartsAttackAnimation(
   source: { kind: string; castingAbility?: string | null } | undefined,
   sourceVisual: AttackClipOverrideSource | null,
   attackAnimationStarted: boolean | undefined,
+  abilityLabel?: string | null,
+  primaryAbilityId?: string | null,
 ): boolean {
+  if (!abilityLabel && !primaryAbilityId && sourceVisual?.isPerformingAbility) return false;
+  if (
+    isBleedContinuation(attackAbilityId(abilityLabel ?? null), primaryAbilityId)
+  )
+    return false;
+  if (
+    !primaryAbilityId &&
+    [
+      'Hunting Momentum',
+      'Bloodhook Re-entry',
+      'Bloodhook Wound',
+      'Woundrend',
+    ].includes(abilityLabel ?? '')
+  )
+    return false;
+  if (hunterPetComponent(abilityLabel)) return false;
   const authoredCastOwnsBody =
     source?.kind === 'mob' &&
     source.castingAbility !== null &&

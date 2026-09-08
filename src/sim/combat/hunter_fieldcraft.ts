@@ -138,6 +138,10 @@ export function finishBloodhook(
     pending.value3 ?? 12,
     pending.tickInterval ?? 3,
   );
+  // Presentation-only primary arrival. The wound can replace an existing
+  // bleed, and the whole dash can resolve between renderer snapshots.
+  ctx.emit({ type: 'spellfx', sourceId: hunter.id, targetId: target.id,
+    school: 'physical', fx: 'dotApply', ability: 'bloodhook' });
   const bloodtrail = hunter.auras.some((aura) => aura.kind === 'hunter_bloodtrail');
   if (bloodtrail) {
     const nearby = ctx

@@ -93,6 +93,11 @@ and never reaches the sequencer.
 
 Verification: `scripts/ability_vfx_probe.mjs` (dev server + headless browser)
 asserts every spec'd ability clears its per-archetype primitive bar in the
-real client via the dev-only `window.__game.abilityVfxStats` hook. All
+real client via the dev-only `window.__game.abilityVfxStats` hook. Most
 materials are additive with depth-write off; no new post-processing: HDR
 multipliers ride the existing composer bloom exactly like `../vfx.ts`.
+
+`water_volumes.ts` is the bounded normal-alpha liquid exception: one instanced
+draw, twelve slots, spawn-time attribute uploads and uniform-only animation.
+It is tagged for the existing compile-target discovery and included in boot
+prewarm, clear and dispose. No new post-processing or runtime texture loads.

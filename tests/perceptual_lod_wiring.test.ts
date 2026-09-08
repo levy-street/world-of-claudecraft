@@ -2,7 +2,17 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 const foliage = readFileSync(new URL('../src/render/foliage.ts', import.meta.url), 'utf8');
-const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+const coordinator = readFileSync(
+  new URL('../src/render/renderer.ts', import.meta.url),
+  'utf8',
+).replaceAll('\r\n', '\n');
+// Keep both prewarm and live-update consumers in the count after extraction.
+const renderer =
+  coordinator +
+  '\n' +
+  readFileSync(new URL('../src/render/renderer_scenery.ts', import.meta.url), 'utf8')
+    .replaceAll('\r\n', '\n')
+    .replace(/\bhost\./g, 'this.');
 
 describe('perceptual scenery LOD production wiring', () => {
   it('changes grass density through existing instance counts without runtime uploads', () => {
@@ -29,6 +39,9 @@ describe('perceptual scenery LOD production wiring', () => {
   });
 
   it('routes the live projection only through the scenery flame helper', () => {
+    expect(coordinator).toContain(
+      'updateRendererScenery(this, p, dt, projectionPixels, worldPhaseMs, worldStart)',
+    );
     expect(renderer).toContain('this.camera.projectionMatrix.elements[5]');
     expect(
       renderer.match(
@@ -38,7 +51,7 @@ describe('perceptual scenery LOD production wiring', () => {
     expect(renderer).toContain('const state = updateSceneryFlame(');
     expect(renderer).toContain('if (state.emitsEmber) this.vfx.campfireEmber');
     expect(renderer).not.toContain('animCadenceFrames(projectionPixels');
-    const foliageCalls = [...renderer.matchAll(/this\.foliage\.update\(([\s\S]*?)\n {4}\);/g)];
+    const foliageCalls = [...renderer.matchAll(/this\.foliage\.update\(([\s\S]*?)\n\s*\);/g)];
     expect(foliageCalls).toHaveLength(2);
     for (const call of foliageCalls) {
       expect(call[1]).toMatch(/this\.lastRequestedFogFar,\s*projectionPixels,\s*dt,/);

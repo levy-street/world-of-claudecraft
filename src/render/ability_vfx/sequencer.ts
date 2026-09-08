@@ -10,6 +10,22 @@ import {
   STUN_STAR_RATE,
   STUN_STAR_SIZE,
 } from '../ability_vfx_core';
+import { drawThroatWire } from './action_contact';
+import { classRelease, hasClassCast } from './cast_language';
+import { drawBuffCeremony, drawHealingCeremony } from './ceremonies';
+import { kitContact } from './kit_contact';
+import {
+  physicalFollowThrough,
+  physicalImpact,
+  physicalRelease,
+  physicalTravel,
+} from './physical_choreography';
+import type { BakedKind, FragmentKind } from './production_assets';
+import { ritualFollowThrough, ritualImpact, ritualRelease } from './ritual_choreography';
+import { signatureMoment } from './signature_choreography';
+import type { Substance } from './signature_core';
+import { SIGNATURE_ABILITIES, SIGNATURE_CONTACT_TIME } from './signature_core';
+import type { CrestKind } from './signature_shapes';
 import { SPECTACLE, usesCrescendoScale } from './spectacle';
 
 // The archetype sequencer, ported from the gallery interpreters
@@ -49,6 +65,79 @@ export interface SeqPoint {
 
 // The host surface fx.ts implements: every primitive the sequences drive.
 export interface SequencerHost {
+  handPoint?(id: number, hand: 0 | 1, out: SeqPoint): SeqPoint | null;
+  contact?(sourceId: number, targetId: number, school: string, weight: number, abilityId?: string, beat?: number): void;
+  facingAt?(id: number): number | null;
+  weaponTrail?(id: number, hand: 0 | 1, color: number, width: number, duration: number): void;
+  elementalImpact?(
+    id: string,
+    spec: AbilityVfxFullSpec,
+    at: SeqPoint,
+    tier: number,
+    colour: number,
+    accent: number,
+    dx: number,
+    dz: number,
+  ): number;
+  presentationMoment?(id: string, phase: 'release' | 'impact', sourceId: number): void;
+  bakedAt?(
+    kind: BakedKind,
+    x: number,
+    y: number,
+    z: number,
+    size: number,
+    tint: number,
+    hot: number,
+    duration: number,
+    delay: number,
+    heat: number,
+    angle?: number,
+  ): void;
+  fragmentsAt?(
+    kind: FragmentKind,
+    x: number,
+    y: number,
+    z: number,
+    tint: number,
+    count: number,
+    power: number,
+    dx: number,
+    dz: number,
+    duration?: number,
+  ): void;
+  residueAt?(x: number, z: number, radius: number, tint: number, substance: Substance): void;
+  worldLightAt?(
+    x: number,
+    y: number,
+    z: number,
+    palette: string,
+    intensity: number,
+    duration: number,
+  ): void;
+  detailAt?(
+    x: number,
+    y: number,
+    z: number,
+    size: number,
+    tint: number,
+    accent: number,
+    substance: Substance,
+    delay?: number,
+    duration?: number,
+  ): void;
+  crestAt?(
+    x: number,
+    y: number,
+    z: number,
+    radius: number,
+    height: number,
+    tint: number,
+    accent: number,
+    substance: CrestKind,
+    angle?: number,
+    duration?: number,
+    pitch?: number,
+  ): void;
   /** Resolve an entity anchor. Pass `out` from a per-frame path to fill a
    *  caller-owned point instead of allocating (see src/render/vfx_anchor.ts);
    *  the reading is only valid until that scratch is reused. */
@@ -73,6 +162,9 @@ export interface SequencerHost {
     colorHex: number,
     sheet: string,
     hdr: number,
+    duration?: number,
+    rotation?: number,
+    aspect?: number,
   ): void;
   pillarAt(
     x: number,
@@ -92,6 +184,7 @@ export interface SequencerHost {
     count: number,
     power: number,
     kind: 'sparks' | 'embers' | 'debris' | 'smoke' | 'blood',
+    duration?: number,
   ): void;
   pulseLight(
     entityId: number,
@@ -127,11 +220,22 @@ export interface SequencerHost {
     style: string,
     scale?: number,
   ): void;
+  waterVolume?(
+    from: SeqPoint,
+    to: SeqPoint,
+    tint: number,
+    accent: number,
+    width: number,
+    duration?: number,
+  ): void;
+  tetherRibbon?(color: number, width: number, life: number,
+    fill: (pts: {set(x:number,y:number,z:number):unknown}[])=>number): void;
   pathRibbon(
     colorHex: number,
     width: number,
     life: number,
     fill: (pts: { set(x: number, y: number, z: number): unknown }[]) => number,
+    brushed?: boolean,
   ): void;
   pushOverlay(
     x: number,
@@ -224,6 +328,7 @@ interface Beat {
 }
 
 export interface SeqSlot {
+  physicalSecondary: boolean;
   active: boolean;
   abilityId: string;
   casterId: number;
@@ -260,6 +365,8 @@ export interface SeqSlot {
   afterglowUntil: number;
   afterglowTimer: number;
   afterglowSpan: number;
+  sourceX: number;
+  sourceZ: number;
   // impact anchor captured at impact time (world point)
   ix: number;
   iy: number;
@@ -316,6 +423,10 @@ const SHEET_BY_PALETTE: Record<string, string> = {
 };
 
 export class ArchetypeSequencer {
+  cancelOwned(casterId: number, abilityId: string): void {
+    for (const slot of this.slots)
+      if (slot.casterId === casterId && slot.abilityId === abilityId) slot.active = false;
+  }
   private slots: SeqSlot[] = [];
   private beats: Beat[] = [];
 
@@ -341,6 +452,7 @@ export class ArchetypeSequencer {
     }
     for (let i = 0; i < SEQ_SLOTS; i++) {
       this.slots.push({
+        physicalSecondary: false,
         active: false,
         abilityId: '',
         casterId: 0,
@@ -353,7 +465,9 @@ export class ArchetypeSequencer {
         power: 1,
         releaseAt: 0,
         releaseDone: true,
-        impactAt: 0.15,
+        sourceX: 0,
+        sourceZ: 0,
+        impactAt: SIGNATURE_CONTACT_TIME,
         impactDone: false,
         flip2At: 0,
         flip2Done: true,
@@ -401,7 +515,18 @@ export class ArchetypeSequencer {
     windupDelay = 0,
     at?: { x: number; y: number; z: number },
   ): SeqSlot | null {
-    if (tier >= 2) return null;
+    if (tier >= 2 || spec.presentation) return null;
+    // One simulation cast can emit several damage components or hit several
+    // victims in the same tick. Weapon motion belongs to that cast once.
+    const owned = !!(spec.physical || spec.ritual);
+    const sameCast = (s: SeqSlot) =>
+      s.active && s.abilityId === abilityId && s.casterId === casterId && s.t < 0.025;
+    const duplicate =
+      owned && !awaitTravel
+        ? this.slots.find((s) => sameCast(s) && s.targetId === targetId)
+        : undefined;
+    if (duplicate) return duplicate;
+    const physicalPrimary = spec.physical && !awaitTravel ? this.slots.find(sameCast) : undefined;
     // steal the oldest running sequence when the pool is saturated: a fresh
     // cast always reads louder than a stale linger tail
     let slot = this.slots.find((s) => !s.active) ?? null;
@@ -412,18 +537,27 @@ export class ArchetypeSequencer {
     }
     if (!slot) return null;
     slot.active = true;
+    slot.physicalSecondary = !!physicalPrimary;
     slot.abilityId = abilityId;
     slot.casterId = casterId;
+    const origin = host.anchorOf(casterId, 0.5);
+    slot.sourceX = origin?.x ?? 0;
+    slot.sourceZ = origin?.z ?? 0;
     slot.targetId = targetId;
     slot.spec = spec;
     slot.color = colorHex;
-    slot.accent = lighten(colorHex, 0.4);
+    slot.accent =
+      typeof spec.accent === 'number'
+        ? spec.accent
+        : spec.accent
+          ? abilityHexColor(spec.accent)
+          : lighten(colorHex, 0.4);
     slot.tier = tier;
     slot.t = 0;
     slot.power = spec.power ?? 1;
     slot.releaseAt = windupDelay;
     slot.releaseDone = windupDelay <= 0;
-    slot.impactAt = awaitTravel ? Number.POSITIVE_INFINITY : windupDelay + 0.15;
+    slot.impactAt = awaitTravel ? Number.POSITIVE_INFINITY : windupDelay + SIGNATURE_CONTACT_TIME;
     slot.impactDone = false;
     slot.flip2Done = true;
     slot.ring2Done = true;
@@ -442,6 +576,9 @@ export class ArchetypeSequencer {
       slot.ix = at.x;
       slot.iy = at.y;
       slot.iz = at.z;
+    } else if (spec.physical?.shape === 'rush' || spec.physical?.shape === 'retreat') {
+      slot.ix = slot.sourceX;
+      slot.iz = slot.sourceZ;
     }
     slot.gavel = false;
     slot.ccStars = 0;
@@ -475,6 +612,16 @@ export class ArchetypeSequencer {
       if (!slot.active) continue;
       slot.t += dt;
       const spec = slot.spec;
+      if (
+        (spec.physical?.shape === 'rush' || spec.physical?.shape === 'retreat') &&
+        !slot.impactDone
+      ) {
+        if (physicalTravel(host, slot, dt)) {
+          slot.impactDone = true;
+          this.impact(host, slot);
+        }
+        continue;
+      }
       if (!slot.releaseDone) {
         if (slot.t < slot.releaseAt) {
           // pre-release: the caster performs the authored windup ceremony
@@ -501,6 +648,22 @@ export class ArchetypeSequencer {
           slot.active = false;
           continue;
         }
+      }
+      if (spec.ritual) {
+        if (slot.impactDone) {
+          ritualFollowThrough(host, slot);
+          if (slot.t >= slot.lingerUntil) slot.active = false;
+        }
+        if (slot.t > 12) slot.active = false;
+        continue;
+      }
+      if (spec.physical) {
+        if (slot.impactDone) {
+          physicalFollowThrough(host, slot);
+          if (slot.t >= slot.lingerUntil) slot.active = false;
+        }
+        if (slot.t > 12) slot.active = false;
+        continue;
       }
       // second staggered flipbook (crescendo tier 0)
       if (!slot.flip2Done && slot.t >= slot.flip2At) {
@@ -540,26 +703,28 @@ export class ArchetypeSequencer {
         const rs = this.ringScale(slot) * (usesCrescendoScale(spec) ? SPECTACLE.followRing : 1);
         // the gallery critFinisher death-sentence beat at +0.12s: a huge
         // second ground wave PLUS the white-hot vertical halo
-        host.ringAt(
-          slot.ix,
-          this.groundOf(host, slot),
-          slot.iz,
-          SPECTACLE.finisherWaveR * this.ringScale(slot),
-          0.6,
-          slot.accent,
-          1.6,
-          false,
-        );
-        host.ringAt(
-          slot.ix,
-          slot.iy + 0.6,
-          slot.iz,
-          SPECTACLE.finisherWaveVR * rs,
-          0.55,
-          0xffffff,
-          1.5,
-          true,
-        );
+        if (spec.impact?.ring !== false)
+          host.ringAt(
+            slot.ix,
+            this.groundOf(host, slot),
+            slot.iz,
+            SPECTACLE.finisherWaveR * this.ringScale(slot),
+            0.6,
+            slot.accent,
+            1.6,
+            false,
+          );
+        if (spec.impact?.vRing !== false)
+          host.ringAt(
+            slot.ix,
+            slot.iy + 0.6,
+            slot.iz,
+            SPECTACLE.finisherWaveVR * rs,
+            0.55,
+            0xffffff,
+            1.5,
+            true,
+          );
         host.countPrimitive(slot.abilityId, 2);
       }
       // strike second swing / follow-through echo: a full contact beat of its
@@ -573,29 +738,36 @@ export class ArchetypeSequencer {
         } else {
           const at = host.anchorOf(slot.targetId, 0.55);
           if (at) {
-            host.slashStyled(at, slot.color, spec.strike?.arc ?? 'horizontal', SPECTACLE.strikeArc);
+            host.slashStyled(
+              at,
+              slot.color,
+              spec.strike?.arc ?? 'horizontal',
+              spec.filler ? 1 : SPECTACLE.strikeArc,
+            );
             host.burstAt(at.x, at.y, at.z, slot.color, 18, 1.2, 'sparks');
             const rs2 = this.ringScale(slot) * SPECTACLE.followRing;
-            host.ringAt(
-              at.x,
-              this.groundOf(host, slot),
-              at.z,
-              4.2 * rs2,
-              0.75,
-              slot.accent,
-              1.5,
-              false,
-            );
-            host.ringAt(
-              at.x,
-              at.y + 0.3,
-              at.z,
-              2.4 * this.ringScale(slot) * SPECTACLE.vRing,
-              0.5,
-              slot.accent,
-              1.4,
-              true,
-            );
+            if (spec.impact?.ring !== false)
+              host.ringAt(
+                at.x,
+                this.groundOf(host, slot),
+                at.z,
+                4.2 * rs2,
+                0.75,
+                slot.accent,
+                1.5,
+                false,
+              );
+            if (spec.impact?.vRing !== false)
+              host.ringAt(
+                at.x,
+                at.y + 0.3,
+                at.z,
+                2.4 * this.ringScale(slot) * SPECTACLE.vRing,
+                0.5,
+                slot.accent,
+                1.4,
+                true,
+              );
             // the echo is a contact beat of its own: white-hot star + camera bite
             host.pushOverlay(
               at.x,
@@ -783,11 +955,35 @@ export class ArchetypeSequencer {
   // Release: the 100ms hot flash at the caster plus per-archetype openers.
   private release(host: SequencerHost, slot: SeqSlot): void {
     const spec = slot.spec;
+    if (spec.presentation) return;
+    if (spec.ritual) {
+      ritualRelease(host, slot);
+      return;
+    }
+    if (spec.physical) {
+      physicalRelease(host, slot);
+      return;
+    }
     // spectacle calibration: targeted crescendos measured 4.5-12.7x under the
     // gallery's release moment while radial/held families sat at parity
     const boost = usesCrescendoScale(spec);
     const caster = host.anchorOf(slot.casterId, 0.58);
+    const classCast = hasClassCast(spec.castIdentity ?? '');
+    if (classCast) host.countPrimitive(slot.abilityId, classRelease(host, slot));
     if (caster) {
+      host.countPrimitive(
+        slot.abilityId,
+        signatureMoment(
+          host,
+          slot.abilityId,
+          spec,
+          caster,
+          slot.color,
+          slot.accent,
+          slot.tier,
+          'release',
+        ),
+      );
       host.burstAt(
         caster.x,
         caster.y,
@@ -805,34 +1001,38 @@ export class ArchetypeSequencer {
         boost ? SPECTACLE.lightRange : undefined,
       );
       host.countPrimitive(slot.abilityId, 2);
-      if (boost && slot.tier === 0) {
+      if (boost && slot.tier === 0 && !SIGNATURE_ABILITIES[slot.abilityId]) {
         // the gallery's cast-off explosion: a full-size sheet AT the caster
-        host.flipbookAt(
-          caster.x,
-          caster.y + 0.1,
-          caster.z,
-          SPECTACLE.releaseFlipbook * slot.power,
-          slot.color,
-          SHEET_BY_PALETTE[spec.palette] ?? 'electric',
-          1.35 * SPECTACLE.flipbookHdr,
-        );
-        host.countPrimitive(slot.abilityId, 1);
+        if (spec.impact?.flipbook !== false) {
+          host.flipbookAt(
+            caster.x,
+            caster.y + 0.1,
+            caster.z,
+            SPECTACLE.releaseFlipbook * slot.power,
+            slot.color,
+            SHEET_BY_PALETTE[spec.palette] ?? 'electric',
+            1.35 * SPECTACLE.flipbookHdr,
+          );
+          host.countPrimitive(slot.abilityId, 1);
+        }
         // the gallery's huge cast-off flash: a vertical shock halo bursting
         // off the caster with the release star
-        host.ringAt(
-          caster.x,
-          caster.y,
-          caster.z,
-          SPECTACLE.releaseRingR * slot.power,
-          0.4,
-          slot.accent,
-          1.5,
-          true,
-        );
-        host.countPrimitive(slot.abilityId, 1);
+        if (!classCast && spec.impact?.vRing !== false) {
+          host.ringAt(
+            caster.x,
+            caster.y,
+            caster.z,
+            SPECTACLE.releaseRingR * slot.power,
+            0.4,
+            slot.accent,
+            1.5,
+            true,
+          );
+          host.countPrimitive(slot.abilityId, 1);
+        }
       }
       const streams = abilityVfxChargeStreams(spec);
-      if (streams > 1 && slot.tier === 0) {
+      if (streams > 1 && slot.tier === 0 && !classCast) {
         const cells = host.overlayCells();
         for (let k = 0; k < streams; k++) {
           const radius = (0.72 + k * 0.24) * slot.power;
@@ -852,6 +1052,7 @@ export class ArchetypeSequencer {
         }
         host.countPrimitive(slot.abilityId, streams * 2);
       }
+      host.presentationMoment?.(slot.abilityId, 'release', slot.casterId);
       host.abilityAudio?.('release', spec.palette, slot.power, caster.x, caster.y, caster.z, {
         lite: spec.impact?.liteAudio === true || slot.tier >= 1,
         archetype: spec.archetype,
@@ -870,17 +1071,61 @@ export class ArchetypeSequencer {
   // The full impact stack at (ix, iy, iz), honoring every spec impact flag.
   private impact(host: SequencerHost, slot: SeqSlot): void {
     const spec = slot.spec;
+    if (spec.presentation) {
+      slot.active = false;
+      return;
+    }
+    if (spec.ritual) {
+      ritualImpact(host, slot);
+      return;
+    }
+    if (spec.physical) {
+      physicalImpact(host, slot);
+      return;
+    }
     const o = spec.impact ?? {};
+    host.countPrimitive(slot.abilityId, kitContact(host, slot));
     const cs = slot.power;
     const rs = this.ringScale(slot);
     const gy = this.groundOf(host, slot);
     const arch = spec.archetype;
     const gentle = arch === 'heal' || arch === 'buff' || arch === 'cc';
+    const sculpted =
+      slot.tier === 0 && !!host.elementalImpact && !!SIGNATURE_ABILITIES[slot.abilityId];
+    host.countPrimitive(
+      slot.abilityId,
+      host.elementalImpact?.(
+        slot.abilityId,
+        spec,
+        { x: slot.ix, y: slot.iy, z: slot.iz },
+        slot.tier,
+        slot.color,
+        slot.accent,
+        slot.ix - slot.sourceX,
+        slot.iz - slot.sourceZ,
+      ) ?? 0,
+    );
+    host.countPrimitive(
+      slot.abilityId,
+      signatureMoment(
+        host,
+        slot.abilityId,
+        spec,
+        { x: slot.ix, y: slot.iy, z: slot.iz },
+        slot.color,
+        slot.accent,
+        slot.tier,
+        'impact',
+        slot.ix - slot.sourceX,
+        slot.iz - slot.sourceZ,
+      ),
+    );
     // spectacle calibration (see spectacle.ts): only the targeted-crescendo
     // archetypes scale up - novas/shouts already measured at gallery parity
     const boost = usesCrescendoScale(spec);
     // the palette identity sounds where the hit visually lands (a ground zone
     // booms AT the zone); gentleness/lite policy resolves in the audio engine
+    host.presentationMoment?.(slot.abilityId, 'impact', slot.casterId);
     host.abilityAudio?.('impact', spec.palette, slot.power, slot.ix, slot.iy, slot.iz, {
       lite: o.liteAudio === true || slot.tier >= 1,
       finisher: spec.finisher,
@@ -894,7 +1139,7 @@ export class ArchetypeSequencer {
     // authored spec wins - an explicit true forces it even on gentle
     // archetypes, false suppresses it, and the default fires only for
     // non-gentle impacts. Tier-0-only spectacle; sheet picked per school.
-    if (slot.tier === 0 && o.flipbook !== false && (o.flipbook === true || !gentle)) {
+    if (!sculpted && slot.tier === 0 && o.flipbook !== false && (o.flipbook === true || !gentle)) {
       const focusedScale = o.focused ? 0.72 : 1;
       host.flipbookAt(
         slot.ix,
@@ -908,7 +1153,12 @@ export class ArchetypeSequencer {
       n++;
     }
     // ground ring (rings default ON except when spec turns them off)
-    if (o.ring !== false && (o.ring !== undefined || !gentle)) {
+    if (
+      (!sculpted || arch === 'nova' || arch === 'shout') &&
+      o.ring !== false &&
+      rs > 0 &&
+      (o.ring !== undefined || !gentle)
+    ) {
       const base =
         arch === 'nova'
           ? (spec.nova?.radius ?? 5) * slot.power
@@ -947,7 +1197,7 @@ export class ArchetypeSequencer {
           : o.vRing === true
             ? 1
             : o.vRing;
-    if (vr > 0) {
+    if (vr > 0 && !sculpted) {
       const focusedScale = o.focused ? 0.72 : 1;
       host.ringAt(
         slot.ix,
@@ -978,7 +1228,7 @@ export class ArchetypeSequencer {
       n += 3;
     }
     // crit-finisher third ring
-    if (spec.finisher) {
+    if (spec.finisher && !sculpted && o.ring !== false) {
       slot.ring3At = slot.t + 0.12;
       slot.ring3Done = false;
     }
@@ -988,7 +1238,7 @@ export class ArchetypeSequencer {
       (o.sparks ?? (gentle ? 14 : 30)) *
         cs *
         q *
-        (slot.tier === 1 ? 0.5 : 1) *
+        (sculpted ? 0.25 : slot.tier === 1 ? 0.5 : 1) *
         (boost ? SPECTACLE.impactSparkCount : 1),
     );
     if (sparks > 0) {
@@ -996,10 +1246,10 @@ export class ArchetypeSequencer {
         slot.ix,
         slot.iy,
         slot.iz,
-        slot.accent,
+        sculpted && spec.palette === 'fire' ? slot.color : slot.accent,
         Math.min(60, Math.max(4, sparks)),
         1.1 * cs * (boost ? SPECTACLE.impactSparkPower : 1),
-        'sparks',
+        sculpted && spec.palette === 'fire' ? 'embers' : 'sparks',
       );
       n++;
     }
@@ -1081,7 +1331,7 @@ export class ArchetypeSequencer {
       }
     }
     // ground mark
-    if (slot.tier === 0 && (spec.decal || (!gentle && (spec.linger ?? 0) >= 1.5))) {
+    if (spec.strike?.arc !== 'wire' && slot.tier === 0 && (spec.decal || (!gentle && (spec.linger ?? 0) >= 1.5))) {
       host.decalXZ(
         slot.ix,
         slot.iz,
@@ -1094,13 +1344,19 @@ export class ArchetypeSequencer {
     }
     // second staggered flipbook stretches the hot window toward the
     // gallery's ~1s aftermath (tier-0 crescendo, only when a first one fired)
-    if (boost && slot.tier === 0 && o.flipbook !== false && (o.flipbook === true || !gentle)) {
+    if (
+      !sculpted &&
+      boost &&
+      slot.tier === 0 &&
+      o.flipbook !== false &&
+      (o.flipbook === true || !gentle)
+    ) {
       slot.flip2At = slot.t + SPECTACLE.flipbook2Delay;
       slot.flip2Done = false;
     }
     // the finisher's post-impact light column (the gallery pillar read IS its
     // impact-phase coverage)
-    if (boost && slot.tier === 0 && spec.finisher) {
+    if (!sculpted && boost && slot.tier === 0 && spec.finisher) {
       host.pillarAt(
         slot.ix,
         gy,
@@ -1153,12 +1409,12 @@ export class ArchetypeSequencer {
     if (spec.motifs && slot.tier <= 1) this.runMotifs(host, slot);
     // lingers honor the authored 1-6s dwell at tier 0 (dot drips, motif loops,
     // and the decal above all ride this window)
-    slot.lingerUntil = slot.t + (slot.tier === 0 ? Math.min(6, spec.linger ?? 0.5) : 0);
+    slot.lingerUntil = slot.t + (spec.strike?.arc === 'wire' ? 0.23 : slot.tier === 0 ? Math.min(6, spec.linger ?? 0.5) : 0);
     // spectacle afterglow: crescendo impacts hold a readable aftermath (fading
     // dome + periodic embers in drawTransients) even when the authored linger
     // is short - the gallery's aftermath field the compressed stack dropped.
     // Strikes hold a SHORT hot-metal window instead of the spell dwell.
-    if (boost && slot.tier === 0) {
+    if (boost && slot.tier === 0 && !SIGNATURE_ABILITIES[slot.abilityId]) {
       slot.afterglowSpan =
         arch === 'strike' ? SPECTACLE.strikeAfterglowDur : SPECTACLE.afterglowDur;
       slot.afterglowUntil = slot.t + slot.afterglowSpan;
@@ -1185,14 +1441,20 @@ export class ArchetypeSequencer {
         if (at) {
           // melee contact measured the worst non-bolt gap (8-20x): the arc is
           // the strike's whole identity, so it swings at gallery span
-          host.slashStyled(at, c, spec.strike?.arc ?? 'horizontal', SPECTACLE.strikeArc);
+          host.slashStyled(
+            at,
+            c,
+            spec.strike?.arc ?? 'horizontal',
+            spec.filler ? 1 : SPECTACLE.strikeArc,
+          );
           host.countPrimitive(slot.abilityId, 1);
           if (spec.strike?.bleed) {
             host.burstAt(at.x, at.y, at.z, 0xa01222, 8, 0.7, 'blood');
             host.countPrimitive(slot.abilityId, 1);
           }
           if (spec.strike?.groundSlam) {
-            host.ringAt(slot.ix, gy, slot.iz, 4.2 * slot.power, 0.6, c, 1.6, false);
+            if (spec.impact?.ring !== false)
+              host.ringAt(slot.ix, gy, slot.iz, 4.2 * slot.power, 0.6, c, 1.6, false);
             host.burstAt(slot.ix, gy + 0.2, slot.iz, c, 12, 1, 'debris');
             host.countPrimitive(slot.abilityId, 2);
             if (slot.tier === 0) host.shakeAt(slot.ix, gy, slot.iz, 0.2);
@@ -1210,7 +1472,7 @@ export class ArchetypeSequencer {
         if ((spec.strike?.swings ?? 1) > 1) {
           slot.swing2At = slot.t + 0.22;
           slot.swing2Done = false;
-        } else if (slot.tier === 0) {
+        } else if (slot.tier === 0 && !spec.filler) {
           // single-swing tier-0 strikes echo the same arc a beat later (the
           // gallery's staggered layering: follow-through reads bigger than
           // one simultaneous blob)
@@ -1235,12 +1497,37 @@ export class ArchetypeSequencer {
           1.4,
           'embers',
         );
-        host.ringAt(slot.ix, slot.iy + 0.8, slot.iz, radius * 0.75, 0.7, c, 2.2, true);
-        host.ringAt(slot.ix, slot.iy + 0.6, slot.iz, radius * 0.35, 0.45, 0xffffff, 2.8, true);
+        if (spec.impact?.vRing !== false) {
+          host.ringAt(slot.ix, slot.iy + 0.8, slot.iz, radius * 0.75, 0.7, c, 2.2, true);
+          host.ringAt(slot.ix, slot.iy + 0.6, slot.iz, radius * 0.35, 0.45, 0xffffff, 2.8, true);
+        }
         host.countPrimitive(slot.abilityId, 2);
         break;
       }
       case 'heal': {
+        if (spec.healStyle) {
+          host.countPrimitive(
+            slot.abilityId,
+            drawHealingCeremony(
+              host,
+              { x: slot.ix, y: slot.iy, z: slot.iz },
+              spec,
+              c,
+              slot.accent,
+              slot.tier > 0,
+            ),
+          );
+          host.burstAt(
+            slot.ix,
+            slot.iy,
+            slot.iz,
+            slot.accent,
+            slot.tier > 0 ? 3 : 7,
+            0.45,
+            'embers',
+          );
+          break;
+        }
         const shaft = spec.shaft === false ? 0 : typeof spec.shaft === 'number' ? spec.shaft : 1;
         if (shaft > 0) {
           host.pillarAt(
@@ -1259,8 +1546,19 @@ export class ArchetypeSequencer {
         break;
       }
       case 'buff': {
+        host.countPrimitive(
+          slot.abilityId,
+          drawBuffCeremony(
+            host,
+            { x: slot.ix, y: slot.iy, z: slot.iz },
+            spec,
+            c,
+            slot.accent,
+            slot.tier > 0,
+          ),
+        );
         if (spec.buff?.shellDur || spec.barrier) {
-          host.shellFlash(slot.casterId, c, Math.max(1, spec.buff?.shellDur ?? 1.2));
+          host.shellFlash(slot.casterId, c, Math.max(0.1, spec.buff?.shellDur ?? 1.2));
           host.countPrimitive(slot.abilityId, 1);
         }
         host.burstAt(slot.ix, slot.iy - 0.4, slot.iz, slot.accent, 12, 0.7, 'embers');
@@ -1370,7 +1668,7 @@ export class ArchetypeSequencer {
         const style = spec.burst?.style ?? 'link';
         if (style === 'skybeam') {
           const shaft = spec.shaft === false ? 0 : typeof spec.shaft === 'number' ? spec.shaft : 1;
-          host.pillarAt(slot.ix, gy, slot.iz, 1.1 * Math.max(0.4, shaft), 11, c, 0.55);
+          if (shaft > 0) host.pillarAt(slot.ix, gy, slot.iz, 1.1 * shaft, 11, c, 0.55);
           host.boltPoints(
             slot.ix,
             slot.iy + 9,
@@ -1610,6 +1908,7 @@ export class ArchetypeSequencer {
         break;
       }
       case 'fountain': {
+        if (slot.spec.healStyle) break;
         // arcing streams rain onto the point from a wide ring
         const streams = lite ? 2 : 6;
         for (let k = 0; k < streams; k++) {
@@ -1840,16 +2139,17 @@ export class ArchetypeSequencer {
           SPECTACLE.afterglowEvery + 0.15,
           SPECTACLE.lightRange,
         );
-        host.ringAt(
-          slot.ix,
-          this.groundOf(host, slot),
-          slot.iz,
-          3.2,
-          0.5,
-          slot.color,
-          1.3 * rem,
-          false,
-        );
+        if (slot.spec.impact?.ring !== false)
+          host.ringAt(
+            slot.ix,
+            this.groundOf(host, slot),
+            slot.iz,
+            3.2,
+            0.5,
+            slot.color,
+            1.3 * rem,
+            false,
+          );
         // storm aftermath crackles: residual ground arcs around the strike
         // point (the gallery's lingering electric field)
         if (slot.spec.palette === 'storm' || slot.spec.palette === 'arcane') {
@@ -1986,6 +2286,11 @@ export class ArchetypeSequencer {
     // seeded world point
     if (slot.targetId < 0) return { x: slot.ix, y: slot.iy, z: slot.iz };
     const spec = slot.spec;
+    if (spec.ritual)
+      return (
+        host.anchorOf(spec.ritual.anchor === 'caster' ? slot.casterId : slot.targetId, 0.4) ??
+        host.anchorOf(slot.casterId, 0.4)
+      );
     const selfCentered =
       spec.self === true ||
       spec.archetype === 'nova' ||
@@ -2010,28 +2315,12 @@ export class ArchetypeSequencer {
   // spectacular. Runs for the first contact AND the echo (the re-tightened
   // pull), which replaces the generic echo's rings/star/shake outright.
   private wireContact(host: SequencerHost, slot: SeqSlot): void {
-    let n = 0;
-    const hands = host.anchorOf(slot.casterId, 0.68);
-    if (hands) {
-      host.slashStyled(hands, slot.color, 'wire', SPECTACLE.strikeArc);
-      n++;
-    }
-    const throat = host.anchorOf(slot.targetId, 0.74);
-    if (throat) {
-      host.burstAt(throat.x, throat.y, throat.z, 0xd8dee6, 6, 0.35, 'sparks');
-      host.burstAt(throat.x, throat.y + 0.08, throat.z, 0xb9c2cc, 3, 0.25, 'smoke');
-      n += 2;
-      if (slot.spec.strike?.bleed) {
-        host.burstAt(throat.x, throat.y - 0.05, throat.z, 0xa01222, 6, 0.5, 'blood');
-        n++;
-      }
-    }
-    if (n > 0) host.countPrimitive(slot.abilityId, n);
+    drawThroatWire(host, slot);
   }
 
   private ringScale(slot: SeqSlot): number {
     const raw = slot.spec.impact?.ring;
-    const rs = typeof raw === 'number' ? Math.min(2, raw) : 1;
+    const rs = raw === false ? 0 : typeof raw === 'number' ? Math.max(0, Math.min(2, raw)) : 1;
     return rs * (0.7 + 0.3 * slot.power);
   }
 

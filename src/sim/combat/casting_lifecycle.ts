@@ -2090,6 +2090,7 @@ function applyChannelTick(
         fx: 'nova',
         radius,
         ability: res.def.id,
+        sourceId: p.id,
       });
     }
     const channelSp = channelTickBonus(abilityScalingPower(p, res.def), res.def, talentDmgMult);
@@ -2146,6 +2147,7 @@ function applyChannelTick(
         type: 'spellfxAt',
         x: p.pos.x,
         z: p.pos.z,
+        sourceId: p.id,
         school: res.def.school,
         fx: 'nova',
         radius: eff.radius,
@@ -2167,6 +2169,14 @@ function applyChannelTick(
   // aura value growing by the effect value per pulse with its clock
   // refreshed; the recalc applies the new power at once. Draws no rng.
   if (!res.def.requiresTarget && res.effects.some((eff) => eff.type === 'gainResource')) {
+    ctx.emit({
+      type: 'spellfx',
+      sourceId: p.id,
+      targetId: p.id,
+      school: res.def.school,
+      fx: 'selfCast',
+      ability: res.def.id,
+    });
     for (const eff of res.effects) {
       if (eff.type === 'gainResource') {
         p.resource = Math.min(p.maxResource, p.resource + eff.amount);
@@ -2219,6 +2229,7 @@ function applyChannelTick(
         type: 'spellfxAt',
         x: p.pos.x,
         z: p.pos.z,
+        sourceId: p.id,
         school: res.def.school,
         fx: 'nova',
         radius: eff.radius,
@@ -2447,6 +2458,14 @@ function applyAbility(
     }
     spendResource(p, billableCost());
     ctx.addItem(waterId, 2, p.id);
+    ctx.emit({
+      type: 'spellfx',
+      sourceId: p.id,
+      targetId: p.id,
+      school: ability.school,
+      fx: 'selfCast',
+      ability: ability.id,
+    });
     if (p.kind === 'player') onCastCompleted(ctx, p, ability.id);
     return;
   }
@@ -2460,6 +2479,14 @@ function applyAbility(
     }
     spendResource(p, billableCost());
     ctx.addItem(foodId, 2, p.id);
+    ctx.emit({
+      type: 'spellfx',
+      sourceId: p.id,
+      targetId: p.id,
+      school: ability.school,
+      fx: 'selfCast',
+      ability: ability.id,
+    });
     if (p.kind === 'player') onCastCompleted(ctx, p, ability.id);
     return;
   }
@@ -2493,6 +2520,14 @@ function applyAbility(
         });
       }
     }
+    ctx.emit({
+      type: 'spellfx',
+      sourceId: p.id,
+      targetId: pet.id,
+      school: ability.school,
+      fx: 'selfCast',
+      ability: ability.id,
+    });
     if (p.kind === 'player') onCastCompleted(ctx, p, ability.id, pet);
     return;
   }

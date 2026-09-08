@@ -347,6 +347,13 @@ Assets were optimized for shipping (animation clip pruning, meshopt compression,
 texture resizing) via `scripts/assets/build_assets.mjs`; raw packs are not
 committed.
 
+The VFX Studio production smoke and shockwave atlases and the ice, stone, and
+metal fragment library are original project assets authored locally in Blender.
+The deterministic source and sampling contract are in
+`scripts/assets/vfx_production/`; runtime assets are in `public/textures/vfx/production/`
+and `public/models/vfx/production_fragments.glb`. No external generation API was
+used for this asset set.
+
 License texts: https://creativecommons.org/publicdomain/zero/1.0/ (CC0 1.0) ,
 https://creativecommons.org/licenses/by/4.0/ (CC BY 4.0) ,
 https://creativecommons.org/licenses/by-nc/4.0/ (CC BY-NC 4.0) ,

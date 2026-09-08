@@ -743,16 +743,19 @@ describe('bow skin attack animation (hunter draw instead of crossbow aim)', () =
     // precedence, since a displayed bow never changes how a melee hit is
     // thrown (second review round on PR #2958).
     visual.playAttack('raptor_strike');
-    expect((visual as unknown as ActionPeek).current?.getClip().name).toBe('Hunter_Melee_Gut');
+    expect((visual as unknown as ActionPeek).current?.getClip().name).toBe('Signature_raptor_strike');
 
     // A self-buff aspect toggle (range-agnostic, no swing) also keeps its
-    // authored Spellcast_Raise raise/buff ceremony with the same bow skin
-    // displayed: casting Harrier's Guise or Fevered Draw must never play the
-    // draw-shot attack (Rubsey's OSSBrain review on PR #2958).
+    // authored raise/buff ceremony with the same bow skin displayed. The
+    // signature clip derives from Spellcast_Raise, never the bow shot.
     visual.playAttack('aspect_of_the_hawk');
-    expect((visual as unknown as ActionPeek).current?.getClip().name).toBe('Spellcast_Raise');
+    expect((visual as unknown as ActionPeek).current?.getClip().name).toBe(
+      'Signature_aspect_of_the_hawk',
+    );
+    // Fevered Draw is now a targeted projectile channel. Every actual shot
+    // must honor the displayed bow in the same way as Aimed Shot.
     visual.playAttack('rapid_fire');
-    expect((visual as unknown as ActionPeek).current?.getClip().name).toBe('Spellcast_Raise');
+    expect((visual as unknown as ActionPeek).current?.getClip().name).toBe('Bow_Draw_Shot');
     // A full charactersReady() reload pulls in this branch's much larger
     // manifest (release/v0.35.0's own content growth), so this single test's
     // real preload pass runs well past the 20s default under host load.

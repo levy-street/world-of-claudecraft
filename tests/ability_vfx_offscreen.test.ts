@@ -2,10 +2,10 @@ import { describe, expect, it, vi } from 'vitest';
 import { AbilityVfx, type AbilityVfxEntityState } from '../src/render/ability_vfx';
 import type { AbilityVfxFx } from '../src/render/ability_vfx/fx';
 
-// battle_shout is policy-silenced while worn (the long-buff rule in
+// arcane_intellect is policy-silenced while worn (the long-buff rule in
 // ability_vfx_longbuff_core.ts: >= 300s buffs hold no disc/band), so the
 // held-read case below wears a SHORT buff that legitimately keeps all three
-// reads (disc, band, gain swirl); the latch-prune case keeps battle_shout,
+// reads (disc, band, gain swirl); the latch-prune case keeps arcane_intellect,
 // whose policy gain swirl rides the same semantic stamps.
 function wornPresenceOfMind(): AbilityVfxEntityState {
   return {
@@ -18,13 +18,13 @@ function wornPresenceOfMind(): AbilityVfxEntityState {
   };
 }
 
-function wornBattleShout(): AbilityVfxEntityState {
+function wornArcaneIntellect(): AbilityVfxEntityState {
   return {
     id: 41,
     castingAbility: null,
     castRemaining: 0,
     castTotal: 0,
-    auras: [{ id: 'battle_shout' }],
+    auras: [{ id: 'arcane_intellect' }],
     queuedOnSwing: null,
   };
 }
@@ -53,6 +53,8 @@ function painterHarness() {
   const decalXZ = vi.fn();
   const pulseLight = vi.fn();
   const shakeAt = vi.fn();
+  const holdControlSignals = vi.fn();
+  const holdCcBand = vi.fn();
   const fx = {
     setDelegates: vi.fn(),
     setQuality: vi.fn(),
@@ -69,6 +71,8 @@ function painterHarness() {
     decalXZ,
     pulseLight,
     shakeAt,
+    holdControlSignals,
+    holdCcBand,
     glowIntensityOf: vi.fn(() => 0),
     groundAuraCountOf: vi.fn(() => 0),
     update: vi.fn(),
@@ -107,6 +111,8 @@ function painterHarness() {
     decalXZ,
     pulseLight,
     shakeAt,
+    holdControlSignals,
+    holdCcBand,
   };
 }
 
@@ -198,37 +204,39 @@ describe('ability VFX offscreen presentation sleep', () => {
       castingAbility: null,
       castRemaining: 0,
       castTotal: 0,
-      auras: [{ id: 'charge_slow' }, { id: 'charge_root' }],
+      auras: [
+        { id: 'charge_slow', kind: 'slow', remaining: 2 },
+        { id: 'charge_root', kind: 'root', remaining: 1 },
+      ],
       queuedOnSwing: null,
     };
 
     h.abilityVfx.syncEntity(entity);
     h.abilityVfx.update(1 / 60);
-    expect(h.orbit).toHaveBeenCalledTimes(2);
+    expect(h.holdControlSignals).toHaveBeenCalledExactlyOnceWith(entity);
+    expect(h.holdCcBand).toHaveBeenCalledExactlyOnceWith(entity.id, 'root', 1);
     expect(h.buffSwirl).not.toHaveBeenCalled();
-    expect(h.ringAt).toHaveBeenCalledTimes(1);
-    expect(h.burstAt).toHaveBeenCalledTimes(2);
-    expect(h.decalXZ).toHaveBeenCalledTimes(1);
-    expect(h.pulseLight).toHaveBeenCalledTimes(1);
-    expect(h.shakeAt).toHaveBeenCalledTimes(1);
+    for (const cue of [h.orbit, h.ringAt, h.burstAt, h.decalXZ, h.pulseLight, h.shakeAt])
+      expect(cue).not.toHaveBeenCalled();
 
     h.abilityVfx.syncEntity(entity, false);
     h.abilityVfx.update(1 / 60);
+    expect(h.sleepEntity).toHaveBeenCalledWith(entity.id);
+    expect(h.holdControlSignals).toHaveBeenCalledTimes(1);
+    expect(h.holdCcBand).toHaveBeenCalledTimes(1);
     h.abilityVfx.syncEntity(entity);
 
-    expect(h.orbit).toHaveBeenCalledTimes(4);
-    expect(h.ringAt).toHaveBeenCalledTimes(1);
-    expect(h.burstAt).toHaveBeenCalledTimes(2);
-    expect(h.decalXZ).toHaveBeenCalledTimes(1);
-    expect(h.pulseLight).toHaveBeenCalledTimes(1);
-    expect(h.shakeAt).toHaveBeenCalledTimes(1);
+    expect(h.holdControlSignals).toHaveBeenCalledTimes(2);
+    expect(h.holdCcBand).toHaveBeenCalledTimes(2);
+    for (const cue of [h.orbit, h.ringAt, h.burstAt, h.decalXZ, h.pulseLight, h.shakeAt])
+      expect(cue).not.toHaveBeenCalled();
   });
 
   it('prunes semantic latches for entities absent from the next frame', () => {
     const h = painterHarness();
     const semantic = h.abilityVfx as unknown as { heldSemantic: Map<number, unknown> };
 
-    h.abilityVfx.syncEntity(wornBattleShout());
+    h.abilityVfx.syncEntity(wornArcaneIntellect());
     h.abilityVfx.update(1 / 60);
     expect(semantic.heldSemantic.has(41)).toBe(true);
     expect(h.buffSwirl).toHaveBeenCalledTimes(1);
@@ -238,7 +246,7 @@ describe('ability VFX offscreen presentation sleep', () => {
 
     h.heldGround.clear();
     h.heldOrbits.clear();
-    h.abilityVfx.syncEntity(wornBattleShout());
+    h.abilityVfx.syncEntity(wornArcaneIntellect());
     expect(h.buffSwirl).toHaveBeenCalledTimes(2);
   });
 });

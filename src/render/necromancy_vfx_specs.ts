@@ -434,9 +434,9 @@ export const REAPING_COMMAND_VFX_FULL_SPEC = {
   impact: {
     trail: 'overhead',
     focused: true,
-    flipbook: true,
-    ring: 1.05,
-    vRing: 0.8,
+    flipbook: false,
+    ring: false,
+    vRing: false,
     sparks: 38,
     debris: true,
     smoke: true,

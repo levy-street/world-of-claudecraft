@@ -1,0 +1,1700 @@
+{
+  "assetCount": 24,
+  "allPassed": true,
+  "runtimeBytes": 1556481,
+  "verification": "Canonical repository post-MP3 conformance plus complete 44.1kHz mono float decode, exact decoded sample counts, finite samples, literal -6dBFS true peak ceiling, and measured loop seam transitions. Auditory listening was not available through an enabled tool.",
+  "results": [
+    {
+      "key": "cast_masterwork_pyre",
+      "file": "runtime/cast_masterwork_pyre.mp3",
+      "bytes": 97846,
+      "sha256": "3070645d53c698d74656d8d48074d5744b206cb5a3fe0b7626ad0eb46b492fb8",
+      "passed": true,
+      "conform": {
+        "method": "linear peak-constrained normalization from pristine WAV",
+        "sourcePeakDb": -7.9,
+        "sourceLufs": -19.9,
+        "desiredGainDb": 5.899999999999999,
+        "gainDb": 1.6500000000000004,
+        "peakLimited": true,
+        "policy": "sound_effects.md peak-safety binding constraint; validated by repository inspectSfxConformance/classify"
+      },
+      "safetyCorrections": [],
+      "inspect": {
+        "duration": 4.04898,
+        "bitrate": 192,
+        "sampleRate": 44100,
+        "codec": "mp3",
+        "channels": 1,
+        "isLossless": false,
+        "isMp3": true,
+        "peakDb": -6.5,
+        "lufs": -18.5,
+        "reject": false,
+        "problems": [],
+        "advisories": [],
+        "normBranch": "lufs"
+      },
+      "decoded": {
+        "samples": 176400,
+        "durationSeconds": 4,
+        "samplePeakDbfs": -6.569972917876928,
+        "rmsDbfs": -17.225455652199496,
+        "nonFiniteSamples": 0,
+        "loopStartSample": 44100,
+        "loopEndSample": 132300,
+        "loopSeamDelta": 0.027717694640159607,
+        "loopSeamVsAdjacentRms": 2.050060207920183
+      },
+      "materialReview": {
+        "bandEdgesHz": [
+          25,
+          80,
+          180,
+          450,
+          1000,
+          2500,
+          6000,
+          12000,
+          18000
+        ],
+        "bandEnergyFraction": [
+          0.2537,
+          0.2884,
+          0.3059,
+          0.0646,
+          0.084,
+          0.0016,
+          0.0011,
+          0.0007
+        ],
+        "spectralCentroidHz": 337.2,
+        "first20msRms": 0.11912,
+        "last20msRms": 0.150103,
+        "loopPhaseMismatch": 0.0068984255194664,
+        "loopPhaseMismatchDbfs": -43.23,
+        "loopPhaseMismatchVsNormalStep": 0.5102
+      }
+    },
+    {
+      "key": "proj_masterwork_pyre",
+      "file": "runtime/proj_masterwork_pyre.mp3",
+      "bytes": 23240,
+      "sha256": "f7c8384f51628aa58961e06c2fb11fea7c25699cb7861c318e2c09558871f745",
+      "passed": true,
+      "conform": {
+        "method": "linear peak-constrained normalization from pristine WAV",
+        "sourcePeakDb": -8,
+        "sourceLufs": null,
+        "desiredGainDb": 1.75,
+        "gainDb": 1.75,
+        "peakLimited": false,
+        "policy": "sound_effects.md peak-safety binding constraint; validated by repository inspectSfxConformance/classify"
+      },
+      "safetyCorrections": [],
+      "inspect": {
+        "duration": 0.940408,
+        "bitrate": 192,
+        "sampleRate": 44100,
+        "codec": "mp3",
+        "channels": 1,
+        "isLossless": false,
+        "isMp3": true,
+        "peakDb": -6.5,
+        "lufs": null,
+        "reject": false,
+        "problems": [],
+        "advisories": [],
+        "normBranch": "peak"
+      },
+      "decoded": {
+        "samples": 39690,
+        "durationSeconds": 0.9,
+        "samplePeakDbfs": -6.491243609536747,
+        "rmsDbfs": -20.994915940821027,
+        "nonFiniteSamples": 0,
+        "loopStartSample": null,
+        "loopEndSample": null,
+        "loopSeamDelta": null,
+        "loopSeamVsAdjacentRms": null
+      },
+      "materialReview": {
+        "bandEdgesHz": [
+          25,
+          80,
+          180,
+          450,
+          1000,
+          2500,
+          6000,
+          12000,
+          18000
+        ],
+        "bandEnergyFraction": [
+          0.3312,
+          0.217,
+          0.0633,
+          0.0828,
+          0.1546,
+          0.1487,
+          0.0017,
+          0.0007
+        ],
+        "spectralCentroidHz": 949.9,
+        "first20msRms": 0.217546,
+        "last20msRms": 0.000145
+      }
+    },
+    {
+      "key": "impact_masterwork_pyre",
+      "file": "runtime/impact_masterwork_pyre.mp3",
+      "bytes": 78411,
+      "sha256": "2a21d358a0cdd8dc68d7da17871157ff9e6ad7545c204805232f67f07c28bee0",
+      "passed": true,
+      "conform": {
+        "method": "linear peak-constrained normalization from pristine WAV",
+        "sourcePeakDb": -8,
+        "sourceLufs": -25.8,
+        "desiredGainDb": 11.8,
+        "gainDb": 1.75,
+        "peakLimited": true,
+        "policy": "sound_effects.md peak-safety binding constraint; validated by repository inspectSfxConformance/classify"
+      },
+      "safetyCorrections": [],
+      "inspect": {
+        "duration": 3.239184,
+        "bitrate": 192,
+        "sampleRate": 44100,
+        "codec": "mp3",
+        "channels": 1,
+        "isLossless": false,
+        "isMp3": true,
+        "peakDb": -6.5,
+        "lufs": -24.3,
+        "reject": false,
+        "problems": [],
+        "advisories": [],
+        "normBranch": "lufs"
+      },
+      "decoded": {
+        "samples": 141120,
+        "durationSeconds": 3.2,
+        "samplePeakDbfs": -6.508839427673401,
+        "rmsDbfs": -23.044178638995405,
+        "nonFiniteSamples": 0,
+        "loopStartSample": null,
+        "loopEndSample": null,
+        "loopSeamDelta": null,
+        "loopSeamVsAdjacentRms": null
+      },
+      "materialReview": {
+        "bandEdgesHz": [
+          25,
+          80,
+          180,
+          450,
+          1000,
+          2500,
+          6000,
+          12000,
+          18000
+        ],
+        "bandEnergyFraction": [
+          0.4523,
+          0.1288,
+          0.1479,
+          0.1332,
+          0.1173,
+          0.0152,
+          0.0034,
+          0.0019
+        ],
+        "spectralCentroidHz": 465.4,
+        "first20msRms": 0.22607,
+        "last20msRms": 9.3e-05
+      }
+    },
+    {
+      "key": "cast_masterwork_glacier",
+      "file": "runtime/cast_masterwork_glacier.mp3",
+      "bytes": 97846,
+      "sha256": "b732fbfaf973a6a09bec47c8486f0d93c04195f3076becc589b698fe46199c5e",
+      "passed": true,
+      "conform": {
+        "method": "linear peak-constrained normalization from pristine WAV",
+        "sourcePeakDb": -8,
+        "sourceLufs": -19.1,
+        "desiredGainDb": 5.100000000000001,
+        "gainDb": 1.75,
+        "peakLimited": true,
+        "policy": "sound_effects.md peak-safety binding constraint; validated by repository inspectSfxConformance/classify"
+      },
+      "safetyCorrections": [],
+      "inspect": {
+        "duration": 4.04898,
+        "bitrate": 192,
+        "sampleRate": 44100,
+        "codec": "mp3",
+        "channels": 1,
+        "isLossless": false,
+        "isMp3": true,
+        "peakDb": -6.5,
+        "lufs": -17.6,
+        "reject": false,
+        "problems": [],
+        "advisories": [],
+        "normBranch": "lufs"
+      },
+      "decoded": {
+        "samples": 176400,
+        "durationSeconds": 4,
+        "samplePeakDbfs": -6.523190505512526,
+        "rmsDbfs": -20.00857893635795,
+        "nonFiniteSamples": 0,
+        "loopStartSample": 44100,
+        "loopEndSample": 132300,
+        "loopSeamDelta": 0.1783474236726761,
+        "loopSeamVsAdjacentRms": 3.2525656528943485
+      },
+      "materialReview": {
+        "bandEdgesHz": [
+          25,
+          80,
+          180,
+          450,
+          1000,
+          2500,
+          6000,
+          12000,
+          18000
+        ],
+        "bandEnergyFraction": [
+          0.0002,
+          0.032,
+          0.0717,
+          0.1012,
+          0.1962,
+          0.4989,
+          0.0999,
+          0.0
+        ],
+        "spectralCentroidHz": 3340.9,
+        "first20msRms": 0.090043,
+        "last20msRms": 0.090862,
+        "loopPhaseMismatch": 0.00021428987383842468,
+        "loopPhaseMismatchDbfs": -73.38,
+        "loopPhaseMismatchVsNormalStep": 0.0039
+      }
+    },
+    {
+      "key": "proj_masterwork_glacier",
+      "file": "runtime/proj_masterwork_glacier.mp3",
+      "bytes": 18852,
+      "sha256": "984f9e1204106e723d7627be3cb44d4ed153ae3c8bc507583eb4921c12c92c3a",
+      "passed": true,
+      "conform": {
+        "method": "linear peak-constrained normalization from pristine WAV",
+        "sourcePeakDb": -7.9,
+        "sourceLufs": null,
+        "desiredGainDb": 1.6500000000000004,
+        "gainDb": 1.6500000000000004,
+        "peakLimited": false,
+        "policy": "sound_effects.md peak-safety binding constraint; validated by repository inspectSfxConformance/classify"
+      },
+      "safetyCorrections": [],
+      "inspect": {
+        "duration": 0.757551,
+        "bitrate": 192,
+        "sampleRate": 44100,
+        "codec": "mp3",
+        "channels": 1,
+        "isLossless": false,
+        "isMp3": true,
+        "peakDb": -6.5,
+        "lufs": null,
+        "reject": false,
+        "problems": [],
+        "advisories": [],
+        "normBranch": "peak"
+      },
+      "decoded": {
+        "samples": 31752,
+        "durationSeconds": 0.72,
+        "samplePeakDbfs": -6.584027694685176,
+        "rmsDbfs": -21.7962762367462,
+        "nonFiniteSamples": 0,
+        "loopStartSample": null,
+        "loopEndSample": null,
+        "loopSeamDelta": null,
+        "loopSeamVsAdjacentRms": null
+      },
+      "materialReview": {
+        "bandEdgesHz": [
+          25,
+          80,
+          180,
+          450,
+          1000,
+          2500,
+          6000,
+          12000,
+          18000
+        ],
+        "bandEnergyFraction": [
+          0.0093,
+          0.1446,
+          0.0326,
+          0.4541,
+          0.091,
+          0.1489,
+          0.1127,
+          0.0067
+        ],
+        "spectralCentroidHz": 2039.5,
+        "first20msRms": 0.19954,
+        "last20msRms": 7.7e-05
+      }
+    },
+    {
+      "key": "impact_masterwork_glacier",
+      "file": "runtime/impact_masterwork_glacier.mp3",
+      "bytes": 70261,
+      "sha256": "345c5839ed83cd0df4b901676859f71f2b60c2b4e12562aed129d1109c9c2310",
+      "passed": true,
+      "conform": {
+        "method": "linear peak-constrained normalization from pristine WAV",
+        "sourcePeakDb": -8,
+        "sourceLufs": -23.1,
+        "desiredGainDb": 9.100000000000001,
+        "gainDb": 1.75,
+        "peakLimited": true,
+        "policy": "sound_effects.md peak-safety binding constraint; validated by repository inspectSfxConformance/classify"
+      },
+      "safetyCorrections": [],
+      "inspect": {
+        "duration": 2.899592,
+        "bitrate": 192,
+        "sampleRate": 44100,
+        "codec": "mp3",
+        "channels": 1,
+        "isLossless": false,
+        "isMp3": true,
+        "peakDb": -6.5,
+        "lufs": -21.6,
+        "reject": false,
+        "problems": [],
+        "advisories": [],
+        "normBranch": "lufs"
+      },
+      "decoded": {
+        "samples": 125685,
+        "durationSeconds": 2.85,
+        "samplePeakDbfs": -6.536027508093731,
+        "rmsDbfs": -22.421436243740924,
+        "nonFiniteSamples": 0,
+        "loopStartSample": null,
+        "loopEndSample": null,
+        "loopSeamDelta": null,
+        "loopSeamVsAdjacentRms": null
+      },
+      "materialReview": {
+        "bandEdgesHz": [
+          25,
+          80,
+          180,
+          450,
+          1000,
+          2500,
+          6000,
+          12000,
+          18000
+        ],
+        "bandEnergyFraction": [
+          0.0481,
+          0.0616,
+          0.3848,
+          0.1719,
+          0.0949,
+          0.1578,
+          0.079,
+          0.0018
+        ],
+        "spectralCentroidHz": 1751.4,
+        "first20msRms": 0.21968,
+        "last20msRms": 3.9e-05
+      }
+    },
+    {
+      "key": "cast_masterwork_thunder",
+      "file": "runtime/cast_masterwork_thunder.mp3",
+      "bytes": 97846,
+      "sha256": "bc351c6a7fdec945298da9addf9433c794fbcfd95f7956c8ee075a3c94ea2d49",
+      "passed": true,
+      "conform": {
+        "method": "linear peak-constrained normalization from pristine WAV",
+        "sourcePeakDb": -7.9,
+        "sourceLufs": -19.3,
+        "desiredGainDb": 5.300000000000001,
+        "gainDb": 1.6500000000000004,
+        "peakLimited": true,
+        "policy": "sound_effects.md peak-safety binding constraint; validated by repository inspectSfxConformance/classify"
+      },
+      "safetyCorrections": [],
+      "inspect": {
+        "duration": 4.04898,
+        "bitrate": 192,
+        "sampleRate": 44100,
+        "codec": "mp3",
+        "channels": 1,
+        "isLossless": false,
+        "isMp3": true,
+        "peakDb": -6.5,
+        "lufs": -18,
+        "reject": false,
+        "problems": [],
+        "advisories": [],
+        "normBranch": "lufs"
+      },
+      "decoded": {
+        "samples": 176400,
+        "durationSeconds": 4,
+        "samplePeakDbfs": -6.555178805314471,
+        "rmsDbfs": -18.2161833261109,
+        "nonFiniteSamples": 0,
+        "loopStartSample": 44100,
+        "loopEndSample": 132300,
+        "loopSeamDelta": 0.026330091059207916,
+        "loopSeamVsAdjacentRms": 0.5210145808523179
+      },
+      "materialReview": {
+        "bandEdgesHz": [
+          25,
+          80,
+          180,
+          450,
+          1000,
+          2500,
+          6000,
+          12000,
+          18000
+        ],
+        "bandEnergyFraction": [
+          0.1873,
+          0.2986,
+          0.2244,
+          0.0008,
+          0.0494,
+          0.1306,
+          0.1065,
+          0.0025
+        ],
+        "spectralCentroidHz": 1569.7,
+        "first20msRms": 0.173368,
+        "last20msRms": 0.122097,
+        "loopPhaseMismatch": 0.0009853094816207886,
+        "loopPhaseMismatchDbfs": -60.13,
+        "loopPhaseMismatchVsNormalStep": 0.0195
+      }
+    },
+    {
+      "key": "proj_masterwork_thunder",
+      "file": "runtime/proj_masterwork_thunder.mp3",
+      "bytes": 16971,
+      "sha256": "5f0b2d2c365a039fee95bd7c40f8c0f21821cd1761584843d455d47c729ba714",
+      "passed": true,
+      "conform": {
+        "method": "linear peak-constrained normalization from pristine WAV",
+        "sourcePeakDb": -6.9,
+        "sourceLufs": null,
+        "desiredGainDb": 0.6500000000000004,
+        "gainDb": 0.6500000000000004,
+        "peakLimited": false,
+        "policy": "sound_effects.md peak-safety binding constraint; validated by repository inspectSfxConformance/classify"
+      },
+      "safetyCorrections": [],
+      "inspect": {
+        "duration": 0.679184,
+        "bitrate": 192,
+        "sampleRate": 44100,
+        "codec": "mp3",
+        "channels": 1,
+        "isLossless": false,
+        "isMp3": true,
+        "peakDb": -6.5,
+        "lufs": null,
+        "reject": false,
+        "problems": [],
+        "advisories": [],
+        "normBranch": "peak"
+      },
+      "decoded": {
+        "samples": 28224,
+        "durationSeconds": 0.64,
+        "samplePeakDbfs": -7.088711103130798,
+        "rmsDbfs": -24.421920592334505,
+        "nonFiniteSamples": 0,
+        "loopStartSample": null,
+        "loopEndSample": null,
+        "loopSeamDelta": null,
+        "loopSeamVsAdjacentRms": null
+      },
+      "materialReview": {
+        "bandEdgesHz": [
+          25,
+          80,
+          180,
+          450,
+          1000,
+          2500,
+          6000,
+          12000,
+          18000
+        ],
+        "bandEnergyFraction": [
+          0.1824,
+          0.1788,
+          0.0722,
+          0.0368,
+          0.0978,
+          0.2419,
+          0.1731,
+          0.0171
+        ],
+        "spectralCentroidHz": 2855.9,
+        "first20msRms": 0.194947,
+        "last20msRms": 2.5e-05
+      }
+    },
+    {
+      "key": "impact_masterwork_thunder",
+      "file": "runtime/impact_masterwork_thunder.mp3",
+      "bytes": 75903,
+      "sha256": "d496369cb6282f5aaf08cc556bc7471ba4d04c05545d46b1745a5c5d7c62462b",
+      "passed": true,
+      "conform": {
+        "method": "linear peak-constrained normalization from pristine WAV",
+        "sourcePeakDb": -7.7,
+        "sourceLufs": -26.1,
+        "desiredGainDb": 12.100000000000001,
+        "gainDb": 1.4500000000000002,
+        "peakLimited": true,
+        "policy": "sound_effects.md peak-safety binding constraint; validated by repository inspectSfxConformance/classify"
+      },
+      "safetyCorrections": [],
+      "inspect": {
+        "duration": 3.134694,
+        "bitrate": 192,
+        "sampleRate": 44100,
+        "codec": "mp3",
+        "channels": 1,
+        "isLossless": false,
+        "isMp3": true,
+        "peakDb": -6.4,
+        "lufs": -24.9,
+        "reject": false,
+        "problems": [],
+        "advisories": [],
+        "normBranch": "lufs"
+      },
+      "decoded": {
+        "samples": 136710,
+        "durationSeconds": 3.1,
+        "samplePeakDbfs": -6.530475141535601,
+        "rmsDbfs": -23.017629196001312,
+        "nonFiniteSamples": 0,
+        "loopStartSample": null,
+        "loopEndSample": null,
+        "loopSeamDelta": null,
+        "loopSeamVsAdjacentRms": null
+      },
+      "materialReview": {
+        "bandEdgesHz": [
+          25,
+          80,
+          180,
+          450,
+          1000,
+          2500,
+          6000,
+          12000,
+          18000
+        ],
+        "bandEnergyFraction": [
+          0.4985,
+          0.2355,
+          0.1609,
+          0.0604,
+          0.0106,
+          0.0131,
+          0.0193,
+          0.0017
+        ],
+        "spectralCentroidHz": 405.4,
+        "first20msRms": 0.224817,
+        "last20msRms": 7.4e-05
+      }
+    },
+    {
+      "key": "cast_masterwork_tide",
+      "file": "runtime/cast_masterwork_tide.mp3",
+      "bytes": 97846,
+      "sha256": "55dd0a77d73b3f11b274db3a75e09f7648d6c53a86395c14ef6019ba7ad859f6",
+      "passed": true,
+      "conform": {
+        "method": "linear peak-constrained normalization from pristine WAV",
+        "sourcePeakDb": -8,
+        "sourceLufs": -19.2,
+        "desiredGainDb": 5.199999999999999,
+        "gainDb": 1.75,
+        "peakLimited": true,
+        "policy": "sound_effects.md peak-safety binding constraint; validated by repository inspectSfxConformance/classify"
+      },
+      "safetyCorrections": [],
+      "inspect": {
+        "duration": 4.04898,
+        "bitrate": 192,
+        "sampleRate": 44100,
+        "codec": "mp3",
+        "channels": 1,
+        "isLossless": false,
+        "isMp3": true,
+        "peakDb": -6.5,
+        "lufs": -17.7,
+        "reject": false,
+        "problems": [],
+        "advisories": [],
+        "normBranch": "lufs"
+      },
+      "decoded": {
+        "samples": 176400,
+        "durationSeconds": 4,
+        "samplePeakDbfs": -6.503022003187052,
+        "rmsDbfs": -19.21478010369532,
+        "nonFiniteSamples": 0,
+        "loopStartSample": 44100,
+        "loopEndSample": 132300,
+        "loopSeamDelta": 0.02741178497672081,
+        "loopSeamVsAdjacentRms": 0.7328127608538896
+      },
+      "materialReview": {
+        "bandEdgesHz": [
+          25,
+          80,
+          180,
+          450,
+          1000,
+          2500,
+          6000,
+          12000,
+          18000
+        ],
+        "bandEnergyFraction": [
+          0.0,
+          0.0263,
+          0.1472,
+          0.1809,
+          0.3822,
+          0.2351,
+          0.0284,
+          0.0
+        ],
+        "spectralCentroidHz": 1893.3,
+        "first20msRms": 0.115684,
+        "last20msRms": 0.11269,
+        "loopPhaseMismatch": 0.0005340017378330231,
+        "loopPhaseMismatchDbfs": -65.45,
+        "loopPhaseMismatchVsNormalStep": 0.0143
+      }
+    },
+    {
+      "key": "proj_masterwork_tide",
+      "file": "runtime/proj_masterwork_tide.mp3",
+      "bytes": 27002,
+      "sha256": "b840a21df3d60543854cc2d797037762034dd26480730de2eb73e4e21054a882",
+      "passed": true,
+      "conform": {
+        "method": "linear peak-constrained normalization from pristine WAV",
+        "sourcePeakDb": -7.9,
+        "sourceLufs": -22.2,
+        "desiredGainDb": 8.2,
+        "gainDb": 1.6500000000000004,
+        "peakLimited": true,
+        "policy": "sound_effects.md peak-safety binding constraint; validated by repository inspectSfxConformance/classify"
+      },
+      "safetyCorrections": [],
+      "inspect": {
+        "duration": 1.097143,
+        "bitrate": 192,
+        "sampleRate": 44100,
+        "codec": "mp3",
+        "channels": 1,
+        "isLossless": false,
+        "isMp3": true,
+        "peakDb": -6.6,
+        "lufs": -20.8,
+        "reject": false,
+        "problems": [],
+        "advisories": [],
+        "normBranch": "lufs"
+      },
+      "decoded": {
+        "samples": 46305,
+        "durationSeconds": 1.05,
+        "samplePeakDbfs": -6.65053171973279,
+        "rmsDbfs": -21.981099438003753,
+        "nonFiniteSamples": 0,
+        "loopStartSample": null,
+        "loopEndSample": null,
+        "loopSeamDelta": null,
+        "loopSeamVsAdjacentRms": null
+      },
+      "materialReview": {
+        "bandEdgesHz": [
+          25,
+          80,
+          180,
+          450,
+          1000,
+          2500,
+          6000,
+          12000,
+          18000
+        ],
+        "bandEnergyFraction": [
+          0.0001,
+          0.017,
+          0.2246,
+          0.1074,
+          0.2078,
+          0.4115,
+          0.0315,
+          0.0
+        ],
+        "spectralCentroidHz": 2393.2,
+        "first20msRms": 0.161641,
+        "last20msRms": 0.000122
+      }
+    },
+    {
+      "key": "impact_masterwork_tide",
+      "file": "runtime/impact_masterwork_tide.mp3",
+      "bytes": 75903,
+      "sha256": "35922721129efd75d16f7118daf86628e215268100accdf0640d7fc273bda633",
+      "passed": true,
+      "conform": {
+        "method": "linear peak-constrained normalization from pristine WAV",
+        "sourcePeakDb": -8,
+        "sourceLufs": -24.5,
+        "desiredGainDb": 10.5,
+        "gainDb": 1.75,
+        "peakLimited": true,
+        "policy": "sound_effects.md peak-safety binding constraint; validated by repository inspectSfxConformance/classify"
+      },
+      "safetyCorrections": [],
+      "inspect": {
+        "duration": 3.134694,
+        "bitrate": 192,
+        "sampleRate": 44100,
+        "codec": "mp3",
+        "channels": 1,
+        "isLossless": false,
+        "isMp3": true,
+        "peakDb": -6.5,
+        "lufs": -23,
+        "reject": false,
+        "problems": [],
+        "advisories": [],
+        "normBranch": "lufs"
+      },
+      "decoded": {
+        "samples": 136710,
+        "durationSeconds": 3.1,
+        "samplePeakDbfs": -6.514101239280072,
+        "rmsDbfs": -24.263470824102203,
+        "nonFiniteSamples": 0,
+        "loopStartSample": null,
+        "loopEndSample": null,
+        "loopSeamDelta": null,
+        "loopSeamVsAdjacentRms": null
+      },
+      "materialReview": {
+        "bandEdgesHz": [
+          25,
+          80,
+          180,
+          450,
+          1000,
+          2500,
+          6000,
+          12000,
+          18000
+        ],
+        "bandEnergyFraction": [
+          0.0,
+          0.055,
+          0.2952,
+          0.1599,
+          0.1656,
+          0.3108,
+          0.0136,
+          0.0
+        ],
+        "spectralCentroidHz": 1883.6,
+        "first20msRms": 0.130126,
+        "last20msRms": 2.5e-05
+      }
+    },
+    {
+      "key": "cast_masterwork_wolf",
+      "file": "runtime/cast_masterwork_wolf.mp3",
+      "bytes": 97846,
+      "sha256": "7c19afab19fbb31e8812c6236203406d579daa82a45ac2d4fcba14732d998b5c",
+      "passed": true,
+      "conform": {
+        "method": "linear peak-constrained normalization from pristine WAV",
+        "sourcePeakDb": -8,
+        "sourceLufs": -20.5,
+        "desiredGainDb": 6.5,
+        "gainDb": 1.75,
+        "peakLimited": true,
+        "policy": "sound_effects.md peak-safety binding constraint; validated by repository inspectSfxConformance/classify"
+      },
+      "safetyCorrections": [],
+      "inspect": {
+        "duration": 4.04898,
+        "bitrate": 192,
+        "sampleRate": 44100,
+        "codec": "mp3",
+        "channels": 1,
+        "isLossless": false,
+        "isMp3": true,
+        "peakDb": -6.5,
+        "lufs": -19,
+        "reject": false,
+        "problems": [],
+        "advisories": [],
+        "normBranch": "lufs"
+      },
+      "decoded": {
+        "samples": 176400,
+        "durationSeconds": 4,
+        "samplePeakDbfs": -6.504134162551089,
+        "rmsDbfs": -19.285553282969698,
+        "nonFiniteSamples": 0,
+        "loopStartSample": 44100,
+        "loopEndSample": 132300,
+        "loopSeamDelta": 0.0013139471411705017,
+        "loopSeamVsAdjacentRms": 0.05137673298544909
+      },
+      "materialReview": {
+        "bandEdgesHz": [
+          25,
+          80,
+          180,
+          450,
+          1000,
+          2500,
+          6000,
+          12000,
+          18000
+        ],
+        "bandEnergyFraction": [
+          0.113,
+          0.0924,
+          0.2668,
+          0.2016,
+          0.1986,
+          0.1125,
+          0.0151,
+          0.0
+        ],
+        "spectralCentroidHz": 1052.6,
+        "first20msRms": 0.121535,
+        "last20msRms": 0.108696,
+        "loopPhaseMismatch": 0.0004803314805030823,
+        "loopPhaseMismatchDbfs": -66.37,
+        "loopPhaseMismatchVsNormalStep": 0.0188
+      }
+    },
+    {
+      "key": "proj_masterwork_wolf",
+      "file": "runtime/proj_masterwork_wolf.mp3",
+      "bytes": 28256,
+      "sha256": "37954566264d9ede0fe0ab98d82b1c34553a63db5a0faf26ba37ad73f7ba463d",
+      "passed": true,
+      "conform": {
+        "method": "linear peak-constrained normalization from pristine WAV",
+        "sourcePeakDb": -8,
+        "sourceLufs": -23.4,
+        "desiredGainDb": 9.399999999999999,
+        "gainDb": 1.75,
+        "peakLimited": true,
+        "policy": "sound_effects.md peak-safety binding constraint; validated by repository inspectSfxConformance/classify"
+      },
+      "safetyCorrections": [],
+      "inspect": {
+        "duration": 1.149388,
+        "bitrate": 192,
+        "sampleRate": 44100,
+        "codec": "mp3",
+        "channels": 1,
+        "isLossless": false,
+        "isMp3": true,
+        "peakDb": -6.5,
+        "lufs": -21.9,
+        "reject": false,
+        "problems": [],
+        "advisories": [],
+        "normBranch": "lufs"
+      },
+      "decoded": {
+        "samples": 48510,
+        "durationSeconds": 1.1,
+        "samplePeakDbfs": -6.49618250857905,
+        "rmsDbfs": -21.2052945618105,
+        "nonFiniteSamples": 0,
+        "loopStartSample": null,
+        "loopEndSample": null,
+        "loopSeamDelta": null,
+        "loopSeamVsAdjacentRms": null
+      },
+      "materialReview": {
+        "bandEdgesHz": [
+          25,
+          80,
+          180,
+          450,
+          1000,
+          2500,
+          6000,
+          12000,
+          18000
+        ],
+        "bandEnergyFraction": [
+          0.0053,
+          0.3332,
+          0.2383,
+          0.1449,
+          0.1616,
+          0.0999,
+          0.0169,
+          0.0
+        ],
+        "spectralCentroidHz": 946.0,
+        "first20msRms": 0.191334,
+        "last20msRms": 0.000121
+      }
+    },
+    {
+      "key": "impact_masterwork_wolf",
+      "file": "runtime/impact_masterwork_wolf.mp3",
+      "bytes": 69007,
+      "sha256": "f72f58ef379260cc36bc10b07a92afe1184f25d42c8278a63b7cf52d0ec75b61",
+      "passed": true,
+      "conform": {
+        "method": "linear peak-constrained normalization from pristine WAV",
+        "sourcePeakDb": -8,
+        "sourceLufs": -23.7,
+        "desiredGainDb": 9.7,
+        "gainDb": 1.75,
+        "peakLimited": true,
+        "policy": "sound_effects.md peak-safety binding constraint; validated by repository inspectSfxConformance/classify"
+      },
+      "safetyCorrections": [],
+      "inspect": {
+        "duration": 2.847347,
+        "bitrate": 192,
+        "sampleRate": 44100,
+        "codec": "mp3",
+        "channels": 1,
+        "isLossless": false,
+        "isMp3": true,
+        "peakDb": -6.5,
+        "lufs": -22.2,
+        "reject": false,
+        "problems": [],
+        "advisories": [],
+        "normBranch": "lufs"
+      },
+      "decoded": {
+        "samples": 123480,
+        "durationSeconds": 2.8,
+        "samplePeakDbfs": -6.512462367723412,
+        "rmsDbfs": -23.331688996797855,
+        "nonFiniteSamples": 0,
+        "loopStartSample": null,
+        "loopEndSample": null,
+        "loopSeamDelta": null,
+        "loopSeamVsAdjacentRms": null
+      },
+      "materialReview": {
+        "bandEdgesHz": [
+          25,
+          80,
+          180,
+          450,
+          1000,
+          2500,
+          6000,
+          12000,
+          18000
+        ],
+        "bandEnergyFraction": [
+          0.0,
+          0.3341,
+          0.1371,
+          0.2062,
+          0.1916,
+          0.12,
+          0.011,
+          0.0
+        ],
+        "spectralCentroidHz": 1043.7,
+        "first20msRms": 0.165668,
+        "last20msRms": 9.4e-05
+      }
+    },
+    {
+      "key": "cast_masterwork_judgement",
+      "file": "runtime/cast_masterwork_judgement.mp3",
+      "bytes": 97846,
+      "sha256": "be24ca4d5e23a4b2cc239eb7795d3e3eb165ef81a1654e272843500edfa2b8ac",
+      "passed": true,
+      "conform": {
+        "method": "linear peak-constrained normalization from pristine WAV",
+        "sourcePeakDb": -8,
+        "sourceLufs": -19.5,
+        "desiredGainDb": 5.5,
+        "gainDb": 1.75,
+        "peakLimited": true,
+        "policy": "sound_effects.md peak-safety binding constraint; validated by repository inspectSfxConformance/classify"
+      },
+      "safetyCorrections": [],
+      "inspect": {
+        "duration": 4.04898,
+        "bitrate": 192,
+        "sampleRate": 44100,
+        "codec": "mp3",
+        "channels": 1,
+        "isLossless": false,
+        "isMp3": true,
+        "peakDb": -6.5,
+        "lufs": -18.1,
+        "reject": false,
+        "problems": [],
+        "advisories": [],
+        "normBranch": "lufs"
+      },
+      "decoded": {
+        "samples": 176400,
+        "durationSeconds": 4,
+        "samplePeakDbfs": -6.488733687152877,
+        "rmsDbfs": -18.50673167018828,
+        "nonFiniteSamples": 0,
+        "loopStartSample": 44100,
+        "loopEndSample": 132300,
+        "loopSeamDelta": 0.016587592661380768,
+        "loopSeamVsAdjacentRms": 0.43455539217329564
+      },
+      "materialReview": {
+        "bandEdgesHz": [
+          25,
+          80,
+          180,
+          450,
+          1000,
+          2500,
+          6000,
+          12000,
+          18000
+        ],
+        "bandEnergyFraction": [
+          0.0,
+          0.0228,
+          0.4229,
+          0.2561,
+          0.1518,
+          0.0983,
+          0.048,
+          0.0
+        ],
+        "spectralCentroidHz": 1328.6,
+        "first20msRms": 0.123805,
+        "last20msRms": 0.112003,
+        "loopPhaseMismatch": 8.363276720046997e-05,
+        "loopPhaseMismatchDbfs": -81.55,
+        "loopPhaseMismatchVsNormalStep": 0.0022
+      }
+    },
+    {
+      "key": "proj_masterwork_judgement",
+      "file": "runtime/proj_masterwork_judgement.mp3",
+      "bytes": 24494,
+      "sha256": "7cae81ec8cb4fd58f090807854065e92dff9a96fce57e484c6d779e381f15429",
+      "passed": true,
+      "conform": {
+        "method": "linear peak-constrained normalization from pristine WAV",
+        "sourcePeakDb": -8,
+        "sourceLufs": null,
+        "desiredGainDb": 1.75,
+        "gainDb": 1.75,
+        "peakLimited": false,
+        "policy": "sound_effects.md peak-safety binding constraint; validated by repository inspectSfxConformance/classify"
+      },
+      "safetyCorrections": [],
+      "inspect": {
+        "duration": 0.992653,
+        "bitrate": 192,
+        "sampleRate": 44100,
+        "codec": "mp3",
+        "channels": 1,
+        "isLossless": false,
+        "isMp3": true,
+        "peakDb": -6.5,
+        "lufs": null,
+        "reject": false,
+        "problems": [],
+        "advisories": [],
+        "normBranch": "peak"
+      },
+      "decoded": {
+        "samples": 42336,
+        "durationSeconds": 0.96,
+        "samplePeakDbfs": -6.53855278461654,
+        "rmsDbfs": -21.91251607867351,
+        "nonFiniteSamples": 0,
+        "loopStartSample": null,
+        "loopEndSample": null,
+        "loopSeamDelta": null,
+        "loopSeamVsAdjacentRms": null
+      },
+      "materialReview": {
+        "bandEdgesHz": [
+          25,
+          80,
+          180,
+          450,
+          1000,
+          2500,
+          6000,
+          12000,
+          18000
+        ],
+        "bandEnergyFraction": [
+          0.0643,
+          0.2211,
+          0.1147,
+          0.2884,
+          0.1957,
+          0.1115,
+          0.0042,
+          0.0
+        ],
+        "spectralCentroidHz": 991.5,
+        "first20msRms": 0.195884,
+        "last20msRms": 9.4e-05
+      }
+    },
+    {
+      "key": "impact_masterwork_judgement",
+      "file": "runtime/impact_masterwork_judgement.mp3",
+      "bytes": 83426,
+      "sha256": "1aeb22ad46781c16b200c3d788185768781663f61f7b5c25b3c71f27f368bf62",
+      "passed": true,
+      "conform": {
+        "method": "linear peak-constrained normalization from pristine WAV",
+        "sourcePeakDb": -8,
+        "sourceLufs": -24.8,
+        "desiredGainDb": 10.8,
+        "gainDb": 1.75,
+        "peakLimited": true,
+        "policy": "sound_effects.md peak-safety binding constraint; validated by repository inspectSfxConformance/classify"
+      },
+      "safetyCorrections": [],
+      "inspect": {
+        "duration": 3.448163,
+        "bitrate": 192,
+        "sampleRate": 44100,
+        "codec": "mp3",
+        "channels": 1,
+        "isLossless": false,
+        "isMp3": true,
+        "peakDb": -6.5,
+        "lufs": -23.3,
+        "reject": false,
+        "problems": [],
+        "advisories": [],
+        "normBranch": "lufs"
+      },
+      "decoded": {
+        "samples": 149940,
+        "durationSeconds": 3.4,
+        "samplePeakDbfs": -6.484887967582528,
+        "rmsDbfs": -23.356423287896853,
+        "nonFiniteSamples": 0,
+        "loopStartSample": null,
+        "loopEndSample": null,
+        "loopSeamDelta": null,
+        "loopSeamVsAdjacentRms": null
+      },
+      "materialReview": {
+        "bandEdgesHz": [
+          25,
+          80,
+          180,
+          450,
+          1000,
+          2500,
+          6000,
+          12000,
+          18000
+        ],
+        "bandEnergyFraction": [
+          0.1419,
+          0.0672,
+          0.4909,
+          0.199,
+          0.0651,
+          0.0261,
+          0.0098,
+          0.0
+        ],
+        "spectralCentroidHz": 533.7,
+        "first20msRms": 0.205497,
+        "last20msRms": 0.000102
+      }
+    },
+    {
+      "key": "cast_masterwork_execution",
+      "file": "runtime/cast_masterwork_execution.mp3",
+      "bytes": 97846,
+      "sha256": "bdf3d5db2d8cfc5a041fab8e3a1d25eed9a2ea00905021ac4cdecbe6d86a4e1b",
+      "passed": true,
+      "conform": {
+        "method": "linear peak-constrained normalization from pristine WAV",
+        "sourcePeakDb": -8,
+        "sourceLufs": -20.9,
+        "desiredGainDb": 6.899999999999999,
+        "gainDb": 1.75,
+        "peakLimited": true,
+        "policy": "sound_effects.md peak-safety binding constraint; validated by repository inspectSfxConformance/classify"
+      },
+      "safetyCorrections": [],
+      "inspect": {
+        "duration": 4.04898,
+        "bitrate": 192,
+        "sampleRate": 44100,
+        "codec": "mp3",
+        "channels": 1,
+        "isLossless": false,
+        "isMp3": true,
+        "peakDb": -6.4,
+        "lufs": -19.4,
+        "reject": false,
+        "problems": [],
+        "advisories": [],
+        "normBranch": "lufs"
+      },
+      "decoded": {
+        "samples": 176400,
+        "durationSeconds": 4,
+        "samplePeakDbfs": -6.420192734237503,
+        "rmsDbfs": -19.266895217525782,
+        "nonFiniteSamples": 0,
+        "loopStartSample": 44100,
+        "loopEndSample": 132300,
+        "loopSeamDelta": 0.0012339800596237183,
+        "loopSeamVsAdjacentRms": 0.06020707348940544
+      },
+      "materialReview": {
+        "bandEdgesHz": [
+          25,
+          80,
+          180,
+          450,
+          1000,
+          2500,
+          6000,
+          12000,
+          18000
+        ],
+        "bandEnergyFraction": [
+          0.0,
+          0.1421,
+          0.4589,
+          0.2448,
+          0.0727,
+          0.0773,
+          0.0025,
+          0.0017
+        ],
+        "spectralCentroidHz": 741.6,
+        "first20msRms": 0.115323,
+        "last20msRms": 0.103064,
+        "loopPhaseMismatch": 0.003972947597503662,
+        "loopPhaseMismatchDbfs": -48.02,
+        "loopPhaseMismatchVsNormalStep": 0.1938
+      }
+    },
+    {
+      "key": "proj_masterwork_execution",
+      "file": "runtime/proj_masterwork_execution.mp3",
+      "bytes": 17598,
+      "sha256": "c91e9e335a7eb63aa95e9f7c0f983eb7f88f1bdb81f6099d3285bdd5fee28b4b",
+      "passed": true,
+      "conform": {
+        "method": "linear peak-constrained normalization from pristine WAV",
+        "sourcePeakDb": -8,
+        "sourceLufs": null,
+        "desiredGainDb": 1.75,
+        "gainDb": 1.75,
+        "peakLimited": false,
+        "policy": "sound_effects.md peak-safety binding constraint; validated by repository inspectSfxConformance/classify"
+      },
+      "safetyCorrections": [],
+      "inspect": {
+        "duration": 0.705306,
+        "bitrate": 192,
+        "sampleRate": 44100,
+        "codec": "mp3",
+        "channels": 1,
+        "isLossless": false,
+        "isMp3": true,
+        "peakDb": -6.5,
+        "lufs": null,
+        "reject": false,
+        "problems": [],
+        "advisories": [],
+        "normBranch": "peak"
+      },
+      "decoded": {
+        "samples": 29106,
+        "durationSeconds": 0.66,
+        "samplePeakDbfs": -6.544133963762033,
+        "rmsDbfs": -22.998633486915615,
+        "nonFiniteSamples": 0,
+        "loopStartSample": null,
+        "loopEndSample": null,
+        "loopSeamDelta": null,
+        "loopSeamVsAdjacentRms": null
+      },
+      "materialReview": {
+        "bandEdgesHz": [
+          25,
+          80,
+          180,
+          450,
+          1000,
+          2500,
+          6000,
+          12000,
+          18000
+        ],
+        "bandEnergyFraction": [
+          0.1061,
+          0.1505,
+          0.1439,
+          0.1134,
+          0.188,
+          0.1935,
+          0.1044,
+          0.0002
+        ],
+        "spectralCentroidHz": 1987.8,
+        "first20msRms": 0.185213,
+        "last20msRms": 5.9e-05
+      }
+    },
+    {
+      "key": "impact_masterwork_execution",
+      "file": "runtime/impact_masterwork_execution.mp3",
+      "bytes": 47064,
+      "sha256": "aac729b724d51745e8f984d6361bb64d9ef622926e9ba1a548ade0ce254abe31",
+      "passed": true,
+      "conform": {
+        "method": "linear peak-constrained normalization from pristine WAV",
+        "sourcePeakDb": -8,
+        "sourceLufs": -27.8,
+        "desiredGainDb": 13.8,
+        "gainDb": 1.75,
+        "peakLimited": true,
+        "policy": "sound_effects.md peak-safety binding constraint; validated by repository inspectSfxConformance/classify"
+      },
+      "safetyCorrections": [],
+      "inspect": {
+        "duration": 1.933061,
+        "bitrate": 192,
+        "sampleRate": 44100,
+        "codec": "mp3",
+        "channels": 1,
+        "isLossless": false,
+        "isMp3": true,
+        "peakDb": -6.5,
+        "lufs": -26.3,
+        "reject": false,
+        "problems": [],
+        "advisories": [],
+        "normBranch": "lufs"
+      },
+      "decoded": {
+        "samples": 83790,
+        "durationSeconds": 1.9,
+        "samplePeakDbfs": -6.514503470330358,
+        "rmsDbfs": -24.691014949606043,
+        "nonFiniteSamples": 0,
+        "loopStartSample": null,
+        "loopEndSample": null,
+        "loopSeamDelta": null,
+        "loopSeamVsAdjacentRms": null
+      },
+      "materialReview": {
+        "bandEdgesHz": [
+          25,
+          80,
+          180,
+          450,
+          1000,
+          2500,
+          6000,
+          12000,
+          18000
+        ],
+        "bandEnergyFraction": [
+          0.4981,
+          0.2287,
+          0.157,
+          0.0502,
+          0.0258,
+          0.024,
+          0.0142,
+          0.002
+        ],
+        "spectralCentroidHz": 422.7,
+        "first20msRms": 0.219618,
+        "last20msRms": 2.2e-05
+      }
+    },
+    {
+      "key": "cast_masterwork_rift",
+      "file": "runtime/cast_masterwork_rift.mp3",
+      "bytes": 97846,
+      "sha256": "f7151fb76f4e3cfd8fe23a83e2858f17c98b96e74fe4a71f3c3908ad5a4f9c98",
+      "passed": true,
+      "conform": {
+        "method": "linear peak-constrained normalization from pristine WAV",
+        "sourcePeakDb": -8,
+        "sourceLufs": -20.5,
+        "desiredGainDb": 6.5,
+        "gainDb": 1.75,
+        "peakLimited": true,
+        "policy": "sound_effects.md peak-safety binding constraint; validated by repository inspectSfxConformance/classify"
+      },
+      "safetyCorrections": [],
+      "inspect": {
+        "duration": 4.04898,
+        "bitrate": 192,
+        "sampleRate": 44100,
+        "codec": "mp3",
+        "channels": 1,
+        "isLossless": false,
+        "isMp3": true,
+        "peakDb": -6.5,
+        "lufs": -19,
+        "reject": false,
+        "problems": [],
+        "advisories": [],
+        "normBranch": "lufs"
+      },
+      "decoded": {
+        "samples": 176400,
+        "durationSeconds": 4,
+        "samplePeakDbfs": -6.512979584327393,
+        "rmsDbfs": -17.895869712719417,
+        "nonFiniteSamples": 0,
+        "loopStartSample": 44100,
+        "loopEndSample": 132300,
+        "loopSeamDelta": 0.012951437383890152,
+        "loopSeamVsAdjacentRms": 0.8201222387271132
+      },
+      "materialReview": {
+        "bandEdgesHz": [
+          25,
+          80,
+          180,
+          450,
+          1000,
+          2500,
+          6000,
+          12000,
+          18000
+        ],
+        "bandEnergyFraction": [
+          0.269,
+          0.2097,
+          0.2088,
+          0.1566,
+          0.1249,
+          0.031,
+          0.0,
+          0.0
+        ],
+        "spectralCentroidHz": 491.4,
+        "first20msRms": 0.109088,
+        "last20msRms": 0.108027,
+        "loopPhaseMismatch": 8.66428017616272e-05,
+        "loopPhaseMismatchDbfs": -81.25,
+        "loopPhaseMismatchVsNormalStep": 0.0055
+      }
+    },
+    {
+      "key": "proj_masterwork_rift",
+      "file": "runtime/proj_masterwork_rift.mp3",
+      "bytes": 29510,
+      "sha256": "acec631e31183703cf262642b8e211181e046989a84c10c30089ec5491160f80",
+      "passed": true,
+      "conform": {
+        "method": "linear peak-constrained normalization from pristine WAV",
+        "sourcePeakDb": -8,
+        "sourceLufs": -25.8,
+        "desiredGainDb": 11.8,
+        "gainDb": 1.75,
+        "peakLimited": true,
+        "policy": "sound_effects.md peak-safety binding constraint; validated by repository inspectSfxConformance/classify"
+      },
+      "safetyCorrections": [],
+      "inspect": {
+        "duration": 1.201633,
+        "bitrate": 192,
+        "sampleRate": 44100,
+        "codec": "mp3",
+        "channels": 1,
+        "isLossless": false,
+        "isMp3": true,
+        "peakDb": -6.5,
+        "lufs": -24.3,
+        "reject": false,
+        "problems": [],
+        "advisories": [],
+        "normBranch": "lufs"
+      },
+      "decoded": {
+        "samples": 51156,
+        "durationSeconds": 1.16,
+        "samplePeakDbfs": -6.577792058489031,
+        "rmsDbfs": -23.47824375290667,
+        "nonFiniteSamples": 0,
+        "loopStartSample": null,
+        "loopEndSample": null,
+        "loopSeamDelta": null,
+        "loopSeamVsAdjacentRms": null
+      },
+      "materialReview": {
+        "bandEdgesHz": [
+          25,
+          80,
+          180,
+          450,
+          1000,
+          2500,
+          6000,
+          12000,
+          18000
+        ],
+        "bandEnergyFraction": [
+          0.0151,
+          0.4313,
+          0.2695,
+          0.0559,
+          0.0707,
+          0.1034,
+          0.0518,
+          0.0021
+        ],
+        "spectralCentroidHz": 1106.8,
+        "first20msRms": 0.166603,
+        "last20msRms": 0.000137
+      }
+    },
+    {
+      "key": "impact_masterwork_rift",
+      "file": "runtime/impact_masterwork_rift.mp3",
+      "bytes": 87815,
+      "sha256": "ec130feb96991e6a65e9524d68048db2f970d60820f787cf85bba5e6f0604338",
+      "passed": true,
+      "conform": {
+        "method": "linear peak-constrained normalization from pristine WAV",
+        "sourcePeakDb": -8,
+        "sourceLufs": -26.1,
+        "desiredGainDb": 12.100000000000001,
+        "gainDb": 1.75,
+        "peakLimited": true,
+        "policy": "sound_effects.md peak-safety binding constraint; validated by repository inspectSfxConformance/classify"
+      },
+      "safetyCorrections": [],
+      "inspect": {
+        "duration": 3.63102,
+        "bitrate": 192,
+        "sampleRate": 44100,
+        "codec": "mp3",
+        "channels": 1,
+        "isLossless": false,
+        "isMp3": true,
+        "peakDb": -6.5,
+        "lufs": -24.6,
+        "reject": false,
+        "problems": [],
+        "advisories": [],
+        "normBranch": "lufs"
+      },
+      "decoded": {
+        "samples": 158760,
+        "durationSeconds": 3.6,
+        "samplePeakDbfs": -6.49530102030221,
+        "rmsDbfs": -23.367048582941848,
+        "nonFiniteSamples": 0,
+        "loopStartSample": null,
+        "loopEndSample": null,
+        "loopSeamDelta": null,
+        "loopSeamVsAdjacentRms": null
+      },
+      "materialReview": {
+        "bandEdgesHz": [
+          25,
+          80,
+          180,
+          450,
+          1000,
+          2500,
+          6000,
+          12000,
+          18000
+        ],
+        "bandEnergyFraction": [
+          0.3269,
+          0.4077,
+          0.1012,
+          0.0595,
+          0.0751,
+          0.0291,
+          0.0004,
+          0.0
+        ],
+        "spectralCentroidHz": 353.7,
+        "first20msRms": 0.22582,
+        "last20msRms": 5.2e-05
+      }
+    }
+  ],
+  "runtimeBudgetBytes": 2097152,
+  "losslessMasterCount": 24,
+  "editableStemCount": 131,
+  "loopConvention": {
+    "startOffset": 1,
+    "loopStart": 1,
+    "loopEnd": 3,
+    "period": 2,
+    "playbackRate": 1,
+    "pitchJitter": false
+  },
+  "materialReviewPassed": true
+}

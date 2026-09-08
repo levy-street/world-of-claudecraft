@@ -277,6 +277,7 @@ export function syncIgnivarEncounterVisuals(
       plan.frontalProgress,
       plan.inverseEntityScale,
       dt,
+      reducedMotion,
     );
 
     let skyfire = group.getObjectByName(IGNIVAR_SKYFIRE_VISUAL_NAME);

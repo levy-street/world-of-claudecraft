@@ -65,9 +65,19 @@ describe('renderer CPU hot path', () => {
 
   it('manually updates the camera once on ordinary frames', () => {
     expect(renderer).toContain('this.camera.matrixWorldAutoUpdate = false');
-    expect(renderer).toContain(
-      'if (shakeX !== 0 || shakeY !== 0) refreshFrozenWorldMatrix(this.camera)',
+    const begin = renderer.indexOf(
+      'const cameraShifted = this.cameraImpact.beginDraw(this.camera, dt, this.reducedMotion());',
     );
+    const refresh = renderer.indexOf(
+      'if (cameraShifted) refreshFrozenWorldMatrix(this.camera);',
+      begin,
+    );
+    const present = renderer.indexOf('presentFrame(host, dt, present)', refresh);
+    const end = renderer.indexOf('this.cameraImpact.endDraw(this.camera);', present);
+    expect(begin).toBeGreaterThan(-1);
+    expect(refresh).toBeGreaterThan(begin);
+    expect(present).toBeGreaterThan(refresh);
+    expect(end).toBeGreaterThan(present);
   });
 
   it('preserves completed submit and total timings through the reused frame-start buffers', () => {
@@ -142,28 +152,32 @@ describe('renderer CPU hot path', () => {
   });
 
   it('attributes visibility, fish, ambient scenery, and zone feature animation separately', () => {
-    const terrainMarkAt = renderer.lastIndexOf(
-      "this.markRendererWorldPhase(worldPhaseMs, 'terrain', worldStart)",
+    const scenery = readFileSync('src/render/renderer_scenery.ts', 'utf8');
+    expect(renderer).toContain(
+      'worldStart = updateRendererScenery(this, p, dt, projectionPixels, worldPhaseMs, worldStart);',
     );
-    const zoneVisibilityAt = renderer.lastIndexOf('this.updateZoneFeatureVisibility(fogFar);');
-    const earlyZoneFeatureMarkAt = renderer.indexOf(
-      "this.markRendererWorldPhase(worldPhaseMs, 'zoneVisibility', worldStart)",
+    const terrainMarkAt = scenery.lastIndexOf(
+      "host.markRendererWorldPhase(worldPhaseMs, 'terrain', worldStart)",
+    );
+    const zoneVisibilityAt = scenery.lastIndexOf('host.updateZoneFeatureVisibility(fogFar);');
+    const earlyZoneFeatureMarkAt = scenery.indexOf(
+      "host.markRendererWorldPhase(worldPhaseMs, 'zoneVisibility', worldStart)",
       zoneVisibilityAt,
     );
-    const propsUpdateAt = renderer.indexOf('this.propsView.update(', zoneVisibilityAt);
-    const fishUpdateAt = renderer.lastIndexOf('this.fish.update(p.pos.x, p.pos.z, dt);');
-    const fishMarkAt = renderer.indexOf(
-      "this.markRendererWorldPhase(worldPhaseMs, 'fish', worldStart)",
+    const propsUpdateAt = scenery.indexOf('host.propsView.update(', zoneVisibilityAt);
+    const fishUpdateAt = scenery.lastIndexOf('host.fish.update(p.pos.x, p.pos.z, dt);');
+    const fishMarkAt = scenery.indexOf(
+      "host.markRendererWorldPhase(worldPhaseMs, 'fish', worldStart)",
       fishUpdateAt,
     );
-    const motesAt = renderer.indexOf('this.motes.update(p.pos.x, p.pos.z, dt);', fishUpdateAt);
-    const ambientMarkAt = renderer.indexOf(
-      "this.markRendererWorldPhase(worldPhaseMs, 'ambientScenery', worldStart)",
+    const motesAt = scenery.indexOf('host.motes.update(p.pos.x, p.pos.z, dt);', fishUpdateAt);
+    const ambientMarkAt = scenery.indexOf(
+      "host.markRendererWorldPhase(worldPhaseMs, 'ambientScenery', worldStart)",
       motesAt,
     );
-    const realmFloraAt = renderer.indexOf('this.realmFlora?.update(this.time);', motesAt);
-    const featureMarkAt = renderer.indexOf(
-      "this.markRendererWorldPhase(worldPhaseMs, 'zoneFeatures', worldStart)",
+    const realmFloraAt = scenery.indexOf('host.realmFlora?.update(host.time);', motesAt);
+    const featureMarkAt = scenery.indexOf(
+      "host.markRendererWorldPhase(worldPhaseMs, 'zoneFeatures', worldStart)",
       realmFloraAt,
     );
 
@@ -180,7 +194,7 @@ describe('renderer CPU hot path', () => {
   });
   it('fully skips proven-static world branches while reusing telemetry containers', () => {
     expect(renderer).toContain('const frameStats = this.lastFrameStats');
-    expect(renderer).toContain('this.foliage.perfStats(frameStats.foliage)');
+    expect(renderer).toContain('this.foliage?.perfStats(frameStats.foliage)');
     expect(renderer).not.toContain('const markPhase =');
     expect(renderer).not.toContain('const markWorldPhase =');
     expect(renderer).toContain('freezeStaticSubtreeMatrices(this.terrainView.group)');

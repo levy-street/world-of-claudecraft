@@ -12,6 +12,7 @@ import { StaticOpaqueN8AOPass } from './post_n8ao';
 import { OutputGradePass } from './post_output_grade';
 import { postPipelinePlan } from './post_plan_core';
 import { renderLayerDisabled } from './render_dev_flags';
+import { OpaqueSceneCapture } from './scene_sampling';
 
 // Post chain: N8AO (high: half-res Low, ultra+insane: full-res Medium)
 // -> UnrealBloom -> OutputGradePass (OutputPass ACES tonemap + sRGB followed
@@ -159,11 +160,16 @@ export function buildComposer(
   // target that rasterizes geometry.
   const target = new THREE.WebGLRenderTarget(size.x, size.y, {
     depthBuffer: plan.scene.pass === 'render',
+    depthTexture:
+      plan.scene.pass === 'render'
+        ? new THREE.DepthTexture(size.x, size.y, THREE.UnsignedIntType)
+        : null,
     resolveDepthBuffer: !gradeOnly,
     samples: plan.composerSamples,
     type: THREE.HalfFloatType,
   });
   const composer = new PostEffectComposer(webgl, target, width, height, plan.singleComposerBuffer);
+  const sceneCapture = new OpaqueSceneCapture(webgl, scene, size.x, size.y);
 
   let ao: N8AOPass | null = null;
   if (plan.scene.pass === 'n8ao') {
@@ -267,6 +273,7 @@ export function buildComposer(
     supportsDynamicResolution: plan.supportsDynamicResolution,
     setSize(width: number, height: number, pixelRatio = webgl.getPixelRatio()): void {
       composer.setSizeAndPixelRatio(width, height, pixelRatio);
+      sceneCapture.setSize(composer.renderTarget1.width, composer.renderTarget1.height);
       // The ripple projection maps world points to clip space, so it needs the
       // logical aspect, not the drawing-buffer extent.
       aspect = width / Math.max(1, height);
@@ -281,13 +288,25 @@ export function buildComposer(
       grade.setInputUvRect(region.uvScaleX, region.uvScaleY, region.uvMaxX, region.uvMaxY);
     },
     render(): void {
+      sceneCapture.begin();
       composer.render();
     },
     dispose(): void {
       if (disposed) return;
       disposed = true;
-      for (const pass of composer.passes) pass.dispose();
-      composer.dispose();
+      const errors: unknown[] = [];
+      for (const release of [
+        () => sceneCapture.dispose(),
+        ...composer.passes.map((pass) => () => pass.dispose()),
+        () => composer.dispose(),
+      ]) {
+        try {
+          release();
+        } catch (error) {
+          errors.push(error);
+        }
+      }
+      if (errors.length) throw new AggregateError(errors, 'Post pipeline cleanup failed');
     },
     screenRipple(x: number, y: number, z: number, strength: number): void {
       if (!screenFx) return;

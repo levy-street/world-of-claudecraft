@@ -114,6 +114,24 @@ function currentClipName(visual: CharacterVisual): string | null {
 }
 
 describe('generic-cast pointing hold and cast-exit play-out (real mixer)', () => {
+  it('keeps a live cast through hit reactions and restarts a queued identical cast', async () => {
+    const visual = await makeVisual(),
+      state = anim({ casting: true, castingAbility: 'fireball' });
+    visual.update(FRAME, anim(), true);
+    visual.beginCastChannel('fireball');
+    for (let i = 0; i < 80; i++) visual.update(FRAME, state, true);
+    const action = castingAction(visual);
+    expect(action.paused).toBe(true);
+    visual.playHit();
+    expect(currentClipName(visual)).toBe('Casting');
+    visual.beginCastChannel('fireball');
+    expect(action.paused).toBe(false);
+    expect(action.time).toBe(0);
+    visual.update(FRAME, state, true);
+    expect(action.time).toBeGreaterThan(0);
+    visual.dispose();
+  });
+
   it('plays the raise once, then freezes on the pointing frame while the cast channels', async () => {
     const visual = await makeVisual();
     visual.update(FRAME, anim(), true);

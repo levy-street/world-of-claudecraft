@@ -24,12 +24,17 @@ const defaultScheduler: ContextRecycleScheduler = {
 };
 
 const DEFAULT_RECYCLE_TIMEOUT_MS = 10_000;
+// A lost WebGL context cannot reacquire extensions, but an existing handle can
+// restore it. Keep that handle across a failed recycle and a subsequent Reset.
+const restoreHandles = new WeakMap<WebGL2RenderingContext, LoseContextExtension>();
 
 export function preflightWebGL2ContextRecycle(context: WebGL2RenderingContext): void {
   if (context.isContextLost()) throw new Error('Renderer WebGL2 context is already lost');
-  if (!context.getExtension('WEBGL_lose_context')) {
+  const extension = context.getExtension('WEBGL_lose_context');
+  if (!extension) {
     throw new Error('WEBGL_lose_context is required to recycle the renderer');
   }
+  restoreHandles.set(context, extension);
 }
 
 /**
@@ -42,10 +47,13 @@ export function recycleWebGL2Context(
   options: ContextRecycleOptions = {},
 ): Promise<RecycledRendererContext> {
   const { canvas, context } = recycled;
-  const extension = context.getExtension('WEBGL_lose_context') as LoseContextExtension | null;
+  const extension = context.isContextLost()
+    ? restoreHandles.get(context)
+    : (context.getExtension('WEBGL_lose_context') as LoseContextExtension | null);
   if (!extension) {
     return Promise.reject(new Error('WEBGL_lose_context is required to recycle WebGL2'));
   }
+  restoreHandles.set(context, extension);
 
   const scheduler = options.scheduler ?? defaultScheduler;
   const timeoutMs = options.timeoutMs ?? DEFAULT_RECYCLE_TIMEOUT_MS;
@@ -86,6 +94,14 @@ export function recycleWebGL2Context(
     const requestRestore = (): void => {
       try {
         extension.restoreContext();
+        // Synthetic context loss does not get Chromium's automatic allocation
+        // retries. Retry at its one-second cadence, inside the same deadline.
+        if (!settled && context.isContextLost()) {
+          restoreTimer = scheduler.setTimeout(() => {
+            restoreTimer = null;
+            requestRestore();
+          }, 1_000);
+        }
       } catch (error) {
         fail(error);
       }

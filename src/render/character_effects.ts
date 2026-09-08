@@ -7,7 +7,7 @@ import {
 } from '../sim/social/battleground';
 import type { Aura, Entity } from '../sim/types';
 import { abilityHexColor } from './ability_vfx_core';
-import { ABILITY_VFX_FULL_SPECS } from './ability_vfx_full_specs';
+import { abilityVfxFullSpec } from './ability_vfx_registry';
 import {
   CHARACTER_EFFECT_RECKLESSNESS,
   CHARACTER_EFFECT_SANGUINE,
@@ -68,7 +68,7 @@ export function characterWeaponAuraInto(
   out: CharacterWeaponAura,
 ): CharacterWeaponAura | null {
   for (const a of e.auras) {
-    const buff = ABILITY_VFX_FULL_SPECS[a.id]?.buff;
+    const buff = abilityVfxFullSpec(a.id)?.buff;
     const tint = buff?.weaponAura;
     if (tint !== undefined) {
       out.color = abilityHexColor(tint);

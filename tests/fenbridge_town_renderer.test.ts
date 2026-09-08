@@ -873,7 +873,13 @@ describe('Fenbridge dedicated town renderer', () => {
     );
     expect(rendererSource).toContain('buildFenbridgeTownView(this.sim.cfg.seed)');
     expect(rendererSource).toContain("setRenderCategory(this.fenbridgeTownView.group, 'props')");
-    expect(rendererSource.match(/this\.fenbridgeTownView\.update\(/g)).toHaveLength(2);
+    const scenerySource = readFileSync(
+      path.join(__dirname, '..', 'src/render/renderer_scenery.ts'),
+      'utf8',
+    );
+    expect(rendererSource).toContain('updateRendererScenery(this, p, dt, projectionPixels');
+    expect(rendererSource.match(/this\.fenbridgeTownView\.update\(/g)).toHaveLength(1);
+    expect(scenerySource.match(/host\.fenbridgeTownView\.update\(/g)).toHaveLength(1);
     expect(rendererSource).toContain('setFenbridgeCaptureOverlay(visible: boolean)');
 
     const propsSource = readFileSync(path.join(__dirname, '..', 'src/render/props.ts'), 'utf8');

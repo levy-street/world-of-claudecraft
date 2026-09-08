@@ -1,3 +1,6 @@
+import { DAMAGE_CAST_RELEASES } from '../characters/cast_performance';
+import { SIGNATURE_ABILITIES } from './signature_core';
+import { isBleedContinuation, meleeImpactProfile } from '../melee_impact_core';
 // Thin painter for the per-ability spell VFX system: resolves an event's
 // ability id against the authored spec table (ability_vfx_specs.ts), asks the
 // pure core (ability_vfx_core.ts) for a plan, and drives the pooled Vfx
@@ -24,9 +27,12 @@ import { holdsBuffVfxWhileWorn } from '../ability_vfx_longbuff_core';
 import { isVisuallyDead } from '../anim_state';
 import type { AbilityAudioKind, AbilityAudioOpts } from '../audio_sink';
 import { attackAbilityId } from '../characters/weapon_attack_style_core';
+import { HunterClapContacts, hunterPetComponent } from '../hunter_pet_component_core';
 import { ignivarAllowsBodyGlow } from '../ignivar_encounter_core';
 import { abilityVfxFullSpecFor, abilityVfxSpecFor } from './encounter_specs';
 import { type AbilityVfxFx, asOrbitStyle, type ParticleBurstKind } from './fx';
+import { HunterPetContact } from './hunter_pet_contact';
+import { drawHunterVolley } from './hunter_volley';
 
 interface VfxPoint {
   x: number;
@@ -44,7 +50,14 @@ export interface AbilityVfxPrimitives {
     color?: number,
   ): void;
   lightningProjectile(sourceId: number, targetId: number, color?: number): void;
-  burst(at: VfxPoint, school: string, count?: number, power?: number, color?: number): void;
+  burst(
+    at: VfxPoint,
+    school: string,
+    count?: number,
+    power?: number,
+    color?: number,
+    duration?: number,
+  ): void;
   nova(centerId: number, school: string, color?: number): void;
   tick(targetId: number, school: string, color?: number): void;
   shoutwave(centerId: number, colorHex: number): void;
@@ -92,6 +105,7 @@ export interface AbilityVfxDeps {
   isMidOneShot?: (entityId: number) => boolean;
   // The local player's entity id (cast-acknowledgment gestures).
   localPlayerId?: () => number;
+  visualVariantOf?: (abilityId: string, casterId: number) => string;
   // True when the entity's rig authors a per-ability one-shot clip
   // (manifest attackByAbility with a live action). Gates the ceremonial cast
   // gesture below: without an authored clip, triggerAttack would fall back to
@@ -105,7 +119,7 @@ export interface AbilityVfxDeps {
   // Adds camera trauma (the renderer's Fiesta addShake accumulator); the fx
   // engine applies distance falloff and a rolling budget before it. Optional
   // so tests can omit it.
-  addShake?: (amount: number) => void;
+  addShake?: (amount: number, x?: number, y?: number, z?: number) => void;
   // Contact-frame hitstop on ONE rig (CharacterVisual.holdFrame): briefly hold
   // that character's animation clock at `scale` for `dur` seconds. The visual
   // guards stacking; the world clock is never touched. Optional for tests.
@@ -158,6 +172,7 @@ export interface AbilityVfxSpellfxAtEvent {
 }
 
 export interface AbilityVfxDamageEvent {
+  abilityId?: string | null;
   sourceId: number;
   targetId: number;
   school: string;
@@ -187,7 +202,17 @@ export interface AbilityVfxEntityState {
   // (both live on the offline Aura and on the online mirror via the aura
   // wire's kind/rem), and dead gates it off a corpse; optional so tests can
   // omit them.
-  auras: readonly { id: string; kind?: string; remaining?: number; breakThreshold?: number }[];
+  auras: readonly {
+    id: string;
+    kind?: string;
+    remaining?: number;
+    duration?: number;
+    school?: string;
+    breakThreshold?: number;
+    value?: number;
+    charges?: number;
+    sourceId?: number;
+  }[];
   // dead + hp gate the stun tell off a corpse through isVisuallyDead; both
   // optional so tests can omit them (an absent hp reads as alive).
   dead?: boolean;
@@ -224,6 +249,8 @@ const CAST_FX = new Set([
 // spawnAoeRing radius in yards per spec ringScale unit (rg 2 = the classic
 // 8 yd warrior shout ring).
 const RING_RADIUS_PER_SCALE = 4;
+const PHYSICAL_WOUND_DNA = { density: 6, spread: 0.12, up: -1.3, span: 1.1, size: 0.075 };
+const THUNDER_CHARGES = [1, 2, 3].map((n) => ({ n, size: 0.3, radius: 0.7, up: 0.65, rate: 1.8 }));
 
 // Palette to school mapping for the pooled point-light flashes (the renderer's
 // pulseAt is school-colored).
@@ -339,7 +366,7 @@ const BURST_SCHOOL_BY_KIND: Record<ParticleBurstKind, string> = {
   embers: 'fire',
   debris: 'physical',
   smoke: 'shadow',
-  blood: 'physical',
+  blood: 'blood',
 };
 
 // One FULL point-anchored sequence per (caster, ability) inside this window:
@@ -406,7 +433,24 @@ export class AbilityVfx {
   // pooled render primitives. This prevents a persistent offscreen aura from
   // looking newly acquired when its actor re-enters the camera.
   private heldSemantic = new Map<number, AbilityVfxHeldSemanticState>();
+  private readonly gestureAt = new Map<string, number>();
   private semanticFrame = 0;
+  private petClaps = new HunterClapContacts();
+  private petContact = new HunterPetContact();
+
+  /** A preview take can replace its world while keeping warmed primitives. */
+  resetPresentation(): void {
+    this.budget = new AbilityVfxBudget();
+    this.stats.clear();
+    this.pointSeqAt.clear();
+    this.castChargeAt.clear();
+    this.beamChannels.clear();
+    this.heldSemantic.clear();
+    this.gestureAt.clear();
+    this.semanticFrame = 0;
+    this.petClaps.reset();
+    this.spawned = 0;
+  }
 
   constructor(
     private deps: AbilityVfxDeps,
@@ -416,13 +460,14 @@ export class AbilityVfx {
     // Particle bursts ride the pooled Vfx cloud; sequencer light pulses ride
     // the renderer's pooled point lights; sequencer spawns feed the probe stats.
     deps.fx.setDelegates(
-      (x, y, z, colorHex, count, power, kind) =>
+      (x, y, z, colorHex, count, power, kind, duration) =>
         deps.vfx.burst(
           { x, y, z },
           BURST_SCHOOL_BY_KIND[kind],
           count,
           power,
           kind === 'blood' ? 0xa01222 : colorHex,
+          duration,
         ),
       (entityId, palette, intensity, duration, range) =>
         deps.lightPulse?.(
@@ -437,7 +482,7 @@ export class AbilityVfx {
         this.recordStat(abilityId, false);
       },
       (entityId, colorHex, intensity) => deps.setAuraGlow?.(entityId, colorHex, intensity),
-      deps.addShake ? (amount) => deps.addShake?.(amount) : undefined,
+      deps.addShake ? (amount, x, y, z) => deps.addShake?.(amount, x, y, z) : undefined,
       deps.bodyLean ? (entityId, amount) => deps.bodyLean?.(entityId, amount) : undefined,
       deps.screenImpact ? (x, y, z, s) => deps.screenImpact?.(x, y, z, s) : undefined,
       deps.abilityAudio
@@ -500,15 +545,40 @@ export class AbilityVfx {
   // Returns true when this painter fully handled the event (the renderer skips
   // its generic school-colored arm), false to fall through unchanged.
   handleSpellfx(ev: AbilityVfxSpellfxEvent): boolean {
-    if (!ev.ability || !CAST_FX.has(ev.fx)) return false;
-    const spec = abilityVfxSpecFor(ev.ability);
+    const ability = ev.ability;
+    if (!ability) return false;
+    if (ability === 'bloodhook' && ev.fx === 'dotApply') {
+      // A primary successful arrival, including refreshed wounds, owns this
+      // cue. Snapshot timing, periodic ticks and splash wounds cannot fake it.
+      const fx = this.deps.fx, at = this.deps.anchor(ev.targetId, 0.55);
+      fx.cancelSequence(ev.sourceId, 'bloodhook');
+      if (at) {
+        fx.crestAt(at.x, at.y, at.z, 1.15, 1.15, 0x8f8374, 0xf2d5ad, 'hook', 0.6, 0.25);
+        fx.flipbookAt(at.x, at.y, at.z, 1.5, 0xb8383c, 'contact_pierce', 1.9, 0.23);
+      }
+      return true;
+    }
+    const appearance = this.deps.visualVariantOf?.(ability, ev.sourceId) ?? ability;
+    const authored = abilityVfxFullSpecFor(appearance);
+    if (!CAST_FX.has(ev.fx)) {
+      if (authored?.physical && (ev.fx === 'flourish' || ev.fx === 'weaponAura'))
+        ev = { ...ev, fx: 'selfCast' };
+      else return false;
+    }
+    const spec = abilityVfxSpecFor(appearance);
     if (!spec) return false;
-    const full = abilityVfxFullSpecFor(ev.ability);
+    const full = authored;
+    if (full?.presentation) {
+      // Live-state and dedicated event painters remain the sole visual owner.
+      if (ev.fx === 'windup') this.deps.triggerAttack(ev.sourceId, ability);
+      else if (ev.fx === 'selfCast' || ev.fx === 'projectile') this.releaseGesture(ev.sourceId, ability);
+      return true;
+    }
     // Beam-archetype channels (mind rays, drains) never fly a projectile:
     // every tick's cast-fx event feeds the channel tracker, which draws the
     // crescendoing cord and lands the full impact stack once, on the last tick.
     if (full?.archetype === 'beam' && ev.fx !== 'windup' && ev.fx !== 'shout')
-      return this.beamChannelTick(ev, ev.ability, spec, full);
+      return this.beamChannelTick(ev, ability, spec, full);
     // selfCast is the ONLY completion cue a cast with no castFx and no damage
     // emits. Untargeted/self ceremonies (forms, summon rites, aspects) are
     // claimed by ceremony archetypes; a cue carrying a VICTIM (sunder,
@@ -522,33 +592,45 @@ export class AbilityVfx {
     // claim) so nothing double-stages. Checked before castTier so an
     // unclaimed selfCast never charges the budget.
     if (ev.fx === 'selfCast') {
+      // The actual pet's damage owns these contacts; the owner's completion
+      // cue must not make the hunter perform a second animal attack.
+      if (ability === 'pack_command' || ability === 'unleash_beast') { this.releaseGesture(ev.sourceId, ability); return true; }
       const arch = full?.archetype ?? spec.a;
       const targeted = ev.targetId !== ev.sourceId;
       const ceremonial =
         arch === 'buff' || arch === 'summon' || arch === 'cc' || arch === 'heal' || !!full?.spirit;
       const utility =
         (targeted &&
-          (arch === 'strike' || arch === 'cc' || arch === 'burst' || arch === 'shout')) ||
+          (arch === 'strike' ||
+            arch === 'cc' ||
+            arch === 'burst' ||
+            arch === 'shout' ||
+            ((arch === 'dash' || arch === 'dot') && !!(full?.physical || full?.ritual)))) ||
         // Untargeted shout/dash carry no victim to anchor a contact claim and
         // no castFx of their own (heroic_leap, piercing_howl): selfCast is
         // their only completion cue, same as the ceremonies above.
         (!targeted && (arch === 'shout' || arch === 'dash'));
-      if (!full || !(utility || ceremonial)) return false;
+      if (!full || !(utility || ceremonial)) {
+        this.releaseGesture(ev.sourceId, ability);
+        return false;
+      }
     }
-    const tier = this.castTier(ev.sourceId, ev.ability);
+    const tier = this.castTier(ev.sourceId, ability);
     const plan = planCast(spec, this.quality, tier);
     const fx = this.deps.fx;
     this.spawned = 0;
     // Spin specs whirl the rig (Bladestorm); the one-shot is cheap, so it
     // survives every degrade tier.
-    if (plan.whirl) this.deps.triggerAttack(ev.sourceId, ev.ability);
+    if (plan.whirl) this.deps.triggerAttack(ev.sourceId, ability);
     switch (ev.fx) {
       case 'projectile':
       case 'heavyBolt': {
         // A player ranged shot's draw animation rides the projectile launch
         // cue; keep it when this painter claims the event.
-        if (ev.attackAnimation === 'ranged-shot' && !plan.whirl)
-          this.deps.triggerAttack(ev.sourceId);
+        if (ev.attackAnimation === 'ranged-shot' && !plan.whirl) {
+          if (this.deps.hasGestureClip?.(ev.sourceId, ability)) this.releaseGesture(ev.sourceId, ability);
+          else this.deps.triggerAttack(ev.sourceId, ability);
+        }
         const scale = ev.fx === 'heavyBolt' ? Math.max(plan.projScale, 2) : plan.projScale;
         if (tier < 2 && full?.bolt) {
           // The full spec's bolt DNA (style silhouette, authored speed, coils,
@@ -556,7 +638,7 @@ export class AbilityVfx {
           // whose head sprite IS the projectile - the generic Vfx comet would
           // shadow it at the wrong speed, so it stays off entirely.
           fx.sequenceBolt(
-            ev.ability,
+            ability,
             full,
             ev.sourceId,
             ev.targetId,
@@ -574,8 +656,7 @@ export class AbilityVfx {
             fx.jaggedBolt(ev.sourceId, ev.targetId, plan.color);
             this.spawned++;
             // the crack lands instantly: run the archetype sequence compressed
-            if (full)
-              fx.sequenceInstant(ev.ability, full, ev.sourceId, ev.targetId, plan.color, tier);
+            if (full) fx.sequenceInstant(ability, full, ev.sourceId, ev.targetId, plan.color, tier);
           }
         } else {
           for (let i = 0; i < plan.volley; i++) {
@@ -587,7 +668,7 @@ export class AbilityVfx {
           if (tier < 2) {
             if (full) {
               fx.sequenceBolt(
-                ev.ability,
+                ability,
                 full,
                 ev.sourceId,
                 ev.targetId,
@@ -602,8 +683,8 @@ export class AbilityVfx {
           }
         }
         if (!plan.whirl && ev.attackAnimation !== 'ranged-shot') {
-          this.mobThrowFallback(ev.sourceId, ev.ability);
-          this.playerGestureRelease(ev.sourceId, ev.ability);
+          this.mobThrowFallback(ev.sourceId, ability);
+          this.releaseGesture(ev.sourceId, ability);
         }
         break;
       }
@@ -613,12 +694,11 @@ export class AbilityVfx {
         if (tier < 2) {
           fx.jaggedBolt(ev.sourceId, ev.targetId, plan.color);
           this.spawned++;
-          if (full)
-            fx.sequenceInstant(ev.ability, full, ev.sourceId, ev.targetId, plan.color, tier);
+          if (full) fx.sequenceInstant(ability, full, ev.sourceId, ev.targetId, plan.color, tier);
         }
         if (!plan.whirl) {
-          this.mobThrowFallback(ev.sourceId, ev.ability);
-          this.playerGestureRelease(ev.sourceId, ev.ability);
+          this.mobThrowFallback(ev.sourceId, ability);
+          this.releaseGesture(ev.sourceId, ability);
         }
         break;
       case 'beam':
@@ -630,48 +710,52 @@ export class AbilityVfx {
           fx.beamRibbon(ev.sourceId, ev.targetId, plan.color);
           this.spawned++;
         }
-        if (!plan.whirl) this.mobThrowFallback(ev.sourceId, ev.ability);
+        if (!plan.whirl) this.mobThrowFallback(ev.sourceId, ability);
         break;
       case 'windup':
         // The generic windup arm's whole job is the throw animation: keep it.
-        if (!plan.whirl) this.deps.triggerAttack(ev.sourceId, ev.ability);
+        if (!plan.whirl) this.deps.triggerAttack(ev.sourceId, ability);
         this.spawned++;
         break;
       case 'shout': {
         // The roar starts now even when the sequence stages a short windup:
         // the caster bellowing THROUGH the ceremony is the natural read.
-        this.deps.vfx.shoutwave(ev.sourceId, plan.color);
-        this.spawned++;
+        if (!(full?.physical || full?.ritual)) {
+          this.deps.vfx.shoutwave(ev.sourceId, plan.color);
+          this.spawned++;
+        }
         this.spawnRing(ev.sourceId, plan, ev.school);
-        this.deps.playShoutAnim?.(ev.sourceId);
+        if (full?.physical && this.deps.hasGestureClip?.(ev.sourceId, ability))
+          this.deps.triggerAttack(ev.sourceId, ability);
+        else this.deps.playShoutAnim?.(ev.sourceId);
         if (tier < 2 && full)
           fx.sequenceInstant(
-            ev.ability,
+            ability,
             full,
             ev.sourceId,
             ev.targetId,
             plan.color,
             tier,
-            this.windupDelayFor(ev.ability, full, ev.sourceId),
+            this.windupDelayFor(ability, full, ev.sourceId),
           );
         break;
       }
       case 'nova': {
         if (tier < 2 && full) {
-          const delay = this.windupDelayFor(ev.ability, full, ev.sourceId);
+          const delay = this.windupDelayFor(ability, full, ev.sourceId);
           // a staged release carries the boom itself: firing the pooled nova
           // now would double the read half a windup early
-          if (delay <= 0) {
+          if (delay <= 0 && !(full.physical || full.ritual)) {
             this.deps.vfx.nova(ev.targetId, ev.school, plan.color);
             this.spawned++;
           }
-          fx.sequenceInstant(ev.ability, full, ev.sourceId, ev.targetId, plan.color, tier, delay);
-        } else {
+          fx.sequenceInstant(ability, full, ev.sourceId, ev.targetId, plan.color, tier, delay);
+        } else if (!(full?.physical || full?.ritual)) {
           this.deps.vfx.nova(ev.targetId, ev.school, plan.color);
           this.spawned++;
         }
         this.spawnRing(ev.targetId, plan, ev.school);
-        if (!plan.whirl) this.playerGestureRelease(ev.sourceId, ev.ability);
+        if (!plan.whirl) this.releaseGesture(ev.sourceId, ability);
         break;
       }
       case 'tick':
@@ -682,13 +766,13 @@ export class AbilityVfx {
         this.spawned++;
         if (tier < 2 && full)
           fx.sequenceInstant(
-            ev.ability,
+            ability,
             full,
             ev.sourceId,
             ev.targetId,
             plan.color,
             tier,
-            this.windupDelayFor(ev.ability, full, ev.sourceId),
+            this.windupDelayFor(ability, full, ev.sourceId),
           );
         break;
       case 'selfCast': {
@@ -708,22 +792,25 @@ export class AbilityVfx {
         // paladin before pouring into the target. No swing, no shoutwave.
         const arch = full?.archetype ?? spec.a;
         const targeted = ev.targetId !== ev.sourceId;
-        const defTargetType = ABILITIES[ev.ability]?.targetType;
+        const defTargetType = ABILITIES[ability]?.targetType;
         const friendly = targeted && (defTargetType === 'friendly' || defTargetType === 'any');
-        const contact = targeted && !friendly && (arch === 'strike' || arch === 'cc');
+        const contact =
+          targeted &&
+          !friendly &&
+          (arch === 'strike' ||
+            arch === 'cc' ||
+            (arch === 'dot' && !!(full?.physical || full?.ritual)));
         // The physical hit reads on the body first: the caster visibly swings
         // (attackByAbility picks the authored clip - Jawcrack's bare-fist
         // punch), on every client that sees the cue. Burst zaps and shouts
         // carry no swing.
-        if (contact && !plan.whirl) this.deps.triggerAttack(ev.sourceId, ev.ability);
+        if (contact && !plan.whirl) this.deps.triggerAttack(ev.sourceId, ability);
         // Ceremonial cast gesture (Lingering Grace's one-hand blessing): a
         // non-contact cue whose rig authors a per-ability clip plays it on the
         // caster - on every client that sees the cue, so the gesture reads for
         // spectators too. The authored-clip gate keeps this data-driven and
         // means an un-authored ceremony changes nothing.
-        if (!contact && !plan.whirl && this.deps.hasGestureClip?.(ev.sourceId, ev.ability)) {
-          this.deps.triggerAttack(ev.sourceId, ev.ability);
-        }
+        if (!contact && !plan.whirl) this.releaseGesture(ev.sourceId, ability);
         // A shout barks from the caster whether it is a targeted taunt (Menace)
         // or a self-centered untargeted AoE roar (Craven Roar): the wave, ring
         // and roar animation always originate at the bellowing caster. Craven
@@ -731,26 +818,29 @@ export class AbilityVfx {
         // roar behind `targeted` left it silent with no visual - mirror the
         // unconditional castFx 'shout' arm instead.
         if (!friendly && arch === 'shout') {
-          this.deps.vfx.shoutwave(ev.sourceId, plan.color);
-          this.spawned++;
+          if (!(full?.physical || full?.ritual)) {
+            this.deps.vfx.shoutwave(ev.sourceId, plan.color);
+            this.spawned++;
+          }
           this.spawnRing(ev.sourceId, plan, ev.school);
           this.deps.playShoutAnim?.(ev.sourceId);
         }
         const seqTarget =
-          targeted && (contact || friendly || arch === 'burst' || arch === 'shout')
+          targeted &&
+          (contact || friendly || arch === 'burst' || arch === 'shout' || arch === 'dash')
             ? ev.targetId
             : ev.sourceId;
-        if (tier < 2 && full) {
+        if (tier < 2 && full && ability !== 'heroic_leap') {
           fx.sequenceInstant(
-            ev.ability,
+            ability,
             full,
             ev.sourceId,
             seqTarget,
             plan.color,
             tier,
-            this.windupDelayFor(ev.ability, full, ev.sourceId),
+            this.windupDelayFor(ability, full, ev.sourceId),
           );
-        } else {
+        } else if (ability !== 'heroic_leap') {
           this.deps.vfx.tick(seqTarget, ev.school, plan.color);
           this.spawned++;
         }
@@ -767,12 +857,13 @@ export class AbilityVfx {
       ev.fx !== 'selfCast' &&
       !plan.whirl &&
       ev.attackAnimation !== 'ranged-shot' &&
+      !this.deps.hasGestureClip?.(ev.sourceId, ability) &&
       this.deps.localPlayerId?.() === ev.sourceId
     ) {
       const arch = full?.archetype ?? spec.a;
-      if (arch === 'strike' || arch === 'dash') this.deps.triggerAttack(ev.sourceId, ev.ability);
+      if (arch === 'strike' || arch === 'dash') this.deps.triggerAttack(ev.sourceId, ability);
     }
-    this.recordStat(ev.ability, true);
+    this.recordStat(ability, true);
     return true;
   }
 
@@ -885,6 +976,22 @@ export class AbilityVfx {
     const gy = fx.groundYAt(ev.x, ev.z);
     const nowSec = this.now();
     this.spawned = 0;
+    if (ev.ability === 'volley') {
+      const tier = this.biasFor(
+        casterId,
+        this.budget.admitAccent(nowSec) ? this.budget.peek(casterId, nowSec) : 2,
+      );
+      const radius =
+        ev.radius ?? ABILITIES.volley.effects.find((e) => e.type === 'aoeDamage')?.radius ?? 0;
+      if (radius > 0) {
+        this.deps.spawnAoeRing(ev.x, ev.z, radius, ev.school, 0xbfa779);
+        this.spawned =
+          1 + drawHunterVolley(fx, ev.x, ev.z, radius, casterId, nowSec, tier, this.quality);
+        this.deps.abilityAudio?.('pulse', 'physical', 1, ev.x, gy, ev.z, { abilityId: ev.ability });
+      }
+      this.recordStat(ev.ability, true);
+      return true;
+    }
     if (ev.fx === 'tick') {
       // Zone-pulse re-hits ride the accent window, never the cast budget: a
       // 6s earthquake must not starve its caster's next cast.
@@ -910,7 +1017,11 @@ export class AbilityVfx {
     const pointCellZ = Math.round(ev.z * POINT_SEQ_CELLS_PER_YARD);
     const seqKey = `${casterId}:${ev.ability}:${pointCellX}:${pointCellZ}`;
     const lastSeq = this.pointSeqAt.get(seqKey);
-    const repeat = lastSeq !== undefined && nowSec - lastSeq < POINT_SEQ_REFRACTORY_SEC;
+    const repeat =
+      !full?.physical &&
+      !full?.ritual &&
+      lastSeq !== undefined &&
+      nowSec - lastSeq < POINT_SEQ_REFRACTORY_SEC;
     if (this.pointSeqAt.size > 64) {
       for (const [key, at] of this.pointSeqAt) {
         if (nowSec - at >= POINT_SEQ_REFRACTORY_SEC) this.pointSeqAt.delete(key);
@@ -924,7 +1035,7 @@ export class AbilityVfx {
       : this.castTier(casterId, ev.ability);
     const plan = planCast(spec, this.quality, tier);
     // the terrain-draped area ring is an actionable telegraph: always instant
-    if (ev.radius) {
+    if (ev.radius && (full?.areaTelegraph || full?.impact?.ring !== false) && !full?.presentation) {
       this.deps.spawnAoeRing(ev.x, ev.z, ev.radius, ev.school, plan.color);
       this.spawned++;
     }
@@ -971,7 +1082,7 @@ export class AbilityVfx {
         // arm. Without one, a strike/dash-archetype slam still echoes on the
         // local player only (the pre-existing minimal read).
         if (this.deps.hasGestureClip?.(casterId, ev.ability)) {
-          this.playerGestureRelease(casterId, ev.ability);
+          this.releaseGesture(casterId, ev.ability);
         } else if (this.deps.localPlayerId?.() === casterId) {
           const arch = full.archetype;
           if (arch === 'strike' || arch === 'dash') this.deps.triggerAttack(casterId, ev.ability);
@@ -1013,7 +1124,8 @@ export class AbilityVfx {
     // one delayed hit now has a dedicated recording (combat_sfx.ts's
     // GROUND_TICK_ABILITY_CUES).
     this.deps.abilityAudio?.('pulse', spec.p ?? 'arcane', spec.pw ?? 1, x, gy, z, { abilityId });
-    fx.ringAt(x, gy + 0.15, z, r, 0.5, plan.color, 1.1, false);
+    const full = abilityVfxFullSpecFor(abilityId);
+    if (full?.impact?.ring !== false) fx.ringAt(x, gy + 0.15, z, r, 0.5, plan.color, 1.1, false);
     fx.burstAt(
       x,
       gy + 0.3,
@@ -1024,7 +1136,7 @@ export class AbilityVfx {
       PULSE_BURST_BY_PALETTE[spec.p ?? ''] ?? 'sparks',
     );
     this.spawned += 2;
-    if (tier === 0) {
+    if (tier === 0 && full?.impact?.vRing !== false) {
       fx.ringAt(x, gy + 0.9, z, Math.min(2.4, r * 0.5), 0.4, plan.swirlColor, 1.2, true);
       this.spawned++;
     }
@@ -1039,6 +1151,7 @@ export class AbilityVfx {
   // special whose ONLY event is its hit - that contact IS its cast, so it
   // charges the cast budget (deduped) and runs the full sequence.
   onDamage(ev: AbilityVfxDamageEvent): void {
+    if (ev.abilityId && DAMAGE_CAST_RELEASES.has(ev.abilityId)) this.releaseGesture(ev.sourceId, ev.abilityId);
     if (ev.kind !== 'hit' || ev.amount <= 0) return;
     const nowSec = this.now();
     const local = this.deps.localPlayerId?.() === ev.sourceId;
@@ -1060,12 +1173,50 @@ export class AbilityVfx {
       }
       return;
     }
+    const component = hunterPetComponent(ev.ability);
+    if (component) {
+      const firstClap = component === 'clap' && this.petClaps.admit(ev.sourceId, nowSec);
+      const baseTier = firstClap
+        ? this.castTier(ev.sourceId, 'unleash_beast')
+        : this.biasFor(ev.sourceId, this.budget.peek(ev.sourceId, nowSec));
+      const tier = this.budget.admitAccent(nowSec) ? baseTier : 2;
+      this.spawned = this.petContact.draw(
+        this.deps.fx,
+        component,
+        ev.sourceId,
+        ev.targetId,
+        ev.amount,
+        firstClap,
+        tier,
+      );
+      this.recordStat(component === 'clap' ? 'unleash_beast_clap' : 'frenzy_cleave', false);
+      return;
+    }
     const abilityId = attackAbilityId(ev.ability);
-    const spec = abilityId ? abilityVfxSpecFor(abilityId) : undefined;
-    if (!spec || !abilityId) return;
-    const full = abilityVfxFullSpecFor(abilityId);
+    if (isBleedContinuation(abilityId, ev.abilityId)) {
+      // Periodic wounds and consumed-bleed payoffs belong to the struck body.
+      // This also covers the last tick, when the aura has already been removed.
+      const wound = this.deps.anchor(ev.targetId, meleeImpactProfile(abilityId!)?.height ?? .55);
+      if (wound && this.budget.admitAccent(nowSec))
+        this.deps.fx.burstAt(wound.x, wound.y, wound.z, 0x9e1526, 7, .5, 'blood', .23);
+      return;
+    }
+    const appearance = abilityId
+      ? (this.deps.visualVariantOf?.(abilityId, ev.sourceId) ?? abilityId)
+      : undefined;
+    const spec = appearance ? abilityVfxSpecFor(appearance) : undefined;
+    if (!spec || !abilityId || !appearance) return;
+    const full = abilityVfxFullSpecFor(appearance);
+    if (full?.presentation) return;
     const arch = full?.archetype ?? spec.a ?? 'strike';
-    const isCastMoment = !!full && (arch === 'strike' || arch === 'dash' || arch === 'buff');
+    const def = ABILITIES[abilityId];
+    const physicalProjectile =
+      !!full?.physical && !!def && (def.projectile ?? def.school !== 'physical');
+    const isCastMoment =
+      !!full &&
+      !physicalProjectile &&
+      abilityId !== 'heroic_leap' &&
+      (arch === 'strike' || arch === 'dash' || arch === 'buff' || full.damageCue === true);
     // Local-player crit hitstop + screen pop (gallery critHit feel): body and
     // screen feedback, not a particle spawn, so it rides OUTSIDE the accent
     // window - your own crit reads even in a saturated fight. The visual's
@@ -1080,7 +1231,8 @@ export class AbilityVfx {
     // ~0.11s): the local player's strike/dash contact briefly holds both rigs.
     if (local && isCastMoment && (arch === 'strike' || arch === 'dash')) {
       const dur = ev.crit ? 0.16 : 0.1;
-      this.deps.animHold?.(ev.sourceId, 0.1, dur);
+      // Signature clips already hold their authored contact pose at 150ms.
+      if (!SIGNATURE_ABILITIES[abilityId] && !meleeImpactProfile(abilityId)) this.deps.animHold?.(ev.sourceId, 0.1, dur);
       this.deps.animHold?.(ev.targetId, 0.1, dur);
     }
     let tier: 0 | 1 | 2;
@@ -1109,15 +1261,17 @@ export class AbilityVfx {
       );
     }
     this.spawned = 0;
-    this.deps.vfx.burst(at, ev.school, plan.burstCount, plan.burstPower, plan.color);
-    this.spawned++;
+    if (!(full?.physical || full?.ritual) || tier >= 2) {
+      this.deps.vfx.burst(at, ev.school, plan.burstCount, plan.burstPower, plan.color);
+      this.spawned++;
+    }
     if (isCastMoment && full && tier < 2) {
       // The contact moment runs the full archetype sequence (authored slash
       // arc, impact stack, motifs). Buff-archetype self-hits (Blood Toll's
       // health price) run the buff sequence too: shell pop plus the red
       // body-glow pulse.
       this.deps.fx.sequenceInstant(abilityId, full, ev.sourceId, ev.targetId, plan.color, tier);
-    } else if (!isCastMoment && (ev.crit || spec.fin === 1)) {
+    } else if (!isCastMoment && full?.impact?.vRing !== false && (ev.crit || spec.fin === 1)) {
       this.deps.fx.impactRing(ev.targetId, plan.color, ev.crit);
       this.spawned++;
     }
@@ -1134,6 +1288,9 @@ export class AbilityVfx {
     if (!abilityId) return;
     const spec = abilityVfxSpecFor(abilityId);
     if (!spec) return;
+    const full = abilityVfxFullSpecFor(abilityId);
+    if (full?.physical || full?.presentation) return;
+    if (full?.ritual) return;
     this.deps.vfx.buffSwirl(ev.targetId, planCast(spec, this.quality, 0).swirlColor);
   }
 
@@ -1191,7 +1348,12 @@ export class AbilityVfx {
         const full = abilityVfxFullSpecFor(e.castingAbility);
         const style = full?.windupStyle ?? 'orb';
         glowColor = rimColorOf(full, spec);
-        glowStrength = 1.2 * (full?.power ?? 1);
+        // Preserve armour and skin detail throughout the cast. Physical
+        // channels carry weapon motion, never an emissive whole-body wash.
+        glowStrength =
+          full?.physical || full?.presentation
+            ? 0
+            : (full?.ritual ? 0.12 : 0.35) * (full?.power ?? 1);
         // the local player is priority: guaranteed a windup slot even when
         // a crowded hub saturates the pool
         const windupStarted = fx.windup(
@@ -1225,6 +1387,11 @@ export class AbilityVfx {
       }
     }
     let bands = 0;
+    if (
+      held.auraStamps.has('bloodhook_pending') &&
+      !e.auras.some((a) => a.id === 'bloodhook_pending')
+    )
+      fx.cancelSequence(e.id, 'bloodhook');
     let discs = 0;
     // Peeked (never charged) degrade tier for this entity's orbit bands,
     // computed lazily on the first orbit-carrying aura: tier >= 1 halves each
@@ -1233,6 +1400,27 @@ export class AbilityVfx {
     for (let i = 0; i < e.auras.length; i++) {
       const aura = e.auras[i];
       const auraWasHeld = held.auraStamps.has(aura.id);
+      if (aura.id === 'bloodhook_pending') {
+        if (!auraWasHeld && typeof aura.value === 'number') {
+          this.deps.triggerAttack(e.id, 'bloodhook');
+          const hookSpec = abilityVfxFullSpecFor('bloodhook');
+          const compact = abilityVfxSpecFor('bloodhook');
+          if (hookSpec && compact)
+            fx.sequenceInstant(
+              'bloodhook',
+              hookSpec,
+              e.id,
+              aura.value,
+              abilityVfxColor(compact),
+              this.biasFor(e.id, this.budget.peek(e.id, this.now())),
+            );
+        }
+        continue;
+      }
+      if (aura.kind === 'dot' && aura.id === 'bloodhook_bleed') {
+        fx.orbit(e.id, 'leaves', 0x9b1425, PHYSICAL_WOUND_DNA, 0);
+        continue;
+      }
       let auraId = auraSpecId(aura.id);
       // Victim-worn resolution: a hostile suffix (_slow/_root), or the fixed
       // fear id armed by Lingering Dread. A wornDebuff aura reads ONLY through
@@ -1251,6 +1439,21 @@ export class AbilityVfx {
       // maintenance passives (stances, spellbook traits): no read at all
       if (isPassiveAura(auraId)) continue;
       const full = abilityVfxFullSpecFor(auraId);
+      // Physical auras live on the rig/weapon. Their cast owns the transition;
+      // adding generic buff discs and heartbeat rings would obscure the kit.
+      if (full?.presentation || (full?.ritual && !full.buff?.persist)) continue;
+      if (aura.kind === 'dot' && meleeImpactProfile(aura.id)?.bleeding) {
+        fx.orbit(e.id, 'leaves', 0x9b1425, PHYSICAL_WOUND_DNA, 0);
+        continue;
+      }
+      if (full?.physical) {
+        if (
+          aura.kind === 'dot' &&
+          (full.physical.material === 'blood' || full.physical.material === 'venom')
+        )
+          fx.orbit(e.id, 'leaves', abilityVfxColor(spec), PHYSICAL_WOUND_DNA, 0);
+        continue;
+      }
       const wornDebuff = hostileWorn && full?.debuff !== undefined;
       // Long-worn buffs are SILENT while held (the long-buff policy,
       // ability_vfx_longbuff_core.ts): no orbit band, ground disc, shell, or
@@ -1292,7 +1495,10 @@ export class AbilityVfx {
             glowColor = rimColorOf(full, spec);
             glowSlow = false;
           }
-        } else if (full.buff?.style !== 'veil') {
+        } else if (
+          full.buff?.style !== 'veil' &&
+          (!full.castIdentity || full.castIdentity === 'runes')
+        ) {
           const spin = full.palette !== 'physical' && full.palette !== 'blood';
           discStarted = fx.holdGroundAura(e.id, discs, rimColorOf(full, spec), spin);
           discs++;
@@ -1320,7 +1526,12 @@ export class AbilityVfx {
       }
       if (bands >= 3) continue;
       if (orbitTier < 0) orbitTier = this.biasFor(e.id, this.budget.peek(e.id, this.now()));
-      const bandO = wornDebuff ? full?.debuff?.o : (full?.debuff?.o ?? full?.buff?.o);
+      const bandO =
+        auraId === 'lightning_shield'
+          ? THUNDER_CHARGES[Math.max(0, Math.min(2, (aura.charges ?? 3) - 1))]
+          : wornDebuff
+            ? full?.debuff?.o
+            : (full?.debuff?.o ?? full?.buff?.o);
       if (fx.orbit(e.id, style, abilityVfxColor(spec), bandO, orbitTier)) {
         if (auraWasHeld) {
           bands++;
@@ -1383,28 +1594,22 @@ export class AbilityVfx {
     // has not landed yet would otherwise keep the band for that window.
     // CC_BAND_SPECS in the core owns each band's look and why.
     if (!isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 })) {
+      fx.holdControlSignals?.(e);
       const band = wornCcBand(e.auras);
       if (band) fx.holdCcBand(e.id, band.type, band.remaining);
     }
-    // On-next-swing queue (heroic-strike style): while the sim's queuedOnSwing
-    // flag is armed, the queued ability's authored orbit rides the caster as
-    // the empowerment tell - Reaver Strike's hot amber weaponGlow ember that
-    // releases with the swing. Same pooled band system as the aura loop (the
-    // fx engine sweeps it the frame the sim clears the flag on swing/untoggle,
-    // so there is no teardown bookkeeping), tier-gated the same way, and fed
-    // AFTER the aura loop so a style collision (Iron Bellow's red weaponGlow)
-    // shows the armed strike's color while queued and reverts on release. No
-    // gain swirl: arming a level-1 filler is a tell, not a ceremony.
-    if (e.queuedOnSwing && bands < 3) {
+    // Physical queues keep a real-weapon glint even when their buff orbit is
+    // deliberately silent. Existing frame stamps remove it on release/cancel.
+    if (e.queuedOnSwing && !isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 })) {
       const qspec = abilityVfxSpecFor(e.queuedOnSwing);
       const qfull = abilityVfxFullSpecFor(e.queuedOnSwing);
       const qstyle = qspec ? asOrbitStyle(qfull?.buff?.orbit ?? qspec.bo) : null;
-      if (qspec !== undefined && qstyle !== null) {
+      if (qspec !== undefined && (qfull?.physical || (qstyle !== null && bands < 3))) {
         if (orbitTier < 0) orbitTier = this.biasFor(e.id, this.budget.peek(e.id, this.now()));
-        if (
-          fx.orbit(e.id, qstyle, abilityVfxColor(qspec), qfull?.buff?.o, orbitTier) &&
-          !queuedWasHeld
-        ) {
+        const created = qfull?.physical
+          ? fx.holdQueuedWeapon?.(e.id, abilityVfxColor(qspec), orbitTier)
+          : fx.orbit(e.id, qstyle!, abilityVfxColor(qspec), qfull?.buff?.o, orbitTier);
+        if (created && !queuedWasHeld) {
           this.spawned = 1;
           this.recordStat(e.queuedOnSwing, false);
         }
@@ -1465,6 +1670,7 @@ export class AbilityVfx {
     full: AbilityVfxFullSpec | undefined,
     sourceId: number,
   ): number {
+    if (SIGNATURE_ABILITIES[abilityId]) return 0;
     if (!full?.windup || full.windup <= 0) return 0;
     if ((full.windupStyle ?? 'orb') === 'none') return 0;
     if (full.finisher) return 0;
@@ -1507,10 +1713,21 @@ export class AbilityVfx {
   // player caster whose ability authors a bespoke clip (Cast_Bolt, Cast_Shock,
   // Cast_Quake, ...) now plays it here too, on every client that sees the
   // cue, the same authored-clip gate selfCast already uses.
-  private playerGestureRelease(sourceId: number, abilityId: string): void {
+  releaseGesture(sourceId: number, abilityId: string, completedChannel = false): void {
     const d = this.deps;
     if (d.isMob?.(sourceId)) return;
+    // Channel projectiles include their final tick after cast state clears.
+    // The canonical channel owns body posture, each tick owns only its VFX.
+    if (!completedChannel && ABILITIES[abilityId]?.channel && ABILITIES[abilityId]?.class !== 'hunter') return;
     if (!d.hasGestureClip?.(sourceId, abilityId)) return;
+    const key = `${sourceId}:${abilityId}`, now = this.now();
+    if (now - (this.gestureAt.get(key) ?? -Infinity) < 0.075) return;
+    if (this.gestureAt.size >= 256) {
+      for (const [id, at] of this.gestureAt) if (now - at > 0.075) this.gestureAt.delete(id);
+      const oldest = this.gestureAt.keys().next().value;
+      if (this.gestureAt.size >= 256 && oldest !== undefined) this.gestureAt.delete(oldest);
+    }
+    this.gestureAt.set(key, now);
     d.triggerAttack(sourceId, abilityId);
   }
 

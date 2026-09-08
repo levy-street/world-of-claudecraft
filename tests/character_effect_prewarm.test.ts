@@ -111,7 +111,10 @@ describe('the character-effect prewarm mints the twin the live effect asks for',
     root.add(rig(source));
 
     const group = buildCharacterEffectPrewarmGroup(root);
-    expect(group.children).toHaveLength(1);
+    expect(group.children).toHaveLength(2);
+    const surface = (group.children[1] as THREE.Mesh).material as THREE.Material;
+    expect(surface.userData.wocSurfaceResponseProgram).toBe(true);
+    expect(surface.transparent).toBe(false);
     const twin = (group.children[0] as THREE.Mesh).material as THREE.Material;
 
     // The clone the live path mounts, built by the same exported factory.
@@ -163,7 +166,7 @@ describe('the character-effect prewarm mints the twin the live effect asks for',
     const targets = collectCharacterEffectTargets(root);
     expect(targets).toHaveLength(3); // three distinct MATERIALS
     const group = buildCharacterEffectPrewarmGroup(root);
-    expect(group.children).toHaveLength(2); // two distinct PROGRAMS
+    expect(group.children).toHaveLength(4); // two draw paths, ghost and surface variants
   });
 
   it('gets both face passes of a double-sided material', () => {
@@ -177,7 +180,7 @@ describe('the character-effect prewarm mints the twin the live effect asks for',
     root.add(rig(source));
 
     const group = buildCharacterEffectPrewarmGroup(root);
-    expect(group.children).toHaveLength(1);
+    expect(group.children).toHaveLength(2);
     const twin = (group.children[0] as THREE.Mesh).material as THREE.Material;
     expect(twin.side).toBe(THREE.DoubleSide);
     expect(twin.forceSinglePass).toBe(false);
@@ -209,7 +212,7 @@ describe('the character-effect prewarm mints the twin the live effect asks for',
     const both = new THREE.Group();
     both.add(rig(source));
     both.add(rig(single));
-    expect(buildCharacterEffectPrewarmGroup(both).children).toHaveLength(2);
+    expect(buildCharacterEffectPrewarmGroup(both).children).toHaveLength(4);
   });
 
   it('warms nothing for a material no rig wears', () => {
@@ -235,7 +238,7 @@ describe('the character-effect prewarm mints the twin the live effect asks for',
     root.add(rig(rigMaterial('mod_skin')));
     const group = buildCharacterEffectPrewarmGroup(root);
     root.add(group);
-    expect(buildCharacterEffectPrewarmGroup(root).children).toHaveLength(1);
+    expect(buildCharacterEffectPrewarmGroup(root).children).toHaveLength(2);
   });
 
   it('keeps the twin set bounded by program identity (pure core)', () => {

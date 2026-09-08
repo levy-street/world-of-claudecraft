@@ -1,0 +1,17 @@
+{
+  "status": "complete",
+  "runtimeFiles": 24,
+  "runtimeBytes": 1556481,
+  "allConformancePassed": true,
+  "materialReviewPassed": true,
+  "masters": 24,
+  "editableStems": 131,
+  "loopStart": 1,
+  "loopEnd": 3,
+  "startOffset": 1,
+  "playbackRate": 1,
+  "noPitchJitter": true,
+  "generatorSha256": "e676307bdb21b59eaf1264baf9f3b10493246ded7197d59dfad5583f7e0141c5",
+  "manifestSha256": "7944178df73be08c80832ba3d3d5f4994201d41ccc082217d9377a0636d715a3",
+  "validationSha256": "b2fa80c071f913c285e34322739c0c8cde8f4d6ed42456c894b2ca9fb0f2a774"
+}

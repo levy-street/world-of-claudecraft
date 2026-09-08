@@ -1355,7 +1355,7 @@ export const VISUALS: Record<string, VisualDef> = {
         mortal_strike: '2H_Melee_Attack_Chop',
         execute: '2H_Melee_Attack_Chop',
         slam: '2H_Melee_Attack_Chop',
-        red_harvest: '2H_Melee_Attack_Chop',
+        red_harvest: 'Dualwield_Melee_Attack_Chop',
         breachmaker: '2H_Melee_Attack_Chop',
         // Shieldcrack slams the SHIELD (offhand arm), not the sword: the
         // synthesized bash (scripts/_add_shield_bash_anim.mjs) drives the
@@ -1479,7 +1479,7 @@ export const VISUALS: Record<string, VisualDef> = {
       // ranged shots split into a quick snap (every instant no-cast-time
       // shot) versus the slow full draw Long Draw's own 3.0s cast time
       // names; Volley gets its own rapid-pulse barrage. The three aspect
-      // toggles plus Fevered Draw are self-buffs with no swing to author, so
+      // toggles are self-buffs with no swing to author, so
       // they point straight at ranger.glb's own already-baked
       // 'Spellcast_Raise' clip, the same no-bake pattern player_warrior's
       // sanguine_aura already uses. Not every ability in the kit is listed:
@@ -1499,7 +1499,8 @@ export const VISUALS: Record<string, VisualDef> = {
         aspect_of_the_hawk: 'Spellcast_Raise',
         aspect_of_the_monkey: 'Spellcast_Raise',
         aspect_of_the_cheetah: 'Spellcast_Raise',
-        rapid_fire: 'Spellcast_Raise',
+        rapid_fire: 'Hunter_Shot_Snap',
+        measured_shot: 'Hunter_Shot_Snap',
       },
     },
     // Bow-draw clips for the Season 1 bow skins (scripts/build_bow_anims.mjs):
@@ -1908,6 +1909,8 @@ export const VISUALS: Record<string, VisualDef> = {
       hit: ['Hit'],
       death: 'Death',
       cast: 'Cast',
+      attackByAbility: { soul_harvest: 'Cast', soul_lance: 'Cast' },
+      attackTimeScaleByAbility: { soul_harvest: 8, soul_lance: 8 },
     },
   },
   // Druid Wolf Form AND shaman Shadewolf (ghost_wolf renders this visual with
@@ -3451,6 +3454,27 @@ export const VISUALS: Record<string, VisualDef> = {
 // Driven by ALL_CLASSES rather than a local copy: a tenth class would otherwise
 // get no modular def at all and fall back to the warrior's clips through
 // modularKeyFor, silently, with no test able to see it.
+// A real feathered body on the exact Druid skeleton. Existing locomotion and
+// casting donors bind by their native bone names; no weapon or humanoid pack
+// is attached to the creature. The normal prepared-form path owns its reveal.
+VISUALS.form_moonkin = {
+  ...VISUALS.player_druid,
+  url: `${FORMS}/moonwing.glb`,
+  height: 2.95,
+  attach: undefined,
+  weaponSlots: undefined,
+  animUrls: [VISUALS.player_druid.url, ...(VISUALS.player_druid.animUrls ?? [])],
+  clips: {
+    ...VISUALS.player_druid.clips,
+    attackByAbility: {
+      ...VISUALS.player_druid.clips.attackByAbility,
+      moonseed: 'Cast_Starfall',
+      moonlash: 'Cast_Starfall',
+      sunlance: 'Cast_Nature',
+    },
+  },
+};
+
 for (const cls of ALL_CLASSES) {
   const {
     show: _show,

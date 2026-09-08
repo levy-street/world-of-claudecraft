@@ -229,8 +229,13 @@ export { isOverheadEmoteId, OVERHEAD_EMOTES } from './world_api/chat';
 export type {
   ActiveConsecration,
   ActiveFrostRing,
+  ActiveHunterTrap,
   ActiveIgnivarMeteorWarning,
   ActiveTemporalHourglass,
+  ActiveBlizzard,
+  ActiveRuneOfPower,
+  RuneOfPowerDisposition,
+  TemporalHourglassDisposition,
   ActiveVarkhulAnvilMeteorWarning,
   ActiveVarkhulAssembly,
   ActiveVarkhulCinderFire,

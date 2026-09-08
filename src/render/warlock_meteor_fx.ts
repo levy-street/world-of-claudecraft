@@ -29,11 +29,13 @@ let powerfulFelMeteorTexture: THREE.Texture | null = null;
 // Deferred, never eager: a module-import registerPreload joins the launch
 // fetch burst and re-opens the WKWebView OOM lane the deferred gate exists
 // to prevent (tests/defer_launcher_preloads.test.ts pins the sanctioned set).
-registerDeferredPreload(() =>
-  loadTexture(POWERFUL_FEL_METEOR_TEXTURE_URL, { srgb: true }).then((texture) => {
-    powerfulFelMeteorTexture = texture;
-    return texture;
-  }),
+registerDeferredPreload(
+  () =>
+    loadTexture(POWERFUL_FEL_METEOR_TEXTURE_URL, { srgb: true }).then((texture) => {
+      powerfulFelMeteorTexture = texture;
+      return texture;
+    }),
+  true,
 );
 
 /**
@@ -363,9 +365,13 @@ export class WarlockMeteorFx {
     }
   }
 
-  dispose(): void {
-    this.disposed = true;
+  clear(): void {
     const errors: unknown[] = [];
+    this.clearActive(errors);
+    if (errors.length > 0) throw new AggregateError(errors, 'WarlockMeteorFx clear failed');
+  }
+
+  private clearActive(errors: unknown[]): void {
     // Showers own their rain fragment roots. Dispose those first so the
     // shower's cosmetic sweep removes each child from `meteors` exactly once;
     // the remaining meteor pass then handles only standalone infernals.
@@ -394,6 +400,12 @@ export class WarlockMeteorFx {
       if (this.disposeImpact(impact, errors, 'disposed')) this.impacts.splice(index, 1);
       else index++;
     }
+  }
+
+  dispose(): void {
+    this.disposed = true;
+    const errors: unknown[] = [];
+    this.clearActive(errors);
     if (!this.staticDisposalComplete) {
       let staticOk = true;
       for (const geometry of [

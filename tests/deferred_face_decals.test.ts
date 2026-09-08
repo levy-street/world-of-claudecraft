@@ -34,6 +34,7 @@ import {
   decalTextureFromData,
   ensureDecalGeometry,
 } from '../src/render/characters/stubble';
+import { CharacterSurfaceResponse } from '../src/render/characters/surface_response';
 import { CharacterVisual, type FarBakeGate } from '../src/render/characters/visual';
 
 const DEF = VISUALS[MODULAR_WARRIOR_KEY];
@@ -251,6 +252,7 @@ describe('CharacterVisual.attachDeferredDecals', () => {
       skinIndex: 0,
       tintedRigClaims: new Set(),
       originalMaterials: new Map(),
+      surfaceResponse: new CharacterSurfaceResponse(),
       casters: [],
       shadowOn: true,
       farBakeGate: gate,

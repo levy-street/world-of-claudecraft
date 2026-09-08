@@ -1,0 +1,145 @@
+{
+  "smoke": {
+    "name": "smoke",
+    "version": 1,
+    "runtime_file": "smoke_atlas.webp",
+    "master_file": "smoke_atlas.png",
+    "source_blend": "smoke.blend",
+    "source_script": "bake_assets.py",
+    "dimensions_px": [
+      2048,
+      2048
+    ],
+    "frame_count": 64,
+    "fps": 30,
+    "duration_seconds": 2.1333333333333333,
+    "grid": {
+      "columns": 8,
+      "rows": 8,
+      "order": "row-major, left-to-right, top-to-bottom"
+    },
+    "tile_px": [
+      256,
+      256
+    ],
+    "content_px": [
+      248,
+      248
+    ],
+    "gutter_px": 4,
+    "uv_rect_formula": {
+      "u0": "((frame % 8)*256+4)/2048",
+      "v0_top_origin": "(floor(frame/8)*256+4)/2048",
+      "du": "248/2048",
+      "dv": "248/2048"
+    },
+    "pivot_uv_tile_top_origin": [
+      0.5,
+      0.8739120303666997
+    ],
+    "color_space": "sRGB RGB; linear alpha",
+    "alpha": "straight / unassociated",
+    "channels": "neutral grayscale RGB for tinting; opacity in A",
+    "film_transparent": true,
+    "bloom_baked": false,
+    "loop": false,
+    "runtime_filter": "linear; clamp; disable atlas mipmaps to prevent cross-frame bleed",
+    "intended_blend": "premultiply in shader once, then premultiplied-alpha over; straight-alpha over also valid with matching blend factors",
+    "webp_quality": 78,
+    "runtime_bytes": 358190,
+    "rendering": {
+      "application": "Blender 5.2.1",
+      "engine": "EEVEE",
+      "samples": 32,
+      "supersampled_frame_px": [
+        496,
+        496
+      ],
+      "density": "Animated analytic volume with advected multiscale procedural turbulence",
+      "lighting": "Three white area lights; volumetric self-shadowing"
+    }
+  },
+  "shockwave": {
+    "name": "shockwave",
+    "version": 1,
+    "runtime_file": "shockwave_atlas.webp",
+    "master_file": "shockwave_atlas.png",
+    "source_blend": "shockwave.blend",
+    "source_script": "bake_assets.py",
+    "dimensions_px": [
+      2048,
+      2048
+    ],
+    "frame_count": 64,
+    "fps": 30,
+    "duration_seconds": 2.1333333333333333,
+    "grid": {
+      "columns": 8,
+      "rows": 8,
+      "order": "row-major, left-to-right, top-to-bottom"
+    },
+    "tile_px": [
+      256,
+      256
+    ],
+    "content_px": [
+      248,
+      248
+    ],
+    "gutter_px": 4,
+    "uv_rect_formula": {
+      "u0": "((frame % 8)*256+4)/2048",
+      "v0_top_origin": "(floor(frame/8)*256+4)/2048",
+      "du": "248/2048",
+      "dv": "248/2048"
+    },
+    "pivot_uv_tile_top_origin": [
+      0.5,
+      0.5
+    ],
+    "color_space": "sRGB RGB; linear alpha",
+    "alpha": "straight / unassociated",
+    "channels": "neutral grayscale RGB for tinting; opacity in A",
+    "film_transparent": true,
+    "bloom_baked": false,
+    "loop": false,
+    "runtime_filter": "linear; clamp; disable atlas mipmaps to prevent cross-frame bleed",
+    "intended_blend": "premultiply in shader once, then premultiplied-alpha over; straight-alpha over also valid with matching blend factors",
+    "webp_quality": 78,
+    "runtime_bytes": 397602,
+    "rendering": {
+      "application": "Blender 5.2.1",
+      "engine": "EEVEE",
+      "samples": 32,
+      "supersampled_frame_px": [
+        496,
+        496
+      ],
+      "density": "Animated analytic volume with advected multiscale procedural turbulence",
+      "lighting": "Three white area lights; volumetric self-shadowing"
+    }
+  },
+  "meshes": {
+    "ice_shard": {
+      "triangles": 36,
+      "vertices": 20,
+      "radius": 1.000000006868504,
+      "pivot": "vertex centroid; object translation zero",
+      "axes": "glTF Y-up"
+    },
+    "stone_chip": {
+      "triangles": 80,
+      "vertices": 42,
+      "radius": 1.0000000355666991,
+      "pivot": "vertex centroid; object translation zero",
+      "axes": "glTF Y-up"
+    },
+    "metal_splinter": {
+      "triangles": 16,
+      "vertices": 10,
+      "radius": 1.000000009109499,
+      "pivot": "vertex centroid; object translation zero",
+      "axes": "glTF Y-up"
+    }
+  }
+}

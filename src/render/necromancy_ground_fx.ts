@@ -446,9 +446,13 @@ export class NecromancyGroundFx {
     }
   }
 
-  dispose(): void {
+  clear(): void {
     while (this.zones.length > 0) this.removeZone(this.zones.length - 1);
     for (const key of [...this.deathEchoes.keys()]) this.removeDeathEcho(key);
+  }
+
+  dispose(): void {
+    this.clear();
     this.wispTexture.dispose();
   }
 

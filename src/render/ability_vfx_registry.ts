@@ -1,6 +1,14 @@
+import { refineCatalogueSpec } from './ability_vfx/material_response_core';
+import { refineSignatureSpec } from './ability_vfx/signature_core';
+import { ABILITY_VFX_ART_PROFILES } from './ability_vfx_art_profiles';
 import type { AbilityVfxFullSpec, AbilityVfxSpec } from './ability_vfx_core';
-import { ABILITY_VFX_FULL_SPECS } from './ability_vfx_full_specs';
+import {
+  type AbilityVfxDraft,
+  draftAbilityVfx,
+  validAbilityVfxDraft,
+} from './ability_vfx_draft_core';
 import { ABILITY_VFX_SPECS } from './ability_vfx_specs';
+import { withClassVfxLanguage } from './class_vfx_language';
 import {
   BURNING_PACT_VFX_FULL_SPEC,
   BURNING_PACT_VFX_SPEC,
@@ -19,6 +27,8 @@ import {
   RUINOUS_BRAND_VFX_FULL_SPEC,
   RUINOUS_BRAND_VFX_SPEC,
 } from './destruction_vfx_specs';
+import { DRUID_VFX_FULL_SPECS } from './druid_vfx_specs';
+import { HUNTER_VFX_FULL_SPECS, HUNTER_VFX_SPECS } from './hunter_vfx_specs';
 import {
   ARMY_OF_THE_DEAD_VFX_FULL_SPEC,
   ARMY_OF_THE_DEAD_VFX_SPEC,
@@ -39,6 +49,10 @@ import {
   SOUL_LANCE_VFX_FULL_SPEC,
   SOUL_LANCE_VFX_SPEC,
 } from './necromancy_vfx_specs';
+import { PHYSICAL_KIT_FULL_SPECS, PHYSICAL_KIT_SPECS } from './physical_kit_vfx_specs';
+import { PRIEST_VFX_FULL_SPECS } from './priest_vfx_specs';
+import { RITUAL_KIT_FULL_SPECS, RITUAL_KIT_SPECS } from './ritual_kit_vfx_specs';
+import { SHAMAN_VFX_FULL_SPECS, SHAMAN_VFX_SPECS } from './shaman_vfx_specs';
 import {
   EMBERKIN_FELBOLT_VFX_FULL_SPEC,
   EMBERKIN_FELBOLT_VFX_SPEC,
@@ -46,10 +60,51 @@ import {
   GLOOMSHADE_ABYSSAL_CHAIN_VFX_SPEC,
 } from './warlock_pet_vfx_specs';
 import { ABYSSAL_RIFT_VFX_FULL_SPEC, ABYSSAL_RIFT_VFX_SPEC } from './warlock_vfx_specs';
+import { WARRIOR_VFX_FULL_SPECS, WARRIOR_VFX_SPECS } from './warrior_vfx_specs';
+
+const drafts = new Map<string, ReturnType<typeof draftAbilityVfx>>();
+const refined = new Map<string, AbilityVfxFullSpec>();
+function resolvedBaseFull(id: string): AbilityVfxFullSpec | undefined {
+  const cached = refined.get(id);
+  if (cached) return cached;
+  const base = baseAbilityVfxFullSpec(id);
+  if (!base) return;
+  let result =
+    base.physical || base.ritual || base.presentation
+      ? base
+      : refineSignatureSpec(id, refineCatalogueSpec(base));
+  if (id === 'scorch' || id === 'arcane_surge') result = { ...result, damageCue: true };
+  result = withClassVfxLanguage(id, result);
+  refined.set(id, result);
+  return result;
+}
+
+/** In-memory authoring only. Both game and studio consume the same resolution
+ * seam; shipping definitions are never mutated. No executable draft content. */
+export function setAbilityVfxDraft(id: string, draft: AbilityVfxDraft | null): boolean {
+  if (draft === null) return drafts.delete(id);
+  const compact = baseAbilityVfxSpec(id);
+  const full = resolvedBaseFull(id);
+  if (!compact || !full || !validAbilityVfxDraft(draft)) return false;
+  drafts.set(id, draftAbilityVfx(compact, full, draft));
+  return true;
+}
+
+export function abilityVfxSpec(id: string): AbilityVfxSpec | undefined {
+  return drafts.get(id)?.compact ?? baseAbilityVfxSpec(id);
+}
+export function abilityVfxFullSpec(id: string): AbilityVfxFullSpec | undefined {
+  return drafts.get(id)?.full ?? resolvedBaseFull(id);
+}
 
 // Generated gallery projections remain untouched. Class-owned bespoke
 // identities resolve through this narrow runtime seam instead.
-export function abilityVfxSpec(abilityId: string): AbilityVfxSpec | undefined {
+function baseAbilityVfxSpec(abilityId: string): AbilityVfxSpec | undefined {
+  if (Object.hasOwn(HUNTER_VFX_SPECS, abilityId)) return HUNTER_VFX_SPECS[abilityId];
+  if (Object.hasOwn(WARRIOR_VFX_SPECS, abilityId)) return WARRIOR_VFX_SPECS[abilityId];
+  if (Object.hasOwn(PHYSICAL_KIT_SPECS, abilityId)) return PHYSICAL_KIT_SPECS[abilityId];
+  if (Object.hasOwn(RITUAL_KIT_SPECS, abilityId)) return RITUAL_KIT_SPECS[abilityId];
+  if (Object.hasOwn(SHAMAN_VFX_SPECS, abilityId)) return SHAMAN_VFX_SPECS[abilityId];
   if (abilityId === 'emberkin_felbolt') return EMBERKIN_FELBOLT_VFX_SPEC;
   if (abilityId === 'gloomshade_abyssal_chain') return GLOOMSHADE_ABYSSAL_CHAIN_VFX_SPEC;
   if (abilityId === 'bone_mage_shadow_bolt') return BONE_MAGE_SHADOW_BOLT_VFX_SPEC;
@@ -70,10 +125,17 @@ export function abilityVfxSpec(abilityId: string): AbilityVfxSpec | undefined {
   if (abilityId === 'reaping_command') return REAPING_COMMAND_VFX_SPEC;
   if (abilityId === 'army_of_the_dead') return ARMY_OF_THE_DEAD_VFX_SPEC;
   if (abilityId === 'abyssal_rift') return ABYSSAL_RIFT_VFX_SPEC;
-  return ABILITY_VFX_SPECS[abilityId];
+  return Object.hasOwn(ABILITY_VFX_SPECS, abilityId) ? ABILITY_VFX_SPECS[abilityId] : undefined;
 }
 
-export function abilityVfxFullSpec(abilityId: string): AbilityVfxFullSpec | undefined {
+function baseAbilityVfxFullSpec(abilityId: string): AbilityVfxFullSpec | undefined {
+  if (Object.hasOwn(DRUID_VFX_FULL_SPECS, abilityId)) return DRUID_VFX_FULL_SPECS[abilityId];
+  if (Object.hasOwn(HUNTER_VFX_FULL_SPECS, abilityId)) return HUNTER_VFX_FULL_SPECS[abilityId];
+  if (Object.hasOwn(PRIEST_VFX_FULL_SPECS, abilityId)) return PRIEST_VFX_FULL_SPECS[abilityId];
+  if (Object.hasOwn(WARRIOR_VFX_FULL_SPECS, abilityId)) return WARRIOR_VFX_FULL_SPECS[abilityId];
+  if (Object.hasOwn(PHYSICAL_KIT_FULL_SPECS, abilityId)) return PHYSICAL_KIT_FULL_SPECS[abilityId];
+  if (Object.hasOwn(RITUAL_KIT_FULL_SPECS, abilityId)) return RITUAL_KIT_FULL_SPECS[abilityId];
+  if (Object.hasOwn(SHAMAN_VFX_FULL_SPECS, abilityId)) return SHAMAN_VFX_FULL_SPECS[abilityId];
   if (abilityId === 'emberkin_felbolt') return EMBERKIN_FELBOLT_VFX_FULL_SPEC;
   if (abilityId === 'gloomshade_abyssal_chain') return GLOOMSHADE_ABYSSAL_CHAIN_VFX_FULL_SPEC;
   if (abilityId === 'bone_mage_shadow_bolt') return BONE_MAGE_SHADOW_BOLT_VFX_FULL_SPEC;
@@ -94,7 +156,9 @@ export function abilityVfxFullSpec(abilityId: string): AbilityVfxFullSpec | unde
   if (abilityId === 'reaping_command') return REAPING_COMMAND_VFX_FULL_SPEC;
   if (abilityId === 'army_of_the_dead') return ARMY_OF_THE_DEAD_VFX_FULL_SPEC;
   if (abilityId === 'abyssal_rift') return ABYSSAL_RIFT_VFX_FULL_SPEC;
-  return ABILITY_VFX_FULL_SPECS[abilityId];
+  return Object.hasOwn(ABILITY_VFX_ART_PROFILES, abilityId)
+    ? ABILITY_VFX_ART_PROFILES[abilityId]
+    : undefined;
 }
 
 interface CastVfxSyncPort<T> {

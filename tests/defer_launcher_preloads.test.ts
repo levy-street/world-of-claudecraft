@@ -16,6 +16,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import {
   assetsReady,
   beginDeferredPreloads,
+  beginStudioPreloads,
   preloadInternalsForTest,
   registerDeferredPreload,
   registerPreload,
@@ -29,6 +30,28 @@ beforeEach(() => {
   preloadInternalsForTest.reset();
 });
 describe('deferred preload lane', () => {
+  it('prepares studio art once while leaving world assets deferred', async () => {
+    const calls: string[] = [];
+    registerDeferredPreload(async () => {
+      calls.push('world');
+    });
+    registerDeferredPreload(async () => {
+      calls.push('art');
+    }, true);
+    expect(beginStudioPreloads()).toBe(1);
+    await assetsReady();
+    expect(calls).toEqual(['art']);
+    expect(preloadInternalsForTest.begun()).toBe(false);
+    expect(beginStudioPreloads()).toBe(0);
+    registerDeferredPreload(async () => {
+      calls.push('late-art');
+    }, true);
+    await assetsReady();
+    expect(calls).toEqual(['art', 'late-art']);
+    expect(beginDeferredPreloads()).toBe(1);
+    await assetsReady();
+    expect(calls).toEqual(['art', 'late-art', 'world']);
+  });
   it('does not start a deferred fetch until the lane opens', () => {
     let started = 0;
     registerDeferredPreload(() => {

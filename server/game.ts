@@ -8567,7 +8567,7 @@ export class GameServer {
         if (this.perfDetailActive) this.bcastSelfNs += process.hrtime.bigint() - selfStart;
         const keepJson = keep.length > 0 ? `,"keep":[${keep.join(',')}]` : '';
         const aoeBase = isBgPos(anchorEntity.pos.x) ? BG_MATCH_DROP_RADIUS : INTEREST_QUERY_RADIUS;
-        const telegraphJson = groundTelegraphWireJson(telegraphWorld, anchorEntity.pos, aoeBase);
+        const telegraphJson = groundTelegraphWireJson(telegraphWorld, anchorEntity.pos, aoeBase, anchorEntity.id);
         const timerWireJson = stableTimerWire ? `,"tw":${STABLE_TIMER_WIRE_VERSION}` : '';
         const petSpecialWireJson =
           session.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION

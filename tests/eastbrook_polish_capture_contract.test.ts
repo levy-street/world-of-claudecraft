@@ -362,8 +362,10 @@ interface AttributionTargetFixture {
 // Re-minted for the PR #3695 review fixes: the monument's impostor fragment
 // gained the fog, tonemapping and colourspace tail, moving
 // realm_builder_monument_fx.ts. No capture was retaken.
+// Re-minted for the Studio renderer and class material integration. Historical
+// captures are retained; only the runtime-input provenance seals changed.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '85392484fb6509a37aa445bcc5bd5ebba58819939847318ccf288b048341b708';
+  'cf5192a9d3c279af82e9a436b5a214cb603f5dc48a2e467f4163c6455aab9465';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

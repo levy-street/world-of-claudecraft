@@ -58,6 +58,9 @@ export function spawnHunterTrap(
     ability: abilityName,
     abilityId,
     hunterTrap: {
+      id: `${source.id}:${ctx.tickCount}:${abilityId}`,
+      duration: effect.trap.lifetime,
+      armTime: effect.trap.armTime,
       abilityId,
       armRemaining: effect.trap.armTime,
       freezeDuration: effect.duration,
@@ -107,6 +110,9 @@ export function spawnFrostjawTrap(
     school: 'frost',
     ability: abilityName,
     hunterTrap: {
+      id: `${source.id}:${ctx.tickCount}:${abilityId}`,
+      duration: effect.lifetime,
+      armTime: effect.armTime,
       abilityId,
       armRemaining: effect.armTime,
       freezeDuration: effect.rootDuration,
@@ -120,6 +126,8 @@ export function spawnFrostjawTrap(
     type: 'spellfxAt',
     x: center.x,
     z: center.z,
+    sourceId: source.id,
+    ability: abilityId,
     school: 'frost',
     fx: 'nova',
     radius: effect.radius,
@@ -144,8 +152,9 @@ export function tickHunterTrap(ctx: SimContext, effect: GroundAoE): void {
       x: effect.pos.x,
       z: effect.pos.z,
       school: 'frost',
-      fx: 'nova',
+      fx: 'tick',
       radius: SHIMMER_RADIUS,
+      sourceId: source.id,
       ability: trap.abilityId,
     });
   }
@@ -219,6 +228,7 @@ export function tickHunterTrap(ctx: SimContext, effect: GroundAoE): void {
       school: 'frost',
       fx: 'nova',
       radius: effect.radius,
+      sourceId: source.id,
       ability: trap.abilityId,
     });
     break;

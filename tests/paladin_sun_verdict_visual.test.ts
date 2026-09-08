@@ -37,8 +37,10 @@ describe('PaladinSunVerdictVisual', () => {
     visual.update({ active: true, charges: 3, imminent: true }, 0.1, false);
     expect(segments.map((segment) => segment.visible)).toEqual([true, true, true]);
     expect(visual.group.userData.charges).toBe(3);
-    const sprites = visual.group.children as THREE.Sprite[];
-    expect(sprites.every((sprite) => sprite.material.depthTest)).toBe(true);
+    visual.group.traverse((object) => {
+      const material = (object as THREE.Mesh).material;
+      if (material && !Array.isArray(material)) expect(material.depthTest).toBe(true);
+    });
     visual.update({ active: false, charges: 0, imminent: false }, 0.1, false);
     expect(visual.group.visible).toBe(false);
     visual.dispose();

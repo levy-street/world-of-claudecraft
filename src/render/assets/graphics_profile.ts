@@ -1,3 +1,5 @@
+import { prepareProductionProfileAssets } from '../ability_vfx/production_assets';
+import { prepareSimulationProfileAssets } from '../ability_vfx/simulation_assets';
 import { resetBankerChestProfileCaches } from '../banker_chest';
 import { prepareCanopyDetailProfileAssets } from '../canopy_detail';
 import { resetCastleFeatureProfileCaches } from '../castle_features';
@@ -43,6 +45,8 @@ type GraphicsProfileAssetPreparer = (
 ) => Promise<void>;
 
 const PREPARERS: readonly GraphicsProfileAssetPreparer[] = [
+  (target) => prepareProductionProfileAssets(target),
+  (target) => prepareSimulationProfileAssets(target),
   (target) => prepareTerrainProfileAssets(target),
   (target) => prepareWaterProfileAssets(target),
   (target) => prepareStoneDetailProfileAssets(target),

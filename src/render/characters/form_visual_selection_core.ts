@@ -5,6 +5,7 @@ export const CHARACTER_FORM_FLAG = {
   travel: 1 << 3,
   fireball: 1 << 4,
   metamorph: 1 << 5,
+  moonkin: 1 << 6,
 } as const;
 
 export const CHARACTER_FORM_READY = {
@@ -13,6 +14,7 @@ export const CHARACTER_FORM_READY = {
   cat: 1 << 2,
   travel: 1 << 3,
   metamorph: 1 << 4,
+  moonkin: 1 << 5,
 } as const;
 
 export type CharacterFormVisual =
@@ -22,7 +24,8 @@ export type CharacterFormVisual =
   | 'cat'
   | 'travel'
   | 'fireball'
-  | 'metamorph';
+  | 'metamorph'
+  | 'moonkin';
 
 export interface CharacterFormVisibility {
   base: boolean;
@@ -31,6 +34,7 @@ export interface CharacterFormVisibility {
   cat: boolean;
   travel: boolean;
   metamorph: boolean;
+  moonkin: boolean;
 }
 
 export interface CharacterFormShadowPlan {
@@ -59,6 +63,7 @@ export function characterFormMaskForAura(aura: AuraIdentity): number {
   }
   if (aura.kind === 'form_travel') return CHARACTER_FORM_FLAG.travel;
   if (aura.kind === 'form_fireball') return CHARACTER_FORM_FLAG.fireball;
+  if (aura.kind === 'form_moonkin') return CHARACTER_FORM_FLAG.moonkin;
   // `form_lich` is the current Necromancy marker and `form_metamorph` is the
   // legacy Warlock marker. They intentionally share presentation only; their
   // simulation mechanics remain independent and renderer-owned code never
@@ -76,6 +81,7 @@ export function requestedCharacterForm(mask: number): CharacterFormVisual {
   if (mask & CHARACTER_FORM_FLAG.travel) return 'travel';
   if (mask & CHARACTER_FORM_FLAG.fireball) return 'fireball';
   if (mask & CHARACTER_FORM_FLAG.metamorph) return 'metamorph';
+  if (mask & CHARACTER_FORM_FLAG.moonkin) return 'moonkin';
   return 'base';
 }
 
@@ -91,6 +97,8 @@ function readyFlagFor(form: CharacterFormVisual): number {
       return CHARACTER_FORM_READY.travel;
     case 'metamorph':
       return CHARACTER_FORM_READY.metamorph;
+    case 'moonkin':
+      return CHARACTER_FORM_READY.moonkin;
     default:
       return 0;
   }
@@ -119,6 +127,7 @@ export function characterFormReadyMask(
   travel: unknown,
   metamorph: unknown,
   compilePending: unknown,
+  moonkin: unknown = null,
 ): number {
   let mask = 0;
   if (formRigReady(sheep, compilePending)) mask |= CHARACTER_FORM_READY.sheep;
@@ -126,6 +135,7 @@ export function characterFormReadyMask(
   if (formRigReady(cat, compilePending)) mask |= CHARACTER_FORM_READY.cat;
   if (formRigReady(travel, compilePending)) mask |= CHARACTER_FORM_READY.travel;
   if (formRigReady(metamorph, compilePending)) mask |= CHARACTER_FORM_READY.metamorph;
+  if (formRigReady(moonkin, compilePending)) mask |= CHARACTER_FORM_READY.moonkin;
   return mask;
 }
 
@@ -143,6 +153,7 @@ export function activeCharacterFormVisual<T>(
   cat: T | null,
   travel: T | null,
   metamorph: T | null,
+  moonkin: T | null = null,
 ): T {
   switch (resolved) {
     case 'sheep':
@@ -155,6 +166,8 @@ export function activeCharacterFormVisual<T>(
       return travel ?? base;
     case 'metamorph':
       return metamorph ?? base;
+    case 'moonkin':
+      return moonkin ?? base;
     default:
       return base;
   }
@@ -168,6 +181,7 @@ export function characterFormVisibility(resolved: CharacterFormVisual): Characte
     cat: resolved === 'cat',
     travel: resolved === 'travel',
     metamorph: resolved === 'metamorph',
+    moonkin: resolved === 'moonkin',
   };
 }
 

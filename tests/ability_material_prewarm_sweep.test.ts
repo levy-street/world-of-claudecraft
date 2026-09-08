@@ -83,6 +83,7 @@ const REGISTERED_MODULES = [
   'frost_nova_root_visual.ts',
   'ice_block_visual.ts',
   'temporal_hourglass_visual.ts',
+  'hourglass_field_visual.ts',
   'fireball_travel_visual.ts',
   'coach_trail_materials.ts',
 ];
@@ -320,7 +321,7 @@ describe('the manifest wiring (source pins)', () => {
 
   it('is a staged compile group, so the boot compile lane links it', () => {
     expect(renderer).toContain(
-      "const abilityMaterialSlot = createVariantPrewarmSlot(\n      variantSlotHost,\n      'ability-materials',\n      buildAbilityMaterialPrewarmGroup,\n    );",
+      "const abilityMaterialSlot = createVariantPrewarmSlot(\n      variantSlotHost,\n      'ability-materials',\n      () => {\n        const group = buildAbilityMaterialPrewarmGroup().add(persistentClassVfxPrewarmGroup());\n        group.traverse((child) => {\n          const material = (child as THREE.Mesh).material;\n          if (material) this.prewarmMaterialTextures(material);\n        });\n        return group;\n      },\n    );",
     );
     expect(renderer).toContain('abilityMaterialSlot.staged(),');
   });

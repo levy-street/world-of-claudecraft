@@ -925,7 +925,13 @@ describe('Eastbrook town renderer', () => {
     );
     expect(rendererSource).toContain('buildEastbrookTownView(this.sim.cfg.seed)');
     expect(rendererSource).toContain("setRenderCategory(this.eastbrookTownView.group, 'props')");
-    expect(rendererSource.match(/this\.eastbrookTownView\.update\(/g)).toHaveLength(2);
+    const scenerySource = readFileSync(
+      path.join(__dirname, '..', 'src/render/renderer_scenery.ts'),
+      'utf8',
+    );
+    expect(rendererSource).toContain('updateRendererScenery(this, p, dt, projectionPixels');
+    expect(rendererSource.match(/this\.eastbrookTownView\.update\(/g)).toHaveLength(1);
+    expect(scenerySource.match(/host\.eastbrookTownView\.update\(/g)).toHaveLength(1);
 
     const propsSource = readFileSync(path.join(__dirname, '..', 'src/render/props.ts'), 'utf8');
     expect(propsSource).toContain('builtInWorld && isEastbrookRebuildBuilding(b)');

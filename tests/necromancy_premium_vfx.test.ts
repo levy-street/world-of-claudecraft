@@ -5,7 +5,7 @@ import type { AbilityVfxFx } from '../src/render/ability_vfx/fx';
 import type { AbilityVfxTextures } from '../src/render/ability_vfx/fx_textures';
 import { AbilityVfx } from '../src/render/ability_vfx/painter';
 import { AbilityVfxRibbons } from '../src/render/ability_vfx/ribbons';
-import { abilityVfxFullSpec, abilityVfxSpec } from '../src/render/ability_vfx_registry';
+import { abilityVfxSpec } from '../src/render/ability_vfx_registry';
 import {
   ARMY_OF_THE_DEAD_VFX_FULL_SPEC,
   ARMY_OF_THE_DEAD_VFX_SPEC,
@@ -27,6 +27,7 @@ import {
   EMBERKIN_FELBOLT_VFX_FULL_SPEC,
   EMBERKIN_FELBOLT_VFX_SPEC,
 } from '../src/render/warlock_pet_vfx_specs';
+import { authoredVfxSpec } from './helpers/authored_vfx_spec';
 
 function fakeTextures(): AbilityVfxTextures {
   const texture = (): THREE.CanvasTexture => new THREE.Texture() as THREE.CanvasTexture;
@@ -87,7 +88,7 @@ function painterHarness() {
 describe('Necromancy premium VFX', () => {
   it('retints Emberkin fel-lance anatomy violet for the Bone Mage projectile', () => {
     expect(abilityVfxSpec('bone_mage_shadow_bolt')).toBe(BONE_MAGE_SHADOW_BOLT_VFX_SPEC);
-    expect(abilityVfxFullSpec('bone_mage_shadow_bolt')).toBe(BONE_MAGE_SHADOW_BOLT_VFX_FULL_SPEC);
+    authoredVfxSpec('bone_mage_shadow_bolt', BONE_MAGE_SHADOW_BOLT_VFX_FULL_SPEC);
     expect(BONE_MAGE_SHADOW_BOLT_VFX_SPEC).toMatchObject({
       c: '#8f4dff',
       p: 'shadow',
@@ -146,7 +147,7 @@ describe('Necromancy premium VFX', () => {
     ).toBe(true);
     expect(h.sequenceBolt).toHaveBeenCalledWith(
       'bone_mage_shadow_bolt',
-      BONE_MAGE_SHADOW_BOLT_VFX_FULL_SPEC,
+      authoredVfxSpec('bone_mage_shadow_bolt', BONE_MAGE_SHADOW_BOLT_VFX_FULL_SPEC),
       4,
       2,
       0x8f4dff,
@@ -198,7 +199,7 @@ describe('Necromancy premium VFX', () => {
 
   it('opens Army of the Dead as a final-tier three-lane portal ritual', () => {
     expect(abilityVfxSpec('army_of_the_dead')).toBe(ARMY_OF_THE_DEAD_VFX_SPEC);
-    expect(abilityVfxFullSpec('army_of_the_dead')).toBe(ARMY_OF_THE_DEAD_VFX_FULL_SPEC);
+    authoredVfxSpec('army_of_the_dead', ARMY_OF_THE_DEAD_VFX_FULL_SPEC);
     expect(ARMY_OF_THE_DEAD_VFX_SPEC).toMatchObject({
       p: 'shadow',
       pw: 1.9,
@@ -248,7 +249,7 @@ describe('Necromancy premium VFX', () => {
     expect(h.sequenceBolt).toHaveBeenCalledOnce();
     expect(h.sequenceBolt).toHaveBeenCalledWith(
       'soul_lance',
-      SOUL_LANCE_VFX_FULL_SPEC,
+      authoredVfxSpec('soul_lance', SOUL_LANCE_VFX_FULL_SPEC),
       1,
       2,
       0x7b42c3,
@@ -330,7 +331,7 @@ describe('Necromancy premium VFX', () => {
     ).toBe(true);
     expect(h.sequenceInstant).toHaveBeenCalledWith(
       'ossuary_mark',
-      OSSUARY_MARK_VFX_FULL_SPEC,
+      authoredVfxSpec('ossuary_mark', OSSUARY_MARK_VFX_FULL_SPEC),
       1,
       2,
       0x6730a6,
@@ -364,7 +365,7 @@ describe('Necromancy premium VFX', () => {
     ).toBe(true);
     expect(h.sequenceInstant).toHaveBeenCalledWith(
       'ossuary_mark_detonate',
-      OSSUARY_MARK_DETONATE_VFX_FULL_SPEC,
+      authoredVfxSpec('ossuary_mark_detonate', OSSUARY_MARK_DETONATE_VFX_FULL_SPEC),
       1,
       2,
       expect.any(Number),
@@ -389,7 +390,7 @@ describe('Necromancy premium VFX', () => {
     ).toBe(true);
     expect(h.sequenceInstantAt).toHaveBeenCalledWith(
       'death_echo',
-      DEATH_ECHO_VFX_FULL_SPEC,
+      authoredVfxSpec('death_echo', DEATH_ECHO_VFX_FULL_SPEC),
       1,
       4,
       6,
@@ -411,7 +412,7 @@ describe('Necromancy premium VFX', () => {
     ).toBe(true);
     expect(h.sequenceInstantAt).toHaveBeenCalledWith(
       'corpse_explosion',
-      CORPSE_EXPLOSION_VFX_FULL_SPEC,
+      authoredVfxSpec('corpse_explosion', CORPSE_EXPLOSION_VFX_FULL_SPEC),
       1,
       4,
       6,
@@ -441,7 +442,7 @@ describe('Necromancy premium VFX', () => {
     ).toBe(true);
     expect(melee.sequenceInstant).toHaveBeenCalledWith(
       'reaping_command',
-      REAPING_COMMAND_VFX_FULL_SPEC,
+      authoredVfxSpec('reaping_command', REAPING_COMMAND_VFX_FULL_SPEC),
       3,
       2,
       expect.any(Number),
@@ -461,7 +462,7 @@ describe('Necromancy premium VFX', () => {
     ).toBe(true);
     expect(mage.sequenceBolt).toHaveBeenCalledWith(
       'reaping_command',
-      REAPING_COMMAND_VFX_FULL_SPEC,
+      authoredVfxSpec('reaping_command', REAPING_COMMAND_VFX_FULL_SPEC),
       4,
       2,
       expect.any(Number),

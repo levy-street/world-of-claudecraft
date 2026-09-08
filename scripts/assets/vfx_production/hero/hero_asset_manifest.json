@@ -1,0 +1,400 @@
+{
+  "version": 2,
+  "runtime_total_bytes": 6696396,
+  "runtime_budget_bytes": null,
+  "budget_note": "Quality90 WebP fallbacks retained by integration request. Parent integration produces KTX2 runtime textures from lossless masters.",
+  "effects": {
+    "pyroblast": {
+      "effect": "pyroblast",
+      "source": "pyroblast.blend",
+      "authoring": "Original authored analytic Blender geometry/volume animation; no fluid simulation",
+      "camera": {
+        "type": "orthographic",
+        "target_pivot_world": [
+          0,
+          0,
+          0
+        ],
+        "location": [
+          0.0,
+          -14.0,
+          7.199999809265137
+        ],
+        "rotation_euler": [
+          1.2214518785476685,
+          -0.0,
+          0.0
+        ],
+        "ortho_scale": 6.699999809265137
+      },
+      "pivot_uv_content_top_origin": [
+        0.5,
+        0.794500470161438
+      ],
+      "pivot_uv_tile_top_origin": [
+        0.5,
+        0.785297330468893
+      ],
+      "phase_frames_zero_based": {
+        "onset": [
+          0,
+          6
+        ],
+        "rise": [
+          7,
+          18
+        ],
+        "peak": [
+          19,
+          32
+        ],
+        "breakup": [
+          33,
+          46
+        ],
+        "tail": [
+          47,
+          63
+        ]
+      },
+      "normal_map": null,
+      "motion_vector_map": null,
+      "auxiliary_map_note": "No invented normal or optical flow maps. Volume density has no single surface normal; beauty-only contract.",
+      "simulation_claim": false,
+      "bloom_baked": false,
+      "view_transform": "Standard / None",
+      "render_engine": "EEVEE",
+      "samples": 64,
+      "render_resolution": 744,
+      "version": 2,
+      "runtime_file": "pyroblast_atlas.webp",
+      "master_file": "pyroblast_atlas_master.png",
+      "source_frame_format": "744x744 RGBA16 PNG in pyroblast_frames; retained unmodified",
+      "reference": "production_reference.png (visual guidance only; not used in runtime pixels)",
+      "reference_prompt": "reference_prompt.txt",
+      "authoring_script": "bake_hero_assets.py",
+      "packaging_script": "package_hero_assets.py",
+      "dimensions_px": [
+        4096,
+        4096
+      ],
+      "tile_px": [
+        512,
+        512
+      ],
+      "content_px": [
+        496,
+        496
+      ],
+      "gutter_px": 8,
+      "grid": {
+        "columns": 8,
+        "rows": 8,
+        "order": "row-major left-to-right top-to-bottom"
+      },
+      "frame_count": 64,
+      "fps": 30,
+      "duration_seconds": 2.1333333333333333,
+      "loop": false,
+      "uv_rect_formula": {
+        "u0": "((frame % 8)*512+8)/4096",
+        "v0_top_origin": "(floor(frame/8)*512+8)/4096",
+        "du": "496/4096",
+        "dv": "496/4096"
+      },
+      "color_space": "sRGB color / linear alpha",
+      "alpha": "straight, unassociated; lossless WebP alpha",
+      "channels": "RGB rendered color and lighting, including localized authored emission; A geometric/volumetric opacity",
+      "intended_blend": "Premultiply once in shader, then ONE / ONE_MINUS_SRC_ALPHA; straight-alpha blending also valid when matched correctly",
+      "runtime_filter": "Linear, clamp, no atlas mipmaps; 8px gutters; zero-alpha RGB dilated 4px to prevent dark fringes",
+      "normal_atlas": null,
+      "lighting_atlas": null,
+      "motion_vector_atlas": null,
+      "auxiliary_encoding": "No auxiliary maps supplied. Do not infer normal or motion data from beauty RGB.",
+      "union_content_alpha_bounds_px": [
+        84,
+        51,
+        429,
+        406
+      ],
+      "camera_plane_bounds_relative_to_origin_world": [
+        -2.215322517579602,
+        -0.16112103887997675,
+        2.4449596078165112,
+        4.6342417278319665
+      ],
+      "runtime_bytes": 2204226,
+      "webp_quality": 90,
+      "validation": {
+        "frames": 64,
+        "edge_alpha_max": 0,
+        "min_visible_content_margin_px": 51,
+        "first_alpha_mass": 0.0,
+        "last_alpha_mass": 0.0,
+        "webp_alpha_exact": true
+      }
+    },
+    "frost_nova": {
+      "effect": "frost_nova",
+      "source": "frost_nova.blend",
+      "authoring": "Original authored analytic Blender geometry/volume animation; no fluid simulation",
+      "camera": {
+        "type": "orthographic",
+        "target_pivot_world": [
+          0,
+          0,
+          0
+        ],
+        "location": [
+          0.0,
+          -14.0,
+          6.199999809265137
+        ],
+        "rotation_euler": [
+          1.2214518785476685,
+          -0.0,
+          0.0
+        ],
+        "ortho_scale": 7.25
+      },
+      "pivot_uv_content_top_origin": [
+        0.5,
+        0.6425594389438629
+      ],
+      "pivot_uv_tile_top_origin": [
+        0.5,
+        0.6381044564768672
+      ],
+      "phase_frames_zero_based": {
+        "onset": [
+          0,
+          6
+        ],
+        "rise": [
+          7,
+          18
+        ],
+        "peak": [
+          19,
+          32
+        ],
+        "breakup": [
+          33,
+          46
+        ],
+        "tail": [
+          47,
+          63
+        ]
+      },
+      "normal_map": null,
+      "motion_vector_map": null,
+      "auxiliary_map_note": "No invented normal or optical flow maps. Volume density has no single surface normal; beauty-only contract.",
+      "simulation_claim": false,
+      "bloom_baked": false,
+      "view_transform": "AgX / AgX - Medium High Contrast",
+      "render_engine": "EEVEE",
+      "samples": 64,
+      "render_resolution": 744,
+      "version": 2,
+      "runtime_file": "frost_nova_atlas.webp",
+      "master_file": "frost_nova_atlas_master.png",
+      "source_frame_format": "744x744 RGBA16 PNG in frost_nova_frames; retained unmodified",
+      "reference": "production_reference.png (visual guidance only; not used in runtime pixels)",
+      "reference_prompt": "reference_prompt.txt",
+      "authoring_script": "bake_hero_assets.py",
+      "packaging_script": "package_hero_assets.py",
+      "dimensions_px": [
+        4096,
+        4096
+      ],
+      "tile_px": [
+        512,
+        512
+      ],
+      "content_px": [
+        496,
+        496
+      ],
+      "gutter_px": 8,
+      "grid": {
+        "columns": 8,
+        "rows": 8,
+        "order": "row-major left-to-right top-to-bottom"
+      },
+      "frame_count": 64,
+      "fps": 30,
+      "duration_seconds": 2.1333333333333333,
+      "loop": false,
+      "uv_rect_formula": {
+        "u0": "((frame % 8)*512+8)/4096",
+        "v0_top_origin": "(floor(frame/8)*512+8)/4096",
+        "du": "496/4096",
+        "dv": "496/4096"
+      },
+      "color_space": "sRGB color / linear alpha",
+      "alpha": "straight, unassociated; lossless WebP alpha",
+      "channels": "RGB rendered color and lighting, including localized authored emission; A geometric/volumetric opacity",
+      "intended_blend": "Premultiply once in shader, then ONE / ONE_MINUS_SRC_ALPHA; straight-alpha blending also valid when matched correctly",
+      "runtime_filter": "Linear, clamp, no atlas mipmaps; 8px gutters; zero-alpha RGB dilated 4px to prevent dark fringes",
+      "normal_atlas": null,
+      "lighting_atlas": null,
+      "motion_vector_atlas": null,
+      "auxiliary_encoding": "No auxiliary maps supplied. Do not infer normal or motion data from beauty RGB.",
+      "union_content_alpha_bounds_px": [
+        52,
+        116,
+        443,
+        388
+      ],
+      "camera_plane_bounds_relative_to_origin_world": [
+        -2.8649193548387095,
+        -1.0128150353989291,
+        2.850302419354839,
+        2.9629914162139737
+      ],
+      "runtime_bytes": 2271474,
+      "webp_quality": 90,
+      "validation": {
+        "frames": 64,
+        "edge_alpha_max": 0,
+        "min_visible_content_margin_px": 52,
+        "first_alpha_mass": 0.0,
+        "last_alpha_mass": 0.0,
+        "webp_alpha_exact": true
+      }
+    },
+    "chain_heal": {
+      "effect": "chain_heal",
+      "source": "chain_heal.blend",
+      "authoring": "Original authored analytic Blender geometry/volume animation; no fluid simulation",
+      "camera": {
+        "type": "orthographic",
+        "target_pivot_world": [
+          0,
+          0,
+          0
+        ],
+        "location": [
+          0.0,
+          -14.0,
+          6.399999618530273
+        ],
+        "rotation_euler": [
+          1.221451997756958,
+          -0.0,
+          0.0
+        ],
+        "ortho_scale": 6.300000190734863
+      },
+      "pivot_uv_content_top_origin": [
+        0.5,
+        0.693885326385498
+      ],
+      "pivot_uv_tile_top_origin": [
+        0.5,
+        0.6878264099359512
+      ],
+      "phase_frames_zero_based": {
+        "onset": [
+          0,
+          6
+        ],
+        "rise": [
+          7,
+          18
+        ],
+        "peak": [
+          19,
+          32
+        ],
+        "breakup": [
+          33,
+          46
+        ],
+        "tail": [
+          47,
+          63
+        ]
+      },
+      "normal_map": null,
+      "motion_vector_map": null,
+      "auxiliary_map_note": "No invented normal or optical flow maps. Volume density has no single surface normal; beauty-only contract.",
+      "simulation_claim": false,
+      "bloom_baked": false,
+      "view_transform": "AgX / AgX - Medium High Contrast",
+      "render_engine": "EEVEE",
+      "samples": 64,
+      "render_resolution": 744,
+      "version": 2,
+      "runtime_file": "chain_heal_atlas.webp",
+      "master_file": "chain_heal_atlas_master.png",
+      "source_frame_format": "744x744 RGBA16 PNG in chain_heal_frames; retained unmodified",
+      "reference": "production_reference.png (visual guidance only; not used in runtime pixels)",
+      "reference_prompt": "reference_prompt.txt",
+      "authoring_script": "bake_hero_assets.py",
+      "packaging_script": "package_hero_assets.py",
+      "dimensions_px": [
+        4096,
+        4096
+      ],
+      "tile_px": [
+        512,
+        512
+      ],
+      "content_px": [
+        496,
+        496
+      ],
+      "gutter_px": 8,
+      "grid": {
+        "columns": 8,
+        "rows": 8,
+        "order": "row-major left-to-right top-to-bottom"
+      },
+      "frame_count": 64,
+      "fps": 30,
+      "duration_seconds": 2.1333333333333333,
+      "loop": false,
+      "uv_rect_formula": {
+        "u0": "((frame % 8)*512+8)/4096",
+        "v0_top_origin": "(floor(frame/8)*512+8)/4096",
+        "du": "496/4096",
+        "dv": "496/4096"
+      },
+      "color_space": "sRGB color / linear alpha",
+      "alpha": "straight, unassociated; lossless WebP alpha",
+      "channels": "RGB rendered color and lighting, including localized authored emission; A geometric/volumetric opacity",
+      "intended_blend": "Premultiply once in shader, then ONE / ONE_MINUS_SRC_ALPHA; straight-alpha blending also valid when matched correctly",
+      "runtime_filter": "Linear, clamp, no atlas mipmaps; 8px gutters; zero-alpha RGB dilated 4px to prevent dark fringes",
+      "normal_atlas": null,
+      "lighting_atlas": null,
+      "motion_vector_atlas": null,
+      "auxiliary_encoding": "No auxiliary maps supplied. Do not infer normal or motion data from beauty RGB.",
+      "union_content_alpha_bounds_px": [
+        80,
+        51,
+        460,
+        463
+      ],
+      "camera_plane_bounds_relative_to_origin_world": [
+        -2.1338710323456795,
+        -1.50936926366163,
+        2.692742017007643,
+        3.723695410900394
+      ],
+      "runtime_bytes": 2220696,
+      "webp_quality": 90,
+      "validation": {
+        "frames": 64,
+        "edge_alpha_max": 0,
+        "min_visible_content_margin_px": 33,
+        "first_alpha_mass": 0.0,
+        "last_alpha_mass": 0.0,
+        "webp_alpha_exact": true
+      }
+    }
+  },
+  "sources": "Original Blender authoring and built-in ImageGen reference; no external assets or credentials",
+  "preview": "hero_effects_preview.mp4"
+}

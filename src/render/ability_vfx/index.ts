@@ -19,4 +19,6 @@ export {
   type AbilityVfxPrewarmTextureStep,
   abilityVfxTexturePrewarmSteps,
   collectAbilityVfxCompileTargets,
+  persistentClassVfxCompileTargets,
+  persistentClassVfxPrewarmGroup,
 } from './prewarm';

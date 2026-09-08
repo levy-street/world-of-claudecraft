@@ -28,7 +28,13 @@ import { cloneMaterialWithHooks } from '../material_clone_hooks';
 
 /** Translucent-rig flavor: 'spirit' is the thin ghost run (released spirits,
  *  ghost wolf, the graveyard angel); 'stealth' is the denser Duskveil fade. */
-export type GhostStyle = 'spirit' | 'stealth';
+export type GhostStyle = 'spirit' | 'stealth' | 'shadewolf';
+
+export function resolveGhostStyle(wolf: boolean, stealth: boolean, released: boolean): GhostStyle {
+  if (released) return 'spirit';
+  if (wolf) return 'shadewolf';
+  return stealth ? 'stealth' : 'spirit';
+}
 
 /** Every overlay that flips `transparent` on a rig material. */
 type CharacterEffectStyle = GhostStyle | 'shadowform' | 'moonkin';
@@ -84,14 +90,36 @@ export function createGhostEffectMaterial(
   style: GhostStyle = 'spirit',
 ): THREE.Material {
   const clone = cloneTransparent(source, style);
-  clone.opacity = ghostEffectOpacity(style);
+  applyGhostEffectStyle(clone, source, style);
   return clone;
+}
+
+/** Uniform-only style changes reuse the prewarmed transparent program.
+ * Always restore the source first: a form/stealth/death transition reuses clones. */
+export function applyGhostEffectStyle(
+  target: THREE.Material,
+  source: THREE.Material,
+  style: GhostStyle,
+): void {
+  const to = target as TintableMaterial;
+  const from = source as TintableMaterial;
+  to.opacity = ghostEffectOpacity(style);
+  if (to.color && from.color) to.color.copy(from.color);
+  if (to.emissive && from.emissive) to.emissive.copy(from.emissive);
+  if (to.emissiveIntensity !== undefined) to.emissiveIntensity = from.emissiveIntensity ?? 1;
+  if (style === 'shadewolf') {
+    // A dense silver-blue body preserves the wolf's silhouette and fur detail.
+    // Indigo emission lives inside it; the production rim lighting defines its edge.
+    to.color?.setHex(0x92b8d2);
+    to.emissive?.setHex(0x243979);
+    if (to.emissiveIntensity !== undefined) to.emissiveIntensity = 0.42;
+  }
 }
 
 /** The opacity a ghost clone wears for `style` (rewritten in place on a flip:
  *  stealth to death to ghost run reuses the same clones). */
 export function ghostEffectOpacity(style: GhostStyle): number {
-  return style === 'stealth' ? STEALTH_OPACITY : GHOST_OPACITY;
+  return style === 'shadewolf' ? 0.68 : style === 'stealth' ? STEALTH_OPACITY : GHOST_OPACITY;
 }
 
 /** The Shadowform clone of `source`. */

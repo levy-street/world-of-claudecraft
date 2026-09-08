@@ -15,10 +15,11 @@ interface FakeSource {
   playbackRate: { value: number };
   onended: (() => void) | null;
   started: boolean;
+  startOffset: number | null;
   stopAt: number | null;
   connect(n: unknown): unknown;
   disconnect(): void;
-  start(): void;
+  start(t?: number, offset?: number): void;
   stop(t?: number): void;
 }
 
@@ -103,13 +104,15 @@ function installAudioStub(): void {
         playbackRate: { value: 1 },
         onended: null,
         started: false,
+        startOffset: null,
         stopAt: null,
         connect(n: unknown) {
           return n;
         },
         disconnect() {},
-        start() {
+        start(_t?: number, offset = 0) {
           this.started = true;
+          this.startOffset = offset;
         },
         stop(t?: number) {
           this.stopAt = t ?? 0;
@@ -154,6 +157,18 @@ beforeEach(() => {
 });
 
 describe('footstep audio', () => {
+  it('holds signature charges within their seamless interior region at fixed pitch', () => {
+    const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
+    buffers.set('cast_masterwork_pyre', { duration: 4 });
+    sfx.loop('masterwork-test', 'cast_masterwork_pyre', 0.28, 0, 0, 0);
+    const src = lastSource() as FakeSource & { loop: boolean; loopStart: number; loopEnd: number };
+    expect(src.loop).toBe(true);
+    expect(src.loopStart).toBe(1);
+    expect(src.loopEnd).toBe(3);
+    expect(src.startOffset).toBe(1);
+    expect(src.playbackRate.value).toBe(1);
+    sfx.unloop('masterwork-test', 0);
+  });
   it('shapes each footfall into a transient stopped before the next step', () => {
     sfx.footstep(0, 0, 0, 'grass', true, true);
     const src = lastSource();

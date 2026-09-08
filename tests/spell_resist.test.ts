@@ -90,6 +90,7 @@ describe('spell_resist: cast outcome labeling', () => {
     const dmg = events.filter((e) => e.type === 'damage' && e.targetId === mob.id);
     expect(dmg.length).toBeGreaterThan(0);
     expect(dmg.every((e) => e.kind === 'resist')).toBe(true);
+    expect(dmg.every((e) => e.abilityId === 'fireball')).toBe(true);
     expect(dmg.some((e) => e.kind === 'miss')).toBe(false);
     expect(dmg.every((e) => e.amount === 0)).toBe(true);
   });

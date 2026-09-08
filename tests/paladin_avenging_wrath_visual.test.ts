@@ -43,6 +43,22 @@ describe('Paladin Avenging Wrath visual', () => {
     expect(renderer).toContain('if (isPaladinWingAura(a)) hasPaladinWings = true');
     expect(renderer).toContain('v.paladinAvengingWrathVisual = syncPaladinAvengingWrathVisual(');
     expect(renderer).toContain('v.paladinAvengingWrathVisual?.dispose()');
-    expect(renderer).toContain('!e.dead && hasPaladinWings');
+    expect(renderer).toContain('!e.dead && (hasPaladinWings || e.auras.length > 0)');
+  });
+  it('holds distinct defenses and updates the frozen wing silhouette when the aura changes', () => {
+    const parent = new THREE.Group();
+    const visual = syncPaladinAvengingWrathVisual(null, parent, 1.8, true, 0, true, [
+      { id: 'guardian_covenant', kind: 'buff_dr' },
+    ])!;
+    const folded = visual.leftWing.rotation.z;
+    syncPaladinAvengingWrathVisual(visual, parent, 1.8, true, 0, true, [
+      { id: 'avenging_wrath', kind: 'buff_dmg_done' },
+      { id: 'holy_shield_absorb', kind: 'absorb' },
+      { id: 'bastion_rite', kind: 'buff_dr_phys' },
+    ]);
+    expect(visual.leftWing.rotation.z).not.toBe(folded);
+    expect(visual.ground.visible).toBe(true);
+    expect(visual.bulwark.visible).toBe(true);
+    expect(syncPaladinAvengingWrathVisual(visual, parent, 1.8, true, 0, true, [])).toBeNull();
   });
 });

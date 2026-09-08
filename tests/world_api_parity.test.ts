@@ -111,6 +111,7 @@ export const IWORLD_MEMBERS = [
   { name: 'known', kind: 'data' },
   { name: 'activeConsecrations', kind: 'data' },
   { name: 'activeFrostRings', kind: 'data' },
+  { name: 'activeHunterTraps', kind: 'data' },
   { name: 'activeIgnivarMeteors', kind: 'data' },
   { name: 'activeVarkhulCinderFires', kind: 'data' },
   { name: 'activeVarkhulCinderOrbProjectiles', kind: 'data' },
@@ -118,6 +119,8 @@ export const IWORLD_MEMBERS = [
   { name: 'activeVarkhulAnvilMeteors', kind: 'data' },
   { name: 'activeVarkhulAssemblies', kind: 'data' },
   { name: 'activeTemporalHourglasses', kind: 'data' },
+  { name: 'activeRunesOfPower', kind: 'data' },
+  { name: 'activeBlizzards', kind: 'data' },
   { name: 'questLog', kind: 'data' },
   { name: 'questsDone', kind: 'data' },
   // --- commands + read-returning methods ---
@@ -662,8 +665,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // even when the total agrees. Only running the suite says what these
     // numbers really are; never reconcile them by arithmetic in the diff (the
     // numbers below were set from a suite run, not from this narrative).
-    expect(IWORLD_MEMBERS.length).toBe(344);
-    expect(DATA_MEMBERS.length).toBe(95);
+    expect(IWORLD_MEMBERS.length).toBe(347);
+    expect(DATA_MEMBERS.length).toBe(98);
     expect(METHOD_MEMBERS.length).toBe(249);
   });
   it('has no duplicate member names', () => {
@@ -683,14 +686,17 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'accountAdmin',
       'accountCosmetics',
       'accountFlair',
+      'activeBlizzards',
       'activeBorder',
       'activeConsecrations',
       'activeFrostRings',
+      'activeHunterTraps',
       'activeIgnivarMeteors',
       'activeLoadout',
       'activeLootRolls',
       'activeMasterLootRolls',
       'activeMobileStationCraft',
+      'activeRunesOfPower',
       'activeTemporalHourglasses',
       'activeTitle',
       'activeVarkhulAnvilMeteors',
@@ -1026,12 +1032,15 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     expect(DATA_MEMBERS.map((m) => m.name).sort()).toEqual([
       'accountAdmin',
       'accountCosmetics',
+      'activeBlizzards',
       'activeBorder',
       'activeConsecrations',
       'activeFrostRings',
+      'activeHunterTraps',
       'activeIgnivarMeteors',
       'activeLoadout',
       'activeMobileStationCraft',
+      'activeRunesOfPower',
       'activeTemporalHourglasses',
       'activeTitle',
       'activeVarkhulAnvilMeteors',
@@ -1472,7 +1481,10 @@ const FACET_COMBAT = [
   'known',
   'activeConsecrations',
   'activeFrostRings',
+  'activeHunterTraps',
   'activeIgnivarMeteors',
+  'activeRunesOfPower',
+  'activeBlizzards',
   'activeTemporalHourglasses',
   'activeVarkhulForgestormWarnings',
   'activeVarkhulCinderFires',
@@ -2023,8 +2035,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(344);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(344);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(347);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(347);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

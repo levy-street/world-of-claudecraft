@@ -8,7 +8,10 @@
 // a new editor string is an English-only add that compiles; the translations
 // live solely in the overlays.
 
+import { vfxStudioStrings } from './vfx_studio';
+
 export const editorStrings = {
+  vfx: vfxStudioStrings,
   appTitle: 'Map Editor',
   // Browser tab title. Hyphen separator (not a dash character).
   docTitle: 'Map Editor - World of ClaudeCraft',

@@ -14,6 +14,7 @@ describe('renderer resource lifecycle', () => {
       }),
     };
     const warlockMeteorFx = { dispose: vi.fn() };
+    const hunterTrapVisuals = { dispose: vi.fn() };
     const abilityVfxFx = { dispose: vi.fn() };
     const vfx = { dispose: vi.fn() };
     const prewarmDepthMaterials = new Map([['depth', depthMaterial]]);
@@ -27,13 +28,14 @@ describe('renderer resource lifecycle', () => {
     };
 
     disposeRendererPrewarmAndGroundFx(
-      { prewarmDepthMaterials, mageGroundFx, warlockMeteorFx, abilityVfxFx, vfx },
+      { prewarmDepthMaterials, mageGroundFx, warlockMeteorFx, hunterTrapVisuals, abilityVfxFx, vfx },
       bestEffort,
     );
 
     expect(depthMaterial.dispose).toHaveBeenCalledOnce();
     expect(mageGroundFx.dispose).toHaveBeenCalledOnce();
     expect(warlockMeteorFx.dispose).toHaveBeenCalledOnce();
+    expect(hunterTrapVisuals.dispose).toHaveBeenCalledOnce();
     expect(abilityVfxFx.dispose).toHaveBeenCalledOnce();
     expect(vfx.dispose).toHaveBeenCalledOnce();
     expect(prewarmDepthMaterials.size).toBe(0);

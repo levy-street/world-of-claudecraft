@@ -1,0 +1,194 @@
+[
+  {
+    "key": "cast_masterwork_pyre",
+    "duration": 4.0,
+    "loop": true,
+    "custom": true,
+    "generator": "masterwork",
+    "prompt": "Contained furnace pressure, tearing flame launch, deep combustion and falling cinders. Original charge cue. No music, no speech."
+  },
+  {
+    "key": "proj_masterwork_pyre",
+    "duration": 0.9,
+    "loop": false,
+    "custom": true,
+    "generator": "masterwork",
+    "prompt": "Contained furnace pressure, tearing flame launch, deep combustion and falling cinders. Original release cue. No music, no speech."
+  },
+  {
+    "key": "impact_masterwork_pyre",
+    "duration": 3.2,
+    "loop": false,
+    "custom": true,
+    "generator": "masterwork",
+    "prompt": "Contained furnace pressure, tearing flame launch, deep combustion and falling cinders. Original impact cue. No music, no speech."
+  },
+  {
+    "key": "cast_masterwork_glacier",
+    "duration": 4.0,
+    "loop": true,
+    "custom": true,
+    "generator": "masterwork",
+    "prompt": "Crystalline stress, radial ice fracture, irregular shards and cold airborne dust. Original charge cue. No music, no speech."
+  },
+  {
+    "key": "proj_masterwork_glacier",
+    "duration": 0.72,
+    "loop": false,
+    "custom": true,
+    "generator": "masterwork",
+    "prompt": "Crystalline stress, radial ice fracture, irregular shards and cold airborne dust. Original release cue. No music, no speech."
+  },
+  {
+    "key": "impact_masterwork_glacier",
+    "duration": 2.85,
+    "loop": false,
+    "custom": true,
+    "generator": "masterwork",
+    "prompt": "Crystalline stress, radial ice fracture, irregular shards and cold airborne dust. Original impact cue. No music, no speech."
+  },
+  {
+    "key": "cast_masterwork_thunder",
+    "duration": 4.0,
+    "loop": true,
+    "custom": true,
+    "generator": "masterwork",
+    "prompt": "Coronal charge, braided electrical discharge, branching crack and rolling thunder. Original charge cue. No music, no speech."
+  },
+  {
+    "key": "proj_masterwork_thunder",
+    "duration": 0.64,
+    "loop": false,
+    "custom": true,
+    "generator": "masterwork",
+    "prompt": "Coronal charge, braided electrical discharge, branching crack and rolling thunder. Original release cue. No music, no speech."
+  },
+  {
+    "key": "impact_masterwork_thunder",
+    "duration": 3.1,
+    "loop": false,
+    "custom": true,
+    "generator": "masterwork",
+    "prompt": "Coronal charge, braided electrical discharge, branching crack and rolling thunder. Original impact cue. No music, no speech."
+  },
+  {
+    "key": "cast_masterwork_tide",
+    "duration": 4.0,
+    "loop": true,
+    "custom": true,
+    "generator": "masterwork",
+    "prompt": "Suspended water circulation, fluid ribbon release, restorative liquid bloom and droplets. Original charge cue. No music, no speech."
+  },
+  {
+    "key": "proj_masterwork_tide",
+    "duration": 1.05,
+    "loop": false,
+    "custom": true,
+    "generator": "masterwork",
+    "prompt": "Suspended water circulation, fluid ribbon release, restorative liquid bloom and droplets. Original release cue. No music, no speech."
+  },
+  {
+    "key": "impact_masterwork_tide",
+    "duration": 3.1,
+    "loop": false,
+    "custom": true,
+    "generator": "masterwork",
+    "prompt": "Suspended water circulation, fluid ribbon release, restorative liquid bloom and droplets. Original impact cue. No music, no speech."
+  },
+  {
+    "key": "cast_masterwork_wolf",
+    "duration": 4.0,
+    "loop": true,
+    "custom": true,
+    "generator": "masterwork",
+    "prompt": "Breathy spectral gathering, organic wolf-like formant motion, soft transformation and spirit wake. Original charge cue. No music, no speech."
+  },
+  {
+    "key": "proj_masterwork_wolf",
+    "duration": 1.1,
+    "loop": false,
+    "custom": true,
+    "generator": "masterwork",
+    "prompt": "Breathy spectral gathering, organic wolf-like formant motion, soft transformation and spirit wake. Original release cue. No music, no speech."
+  },
+  {
+    "key": "impact_masterwork_wolf",
+    "duration": 2.8,
+    "loop": false,
+    "custom": true,
+    "generator": "masterwork",
+    "prompt": "Breathy spectral gathering, organic wolf-like formant motion, soft transformation and spirit wake. Original impact cue. No music, no speech."
+  },
+  {
+    "key": "cast_masterwork_judgement",
+    "duration": 4.0,
+    "loop": true,
+    "custom": true,
+    "generator": "masterwork",
+    "prompt": "Suspended radiant metal, broad air-cut, deep struck bronze and luminous alloy resonance. Original charge cue. No music, no speech."
+  },
+  {
+    "key": "proj_masterwork_judgement",
+    "duration": 0.96,
+    "loop": false,
+    "custom": true,
+    "generator": "masterwork",
+    "prompt": "Suspended radiant metal, broad air-cut, deep struck bronze and luminous alloy resonance. Original release cue. No music, no speech."
+  },
+  {
+    "key": "impact_masterwork_judgement",
+    "duration": 3.4,
+    "loop": false,
+    "custom": true,
+    "generator": "masterwork",
+    "prompt": "Suspended radiant metal, broad air-cut, deep struck bronze and luminous alloy resonance. Original impact cue. No music, no speech."
+  },
+  {
+    "key": "cast_masterwork_execution",
+    "duration": 4.0,
+    "loop": true,
+    "custom": true,
+    "generator": "masterwork",
+    "prompt": "Tensioned steel and leather movement, accelerating heavy blade, dry contact and falling grit. Original charge cue. No music, no speech."
+  },
+  {
+    "key": "proj_masterwork_execution",
+    "duration": 0.66,
+    "loop": false,
+    "custom": true,
+    "generator": "masterwork",
+    "prompt": "Tensioned steel and leather movement, accelerating heavy blade, dry contact and falling grit. Original release cue. No music, no speech."
+  },
+  {
+    "key": "impact_masterwork_execution",
+    "duration": 1.9,
+    "loop": false,
+    "custom": true,
+    "generator": "masterwork",
+    "prompt": "Tensioned steel and leather movement, accelerating heavy blade, dry contact and falling grit. Original impact cue. No music, no speech."
+  },
+  {
+    "key": "cast_masterwork_rift",
+    "duration": 4.0,
+    "loop": true,
+    "custom": true,
+    "generator": "masterwork",
+    "prompt": "Hollow spatial pressure, twisting torn-air release, implosive cavity and unstable dark residue. Original charge cue. No music, no speech."
+  },
+  {
+    "key": "proj_masterwork_rift",
+    "duration": 1.16,
+    "loop": false,
+    "custom": true,
+    "generator": "masterwork",
+    "prompt": "Hollow spatial pressure, twisting torn-air release, implosive cavity and unstable dark residue. Original release cue. No music, no speech."
+  },
+  {
+    "key": "impact_masterwork_rift",
+    "duration": 3.6,
+    "loop": false,
+    "custom": true,
+    "generator": "masterwork",
+    "prompt": "Hollow spatial pressure, twisting torn-air release, implosive cavity and unstable dark residue. Original impact cue. No music, no speech."
+  }
+]

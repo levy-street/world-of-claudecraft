@@ -1,0 +1,96 @@
+{
+  "effects": {
+    "pyroblast": {
+      "source_frames": 64,
+      "source_resolution": [
+        744,
+        744
+      ],
+      "source_png_bit_depth": 16,
+      "source_png_color_type": "RGBA",
+      "runtime_dimensions": [
+        4096,
+        4096
+      ],
+      "runtime_bytes": 2204226,
+      "webp_quality": 90,
+      "runtime_sha256": "3cb9b1dacfb6674abb4182b47fc44d9164e9c746cdef423e6fd05809d07faaa7",
+      "master_sha256": "56fc921a4bc92d5b54881b8d3ce889517c0533d6d075a06183ffc7c71b8b205a",
+      "decoded_alpha_exact": true,
+      "maximum_edge_alpha": 0,
+      "empty_first_and_last_frame": true,
+      "minimum_visible_content_margin_px": 51,
+      "max_alpha_mass_step_during_frames_18_to_46_percent_of_peak": 3.4558,
+      "max_alpha_mass_second_difference_frames_8_to_59_percent_of_peak": 2.8169,
+      "visual_review": "All 64-frame dark and bright contact sheets inspected; peak and progression frames inspected separately.",
+      "timing_review": "No abrupt one-frame opacity mass steps during main action; authored coherent motion and phase timing retained."
+    },
+    "frost_nova": {
+      "source_frames": 64,
+      "source_resolution": [
+        744,
+        744
+      ],
+      "source_png_bit_depth": 16,
+      "source_png_color_type": "RGBA",
+      "runtime_dimensions": [
+        4096,
+        4096
+      ],
+      "runtime_bytes": 2271474,
+      "webp_quality": 90,
+      "runtime_sha256": "4fd0e06cc6602ac41f8c413fef9185664734ac262bf24f81700cf27cb9d89546",
+      "master_sha256": "0cd41be551e909016092e8222b66ffe8e5a8ab4b5b13f3a548672a16fe8bdaa7",
+      "decoded_alpha_exact": true,
+      "maximum_edge_alpha": 0,
+      "empty_first_and_last_frame": true,
+      "minimum_visible_content_margin_px": 52,
+      "max_alpha_mass_step_during_frames_18_to_46_percent_of_peak": 2.9981,
+      "max_alpha_mass_second_difference_frames_8_to_59_percent_of_peak": 1.528,
+      "visual_review": "All 64-frame dark and bright contact sheets inspected; peak and progression frames inspected separately.",
+      "timing_review": "No abrupt one-frame opacity mass steps during main action; authored coherent motion and phase timing retained."
+    },
+    "chain_heal": {
+      "source_frames": 64,
+      "source_resolution": [
+        744,
+        744
+      ],
+      "source_png_bit_depth": 16,
+      "source_png_color_type": "RGBA",
+      "runtime_dimensions": [
+        4096,
+        4096
+      ],
+      "runtime_bytes": 2220696,
+      "webp_quality": 90,
+      "runtime_sha256": "3c1e1cf0903ffb8e7c6b22ac69dd2c838a30cb011d957f4bd2a92d94833e55e0",
+      "master_sha256": "084ce5d5231370ed037b439ce077e0b995a02b41705938b04cc2cc22b7ab977e",
+      "decoded_alpha_exact": true,
+      "maximum_edge_alpha": 0,
+      "empty_first_and_last_frame": true,
+      "minimum_visible_content_margin_px": 33,
+      "max_alpha_mass_step_during_frames_18_to_46_percent_of_peak": 3.0208,
+      "max_alpha_mass_second_difference_frames_8_to_59_percent_of_peak": 1.0348,
+      "visual_review": "All 64-frame dark and bright contact sheets inspected; peak and progression frames inspected separately.",
+      "timing_review": "No abrupt one-frame opacity mass steps during main action; authored coherent motion and phase timing retained."
+    }
+  },
+  "source_frame_total": 192,
+  "scope": "Asset source, alpha, bounds, temporal mass, file integrity, preview decode. Browser compositing is checked by parent integration.",
+  "animated_preview": {
+    "file": "hero_effects_preview.mp4",
+    "decode_success": true,
+    "bytes": 297104,
+    "frame_count": 64,
+    "fps": 30
+  },
+  "fallback_webp_total_bytes": 6696396,
+  "production_reference": {
+    "tool": "built-in imagegen",
+    "file": "production_reference.png",
+    "prompt": "reference_prompt.txt",
+    "runtime_pixels_used": false,
+    "known_limitation": "Reference did not obey transparent/no-bloom prompt; runtime images independently rendered with true alpha and no bloom."
+  }
+}

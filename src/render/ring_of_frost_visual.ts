@@ -199,9 +199,13 @@ export class RingOfFrostVisuals {
     }
   }
 
-  dispose(): void {
+  clear(): void {
     for (const ring of this.rings.values()) this.disposeRing(ring);
     this.rings.clear();
+  }
+
+  dispose(): void {
+    this.clear();
     this.shardGeometry?.dispose();
     this.shardGeometry = null;
     for (const pool of [this.outerPool, this.innerPool, this.bandPool] as const) {

@@ -1762,9 +1762,10 @@ describe('boot prewarm ordering: the sky fetch never starves the compute stages'
     // The entry waits only through the budget-bounded prefetch race.
     expect(source).toContain('await waitForPrefetch(skyAssetPrefetch, waitMs, sleep)');
     expect(source).toContain('reserveMs: PREWARM_BUILD_RESERVE_MS');
-    // Constrained profiles skip the sky entry, so they must not fetch either.
-    expect(source).toContain(
-      "const skyAssetPrefetch = prewarmEntryRuns('sky.nearby-biomes', policy)",
+    // Both the lightweight studio and constrained profiles skip the sky entry;
+    // neither may fetch or retain HDRIs for an environment it does not render.
+    expect(source).toMatch(
+      /const skyAssetPrefetch\s*=\s*!this\.studioEnvironment\s*&&\s*prewarmEntryRuns\('sky\.nearby-biomes', policy\)\s*\?\s*trackPrefetch\(ensureSkyBiomeAssets\(initialSkyBiomes\)\)\s*:\s*null;/,
     );
   });
 

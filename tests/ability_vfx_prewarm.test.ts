@@ -8,6 +8,42 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+
+vi.mock('../src/render/ability_vfx/contact_assets', async () => {
+  const { Texture } = await import('three');
+  const CONTACT_SHEETS = ['contact_cut', 'contact_crush', 'contact_pierce'];
+  const textures = new Map(CONTACT_SHEETS.map((id) => [id, new Texture()]));
+  return {
+    CONTACT_SHEETS,
+    contactTexture: (id: string) => textures.get(id),
+    isContactSheet: (id: string) => textures.has(id),
+  };
+});
+
+vi.mock('../src/render/ability_vfx/production_assets', async () => {
+  const { Texture } = await import('three');
+  const textures = {
+    smoke: new Texture(),
+    shockwave: new Texture(),
+    pyroblast: new Texture(),
+    frost_nova: new Texture(),
+    chain_heal: new Texture(),
+  };
+  return { bakedTexture: (kind: keyof typeof textures) => textures[kind] };
+});
+
+vi.mock('../src/render/ability_vfx/signature_texture', async () => {
+  const { Texture } = await import('three');
+  const atlas = new Texture();
+  return { signatureTexture: () => atlas };
+});
+
+vi.mock('../src/render/ability_vfx/simulation_assets', async () => {
+  const { Texture } = await import('three');
+  const maps = { normal: new Texture(), motion: new Texture(), lighting: new Texture() };
+  return { liquidSurfaceMaps: () => maps };
+});
+
 import { FLIPBOOK_STYLES } from '../src/render/ability_vfx/fx_textures';
 import {
   abilityVfxTexturePrewarmSteps,
@@ -66,7 +102,13 @@ describe('abilityVfxTexturePrewarmSteps', () => {
     const ids = steps.map((step) => step.id);
     for (const style of FLIPBOOK_STYLES) expect(ids).toContain(`flipbook:${style}`);
     expect(ids).toContain('shared-canvases');
-    expect(ids).toHaveLength(FLIPBOOK_STYLES.length + 1);
+    expect(ids).toContain('signature-atlas');
+    expect(ids).toContain('production:smoke');
+    expect(ids).toContain('production:shockwave');
+    for (const key of ['normal', 'motion', 'lighting'])
+      expect(ids).toContain(`liquid-surface:${key}`);
+    for (const id of ['contact_cut', 'contact_crush', 'contact_pierce']) expect(ids).toContain(id);
+    expect(ids).toHaveLength(FLIPBOOK_STYLES.length + 13);
     expect(new Set(ids).size).toBe(ids.length);
   });
 

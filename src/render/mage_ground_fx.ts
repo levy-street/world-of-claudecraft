@@ -19,6 +19,9 @@
 // cast. Math.random is fine here (render-only).
 
 import * as THREE from 'three';
+import { BlizzardFields, blizzardPerimeter } from './blizzard_field';
+import type { ActiveBlizzard, ActiveRuneOfPower } from '../world_api/combat';
+import { RunesOfPowerVisuals } from './rune_of_power_visual';
 import type { SimEvent } from '../sim/types';
 import { createGroundFireAoe, type GroundFireAoeHandle } from './ignivar_fire_vfx';
 import { SCHOOL_COLORS } from './vfx';
@@ -78,6 +81,9 @@ export interface MeteorWarningState extends MeteorFallSpawn {
 }
 
 export interface RuneCircleSpawn {
+  sourceId?: number;
+  ability?: string;
+  persistentId?: string;
   x: number;
   z: number;
   radius: number;
@@ -160,6 +166,8 @@ interface RuneFx {
 }
 
 interface SnowFx {
+  snapshotOwned?: boolean;
+  active: boolean;
   points: THREE.Points;
   mat: THREE.PointsMaterial;
   pos: Float32Array;
@@ -182,7 +190,9 @@ export class MageGroundFx {
   private readonly meteors: MeteorFx[] = [];
   private readonly resolvedPersistentMeteorIds = new Set<string>();
   private readonly runes: RuneFx[] = [];
+  private readonly powerRunes: RunesOfPowerVisuals;
   private readonly snows: SnowFx[] = [];
+  private readonly blizzards = new BlizzardFields<SnowFx>(row => this.spawnSnow(row));
   private meteorGeo: THREE.IcosahedronGeometry | null = null;
   private meteorCoronaGeo: THREE.SphereGeometry | null = null;
   private meteorCrackGeos: THREE.TubeGeometry[] | null = null;
@@ -206,6 +216,7 @@ export class MageGroundFx {
     this.scene = scene;
     this.groundY = groundY;
     this.onMeteorLand = onMeteorLand;
+    this.powerRunes = new RunesOfPowerVisuals(scene, groundY);
   }
 
   /** Reuse a retired material of this kind if the pool has one (resetting the
@@ -459,10 +470,15 @@ export class MageGroundFx {
 
   /** Reconciles warnings from authoritative snapshots with their live event visual. */
   syncWorldMeteorWarnings(world: {
+    player?: { id: number; pos: { x: number; z: number } };
+    activeRunesOfPower?: readonly ActiveRuneOfPower[];
+    activeBlizzards?: readonly ActiveBlizzard[];
     activeIgnivarMeteors: readonly MeteorWarningState[];
     activeVarkhulAnvilMeteors: readonly MeteorWarningState[];
     activeVarkhulForgestormWarnings: readonly MeteorWarningState[];
   }): void {
+    this.powerRunes.sync(world.activeRunesOfPower ?? [], world.player);
+    this.blizzards.sync(world.activeBlizzards ?? []);
     this.syncMeteorWarnings(
       world.activeIgnivarMeteors,
       world.activeVarkhulAnvilMeteors,
@@ -981,6 +997,9 @@ export class MageGroundFx {
   }
 
   spawnRune(opts: RuneCircleSpawn): void {
+    // Current Rune of Power is snapshot-owned: no event replay or double field.
+    // Legacy events and anonymous boss warnings retain their original path.
+    if (opts.ability === 'rune_of_power' && opts.persistentId) return;
     if (this.disposed) return;
     const school = opts.school ?? 'arcane';
     const schoolColor = capRingLightness(
@@ -1216,8 +1235,13 @@ export class MageGroundFx {
     return geometry;
   }
 
-  spawnSnow(opts: SnowZoneSpawn): void {
-    if (this.disposed) return;
+  spawnSnowEvent(event: MageGroundSpellfxEvent): void {
+    if (!event.persistentId) this.spawnSnow({ x: event.x, z: event.z,
+      radius: event.radius ?? 7, duration: event.duration ?? 6 });
+  }
+
+  spawnSnow(opts: SnowZoneSpawn): SnowFx | null {
+    if (this.disposed) return null;
     const frost = new THREE.Color(SCHOOL_COLORS.frost);
     const pos = new Float32Array(SNOW_COUNT * 3);
     const gy = this.groundY(opts.x, opts.z);
@@ -1247,9 +1271,7 @@ export class MageGroundFx {
     points.name = 'mage-blizzard-snow';
     points.frustumCulled = false;
     this.scene.add(points);
-    // The perimeter: a crisp frost ring at the zone edge so the player reads
-    // the storm's exact reach at a glance (reuses the rune ring geometry).
-    this.runeRingGeo ??= new THREE.RingGeometry(0.82, 1, 48);
+    // Terrain-following fractured frost preserves the exact playable outer edge.
     const ringMat = this.acquireMaterial(
       'snow-ring',
       0.55,
@@ -1263,13 +1285,12 @@ export class MageGroundFx {
           side: THREE.DoubleSide,
         }),
     );
-    const ring = new THREE.Mesh(this.runeRingGeo, ringMat);
+    const ring = new THREE.Mesh(blizzardPerimeter(opts.x, opts.z, opts.radius, this.groundY), ringMat);
     ring.name = 'mage-blizzard-boundary';
-    ring.rotation.x = -Math.PI / 2;
-    ring.scale.setScalar(opts.radius);
-    ring.position.set(opts.x, gy + 0.12, opts.z);
+    ring.frustumCulled = false;
     this.scene.add(ring);
-    this.snows.push({
+    const snow: SnowFx = {
+      active: true,
       points,
       mat,
       pos,
@@ -1281,7 +1302,9 @@ export class MageGroundFx {
       radius: opts.radius,
       duration: opts.duration,
       elapsed: 0,
-    });
+    };
+    this.snows.push(snow);
+    return snow;
   }
 
   /**
@@ -1309,6 +1332,8 @@ export class MageGroundFx {
         return false;
       }
     };
+    this.blizzards.clear();
+    attempt(() => this.powerRunes.dispose());
     const materials = new Set<THREE.Material>();
     const geometries = new Set<THREE.BufferGeometry>();
     const instancedMeshes = new Set<THREE.InstancedMesh>();
@@ -1407,6 +1432,7 @@ export class MageGroundFx {
     }
     for (const snow of this.snows) {
       geometries.add(snow.points.geometry);
+      geometries.add(snow.ring.geometry);
       materials.add(snow.mat);
       materials.add(snow.ringMat);
     }
@@ -1475,8 +1501,22 @@ export class MageGroundFx {
     if (errors.length > 0) throw new AggregateError(errors, 'MageGroundFx disposal failed');
   }
 
-  update(dt: number): void {
+  clear(): void {
+    this.powerRunes.sync([]);
+    this.blizzards.clear();
+    // Expire through the same pooling paths without landing a cancelled meteor.
+    for (const meteor of this.meteors) {
+      meteor.landed = true;
+      meteor.elapsed = meteor.duration + METEOR_SCORCH_LINGER;
+    }
+    for (const rune of this.runes) rune.elapsed = rune.duration;
+    for (const snow of this.snows) snow.elapsed = snow.duration;
+    this.update(0);
+  }
+
+  update(dt: number, reducedMotion = false): void {
     if (this.disposed) return;
+    this.powerRunes.update(dt, reducedMotion);
     for (let i = this.meteors.length - 1; i >= 0; i--) {
       const m = this.meteors[i];
       m.elapsed += dt;
@@ -1585,13 +1625,15 @@ export class MageGroundFx {
     }
     for (let i = this.snows.length - 1; i >= 0; i--) {
       const sfx = this.snows[i];
-      sfx.elapsed += dt;
-      if (sfx.elapsed >= sfx.duration) {
+      // Authoritative fields retire through snapshot absence, even after a long frame.
+      sfx.elapsed = sfx.snapshotOwned ? Math.min(sfx.duration, sfx.elapsed + dt) : sfx.elapsed + dt;
+      if (!sfx.snapshotOwned && sfx.elapsed >= sfx.duration) {
         this.scene.remove(sfx.points);
         this.releaseMaterial('snow-flake', sfx.mat);
         sfx.points.geometry.dispose();
         this.scene.remove(sfx.ring);
         this.releaseMaterial('snow-ring', sfx.ringMat);
+        sfx.ring.geometry.dispose();
         this.snows.splice(i, 1);
         continue;
       }
@@ -1608,13 +1650,12 @@ export class MageGroundFx {
         }
       }
       sfx.points.geometry.attributes.position.needsUpdate = true;
-      const snowFade = Math.min(1, (sfx.duration - sfx.elapsed) / 0.6);
-      sfx.mat.opacity = 0.9 * snowFade;
+      const snowFade = Math.max(0, Math.min(1, (sfx.duration - sfx.elapsed) / 0.6));
+      sfx.mat.opacity = 0.9 * snowFade * (sfx.active ? 1 : .25);
       // Keep the playable boundary readable until the authoritative zone
       // expires. Only the falling snow fades; the ring is removed on the
       // exact expiry branch above, so it never disappears early.
-      sfx.ringMat.opacity = 0.55 * (0.92 + Math.sin(sfx.elapsed * 2.4) * 0.08);
-      sfx.ring.rotation.z += 0.15 * dt; // a lazy drift so the edge reads alive
+      sfx.ringMat.opacity = (sfx.active ? .55 : .2) * (0.92 + Math.sin(sfx.elapsed * 2.4) * 0.08);
     }
   }
 }
@@ -1669,6 +1710,9 @@ export function handleMageGroundSpellfxEvent(
   }
   if (ev.fx === 'runeCircle') {
     fx.spawnRune({
+      sourceId: ev.sourceId,
+      ability: ev.ability,
+      persistentId: ev.persistentId,
       x: ev.x,
       z: ev.z,
       radius: ev.radius ?? 8,
