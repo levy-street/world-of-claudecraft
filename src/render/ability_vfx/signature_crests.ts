@@ -1,7 +1,11 @@
 import * as THREE from 'three';
 import { bindSceneSamples, SCENE_SAMPLE_GLSL, sceneKeyLightUniform } from '../scene_sampling';
 import { CrestPrewarm } from './crest_prewarm';
-import { warriorPressureTexture } from './production_assets';
+import {
+  warriorBloodTexture,
+  warriorPressureTexture,
+  warriorSteelTexture,
+} from './production_assets';
 import { buildSignatureShapes, type CrestKind } from './signature_shapes';
 
 /** Prepared crystalline fans, curling water sheets, flame ribbons and torn
@@ -29,6 +33,8 @@ export class SignatureCrests {
       uniforms: {
         uAge: { value: 0 },
         uPressureMap: { value: null },
+        uBloodMap: { value: null },
+        uSteelMap: { value: null },
         uSunWorld: sceneKeyLightUniform(scene),
         uKind: { value: 0 },
         uMotion: { value: 1 },
@@ -36,7 +42,7 @@ export class SignatureCrests {
         uTint: { value: new THREE.Color() },
         uAccent: { value: new THREE.Color() },
       },
-      vertexShader: `uniform float uAge,uKind,uMotion,uPressureGround[25]; varying vec2 vUv; varying vec3 vNormal,vView;
+      vertexShader: `uniform float uAge,uKind,uMotion,uPressureGround[25]; varying vec2 vUv,vSurface; varying vec3 vNormal,vView;
         float pressureGround(vec2 p){
           vec2 grid=clamp(vec2(p.x/12.0+0.5,p.y/10.0)*4.0,vec2(0.0),vec2(3.9999));
           ivec2 cell=ivec2(floor(grid));vec2 f=fract(grid);int i=cell.y*5+cell.x;
@@ -44,7 +50,7 @@ export class SignatureCrests {
             mix(uPressureGround[i+5],uPressureGround[i+6],f.x),f.y);
         }
         void main(){
-          vUv=uv; vec3 p=position;
+          vUv=uv; vSurface=position.xy*0.4+0.5; vec3 p=position;
           float angle=atan(p.z,p.x);
           float lip=uKind<0.5 || uKind>3.5 ? 1.0 : 0.9+sin(angle*5.0-uAge*5.0*uMotion)*0.1;
           p.y*=lip;
@@ -57,19 +63,24 @@ export class SignatureCrests {
             p.x+=(uv.x-0.5)*peel*0.7;
             p.y-=uAge*uAge*uv.y*(0.35+uv.y*0.45)*uMotion;
           }
-          if(uKind>12.5){
-            float advance=mix(0.72,0.38+0.62*(1.0-pow(1.0-uAge,3.0)),uMotion);
+          if(uKind>12.5 && uKind<13.5){
+            float advance=mix(0.72,0.38+0.62*(1.0-pow(max(0.0,1.0-uAge),3.0)),uMotion);
             p.xz*=advance;
             p.y*=mix(1.0,0.62+0.38*sin(min(1.0,uAge*1.3)*3.14159265),uMotion);
             p.y+=sin(uv.x*19.0+uv.y*8.0-uAge*7.0)*uv.y*0.045*uMotion;
             p.y+=pressureGround(p.xz);
           }
+          if(uKind>13.5){
+            p.xy*=0.88+0.12*smoothstep(0.0,0.16,uAge);
+            p.x+=sign(p.x)*smoothstep(0.35,1.0,uAge)*0.17*uMotion;
+            p.z-=uAge*uAge*0.18*uMotion;
+          }
           vec4 view=modelViewMatrix*vec4(p,1.0); vView=-view.xyz; vNormal=normalize(normalMatrix*normal);
           gl_Position=projectionMatrix*view;
         }`,
       fragmentShader: `${SCENE_SAMPLE_GLSL}
-        uniform sampler2D uPressureMap; uniform float uAge,uKind,uMotion; uniform vec3 uTint,uAccent,uSunWorld;
-        varying vec2 vUv; varying vec3 vNormal,vView;
+        uniform sampler2D uPressureMap,uBloodMap,uSteelMap; uniform float uAge,uKind,uMotion; uniform vec3 uTint,uAccent,uSunWorld;
+        varying vec2 vUv,vSurface; varying vec3 vNormal,vView;
         void main(){
           float fresnel=pow(max(0.0,1.0-abs(dot(normalize(cross(dFdx(vView),dFdy(vView))),normalize(vView)))),3.0);
           float thread=sin(vUv.x*150.0+sin(vUv.y*22.0)*2.0-uAge*8.0*uMotion);
@@ -102,24 +113,32 @@ export class SignatureCrests {
           }
           if(uKind>11.5 && uKind<12.5){
             float taper=sin(vUv.x*3.14159265);
-            float striation=sin(vUv.x*109.0+sin(vUv.y*17.0)*2.2);
             float tear=sin(vUv.x*67.0+vUv.y*19.0)*sin(vUv.x*31.0-vUv.y*13.0);
             float edge=1.0-smoothstep(0.015,0.08,vUv.y);
             float dissolve=smoothstep(uAge*1.2-0.2,uAge*1.2+0.15,1.0-vUv.y*0.65+tear*0.28);
-            float perforation=sin(vUv.x*91.0+vUv.y*23.0)*sin(vUv.x*47.0-vUv.y*19.0);
-            float ragged=smoothstep(-0.42,0.12,perforation+0.5-vUv.y*0.9-uAge*0.85);
-            float film=mix(1.0,ragged,smoothstep(0.18,0.65,vUv.y));
-            float vein=pow(max(0.0,striation),5.0)*(1.0-vUv.y)*0.16;
-            colour=colour*(0.82+striation*0.12)+uAccent*(edge*0.85+vein);
-            alpha=0.94*film*dissolve*smoothstep(0.0,0.16,taper)*(1.0-smoothstep(0.68,1.0,uAge));
+            // Source is an authored red surface on a black matte. Sample the
+            // actual painted strip, flipped from image rows into the mesh UVs.
+            vec3 enamel=texture2D(uBloodMap,vec2(vUv.x,0.70-vUv.y*0.47)).rgb;
+            float coverage=smoothstep(0.004,0.055,max(enamel.r,max(enamel.g,enamel.b)));
+            colour=enamel*(1.1+fresnel*0.28)+uAccent*edge*0.34;
+            alpha=0.97*coverage*dissolve*smoothstep(0.0,0.1,taper)*(1.0-smoothstep(0.68,1.0,uAge));
           }
-          if(uKind>12.5){
+          if(uKind>12.5 && uKind<13.5){
             vec2 flowUv=vUv;
             flowUv.y+=sin(vUv.x*13.0-uAge*4.0)*0.012*uMotion*uAge;
             float density=texture2D(uPressureMap,clamp(flowUv,vec2(0.0),vec2(1.0))).r;
             float dissolution=smoothstep(uAge*0.9-0.35,uAge*0.9+0.1,density);
-            colour=mix(uTint*(0.8+density*0.6),uAccent*1.3,pow(density,2.5));
+            colour=mix(uTint*(0.8+density*0.6),uAccent*1.3,pow(max(0.0,density),2.5));
             alpha=density*0.72*dissolution*(1.0-smoothstep(0.55,1.0,uAge));
+          }
+          if(uKind>13.5){
+            float bevel=1.0-smoothstep(0.18,0.3,vUv.y);
+            vec3 steel=texture2D(uSteelMap,clamp(vSurface,vec2(0.0),vec2(1.0))).rgb;
+            vec3 n=normalize(cross(dFdx(vView),dFdy(vView)));
+            vec3 sun=normalize((viewMatrix*vec4(uSunWorld,0.0)).xyz);
+            float light=0.65+0.65*abs(dot(n,sun));
+            colour=steel*light+uAccent*(bevel*0.58+fresnel*0.13);
+            alpha=1.0-smoothstep(0.48,1.0,uAge);
           }
           gl_FragColor=vec4(colour,alpha*sceneSoftness(vView.z,0.12));
           #include <tonemapping_fragment>
@@ -134,6 +153,8 @@ export class SignatureCrests {
       const mesh = new THREE.Mesh(initialGeometry, proto.clone());
       mesh.material.uniforms.uSunWorld = sceneKeyLightUniform(scene);
       mesh.material.uniforms.uPressureMap.value = warriorPressureTexture();
+      mesh.material.uniforms.uBloodMap.value = warriorBloodTexture();
+      mesh.material.uniforms.uSteelMap.value = warriorSteelTexture();
       mesh.material.uniforms.uPressureGround.value = new Float32Array(25);
       this.unbind.push(bindSceneSamples(scene, mesh));
       mesh.name = 'signatureCrest';
@@ -168,12 +189,13 @@ export class SignatureCrests {
       height <= 0
     )
       return false;
-    const authoredSurface = kind === 'blood_cut' || kind.endsWith('_pressure');
+    const contactSurface = kind === 'blood_cut' || kind === 'shield_contact';
+    const authoredSurface = contactSurface || kind.endsWith('_pressure');
     if (authoredSurface && !this.preparation.ready(kind)) return false;
     let s = this.slots.find((s) => !s.active);
     // A decorative voice wake can yield to the target's physical blade contact.
     // Never displace another material family or another contact backing.
-    if (!s && kind === 'blood_cut') {
+    if (!s && contactSurface) {
       for (const candidate of this.slots)
         if (candidate.pressure && (!s || candidate.age / candidate.duration > s.age / s.duration))
           s = candidate;
@@ -211,33 +233,36 @@ export class SignatureCrests {
     }
     u.uTint.value.setHex(tint);
     u.uAccent.value.setHex(accent);
-    u.uKind.value = kind.endsWith('_pressure')
-      ? 13
-      : kind === 'blood_cut'
-        ? 12
-        : kind === 'chain'
-          ? 11
-          : kind === 'hook'
-            ? 10
-            : kind === 'bone'
-              ? 7
-              : kind === 'ward'
-                ? 8
-                : kind === 'feather'
-                  ? 9
-                  : kind === 'ice'
-                    ? 0
-                    : kind === 'water'
-                      ? 1
-                      : kind === 'fire'
-                        ? 3
-                        : kind === 'light'
-                          ? 4
-                          : kind === 'nature'
-                            ? 5
-                            : kind === 'arcane'
-                              ? 6
-                              : 2;
+    u.uKind.value =
+      kind === 'shield_contact'
+        ? 14
+        : kind.endsWith('_pressure')
+          ? 13
+          : kind === 'blood_cut'
+            ? 12
+            : kind === 'chain'
+              ? 11
+              : kind === 'hook'
+                ? 10
+                : kind === 'bone'
+                  ? 7
+                  : kind === 'ward'
+                    ? 8
+                    : kind === 'feather'
+                      ? 9
+                      : kind === 'ice'
+                        ? 0
+                        : kind === 'water'
+                          ? 1
+                          : kind === 'fire'
+                            ? 3
+                            : kind === 'light'
+                              ? 4
+                              : kind === 'nature'
+                                ? 5
+                                : kind === 'arcane'
+                                  ? 6
+                                  : 2;
     u.uAge.value = 0;
     u.uMotion.value = this.reducedMotion ? 0 : 1;
     return true;

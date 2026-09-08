@@ -31,9 +31,13 @@ vi.mock('../src/render/ability_vfx/production_assets', async () => {
     chain_heal: new Texture(),
   };
   const pressure = new Texture();
+  const blood = new Texture();
+  const steel = new Texture();
   return {
     bakedTexture: (kind: keyof typeof textures) => textures[kind],
     warriorPressureTexture: () => pressure,
+    warriorBloodTexture: () => blood,
+    warriorSteelTexture: () => steel,
   };
 });
 
@@ -114,7 +118,7 @@ describe('abilityVfxTexturePrewarmSteps', () => {
     for (const key of ['normal', 'motion', 'lighting'])
       expect(ids).toContain(`liquid-surface:${key}`);
     for (const id of ['contact_cut', 'contact_crush', 'contact_pierce']) expect(ids).toContain(id);
-    expect(ids).toHaveLength(FLIPBOOK_STYLES.length + 15);
+    expect(ids).toHaveLength(FLIPBOOK_STYLES.length + 17);
     expect(new Set(ids).size).toBe(ids.length);
   });
 

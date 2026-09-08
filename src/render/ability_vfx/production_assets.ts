@@ -22,6 +22,16 @@ export const BAKED_URLS = {
 export const FRAGMENT_URL = '/models/vfx/production_fragments.glb';
 const textures = new Map<BakedKind, THREE.Texture>();
 const PRESSURE_URL = '/textures/vfx/production/warrior_pressure.png';
+const BLOOD_URL = '/textures/vfx/production/warrior_blood_blade.png';
+const STEEL_URL = '/textures/vfx/production/warrior_forged_steel.png';
+let steelTexture: THREE.Texture | null = null;
+export function warriorSteelTexture(): THREE.Texture | null {
+  return steelTexture;
+}
+let bloodTexture: THREE.Texture | null = null;
+export function warriorBloodTexture(): THREE.Texture | null {
+  return bloodTexture;
+}
 let pressureTexture: THREE.Texture | null = null;
 export function warriorPressureTexture(): THREE.Texture | null {
   return pressureTexture;
@@ -84,6 +94,13 @@ registerDeferredPreload(async () => {
   pressureTexture.colorSpace = THREE.NoColorSpace;
   pressureTexture.generateMipmaps = false;
   pressureTexture.minFilter = pressureTexture.magFilter = THREE.LinearFilter;
+  bloodTexture = (await loadTexture(BLOOD_URL, { srgb: true })).clone();
+  bloodTexture.generateMipmaps = false;
+  bloodTexture.minFilter = bloodTexture.magFilter = THREE.LinearFilter;
+  steelTexture = (await loadTexture(STEEL_URL, { srgb: true })).clone();
+  steelTexture.generateMipmaps = true;
+  steelTexture.minFilter = THREE.LinearMipmapLinearFilter;
+  steelTexture.magFilter = THREE.LinearFilter;
   const model = await loadGltf(FRAGMENT_URL);
   model.scene.updateMatrixWorld(true);
   for (const name of ['ice_shard', 'stone_chip', 'metal_splinter'] as const) {
@@ -98,6 +115,8 @@ export const productionPreloadInternalsForTest = {
   urls: [
     ...Object.values(BAKED_URLS),
     PRESSURE_URL,
+    BLOOD_URL,
+    STEEL_URL,
     '/textures/vfx/production/pyroblast_2k.ktx2',
     '/textures/vfx/production/chain_heal_2k.ktx2',
     FRAGMENT_URL,

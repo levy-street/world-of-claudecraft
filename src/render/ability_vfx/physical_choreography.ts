@@ -9,6 +9,7 @@ import {
 } from './physical_choreography_core';
 import { physicalContact } from './physical_contact';
 import type { SeqSlot, SequencerHost } from './sequencer';
+import { drawWarriorShield } from './warrior_shield';
 import { drawWarriorShout } from './warrior_shouts';
 
 const origin = { x: 0, y: 0, z: 0 };
@@ -170,6 +171,7 @@ export function physicalFollowThrough(host: SequencerHost, slot: SeqSlot): void 
 function physicalBeat(host: SequencerHost, slot: SeqSlot, beat: number): void {
   if (drawWarriorShout(host, slot, beat)) return;
   if (furyBeat(host, slot, beat)) return;
+  if (drawWarriorShield(host, slot, beat)) return;
   const authored = slot.spec.physical!;
   const p =
     authored.shape === 'rush' || authored.shape === 'retreat'

@@ -1197,6 +1197,32 @@ export class AbilityVfx {
         return true;
       }
     }
+    // A shield still collides when a ward absorbs all its damage. Retain the
+    // authored steel contact while explicitly withholding a flesh imprint.
+    if (
+      compoundId === 'shield_slam' &&
+      ev.kind === 'hit' &&
+      ev.amount <= 0 &&
+      (ev.absorbed ?? 0) > 0
+    ) {
+      const appearance = this.deps.visualVariantOf?.(compoundId, ev.sourceId) ?? compoundId;
+      const spec = abilityVfxSpecFor(appearance),
+        full = abilityVfxFullSpecFor(appearance);
+      const tier = this.castTier(ev.sourceId, compoundId);
+      if (appearance === compoundId && spec && full && tier < 2) {
+        this.deps.fx.sequenceInstant(
+          compoundId,
+          full,
+          ev.sourceId,
+          ev.targetId,
+          planImpact(spec, false, this.quality, tier).color,
+          tier,
+          0,
+          2,
+        );
+        return true;
+      }
+    }
     if (ev.kind !== 'hit' || ev.amount <= 0) return;
     const nowSec = this.now();
     const local = this.deps.localPlayerId?.() === ev.sourceId;

@@ -1347,6 +1347,7 @@ export const VISUALS: Record<string, VisualDef> = {
       `${PLAYERS}/knight_hit_variety_anims.glb`,
       `${PLAYERS}/warrior_ability_anims.glb`,
       `${PLAYERS}/warrior_fury_anims.glb`,
+      `${PLAYERS}/warrior_contact_anims.glb`,
     ],
     height: HUMANOID_H,
     clips: {
@@ -1361,10 +1362,9 @@ export const VISUALS: Record<string, VisualDef> = {
         slam: '2H_Melee_Attack_Chop',
         red_harvest: 'Fury_Red_Harvest',
         breachmaker: '2H_Melee_Attack_Chop',
-        // Shieldcrack slams the SHIELD (offhand arm), not the sword: the
-        // synthesized bash (scripts/_add_shield_bash_anim.mjs) drives the
-        // left arm carrying the handslot.l shield; the weapon hand stays back.
-        shield_slam: 'Shield_Bash',
+        // Native shield drive with a planted lower body and a held contact.
+        // scripts/build_warrior_contact_anims.mjs bakes foot locking offline.
+        shield_slam: 'Warrior_Shieldcrack',
         raging_gale: 'Fury_Twinstrike',
         bloodthirst: 'Dualwield_Melee_Attack_Chop',
         // Reaping Arc and Revenge hit everything in the frontal arc: the

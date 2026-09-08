@@ -2,11 +2,16 @@ import type * as THREE from 'three';
 import { type BackgroundGpuQueue, GPU_WORK_PRIORITY } from '../background_gpu_queue';
 import type { PrewarmManifestEntry } from '../prewarm_entry';
 import type { PrewarmResumeUnit } from '../prewarm_resume';
-import { warriorPressureTexture } from './production_assets';
+import {
+  warriorBloodTexture,
+  warriorPressureTexture,
+  warriorSteelTexture,
+} from './production_assets';
 import type { CrestKind } from './signature_shapes';
 
 export const ACTIVE_WARRIOR_CRESTS: readonly CrestKind[] = [
   'blood_cut',
+  'shield_contact',
   'rally_pressure',
   'dread_pressure',
   'challenge_pressure',
@@ -28,6 +33,22 @@ const preparations = new WeakMap<object, Preparation>();
 function recipe(state: Preparation, cls: string): readonly PrewarmResumeUnit[] {
   if (cls !== 'warrior') return [];
   return [
+    {
+      id: 'upload-big:active-warrior-blood',
+      run: () => {
+        const texture = warriorBloodTexture();
+        if (!texture) throw new Error('Active Warrior blood texture was not loaded');
+        state.host.texture(texture);
+      },
+    },
+    {
+      id: 'upload-big:active-warrior-steel',
+      run: () => {
+        const texture = warriorSteelTexture();
+        if (!texture) throw new Error('Active Warrior steel texture was not loaded');
+        state.host.texture(texture);
+      },
+    },
     {
       id: 'upload-big:active-warrior-pressure',
       run: () => {

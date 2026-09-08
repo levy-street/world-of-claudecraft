@@ -16,6 +16,7 @@ import { join } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import type { AbilityVfxDeps } from '../src/render/ability_vfx/painter';
 import { AbilityVfx } from '../src/render/ability_vfx/painter';
+import { VISUALS } from '../src/render/characters/manifest';
 import { ABILITIES } from '../src/sim/data';
 
 const ROOT = join(__dirname, '..');
@@ -91,21 +92,12 @@ describe('warrior bespoke movement clip (issue #2889 warrior/kobold batch)', () 
     const block = warriorBlock.slice(abilityStart, abilityEnd);
     const rows = [...block.matchAll(/^\s*([a-z_]+): '([A-Za-z_0-9]+)',$/gm)];
     expect(rows.length).toBeGreaterThan(23); // 18 pre-existing + this batch's 7 additions
-    const knightClips = new Set([
-      // stock KayKit clips already shipped in knight.glb
-      '1H_Melee_Attack_Chop',
-      '1H_Melee_Attack_Slice_Diagonal',
-      '2H_Melee_Attack_Chop',
-      'Dualwield_Melee_Attack_Chop',
-      '1H_Melee_Attack_Slice_Horizontal',
-      'Shield_Bash',
-      'Spellcast_Raise',
-      'Block',
-      'Punch_A',
-      'Cheer',
-      // this batch's new bake
-      ...WARRIOR_NEW_CLIPS,
-    ]);
+    // Read the actual delivered libraries; a handwritten donor allowlist can
+    // claim a missing clip exists and becomes stale when a new bake ships.
+    const visual = VISUALS.player_warrior;
+    const knightClips = new Set(
+      [visual.url, ...(visual.animUrls ?? [])].flatMap((url) => clipNamesOf(join('public', url))),
+    );
     const map: Record<string, string> = {};
     for (const [, abilityId, clip] of rows) {
       map[abilityId] = clip;

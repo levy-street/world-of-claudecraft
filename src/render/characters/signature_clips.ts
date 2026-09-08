@@ -99,6 +99,12 @@ export function prepareSignatureClips(
           ? 'Cast_Verdict'
           : (overrides?.[id] ?? overrides?.[SOURCE_ALIASES[id]]),
       source = name ? clips.get(name) : undefined;
+    if (source?.name === 'Warrior_Shieldcrack' && id === 'shield_slam') {
+      const clip = source.clone();
+      clip.name = signatureClipName(id);
+      clips.set(clip.name, clip);
+      continue;
+    }
     if (source && (id === 'raging_gale' || id === 'red_harvest')) {
       const clip = source.name.startsWith('Fury_')
         ? source.clone()

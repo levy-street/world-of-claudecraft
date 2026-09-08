@@ -29,7 +29,12 @@ import { RuneOfPowerVisual } from '../rune_of_power_visual';
 import { SupportRecipientVisual } from '../support_recipient_visual';
 import { CONTACT_SHEETS, contactTexture } from './contact_assets';
 import { abilityVfxTextures, FLIPBOOK_STYLES, flipbookSheet } from './fx_textures';
-import { bakedTexture, warriorPressureTexture } from './production_assets';
+import {
+  bakedTexture,
+  warriorBloodTexture,
+  warriorPressureTexture,
+  warriorSteelTexture,
+} from './production_assets';
 import { signatureTexture } from './signature_texture';
 import { liquidSurfaceMaps } from './simulation_assets';
 
@@ -176,6 +181,20 @@ export function abilityVfxTexturePrewarmSteps(): AbilityVfxPrewarmTextureStep[] 
         return texture ? [texture] : [];
       },
     });
+  steps.push({
+    id: 'warrior-blood',
+    build: () => {
+      const texture = warriorBloodTexture();
+      return texture ? [texture] : [];
+    },
+  });
+  steps.push({
+    id: 'warrior-steel',
+    build: () => {
+      const texture = warriorSteelTexture();
+      return texture ? [texture] : [];
+    },
+  });
   steps.push({
     id: 'warrior-pressure',
     build: () => {

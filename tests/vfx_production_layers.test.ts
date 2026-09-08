@@ -13,6 +13,8 @@ vi.mock('../src/render/ability_vfx/production_assets', async () => {
     bakedTexture: (kind: keyof typeof textures) => textures[kind],
     fragmentGeometry: () => source,
     warriorPressureTexture: () => null,
+    warriorBloodTexture: () => null,
+    warriorSteelTexture: () => null,
   };
 });
 
@@ -236,27 +238,29 @@ it('two full shouts retain four dust quadrants each beside two other live spell 
   pool.dispose();
 });
 
-
 it('plays the dust sprite frames while moving out across sampled ground, then holds motion when requested', () => {
-  const scene=new THREE.Scene(), pool=new BakedImpactLayers(scene);
-  const floor=vi.fn((x:number,z:number)=>x*.2+z*.3);
-  expect(pool.spawn('shout_dust',0,.08,0,8,0xd3bb95,0,1,0,0,0,Math.PI/2,floor)).toBe(true);
-  const mesh=meshes(scene)[0];
-  const samples=floor.mock.calls.length;
-  pool.update(.2,new THREE.Quaternion(),false);
-  const firstFrame=mesh.material.uniforms.uFrame.value;
-  const firstX=mesh.position.x;
+  const scene = new THREE.Scene(),
+    pool = new BakedImpactLayers(scene);
+  const floor = vi.fn((x: number, z: number) => x * 0.2 + z * 0.3);
+  expect(pool.spawn('shout_dust', 0, 0.08, 0, 8, 0xd3bb95, 0, 1, 0, 0, 0, Math.PI / 2, floor)).toBe(
+    true,
+  );
+  const mesh = meshes(scene)[0];
+  const samples = floor.mock.calls.length;
+  pool.update(0.2, new THREE.Quaternion(), false);
+  const firstFrame = mesh.material.uniforms.uFrame.value;
+  const firstX = mesh.position.x;
   expect(firstFrame).toBeGreaterThan(0);
-  expect(mesh.position.y).toBeCloseTo(.08+mesh.position.x*.2,5);
-  pool.update(.15,new THREE.Quaternion(),false);
+  expect(mesh.position.y).toBeCloseTo(0.08 + mesh.position.x * 0.2, 5);
+  pool.update(0.15, new THREE.Quaternion(), false);
   expect(mesh.material.uniforms.uFrame.value).toBeGreaterThan(firstFrame);
   expect(mesh.position.x).toBeGreaterThan(firstX);
-  pool.update(.1,new THREE.Quaternion(),true);
-  const frozenPosition=mesh.position.clone();
-  expect(mesh.material.uniforms.uFrame.value).toBeCloseTo(.36*63);
-  pool.update(.1,new THREE.Quaternion(),true);
+  pool.update(0.1, new THREE.Quaternion(), true);
+  const frozenPosition = mesh.position.clone();
+  expect(mesh.material.uniforms.uFrame.value).toBeCloseTo(0.36 * 63);
+  pool.update(0.1, new THREE.Quaternion(), true);
   expect(mesh.position.equals(frozenPosition)).toBe(true);
-  expect(mesh.material.uniforms.uFrame.value).toBeCloseTo(.36*63);
+  expect(mesh.material.uniforms.uFrame.value).toBeCloseTo(0.36 * 63);
   expect(floor).toHaveBeenCalledTimes(samples);
   pool.dispose();
 });

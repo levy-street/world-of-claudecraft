@@ -196,10 +196,16 @@ it('releases every live crest resource even when a carrier removal listener thro
   expect(() => crests.dispose()).not.toThrow();
 });
 
-it('binds the exact shared pressure texture to every live slot and never owns its disposal', () => {
+it('binds exact shared Warrior textures to every slot without owning disposal', () => {
   const texture = new THREE.Texture(),
     dispose = vi.spyOn(texture, 'dispose');
   const source = vi.spyOn(productionAssets, 'warriorPressureTexture').mockReturnValue(texture);
+  const blood = new THREE.Texture();
+  const bloodDispose = vi.spyOn(blood, 'dispose');
+  const bloodSource = vi.spyOn(productionAssets, 'warriorBloodTexture').mockReturnValue(blood);
+  const steel = new THREE.Texture();
+  const steelDispose = vi.spyOn(steel, 'dispose');
+  const steelSource = vi.spyOn(productionAssets, 'warriorSteelTexture').mockReturnValue(steel);
   const scene = new THREE.Scene(),
     crests = new SignatureCrests(scene);
   try {
@@ -208,13 +214,23 @@ it('binds the exact shared pressure texture to every live slot and never owns it
       THREE.ShaderMaterial
     >[];
     expect(slots).toHaveLength(8);
-    for (const mesh of slots) expect(mesh.material.uniforms.uPressureMap.value).toBe(texture);
+    for (const mesh of slots) {
+      expect(mesh.material.uniforms.uPressureMap.value).toBe(texture);
+      expect(mesh.material.uniforms.uBloodMap.value).toBe(blood);
+      expect(mesh.material.uniforms.uSteelMap.value).toBe(steel);
+    }
   } finally {
     crests.dispose();
     source.mockRestore();
+    bloodSource.mockRestore();
+    steelSource.mockRestore();
   }
   expect(dispose).not.toHaveBeenCalled();
+  expect(bloodDispose).not.toHaveBeenCalled();
+  expect(steelDispose).not.toHaveBeenCalled();
   texture.dispose();
+  blood.dispose();
+  steel.dispose();
 });
 
 it('shares an in-flight compile between selected-kit preparation and the ordinary catalogue', async () => {

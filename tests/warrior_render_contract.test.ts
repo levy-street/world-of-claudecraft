@@ -33,9 +33,8 @@ describe('winning Warrior attack animation routing', () => {
       slam: '2H_Melee_Attack_Chop',
       red_harvest: 'Fury_Red_Harvest',
       breachmaker: '2H_Melee_Attack_Chop',
-      // Shieldcrack drives the offhand SHIELD arm (synthesized clip,
-      // scripts/_add_shield_bash_anim.mjs), never a sword chop.
-      shield_slam: 'Shield_Bash',
+      // Authored shield drive retains its planted feet and contact hold.
+      shield_slam: 'Warrior_Shieldcrack',
       raging_gale: 'Fury_Twinstrike',
       bloodthirst: 'Dualwield_Melee_Attack_Chop',
       // The two frontal-arc AoE strikes reap sideways (synthesized clip,

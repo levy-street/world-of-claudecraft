@@ -130,10 +130,10 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/ability_vfx/ribbons.ts': 1,
   'src/render/ability_vfx/water_volumes.ts': 4,
   'src/render/ability_vfx/pillars.ts': 1,
-  'src/render/ability_vfx/signature_crests.ts': 3,
+  'src/render/ability_vfx/signature_crests.ts': 5,
   'src/render/ability_vfx/solid_impact_fragments.ts': 2,
   'src/render/ability_vfx/signature_details.ts': 1,
-  'src/render/characters/surface_response.ts': 3,
+  'src/render/characters/surface_response.ts': 5,
   'src/render/paladin_aegis_visual.ts': 3,
   'src/render/telegraph_heat.ts': 1,
   // the armour-dye sRGB<->linear pair (bases clamped with max(c, 0))

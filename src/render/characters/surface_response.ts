@@ -106,7 +106,7 @@ export function createSurfaceResponseMaterial(
         float seep=dripLane*smoothstep(-0.24*uSurfaceAge,-0.02,woundLine)*(1.0-smoothstep(-0.008,0.008,woundLine));
         float wound=max(cut,seep*0.7)*surfaceFade;
         diffuseColor.rgb=mix(diffuseColor.rgb,vec3(0.16,0.004,0.012),wound*0.96);
-        surfaceEmission=vec3(0.8,0.018,0.035)*cut*surfaceFade*pow(1.0-uSurfaceAge,2.0)*1.6;
+        surfaceEmission=vec3(0.8,0.018,0.035)*cut*surfaceFade*pow(max(0.0,1.0-uSurfaceAge),2.0)*1.6;
       }
     `,
     );
@@ -130,11 +130,7 @@ export class CharacterSurfaceResponse {
   private age = 0;
   private duration = 2.5;
   active = false;
-  trigger(
-    school: string,
-    strength: number,
-    contact?: MeleeImpactProfile,
-  ): boolean {
+  trigger(school: string, strength: number, contact?: MeleeImpactProfile): boolean {
     const kind =
       school === 'fire'
         ? 0
@@ -176,10 +172,7 @@ export class CharacterSurfaceResponse {
     this.uniforms.uSurfaceAge.value = 0;
     this.uniforms.uSurfaceKind.value = kind;
     this.uniforms.uSurfaceAmount.value = Math.min(0.95, strength);
-    this.uniforms.uSurfaceContact.value.set(
-      contact?.height ?? 0.56,
-      contact?.angle ?? -0.28,
-    );
+    this.uniforms.uSurfaceContact.value.set(contact?.height ?? 0.56, contact?.angle ?? -0.28);
     return edge;
   }
   material(source: THREE.Material): THREE.Material {
