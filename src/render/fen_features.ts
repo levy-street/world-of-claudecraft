@@ -159,12 +159,19 @@ function extractParts(scene: THREE.Group): ExtractedModel {
 // attribute objects give each cell its own binding at zero vertex memory
 // (the GPU buffers are cached per attribute, not per geometry).
 //
+// The trade is the other way round for the driver: one binding per cell
+// instead of one per family. That was measured a win on ANGLE GL; whether it
+// is one on ANGLE Vulkan, where vertex-state changes have their own price, is
+// what `?fencellgeo=off` exists to answer. Off, every cell of a family shares
+// the family's geometry and three re-runs the attribute setup between them.
+//
 // Dispose contract: a wrapper is never disposed on its own. three answers a
 // dispose on any one of them by deleting the SHARED attribute buffers, and
 // every sibling cell would silently re-upload on its next draw. The fen has
 // no teardown today (built once, never evicted); a future release path
 // disposes the family's source geometry once, not the cells.
 function cellGeometry(source: THREE.BufferGeometry): THREE.BufferGeometry {
+  if (renderLayerDisabled('fencellgeo')) return source;
   const geo = new THREE.BufferGeometry();
   if (source.index) geo.setIndex(source.index);
   for (const name of Object.keys(source.attributes)) {

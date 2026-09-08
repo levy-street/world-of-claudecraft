@@ -30,6 +30,12 @@
 //   fencells    - the Willowfen dressing's per-cell cull groups (fen_features);
 //                 off builds today's five whole meshes and one footprint on
 //                 any tier, the before arm of the scene census
+//   fencellgeo  - the per-cell geometry OBJECT the same cells carry (one
+//                 vertex-array binding per cell instead of one per family,
+//                 over the same attribute buffers); off shares the family's
+//                 geometry across its cells, which is the A/B arm for pricing
+//                 the binding on a driver whose vertex-state changes cost
+//                 more than three's attribute re-setup
 //   farvista    - the whole coarse far-vista terrain layer (far_terrain); off
 //                 is the A/B that says whether a suspect distant surface is
 //                 this layer or the real splat terrain underneath it

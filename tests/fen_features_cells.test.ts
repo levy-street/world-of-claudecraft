@@ -59,26 +59,29 @@ const MODEL_EXTENT_YD: Record<string, number> = {
   log: 0.96,
 };
 const WIDE_FAMILY = 'log';
+function standInScene(key: string): THREE.Group {
+  const scene = new THREE.Group();
+  scene.name = `${key}_glb`;
+  const e = MODEL_EXTENT_YD[key];
+  const trunk =
+    key === WIDE_FAMILY
+      ? new THREE.BoxGeometry(e, e * 0.27, e * 0.4)
+      : new THREE.BoxGeometry(e, e, e);
+  if (key === TWO_PART_FAMILY) {
+    trunk.addGroup(0, trunk.index?.count ?? 36, 0);
+    const canopy = new THREE.Mesh(
+      new THREE.BoxGeometry(e * 2, e, e * 2),
+      new THREE.MeshStandardMaterial({ name: key }),
+    );
+    canopy.position.y = e * 1.5;
+    scene.add(canopy);
+  }
+  scene.add(new THREE.Mesh(trunk, new THREE.MeshStandardMaterial({ name: key })));
+  return scene;
+}
 function seedStandIns(): void {
   for (const key of fenFeaturesInternalsForTest.familyKeys) {
-    const scene = new THREE.Group();
-    scene.name = `${key}_glb`;
-    const e = MODEL_EXTENT_YD[key];
-    const trunk =
-      key === WIDE_FAMILY
-        ? new THREE.BoxGeometry(e, e * 0.27, e * 0.4)
-        : new THREE.BoxGeometry(e, e, e);
-    if (key === TWO_PART_FAMILY) {
-      trunk.addGroup(0, trunk.index?.count ?? 36, 0);
-      const canopy = new THREE.Mesh(
-        new THREE.BoxGeometry(2, 1, 2),
-        new THREE.MeshStandardMaterial({ name: key }),
-      );
-      canopy.position.y = 1.5;
-      scene.add(canopy);
-    }
-    scene.add(new THREE.Mesh(trunk, new THREE.MeshStandardMaterial({ name: key })));
-    fenFeaturesInternalsForTest.seedPropScene(key, scene);
+    fenFeaturesInternalsForTest.seedPropScene(key, standInScene(key));
   }
 }
 const partsOf = (family: string): number => (family === TWO_PART_FAMILY ? 2 : 1);
@@ -367,6 +370,43 @@ describe('fen features per-cell cull groups', () => {
     // so the collider family survives the sweep whole
     for (const g of willow) expect(g.visible).toBe(true);
     expect(shed).toBeGreaterThan(0);
+  });
+
+  it('shares one geometry across a family under the ?fencellgeo=off bench arm', async () => {
+    // The A/B arm that prices the per-cell vertex-array binding against
+    // three's attribute re-setup on a given driver. Same instances, same
+    // groups; only the geometry object differs.
+    vi.resetModules();
+    vi.stubGlobal('location', { search: '?fencellgeo=off' });
+    try {
+      const fresh = await import('../src/render/fen_features');
+      for (const key of fresh.fenFeaturesInternalsForTest.familyKeys) {
+        fresh.fenFeaturesInternalsForTest.seedPropScene(key, standInScene(key));
+      }
+      const shared = fresh.buildFenFeatures(WORLD_SEED, LIVE_ARM);
+      expect(shared.cullGroups).toHaveLength(26);
+      const byFamily = new Map<string, Set<number>>();
+      let instances = 0;
+      for (const g of shared.cullGroups) {
+        const family = familyOf(g);
+        for (const mesh of meshesOf(g)) {
+          instances += mesh.count;
+          const ids = byFamily.get(family) ?? new Set<number>();
+          ids.add(mesh.geometry.id);
+          byFamily.set(family, ids);
+        }
+      }
+      // one geometry id per PART of a family, not one per cell
+      for (const [family, ids] of byFamily) {
+        expect(ids.size, family).toBe(family === TWO_PART_FAMILY ? 2 : 1);
+      }
+      // and the drawn set is the shipped one either way
+      expect(instances).toBe(instanceCount(cells.group));
+      fresh.fenFeaturesInternalsForTest.resetPropScenes();
+    } finally {
+      vi.unstubAllGlobals();
+      vi.resetModules();
+    }
   });
 
   it('keeps every cell footprint inside the fen rectangle', () => {
