@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { safeStartupGraphicsPreset } from '../src/game/startup_graphics_safety';
+import { PROFILE_TOKENS } from './helpers/profile_tokens';
 
 const ULTRA = 4;
 const HIGH = 3;
@@ -96,9 +97,20 @@ describe('constrained renderer integration', () => {
     // prewarm gate above pins the same policy through the static preset knob.
     expect(source).toContain('shadowArm: () => GFX.dynamicShadows && this.asyncCompileSupported,');
     expect(source).toContain('if (this.lowGfx && !this.sun.castShadow) return;');
-    expect(
-      source.match(/if \(this\.sun\.castShadow\) \{\n\s+this\.shadowLightDirection\.subVectors/g),
-    ).toHaveLength(2);
+    // The gather-node view runs its shadow shed off sun.castShadow itself (it
+    // reads the flag inside update, never the governor), at both frame sites.
+    const stripped = source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+    expect(stripped.match(/this\.gatherNodes\.update\(this\.camera, this\.sun,/g)).toHaveLength(2);
+    const gatherNodes = readFileSync(
+      new URL('../src/render/gather_nodes.ts', import.meta.url),
+      'utf8',
+    )
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|[^:])\/\/.*$/gm, '$1');
+    expect(gatherNodes).toContain('sun.castShadow');
+    for (const token of PROFILE_TOKENS) {
+      expect(gatherNodes.includes(token), `gather_nodes.ts must not read ${token}`).toBe(false);
+    }
   });
 
   it('keys fixed LOW daylight by biome and invalidates it for developer overrides', () => {

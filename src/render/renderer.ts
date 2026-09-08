@@ -1566,7 +1566,6 @@ export class Renderer {
   // (0 down, 1 up); recomputed each frame in updateAmbience from the world clock
   private moonDir = new THREE.Vector3(0, -1, 0);
   private lightDir = new THREE.Vector3(); // blended sun/moon dir the key light uses
-  private shadowLightDirection = new THREE.Vector3();
   // World units per shadow-map texel (ortho box width / GFX.shadowMap), set
   // once beside the shadow camera; 0 disables snapping. shadowSnappedAnchor
   // is the per-frame scratch shadow_texel_snap_core.ts fills so the frustum
@@ -5042,10 +5041,7 @@ export class Renderer {
       this.updateKeyLight(pp);
     }
     this.jailScene.updateVisibility(this.camera, this.sun);
-    if (this.sun.castShadow) {
-      this.shadowLightDirection.subVectors(this.sun.position, this.sun.target.position).normalize();
-      this.gatherNodes.updateShadowVisibility(this.camera, this.shadowLightDirection, true);
-    }
+    this.gatherNodes.update(this.camera, this.sun, Math.max(fogFar, this.lastRequestedFogFar));
     this.sky.position.set(this.camera.position.x, 0, this.camera.position.z);
     // The dome rides the camera, so it serves every open-air state: the
     // overworld, Wildheart's field, and the Thornhollow Fields hollow (hiding
@@ -11976,10 +11972,7 @@ export class Renderer {
       this.shakeTrauma = Math.max(0, this.shakeTrauma - dt * 1.8);
     }
     this.jailScene.updateVisibility(this.camera, this.sun);
-    if (this.sun.castShadow) {
-      this.shadowLightDirection.subVectors(this.sun.position, this.sun.target.position).normalize();
-      this.gatherNodes.updateShadowVisibility(this.camera, this.shadowLightDirection, true);
-    }
+    this.gatherNodes.update(this.camera, this.sun, Math.max(fogFar, this.lastRequestedFogFar));
     this.updateOpaqueDrawOrder(dt);
     if (shakeX !== 0 || shakeY !== 0) refreshFrozenWorldMatrix(this.camera);
     // Refresh the reused host every frame instead of building a literal: sync

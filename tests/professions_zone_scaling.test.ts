@@ -11,6 +11,7 @@
 // parity arms live in tests/minimap_markers.test.ts and the painter budgets
 // in tests/hud_perf_budget.test.ts. This file owns the resident-set and
 // collider halves.
+import { DirectionalLight, PerspectiveCamera } from 'three';
 import { describe, expect, it } from 'vitest';
 import { buildGatherNodes } from '../src/render/gather_nodes';
 import type { Collider } from '../src/sim/colliders';
@@ -26,12 +27,13 @@ describe('node meshes: one resident object per authored node, identified by id',
     // The renderer builds the whole world's node meshes ONCE at construction
     // and never per frame; the linear term the projection names is this
     // resident set. The nodes are InstancedMesh batches after the v0.33.0
-    // draw-call diet (one batch per type x z-band, ids in
+    // draw-call diet (one batch per zone x type, ids in
     // userData.gatherNodeIds); in the Node host each type resolves to its
     // single fallback part, so flattening the batch id lists yields each
     // authored node exactly once. Pinned as an ID SET, not a count, so a
     // duplicated or dropped node fails even at an unchanged length.
-    const { group } = buildGatherNodes(WORLD_SEED);
+    const view = buildGatherNodes(WORLD_SEED);
+    const { group } = view;
     const meshIds = group.children
       .flatMap((child) => (child.userData.gatherNodeIds as string[]) ?? [])
       .sort();
@@ -43,6 +45,21 @@ describe('node meshes: one resident object per authored node, identified by id',
       const im = child as unknown as { count: number };
       expect(im.count).toBe((child.userData.gatherNodeIds as string[]).length);
     }
+    // The per-batch reach hide works through `count` alone: a camera far
+    // from every node hides every batch, and the id table stays the
+    // resident set (a restore puts the count back against the same list).
+    const camera = new PerspectiveCamera(60, 1, 0.1, 2_000);
+    camera.position.set(1_000_000, 2, 1_000_000);
+    camera.updateMatrixWorld(true);
+    view.update(camera, new DirectionalLight(), 100);
+    for (const child of group.children) {
+      const im = child as unknown as { count: number };
+      expect(im.count).toBe(0);
+      expect(child.visible).toBe(true);
+    }
+    expect(
+      group.children.flatMap((child) => (child.userData.gatherNodeIds as string[]) ?? []).sort(),
+    ).toEqual(nodeIds);
     // The per-zone contribution is linear by construction: every zone's
     // authored nodes appear, none minted from anywhere else.
     for (const zone of ZONES) {

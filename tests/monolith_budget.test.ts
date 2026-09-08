@@ -842,7 +842,10 @@ const MONOLITHS: MonolithRow[] = [
     // merged count, zero slack: any further growth reds again.
     // OSSBrain integration: Fiesta effects moved to render/fiesta_effects.ts.
     // Measured after formatting; lower the ratchet with the extraction.
-    ceiling: 12879,
+    // Lowered again when the gather-node shadow shed and reach hide moved
+    // behind GatherNodesView.update (the two guard blocks collapsed to one
+    // call each and the shadowLightDirection scratch left the renderer).
+    ceiling: 12872,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
