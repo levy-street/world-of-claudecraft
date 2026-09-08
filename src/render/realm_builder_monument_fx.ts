@@ -396,11 +396,11 @@ const IMPOSTOR_VERTEX = /* glsl */ `
     // Billboard about the vertical axis ONLY: a statue that tips to face the
     // camera reads as a card the moment you look down at it from a rise.
     vec3 right = vec3(modelViewMatrix[0][0], modelViewMatrix[1][0], modelViewMatrix[2][0]);
-    vec3 flat = normalize(vec3(right.x, 0.0, right.z));
+    vec3 horizontalRight = normalize(vec3(right.x, 0.0, right.z));
     vec3 world = vec3(
-      flat.x * position.x,
+      horizontalRight.x * position.x,
       position.y,
-      flat.z * position.x
+      horizontalRight.z * position.x
     );
     vec4 mvPosition = modelViewMatrix * vec4(world, 1.0);
     gl_Position = projectionMatrix * mvPosition;

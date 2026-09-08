@@ -21,6 +21,7 @@ const donors = [
   '1H_Melee_Attack_Slice_Diagonal',
   '2H_Melee_Attack_Chop',
   'Dualwield_Melee_Attack_Chop',
+  '1H_Melee_Attack_Slice_Horizontal',
 ].map((name) => indexClip(root, name));
 for (const donor of donors) {
   for (const channel of donor.values()) {
@@ -195,7 +196,35 @@ const bruteFollow = bladePose(3, 1, [0, -0.012, 0.02], 8, 0, -10);
 const redhandLoad = bladePose(3, 0.95, [-0.012, -0.03, -0.02], -20, 6, -22);
 const redhandCut = bladePose(3, 0.81, [-0.012, -0.02, 0.03], -20, 6, -22);
 const redhandRise = bladePose(3, 0.7, [-0.004, -0.01, 0.015], -20, -12, 0);
+const reapLoad = bladePose(5, 0.1, [0, -0.025, 0.02], -25, -4);
+const reapCut = bladePose(5, 0.24, [0, -0.025, 0.02], 20, 5);
+const reapFollow = bladePose(5, 0.5, [0, -0.025, 0.02], 35, 5);
+const stormA = bladePose(3, 0.83, [0, -0.025, 0], -6, -3, -8);
+const stormB = bladePose(3, 0.83, [0, -0.025, 0], 6, -3, -8);
+const stormC = bladePose(3, 0.83, [0, -0.025, 0], 6, 3, -8);
+const stormD = bladePose(3, 0.83, [0, -0.025, 0], -6, 3, -8);
 const performances = [
+  [
+    'Warrior_Reaping_Arc',
+    [
+      [0, idle],
+      [0.085, reapLoad],
+      [0.15, reapCut],
+      [0.175, reapCut],
+      [0.33, reapFollow],
+      [0.64, idle],
+    ],
+  ],
+  [
+    'Warrior_Bladestorm_Loop',
+    [
+      [0, stormA],
+      [0.1125, stormB],
+      [0.225, stormC],
+      [0.3375, stormD],
+      [0.45, stormA],
+    ],
+  ],
   [
     'Warrior_Brute_Swing',
     [
@@ -268,7 +297,7 @@ const performances = [
 const clips = [],
   reports = [];
 for (const [name, beats] of performances) {
-  const first = plantFeet(new Map([...idle].map(([key, value]) => [key, [...value]])));
+  const first = plantFeet(new Map([...beats[0][1]].map(([key, value]) => [key, [...value]])));
   const timeline = [[0, (key) => first.get(key)]];
   for (let b = 1; b < beats.length; b++) {
     const [start, from] = beats[b - 1],

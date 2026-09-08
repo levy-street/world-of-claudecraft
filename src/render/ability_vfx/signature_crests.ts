@@ -19,9 +19,13 @@ export class SignatureCrests {
     duration: number;
     active: boolean;
     pressure: boolean;
+    heldId: number | null;
+    heldStamp: number;
+    phase: number;
   }[] = [];
   private disposed = false;
   private reducedMotion = false;
+  private frame = 0;
   private readonly unbind: Array<() => void> = [];
   constructor(
     scene: THREE.Scene,
@@ -50,7 +54,7 @@ export class SignatureCrests {
             mix(uPressureGround[i+5],uPressureGround[i+6],f.x),f.y);
         }
         void main(){
-          vUv=uv; vSurface=position.xy*(uKind>14.5?vec2(0.22,0.55):vec2(0.4))+0.5; vec3 p=position;
+          vUv=uv; vSurface=uKind>15.5?position.xz*0.08+0.5:position.xy*(uKind>14.5?vec2(0.22,0.55):vec2(0.4))+0.5; vec3 p=position;
           float angle=atan(p.z,p.x);
           float lip=uKind<0.5 || uKind>3.5 ? 1.0 : 0.9+sin(angle*5.0-uAge*5.0*uMotion)*0.1;
           p.y*=lip;
@@ -164,7 +168,16 @@ export class SignatureCrests {
       // Shader animation can move the surface beyond its prepared bounds.
       mesh.frustumCulled = false;
       scene.add(mesh);
-      this.slots.push({ mesh, age: 0, duration: 1.15, active: false, pressure: false });
+      this.slots.push({
+        mesh,
+        age: 0,
+        duration: 1.15,
+        active: false,
+        pressure: false,
+        heldId: null,
+        heldStamp: -1,
+        phase: 0,
+      });
     }
     this.preparation = new CrestPrewarm(scene, this.shapes, this.slots[0].mesh.material);
     proto.dispose();
@@ -191,7 +204,11 @@ export class SignatureCrests {
       return false;
     const contactSurface =
       kind === 'blood_cut' || kind === 'shield_contact' || kind === 'steel_cut';
-    const authoredSurface = contactSurface || kind.endsWith('_pressure');
+    const authoredSurface =
+      contactSurface ||
+      kind === 'steel_storm' ||
+      kind === 'steel_reap' ||
+      kind.endsWith('_pressure');
     if (authoredSurface && !this.preparation.ready(kind)) return false;
     let s = this.slots.find((s) => !s.active);
     // A decorative voice wake can yield to the target's physical blade contact.
@@ -203,6 +220,7 @@ export class SignatureCrests {
     }
     if (!s) return false;
     s.pressure = kind.endsWith('_pressure');
+    s.heldId = null;
     s.active = true;
     s.age = 0;
     s.duration = Number.isFinite(duration) ? Math.max(0.05, duration) : 1.15;
@@ -235,52 +253,100 @@ export class SignatureCrests {
     u.uTint.value.setHex(tint);
     u.uAccent.value.setHex(accent);
     u.uKind.value =
-      kind === 'steel_cut'
-        ? 15
-        : kind === 'shield_contact'
-          ? 14
-          : kind.endsWith('_pressure')
-            ? 13
-            : kind === 'blood_cut'
-              ? 12
-              : kind === 'chain'
-                ? 11
-                : kind === 'hook'
-                  ? 10
-                  : kind === 'bone'
-                    ? 7
-                    : kind === 'ward'
-                      ? 8
-                      : kind === 'feather'
-                        ? 9
-                        : kind === 'ice'
-                          ? 0
-                          : kind === 'water'
-                            ? 1
-                            : kind === 'fire'
-                              ? 3
-                              : kind === 'light'
-                                ? 4
-                                : kind === 'nature'
-                                  ? 5
-                                  : kind === 'arcane'
-                                    ? 6
-                                    : 2;
+      kind === 'steel_storm' || kind === 'steel_reap'
+        ? 16
+        : kind === 'steel_cut'
+          ? 15
+          : kind === 'shield_contact'
+            ? 14
+            : kind.endsWith('_pressure')
+              ? 13
+              : kind === 'blood_cut'
+                ? 12
+                : kind === 'chain'
+                  ? 11
+                  : kind === 'hook'
+                    ? 10
+                    : kind === 'bone'
+                      ? 7
+                      : kind === 'ward'
+                        ? 8
+                        : kind === 'feather'
+                          ? 9
+                          : kind === 'ice'
+                            ? 0
+                            : kind === 'water'
+                              ? 1
+                              : kind === 'fire'
+                                ? 3
+                                : kind === 'light'
+                                  ? 4
+                                  : kind === 'nature'
+                                    ? 5
+                                    : kind === 'arcane'
+                                      ? 6
+                                      : 2;
     u.uAge.value = 0;
     u.uMotion.value = this.reducedMotion ? 0 : 1;
     return true;
+  }
+  /** One caster-owned storm borrows the existing eight-slot sculpture pool.
+   * Live frame stamps, not a guessed duration, own release and interruption. */
+  holdStorm(entityId: number, x: number, y: number, z: number, elapsed: number): boolean {
+    if (
+      this.disposed ||
+      !Number.isFinite(x) ||
+      !Number.isFinite(y) ||
+      !Number.isFinite(z) ||
+      !Number.isFinite(elapsed)
+    )
+      return false;
+    let slot: (typeof this.slots)[number] | undefined;
+    for (const candidate of this.slots)
+      if (candidate.active && candidate.heldId === entityId) {
+        slot = candidate;
+        break;
+      }
+    if (!slot) {
+      const available = this.slots.find((s) => !s.active);
+      if (!available) return false;
+      if (!this.spawn(x, y, z, 1, 1, 0x8197a8, 0xd9af89, 'steel_storm', 0, 1)) return false;
+      slot = available;
+      slot.heldId = entityId;
+    }
+    slot.heldStamp = this.frame;
+    slot.phase = Math.max(0, elapsed);
+    slot.mesh.position.set(x, y, z);
+    return true;
+  }
+  releaseHeld(entityId: number): void {
+    for (const s of this.slots)
+      if (s.heldId === entityId) {
+        s.active = false;
+        s.mesh.visible = false;
+        s.heldId = null;
+      }
   }
   update(dt: number, reducedMotion: boolean): void {
     if (this.disposed) return;
     this.reducedMotion = reducedMotion;
     for (const s of this.slots) {
       if (!s.active) continue;
+      if (s.heldId !== null) {
+        s.active = s.heldStamp === this.frame;
+        s.mesh.visible = s.active;
+        s.mesh.rotation.y = reducedMotion ? 0 : s.phase * 14;
+        s.mesh.material.uniforms.uAge.value = 0.18;
+        s.mesh.material.uniforms.uMotion.value = reducedMotion ? 0 : 1;
+        continue;
+      }
       s.age += Number.isFinite(dt) ? Math.max(0, dt) : 0;
       s.active = s.age < s.duration;
       s.mesh.visible = s.active;
       s.mesh.material.uniforms.uAge.value = Math.min(1, s.age / s.duration);
       s.mesh.material.uniforms.uMotion.value = reducedMotion ? 0 : 1;
     }
+    this.frame++;
   }
   clear(): void {
     for (const s of this.slots) {

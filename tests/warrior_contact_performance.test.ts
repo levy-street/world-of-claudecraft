@@ -36,6 +36,32 @@ const position = (bone: THREE.Object3D) => bone.getWorldPosition(new THREE.Vecto
 const rotation = (bone: THREE.Object3D) =>
   bone.getWorldQuaternion(new THREE.Quaternion()).normalize();
 
+it('holds a seamless native Bladestorm loop with planted feet and no repeated chop', async () => {
+  const f = await fixture('Warrior_Bladestorm_Loop');
+  expect(VISUALS.player_warrior.clips.castByAbility?.bladestorm).toBe(f.clip.name);
+  expect(VISUALS.player_warrior.clips.castTimeScaleByAbility?.bladestorm).toBe(1);
+  expect(f.clip.duration).toBeCloseTo(0.45, 6);
+  const feet = ['footl', 'footr', 'toesl', 'toesr'].map(f.bone);
+  f.pose(0);
+  const initial = feet.map((b) => ({ p: position(b), q: rotation(b) }));
+  const hand = f.bone('handslotr'),
+    start = position(hand);
+  for (let i = 0; i <= 90; i++) {
+    f.pose(i * 0.005);
+    feet.forEach((b, j) => {
+      expect(position(b).distanceTo(initial[j].p)).toBeLessThan(0.0005);
+      expect(rotation(b).angleTo(initial[j].q)).toBeLessThan(0.005);
+    });
+    expect(position(hand).distanceTo(start)).toBeLessThan(0.3);
+  }
+  expect(position(hand).distanceTo(start)).toBeLessThan(1e-5);
+  for (const track of f.clip.tracks) {
+    const stride = track.getValueSize();
+    for (let i = 0; i < stride; i++)
+      expect(track.values[track.values.length - stride + i]).toBeCloseTo(track.values[i], 5);
+  }
+});
+
 it('ships complete normalized native tracks and preserves every value through both preparation stages', async () => {
   const { gltf, clip } = await fixture();
   expect(clip.duration).toBeCloseTo(0.68, 6);
@@ -103,6 +129,7 @@ it.each([
   ['victory_rush', 'Warrior_Victory_Rush'],
   ['slam', 'Warrior_Brute_Swing'],
   ['overpower', 'Warrior_Redhand'],
+  ['cleave', 'Warrior_Reaping_Arc'],
 ])('preserves native %s loading, contact and planted recovery', async (id, name) => {
   const f = await fixture(name);
   const bones = ['footl', 'footr', 'toesl', 'toesr', 'root'].map(f.bone);

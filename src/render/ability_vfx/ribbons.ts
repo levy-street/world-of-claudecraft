@@ -813,11 +813,20 @@ export class AbilityVfxRibbons {
     }
   }
 
-  update(dt: number, camPos: THREE.Vector3, reducedMotion = false, drawHeld?: () => void): void {
+  update(
+    dt: number,
+    camPos: THREE.Vector3,
+    reducedMotion = false,
+    drawHeld?: () => void,
+    drawPriorityHeld?: () => void,
+  ): void {
     this.time += dt;
     this.camPos.copy(camPos);
     this.v = 0;
     this.i = 0;
+    // A live damage channel keeps a compact primary when its sculpture is
+    // unavailable. Decoration still uses only the remaining tail below.
+    drawPriorityHeld?.();
 
     for (const b of this.bolts) {
       if (!b.active) continue;
@@ -1033,7 +1042,7 @@ export class AbilityVfxRibbons {
       }
     }
 
-    // Transient attacks own the buffer first. Held decoration uses remaining
+    // After channel primaries and transient attacks, held decoration uses remaining
     // vertices only, without occupying or restarting any timed effect slot.
     drawHeld?.();
     this.commit();

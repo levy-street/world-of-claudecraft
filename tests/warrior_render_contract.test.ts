@@ -37,9 +37,8 @@ describe('winning Warrior attack animation routing', () => {
       shield_slam: 'Warrior_Shieldcrack',
       raging_gale: 'Fury_Twinstrike',
       bloodthirst: 'Warrior_Bloodletting',
-      // The two frontal-arc AoE strikes reap sideways (synthesized clip,
-      // scripts/_add_sweep_slice_anim.mjs), never the top-to-bottom chop.
-      cleave: '1H_Melee_Attack_Slice_Horizontal',
+      // Reaping Arc is radial; Revenge retains its frontal counter.
+      cleave: 'Warrior_Reaping_Arc',
       revenge: '1H_Melee_Attack_Slice_Horizontal',
       thunder_clap: '1H_Melee_Attack_Chop',
       faultline: '1H_Melee_Attack_Chop',

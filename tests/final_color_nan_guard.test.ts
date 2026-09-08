@@ -112,7 +112,11 @@ describe('installFinalColorNanGuard call sites', () => {
 
   it('the world renderer reaches gfx.ts (and so the guard) before it can compile or render', () => {
     const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
-    const rendererCreated = renderer.indexOf('this.webgl = new THREE.WebGLRenderer');
+    const worldRenderer = readFileSync(
+      new URL('../src/render/world_renderer.ts', import.meta.url),
+      'utf8',
+    );
+    const rendererCreated = renderer.indexOf('this.webgl = createWorldRenderer');
     const rendererInit = renderer.indexOf('initGfxTier(this.webgl)', rendererCreated);
     const firstCompile = renderer.indexOf('this.webgl.compile', rendererCreated);
     const firstRender = renderer.indexOf('this.webgl.render', rendererCreated);
@@ -121,6 +125,9 @@ describe('installFinalColorNanGuard call sites', () => {
     expect(rendererInit).toBeGreaterThan(rendererCreated);
     expect(firstCompile).toBeGreaterThan(rendererInit);
     expect(firstRender).toBeGreaterThan(rendererInit);
+    expect(worldRenderer).toContain('new THREE.WebGLRenderer');
+    expect(worldRenderer).not.toContain('.compile(');
+    expect(worldRenderer).not.toContain('.render(');
   });
 });
 

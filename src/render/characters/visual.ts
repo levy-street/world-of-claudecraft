@@ -1,4 +1,3 @@
-import { CastLocomotion } from './cast_locomotion';
 // Per-entity character visual: a SkeletonUtils clone of a manifest asset with
 // its own AnimationMixer, a clip-driven state machine fed by renderer-derived
 // state, a baked static idle-pose far LOD, and a shadow-only proxy for the
@@ -7,15 +6,13 @@ import { CastLocomotion } from './cast_locomotion';
 // on the shared tinted-material cache (which disposes a clone only once no
 // visual mounts it).
 import * as THREE from 'three';
-import { ActionProps } from './action_props';
-import { attachHunterMeleeProp } from './assets';
-import type { MeleeImpactProfile } from '../melee_impact_core';
 import { offhandMirrorsWeaponSkin } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import type { OverheadEmoteId } from '../../world_api';
 import { recordBuildSpan, timeBuildSpan } from '../build_spans';
 import { GFX } from '../gfx';
 import { cloneMaterialWithHooks } from '../material_clone_hooks';
+import type { MeleeImpactProfile } from '../melee_impact_core';
 import type { MountRideSpec } from '../mount_visuals';
 import {
   createWeaponVfx,
@@ -26,6 +23,7 @@ import {
 } from '../weapon_vfx';
 import { scaleWeaponVfxTuning } from '../weapon_vfx_shed_core';
 import { weaponVfxTuningFor } from '../weapon_vfx_tuning';
+import { ActionProps } from './action_props';
 import {
   type AnimActionWeight,
   type AnimState,
@@ -47,6 +45,7 @@ import {
   applyModularSliderMorphs,
   assembleModel,
   attachDeferredFaceDecals,
+  attachHunterMeleeProp,
   ensureSkinTexture,
   farSourceMaterials,
   modularFarBake,
@@ -63,6 +62,7 @@ import {
   takeFarBakeBudget,
   tintedFarMaterials,
 } from './assets';
+import { CastLocomotion } from './cast_locomotion';
 import { deathGroundingOffset } from './death_grounding_core';
 import {
   applyGhostEffectStyle,
@@ -848,7 +848,12 @@ export class CharacterVisual {
     // No-op for a fixed rig.
     try {
       configureTightBoneTextures(this.model);
-      this.actionProps = new ActionProps(this.model, key === 'player_hunter' || key === 'player_hunter_modular' ? attachHunterMeleeProp(this.model) : null);
+      this.actionProps = new ActionProps(
+        this.model,
+        key === 'player_hunter' || key === 'player_hunter_modular'
+          ? attachHunterMeleeProp(this.model)
+          : null,
+      );
       timeBuildSpan('view-part:materials', () =>
         applyMaterials(
           this.model,
@@ -1130,7 +1135,10 @@ export class CharacterVisual {
             this.current.time = Math.max(0, this.current.getClip().duration - 1e-3);
           this.current.timeScale = timeScale;
         }
-        if (this.baseState === 'spin') this.current.timeScale = SPIN_ATTACK_TIMESCALE;
+        if (this.baseState === 'spin')
+          this.current.timeScale =
+            (this.castingAbility && this.def.clips.castTimeScaleByAbility?.[this.castingAbility]) ||
+            SPIN_ATTACK_TIMESCALE;
         if (this.baseState === 'cast') {
           // per-frame on purpose: actions are cached per clip, so a clip that
           // doubles as an attackByAbility one-shot would otherwise leak that
@@ -1737,7 +1745,8 @@ export class CharacterVisual {
 
   playAttack(abilityId?: string): void {
     if (this.deadLock) return;
-    if (abilityId === 'fire_blast' && this.castingAbility && this.castLocomotion?.triggerFlick()) return;
+    if (abilityId === 'fire_blast' && this.castingAbility && this.castLocomotion?.triggerFlick())
+      return;
     const signature = abilityId ? signatureClipName(abilityId) : null;
     if (signature && this.action(signature)) {
       this.playOneShot(signature, 1);
@@ -1796,8 +1805,14 @@ export class CharacterVisual {
 
   /** Bladed Gyre is instant, so it uses one short body spin instead of the
    *  held Bladestorm channel pose. Repeated AoE hits only refresh the timer. */
-  playWhirl(): void {
+  playWhirl(abilityId?: string): void {
     if (this.deadLock) return;
+    if (abilityId === 'cleave' && this.action('Signature_cleave')) {
+      this.spinOnceTimer = 0;
+      this.playOneShot('Signature_cleave', 1);
+      this.currentOneShotIsAttack = true;
+      return;
+    }
     this.spinOnceTimer = SPIN_ATTACK_VISUAL_DURATION;
     const clips = this.def.clips.attack;
     if (clips.length > 0) {
@@ -1806,7 +1821,8 @@ export class CharacterVisual {
   }
 
   playHit(): void {
-    if (this.deadLock || this.castingAbility || this.currentIsOneShot || this.hitCooldown > 0) return;
+    if (this.deadLock || this.castingAbility || this.currentIsOneShot || this.hitCooldown > 0)
+      return;
     const clips = this.def.clips.hit;
     if (!clips || clips.length === 0) return;
     this.hitCooldown = HIT_REACT_COOLDOWN;
@@ -3528,14 +3544,20 @@ export class CharacterVisual {
         // every other weapon keeps the rig's authored cast.
         return (
           this.action(weaponSkinCastClip(this.weaponSkinId, this.castingAbility) ?? undefined) ??
-          this.action(this.castingAbility ? 'Signature_Channel_' + this.castingAbility : undefined) ??
+          this.action(
+            this.castingAbility ? 'Signature_Channel_' + this.castingAbility : undefined,
+          ) ??
           this.action(this.castingAbility ? signatureHoldName(this.castingAbility) : undefined) ??
           this.action(this.castingAbility ? c.castByAbility?.[this.castingAbility] : undefined) ??
           this.action(c.cast) ??
           this.action(c.idle)
         );
       case 'spin':
-        return this.action(c.attack[0]) ?? this.action(c.idle);
+        return (
+          this.action(this.castingAbility ? c.castByAbility?.[this.castingAbility] : undefined) ??
+          this.action(c.attack[0]) ??
+          this.action(c.idle)
+        );
       case 'swim':
         return this.action(c.swim) ?? this.action(c.idle);
       case 'swimSurface':

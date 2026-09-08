@@ -1356,6 +1356,8 @@ export const VISUALS: Record<string, VisualDef> = {
         twohand: '2H_Melee_Attack_Chop',
         dualwield: 'Dualwield_Melee_Attack_Chop',
       },
+      castByAbility: { bladestorm: 'Warrior_Bladestorm_Loop' },
+      castTimeScaleByAbility: { bladestorm: 1 },
       attackByAbility: {
         mortal_strike: 'Warrior_Maiming_Strike',
         execute: 'Warrior_Early_Grave',
@@ -1367,10 +1369,8 @@ export const VISUALS: Record<string, VisualDef> = {
         shield_slam: 'Warrior_Shieldcrack',
         raging_gale: 'Fury_Twinstrike',
         bloodthirst: 'Warrior_Bloodletting',
-        // Reaping Arc and Revenge hit everything in the frontal arc: the
-        // synthesized flat reap (scripts/_add_sweep_slice_anim.mjs), not the
-        // top-to-bottom chop (owner: "sideways sword sweep").
-        cleave: '1H_Melee_Attack_Slice_Horizontal',
+        // Reaping Arc turns through all surrounding enemies; Revenge is frontal.
+        cleave: 'Warrior_Reaping_Arc',
         revenge: '1H_Melee_Attack_Slice_Horizontal',
         thunder_clap: '1H_Melee_Attack_Chop',
         faultline: '1H_Melee_Attack_Chop',

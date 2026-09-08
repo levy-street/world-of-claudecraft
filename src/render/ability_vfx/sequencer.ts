@@ -532,6 +532,7 @@ export class ArchetypeSequencer {
     windupDelay = 0,
     at?: { x: number; y: number; z: number },
     componentOutcome?: 0 | 1 | 2,
+    recipientOnly = false,
   ): SeqSlot | null {
     if (tier >= 2 || spec.presentation) return null;
     // One simulation cast can emit several damage components or hit several
@@ -563,6 +564,9 @@ export class ArchetypeSequencer {
     let slot = this.slots.find((s) => !s.active) ?? null;
     if (!slot) {
       for (const cand of this.slots) {
+        // Recipient decoration cannot evict a cast before its main contact.
+        // At saturation shed an older recipient/linger, or decline this one.
+        if (recipientOnly && !cand.physicalSecondary && !cand.impactDone) continue;
         if (!slot || cand.t > slot.t) slot = cand;
       }
     }
@@ -570,7 +574,7 @@ export class ArchetypeSequencer {
     slot.active = true;
     slot.componentOutcomes = componentOutcome;
     slot.componentCount = componentOutcome === undefined ? undefined : 1;
-    slot.physicalSecondary = !!physicalPrimary;
+    slot.physicalSecondary = recipientOnly || !!physicalPrimary;
     slot.abilityId = abilityId;
     slot.casterId = casterId;
     const origin = host.anchorOf(casterId, 0.5);

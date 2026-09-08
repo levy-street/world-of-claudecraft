@@ -2,6 +2,7 @@ import { clearFuryAudioClaim, isMeleeAudioId } from '../../fury_audio_core';
 import { DAMAGE_CAST_RELEASES } from '../characters/cast_performance';
 import { isBleedContinuation, meleeImpactProfile } from '../melee_impact_core';
 import { SIGNATURE_ABILITIES } from './signature_core';
+import { drawWarriorAreaContact, drawWarriorStormPulse } from './warrior_area';
 import { WARRIOR_BLADE_STYLES } from './warrior_blades';
 // Thin painter for the per-ability spell VFX system: resolves an event's
 // ability id against the authored spec table (ability_vfx_specs.ts), asks the
@@ -752,7 +753,8 @@ export class AbilityVfx {
         break;
       }
       case 'nova': {
-        if (tier < 2 && full) {
+        const sequenceTier = ability === 'cleave' && tier === 2 ? 1 : tier;
+        if (sequenceTier < 2 && full) {
           const delay = this.windupDelayFor(ability, full, ev.sourceId);
           // a staged release carries the boom itself: firing the pooled nova
           // now would double the read half a windup early
@@ -760,7 +762,15 @@ export class AbilityVfx {
             this.deps.vfx.nova(ev.targetId, ev.school, plan.color);
             this.spawned++;
           }
-          fx.sequenceInstant(ability, full, ev.sourceId, ev.targetId, plan.color, tier, delay);
+          fx.sequenceInstant(
+            ability,
+            full,
+            ev.sourceId,
+            ev.targetId,
+            plan.color,
+            sequenceTier,
+            delay,
+          );
         } else if (!(full?.physical || full?.ritual)) {
           this.deps.vfx.nova(ev.targetId, ev.school, plan.color);
           this.spawned++;
@@ -1003,6 +1013,16 @@ export class AbilityVfx {
       this.recordStat(ev.ability, true);
       return true;
     }
+    if (ev.ability === 'bladestorm') {
+      const tier = this.biasFor(casterId, this.budget.peek(casterId, nowSec));
+      this.spawned = drawWarriorStormPulse(fx, ev.x, ev.z, ev.radius ?? 6, tier);
+      this.deps.abilityAudio?.('impact', 'physical', 1.35, ev.x, gy, ev.z, {
+        abilityId: 'bladestorm',
+        lite: tier > 0,
+      });
+      this.recordStat('bladestorm', true);
+      return true;
+    }
     if (ev.fx === 'tick') {
       // Zone-pulse re-hits ride the accent window, never the cast budget: a
       // 6s earthquake must not starve its caster's next cast.
@@ -1165,6 +1185,26 @@ export class AbilityVfx {
     if (ev.abilityId && DAMAGE_CAST_RELEASES.has(ev.abilityId))
       this.releaseGesture(ev.sourceId, ev.abilityId);
     const compoundId = attackAbilityId(ev.ability);
+    if (compoundId === 'bladestorm' || compoundId === 'cleave') {
+      const tier = this.biasFor(ev.sourceId, this.budget.peek(ev.sourceId, this.now()));
+      const outcome = ev.kind === 'hit' ? (ev.amount > 0 ? 1 : (ev.absorbed ?? 0) > 0 ? 2 : 0) : 0;
+      if (compoundId === 'cleave') {
+        if (!outcome) return true;
+        const full = abilityVfxFullSpecFor('cleave');
+        return (
+          !!full &&
+          this.deps.fx.sequenceWarriorAreaContact(full, ev.sourceId, ev.targetId, tier, outcome)
+        );
+      }
+      return drawWarriorAreaContact(
+        this.deps.fx,
+        compoundId,
+        ev.sourceId,
+        ev.targetId,
+        outcome,
+        tier,
+      );
+    }
     if (
       isMeleeAudioId(compoundId) &&
       compoundId !== 'raging_gale' &&
@@ -1431,6 +1471,12 @@ export class AbilityVfx {
     let glowColor = 0;
     let glowStrength = 0;
     let glowSlow = false;
+    if (
+      e.castingAbility === 'bladestorm' &&
+      e.castRemaining > 0 &&
+      !isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 })
+    )
+      fx.holdWarriorStorm?.(e.id, Math.max(0, e.castTotal - e.castRemaining));
     if (e.castingAbility) {
       const spec = abilityVfxSpecFor(e.castingAbility);
       if (spec) {

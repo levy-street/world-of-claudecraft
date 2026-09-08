@@ -28,6 +28,7 @@ import { FuryAudioQueue } from './fury_audio';
 import { abilityVfxTextures, OVERLAY_CELL } from './fx_textures';
 import { GroundAuras } from './ground_auras';
 import { HeldConduction } from './held_conduction';
+import { HeldWarriorStorm } from './held_warrior_storm';
 import { OverlaySprites } from './overlay_sprites';
 import { LightPillars } from './pillars';
 import type { BakedKind, FragmentKind } from './production_assets';
@@ -510,7 +511,36 @@ export class AbilityVfxFx implements SequencerHost {
   private readonly furyAudio = new FuryAudioQueue();
   private disposed = false;
   private heldConduction = new HeldConduction();
+  private heldWarriorStorm = new HeldWarriorStorm();
+  private warriorStorms = new Map<
+    number,
+    { stamp: number; elapsed: number; nextDust: number; surface: boolean }
+  >();
+  private drawPriorityStorms = (): void => {
+    for (const [id, storm] of this.warriorStorms) {
+      if (storm.surface) continue;
+      const at = this.anchor(id, 0, anchorScratchA);
+      if (at)
+        this.heldWarriorStorm.drawPrimary(
+          this.ribbons,
+          at,
+          storm.elapsed,
+          this.reducedMotionActive,
+        );
+    }
+  };
   private drawHeldConduction = (): void => {
+    for (const [id, storm] of this.warriorStorms) {
+      const at = this.anchor(id, 0, anchorScratchA);
+      if (at)
+        this.heldWarriorStorm.draw(
+          this.ribbons,
+          this.overlay,
+          at,
+          storm.elapsed,
+          this.reducedMotionActive,
+        );
+    }
     for (const [id, bands] of this.orbits) {
       for (const band of bands) {
         if (
@@ -806,6 +836,32 @@ export class AbilityVfxFx implements SequencerHost {
         screenFxStrengthOf(spec),
       );
     }
+  }
+
+  sequenceWarriorAreaContact(
+    spec: AbilityVfxFullSpec,
+    casterId: number,
+    targetId: number,
+    tier: number,
+    outcome: 0 | 1 | 2,
+  ): boolean {
+    if (this.disposed) return false;
+    this.sequencer.start(
+      this,
+      'cleave',
+      spec,
+      casterId,
+      targetId,
+      0xeac6a4,
+      Math.min(1, tier),
+      false,
+      0,
+      undefined,
+      outcome,
+      true,
+    );
+    // Saturation may shed this recipient, but must not play an early generic hit.
+    return true;
   }
 
   cancelSequence(casterId: number, abilityId: string): void {
@@ -1315,6 +1371,8 @@ export class AbilityVfxFx implements SequencerHost {
   sleepEntity(entityId: number): void {
     if (this.disposed) return;
     this.controlSignals.sleep(entityId);
+    this.warriorStorms.delete(entityId);
+    this.crests.releaseHeld(entityId);
     this.ccBands.delete(entityId);
     this.windups.delete(entityId);
     const bands = this.orbits.get(entityId);
@@ -2023,6 +2081,20 @@ export class AbilityVfxFx implements SequencerHost {
   holdQueuedWeapon(entityId: number, colorHex: number, tier = 0): boolean {
     return this.orbit(entityId, 'weaponGlow', colorHex, QUEUED_WEAPON_DNA, tier);
   }
+  holdWarriorStorm(entityId: number, elapsed: number): void {
+    if (this.disposed || !Number.isFinite(elapsed)) return;
+    const current = this.warriorStorms.get(entityId);
+    if (current) {
+      current.stamp = this.frame;
+      current.elapsed = elapsed;
+    } else if (this.warriorStorms.size < 8)
+      this.warriorStorms.set(entityId, {
+        stamp: this.frame,
+        elapsed,
+        nextDust: elapsed,
+        surface: false,
+      });
+  }
 
   /** Redhand's live empowerment count, separate from an armed next-swing cue. */
   holdBladeCharges(entityId: number, stacks: number): boolean {
@@ -2121,6 +2193,34 @@ export class AbilityVfxFx implements SequencerHost {
     // anything spawns into it. The shock rings deliberately do NOT thin: their
     // footprints are too wide for an interpolated drape to stay honest.
     this.decals.setCameraPosition(camPosScratch.x, camPosScratch.z);
+    for (const [id, storm] of this.warriorStorms) {
+      const at = storm.stamp === this.frame ? this.anchor(id, 0, anchorScratchA) : null;
+      if (!at) {
+        this.warriorStorms.delete(id);
+        this.crests.releaseHeld(id);
+        continue;
+      }
+      storm.surface = this.crests.holdStorm(id, at.x, at.y, at.z, storm.elapsed);
+      if (!reducedMotion && this.qualityLevel > 0.55 && storm.elapsed >= storm.nextDust) {
+        storm.nextDust = storm.elapsed + 0.14;
+        const angle = storm.elapsed * 14,
+          x = at.x + Math.sin(angle) * 3.2,
+          z = at.z + Math.cos(angle) * 3.2;
+        this.bakedAt(
+          'smoke',
+          x,
+          this.groundY(x, z) + 0.25,
+          z,
+          1.8,
+          0x7d8b94,
+          0xa9b4ba,
+          0.4,
+          0,
+          0,
+          angle,
+        );
+      }
+    }
     this.crests.update(dt, reducedMotion);
     this.overlay.beginFrame();
     this.controlSignals.update(dt, this.anchor);
@@ -2192,7 +2292,13 @@ export class AbilityVfxFx implements SequencerHost {
     this.furyAudio.update(this, dt);
     // Pack after the sequence emits this frame's contacts, so the visible
     // wound and native weapon contact share one frame. Advance each pool once.
-    this.ribbons.update(dt, camPosScratch, reducedMotion, this.drawHeldConduction);
+    this.ribbons.update(
+      dt,
+      camPosScratch,
+      reducedMotion,
+      this.drawHeldConduction,
+      this.drawPriorityStorms,
+    );
     this.water.update(dt, reducedMotion);
     this.details.update(dt, this.camera.quaternion, reducedMotion);
     this.forms.update(dt, reducedMotion);
@@ -2238,6 +2344,7 @@ export class AbilityVfxFx implements SequencerHost {
   }
 
   clear(): void {
+    this.warriorStorms.clear();
     this.furyAudio.clear();
     this.ribbons.clear();
     this.water.clear();

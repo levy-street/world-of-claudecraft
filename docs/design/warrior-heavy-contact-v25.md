@@ -71,8 +71,13 @@ checks are not presented as an auditory quality review.
 
 ## Matching visual evidence
 
-The six-setting matrix completed 36 real casts and 216 stills with the expected
-positive-hit counts and no page/cast/context errors. The focused native,
+The original matrix requested values 0 through 5 and completed 36 real casts
+and 216 stills with the expected positive-hit counts and no page/cast/context
+errors. A later review found that Low is 1 and Insane is 6, so this original
+matrix missed Insane. The 9 September backfill verifies resolved Insane before
+and after nine real Warrior casts, including all six attacks below and
+Shieldcrack, with 54 stills and no errors. Its retained report is
+`studio-contact-pass/warrior-insane-backfill-final-1/report.json`. The focused native,
 material, routing and audio suites pass 165 tests in 15 files. Five additional
 integration suites pass after updating the exact catalogue and two-wake
 composition expectations; their 122 tests cover the sound manifest/runtime

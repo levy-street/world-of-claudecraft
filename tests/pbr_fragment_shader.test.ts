@@ -55,10 +55,14 @@ describe('PBR point-light fragment pruning', () => {
   it('installs from graphics initialization before the renderer can compile or render', () => {
     const gfx = readFileSync(new URL('../src/render/gfx.ts', import.meta.url), 'utf8');
     const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const worldRenderer = readFileSync(
+      new URL('../src/render/world_renderer.ts', import.meta.url),
+      'utf8',
+    );
     const init = gfx.indexOf('export function initGfxTier');
     const install = gfx.indexOf('installPbrPointLightShaderPruning();', init);
     const probe = gfx.indexOf('const hints =', init);
-    const rendererCreated = renderer.indexOf('this.webgl = new THREE.WebGLRenderer');
+    const rendererCreated = renderer.indexOf('this.webgl = createWorldRenderer');
     const rendererInit = renderer.indexOf('initGfxTier(this.webgl)', rendererCreated);
     const firstCompile = renderer.indexOf('this.webgl.compile', rendererCreated);
     const firstRender = renderer.indexOf('this.webgl.render', rendererCreated);
@@ -70,6 +74,9 @@ describe('PBR point-light fragment pruning', () => {
     expect(rendererInit).toBeGreaterThan(rendererCreated);
     expect(firstCompile).toBeGreaterThan(rendererInit);
     expect(firstRender).toBeGreaterThan(rendererInit);
+    expect(worldRenderer).toContain('new THREE.WebGLRenderer');
+    expect(worldRenderer).not.toContain('.compile(');
+    expect(worldRenderer).not.toContain('.render(');
   });
 });
 

@@ -43,8 +43,13 @@ is pending because this environment cannot listen to audio input.
 
 ## Evidence and remaining review
 
-The builder matrix has 12 real casts and 72 stills across all six graphics
-presets, with one positive hit per cast and no page, cast or context errors.
+The builder matrix has 12 real casts and 72 stills across requested preset
+values 0 through 5, with one positive hit per cast and no page, cast or context
+errors. Review found that these are not all six supported settings: Low is 1
+and Insane is 6. The original matrix missed Insane. The 9 September backfill
+now verifies the resolved Insane profile before and after nine real Warrior
+casts, including both builders, with 54 stills and no errors. Its retained
+report is `studio-contact-pass/warrior-insane-backfill-final-1/report.json`.
 Matching images use preset 4, yaw 1.9, pitch 0.4, camera distance 18 and tick 4.
 
 | Ability | Before | Current development |

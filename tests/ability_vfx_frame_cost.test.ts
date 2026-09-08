@@ -229,6 +229,99 @@ describe('queued physical weapon readiness', () => {
 });
 
 describe('ability VFX steady-state frame cost', () => {
+  it('protects all eight cold storm silhouettes through a full transient pool', () => {
+    installCanvasStub();
+    const anchor = (id: number, frac: number, out?: THREE.Vector3) => {
+      if (!out) throw new Error('Cold held storm allocated an anchor');
+      return out.set(id * 20, frac * 2, 0);
+    };
+    const fx = new AbilityVfxFx(new THREE.Scene(), new THREE.PerspectiveCamera(), anchor, () => 0);
+    const probe = fx as unknown as {
+      ribbons: { geo: THREE.BufferGeometry };
+      warriorStorms: Map<number, unknown>;
+    };
+    try {
+      for (let id = 0; id < 9; id++) fx.holdWarriorStorm(id, 0.7);
+      expect(probe.warriorStorms.size).toBe(8);
+      for (let i = 0; i < 24; i++)
+        fx.pathRibbon(0xff0000, 0.2, 1, (points) => {
+          points.forEach((p, index) => {
+            p.set(-100 + index, 1, i);
+          });
+          return points.length;
+        });
+      fx.update(0.016);
+      const pos = probe.ribbons.geo.getAttribute('position');
+      // Each protected caster writes 3 blades *22 points *2 ribbon vertices.
+      for (let id = 0; id < 8; id++)
+        for (let vertex = id * 132; vertex < (id + 1) * 132; vertex++) {
+          expect(Math.abs(pos.getX(vertex) - id * 20)).toBeLessThan(7);
+          expect(pos.getY(vertex)).toBeGreaterThan(0);
+        }
+      expect(probe.ribbons.geo.drawRange.count).toBeGreaterThanOrEqual(8 * 3 * 21 * 6);
+    } finally {
+      fx.dispose();
+    }
+  });
+  it('keeps the live storm on a moving caster until its state ends, including reduced motion', async () => {
+    installCanvasStub();
+    let x = 0,
+      present = true;
+    const anchor = (_id: number, frac: number, out?: THREE.Vector3) => {
+      if (!out) throw new Error('Held storm allocated an anchor');
+      return present ? out.set(x, frac * 2, 0) : null;
+    };
+    const fx = new AbilityVfxFx(new THREE.Scene(), new THREE.PerspectiveCamera(), anchor, () => 0);
+    const probe = fx as unknown as {
+      crests: SignatureCrests;
+      ribbons: { geo: THREE.BufferGeometry };
+    };
+    const slots = (
+      probe.crests as unknown as {
+        slots: Array<{ active: boolean; heldId: number | null; mesh: THREE.Mesh }>;
+      }
+    ).slots;
+    const programs = new Map([
+      ['one', { isReady: () => true, getUniforms() {}, getAttributes() {} }],
+    ]);
+    try {
+      for (const unit of probe.crests.preparation.units(
+        { properties: { get: () => ({ programs }) }, compile: async () => {}, draw() {} },
+        ['steel_storm'],
+      ))
+        await unit.run();
+      for (let frame = 0; frame < 180; frame++) {
+        x = frame * 0.03;
+        fx.holdWarriorStorm(7, frame / 60);
+        fx.update(1 / 60, frame > 120);
+        const live = slots.filter((s) => s.active && s.heldId === 7);
+        expect(live).toHaveLength(1);
+        expect(live[0].mesh.position.x).toBe(x);
+        expect(live[0].mesh.visible).toBe(true);
+        if (frame > 120) expect(live[0].mesh.rotation.y).toBe(0);
+        expect(probe.ribbons.geo.drawRange.count).toBeGreaterThan(0);
+      }
+      fx.update(1 / 60);
+      expect(slots.filter((s) => s.active)).toHaveLength(0);
+      expect(probe.ribbons.geo.drawRange.count).toBe(0);
+      fx.holdWarriorStorm(7, 0);
+      fx.update(1 / 60);
+      present = false;
+      fx.holdWarriorStorm(7, 0.1);
+      fx.update(1 / 60);
+      expect(slots.filter((s) => s.active)).toHaveLength(0);
+      expect(probe.ribbons.geo.drawRange.count).toBe(0);
+      present = true;
+      fx.holdWarriorStorm(7, 0);
+      fx.update(1 / 60);
+      fx.sleepEntity(7);
+      expect(slots.filter((s) => s.active)).toHaveLength(0);
+      fx.update(1 / 60);
+      expect(probe.ribbons.geo.drawRange.count).toBe(0);
+    } finally {
+      fx.dispose();
+    }
+  });
   it('keeps defensive charges distinct beside mastery and clears held geometry on aura loss', () => {
     installCanvasStub();
     const scene = new THREE.Scene();

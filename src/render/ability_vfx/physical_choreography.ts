@@ -9,6 +9,7 @@ import {
 } from './physical_choreography_core';
 import { physicalContact } from './physical_contact';
 import type { SeqSlot, SequencerHost } from './sequencer';
+import { drawReapingArc, drawWarriorAreaContact } from './warrior_area';
 import { drawWarriorBlade } from './warrior_blades';
 import { drawWarriorShield } from './warrior_shield';
 import { drawWarriorShout } from './warrior_shouts';
@@ -113,6 +114,16 @@ export function physicalRelease(host: SequencerHost, slot: SeqSlot): void {
 
 export function physicalImpact(host: SequencerHost, slot: SeqSlot): void {
   const p = slot.spec.physical!;
+  if (slot.physicalSecondary && slot.abilityId === 'cleave') {
+    const outcome = (slot.componentOutcomes === undefined ? 1 : slot.componentOutcomes & 3) as
+      | 0
+      | 1
+      | 2;
+    drawWarriorAreaContact(host, 'cleave', slot.casterId, slot.targetId, outcome, slot.tier);
+    slot.lingerUntil = slot.t + 0.21;
+    slot.motifLoops = p.beats.length;
+    return;
+  }
   if (slot.physicalSecondary && drawWarriorShout(host, slot, 0)) {
     slot.lingerUntil = slot.t;
     slot.motifLoops = p.beats.length;
@@ -177,6 +188,7 @@ function physicalBeat(host: SequencerHost, slot: SeqSlot, beat: number): void {
   if (furyBeat(host, slot, beat)) return;
   if (drawWarriorShield(host, slot, beat)) return;
   if (drawWarriorBlade(host, slot, beat)) return;
+  if (drawReapingArc(host, slot, beat)) return;
   const authored = slot.spec.physical!;
   const p =
     authored.shape === 'rush' || authored.shape === 'retreat'

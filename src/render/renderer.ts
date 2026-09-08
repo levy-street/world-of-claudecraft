@@ -772,6 +772,7 @@ import { weaponVfxShedScale } from './weapon_vfx_shed_core';
 import { Weather } from './weather';
 import { precipForBiome } from './weather_field_core';
 import { buildWorldAmbientSources, footstepSurfaceAt } from './world_audio';
+import { createWorldRenderer } from './world_renderer';
 import { surfaceDetailPrewarmTextures } from './worn_stone';
 import { buildYumiMaze, type YumiMazeView } from './yumi_maze';
 import { YumiTeamMarkers } from './yumi_team_markers';
@@ -2073,22 +2074,7 @@ export class Renderer {
     this.scene.updateMatrix();
     this.scene.matrixAutoUpdate = false;
     this.ambientPointSources = this.studioEnvironment ? [] : buildWorldAmbientSources(this.sim.cfg.seed);
-    // No default-framebuffer MSAA on any tier: high/ultra get AA from the
-    // composer's MSAA HalfFloat target, low is meant to run without AA, and
-    // requesting it here would hit software GL (the autodetect can only run
-    // after the context exists) with the most expensive setting there is.
-    this.webgl = new THREE.WebGLRenderer({
-      canvas,
-      context: options.context,
-      antialias: false,
-      powerPreference: 'high-performance',
-    });
-    if (!this.webgl.capabilities.isWebGL2) {
-      throw new Error('Renderer requires WebGL2');
-    }
-    if (options.context && this.webgl.getContext() !== options.context) {
-      throw new Error('Three replaced the supplied WebGL2 context');
-    }
+    this.webgl = createWorldRenderer(canvas, options.context);
     // Release this context promptly on page teardown so repeated logout/login
     // reloads (location.reload) don't exhaust the browser's WebGL context pool.
     this.unregisterWebGLContext = trackWebGLContext(this.webgl);
@@ -8966,7 +8952,7 @@ export class Renderer {
     const visual = v ? this.activeVisual(v) : null;
     if (!visual) return;
     this.attackTriggerCount++;
-    if (isSpinAttackAbility(abilityId)) visual.playWhirl();
+    if (isSpinAttackAbility(abilityId)) visual.playWhirl(abilityId);
     else visual.playAttack(abilityId);
   }
 
