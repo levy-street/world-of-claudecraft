@@ -489,18 +489,29 @@ player acts on, but the tree one deserves its reasoning written down rather than
   surviving leaf fragment, 0 below ultra, 3 on ultra (the AO half), 6 on insane. Fragment shading
   only, no displacement and no silhouette change, so it cannot move what a canopy occludes.
 
-### Zone-feature dressing sheds by apparent size on the far-vista arm (2026-09-08)
+### Zone-feature dressing sheds by apparent size, on every profile (2026-09-08)
 
 The bespoke biome dressing (the Willowfen's lily rafts, reeds, mushroom and log
-patches) is culled per registered group against the fog on the classic arm and against
-the detail horizon (700 to 850 yd) on the far-vista arm, where the scene fog is parked
-past 924 yd, so a 6,000-triangle raft five yards across was drawn at 500 yd as a blob a
-few pixels wide. The sweep (`src/render/zone_feature_sweep.ts` over
+patches) is culled per registered group against the session's cull distance, and on
+several profiles that distance is far enough to draw clutter nobody can resolve: the
+far-vista arm culls at the detail horizon (700 to 850 yd) with the scene fog parked past
+924, and the constrained-memory profiles run the classic arm with a fog that eases out
+to 700 yd. On both, a 6,000-triangle raft five yards across was drawn at 500 yd as a
+blob a few pixels wide. The sweep (`src/render/zone_feature_sweep.ts` over
 `zone_feature_visibility_core.ts`) now also sheds a DRESSING group once its largest
 instance would span under `ZONE_FEATURE_MIN_APPARENT_PX` (8) at a fixed reference view
 (720 px tall, the 60 degree base FOV), with a 10 percent hysteresis band. The reach is
 derived from the group's real instance size, never a per-family distance table, so a
 one-off giant model keeps its whole group to the horizon with nothing written anywhere.
+
+It applies on EVERY profile, not only where the far vista runs, and the cull distance
+still applies on top, so the stricter of the two decides. At low (fog 340 yd) the fog is
+stricter for the lily rafts, whose reach is 406 yd, and the reach is stricter for the
+reeds, mushrooms and logs, whose shipped models put theirs at 224 to 287 yd. Gating it
+to the far-vista arm was the first shape and it was wrong: measured on an Iris Xe at
+medium under the constrained-memory profile, the cells without the reach cost 19 draws
+in the Eastbrook view for 2 percent fewer triangles, where the reach turns the same view
+into 1 draw and 91,152 triangles against 5 and 2,335,276.
 
 Why it is fair: the families it applies to carry no collider and no interaction (the
 Willowfen's collider family, the willows, is never sized and keeps the distance rule

@@ -10,9 +10,10 @@
 // cull group per (family, cell), so the renderer's zone-feature sweep can hide
 // the cells the fog has swallowed instead of the whole zone at once: as one
 // mesh per family the fen's footprint edge sat inside the low fog from
-// Eastbrook and 1.49M fully fogged triangles were submitted every frame. On
-// the far-vista arm the dressing cells also carry their apparent-size reach
-// and the willows stay one whole group (fenFeaturesBuildOptions).
+// Eastbrook and 1.49M fully fogged triangles were submitted every frame. The
+// dressing cells carry their apparent-size reach on every profile, and the
+// willows stay one whole group where the far vista runs
+// (fenFeaturesBuildOptions).
 import * as THREE from 'three';
 import { WILLOWFEN_PROPS, WILLOWFEN_ZONE } from '../sim/content/willowfen';
 import { fenWillowSpots } from '../sim/fen_willows';
@@ -51,30 +52,43 @@ export interface FenFeaturesBuildOptions {
    *  are never shed by size. */
   colliderFamiliesWhole: boolean;
   /** Give every dressing cell its apparent-size reach (the sweep sheds a
-   *  cell once its largest instance is below the pixel threshold). The
-   *  far-vista arm's lever: there the cull distance is the detail horizon
-   *  and nothing else hides a 6-pixel raft at 500 yd. Never on the classic
-   *  arm, whose fog already owns the far end, so low stays byte-identical. */
+   *  cell once its largest instance is below the pixel threshold). On every
+   *  profile: the reach and the cull distance are ANDed, so the stricter of
+   *  the two decides, and a session whose cull distance is short simply
+   *  never reaches its own reach. */
   apparentSizeReach: boolean;
 }
 
-/** The live build options. The arm is farFieldPolicy's one decision, the
- *  same read as the renderer's vista arm. Classic (fogged) arm, which the
- *  lean medium session and every constrained-memory profile run like low:
- *  cells for every family, the fog sheds them. Far-vista arm: cells for the
- *  dressing with the apparent-size reach (the only thing that hides a
- *  6-pixel raft at 500 yd there), the willows whole. `?fencells=off` builds
- *  today's whole layout on any session (both arms of one build for the
- *  scene census). */
+/** The live build options: cells for every family with their reach, on every
+ *  profile.
+ *
+ *  The reach was once gated to the far-vista arm, on the premise that the
+ *  classic arm's fog owns the far end. That premise is false for the
+ *  constrained-memory profiles (phone class, and any touch device in a window
+ *  under 760 px tall): they run the classic arm with a fog that eases out to
+ *  700 yd, so the fen sits INSIDE it, the cells shed nothing, and the split
+ *  cost 19 draws for 2 percent fewer triangles (measured on an Iris Xe at
+ *  medium, both arms of one build, 2026-09-08). Applying the reach everywhere
+ *  fixes that cohort and removes the arm decision from this build: the reach
+ *  can only ever hide and the cull distance still applies on top, so the
+ *  stricter of the two decides: at low (fog 340) the fog is stricter for the
+ *  lily rafts, whose reach is 406, and the reach is stricter for the reeds,
+ *  mushrooms and logs, whose models put theirs at 224 to 287.
+ *
+ *  The willows stay whole where the far vista runs: they are the collider
+ *  family, never shed by size, and splitting them there adds draws in the
+ *  idle town view for no triangle.
+ *
+ *  `?fencells=off` builds today's whole layout on any session (both arms of
+ *  one build for the scene census). */
 export function fenFeaturesBuildOptions(): FenFeaturesBuildOptions {
   if (renderLayerDisabled('fencells')) {
     return { cellSize: 0, colliderFamiliesWhole: true, apparentSizeReach: false };
   }
-  const vista = farFieldPolicy(GFX.vistaTier, GFX).vista.enabled;
   return {
     cellSize: ZONE_FEATURE_CELL_SIZE,
-    colliderFamiliesWhole: vista,
-    apparentSizeReach: vista,
+    colliderFamiliesWhole: farFieldPolicy(GFX.vistaTier, GFX).vista.enabled,
+    apparentSizeReach: true,
   };
 }
 

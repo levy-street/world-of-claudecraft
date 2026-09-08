@@ -161,13 +161,17 @@ export function hasUnseededInstanceMatrix(array: ArrayLike<number>, count: numbe
 // The apparent-size reach: how far a feature cull group may sit before its
 // LARGEST instance is too small on screen to be worth its draw.
 //
-// WHY THIS EXISTS. On the far-vista arm zone features cull at the detail
-// horizon (700 to 850 yd) and the scene fog is parked past 924 yd, so a
-// 6,000-triangle lily raft five yards across is drawn at 500 yd as a 6-pixel
-// blob, and the Willowfen's four clutter families were 1.67M of the 2.34M fen
-// triangles submitted from Eastbrook at medium. The props layer draws a far
-// bake at that distance and foliage draws impostors; the bespoke dressing had
-// no far representation at all. The rule below is size-driven, never a
+// WHY THIS EXISTS. A zone feature is culled against the session's cull
+// distance, and on several profiles that distance is far enough to draw
+// clutter nobody can resolve: the far-vista arm culls at the detail horizon
+// (700 to 850 yd) with the scene fog parked past 924, and the constrained
+// memory profiles run the classic arm with a fog that eases out to 700. On
+// both, a 6,000-triangle lily raft five yards across is drawn at 500 yd as a
+// 6-pixel blob, and the Willowfen's four clutter families were 1.67M of the
+// 2.34M fen triangles submitted from Eastbrook at medium. The props layer
+// draws a far bake at that distance and foliage draws impostors; the bespoke
+// dressing had no far representation at all. The rule below is size-driven,
+// never a
 // per-family table: a group's reach is the distance at which its largest
 // instance spans ZONE_FEATURE_MIN_APPARENT_PX at a fixed reference view (720
 // px tall, the 60 degree base FOV), so a giant one-off model pulls its whole

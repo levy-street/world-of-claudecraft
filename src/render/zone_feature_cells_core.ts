@@ -17,10 +17,11 @@
 // origin parameter on purpose: one parameter, deterministic, and reusable by
 // every zone-feature module (farshore, gale) without a per-zone rectangle.
 // A non-positive size means "one cell": the caller's way of building the
-// pre-split layout (the `?fencells=off` census arm). On the far-vista arm the
-// cull distance is the detail horizon (700 to 850 yd) and no fen cell lies
-// beyond it from Eastbrook, so cells alone buy nothing there; the
-// apparent-size reach (zone_feature_visibility_core.ts) is what sheds them.
+// pre-split layout (the `?fencells=off` census arm). Cells alone only pay
+// where the session's cull distance falls inside the feature's own spread
+// (the classic arm's 340 yd fog at low does); where it does not, the
+// apparent-size reach (zone_feature_visibility_core.ts) is what sheds them,
+// which is why a consumer applies both to its dressing.
 //
 // Pure core contract: no three import, no DOM, no clocks, no randomness.
 // Registered in RENDER_PURE_CORES (tests/architecture.test.ts); tested by

@@ -122,7 +122,7 @@ function positionsOf(root: THREE.Object3D): string[] {
 const CLASSIC_ARM = {
   cellSize: ZONE_FEATURE_CELL_SIZE,
   colliderFamiliesWhole: false,
-  apparentSizeReach: false,
+  apparentSizeReach: true,
 };
 const VISTA_ARM = {
   cellSize: ZONE_FEATURE_CELL_SIZE,
@@ -286,6 +286,11 @@ describe('fen features per-cell cull groups', () => {
     expect(farField.calls.at(-1)).toEqual([GFX.vistaTier, GFX]);
     farField.vistaEnabled = true;
     expect(fenFeaturesBuildOptions()).toEqual(VISTA_ARM);
+    // The reach is NOT an arm decision: it is on wherever cells are built,
+    // because the classic arm's fog does not own the far end on every
+    // profile (constrained memory eases it out to 700 yd).
+    expect(CLASSIC_ARM.apparentSizeReach).toBe(true);
+    expect(VISTA_ARM.apparentSizeReach).toBe(true);
     // render_dev_flags reads location once at module load, so the dev arm is
     // exercised on a fresh module graph (the render_dev_flags test's idiom).
     vi.resetModules();
@@ -338,8 +343,15 @@ describe('fen features per-cell cull groups', () => {
         2,
       );
     }
-    // the classic arm sizes nothing: its fog owns the far end
-    for (const g of cells.cullGroups) expect(g.userData[ZONE_FEATURE_EXTENT_KEY]).toBeUndefined();
+    // The classic arm sizes its dressing the same way: the reach applies on
+    // every profile (a constrained-memory session runs the classic arm with a
+    // fog that eases to 700 yd, where the cells alone shed nothing), and the
+    // cull distance still applies on top.
+    for (const g of cells.cullGroups) {
+      const sized = g.userData[ZONE_FEATURE_EXTENT_KEY];
+      if (familyOf(g) === TWO_PART_FAMILY) expect(sized).toBeUndefined();
+      else expect(typeof sized).toBe('number');
+    }
     // and the real sweep over the vista build from the town camera at the
     // vista cull distance: each dressing cell follows its own reach, the
     // willows (no reach) stay, and at least one dressing cell is shed
