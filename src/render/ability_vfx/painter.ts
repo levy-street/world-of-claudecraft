@@ -4,9 +4,11 @@ import {
   isMeleeAudioId,
   WARRIOR_GUARD_AUDIO,
   WARRIOR_POWER_AUDIO,
+  WARRIOR_UTILITY_AUDIO,
 } from '../../fury_audio_core';
 import { DAMAGE_CAST_RELEASES } from '../characters/cast_performance';
 import { isBleedContinuation, meleeImpactProfile } from '../melee_impact_core';
+import { warriorFuryStateKind } from '../warrior_fury_state_core';
 import { warriorPowerIntent, warriorPowerKind } from '../warrior_power_core';
 import { SIGNATURE_ABILITIES } from './signature_core';
 import {
@@ -14,6 +16,7 @@ import {
   drawWarriorStormPulse,
   isWarriorAreaInstant,
 } from './warrior_area';
+import { warriorAttentionSource } from './warrior_attention_core';
 import { WARRIOR_BLADE_STYLES } from './warrior_blades';
 import { warriorGuardKind } from './warrior_guard_plates';
 // Thin painter for the per-ability spell VFX system: resolves an event's
@@ -120,6 +123,7 @@ export interface AbilityVfxDeps {
   isMidOneShot?: (entityId: number) => boolean;
   // The local player's entity id (cast-acknowledgment gestures).
   localPlayerId?: () => number;
+  isLivingWarrior?: (entityId: number) => boolean;
   warriorSpecOf?: (entityId: number) => string | null;
   visualVariantOf?: (abilityId: string, casterId: number) => string;
   // True when the entity's rig authors a per-ability one-shot clip
@@ -210,6 +214,8 @@ export interface AbilityVfxAuraEvent {
 // kind/templateId are optional so tests can omit them; for players templateId
 // IS the class id, which warms that class's spirit models on first sighting.
 export interface AbilityVfxEntityState {
+  forcedTargetId?: number | null;
+  forcedTargetTimer?: number;
   mainhandItemId?: string | null;
   offhandItemId?: string | null;
   id: number;
@@ -817,7 +823,8 @@ export class AbilityVfx {
       case 'selfCast': {
         if (
           (Object.hasOwn(WARRIOR_GUARD_AUDIO, ability) ||
-            Object.hasOwn(WARRIOR_POWER_AUDIO, ability)) &&
+            Object.hasOwn(WARRIOR_POWER_AUDIO, ability) ||
+            Object.hasOwn(WARRIOR_UTILITY_AUDIO, ability)) &&
           isMeleeAudioId(ability) &&
           this.deps.audioReady
         )
@@ -876,21 +883,23 @@ export class AbilityVfx {
             this.spawned++;
           }
           this.spawnRing(ev.sourceId, plan, ev.school);
-          this.deps.playShoutAnim?.(ev.sourceId);
+          if (!full?.physical || !this.deps.hasGestureClip?.(ev.sourceId, ability))
+            this.deps.playShoutAnim?.(ev.sourceId);
         }
         const seqTarget =
           targeted &&
           (contact || friendly || arch === 'burst' || arch === 'shout' || arch === 'dash')
             ? ev.targetId
             : ev.sourceId;
-        if (tier < 2 && full && ability !== 'heroic_leap') {
+        const utilityTier = Object.hasOwn(WARRIOR_UTILITY_AUDIO, ability) && tier === 2 ? 1 : tier;
+        if (utilityTier < 2 && full && ability !== 'heroic_leap') {
           fx.sequenceInstant(
             ability,
             full,
             ev.sourceId,
             seqTarget,
             plan.color,
-            tier,
+            utilityTier,
             this.windupDelayFor(ability, full, ev.sourceId),
           );
         } else if (ability !== 'heroic_leap') {
@@ -1514,6 +1523,14 @@ export class AbilityVfx {
       this.latchHeldState(held, e);
       return;
     }
+    const attentionSource = warriorAttentionSource(e);
+    if (attentionSource !== null && this.deps.isLivingWarrior?.(attentionSource))
+      fx.holdWarriorAttention?.(
+        e.id,
+        attentionSource,
+        e.forcedTargetTimer!,
+        attentionSource === this.deps.localPlayerId?.(),
+      );
     // First sighting of a player of a class kicks the async loads for that
     // class's spirit-apparition GLBs, so the models are warm before a cast
     // needs them (a still-loading model's cast skips its spirit silently).
@@ -1593,6 +1610,12 @@ export class AbilityVfx {
     for (let i = 0; i < e.auras.length; i++) {
       const aura = e.auras[i];
       const auraWasHeld = held.auraStamps.has(aura.id);
+      const furyState = warriorFuryStateKind(aura);
+      if (furyState !== null) {
+        if (!isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 }))
+          fx.holdWarriorFuryState?.(e.id, furyState, aura, this.deps.localPlayerId?.() === e.id);
+        continue;
+      }
       const power = warriorPowerKind(aura);
       if (power !== null) {
         if (!isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 }))

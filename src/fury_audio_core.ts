@@ -59,6 +59,11 @@ export const WARRIOR_CONTACT_AUDIO = {
   },
 } as const;
 export const WARRIOR_AREA_AUDIO = {
+  whirlwind: {
+    release: 'melee_warrior_gyre_release',
+    impacts: ['impact_warrior_gyre_sweep'],
+    times: [0.15],
+  },
   revenge: {
     release: 'melee_warrior_revenge_release',
     impacts: ['impact_warrior_revenge'],
@@ -114,12 +119,25 @@ export const WARRIOR_POWER_AUDIO = {
     times: [0.15],
   },
 } as const;
+export const WARRIOR_UTILITY_AUDIO = {
+  taunt: {
+    release: 'melee_warrior_goad_release',
+    impacts: ['impact_warrior_goad_bark'],
+    times: [0.15],
+  },
+  furious_mending: {
+    release: 'melee_warrior_mending_release',
+    impacts: ['impact_warrior_mending_lock'],
+    times: [0.15],
+  },
+} as const;
 export const MELEE_AUDIO = {
   ...FURY_AUDIO,
   ...WARRIOR_CONTACT_AUDIO,
   ...WARRIOR_AREA_AUDIO,
   ...WARRIOR_GUARD_AUDIO,
   ...WARRIOR_POWER_AUDIO,
+  ...WARRIOR_UTILITY_AUDIO,
 };
 export type MeleeAudioId = keyof typeof MELEE_AUDIO;
 export function isMeleeAudioId(id: string | undefined): id is MeleeAudioId {

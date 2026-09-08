@@ -765,6 +765,8 @@ const RENDER_PURE_CORES = [
   'src/render/player_aura_rings_core.ts',
   'src/render/warrior_cast_fx_core.ts',
   'src/render/warrior_power_core.ts',
+  'src/render/warrior_fury_state_core.ts',
+  'src/render/ability_vfx/warrior_attention_core.ts',
   'src/render/characters/form_visual_selection_core.ts',
   'src/render/characters/metamorph_wing_motion_core.ts',
   'src/render/warlock_meteor_fx_core.ts',

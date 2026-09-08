@@ -469,6 +469,8 @@ const BUFF_APPLY_ABILITY_CUES: Partial<Record<string, SfxId>> = {
 
 export function auraApplyCue(event: AuraEvent, aura: Aura | null): SfxId | null {
   if (!event.gained || !aura || SILENT_ASCENSION_AURA_IDS.has(aura.id)) return null;
+  // The authored defensive clench owns Mending's activation in both clients.
+  if (aura.id === 'furious_mending' && aura.kind === 'buff_dr') return null;
   if (isAuraDebuff(aura)) return 'debuff_apply';
   return BUFF_APPLY_ABILITY_CUES[aura.id] ?? 'buff_apply';
 }

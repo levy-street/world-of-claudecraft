@@ -114,15 +114,17 @@ describe('warrior bespoke movement clip (issue #2889 warrior/kobold batch)', () 
     // actually reach playAttack (see the build script's header trace).
     expect(map.heroic_leap).toBe('Warrior_Heroic_Leap');
     expect(map.victory_rush).toBe('Warrior_Victory_Rush');
-    expect(map.berserker_rage).toBe('Cheer');
-    expect(map.recklessness).toBe('Cheer');
+    expect(map.berserker_rage).toBe('Warrior_Seething_Fury');
+    expect(map.recklessness).toBe('Warrior_Recklessness');
     expect(map.die_by_sword).toBe('Warrior_Sword_Guard');
-    expect(map.avatar).toBe('Spellcast_Raise');
+    expect(map.avatar).toBe('Warrior_Avatar');
+    expect(map.whirlwind).toBe('Warrior_Bladed_Gyre');
+    expect(map.taunt).toBe('Warrior_Goad');
+    expect(map.furious_mending).toBe('Warrior_Furious_Mending');
     expect(map.piercing_howl).toBe('Spellcast_Raise');
-    // The dead-code traps this batch deliberately avoided: none of these got
+    // Gyre now has an authored playWhirl branch; these other traps still have no
     // an entry, because no attackByAbility lookup for them is ever reached.
     for (const deadId of [
-      'whirlwind',
       'bladestorm',
       'storm_bolt',
       'battle_shout',

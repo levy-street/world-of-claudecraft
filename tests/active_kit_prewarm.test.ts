@@ -82,11 +82,11 @@ it('registers without GPU work and resumes only the thirteen selected Warrior sh
     expect(f.entry).not.toHaveProperty('resumeUnits');
     expect(f.entry).not.toHaveProperty('deadlineExempt');
     expect(f.queue.run).not.toHaveBeenCalled();
-    expect(f.entry.progress()).toEqual({ done: 0, planned: 56, trimmed: true });
+    expect(f.entry.progress()).toEqual({ done: 0, planned: 60, trimmed: true });
     // A dropped/skipped manifest never ran entry.run(), but kept registration.
     resumeActiveAbilityKit(f.scene);
     await ensureActiveAbilityKit(f.scene);
-    expect(f.queue.run).toHaveBeenCalledTimes(56);
+    expect(f.queue.run).toHaveBeenCalledTimes(60);
     for (const call of f.queue.run.mock.calls as unknown[][]) {
       expect(call[1]).toBe(GPU_WORK_PRIORITY.ACTIONABLE_VIEW);
       expect(call[3]).toEqual({ releaseTail: true });
@@ -96,7 +96,7 @@ it('registers without GPU work and resumes only the thirteen selected Warrior sh
     expect(f.upload).toHaveBeenNthCalledWith(2, f.steel);
     expect(f.upload).toHaveBeenNthCalledWith(3, f.texture);
     expect(f.upload).toHaveBeenNthCalledWith(4, f.power);
-    expect(f.host.draw).toHaveBeenCalledTimes(13);
+    expect(f.host.draw).toHaveBeenCalledTimes(14);
     expect(ACTIVE_WARRIOR_CRESTS).toContain('steel_storm');
     expect(ACTIVE_WARRIOR_CRESTS).toContain('steel_reap');
     expect(ACTIVE_WARRIOR_CRESTS).toContain('iron_counter');
@@ -106,7 +106,7 @@ it('registers without GPU work and resumes only the thirteen selected Warrior sh
     for (const kind of ACTIVE_WARRIOR_CRESTS) expect(f.prep.ready(kind)).toBe(true);
     expect(f.prep.ready('fire')).toBe(false);
     await ensureActiveAbilityKit(f.scene);
-    expect(f.queue.run).toHaveBeenCalledTimes(56);
+    expect(f.queue.run).toHaveBeenCalledTimes(60);
     expect(f.entry.progress().trimmed).toBe(false);
   } finally {
     f.close();

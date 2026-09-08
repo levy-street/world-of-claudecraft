@@ -309,7 +309,7 @@ function gripBlade(pose, weight) {
     pose.set(`${bone.name}|rotation`, bone.quaternion.toArray());
   return pose;
 }
-function openAvatarArms(pose, weight) {
+function openAvatarArms(pose, weight, targets = null) {
   applyPose(idle);
   const wrists = ['l', 'r'].map((side) => orientation(bones.get(`wrist.${side}`)));
   applyPose(pose);
@@ -323,7 +323,9 @@ function openAvatarArms(pose, weight) {
       a = shoulder.distanceTo(position(lower)),
       b = position(lower).distanceTo(position(wrist));
     const target = position(wrist).lerp(
-      chest.clone().add(new Vector3(sign * 0.62, 0.06, 0.1)),
+      chest
+        .clone()
+        .add(targets ? new Vector3(...targets[index]) : new Vector3(sign * 0.62, 0.06, 0.1)),
       weight,
     );
     const aim = target.clone().sub(shoulder),
@@ -357,7 +359,131 @@ const tollLoad = bladePose(6, 0.14, [0, -0.018, 0], -8, 3);
 const tollClench = bladePose(6, 0.3, [0, -0.034, 0], -12, 9);
 const seethingLoad = bladePose(4, 0.28, [0, -0.04, 0], 0, 8);
 const seethingRelease = bladePose(8, 0.44, [0, -0.008, 0], 0, -5);
+const goadLoad = openAvatarArms(bladePose(8, 0.18, [0, -0.03, 0], -7, 3), 1, [
+  [0.44, -0.14, 0.15],
+  [-0.42, -0.16, 0.2],
+]);
+const goadChallenge = openAvatarArms(bladePose(8, 0.44, [0, -0.025, 0.025], 4, 8), 1, [
+  [0.47, -0.11, 0.12],
+  [-0.43, -0.1, 0.35],
+]);
+const mendingLoad = openAvatarArms(bladePose(6, 0.14, [0, -0.04, 0], 0, 6), 1, [
+  [0.46, -0.18, 0.2],
+  [-0.46, -0.18, 0.2],
+]);
+const mendingLock = openAvatarArms(bladePose(6, 0.3, [0, -0.055, 0], 0, 10), 1, [
+  [0.32, -0.16, 0.32],
+  [-0.32, -0.16, 0.32],
+]);
+function retainGoadLeftGuard(pose, offset) {
+  applyPose(idle);
+  const upper = bones.get('upperarm.l'),
+    lower = bones.get('lowerarm.l'),
+    wrist = bones.get('wrist.l');
+  const target = position(wrist).add(new Vector3(...offset)),
+    rotation = orientation(wrist);
+  applyPose(pose);
+  const shoulder = position(upper),
+    a = shoulder.distanceTo(position(lower)),
+    b = position(lower).distanceTo(position(wrist));
+  const aim = target.clone().sub(shoulder),
+    distance = aim.length();
+  if (distance >= a + b || distance <= Math.abs(a - b)) throw Error('Goad guard reach ' + distance);
+  aim.normalize();
+  const along = (a * a - b * b + distance * distance) / (2 * distance),
+    height = Math.sqrt(Math.max(0, a * a - along * along));
+  const bend = new Vector3(1, -0.65, -0.2);
+  bend.addScaledVector(aim, -bend.dot(aim)).normalize();
+  pointJoint(
+    upper,
+    lower,
+    shoulder.clone().addScaledVector(aim, along).addScaledVector(bend, height),
+  );
+  pointJoint(lower, wrist, target);
+  setWorldRotation(wrist, rotation);
+  for (const b of [upper, lower, wrist]) pose.set(b.name + '|rotation', b.quaternion.toArray());
+  for (const name of ['hand.l', 'handslot.l']) {
+    const key = name + '|rotation';
+    if (idle.has(key)) pose.set(key, [...idle.get(key)]);
+  }
+  return pose;
+}
+
+function retainMendingGuard(pose, offset) {
+  applyPose(idle);
+  const targets = ['l', 'r'].map((side) => ({
+    side,
+    p: position(bones.get('wrist.' + side)).add(
+      new Vector3((side === 'l' ? 1 : -1) * offset[0], offset[1], offset[2]),
+    ),
+    q: orientation(bones.get('wrist.' + side)),
+  }));
+  applyPose(pose);
+  for (const { side, p: target, q: rotation } of targets) {
+    const upper = bones.get('upperarm.' + side),
+      lower = bones.get('lowerarm.' + side),
+      wrist = bones.get('wrist.' + side),
+      shoulder = position(upper),
+      a = shoulder.distanceTo(position(lower)),
+      b = position(lower).distanceTo(position(wrist)),
+      aim = target.clone().sub(shoulder),
+      distance = aim.length();
+    if (distance >= a + b || distance <= Math.abs(a - b))
+      throw Error('Mending guard reach ' + side + ' ' + distance);
+    aim.normalize();
+    const along = (a * a - b * b + distance * distance) / (2 * distance),
+      height = Math.sqrt(Math.max(0, a * a - along * along)),
+      bend = new Vector3(side === 'l' ? 1 : -1, -0.65, -0.2);
+    bend.addScaledVector(aim, -bend.dot(aim)).normalize();
+    pointJoint(
+      upper,
+      lower,
+      shoulder.clone().addScaledVector(aim, along).addScaledVector(bend, height),
+    );
+    pointJoint(lower, wrist, target);
+    setWorldRotation(wrist, rotation);
+    for (const b of [upper, lower, wrist]) pose.set(b.name + '|rotation', b.quaternion.toArray());
+    for (const name of ['hand.' + side, 'handslot.' + side]) {
+      const key = name + '|rotation';
+      if (idle.has(key)) pose.set(key, [...idle.get(key)]);
+    }
+  }
+  return pose;
+}
+
 const performances = [
+  [
+    'Warrior_Goad',
+    [
+      [0, idle],
+      [0.075, retainGoadLeftGuard(goadLoad, [0.1, 0.14, 0.14])],
+      [0.15, retainGoadLeftGuard(goadChallenge, [0.1, 0.14, 0.14])],
+      [0.245, goadChallenge],
+      [0.65, idle],
+    ],
+  ],
+  [
+    'Warrior_Furious_Mending',
+    [
+      [0, idle],
+      [0.085, retainMendingGuard(mendingLoad, [0.06, 0.06, 0.02])],
+      [0.15, retainMendingGuard(mendingLock, [0.12, 0.12, 0.04])],
+      [0.3, mendingLock],
+      [0.72, idle],
+    ],
+  ],
+  [
+    'Warrior_Bladed_Gyre',
+    [
+      [0, idle],
+      [0.085, bladePose(4, 0.54, [0, -0.025, 0.02], 0, 0)],
+      [0.15, bladePose(4, 0.46, [0, -0.025, 0.02], 0, 0)],
+      [0.18, bladePose(4, 0.5, [0, -0.025, 0.02], 0, 0)],
+      [0.29, bladePose(4, 0.54, [0, -0.025, 0.02], 0, 0)],
+      [0.46, bladePose(4, 1.2, [0, -0.025, 0.02], 0, 0)],
+      [0.72, idle],
+    ],
+  ],
   [
     'Warrior_Avatar',
     [

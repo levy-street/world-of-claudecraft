@@ -14,6 +14,7 @@ import {
   shouldPlayCritSfxForTarget,
   spellFxCue,
 } from '../ui/combat_sfx';
+import { warriorRecoveryAudio } from '../warrior_recovery_core';
 
 /** The same canonical cue decisions as the HUD, without constructing a HUD.
  * This adapter owns only its cast loops; the renderer owns spatial VFX audio. */
@@ -110,6 +111,11 @@ export class StudioCombatAudio {
       }
       case 'heal':
       case 'heal2': {
+        const recovery = event.type === 'heal2' ? warriorRecoveryAudio(event) : undefined;
+        if (recovery !== undefined) {
+          if (recovery) play(recovery, entities.get(event.targetId));
+          break;
+        }
         if (
           event.type === 'heal2' &&
           masterworkAudioKey(event.abilityId ?? attackAbilityId(event.ability), 'impact')

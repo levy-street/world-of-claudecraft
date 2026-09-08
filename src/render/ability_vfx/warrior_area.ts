@@ -7,7 +7,13 @@ const source = { x: 0, y: 0, z: 0 },
   point = { x: 0, y: 0, z: 0 };
 
 export function isWarriorAreaInstant(id: string | undefined): boolean {
-  return id === 'cleave' || id === 'revenge' || id === 'thunder_clap' || id === 'faultline';
+  return (
+    id === 'whirlwind' ||
+    id === 'cleave' ||
+    id === 'revenge' ||
+    id === 'thunder_clap' ||
+    id === 'faultline'
+  );
 }
 
 /** Exactly one sweep belongs to the cast, regardless of recipient count. */

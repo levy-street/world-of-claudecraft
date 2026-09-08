@@ -21,6 +21,7 @@ export const ACTIVE_WARRIOR_CRESTS: readonly CrestKind[] = [
   'iron_fault',
   'breach_wedge',
   'avatar_rupture',
+  'blood_gyre',
   'rally_pressure',
   'dread_pressure',
   'challenge_pressure',

@@ -6,6 +6,7 @@ import type { Substance } from './signature_core';
 import { buildWarriorArea, type WarriorAreaShape } from './warrior_area_shapes';
 import { warriorAvatarRuptureShape } from './warrior_avatar_rupture';
 import { buildWarriorBlade } from './warrior_blade_shape';
+import { warriorGyreShape } from './warrior_gyre_shape';
 import { buildWarriorShield } from './warrior_shield_shape';
 import { buildWarriorPressure, type WarriorPressureKind } from './warrior_shout_shapes';
 export type CrestKind =
@@ -19,6 +20,7 @@ export type CrestKind =
   | 'shield_contact'
   | 'steel_cut'
   | 'avatar_rupture'
+  | 'blood_gyre'
   | WarriorAreaShape
   | IronguardShape
   | WarriorPressureKind;
@@ -31,6 +33,7 @@ export function buildSignatureShapes(): Map<CrestKind, THREE.BufferGeometry> {
   shapes.set('shield_contact', buildWarriorShield());
   shapes.set('steel_cut', buildWarriorBlade());
   shapes.set('avatar_rupture', warriorAvatarRuptureShape());
+  shapes.set('blood_gyre', warriorGyreShape());
   shapes.set('steel_storm', buildWarriorArea('steel_storm'));
   shapes.set('steel_reap', buildWarriorArea('steel_reap'));
   for (const kind of ['iron_counter', 'iron_quake', 'iron_fault', 'breach_wedge'] as const)

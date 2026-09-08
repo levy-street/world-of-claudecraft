@@ -1,6 +1,49 @@
 /** Distinct material voices for native Warrior contacts; never bulk-regenerated. */
 export const WARRIOR_CONTACT_SFX = [
   {
+    key: 'melee_warrior_gyre_release',
+    duration: 0.13,
+    prompt:
+      'One very short pair of huge swords winding sideways through dense air, two layered serrated steel scrapes and taut leather grip strain, immediate dry martial preparation. No contact, explosion, voice, music or ambience.',
+  },
+  {
+    key: 'impact_warrior_gyre_sweep',
+    duration: 0.34,
+    prompt:
+      'One immediate broad dual-sword sweep, a heavy shearing steel snap opens into a wide ripping blade-air rush with scattered short bright metal grit. Powerful expansive disciplined physical combat, short dry tail. One combined attack, no repeated hits, voice, music or explosion.',
+  },
+  {
+    key: 'melee_warrior_goad_release',
+    duration: 0.13,
+    prompt:
+      'One very short armored fighter sharply leaning forward to challenge an opponent, leather gauntlet tension and gritty chest armor movement with a compressed air intake. Dry close perspective, no impact, music, words or ringing.',
+  },
+  {
+    key: 'impact_warrior_goad_bark',
+    duration: 0.32,
+    prompt:
+      'One forceful short nonverbal adult battle bark, HAH, rough breath and chest resonance with a sharp forward air crack. Defiant confident mocking challenge, grounded fantasy warrior. Single dry close vocal effort, no words, extra voices, injury scream, music or ambience.',
+  },
+  {
+    key: 'melee_warrior_mending_release',
+    duration: 0.14,
+    prompt:
+      'One very short armored warrior clenching inward, multiple taut sinewy threads pulling together under leather tension and a deep soft body intake. Concentrated physical resolve, dry intimate sound, no healing chime, voice, music or impact.',
+  },
+  {
+    key: 'impact_warrior_mending_lock',
+    duration: 0.33,
+    prompt:
+      'One immediate blood-forged defensive brace, interwoven sinewy strands pulling tightly into a dense warm chest thump with crisp leather stitches cinching shut and a brief low resonant tail. Powerful controlled inward reinforcement, no enemy strike, voice, music, bell or magical sparkle.',
+  },
+  {
+    key: 'impact_warrior_blood_recovery',
+    duration: 0.23,
+    prompt:
+      'One short visceral inward recovery, three fine fibrous strands pulling together into a warm compact heartbeat-like pulse and a soft final leather stitch snap. Satisfying bodily renewal, clean close dry sound. No injury impact, outgoing splash, voice, music or healing chime.',
+  },
+
+  {
     key: 'melee_warrior_avatar_release',
     duration: 0.14,
     prompt:

@@ -132,6 +132,7 @@ import {
 } from '../sim/types';
 import { maxBuyCount } from '../sim/vendor_buy_stack';
 import { worldBossIdFromLockout } from '../sim/world_boss';
+import { warriorRecoveryAudio } from '../warrior_recovery_core';
 import {
   type CharacterProfile,
   type DailyRewardStatus,
@@ -11318,7 +11319,13 @@ export class Hud {
       }
       case 'heal':
       case 'heal2': {
+        const recovery = ev.type === 'heal2' ? warriorRecoveryAudio(ev) : undefined;
         const tgt = sim.entities.get(ev.targetId);
+        if (recovery !== undefined) {
+          if (recovery && tgt)
+            this.combat(recovery, tgt.pos.x, tgt.pos.y, tgt.pos.z, 0.75, { cooldown: 0.1 });
+          return;
+        }
         if (!tgt) return;
         // A potion/eat/drink heal (items.ts / combat/auras.ts) plays its own
         // dedicated cue instead of the generic heal_impact; consumeHealCue

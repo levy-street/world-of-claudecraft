@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import type { MeleeAudioId } from '../../fury_audio_core';
+import type { SimEvent } from '../../sim/types';
 import {
   type AbilityVfxBuffSpec,
   type AbilityVfxFullSpec,
@@ -15,6 +16,7 @@ import type { AbilityAudioKind, AbilityAudioOpts } from '../audio_sink';
 import type { ControlSubject } from '../combat_status_core';
 import { CombatStatusSignals } from '../combat_status_signals';
 import { drawRestorativeStream } from '../restorative_water';
+import type { WarriorFuryStateAura, WarriorFuryStateKind } from '../warrior_fury_state_core';
 import type { WarriorPowerAnchor } from '../warrior_power_anchor';
 import type { WarriorPowerIntent, WarriorPowerKind } from '../warrior_power_core';
 import type { WeaponAnchorSampler } from '../weapon_trail_anchor';
@@ -59,6 +61,9 @@ import {
   type SpiritCompileGate,
 } from './spirits';
 import type { SteelSweepRange } from './steel_sweep';
+import { WarriorAttention } from './warrior_attention';
+import { drawBloodlettingRecovery } from './warrior_fury_feedback';
+import { WarriorFuryStates } from './warrior_fury_states';
 import {
   type WarriorGuardAura,
   type WarriorGuardKind,
@@ -450,6 +455,7 @@ export class AbilityVfxFx implements SequencerHost {
   private crests: SignatureCrests;
   private guards: WarriorGuardPlates;
   private powerForms: WarriorPowerForms;
+  private furyStates: WarriorFuryStates;
   private guardDt = 0;
   private guardFacing = (id: number) => this.facingAt(id) ?? null;
   private rings: ShockRings;
@@ -547,6 +553,7 @@ export class AbilityVfxFx implements SequencerHost {
   private disposed = false;
   private heldConduction = new HeldConduction();
   private heldWarriorStorm = new HeldWarriorStorm();
+  private readonly warriorAttention = new WarriorAttention();
   private warriorStorms = new Map<
     number,
     { stamp: number; elapsed: number; nextDust: number; surface: boolean }
@@ -680,6 +687,7 @@ export class AbilityVfxFx implements SequencerHost {
     this.crests = new SignatureCrests(scene, this.groundY);
     this.guards = new WarriorGuardPlates(scene);
     this.powerForms = new WarriorPowerForms(scene);
+    this.furyStates = new WarriorFuryStates(scene, anchor, tex);
     this.baked = new BakedImpactLayers(scene, textureReady);
     this.fragments = new SolidImpactFragments(scene);
     this.rings = new ShockRings(scene, tex, groundY);
@@ -1255,6 +1263,7 @@ export class AbilityVfxFx implements SequencerHost {
       ...this.crests.preparation.units(host, kinds),
       ...this.guards.units(host),
       ...this.powerForms.units(host),
+      ...this.furyStates.units(host),
     ];
   }
 
@@ -1458,6 +1467,8 @@ export class AbilityVfxFx implements SequencerHost {
     this.controlSignals.sleep(entityId);
     this.guards.sleep(entityId);
     this.powerForms.sleep(entityId);
+    this.furyStates.sleep(entityId);
+    this.warriorAttention.sleep(entityId);
     this.warriorStorms.delete(entityId);
     this.crests.releaseHeld(entityId);
     this.ccBands.delete(entityId);
@@ -2098,6 +2109,29 @@ export class AbilityVfxFx implements SequencerHost {
 
   // ---- per-frame state (refreshed every frame by painter.syncEntity) ------
 
+  holdWarriorAttention(
+    entityId: number,
+    sourceId: number,
+    remaining: number,
+    priority: boolean,
+  ): void {
+    if (!this.disposed)
+      this.warriorAttention.hold(entityId, sourceId, remaining, this.frame, priority);
+  }
+
+  warriorRecovery(event: Extract<SimEvent, { type: 'heal2' }>, maxHp: number): boolean {
+    return !this.disposed && drawBloodlettingRecovery(this, event, maxHp);
+  }
+
+  holdWarriorFuryState(
+    entityId: number,
+    kind: WarriorFuryStateKind,
+    aura: WarriorFuryStateAura,
+    priority: boolean,
+  ): void {
+    this.furyStates.hold(entityId, kind, aura, this.frame, priority);
+  }
+
   holdWarriorPower(
     entityId: number,
     kind: WarriorPowerKind,
@@ -2385,6 +2419,14 @@ export class AbilityVfxFx implements SequencerHost {
       if (!reducedMotion) this.bodyLeanCb?.(id, WINDUP_LEAN_RAD * charge);
       this.drawWindup(id, w.style, w.colorHex, charge, w.streams, w.accentHex, reducedMotion);
     }
+    anchorScratchB.copy(camFwdScratch).negate();
+    this.warriorAttention.draw(
+      this.frame,
+      reducedMotion,
+      this.anchor,
+      anchorScratchB,
+      this.overlay,
+    );
     for (const [id, bands] of this.orbits) {
       for (let i = bands.length - 1; i >= 0; i--) {
         if (bands[i].stamp !== this.frame) {
@@ -2413,6 +2455,16 @@ export class AbilityVfxFx implements SequencerHost {
       reducedMotion,
       this.drawHeldConduction,
       this.drawPriorityStorms,
+    );
+    this.furyStates.draw(
+      this.frame,
+      dt,
+      reducedMotion,
+      this.anchor,
+      this.weaponAnchor,
+      this.bodyAnchor,
+      this.camera,
+      camPosScratch,
     );
     this.water.update(dt, reducedMotion);
     this.details.update(dt, this.camera.quaternion, reducedMotion);
@@ -2461,6 +2513,8 @@ export class AbilityVfxFx implements SequencerHost {
   clear(): void {
     this.guards.clear();
     this.powerForms.clear();
+    this.furyStates.clear();
+    this.warriorAttention.clear();
     this.warriorStorms.clear();
     this.furyAudio.clear();
     this.ribbons.clear();
@@ -2518,6 +2572,7 @@ export class AbilityVfxFx implements SequencerHost {
     release(() => this.crests.dispose());
     release(() => this.guards.dispose());
     release(() => this.powerForms.dispose());
+    release(() => this.furyStates.dispose());
     release(() => this.rings.dispose());
     release(() => this.flipbooks.dispose());
     release(() => this.decals.dispose());

@@ -1396,6 +1396,9 @@ export const VISUALS: Record<string, VisualDef> = {
         victory_rush: 'Warrior_Victory_Rush',
         // Native resource ceremonies: inward clench, outward pressure release,
         // and an aggressive opening of both arms. Each recovers inside a GCD.
+        taunt: 'Warrior_Goad',
+        furious_mending: 'Warrior_Furious_Mending',
+        whirlwind: 'Warrior_Bladed_Gyre',
         bloodrage: 'Warrior_Blood_Toll',
         berserker_rage: 'Warrior_Seething_Fury',
         recklessness: 'Warrior_Recklessness',

@@ -1807,9 +1807,12 @@ export class CharacterVisual {
    *  held Bladestorm channel pose. Repeated AoE hits only refresh the timer. */
   playWhirl(abilityId?: string): void {
     if (this.deadLock) return;
-    if (abilityId === 'cleave' && this.action('Signature_cleave')) {
+    if (
+      (abilityId === 'cleave' || abilityId === 'whirlwind') &&
+      this.action(`Signature_${abilityId}`)
+    ) {
       this.spinOnceTimer = 0;
-      this.playOneShot('Signature_cleave', 1);
+      this.playOneShot(`Signature_${abilityId}`, 1);
       this.currentOneShotIsAttack = true;
       return;
     }

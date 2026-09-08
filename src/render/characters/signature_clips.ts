@@ -31,6 +31,9 @@ const SOURCE_ALIASES: Readonly<Record<string, string>> = {
   abyssal_rift: 'shadow_bolt',
 };
 const WARRIOR_CONTACT_SOURCES: Readonly<Record<string, string>> = {
+  taunt: 'Warrior_Goad',
+  furious_mending: 'Warrior_Furious_Mending',
+  whirlwind: 'Warrior_Bladed_Gyre',
   avatar: 'Warrior_Avatar',
   recklessness: 'Warrior_Recklessness',
   bloodrage: 'Warrior_Blood_Toll',

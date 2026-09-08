@@ -53,6 +53,8 @@ import { buildAbilityMaterialPrewarmGroup } from './ability_material_prewarm';
 import { AbilityVfx, AbilityVfxFx, persistentClassVfxPrewarmGroup } from './ability_vfx';
 import type { AbilityVfxTextures } from './ability_vfx/fx_textures';
 import * as abilityPreparation from './ability_vfx/primitive_prewarm';
+import { isLivingWarriorAttentionSource } from './ability_vfx/warrior_attention_core';
+import { isWarriorFuryAuraEvent } from './ability_vfx/warrior_fury_feedback';
 import { ABILITY_VFX_FULL_SPECS } from './ability_vfx_full_specs';
 import { shouldDrawLegacyCastSparkle, syncAbilityVfxCast } from './ability_vfx_registry';
 import { ABILITY_VFX_SPECS } from './ability_vfx_specs';
@@ -3019,6 +3021,7 @@ export class Renderer {
       },
       localPlayerId: () => this.sim.player.id,
       warriorSpecOf: (id) => id === this.sim.playerId ? this.sim.talentSpec : null,
+      isLivingWarrior: (id) => isLivingWarriorAttentionSource(this.sim.entities.get(id)),
       visualVariantOf: (id, caster) => ritualVariantAbilityId(id, this.sim.entities.get(caster)?.auras ?? []),
       hasGestureClip: (id, abilityId) => {
         const v = this.views.get(id);
@@ -7857,6 +7860,8 @@ export class Renderer {
         break;
       }
       case 'heal2': {
+        if (this.abilityVfxFx.warriorRecovery(ev, this.sim.entities.get(ev.targetId)?.maxHp ?? 0))
+          break;
         const healed = this.views.get(ev.targetId);
         showHealingContact(
           ev,
@@ -7870,6 +7875,7 @@ export class Renderer {
       }
       case 'aura': {
         const tgt = this.sim.entities.get(ev.targetId);
+        if (isWarriorFuryAuraEvent(ev, tgt)) break;
         // Set-proc auras announce themselves with a themed swirl: on the wearer
         // for the self buffs, on the struck mob for the bleeds (so this arm is
         // NOT player-gated). Everything else keeps the generic player swirl.

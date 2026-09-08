@@ -1,0 +1,1432 @@
+[
+  {
+    "file": "gyre-before.png",
+    "captureFolder": "warrior-fury-states-before-settled-2",
+    "original": "p4-whirlwind-dummy-yaw1.9-tick6.png",
+    "sha256": "9bea612fe050a512760bd8cfef4b3f305cbd6a408656cf55372a8113ec19d9f8",
+    "sourceUnchanged": true,
+    "baseline": {
+      "purpose": "Actual-cast Warrior utility visual baseline via in-memory Vite source overlays",
+      "startedAt": "2026-09-08T19:24:59.098Z",
+      "pid": 35596,
+      "root": "C:\\Users\\tony\\Documents\\Codex\\2026-09-06\\new-chat\\work\\woc-vfx-studio",
+      "port": 5184,
+      "strictPort": true,
+      "baseline": "f191d8ddbc9ef2381d66657125b30bcb8b956188",
+      "currentHead": "f191d8ddbc9ef2381d66657125b30bcb8b956188",
+      "scriptSha256": "4a39a7a2e9f01dd53d5b31a4dfa390c6497b92aa623c34c566a812ba2a95cdca",
+      "config": "vite.config.ts",
+      "configSha256": "7768987a8048fffd1fd711131134be5c83840a2e0625b5d5f2954c4b8ee385e9",
+      "statusAtStart": " M public/audio/sfx/runtime-pack.json\n M public/models/chars/players/warrior_contact_anims.glb\n M scripts/build_warrior_contact_anims.mjs\n M scripts/sfx/sfx_gain_ceiling.generated.json\n M scripts/sfx/warrior_contact_sfx.mjs\n M server/ground_telegraph_wire.ts\n M src/fury_audio_core.ts\n M src/game/sfx_manifest.generated.ts\n M src/net/ground_telegraph_wire.ts\n M src/net/online.ts\n M src/render/ability_vfx/active_kit_prewarm.ts\n M src/render/ability_vfx/fx.ts\n M src/render/ability_vfx/fx_textures.ts\n M src/render/ability_vfx/painter.ts\n M src/render/ability_vfx/physical_choreography.ts\n M src/render/ability_vfx/signature_crests.ts\n M src/render/ability_vfx/signature_shapes.ts\n M src/render/ability_vfx/spectacle.ts\n M src/render/ability_vfx/warrior_area.ts\n M src/render/characters/beast_ability_clips.ts\n M src/render/characters/cast_performance.ts\n M src/render/characters/caster_clips.ts\n M src/render/characters/damage_attack_animation.ts\n M src/render/characters/manifest.ts\n M src/render/characters/signature_clips.ts\n M src/render/characters/visual.ts\n M src/render/mage_ground_fx.ts\n M src/render/renderer.ts\n M src/render/vfx.ts\n M src/render/warrior_vfx_specs.ts\n M src/sim/combat/effect_dispatch.ts\n M src/sim/entity_roster.ts\n M src/sim/ground_aoe_readouts.ts\n M src/sim/sim.ts\n M src/ui/combat_sfx.ts\n M src/ui/hud.ts\n M src/vfx_studio/combat_audio.ts\n M src/vfx_studio/prepare_views.ts\n M src/vfx_studio/studio.css\n M src/world_api.ts\n M src/world_api/combat.ts\n M tests/active_kit_prewarm.test.ts\n M tests/anim_pipeline_warrior_kobold.test.ts\n M tests/architecture.test.ts\n M tests/warrior_area_routing.test.ts\n M tests/warrior_contact_performance.test.ts\n?? docs/design/vfx-astonish-v25.md\n?? docs/design/warrior-fury-utility-v25.md\n?? public/audio/sfx/impact_warrior_blood_recovery_1.mp3\n?? public/audio/sfx/impact_warrior_blood_recovery_2.mp3\n?? public/audio/sfx/impact_warrior_goad_bark_1.mp3\n?? public/audio/sfx/impact_warrior_goad_bark_2.mp3\n?? public/audio/sfx/impact_warrior_gyre_sweep_1.mp3\n?? public/audio/sfx/impact_warrior_gyre_sweep_2.mp3\n?? public/audio/sfx/impact_warrior_mending_lock_1.mp3\n?? public/audio/sfx/impact_warrior_mending_lock_2.mp3\n?? public/audio/sfx/melee_warrior_goad_release_1.mp3\n?? public/audio/sfx/melee_warrior_goad_release_2.mp3\n?? public/audio/sfx/melee_warrior_gyre_release_1.mp3\n?? public/audio/sfx/melee_warrior_gyre_release_2.mp3\n?? public/audio/sfx/melee_warrior_mending_release_1.mp3\n?? public/audio/sfx/melee_warrior_mending_release_2.mp3\n?? src/render/ability_vfx/warrior_attention.ts\n?? src/render/ability_vfx/warrior_attention_atlas.ts\n?? src/render/ability_vfx/warrior_attention_core.ts\n?? src/render/ability_vfx/warrior_fury_feedback.ts\n?? src/render/ability_vfx/warrior_fury_state_shapes.ts\n?? src/render/ability_vfx/warrior_fury_states.ts\n?? src/render/ability_vfx/warrior_goad.ts\n?? src/render/ability_vfx/warrior_gyre.ts\n?? src/render/ability_vfx/warrior_gyre_shape.ts\n?? src/render/warrior_fury_state_core.ts\n?? src/warrior_recovery_core.ts\n?? tests/warrior_attention.test.ts\n?? tests/warrior_attention_core.test.ts\n?? tests/warrior_fury_feedback.test.ts\n?? tests/warrior_fury_state_core.test.ts\n?? tests/warrior_fury_state_shapes.test.ts\n?? tests/warrior_fury_states.test.ts\n?? tests/warrior_gyre_shape.test.ts\n?? tests/warrior_recovery_core.test.ts\n?? tests/warrior_utility_audio.test.ts\n",
+      "overrides": [
+        {
+          "path": "src/fury_audio_core.ts",
+          "baselineSha256": "38efce45642e6adbb60a26236d329f3a03ed420ce3300d76d39a2b6a738b41d4",
+          "currentSha256": "49c11c0231006ba74abbde68cc6fb58e475bc122942cfa2cb7ce5e99455e3d72",
+          "bytes": 4605
+        },
+        {
+          "path": "src/game/sfx_manifest.generated.ts",
+          "baselineSha256": "c7e1d608a013337039eb5c8bc25d1cc89b3f1c6f50a97f11cf5a874dddbd7d52",
+          "currentSha256": "cf6932f7410a1aeed82ea8b29d75316fddd01511c55276f20a9ffe6288c636b6",
+          "bytes": 264605
+        },
+        {
+          "path": "src/render/ability_vfx/active_kit_prewarm.ts",
+          "baselineSha256": "c6a3bdeffd78290f1e2a66dda9a8f7d6324813e0677110e452ad979e5bb45f22",
+          "currentSha256": "e5ae3c70edf8571411f2c426e5795d5cbb6b51eb280e440464565c44766a4b86",
+          "bytes": 5042
+        },
+        {
+          "path": "src/render/ability_vfx/fx.ts",
+          "baselineSha256": "20492b8d530a0fc94ae9753364115eeb3f9b0810f68cdf627f46e20658bb2f33",
+          "currentSha256": "52682d8a099eb8db1ac33b581588cad8467f6f514be5963b592b1ed79cd25429",
+          "bytes": 101761
+        },
+        {
+          "path": "src/render/ability_vfx/fx_textures.ts",
+          "baselineSha256": "a8ce77419a3646006960be6dca423adf4e36205a318c803076de18ef72ff33e4",
+          "currentSha256": "7a228c911fba13806e860c169d79ec496d943a8e7efeb50bb93bf743a977e227",
+          "bytes": 25146
+        },
+        {
+          "path": "src/render/ability_vfx/painter.ts",
+          "baselineSha256": "9c9f10a8c89f79bdab3ef744062560d041c55e24d8cdf43fdd743726412ec2ba",
+          "currentSha256": "ef1dccf7aa77bac4cec8ece0f359f765c4fdcc698d9585904cd0beda3d1066b6",
+          "bytes": 84527
+        },
+        {
+          "path": "src/render/ability_vfx/physical_choreography.ts",
+          "baselineSha256": "eb69d760f264df82d961804a7aaf62d484ecb5274c17cdf4b210d06d5adc6b56",
+          "currentSha256": "d62732907ae0cd0c41236168ffd163c9b92864e6a3cdfbaa2264ed3878c6d423",
+          "bytes": 15868
+        },
+        {
+          "path": "src/render/ability_vfx/signature_crests.ts",
+          "baselineSha256": "f69ed06c4851791392082bf32e7cc68e0a16875270a7045658d85816dfe9e61b",
+          "currentSha256": "30473b8cff9ffef42306a340efdc8aaef0c8087a7802c3fcead2e7256c1d76b5",
+          "bytes": 18813
+        },
+        {
+          "path": "src/render/ability_vfx/signature_shapes.ts",
+          "baselineSha256": "ce26fe6ba6a044b26f51e36d268234b3015d607163c097c892e370bfe8fa6a49",
+          "currentSha256": "f3e05dc7e838e21a5ab15bcd657f8b95fb053cad0a2419cee27061eb728437ea",
+          "bytes": 7261
+        },
+        {
+          "path": "src/render/ability_vfx/warrior_area.ts",
+          "baselineSha256": "ad9277b8b6a3817506ab3935c37eb133dce9af91e691180eb0fc611a9a8ca50b",
+          "currentSha256": "6a5f7acc6cb80545b393e482594904702a446a34d408de18799989b4e14f4ecd",
+          "bytes": 4334
+        },
+        {
+          "path": "src/render/characters/manifest.ts",
+          "baselineSha256": "f3dbd4eae794183ea74bc469ee7e897943bd1335e86906a4ac01e088b2b11052",
+          "currentSha256": "81ef58480da00fc936163d37b515d1ac605e4f8cf41769cfb4669aeae1af715f",
+          "bytes": 171496
+        },
+        {
+          "path": "src/render/characters/damage_attack_animation.ts",
+          "baselineSha256": "5bd62d65c5a354ec151c1f727afb34cf3b18f228639f29da24bfd6d77b3b43e1",
+          "currentSha256": "a8e4d5d9fba1d6d185d7d9eea86e90d7603f7a15eec486c264c9d0914eda9570",
+          "bytes": 3248
+        },
+        {
+          "path": "src/render/characters/signature_clips.ts",
+          "baselineSha256": "0fda86704bb2f747ee02ff34e2be533601af29af63baaaaa5bd63cd501b90002",
+          "currentSha256": "5a45b335921612e450074d5183c9e19fd03a862396c720410a00d516ea849a50",
+          "bytes": 6625
+        },
+        {
+          "path": "src/render/characters/visual.ts",
+          "baselineSha256": "a2213ebab178b8a979588f735691c5b1bd99a5d10d277b161d9ff2eb56f4b3c0",
+          "currentSha256": "32f39e71e0439a4faac4fb2a287deb7d31ab362b40b1bdea62add9d58c0826e6",
+          "bytes": 182170
+        },
+        {
+          "path": "src/render/renderer.ts",
+          "baselineSha256": "a84d58cef7136bcfd868e8098aedfbe3004655e7d8e5b067817b367200a1408f",
+          "currentSha256": "dfced9b5cc3c8f71c4cd5e82974b56395901bbf8b4acfbf8976d0f63cda68287",
+          "bytes": 605790
+        },
+        {
+          "path": "src/render/warrior_vfx_specs.ts",
+          "baselineSha256": "275e94149c9f4d8e33e52e97dff485df2dcb31c6b6f6e24850df2f73edb96802",
+          "currentSha256": "527dbf150a3cfaa172abfae0bb1106a859149d0ff732a0ada476af9eaf609816",
+          "bytes": 6476
+        },
+        {
+          "path": "src/ui/combat_sfx.ts",
+          "baselineSha256": "caad53fe327cc963cea870d7b1a768154277e2cbbf81464aa7fabefb1432552c",
+          "currentSha256": "cabd2a2ecb0fc3805692a0012e9e9496f76ea6fb0ca90216400ea8af0c175b63",
+          "bytes": 27060
+        },
+        {
+          "path": "src/ui/hud.ts",
+          "baselineSha256": "f52f54e2d49f7da99596daf7d799f13eedd50f5a942467d76c2f603d4ce31e0a",
+          "currentSha256": "e98e23ab883b1beae8797072108c1bf7502572936031f09508ab176efa2081a4",
+          "bytes": 866514
+        },
+        {
+          "path": "src/vfx_studio/combat_audio.ts",
+          "baselineSha256": "a87eac4e356598313e2426bc009815533989feb88028298e4f1b033df14c2ede",
+          "currentSha256": "a0a34a73da7ca1ecc1cf610329eb82cb719a664f79e1209703c687e811f4123b",
+          "bytes": 5067
+        },
+        {
+          "path": "src/vfx_studio/studio.css",
+          "baselineSha256": "1a168bef63a116471d71fc92d777af2e3c6aa14e58d771cc0bf37a124b855fb5",
+          "currentSha256": "b7282517130c9c027768f45b745be59e01b03a39f96bd62cbabc9e7e5b1f5fec",
+          "bytes": 10919
+        }
+      ],
+      "unconditionalOverrides": [
+        "src/render/characters/damage_attack_animation.ts"
+      ],
+      "allowlistedUnchanged": [
+        "src/render/ability_vfx/prewarm.ts",
+        "src/render/ability_vfx/primitive_prewarm.ts"
+      ],
+      "preservedOriginalWip": [
+        {
+          "path": "server/ground_telegraph_wire.ts",
+          "sha256": "178e37fa7f9b0ccf78f52204b4594afe6e0bf961e6c77c2172aaf21708fe8b39"
+        },
+        {
+          "path": "src/net/ground_telegraph_wire.ts",
+          "sha256": "ad4ee6d41176c80ed7cf7af6a41828374cd0280b330e0f1d9baa61f07e3608c2"
+        },
+        {
+          "path": "src/net/online.ts",
+          "sha256": "6e3db4c899c3bc5f176852beaacc0b90148bd5bc62908c715bd9e4c3bc26f246"
+        },
+        {
+          "path": "src/render/ability_vfx/spectacle.ts",
+          "sha256": "051a02a76ec2f5742f8147da9afd6b2f8bd70172af2d6d5ad7f69e19b56c7aa5"
+        },
+        {
+          "path": "src/render/characters/beast_ability_clips.ts",
+          "sha256": "958ace2961dd35e5cda53d817bc8c446ebabb59b133cbc6a0c37ec177ddd9c55"
+        },
+        {
+          "path": "src/render/characters/cast_performance.ts",
+          "sha256": "d11e6f0c458355b2cd8d06f48ac9cd4037d1045a57ecc09dfc5a7c7185c9e6f2"
+        },
+        {
+          "path": "src/render/characters/caster_clips.ts",
+          "sha256": "c77ca1270f320aaaee50e8ddf4b68209e38e4d2d83d6661e8b98f007068fc1f0"
+        },
+        {
+          "path": "src/render/mage_ground_fx.ts",
+          "sha256": "7223f96964d2c38961f52494d4dbbe9bffad97cd0455e9962ac9075d08dfd27c"
+        },
+        {
+          "path": "src/render/vfx.ts",
+          "sha256": "8c8a931fcd1d8ae72039f67942caca8ad4ee85863f5084f24b8cc84f4f91cf9f"
+        },
+        {
+          "path": "src/sim/combat/effect_dispatch.ts",
+          "sha256": "39cef13ee9811a09de9ce0b75e277036a7dca0a301550671e132deb1552bc9db"
+        },
+        {
+          "path": "src/sim/entity_roster.ts",
+          "sha256": "d0965d0b82a29a138fbea1a6f3395151a543a3aa807332437bf7266969788afd"
+        },
+        {
+          "path": "src/sim/ground_aoe_readouts.ts",
+          "sha256": "7024b608457580f74b0ea65a55fea06c59f09e7ac3b328aa0e9110d2bfc490be"
+        },
+        {
+          "path": "src/sim/sim.ts",
+          "sha256": "acdcf40b654332058dcf367a4462179201d81227c02a38472ecdee2d1d182953"
+        },
+        {
+          "path": "src/vfx_studio/prepare_views.ts",
+          "sha256": "99a695479a3ae4632da36cb9d378a96687c981b67e3aba65b385f06118786ead"
+        },
+        {
+          "path": "src/world_api.ts",
+          "sha256": "d03f10e5d182358876dd50f1b938866506e19e9d6d2230d69561715c66bc44b2"
+        },
+        {
+          "path": "src/world_api/combat.ts",
+          "sha256": "7f8302b9b4418241fe9b13f3595912b5aa28ff40fe1f0b069ea2c5fbf8fafe43"
+        }
+      ],
+      "assetOverride": {
+        "path": "public/models/chars/players/warrior_contact_anims.glb",
+        "url": "/models/chars/players/warrior_contact_anims.glb",
+        "source": "C:\\Users\\tony\\Documents\\Codex\\2026-09-06\\new-chat\\work\\woc-vfx-studio\\tmp\\warrior-utility-old-contact.glb",
+        "sha256": "3cafd8eb57ae64865cc0ad86c4adc8ddf771a3fab1ffbcdb3ca13f25e720a150",
+        "bytes": 652972
+      },
+      "limitations": [
+        "Mixed-source baseline: only listed tracked utility batch files use the baseline commit; all other files retain checkout contents.",
+        "Public audio packs remain current; use this for visual evidence with audio disabled.",
+        "No browser or GPU capture performed by this server; HTTP transforms are not runtime or visual acceptance.",
+        "Vite dependency cache is isolated outside the checkout."
+      ],
+      "httpChecks": [
+        {
+          "path": "src/render/ability_vfx/fx.ts",
+          "status": 200,
+          "transformedSha256": "cdaed4bf830856d68d3920802ca7b983e64fb0fd9f039d29cc900d6273bc059a",
+          "noNewImports": true,
+          "hasOldPowerForms": true
+        },
+        {
+          "path": "src/render/renderer.ts",
+          "status": 200,
+          "transformedSha256": "b9b4b73de3b252138be60a5cb95482115189b86aa2f554017669c63444248f40",
+          "noNewImports": true,
+          "hasOldPowerForms": true
+        },
+        {
+          "path": "src/render/characters/damage_attack_animation.ts",
+          "status": 200,
+          "transformedSha256": "7c6684dd926cb984c7bc605ac7de3f2086942ac374c40646eb14e31c95ba07bc",
+          "noGyreAreaExclusion": true
+        },
+        {
+          "path": "/models/chars/players/warrior_contact_anims.glb",
+          "status": 200,
+          "sha256": "3cafd8eb57ae64865cc0ad86c4adc8ddf771a3fab1ffbcdb3ca13f25e720a150",
+          "bytes": 652972
+        }
+      ],
+      "errors": [],
+      "status": "ready",
+      "readyAt": "2026-09-08T19:25:59.519Z"
+    },
+    "viewport": {
+      "width": 1400,
+      "height": 900
+    },
+    "camera": {
+      "yaw": 1.9,
+      "pitch": 0.4,
+      "distance": 18
+    }
+  },
+  {
+    "file": "gyre-after.png",
+    "captureFolder": "warrior-fury-utility-quality-after-2",
+    "original": "p4-whirlwind-dummy-yaw1.9-tick6.png",
+    "sha256": "2504833c7685ea06de15878620d0612699efca6d1fe9c0f0f78f1936d596cc07",
+    "sourceUnchanged": true,
+    "baseline": null,
+    "viewport": {
+      "width": 1400,
+      "height": 900
+    },
+    "camera": {
+      "yaw": 1.9,
+      "pitch": 0.4,
+      "distance": 18
+    }
+  },
+  {
+    "file": "goad-before.png",
+    "captureFolder": "warrior-fury-states-before-settled-2",
+    "original": "p4-taunt-live-yaw1.9-tick3.png",
+    "sha256": "cbeeeae882ef60055e8cd060f0c0c30787720f1a3135a6071c20fb40a6d75c5b",
+    "sourceUnchanged": true,
+    "baseline": {
+      "purpose": "Actual-cast Warrior utility visual baseline via in-memory Vite source overlays",
+      "startedAt": "2026-09-08T19:24:59.098Z",
+      "pid": 35596,
+      "root": "C:\\Users\\tony\\Documents\\Codex\\2026-09-06\\new-chat\\work\\woc-vfx-studio",
+      "port": 5184,
+      "strictPort": true,
+      "baseline": "f191d8ddbc9ef2381d66657125b30bcb8b956188",
+      "currentHead": "f191d8ddbc9ef2381d66657125b30bcb8b956188",
+      "scriptSha256": "4a39a7a2e9f01dd53d5b31a4dfa390c6497b92aa623c34c566a812ba2a95cdca",
+      "config": "vite.config.ts",
+      "configSha256": "7768987a8048fffd1fd711131134be5c83840a2e0625b5d5f2954c4b8ee385e9",
+      "statusAtStart": " M public/audio/sfx/runtime-pack.json\n M public/models/chars/players/warrior_contact_anims.glb\n M scripts/build_warrior_contact_anims.mjs\n M scripts/sfx/sfx_gain_ceiling.generated.json\n M scripts/sfx/warrior_contact_sfx.mjs\n M server/ground_telegraph_wire.ts\n M src/fury_audio_core.ts\n M src/game/sfx_manifest.generated.ts\n M src/net/ground_telegraph_wire.ts\n M src/net/online.ts\n M src/render/ability_vfx/active_kit_prewarm.ts\n M src/render/ability_vfx/fx.ts\n M src/render/ability_vfx/fx_textures.ts\n M src/render/ability_vfx/painter.ts\n M src/render/ability_vfx/physical_choreography.ts\n M src/render/ability_vfx/signature_crests.ts\n M src/render/ability_vfx/signature_shapes.ts\n M src/render/ability_vfx/spectacle.ts\n M src/render/ability_vfx/warrior_area.ts\n M src/render/characters/beast_ability_clips.ts\n M src/render/characters/cast_performance.ts\n M src/render/characters/caster_clips.ts\n M src/render/characters/damage_attack_animation.ts\n M src/render/characters/manifest.ts\n M src/render/characters/signature_clips.ts\n M src/render/characters/visual.ts\n M src/render/mage_ground_fx.ts\n M src/render/renderer.ts\n M src/render/vfx.ts\n M src/render/warrior_vfx_specs.ts\n M src/sim/combat/effect_dispatch.ts\n M src/sim/entity_roster.ts\n M src/sim/ground_aoe_readouts.ts\n M src/sim/sim.ts\n M src/ui/combat_sfx.ts\n M src/ui/hud.ts\n M src/vfx_studio/combat_audio.ts\n M src/vfx_studio/prepare_views.ts\n M src/vfx_studio/studio.css\n M src/world_api.ts\n M src/world_api/combat.ts\n M tests/active_kit_prewarm.test.ts\n M tests/anim_pipeline_warrior_kobold.test.ts\n M tests/architecture.test.ts\n M tests/warrior_area_routing.test.ts\n M tests/warrior_contact_performance.test.ts\n?? docs/design/vfx-astonish-v25.md\n?? docs/design/warrior-fury-utility-v25.md\n?? public/audio/sfx/impact_warrior_blood_recovery_1.mp3\n?? public/audio/sfx/impact_warrior_blood_recovery_2.mp3\n?? public/audio/sfx/impact_warrior_goad_bark_1.mp3\n?? public/audio/sfx/impact_warrior_goad_bark_2.mp3\n?? public/audio/sfx/impact_warrior_gyre_sweep_1.mp3\n?? public/audio/sfx/impact_warrior_gyre_sweep_2.mp3\n?? public/audio/sfx/impact_warrior_mending_lock_1.mp3\n?? public/audio/sfx/impact_warrior_mending_lock_2.mp3\n?? public/audio/sfx/melee_warrior_goad_release_1.mp3\n?? public/audio/sfx/melee_warrior_goad_release_2.mp3\n?? public/audio/sfx/melee_warrior_gyre_release_1.mp3\n?? public/audio/sfx/melee_warrior_gyre_release_2.mp3\n?? public/audio/sfx/melee_warrior_mending_release_1.mp3\n?? public/audio/sfx/melee_warrior_mending_release_2.mp3\n?? src/render/ability_vfx/warrior_attention.ts\n?? src/render/ability_vfx/warrior_attention_atlas.ts\n?? src/render/ability_vfx/warrior_attention_core.ts\n?? src/render/ability_vfx/warrior_fury_feedback.ts\n?? src/render/ability_vfx/warrior_fury_state_shapes.ts\n?? src/render/ability_vfx/warrior_fury_states.ts\n?? src/render/ability_vfx/warrior_goad.ts\n?? src/render/ability_vfx/warrior_gyre.ts\n?? src/render/ability_vfx/warrior_gyre_shape.ts\n?? src/render/warrior_fury_state_core.ts\n?? src/warrior_recovery_core.ts\n?? tests/warrior_attention.test.ts\n?? tests/warrior_attention_core.test.ts\n?? tests/warrior_fury_feedback.test.ts\n?? tests/warrior_fury_state_core.test.ts\n?? tests/warrior_fury_state_shapes.test.ts\n?? tests/warrior_fury_states.test.ts\n?? tests/warrior_gyre_shape.test.ts\n?? tests/warrior_recovery_core.test.ts\n?? tests/warrior_utility_audio.test.ts\n",
+      "overrides": [
+        {
+          "path": "src/fury_audio_core.ts",
+          "baselineSha256": "38efce45642e6adbb60a26236d329f3a03ed420ce3300d76d39a2b6a738b41d4",
+          "currentSha256": "49c11c0231006ba74abbde68cc6fb58e475bc122942cfa2cb7ce5e99455e3d72",
+          "bytes": 4605
+        },
+        {
+          "path": "src/game/sfx_manifest.generated.ts",
+          "baselineSha256": "c7e1d608a013337039eb5c8bc25d1cc89b3f1c6f50a97f11cf5a874dddbd7d52",
+          "currentSha256": "cf6932f7410a1aeed82ea8b29d75316fddd01511c55276f20a9ffe6288c636b6",
+          "bytes": 264605
+        },
+        {
+          "path": "src/render/ability_vfx/active_kit_prewarm.ts",
+          "baselineSha256": "c6a3bdeffd78290f1e2a66dda9a8f7d6324813e0677110e452ad979e5bb45f22",
+          "currentSha256": "e5ae3c70edf8571411f2c426e5795d5cbb6b51eb280e440464565c44766a4b86",
+          "bytes": 5042
+        },
+        {
+          "path": "src/render/ability_vfx/fx.ts",
+          "baselineSha256": "20492b8d530a0fc94ae9753364115eeb3f9b0810f68cdf627f46e20658bb2f33",
+          "currentSha256": "52682d8a099eb8db1ac33b581588cad8467f6f514be5963b592b1ed79cd25429",
+          "bytes": 101761
+        },
+        {
+          "path": "src/render/ability_vfx/fx_textures.ts",
+          "baselineSha256": "a8ce77419a3646006960be6dca423adf4e36205a318c803076de18ef72ff33e4",
+          "currentSha256": "7a228c911fba13806e860c169d79ec496d943a8e7efeb50bb93bf743a977e227",
+          "bytes": 25146
+        },
+        {
+          "path": "src/render/ability_vfx/painter.ts",
+          "baselineSha256": "9c9f10a8c89f79bdab3ef744062560d041c55e24d8cdf43fdd743726412ec2ba",
+          "currentSha256": "ef1dccf7aa77bac4cec8ece0f359f765c4fdcc698d9585904cd0beda3d1066b6",
+          "bytes": 84527
+        },
+        {
+          "path": "src/render/ability_vfx/physical_choreography.ts",
+          "baselineSha256": "eb69d760f264df82d961804a7aaf62d484ecb5274c17cdf4b210d06d5adc6b56",
+          "currentSha256": "d62732907ae0cd0c41236168ffd163c9b92864e6a3cdfbaa2264ed3878c6d423",
+          "bytes": 15868
+        },
+        {
+          "path": "src/render/ability_vfx/signature_crests.ts",
+          "baselineSha256": "f69ed06c4851791392082bf32e7cc68e0a16875270a7045658d85816dfe9e61b",
+          "currentSha256": "30473b8cff9ffef42306a340efdc8aaef0c8087a7802c3fcead2e7256c1d76b5",
+          "bytes": 18813
+        },
+        {
+          "path": "src/render/ability_vfx/signature_shapes.ts",
+          "baselineSha256": "ce26fe6ba6a044b26f51e36d268234b3015d607163c097c892e370bfe8fa6a49",
+          "currentSha256": "f3e05dc7e838e21a5ab15bcd657f8b95fb053cad0a2419cee27061eb728437ea",
+          "bytes": 7261
+        },
+        {
+          "path": "src/render/ability_vfx/warrior_area.ts",
+          "baselineSha256": "ad9277b8b6a3817506ab3935c37eb133dce9af91e691180eb0fc611a9a8ca50b",
+          "currentSha256": "6a5f7acc6cb80545b393e482594904702a446a34d408de18799989b4e14f4ecd",
+          "bytes": 4334
+        },
+        {
+          "path": "src/render/characters/manifest.ts",
+          "baselineSha256": "f3dbd4eae794183ea74bc469ee7e897943bd1335e86906a4ac01e088b2b11052",
+          "currentSha256": "81ef58480da00fc936163d37b515d1ac605e4f8cf41769cfb4669aeae1af715f",
+          "bytes": 171496
+        },
+        {
+          "path": "src/render/characters/damage_attack_animation.ts",
+          "baselineSha256": "5bd62d65c5a354ec151c1f727afb34cf3b18f228639f29da24bfd6d77b3b43e1",
+          "currentSha256": "a8e4d5d9fba1d6d185d7d9eea86e90d7603f7a15eec486c264c9d0914eda9570",
+          "bytes": 3248
+        },
+        {
+          "path": "src/render/characters/signature_clips.ts",
+          "baselineSha256": "0fda86704bb2f747ee02ff34e2be533601af29af63baaaaa5bd63cd501b90002",
+          "currentSha256": "5a45b335921612e450074d5183c9e19fd03a862396c720410a00d516ea849a50",
+          "bytes": 6625
+        },
+        {
+          "path": "src/render/characters/visual.ts",
+          "baselineSha256": "a2213ebab178b8a979588f735691c5b1bd99a5d10d277b161d9ff2eb56f4b3c0",
+          "currentSha256": "32f39e71e0439a4faac4fb2a287deb7d31ab362b40b1bdea62add9d58c0826e6",
+          "bytes": 182170
+        },
+        {
+          "path": "src/render/renderer.ts",
+          "baselineSha256": "a84d58cef7136bcfd868e8098aedfbe3004655e7d8e5b067817b367200a1408f",
+          "currentSha256": "dfced9b5cc3c8f71c4cd5e82974b56395901bbf8b4acfbf8976d0f63cda68287",
+          "bytes": 605790
+        },
+        {
+          "path": "src/render/warrior_vfx_specs.ts",
+          "baselineSha256": "275e94149c9f4d8e33e52e97dff485df2dcb31c6b6f6e24850df2f73edb96802",
+          "currentSha256": "527dbf150a3cfaa172abfae0bb1106a859149d0ff732a0ada476af9eaf609816",
+          "bytes": 6476
+        },
+        {
+          "path": "src/ui/combat_sfx.ts",
+          "baselineSha256": "caad53fe327cc963cea870d7b1a768154277e2cbbf81464aa7fabefb1432552c",
+          "currentSha256": "cabd2a2ecb0fc3805692a0012e9e9496f76ea6fb0ca90216400ea8af0c175b63",
+          "bytes": 27060
+        },
+        {
+          "path": "src/ui/hud.ts",
+          "baselineSha256": "f52f54e2d49f7da99596daf7d799f13eedd50f5a942467d76c2f603d4ce31e0a",
+          "currentSha256": "e98e23ab883b1beae8797072108c1bf7502572936031f09508ab176efa2081a4",
+          "bytes": 866514
+        },
+        {
+          "path": "src/vfx_studio/combat_audio.ts",
+          "baselineSha256": "a87eac4e356598313e2426bc009815533989feb88028298e4f1b033df14c2ede",
+          "currentSha256": "a0a34a73da7ca1ecc1cf610329eb82cb719a664f79e1209703c687e811f4123b",
+          "bytes": 5067
+        },
+        {
+          "path": "src/vfx_studio/studio.css",
+          "baselineSha256": "1a168bef63a116471d71fc92d777af2e3c6aa14e58d771cc0bf37a124b855fb5",
+          "currentSha256": "b7282517130c9c027768f45b745be59e01b03a39f96bd62cbabc9e7e5b1f5fec",
+          "bytes": 10919
+        }
+      ],
+      "unconditionalOverrides": [
+        "src/render/characters/damage_attack_animation.ts"
+      ],
+      "allowlistedUnchanged": [
+        "src/render/ability_vfx/prewarm.ts",
+        "src/render/ability_vfx/primitive_prewarm.ts"
+      ],
+      "preservedOriginalWip": [
+        {
+          "path": "server/ground_telegraph_wire.ts",
+          "sha256": "178e37fa7f9b0ccf78f52204b4594afe6e0bf961e6c77c2172aaf21708fe8b39"
+        },
+        {
+          "path": "src/net/ground_telegraph_wire.ts",
+          "sha256": "ad4ee6d41176c80ed7cf7af6a41828374cd0280b330e0f1d9baa61f07e3608c2"
+        },
+        {
+          "path": "src/net/online.ts",
+          "sha256": "6e3db4c899c3bc5f176852beaacc0b90148bd5bc62908c715bd9e4c3bc26f246"
+        },
+        {
+          "path": "src/render/ability_vfx/spectacle.ts",
+          "sha256": "051a02a76ec2f5742f8147da9afd6b2f8bd70172af2d6d5ad7f69e19b56c7aa5"
+        },
+        {
+          "path": "src/render/characters/beast_ability_clips.ts",
+          "sha256": "958ace2961dd35e5cda53d817bc8c446ebabb59b133cbc6a0c37ec177ddd9c55"
+        },
+        {
+          "path": "src/render/characters/cast_performance.ts",
+          "sha256": "d11e6f0c458355b2cd8d06f48ac9cd4037d1045a57ecc09dfc5a7c7185c9e6f2"
+        },
+        {
+          "path": "src/render/characters/caster_clips.ts",
+          "sha256": "c77ca1270f320aaaee50e8ddf4b68209e38e4d2d83d6661e8b98f007068fc1f0"
+        },
+        {
+          "path": "src/render/mage_ground_fx.ts",
+          "sha256": "7223f96964d2c38961f52494d4dbbe9bffad97cd0455e9962ac9075d08dfd27c"
+        },
+        {
+          "path": "src/render/vfx.ts",
+          "sha256": "8c8a931fcd1d8ae72039f67942caca8ad4ee85863f5084f24b8cc84f4f91cf9f"
+        },
+        {
+          "path": "src/sim/combat/effect_dispatch.ts",
+          "sha256": "39cef13ee9811a09de9ce0b75e277036a7dca0a301550671e132deb1552bc9db"
+        },
+        {
+          "path": "src/sim/entity_roster.ts",
+          "sha256": "d0965d0b82a29a138fbea1a6f3395151a543a3aa807332437bf7266969788afd"
+        },
+        {
+          "path": "src/sim/ground_aoe_readouts.ts",
+          "sha256": "7024b608457580f74b0ea65a55fea06c59f09e7ac3b328aa0e9110d2bfc490be"
+        },
+        {
+          "path": "src/sim/sim.ts",
+          "sha256": "acdcf40b654332058dcf367a4462179201d81227c02a38472ecdee2d1d182953"
+        },
+        {
+          "path": "src/vfx_studio/prepare_views.ts",
+          "sha256": "99a695479a3ae4632da36cb9d378a96687c981b67e3aba65b385f06118786ead"
+        },
+        {
+          "path": "src/world_api.ts",
+          "sha256": "d03f10e5d182358876dd50f1b938866506e19e9d6d2230d69561715c66bc44b2"
+        },
+        {
+          "path": "src/world_api/combat.ts",
+          "sha256": "7f8302b9b4418241fe9b13f3595912b5aa28ff40fe1f0b069ea2c5fbf8fafe43"
+        }
+      ],
+      "assetOverride": {
+        "path": "public/models/chars/players/warrior_contact_anims.glb",
+        "url": "/models/chars/players/warrior_contact_anims.glb",
+        "source": "C:\\Users\\tony\\Documents\\Codex\\2026-09-06\\new-chat\\work\\woc-vfx-studio\\tmp\\warrior-utility-old-contact.glb",
+        "sha256": "3cafd8eb57ae64865cc0ad86c4adc8ddf771a3fab1ffbcdb3ca13f25e720a150",
+        "bytes": 652972
+      },
+      "limitations": [
+        "Mixed-source baseline: only listed tracked utility batch files use the baseline commit; all other files retain checkout contents.",
+        "Public audio packs remain current; use this for visual evidence with audio disabled.",
+        "No browser or GPU capture performed by this server; HTTP transforms are not runtime or visual acceptance.",
+        "Vite dependency cache is isolated outside the checkout."
+      ],
+      "httpChecks": [
+        {
+          "path": "src/render/ability_vfx/fx.ts",
+          "status": 200,
+          "transformedSha256": "cdaed4bf830856d68d3920802ca7b983e64fb0fd9f039d29cc900d6273bc059a",
+          "noNewImports": true,
+          "hasOldPowerForms": true
+        },
+        {
+          "path": "src/render/renderer.ts",
+          "status": 200,
+          "transformedSha256": "b9b4b73de3b252138be60a5cb95482115189b86aa2f554017669c63444248f40",
+          "noNewImports": true,
+          "hasOldPowerForms": true
+        },
+        {
+          "path": "src/render/characters/damage_attack_animation.ts",
+          "status": 200,
+          "transformedSha256": "7c6684dd926cb984c7bc605ac7de3f2086942ac374c40646eb14e31c95ba07bc",
+          "noGyreAreaExclusion": true
+        },
+        {
+          "path": "/models/chars/players/warrior_contact_anims.glb",
+          "status": 200,
+          "sha256": "3cafd8eb57ae64865cc0ad86c4adc8ddf771a3fab1ffbcdb3ca13f25e720a150",
+          "bytes": 652972
+        }
+      ],
+      "errors": [],
+      "status": "ready",
+      "readyAt": "2026-09-08T19:25:59.519Z"
+    },
+    "viewport": {
+      "width": 1400,
+      "height": 900
+    },
+    "camera": {
+      "yaw": 1.9,
+      "pitch": 0.4,
+      "distance": 18
+    }
+  },
+  {
+    "file": "goad-after.png",
+    "captureFolder": "warrior-utility-readability-after-1",
+    "original": "p4-taunt-live-yaw1.9-tick3.png",
+    "sha256": "229bb637a26a7027eb959e88f3f72acf5e7e18270eb70b45de77a23733166c9d",
+    "sourceUnchanged": true,
+    "baseline": null,
+    "viewport": {
+      "width": 1400,
+      "height": 900
+    },
+    "camera": {
+      "yaw": 1.9,
+      "pitch": 0.4,
+      "distance": 18
+    }
+  },
+  {
+    "file": "mending-cast-before.png",
+    "captureFolder": "warrior-fury-states-before-settled-2",
+    "original": "p4-furious_mending-dummy-yaw1.9-tick3.png",
+    "sha256": "aa031fff0e448a6fcf2a4883a16ad527ffcef6c5e6e729a6d59ed42246cb2a63",
+    "sourceUnchanged": true,
+    "baseline": {
+      "purpose": "Actual-cast Warrior utility visual baseline via in-memory Vite source overlays",
+      "startedAt": "2026-09-08T19:24:59.098Z",
+      "pid": 35596,
+      "root": "C:\\Users\\tony\\Documents\\Codex\\2026-09-06\\new-chat\\work\\woc-vfx-studio",
+      "port": 5184,
+      "strictPort": true,
+      "baseline": "f191d8ddbc9ef2381d66657125b30bcb8b956188",
+      "currentHead": "f191d8ddbc9ef2381d66657125b30bcb8b956188",
+      "scriptSha256": "4a39a7a2e9f01dd53d5b31a4dfa390c6497b92aa623c34c566a812ba2a95cdca",
+      "config": "vite.config.ts",
+      "configSha256": "7768987a8048fffd1fd711131134be5c83840a2e0625b5d5f2954c4b8ee385e9",
+      "statusAtStart": " M public/audio/sfx/runtime-pack.json\n M public/models/chars/players/warrior_contact_anims.glb\n M scripts/build_warrior_contact_anims.mjs\n M scripts/sfx/sfx_gain_ceiling.generated.json\n M scripts/sfx/warrior_contact_sfx.mjs\n M server/ground_telegraph_wire.ts\n M src/fury_audio_core.ts\n M src/game/sfx_manifest.generated.ts\n M src/net/ground_telegraph_wire.ts\n M src/net/online.ts\n M src/render/ability_vfx/active_kit_prewarm.ts\n M src/render/ability_vfx/fx.ts\n M src/render/ability_vfx/fx_textures.ts\n M src/render/ability_vfx/painter.ts\n M src/render/ability_vfx/physical_choreography.ts\n M src/render/ability_vfx/signature_crests.ts\n M src/render/ability_vfx/signature_shapes.ts\n M src/render/ability_vfx/spectacle.ts\n M src/render/ability_vfx/warrior_area.ts\n M src/render/characters/beast_ability_clips.ts\n M src/render/characters/cast_performance.ts\n M src/render/characters/caster_clips.ts\n M src/render/characters/damage_attack_animation.ts\n M src/render/characters/manifest.ts\n M src/render/characters/signature_clips.ts\n M src/render/characters/visual.ts\n M src/render/mage_ground_fx.ts\n M src/render/renderer.ts\n M src/render/vfx.ts\n M src/render/warrior_vfx_specs.ts\n M src/sim/combat/effect_dispatch.ts\n M src/sim/entity_roster.ts\n M src/sim/ground_aoe_readouts.ts\n M src/sim/sim.ts\n M src/ui/combat_sfx.ts\n M src/ui/hud.ts\n M src/vfx_studio/combat_audio.ts\n M src/vfx_studio/prepare_views.ts\n M src/vfx_studio/studio.css\n M src/world_api.ts\n M src/world_api/combat.ts\n M tests/active_kit_prewarm.test.ts\n M tests/anim_pipeline_warrior_kobold.test.ts\n M tests/architecture.test.ts\n M tests/warrior_area_routing.test.ts\n M tests/warrior_contact_performance.test.ts\n?? docs/design/vfx-astonish-v25.md\n?? docs/design/warrior-fury-utility-v25.md\n?? public/audio/sfx/impact_warrior_blood_recovery_1.mp3\n?? public/audio/sfx/impact_warrior_blood_recovery_2.mp3\n?? public/audio/sfx/impact_warrior_goad_bark_1.mp3\n?? public/audio/sfx/impact_warrior_goad_bark_2.mp3\n?? public/audio/sfx/impact_warrior_gyre_sweep_1.mp3\n?? public/audio/sfx/impact_warrior_gyre_sweep_2.mp3\n?? public/audio/sfx/impact_warrior_mending_lock_1.mp3\n?? public/audio/sfx/impact_warrior_mending_lock_2.mp3\n?? public/audio/sfx/melee_warrior_goad_release_1.mp3\n?? public/audio/sfx/melee_warrior_goad_release_2.mp3\n?? public/audio/sfx/melee_warrior_gyre_release_1.mp3\n?? public/audio/sfx/melee_warrior_gyre_release_2.mp3\n?? public/audio/sfx/melee_warrior_mending_release_1.mp3\n?? public/audio/sfx/melee_warrior_mending_release_2.mp3\n?? src/render/ability_vfx/warrior_attention.ts\n?? src/render/ability_vfx/warrior_attention_atlas.ts\n?? src/render/ability_vfx/warrior_attention_core.ts\n?? src/render/ability_vfx/warrior_fury_feedback.ts\n?? src/render/ability_vfx/warrior_fury_state_shapes.ts\n?? src/render/ability_vfx/warrior_fury_states.ts\n?? src/render/ability_vfx/warrior_goad.ts\n?? src/render/ability_vfx/warrior_gyre.ts\n?? src/render/ability_vfx/warrior_gyre_shape.ts\n?? src/render/warrior_fury_state_core.ts\n?? src/warrior_recovery_core.ts\n?? tests/warrior_attention.test.ts\n?? tests/warrior_attention_core.test.ts\n?? tests/warrior_fury_feedback.test.ts\n?? tests/warrior_fury_state_core.test.ts\n?? tests/warrior_fury_state_shapes.test.ts\n?? tests/warrior_fury_states.test.ts\n?? tests/warrior_gyre_shape.test.ts\n?? tests/warrior_recovery_core.test.ts\n?? tests/warrior_utility_audio.test.ts\n",
+      "overrides": [
+        {
+          "path": "src/fury_audio_core.ts",
+          "baselineSha256": "38efce45642e6adbb60a26236d329f3a03ed420ce3300d76d39a2b6a738b41d4",
+          "currentSha256": "49c11c0231006ba74abbde68cc6fb58e475bc122942cfa2cb7ce5e99455e3d72",
+          "bytes": 4605
+        },
+        {
+          "path": "src/game/sfx_manifest.generated.ts",
+          "baselineSha256": "c7e1d608a013337039eb5c8bc25d1cc89b3f1c6f50a97f11cf5a874dddbd7d52",
+          "currentSha256": "cf6932f7410a1aeed82ea8b29d75316fddd01511c55276f20a9ffe6288c636b6",
+          "bytes": 264605
+        },
+        {
+          "path": "src/render/ability_vfx/active_kit_prewarm.ts",
+          "baselineSha256": "c6a3bdeffd78290f1e2a66dda9a8f7d6324813e0677110e452ad979e5bb45f22",
+          "currentSha256": "e5ae3c70edf8571411f2c426e5795d5cbb6b51eb280e440464565c44766a4b86",
+          "bytes": 5042
+        },
+        {
+          "path": "src/render/ability_vfx/fx.ts",
+          "baselineSha256": "20492b8d530a0fc94ae9753364115eeb3f9b0810f68cdf627f46e20658bb2f33",
+          "currentSha256": "52682d8a099eb8db1ac33b581588cad8467f6f514be5963b592b1ed79cd25429",
+          "bytes": 101761
+        },
+        {
+          "path": "src/render/ability_vfx/fx_textures.ts",
+          "baselineSha256": "a8ce77419a3646006960be6dca423adf4e36205a318c803076de18ef72ff33e4",
+          "currentSha256": "7a228c911fba13806e860c169d79ec496d943a8e7efeb50bb93bf743a977e227",
+          "bytes": 25146
+        },
+        {
+          "path": "src/render/ability_vfx/painter.ts",
+          "baselineSha256": "9c9f10a8c89f79bdab3ef744062560d041c55e24d8cdf43fdd743726412ec2ba",
+          "currentSha256": "ef1dccf7aa77bac4cec8ece0f359f765c4fdcc698d9585904cd0beda3d1066b6",
+          "bytes": 84527
+        },
+        {
+          "path": "src/render/ability_vfx/physical_choreography.ts",
+          "baselineSha256": "eb69d760f264df82d961804a7aaf62d484ecb5274c17cdf4b210d06d5adc6b56",
+          "currentSha256": "d62732907ae0cd0c41236168ffd163c9b92864e6a3cdfbaa2264ed3878c6d423",
+          "bytes": 15868
+        },
+        {
+          "path": "src/render/ability_vfx/signature_crests.ts",
+          "baselineSha256": "f69ed06c4851791392082bf32e7cc68e0a16875270a7045658d85816dfe9e61b",
+          "currentSha256": "30473b8cff9ffef42306a340efdc8aaef0c8087a7802c3fcead2e7256c1d76b5",
+          "bytes": 18813
+        },
+        {
+          "path": "src/render/ability_vfx/signature_shapes.ts",
+          "baselineSha256": "ce26fe6ba6a044b26f51e36d268234b3015d607163c097c892e370bfe8fa6a49",
+          "currentSha256": "f3e05dc7e838e21a5ab15bcd657f8b95fb053cad0a2419cee27061eb728437ea",
+          "bytes": 7261
+        },
+        {
+          "path": "src/render/ability_vfx/warrior_area.ts",
+          "baselineSha256": "ad9277b8b6a3817506ab3935c37eb133dce9af91e691180eb0fc611a9a8ca50b",
+          "currentSha256": "6a5f7acc6cb80545b393e482594904702a446a34d408de18799989b4e14f4ecd",
+          "bytes": 4334
+        },
+        {
+          "path": "src/render/characters/manifest.ts",
+          "baselineSha256": "f3dbd4eae794183ea74bc469ee7e897943bd1335e86906a4ac01e088b2b11052",
+          "currentSha256": "81ef58480da00fc936163d37b515d1ac605e4f8cf41769cfb4669aeae1af715f",
+          "bytes": 171496
+        },
+        {
+          "path": "src/render/characters/damage_attack_animation.ts",
+          "baselineSha256": "5bd62d65c5a354ec151c1f727afb34cf3b18f228639f29da24bfd6d77b3b43e1",
+          "currentSha256": "a8e4d5d9fba1d6d185d7d9eea86e90d7603f7a15eec486c264c9d0914eda9570",
+          "bytes": 3248
+        },
+        {
+          "path": "src/render/characters/signature_clips.ts",
+          "baselineSha256": "0fda86704bb2f747ee02ff34e2be533601af29af63baaaaa5bd63cd501b90002",
+          "currentSha256": "5a45b335921612e450074d5183c9e19fd03a862396c720410a00d516ea849a50",
+          "bytes": 6625
+        },
+        {
+          "path": "src/render/characters/visual.ts",
+          "baselineSha256": "a2213ebab178b8a979588f735691c5b1bd99a5d10d277b161d9ff2eb56f4b3c0",
+          "currentSha256": "32f39e71e0439a4faac4fb2a287deb7d31ab362b40b1bdea62add9d58c0826e6",
+          "bytes": 182170
+        },
+        {
+          "path": "src/render/renderer.ts",
+          "baselineSha256": "a84d58cef7136bcfd868e8098aedfbe3004655e7d8e5b067817b367200a1408f",
+          "currentSha256": "dfced9b5cc3c8f71c4cd5e82974b56395901bbf8b4acfbf8976d0f63cda68287",
+          "bytes": 605790
+        },
+        {
+          "path": "src/render/warrior_vfx_specs.ts",
+          "baselineSha256": "275e94149c9f4d8e33e52e97dff485df2dcb31c6b6f6e24850df2f73edb96802",
+          "currentSha256": "527dbf150a3cfaa172abfae0bb1106a859149d0ff732a0ada476af9eaf609816",
+          "bytes": 6476
+        },
+        {
+          "path": "src/ui/combat_sfx.ts",
+          "baselineSha256": "caad53fe327cc963cea870d7b1a768154277e2cbbf81464aa7fabefb1432552c",
+          "currentSha256": "cabd2a2ecb0fc3805692a0012e9e9496f76ea6fb0ca90216400ea8af0c175b63",
+          "bytes": 27060
+        },
+        {
+          "path": "src/ui/hud.ts",
+          "baselineSha256": "f52f54e2d49f7da99596daf7d799f13eedd50f5a942467d76c2f603d4ce31e0a",
+          "currentSha256": "e98e23ab883b1beae8797072108c1bf7502572936031f09508ab176efa2081a4",
+          "bytes": 866514
+        },
+        {
+          "path": "src/vfx_studio/combat_audio.ts",
+          "baselineSha256": "a87eac4e356598313e2426bc009815533989feb88028298e4f1b033df14c2ede",
+          "currentSha256": "a0a34a73da7ca1ecc1cf610329eb82cb719a664f79e1209703c687e811f4123b",
+          "bytes": 5067
+        },
+        {
+          "path": "src/vfx_studio/studio.css",
+          "baselineSha256": "1a168bef63a116471d71fc92d777af2e3c6aa14e58d771cc0bf37a124b855fb5",
+          "currentSha256": "b7282517130c9c027768f45b745be59e01b03a39f96bd62cbabc9e7e5b1f5fec",
+          "bytes": 10919
+        }
+      ],
+      "unconditionalOverrides": [
+        "src/render/characters/damage_attack_animation.ts"
+      ],
+      "allowlistedUnchanged": [
+        "src/render/ability_vfx/prewarm.ts",
+        "src/render/ability_vfx/primitive_prewarm.ts"
+      ],
+      "preservedOriginalWip": [
+        {
+          "path": "server/ground_telegraph_wire.ts",
+          "sha256": "178e37fa7f9b0ccf78f52204b4594afe6e0bf961e6c77c2172aaf21708fe8b39"
+        },
+        {
+          "path": "src/net/ground_telegraph_wire.ts",
+          "sha256": "ad4ee6d41176c80ed7cf7af6a41828374cd0280b330e0f1d9baa61f07e3608c2"
+        },
+        {
+          "path": "src/net/online.ts",
+          "sha256": "6e3db4c899c3bc5f176852beaacc0b90148bd5bc62908c715bd9e4c3bc26f246"
+        },
+        {
+          "path": "src/render/ability_vfx/spectacle.ts",
+          "sha256": "051a02a76ec2f5742f8147da9afd6b2f8bd70172af2d6d5ad7f69e19b56c7aa5"
+        },
+        {
+          "path": "src/render/characters/beast_ability_clips.ts",
+          "sha256": "958ace2961dd35e5cda53d817bc8c446ebabb59b133cbc6a0c37ec177ddd9c55"
+        },
+        {
+          "path": "src/render/characters/cast_performance.ts",
+          "sha256": "d11e6f0c458355b2cd8d06f48ac9cd4037d1045a57ecc09dfc5a7c7185c9e6f2"
+        },
+        {
+          "path": "src/render/characters/caster_clips.ts",
+          "sha256": "c77ca1270f320aaaee50e8ddf4b68209e38e4d2d83d6661e8b98f007068fc1f0"
+        },
+        {
+          "path": "src/render/mage_ground_fx.ts",
+          "sha256": "7223f96964d2c38961f52494d4dbbe9bffad97cd0455e9962ac9075d08dfd27c"
+        },
+        {
+          "path": "src/render/vfx.ts",
+          "sha256": "8c8a931fcd1d8ae72039f67942caca8ad4ee85863f5084f24b8cc84f4f91cf9f"
+        },
+        {
+          "path": "src/sim/combat/effect_dispatch.ts",
+          "sha256": "39cef13ee9811a09de9ce0b75e277036a7dca0a301550671e132deb1552bc9db"
+        },
+        {
+          "path": "src/sim/entity_roster.ts",
+          "sha256": "d0965d0b82a29a138fbea1a6f3395151a543a3aa807332437bf7266969788afd"
+        },
+        {
+          "path": "src/sim/ground_aoe_readouts.ts",
+          "sha256": "7024b608457580f74b0ea65a55fea06c59f09e7ac3b328aa0e9110d2bfc490be"
+        },
+        {
+          "path": "src/sim/sim.ts",
+          "sha256": "acdcf40b654332058dcf367a4462179201d81227c02a38472ecdee2d1d182953"
+        },
+        {
+          "path": "src/vfx_studio/prepare_views.ts",
+          "sha256": "99a695479a3ae4632da36cb9d378a96687c981b67e3aba65b385f06118786ead"
+        },
+        {
+          "path": "src/world_api.ts",
+          "sha256": "d03f10e5d182358876dd50f1b938866506e19e9d6d2230d69561715c66bc44b2"
+        },
+        {
+          "path": "src/world_api/combat.ts",
+          "sha256": "7f8302b9b4418241fe9b13f3595912b5aa28ff40fe1f0b069ea2c5fbf8fafe43"
+        }
+      ],
+      "assetOverride": {
+        "path": "public/models/chars/players/warrior_contact_anims.glb",
+        "url": "/models/chars/players/warrior_contact_anims.glb",
+        "source": "C:\\Users\\tony\\Documents\\Codex\\2026-09-06\\new-chat\\work\\woc-vfx-studio\\tmp\\warrior-utility-old-contact.glb",
+        "sha256": "3cafd8eb57ae64865cc0ad86c4adc8ddf771a3fab1ffbcdb3ca13f25e720a150",
+        "bytes": 652972
+      },
+      "limitations": [
+        "Mixed-source baseline: only listed tracked utility batch files use the baseline commit; all other files retain checkout contents.",
+        "Public audio packs remain current; use this for visual evidence with audio disabled.",
+        "No browser or GPU capture performed by this server; HTTP transforms are not runtime or visual acceptance.",
+        "Vite dependency cache is isolated outside the checkout."
+      ],
+      "httpChecks": [
+        {
+          "path": "src/render/ability_vfx/fx.ts",
+          "status": 200,
+          "transformedSha256": "cdaed4bf830856d68d3920802ca7b983e64fb0fd9f039d29cc900d6273bc059a",
+          "noNewImports": true,
+          "hasOldPowerForms": true
+        },
+        {
+          "path": "src/render/renderer.ts",
+          "status": 200,
+          "transformedSha256": "b9b4b73de3b252138be60a5cb95482115189b86aa2f554017669c63444248f40",
+          "noNewImports": true,
+          "hasOldPowerForms": true
+        },
+        {
+          "path": "src/render/characters/damage_attack_animation.ts",
+          "status": 200,
+          "transformedSha256": "7c6684dd926cb984c7bc605ac7de3f2086942ac374c40646eb14e31c95ba07bc",
+          "noGyreAreaExclusion": true
+        },
+        {
+          "path": "/models/chars/players/warrior_contact_anims.glb",
+          "status": 200,
+          "sha256": "3cafd8eb57ae64865cc0ad86c4adc8ddf771a3fab1ffbcdb3ca13f25e720a150",
+          "bytes": 652972
+        }
+      ],
+      "errors": [],
+      "status": "ready",
+      "readyAt": "2026-09-08T19:25:59.519Z"
+    },
+    "viewport": {
+      "width": 1400,
+      "height": 900
+    },
+    "camera": {
+      "yaw": 1.9,
+      "pitch": 0.4,
+      "distance": 18
+    }
+  },
+  {
+    "file": "mending-cast-after.png",
+    "captureFolder": "warrior-mending-folded-after-2",
+    "original": "p4-furious_mending-dummy-yaw1.9-tick3.png",
+    "sha256": "0a02984fda02d69b5c6bc9b531dfcf935e13acabe1ed39872670241aca50c7e2",
+    "sourceUnchanged": true,
+    "baseline": null,
+    "viewport": {
+      "width": 1400,
+      "height": 900
+    },
+    "camera": {
+      "yaw": 1.9,
+      "pitch": 0.4,
+      "distance": 18
+    }
+  },
+  {
+    "file": "mending-held-before.png",
+    "captureFolder": "warrior-fury-states-before-settled-2",
+    "original": "p4-furious_mending-dummy-yaw1.9-tick30.png",
+    "sha256": "ffc53d2fc74d4f7106c7344d62b27e60bc5318112e53af1a7ae9173c9ded3f10",
+    "sourceUnchanged": true,
+    "baseline": {
+      "purpose": "Actual-cast Warrior utility visual baseline via in-memory Vite source overlays",
+      "startedAt": "2026-09-08T19:24:59.098Z",
+      "pid": 35596,
+      "root": "C:\\Users\\tony\\Documents\\Codex\\2026-09-06\\new-chat\\work\\woc-vfx-studio",
+      "port": 5184,
+      "strictPort": true,
+      "baseline": "f191d8ddbc9ef2381d66657125b30bcb8b956188",
+      "currentHead": "f191d8ddbc9ef2381d66657125b30bcb8b956188",
+      "scriptSha256": "4a39a7a2e9f01dd53d5b31a4dfa390c6497b92aa623c34c566a812ba2a95cdca",
+      "config": "vite.config.ts",
+      "configSha256": "7768987a8048fffd1fd711131134be5c83840a2e0625b5d5f2954c4b8ee385e9",
+      "statusAtStart": " M public/audio/sfx/runtime-pack.json\n M public/models/chars/players/warrior_contact_anims.glb\n M scripts/build_warrior_contact_anims.mjs\n M scripts/sfx/sfx_gain_ceiling.generated.json\n M scripts/sfx/warrior_contact_sfx.mjs\n M server/ground_telegraph_wire.ts\n M src/fury_audio_core.ts\n M src/game/sfx_manifest.generated.ts\n M src/net/ground_telegraph_wire.ts\n M src/net/online.ts\n M src/render/ability_vfx/active_kit_prewarm.ts\n M src/render/ability_vfx/fx.ts\n M src/render/ability_vfx/fx_textures.ts\n M src/render/ability_vfx/painter.ts\n M src/render/ability_vfx/physical_choreography.ts\n M src/render/ability_vfx/signature_crests.ts\n M src/render/ability_vfx/signature_shapes.ts\n M src/render/ability_vfx/spectacle.ts\n M src/render/ability_vfx/warrior_area.ts\n M src/render/characters/beast_ability_clips.ts\n M src/render/characters/cast_performance.ts\n M src/render/characters/caster_clips.ts\n M src/render/characters/damage_attack_animation.ts\n M src/render/characters/manifest.ts\n M src/render/characters/signature_clips.ts\n M src/render/characters/visual.ts\n M src/render/mage_ground_fx.ts\n M src/render/renderer.ts\n M src/render/vfx.ts\n M src/render/warrior_vfx_specs.ts\n M src/sim/combat/effect_dispatch.ts\n M src/sim/entity_roster.ts\n M src/sim/ground_aoe_readouts.ts\n M src/sim/sim.ts\n M src/ui/combat_sfx.ts\n M src/ui/hud.ts\n M src/vfx_studio/combat_audio.ts\n M src/vfx_studio/prepare_views.ts\n M src/vfx_studio/studio.css\n M src/world_api.ts\n M src/world_api/combat.ts\n M tests/active_kit_prewarm.test.ts\n M tests/anim_pipeline_warrior_kobold.test.ts\n M tests/architecture.test.ts\n M tests/warrior_area_routing.test.ts\n M tests/warrior_contact_performance.test.ts\n?? docs/design/vfx-astonish-v25.md\n?? docs/design/warrior-fury-utility-v25.md\n?? public/audio/sfx/impact_warrior_blood_recovery_1.mp3\n?? public/audio/sfx/impact_warrior_blood_recovery_2.mp3\n?? public/audio/sfx/impact_warrior_goad_bark_1.mp3\n?? public/audio/sfx/impact_warrior_goad_bark_2.mp3\n?? public/audio/sfx/impact_warrior_gyre_sweep_1.mp3\n?? public/audio/sfx/impact_warrior_gyre_sweep_2.mp3\n?? public/audio/sfx/impact_warrior_mending_lock_1.mp3\n?? public/audio/sfx/impact_warrior_mending_lock_2.mp3\n?? public/audio/sfx/melee_warrior_goad_release_1.mp3\n?? public/audio/sfx/melee_warrior_goad_release_2.mp3\n?? public/audio/sfx/melee_warrior_gyre_release_1.mp3\n?? public/audio/sfx/melee_warrior_gyre_release_2.mp3\n?? public/audio/sfx/melee_warrior_mending_release_1.mp3\n?? public/audio/sfx/melee_warrior_mending_release_2.mp3\n?? src/render/ability_vfx/warrior_attention.ts\n?? src/render/ability_vfx/warrior_attention_atlas.ts\n?? src/render/ability_vfx/warrior_attention_core.ts\n?? src/render/ability_vfx/warrior_fury_feedback.ts\n?? src/render/ability_vfx/warrior_fury_state_shapes.ts\n?? src/render/ability_vfx/warrior_fury_states.ts\n?? src/render/ability_vfx/warrior_goad.ts\n?? src/render/ability_vfx/warrior_gyre.ts\n?? src/render/ability_vfx/warrior_gyre_shape.ts\n?? src/render/warrior_fury_state_core.ts\n?? src/warrior_recovery_core.ts\n?? tests/warrior_attention.test.ts\n?? tests/warrior_attention_core.test.ts\n?? tests/warrior_fury_feedback.test.ts\n?? tests/warrior_fury_state_core.test.ts\n?? tests/warrior_fury_state_shapes.test.ts\n?? tests/warrior_fury_states.test.ts\n?? tests/warrior_gyre_shape.test.ts\n?? tests/warrior_recovery_core.test.ts\n?? tests/warrior_utility_audio.test.ts\n",
+      "overrides": [
+        {
+          "path": "src/fury_audio_core.ts",
+          "baselineSha256": "38efce45642e6adbb60a26236d329f3a03ed420ce3300d76d39a2b6a738b41d4",
+          "currentSha256": "49c11c0231006ba74abbde68cc6fb58e475bc122942cfa2cb7ce5e99455e3d72",
+          "bytes": 4605
+        },
+        {
+          "path": "src/game/sfx_manifest.generated.ts",
+          "baselineSha256": "c7e1d608a013337039eb5c8bc25d1cc89b3f1c6f50a97f11cf5a874dddbd7d52",
+          "currentSha256": "cf6932f7410a1aeed82ea8b29d75316fddd01511c55276f20a9ffe6288c636b6",
+          "bytes": 264605
+        },
+        {
+          "path": "src/render/ability_vfx/active_kit_prewarm.ts",
+          "baselineSha256": "c6a3bdeffd78290f1e2a66dda9a8f7d6324813e0677110e452ad979e5bb45f22",
+          "currentSha256": "e5ae3c70edf8571411f2c426e5795d5cbb6b51eb280e440464565c44766a4b86",
+          "bytes": 5042
+        },
+        {
+          "path": "src/render/ability_vfx/fx.ts",
+          "baselineSha256": "20492b8d530a0fc94ae9753364115eeb3f9b0810f68cdf627f46e20658bb2f33",
+          "currentSha256": "52682d8a099eb8db1ac33b581588cad8467f6f514be5963b592b1ed79cd25429",
+          "bytes": 101761
+        },
+        {
+          "path": "src/render/ability_vfx/fx_textures.ts",
+          "baselineSha256": "a8ce77419a3646006960be6dca423adf4e36205a318c803076de18ef72ff33e4",
+          "currentSha256": "7a228c911fba13806e860c169d79ec496d943a8e7efeb50bb93bf743a977e227",
+          "bytes": 25146
+        },
+        {
+          "path": "src/render/ability_vfx/painter.ts",
+          "baselineSha256": "9c9f10a8c89f79bdab3ef744062560d041c55e24d8cdf43fdd743726412ec2ba",
+          "currentSha256": "ef1dccf7aa77bac4cec8ece0f359f765c4fdcc698d9585904cd0beda3d1066b6",
+          "bytes": 84527
+        },
+        {
+          "path": "src/render/ability_vfx/physical_choreography.ts",
+          "baselineSha256": "eb69d760f264df82d961804a7aaf62d484ecb5274c17cdf4b210d06d5adc6b56",
+          "currentSha256": "d62732907ae0cd0c41236168ffd163c9b92864e6a3cdfbaa2264ed3878c6d423",
+          "bytes": 15868
+        },
+        {
+          "path": "src/render/ability_vfx/signature_crests.ts",
+          "baselineSha256": "f69ed06c4851791392082bf32e7cc68e0a16875270a7045658d85816dfe9e61b",
+          "currentSha256": "30473b8cff9ffef42306a340efdc8aaef0c8087a7802c3fcead2e7256c1d76b5",
+          "bytes": 18813
+        },
+        {
+          "path": "src/render/ability_vfx/signature_shapes.ts",
+          "baselineSha256": "ce26fe6ba6a044b26f51e36d268234b3015d607163c097c892e370bfe8fa6a49",
+          "currentSha256": "f3e05dc7e838e21a5ab15bcd657f8b95fb053cad0a2419cee27061eb728437ea",
+          "bytes": 7261
+        },
+        {
+          "path": "src/render/ability_vfx/warrior_area.ts",
+          "baselineSha256": "ad9277b8b6a3817506ab3935c37eb133dce9af91e691180eb0fc611a9a8ca50b",
+          "currentSha256": "6a5f7acc6cb80545b393e482594904702a446a34d408de18799989b4e14f4ecd",
+          "bytes": 4334
+        },
+        {
+          "path": "src/render/characters/manifest.ts",
+          "baselineSha256": "f3dbd4eae794183ea74bc469ee7e897943bd1335e86906a4ac01e088b2b11052",
+          "currentSha256": "81ef58480da00fc936163d37b515d1ac605e4f8cf41769cfb4669aeae1af715f",
+          "bytes": 171496
+        },
+        {
+          "path": "src/render/characters/damage_attack_animation.ts",
+          "baselineSha256": "5bd62d65c5a354ec151c1f727afb34cf3b18f228639f29da24bfd6d77b3b43e1",
+          "currentSha256": "a8e4d5d9fba1d6d185d7d9eea86e90d7603f7a15eec486c264c9d0914eda9570",
+          "bytes": 3248
+        },
+        {
+          "path": "src/render/characters/signature_clips.ts",
+          "baselineSha256": "0fda86704bb2f747ee02ff34e2be533601af29af63baaaaa5bd63cd501b90002",
+          "currentSha256": "5a45b335921612e450074d5183c9e19fd03a862396c720410a00d516ea849a50",
+          "bytes": 6625
+        },
+        {
+          "path": "src/render/characters/visual.ts",
+          "baselineSha256": "a2213ebab178b8a979588f735691c5b1bd99a5d10d277b161d9ff2eb56f4b3c0",
+          "currentSha256": "32f39e71e0439a4faac4fb2a287deb7d31ab362b40b1bdea62add9d58c0826e6",
+          "bytes": 182170
+        },
+        {
+          "path": "src/render/renderer.ts",
+          "baselineSha256": "a84d58cef7136bcfd868e8098aedfbe3004655e7d8e5b067817b367200a1408f",
+          "currentSha256": "dfced9b5cc3c8f71c4cd5e82974b56395901bbf8b4acfbf8976d0f63cda68287",
+          "bytes": 605790
+        },
+        {
+          "path": "src/render/warrior_vfx_specs.ts",
+          "baselineSha256": "275e94149c9f4d8e33e52e97dff485df2dcb31c6b6f6e24850df2f73edb96802",
+          "currentSha256": "527dbf150a3cfaa172abfae0bb1106a859149d0ff732a0ada476af9eaf609816",
+          "bytes": 6476
+        },
+        {
+          "path": "src/ui/combat_sfx.ts",
+          "baselineSha256": "caad53fe327cc963cea870d7b1a768154277e2cbbf81464aa7fabefb1432552c",
+          "currentSha256": "cabd2a2ecb0fc3805692a0012e9e9496f76ea6fb0ca90216400ea8af0c175b63",
+          "bytes": 27060
+        },
+        {
+          "path": "src/ui/hud.ts",
+          "baselineSha256": "f52f54e2d49f7da99596daf7d799f13eedd50f5a942467d76c2f603d4ce31e0a",
+          "currentSha256": "e98e23ab883b1beae8797072108c1bf7502572936031f09508ab176efa2081a4",
+          "bytes": 866514
+        },
+        {
+          "path": "src/vfx_studio/combat_audio.ts",
+          "baselineSha256": "a87eac4e356598313e2426bc009815533989feb88028298e4f1b033df14c2ede",
+          "currentSha256": "a0a34a73da7ca1ecc1cf610329eb82cb719a664f79e1209703c687e811f4123b",
+          "bytes": 5067
+        },
+        {
+          "path": "src/vfx_studio/studio.css",
+          "baselineSha256": "1a168bef63a116471d71fc92d777af2e3c6aa14e58d771cc0bf37a124b855fb5",
+          "currentSha256": "b7282517130c9c027768f45b745be59e01b03a39f96bd62cbabc9e7e5b1f5fec",
+          "bytes": 10919
+        }
+      ],
+      "unconditionalOverrides": [
+        "src/render/characters/damage_attack_animation.ts"
+      ],
+      "allowlistedUnchanged": [
+        "src/render/ability_vfx/prewarm.ts",
+        "src/render/ability_vfx/primitive_prewarm.ts"
+      ],
+      "preservedOriginalWip": [
+        {
+          "path": "server/ground_telegraph_wire.ts",
+          "sha256": "178e37fa7f9b0ccf78f52204b4594afe6e0bf961e6c77c2172aaf21708fe8b39"
+        },
+        {
+          "path": "src/net/ground_telegraph_wire.ts",
+          "sha256": "ad4ee6d41176c80ed7cf7af6a41828374cd0280b330e0f1d9baa61f07e3608c2"
+        },
+        {
+          "path": "src/net/online.ts",
+          "sha256": "6e3db4c899c3bc5f176852beaacc0b90148bd5bc62908c715bd9e4c3bc26f246"
+        },
+        {
+          "path": "src/render/ability_vfx/spectacle.ts",
+          "sha256": "051a02a76ec2f5742f8147da9afd6b2f8bd70172af2d6d5ad7f69e19b56c7aa5"
+        },
+        {
+          "path": "src/render/characters/beast_ability_clips.ts",
+          "sha256": "958ace2961dd35e5cda53d817bc8c446ebabb59b133cbc6a0c37ec177ddd9c55"
+        },
+        {
+          "path": "src/render/characters/cast_performance.ts",
+          "sha256": "d11e6f0c458355b2cd8d06f48ac9cd4037d1045a57ecc09dfc5a7c7185c9e6f2"
+        },
+        {
+          "path": "src/render/characters/caster_clips.ts",
+          "sha256": "c77ca1270f320aaaee50e8ddf4b68209e38e4d2d83d6661e8b98f007068fc1f0"
+        },
+        {
+          "path": "src/render/mage_ground_fx.ts",
+          "sha256": "7223f96964d2c38961f52494d4dbbe9bffad97cd0455e9962ac9075d08dfd27c"
+        },
+        {
+          "path": "src/render/vfx.ts",
+          "sha256": "8c8a931fcd1d8ae72039f67942caca8ad4ee85863f5084f24b8cc84f4f91cf9f"
+        },
+        {
+          "path": "src/sim/combat/effect_dispatch.ts",
+          "sha256": "39cef13ee9811a09de9ce0b75e277036a7dca0a301550671e132deb1552bc9db"
+        },
+        {
+          "path": "src/sim/entity_roster.ts",
+          "sha256": "d0965d0b82a29a138fbea1a6f3395151a543a3aa807332437bf7266969788afd"
+        },
+        {
+          "path": "src/sim/ground_aoe_readouts.ts",
+          "sha256": "7024b608457580f74b0ea65a55fea06c59f09e7ac3b328aa0e9110d2bfc490be"
+        },
+        {
+          "path": "src/sim/sim.ts",
+          "sha256": "acdcf40b654332058dcf367a4462179201d81227c02a38472ecdee2d1d182953"
+        },
+        {
+          "path": "src/vfx_studio/prepare_views.ts",
+          "sha256": "99a695479a3ae4632da36cb9d378a96687c981b67e3aba65b385f06118786ead"
+        },
+        {
+          "path": "src/world_api.ts",
+          "sha256": "d03f10e5d182358876dd50f1b938866506e19e9d6d2230d69561715c66bc44b2"
+        },
+        {
+          "path": "src/world_api/combat.ts",
+          "sha256": "7f8302b9b4418241fe9b13f3595912b5aa28ff40fe1f0b069ea2c5fbf8fafe43"
+        }
+      ],
+      "assetOverride": {
+        "path": "public/models/chars/players/warrior_contact_anims.glb",
+        "url": "/models/chars/players/warrior_contact_anims.glb",
+        "source": "C:\\Users\\tony\\Documents\\Codex\\2026-09-06\\new-chat\\work\\woc-vfx-studio\\tmp\\warrior-utility-old-contact.glb",
+        "sha256": "3cafd8eb57ae64865cc0ad86c4adc8ddf771a3fab1ffbcdb3ca13f25e720a150",
+        "bytes": 652972
+      },
+      "limitations": [
+        "Mixed-source baseline: only listed tracked utility batch files use the baseline commit; all other files retain checkout contents.",
+        "Public audio packs remain current; use this for visual evidence with audio disabled.",
+        "No browser or GPU capture performed by this server; HTTP transforms are not runtime or visual acceptance.",
+        "Vite dependency cache is isolated outside the checkout."
+      ],
+      "httpChecks": [
+        {
+          "path": "src/render/ability_vfx/fx.ts",
+          "status": 200,
+          "transformedSha256": "cdaed4bf830856d68d3920802ca7b983e64fb0fd9f039d29cc900d6273bc059a",
+          "noNewImports": true,
+          "hasOldPowerForms": true
+        },
+        {
+          "path": "src/render/renderer.ts",
+          "status": 200,
+          "transformedSha256": "b9b4b73de3b252138be60a5cb95482115189b86aa2f554017669c63444248f40",
+          "noNewImports": true,
+          "hasOldPowerForms": true
+        },
+        {
+          "path": "src/render/characters/damage_attack_animation.ts",
+          "status": 200,
+          "transformedSha256": "7c6684dd926cb984c7bc605ac7de3f2086942ac374c40646eb14e31c95ba07bc",
+          "noGyreAreaExclusion": true
+        },
+        {
+          "path": "/models/chars/players/warrior_contact_anims.glb",
+          "status": 200,
+          "sha256": "3cafd8eb57ae64865cc0ad86c4adc8ddf771a3fab1ffbcdb3ca13f25e720a150",
+          "bytes": 652972
+        }
+      ],
+      "errors": [],
+      "status": "ready",
+      "readyAt": "2026-09-08T19:25:59.519Z"
+    },
+    "viewport": {
+      "width": 1400,
+      "height": 900
+    },
+    "camera": {
+      "yaw": 1.9,
+      "pitch": 0.4,
+      "distance": 18
+    }
+  },
+  {
+    "file": "mending-held-after.png",
+    "captureFolder": "warrior-mending-folded-after-2",
+    "original": "p4-furious_mending-dummy-yaw1.9-tick30.png",
+    "sha256": "21a7528bb1f49ece1173f75ebdfde99b9397f9e07cca50dd8d42b69737b760e3",
+    "sourceUnchanged": true,
+    "baseline": null,
+    "viewport": {
+      "width": 1400,
+      "height": 900
+    },
+    "camera": {
+      "yaw": 1.9,
+      "pitch": 0.4,
+      "distance": 18
+    }
+  },
+  {
+    "file": "mayhem-before.png",
+    "captureFolder": "warrior-fury-states-before-settled-2",
+    "original": "p4-red_harvest-dummy-yaw1.9-tick30.png",
+    "sha256": "721bcf549b28c1efc15960c247dbf12727d0566b2c8fa3485cc40d9f9b9ebb0a",
+    "sourceUnchanged": true,
+    "baseline": {
+      "purpose": "Actual-cast Warrior utility visual baseline via in-memory Vite source overlays",
+      "startedAt": "2026-09-08T19:24:59.098Z",
+      "pid": 35596,
+      "root": "C:\\Users\\tony\\Documents\\Codex\\2026-09-06\\new-chat\\work\\woc-vfx-studio",
+      "port": 5184,
+      "strictPort": true,
+      "baseline": "f191d8ddbc9ef2381d66657125b30bcb8b956188",
+      "currentHead": "f191d8ddbc9ef2381d66657125b30bcb8b956188",
+      "scriptSha256": "4a39a7a2e9f01dd53d5b31a4dfa390c6497b92aa623c34c566a812ba2a95cdca",
+      "config": "vite.config.ts",
+      "configSha256": "7768987a8048fffd1fd711131134be5c83840a2e0625b5d5f2954c4b8ee385e9",
+      "statusAtStart": " M public/audio/sfx/runtime-pack.json\n M public/models/chars/players/warrior_contact_anims.glb\n M scripts/build_warrior_contact_anims.mjs\n M scripts/sfx/sfx_gain_ceiling.generated.json\n M scripts/sfx/warrior_contact_sfx.mjs\n M server/ground_telegraph_wire.ts\n M src/fury_audio_core.ts\n M src/game/sfx_manifest.generated.ts\n M src/net/ground_telegraph_wire.ts\n M src/net/online.ts\n M src/render/ability_vfx/active_kit_prewarm.ts\n M src/render/ability_vfx/fx.ts\n M src/render/ability_vfx/fx_textures.ts\n M src/render/ability_vfx/painter.ts\n M src/render/ability_vfx/physical_choreography.ts\n M src/render/ability_vfx/signature_crests.ts\n M src/render/ability_vfx/signature_shapes.ts\n M src/render/ability_vfx/spectacle.ts\n M src/render/ability_vfx/warrior_area.ts\n M src/render/characters/beast_ability_clips.ts\n M src/render/characters/cast_performance.ts\n M src/render/characters/caster_clips.ts\n M src/render/characters/damage_attack_animation.ts\n M src/render/characters/manifest.ts\n M src/render/characters/signature_clips.ts\n M src/render/characters/visual.ts\n M src/render/mage_ground_fx.ts\n M src/render/renderer.ts\n M src/render/vfx.ts\n M src/render/warrior_vfx_specs.ts\n M src/sim/combat/effect_dispatch.ts\n M src/sim/entity_roster.ts\n M src/sim/ground_aoe_readouts.ts\n M src/sim/sim.ts\n M src/ui/combat_sfx.ts\n M src/ui/hud.ts\n M src/vfx_studio/combat_audio.ts\n M src/vfx_studio/prepare_views.ts\n M src/vfx_studio/studio.css\n M src/world_api.ts\n M src/world_api/combat.ts\n M tests/active_kit_prewarm.test.ts\n M tests/anim_pipeline_warrior_kobold.test.ts\n M tests/architecture.test.ts\n M tests/warrior_area_routing.test.ts\n M tests/warrior_contact_performance.test.ts\n?? docs/design/vfx-astonish-v25.md\n?? docs/design/warrior-fury-utility-v25.md\n?? public/audio/sfx/impact_warrior_blood_recovery_1.mp3\n?? public/audio/sfx/impact_warrior_blood_recovery_2.mp3\n?? public/audio/sfx/impact_warrior_goad_bark_1.mp3\n?? public/audio/sfx/impact_warrior_goad_bark_2.mp3\n?? public/audio/sfx/impact_warrior_gyre_sweep_1.mp3\n?? public/audio/sfx/impact_warrior_gyre_sweep_2.mp3\n?? public/audio/sfx/impact_warrior_mending_lock_1.mp3\n?? public/audio/sfx/impact_warrior_mending_lock_2.mp3\n?? public/audio/sfx/melee_warrior_goad_release_1.mp3\n?? public/audio/sfx/melee_warrior_goad_release_2.mp3\n?? public/audio/sfx/melee_warrior_gyre_release_1.mp3\n?? public/audio/sfx/melee_warrior_gyre_release_2.mp3\n?? public/audio/sfx/melee_warrior_mending_release_1.mp3\n?? public/audio/sfx/melee_warrior_mending_release_2.mp3\n?? src/render/ability_vfx/warrior_attention.ts\n?? src/render/ability_vfx/warrior_attention_atlas.ts\n?? src/render/ability_vfx/warrior_attention_core.ts\n?? src/render/ability_vfx/warrior_fury_feedback.ts\n?? src/render/ability_vfx/warrior_fury_state_shapes.ts\n?? src/render/ability_vfx/warrior_fury_states.ts\n?? src/render/ability_vfx/warrior_goad.ts\n?? src/render/ability_vfx/warrior_gyre.ts\n?? src/render/ability_vfx/warrior_gyre_shape.ts\n?? src/render/warrior_fury_state_core.ts\n?? src/warrior_recovery_core.ts\n?? tests/warrior_attention.test.ts\n?? tests/warrior_attention_core.test.ts\n?? tests/warrior_fury_feedback.test.ts\n?? tests/warrior_fury_state_core.test.ts\n?? tests/warrior_fury_state_shapes.test.ts\n?? tests/warrior_fury_states.test.ts\n?? tests/warrior_gyre_shape.test.ts\n?? tests/warrior_recovery_core.test.ts\n?? tests/warrior_utility_audio.test.ts\n",
+      "overrides": [
+        {
+          "path": "src/fury_audio_core.ts",
+          "baselineSha256": "38efce45642e6adbb60a26236d329f3a03ed420ce3300d76d39a2b6a738b41d4",
+          "currentSha256": "49c11c0231006ba74abbde68cc6fb58e475bc122942cfa2cb7ce5e99455e3d72",
+          "bytes": 4605
+        },
+        {
+          "path": "src/game/sfx_manifest.generated.ts",
+          "baselineSha256": "c7e1d608a013337039eb5c8bc25d1cc89b3f1c6f50a97f11cf5a874dddbd7d52",
+          "currentSha256": "cf6932f7410a1aeed82ea8b29d75316fddd01511c55276f20a9ffe6288c636b6",
+          "bytes": 264605
+        },
+        {
+          "path": "src/render/ability_vfx/active_kit_prewarm.ts",
+          "baselineSha256": "c6a3bdeffd78290f1e2a66dda9a8f7d6324813e0677110e452ad979e5bb45f22",
+          "currentSha256": "e5ae3c70edf8571411f2c426e5795d5cbb6b51eb280e440464565c44766a4b86",
+          "bytes": 5042
+        },
+        {
+          "path": "src/render/ability_vfx/fx.ts",
+          "baselineSha256": "20492b8d530a0fc94ae9753364115eeb3f9b0810f68cdf627f46e20658bb2f33",
+          "currentSha256": "52682d8a099eb8db1ac33b581588cad8467f6f514be5963b592b1ed79cd25429",
+          "bytes": 101761
+        },
+        {
+          "path": "src/render/ability_vfx/fx_textures.ts",
+          "baselineSha256": "a8ce77419a3646006960be6dca423adf4e36205a318c803076de18ef72ff33e4",
+          "currentSha256": "7a228c911fba13806e860c169d79ec496d943a8e7efeb50bb93bf743a977e227",
+          "bytes": 25146
+        },
+        {
+          "path": "src/render/ability_vfx/painter.ts",
+          "baselineSha256": "9c9f10a8c89f79bdab3ef744062560d041c55e24d8cdf43fdd743726412ec2ba",
+          "currentSha256": "ef1dccf7aa77bac4cec8ece0f359f765c4fdcc698d9585904cd0beda3d1066b6",
+          "bytes": 84527
+        },
+        {
+          "path": "src/render/ability_vfx/physical_choreography.ts",
+          "baselineSha256": "eb69d760f264df82d961804a7aaf62d484ecb5274c17cdf4b210d06d5adc6b56",
+          "currentSha256": "d62732907ae0cd0c41236168ffd163c9b92864e6a3cdfbaa2264ed3878c6d423",
+          "bytes": 15868
+        },
+        {
+          "path": "src/render/ability_vfx/signature_crests.ts",
+          "baselineSha256": "f69ed06c4851791392082bf32e7cc68e0a16875270a7045658d85816dfe9e61b",
+          "currentSha256": "30473b8cff9ffef42306a340efdc8aaef0c8087a7802c3fcead2e7256c1d76b5",
+          "bytes": 18813
+        },
+        {
+          "path": "src/render/ability_vfx/signature_shapes.ts",
+          "baselineSha256": "ce26fe6ba6a044b26f51e36d268234b3015d607163c097c892e370bfe8fa6a49",
+          "currentSha256": "f3e05dc7e838e21a5ab15bcd657f8b95fb053cad0a2419cee27061eb728437ea",
+          "bytes": 7261
+        },
+        {
+          "path": "src/render/ability_vfx/warrior_area.ts",
+          "baselineSha256": "ad9277b8b6a3817506ab3935c37eb133dce9af91e691180eb0fc611a9a8ca50b",
+          "currentSha256": "6a5f7acc6cb80545b393e482594904702a446a34d408de18799989b4e14f4ecd",
+          "bytes": 4334
+        },
+        {
+          "path": "src/render/characters/manifest.ts",
+          "baselineSha256": "f3dbd4eae794183ea74bc469ee7e897943bd1335e86906a4ac01e088b2b11052",
+          "currentSha256": "81ef58480da00fc936163d37b515d1ac605e4f8cf41769cfb4669aeae1af715f",
+          "bytes": 171496
+        },
+        {
+          "path": "src/render/characters/damage_attack_animation.ts",
+          "baselineSha256": "5bd62d65c5a354ec151c1f727afb34cf3b18f228639f29da24bfd6d77b3b43e1",
+          "currentSha256": "a8e4d5d9fba1d6d185d7d9eea86e90d7603f7a15eec486c264c9d0914eda9570",
+          "bytes": 3248
+        },
+        {
+          "path": "src/render/characters/signature_clips.ts",
+          "baselineSha256": "0fda86704bb2f747ee02ff34e2be533601af29af63baaaaa5bd63cd501b90002",
+          "currentSha256": "5a45b335921612e450074d5183c9e19fd03a862396c720410a00d516ea849a50",
+          "bytes": 6625
+        },
+        {
+          "path": "src/render/characters/visual.ts",
+          "baselineSha256": "a2213ebab178b8a979588f735691c5b1bd99a5d10d277b161d9ff2eb56f4b3c0",
+          "currentSha256": "32f39e71e0439a4faac4fb2a287deb7d31ab362b40b1bdea62add9d58c0826e6",
+          "bytes": 182170
+        },
+        {
+          "path": "src/render/renderer.ts",
+          "baselineSha256": "a84d58cef7136bcfd868e8098aedfbe3004655e7d8e5b067817b367200a1408f",
+          "currentSha256": "dfced9b5cc3c8f71c4cd5e82974b56395901bbf8b4acfbf8976d0f63cda68287",
+          "bytes": 605790
+        },
+        {
+          "path": "src/render/warrior_vfx_specs.ts",
+          "baselineSha256": "275e94149c9f4d8e33e52e97dff485df2dcb31c6b6f6e24850df2f73edb96802",
+          "currentSha256": "527dbf150a3cfaa172abfae0bb1106a859149d0ff732a0ada476af9eaf609816",
+          "bytes": 6476
+        },
+        {
+          "path": "src/ui/combat_sfx.ts",
+          "baselineSha256": "caad53fe327cc963cea870d7b1a768154277e2cbbf81464aa7fabefb1432552c",
+          "currentSha256": "cabd2a2ecb0fc3805692a0012e9e9496f76ea6fb0ca90216400ea8af0c175b63",
+          "bytes": 27060
+        },
+        {
+          "path": "src/ui/hud.ts",
+          "baselineSha256": "f52f54e2d49f7da99596daf7d799f13eedd50f5a942467d76c2f603d4ce31e0a",
+          "currentSha256": "e98e23ab883b1beae8797072108c1bf7502572936031f09508ab176efa2081a4",
+          "bytes": 866514
+        },
+        {
+          "path": "src/vfx_studio/combat_audio.ts",
+          "baselineSha256": "a87eac4e356598313e2426bc009815533989feb88028298e4f1b033df14c2ede",
+          "currentSha256": "a0a34a73da7ca1ecc1cf610329eb82cb719a664f79e1209703c687e811f4123b",
+          "bytes": 5067
+        },
+        {
+          "path": "src/vfx_studio/studio.css",
+          "baselineSha256": "1a168bef63a116471d71fc92d777af2e3c6aa14e58d771cc0bf37a124b855fb5",
+          "currentSha256": "b7282517130c9c027768f45b745be59e01b03a39f96bd62cbabc9e7e5b1f5fec",
+          "bytes": 10919
+        }
+      ],
+      "unconditionalOverrides": [
+        "src/render/characters/damage_attack_animation.ts"
+      ],
+      "allowlistedUnchanged": [
+        "src/render/ability_vfx/prewarm.ts",
+        "src/render/ability_vfx/primitive_prewarm.ts"
+      ],
+      "preservedOriginalWip": [
+        {
+          "path": "server/ground_telegraph_wire.ts",
+          "sha256": "178e37fa7f9b0ccf78f52204b4594afe6e0bf961e6c77c2172aaf21708fe8b39"
+        },
+        {
+          "path": "src/net/ground_telegraph_wire.ts",
+          "sha256": "ad4ee6d41176c80ed7cf7af6a41828374cd0280b330e0f1d9baa61f07e3608c2"
+        },
+        {
+          "path": "src/net/online.ts",
+          "sha256": "6e3db4c899c3bc5f176852beaacc0b90148bd5bc62908c715bd9e4c3bc26f246"
+        },
+        {
+          "path": "src/render/ability_vfx/spectacle.ts",
+          "sha256": "051a02a76ec2f5742f8147da9afd6b2f8bd70172af2d6d5ad7f69e19b56c7aa5"
+        },
+        {
+          "path": "src/render/characters/beast_ability_clips.ts",
+          "sha256": "958ace2961dd35e5cda53d817bc8c446ebabb59b133cbc6a0c37ec177ddd9c55"
+        },
+        {
+          "path": "src/render/characters/cast_performance.ts",
+          "sha256": "d11e6f0c458355b2cd8d06f48ac9cd4037d1045a57ecc09dfc5a7c7185c9e6f2"
+        },
+        {
+          "path": "src/render/characters/caster_clips.ts",
+          "sha256": "c77ca1270f320aaaee50e8ddf4b68209e38e4d2d83d6661e8b98f007068fc1f0"
+        },
+        {
+          "path": "src/render/mage_ground_fx.ts",
+          "sha256": "7223f96964d2c38961f52494d4dbbe9bffad97cd0455e9962ac9075d08dfd27c"
+        },
+        {
+          "path": "src/render/vfx.ts",
+          "sha256": "8c8a931fcd1d8ae72039f67942caca8ad4ee85863f5084f24b8cc84f4f91cf9f"
+        },
+        {
+          "path": "src/sim/combat/effect_dispatch.ts",
+          "sha256": "39cef13ee9811a09de9ce0b75e277036a7dca0a301550671e132deb1552bc9db"
+        },
+        {
+          "path": "src/sim/entity_roster.ts",
+          "sha256": "d0965d0b82a29a138fbea1a6f3395151a543a3aa807332437bf7266969788afd"
+        },
+        {
+          "path": "src/sim/ground_aoe_readouts.ts",
+          "sha256": "7024b608457580f74b0ea65a55fea06c59f09e7ac3b328aa0e9110d2bfc490be"
+        },
+        {
+          "path": "src/sim/sim.ts",
+          "sha256": "acdcf40b654332058dcf367a4462179201d81227c02a38472ecdee2d1d182953"
+        },
+        {
+          "path": "src/vfx_studio/prepare_views.ts",
+          "sha256": "99a695479a3ae4632da36cb9d378a96687c981b67e3aba65b385f06118786ead"
+        },
+        {
+          "path": "src/world_api.ts",
+          "sha256": "d03f10e5d182358876dd50f1b938866506e19e9d6d2230d69561715c66bc44b2"
+        },
+        {
+          "path": "src/world_api/combat.ts",
+          "sha256": "7f8302b9b4418241fe9b13f3595912b5aa28ff40fe1f0b069ea2c5fbf8fafe43"
+        }
+      ],
+      "assetOverride": {
+        "path": "public/models/chars/players/warrior_contact_anims.glb",
+        "url": "/models/chars/players/warrior_contact_anims.glb",
+        "source": "C:\\Users\\tony\\Documents\\Codex\\2026-09-06\\new-chat\\work\\woc-vfx-studio\\tmp\\warrior-utility-old-contact.glb",
+        "sha256": "3cafd8eb57ae64865cc0ad86c4adc8ddf771a3fab1ffbcdb3ca13f25e720a150",
+        "bytes": 652972
+      },
+      "limitations": [
+        "Mixed-source baseline: only listed tracked utility batch files use the baseline commit; all other files retain checkout contents.",
+        "Public audio packs remain current; use this for visual evidence with audio disabled.",
+        "No browser or GPU capture performed by this server; HTTP transforms are not runtime or visual acceptance.",
+        "Vite dependency cache is isolated outside the checkout."
+      ],
+      "httpChecks": [
+        {
+          "path": "src/render/ability_vfx/fx.ts",
+          "status": 200,
+          "transformedSha256": "cdaed4bf830856d68d3920802ca7b983e64fb0fd9f039d29cc900d6273bc059a",
+          "noNewImports": true,
+          "hasOldPowerForms": true
+        },
+        {
+          "path": "src/render/renderer.ts",
+          "status": 200,
+          "transformedSha256": "b9b4b73de3b252138be60a5cb95482115189b86aa2f554017669c63444248f40",
+          "noNewImports": true,
+          "hasOldPowerForms": true
+        },
+        {
+          "path": "src/render/characters/damage_attack_animation.ts",
+          "status": 200,
+          "transformedSha256": "7c6684dd926cb984c7bc605ac7de3f2086942ac374c40646eb14e31c95ba07bc",
+          "noGyreAreaExclusion": true
+        },
+        {
+          "path": "/models/chars/players/warrior_contact_anims.glb",
+          "status": 200,
+          "sha256": "3cafd8eb57ae64865cc0ad86c4adc8ddf771a3fab1ffbcdb3ca13f25e720a150",
+          "bytes": 652972
+        }
+      ],
+      "errors": [],
+      "status": "ready",
+      "readyAt": "2026-09-08T19:25:59.519Z"
+    },
+    "viewport": {
+      "width": 1400,
+      "height": 900
+    },
+    "camera": {
+      "yaw": 1.9,
+      "pitch": 0.4,
+      "distance": 18
+    }
+  },
+  {
+    "file": "mayhem-after.png",
+    "captureFolder": "warrior-fury-utility-quality-after-2",
+    "original": "p4-red_harvest-dummy-yaw1.9-tick30.png",
+    "sha256": "e0479bb406a368c71fcf62b0a7f4dc8654c1a8fa52104766c92728719a0690bf",
+    "sourceUnchanged": true,
+    "baseline": null,
+    "viewport": {
+      "width": 1400,
+      "height": 900
+    },
+    "camera": {
+      "yaw": 1.9,
+      "pitch": 0.4,
+      "distance": 18
+    }
+  }
+]

@@ -49,7 +49,7 @@ export class SignatureCrests {
       },
       vertexShader: `uniform float uAge,uKind,uMotion,uPressureGround[25]; varying vec2 vUv,vSurface; varying vec3 vNormal,vView,vLocal,vLocalNormal;
         float pressureGround(vec2 p){
-          vec2 uv=uKind>20.5?p/8.0+0.5:uKind>16.5?p/16.0+0.5:vec2(p.x/12.0+0.5,p.y/10.0);
+          vec2 uv=(uKind>20.5 && uKind<21.5)?p/8.0+0.5:uKind>16.5?p/16.0+0.5:vec2(p.x/12.0+0.5,p.y/10.0);
           vec2 grid=clamp(uv*4.0,vec2(0.0),vec2(3.9999));
           ivec2 cell=ivec2(floor(grid));vec2 f=fract(grid);int i=cell.y*5+cell.x;
           return mix(mix(uPressureGround[i],uPressureGround[i+1],f.x),
@@ -86,11 +86,15 @@ export class SignatureCrests {
             if(uKind>17.5)p.y*=mix(1.0,(0.45+0.55*smoothstep(0.0,0.12,uAge))*(1.0-0.7*smoothstep(0.45,1.0,uAge)),uMotion);
             p.y+=pressureGround(p.xz);
           }
-          if(uKind>20.5){
+          if((uKind>20.5 && uKind<21.5)){
             float lift=smoothstep(0.0,0.16,uAge);
             float settle=1.0-smoothstep(0.3,1.0,uAge);
             p.y*=mix(1.0,0.12+0.88*lift*settle,uMotion);
             p.y+=pressureGround(p.xz);
+          }
+          if(uKind>21.5){
+            float turn=(-0.28+0.56*smoothstep(0.0,0.75,uAge))*uMotion;
+            p.xz=mat2(cos(turn),-sin(turn),sin(turn),cos(turn))*p.xz;
           }
           vec4 view=modelViewMatrix*vec4(p,1.0); vView=-view.xyz; vNormal=normalize(normalMatrix*normal);
           gl_Position=projectionMatrix*view;
@@ -101,7 +105,7 @@ export class SignatureCrests {
         varying vec2 vUv,vSurface; varying vec3 vNormal,vView,vLocal,vLocalNormal;
         vec2 groundSteelUv(vec2 p){return 1.0-abs(mod(p*0.24+0.37,2.0)-1.0);}
         void main(){
-          if(((uKind>17.5 && uKind<19.5)||uKind>20.5) && !gl_FrontFacing)discard;
+          if(((uKind>17.5 && uKind<19.5)||(uKind>20.5 && uKind<21.5)) && !gl_FrontFacing)discard;
           float fresnel=pow(max(0.0,1.0-abs(dot(normalize(cross(dFdx(vView),dFdy(vView))),normalize(vView)))),3.0);
           float thread=sin(vUv.x*150.0+sin(vUv.y*22.0)*2.0-uAge*8.0*uMotion);
           float ribs=pow(max(0.0,thread),16.0);
@@ -162,7 +166,7 @@ export class SignatureCrests {
               float score=dot(steel,vec3(0.333333));
               colour=uTint*(0.34+score*0.5)*light+uAccent*(bevel*0.6+fresnel*0.12);
             }
-            if((uKind>17.5 && uKind<19.5)||uKind>20.5){
+            if((uKind>17.5 && uKind<19.5)||(uKind>20.5 && uKind<21.5)){
               // Sidewalls need their own vertical grain. XZ-only projection
               // stretches one texel column down the entire raised fracture.
               vec3 weights=pow(abs(normalize(vLocalNormal)),vec3(4.0));
@@ -185,6 +189,14 @@ export class SignatureCrests {
             float gain=steelSweepGain(sweepU,uAge);
             alpha*=mix(1.0,min(1.0,gain),uMotion);
             colour+=uAccent*max(0.0,gain-0.75)*0.55*uMotion;
+          }
+          if(uKind>21.5){
+            vec3 blood=texture2D(uBloodMap,clamp(vec2(vUv.x,vUv.y),vec2(.01),vec2(.99))).rgb;
+            float grain=dot(blood,vec3(.333333));
+            float edge=1.0-smoothstep(.06,.24,vUv.y);
+            colour=mix(uTint*(.55+grain*1.2),colour,edge*.82)+uAccent*edge*.22;
+            float sweep=smoothstep(vUv.x-.24,vUv.x+.12,uAge*1.55);
+            alpha*=mix(1.0,sweep,uMotion)*(1.0-smoothstep(.4,.98,uAge));
           }
           gl_FragColor=vec4(colour,alpha*sceneSoftness(vView.z,0.12));
           #include <tonemapping_fragment>
@@ -254,6 +266,7 @@ export class SignatureCrests {
       kind === 'steel_storm' ||
       kind === 'steel_reap' ||
       kind === 'avatar_rupture' ||
+      kind === 'blood_gyre' ||
       kind.startsWith('iron_') ||
       kind.endsWith('_pressure');
     if (authoredSurface && !this.preparation.ready(kind)) return false;
@@ -301,49 +314,52 @@ export class SignatureCrests {
     }
     u.uTint.value.setHex(tint);
     u.uAccent.value.setHex(accent);
-    u.uKind.value = ironGround
-      ? kind === 'avatar_rupture'
-        ? 21
-        : kind === 'iron_counter'
-          ? 17
-          : kind === 'iron_quake'
-            ? 18
-            : 19
-      : kind === 'steel_storm' || kind === 'steel_reap'
-        ? 16
-        : kind === 'breach_wedge'
-          ? 20
-          : kind === 'steel_cut'
-            ? 15
-            : kind === 'shield_contact'
-              ? 14
-              : kind.endsWith('_pressure')
-                ? 13
-                : kind === 'blood_cut'
-                  ? 12
-                  : kind === 'chain'
-                    ? 11
-                    : kind === 'hook'
-                      ? 10
-                      : kind === 'bone'
-                        ? 7
-                        : kind === 'ward'
-                          ? 8
-                          : kind === 'feather'
-                            ? 9
-                            : kind === 'ice'
-                              ? 0
-                              : kind === 'water'
-                                ? 1
-                                : kind === 'fire'
-                                  ? 3
-                                  : kind === 'light'
-                                    ? 4
-                                    : kind === 'nature'
-                                      ? 5
-                                      : kind === 'arcane'
-                                        ? 6
-                                        : 2;
+    u.uKind.value =
+      kind === 'blood_gyre'
+        ? 22
+        : ironGround
+          ? kind === 'avatar_rupture'
+            ? 21
+            : kind === 'iron_counter'
+              ? 17
+              : kind === 'iron_quake'
+                ? 18
+                : 19
+          : kind === 'steel_storm' || kind === 'steel_reap'
+            ? 16
+            : kind === 'breach_wedge'
+              ? 20
+              : kind === 'steel_cut'
+                ? 15
+                : kind === 'shield_contact'
+                  ? 14
+                  : kind.endsWith('_pressure')
+                    ? 13
+                    : kind === 'blood_cut'
+                      ? 12
+                      : kind === 'chain'
+                        ? 11
+                        : kind === 'hook'
+                          ? 10
+                          : kind === 'bone'
+                            ? 7
+                            : kind === 'ward'
+                              ? 8
+                              : kind === 'feather'
+                                ? 9
+                                : kind === 'ice'
+                                  ? 0
+                                  : kind === 'water'
+                                    ? 1
+                                    : kind === 'fire'
+                                      ? 3
+                                      : kind === 'light'
+                                        ? 4
+                                        : kind === 'nature'
+                                          ? 5
+                                          : kind === 'arcane'
+                                            ? 6
+                                            : 2;
     u.uAge.value = 0;
     u.uMotion.value = this.reducedMotion ? 0 : 1;
     return true;

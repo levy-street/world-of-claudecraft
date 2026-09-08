@@ -123,6 +123,9 @@ it('ships complete normalized native tracks and preserves every value through bo
 });
 
 it.each([
+  ['taunt', 'Warrior_Goad'],
+  ['furious_mending', 'Warrior_Furious_Mending'],
+  ['whirlwind', 'Warrior_Bladed_Gyre'],
   ['mortal_strike', 'Warrior_Maiming_Strike'],
   ['execute', 'Warrior_Early_Grave'],
   ['bloodthirst', 'Warrior_Bloodletting'],

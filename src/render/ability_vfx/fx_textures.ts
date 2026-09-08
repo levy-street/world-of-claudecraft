@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { paintWarriorAttention } from './warrior_attention_atlas';
 import { paintWarriorMark } from './warrior_mark_atlas';
 
 // Procedural canvas textures for the ability VFX primitives, ported from the
@@ -296,6 +297,9 @@ export const OVERLAY_CELL = {
   spark: 3,
   breachMark: 4,
   quakeBurden: 5,
+  attention0: 6,
+  attention1: 7,
+  attention2: 8,
 } as const;
 
 function overlayAtlasTexture(): THREE.CanvasTexture {
@@ -359,6 +363,8 @@ function overlayAtlasTexture(): THREE.CanvasTexture {
     });
     at(1, 1, (cx, cy) => paintWarriorMark(g, cx, cy, cell, true));
     at(2, 1, (cx, cy) => paintWarriorMark(g, cx, cy, cell, false));
+    for (let cel = 0; cel < 3; cel++)
+      at(cel, 2, (cx, cy) => paintWarriorAttention(g, cx, cy, cell, cel));
   });
 }
 

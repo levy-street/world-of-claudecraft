@@ -91,45 +91,48 @@ it('draws one radial Reaping Arc and keeps recipient hits out of the caster perf
   expect(h.audio).not.toHaveBeenCalled();
 });
 
-it.each(['bladestorm', 'cleave'])('separates %s hit, absorption and avoidance', (id) => {
-  const h = harness();
-  for (const outcome of ['miss', 'dodge', 'parry'] as const)
+it.each(['bladestorm', 'cleave', 'whirlwind'])(
+  'separates %s hit, absorption and avoidance',
+  (id) => {
+    const h = harness();
+    for (const outcome of ['miss', 'dodge', 'parry'] as const)
+      h.painter.onDamage({
+        sourceId: 1,
+        targetId: 2,
+        ability: ABILITIES[id].name,
+        kind: outcome,
+        amount: 0,
+        crit: false,
+        school: 'physical',
+      });
+    expect(h.host.flipbookAt).not.toHaveBeenCalled();
     h.painter.onDamage({
       sourceId: 1,
       targetId: 2,
       ability: ABILITIES[id].name,
-      kind: outcome,
+      kind: 'hit',
       amount: 0,
+      absorbed: 50,
       crit: false,
       school: 'physical',
     });
-  expect(h.host.flipbookAt).not.toHaveBeenCalled();
-  h.painter.onDamage({
-    sourceId: 1,
-    targetId: 2,
-    ability: ABILITIES[id].name,
-    kind: 'hit',
-    amount: 0,
-    absorbed: 50,
-    crit: false,
-    school: 'physical',
-  });
-  h.seq.update(h.host, 0.16);
-  expect(vi.mocked(h.host.flipbookAt).mock.calls[0][5]).toBe('contact_crush');
-  expect(h.host.contact).not.toHaveBeenCalled();
-  h.painter.onDamage({
-    sourceId: 1,
-    targetId: 2,
-    ability: ABILITIES[id].name,
-    kind: 'hit',
-    amount: 50,
-    crit: false,
-    school: 'physical',
-  });
-  h.seq.update(h.host, 0.16);
-  expect(vi.mocked(h.host.flipbookAt).mock.calls[1][5]).toBe('contact_cut');
-  expect(h.host.contact).toHaveBeenCalledTimes(1);
-});
+    h.seq.update(h.host, 0.16);
+    expect(vi.mocked(h.host.flipbookAt).mock.calls[0][5]).toBe('contact_crush');
+    expect(h.host.contact).not.toHaveBeenCalled();
+    h.painter.onDamage({
+      sourceId: 1,
+      targetId: 2,
+      ability: ABILITIES[id].name,
+      kind: 'hit',
+      amount: 50,
+      crit: false,
+      school: 'physical',
+    });
+    h.seq.update(h.host, 0.16);
+    expect(vi.mocked(h.host.flipbookAt).mock.calls[1][5]).toBe('contact_cut');
+    expect(h.host.contact).toHaveBeenCalledTimes(1);
+  },
+);
 
 it('keeps the pending Reaping Arc sweep when same-frame recipients fill its shared pool', () => {
   const h = harness();
@@ -234,7 +237,7 @@ it('uses live channel state before the first pulse and accepts the last pulse af
 
 it('does not restart a blade action per victim or on the final channel pulse', () => {
   for (const castingAbility of ['bladestorm', null])
-    for (const id of ['bladestorm', 'cleave'])
+    for (const id of ['bladestorm', 'cleave', 'whirlwind'])
       expect(
         damageEventStartsAttackAnimation(
           { kind: 'player', castingAbility },

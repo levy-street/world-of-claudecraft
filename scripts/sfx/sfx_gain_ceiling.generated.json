@@ -995,6 +995,23 @@
       }
     ]
   },
+  "impact_warrior_blood_recovery": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "impact_warrior_blood_recovery_1.mp3",
+        "sha256": "dc62b6c8c76ff11b2c999bf16473a4087b4d38c676f2e42a2d21a81e114cbf35",
+        "size": 6940,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "impact_warrior_blood_recovery_2.mp3",
+        "sha256": "fbd947e7382e9e31a5f04d5cf462c0b11ff7904c45a754507a56c08501d75e3f",
+        "size": 6940,
+        "peakDb": -6.2
+      }
+    ]
+  },
   "impact_warrior_bloodletting": {
     "ceilingDb": 5.2,
     "tracks": [
@@ -1080,6 +1097,23 @@
       }
     ]
   },
+  "impact_warrior_goad_bark": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "impact_warrior_goad_bark_1.mp3",
+        "sha256": "b0cefd0e05f3424aa31e674d3480255f500d5e2af9f37662edb787cba54a722b",
+        "size": 9448,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "impact_warrior_goad_bark_2.mp3",
+        "sha256": "9a38609dde1979feb7de8cc4d85307f0e98691b602d1bd413679d0191476f865",
+        "size": 9448,
+        "peakDb": -6.3
+      }
+    ]
+  },
   "impact_warrior_guard_lock": {
     "ceilingDb": 5.3,
     "tracks": [
@@ -1097,6 +1131,23 @@
       }
     ]
   },
+  "impact_warrior_gyre_sweep": {
+    "ceilingDb": 5,
+    "tracks": [
+      {
+        "filename": "impact_warrior_gyre_sweep_1.mp3",
+        "sha256": "c12cfc9d82e4987c30e9484e259e3ff964a7e150f112b158126855d6db0f4f5a",
+        "size": 10075,
+        "peakDb": -6.1
+      },
+      {
+        "filename": "impact_warrior_gyre_sweep_2.mp3",
+        "sha256": "fcabf79f889ab5eabc43779f13a5f40d41d1441b66ab60d74e4f94dbddf44404",
+        "size": 10075,
+        "peakDb": -6
+      }
+    ]
+  },
   "impact_warrior_maiming": {
     "ceilingDb": 5.2,
     "tracks": [
@@ -1110,6 +1161,23 @@
         "filename": "impact_warrior_maiming_2.mp3",
         "sha256": "741fdce59e741d95349399062081b29c569b5cd0cfb6e588f864b748e85958aa",
         "size": 6940,
+        "peakDb": -6.2
+      }
+    ]
+  },
+  "impact_warrior_mending_lock": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "impact_warrior_mending_lock_1.mp3",
+        "sha256": "d507fd265e9c3cc3e749e34ce0b0c1158ff3892b33643a85f54194c9cc44ab80",
+        "size": 9448,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "impact_warrior_mending_lock_2.mp3",
+        "sha256": "dc10fc0a39e8f6bd1aee2bcf0013a1957b98392d38def947c2df248a555ff357",
+        "size": 9448,
         "peakDb": -6.2
       }
     ]
@@ -1859,6 +1927,23 @@
       }
     ]
   },
+  "melee_warrior_goad_release": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "melee_warrior_goad_release_1.mp3",
+        "sha256": "d7a4c836f2424422e4673a3f27c7ce8b73758ed9f1768a498dbce1dfce939803",
+        "size": 4432,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "melee_warrior_goad_release_2.mp3",
+        "sha256": "40b3848280d061d7015d406b009d3591a58d3033c4c004db81a6a7d7cdd77390",
+        "size": 4432,
+        "peakDb": -6.3
+      }
+    ]
+  },
   "melee_warrior_guard_release": {
     "ceilingDb": 5.1,
     "tracks": [
@@ -1876,6 +1961,23 @@
       }
     ]
   },
+  "melee_warrior_gyre_release": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "melee_warrior_gyre_release_1.mp3",
+        "sha256": "81aec3f67e5676ef533c62763f7c8599f9908cf1769787b71a7c942aec440aca",
+        "size": 4432,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "melee_warrior_gyre_release_2.mp3",
+        "sha256": "353743c3514574c392c5293a87f72f276e3d8fee23613a1747597382ef03f8e4",
+        "size": 4432,
+        "peakDb": -6.2
+      }
+    ]
+  },
   "melee_warrior_maiming_release": {
     "ceilingDb": 5.3,
     "tracks": [
@@ -1889,6 +1991,23 @@
         "filename": "melee_warrior_maiming_release_2.mp3",
         "sha256": "350545b745776601091f6d328c7624faa887006fde9ac20f8817e71e73c10b4d",
         "size": 4432,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "melee_warrior_mending_release": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "melee_warrior_mending_release_1.mp3",
+        "sha256": "2c5c661667596df144e0d4e56a5c30dc9ac0ce478f3dd80ce97feb67c47a2162",
+        "size": 5059,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "melee_warrior_mending_release_2.mp3",
+        "sha256": "17de380e63abeee7d3a81789b6e6cb2a9588a6519224ddeb4192711476a39fdc",
+        "size": 5059,
         "peakDb": -6.3
       }
     ]

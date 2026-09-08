@@ -357,7 +357,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/chars/players/swim_anims.glb": "/media/models/chars/players/swim_anims.6021e6fc7132.glb",
   "models/chars/players/warlock_ability_anims.glb": "/media/models/chars/players/warlock_ability_anims.3c9ce0f27de6.glb",
   "models/chars/players/warrior_ability_anims.glb": "/media/models/chars/players/warrior_ability_anims.5cabf7ef81b8.glb",
-  "models/chars/players/warrior_contact_anims.glb": "/media/models/chars/players/warrior_contact_anims.3cafd8eb57ae.glb",
+  "models/chars/players/warrior_contact_anims.glb": "/media/models/chars/players/warrior_contact_anims.084400bfa620.glb",
   "models/chars/players/warrior_fury_anims.glb": "/media/models/chars/players/warrior_fury_anims.9db5d05dc317.glb",
   "models/city/wall_tower.glb": "/media/models/city/wall_tower.f492b537c35f.glb",
   "models/creatures/alpaca.glb": "/media/models/creatures/alpaca.a0de882ed487.glb",
