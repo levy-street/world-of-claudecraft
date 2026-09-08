@@ -663,8 +663,9 @@ interface AttributionTargetFixture {
 // neither parent. No capture was retaken.
 // Re-minted for the second v0.42.0 reconcile after the release branch advanced
 // with Drakelands/hotkey renderer work. No capture was retaken.
+// Re-minted for the gather coarse key on release/v0.42.0.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'ab1019ffc4c4608ac704ba7f791f77133c78d329b748be7829c8576147a8dab3';
+  '628b4c5289dc74651800de88e4cf856b755c9d3902fe281b5aef8b8ed58d6845';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
