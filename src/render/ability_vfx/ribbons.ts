@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import type { VfxAnchorResolver } from '../vfx_anchor';
 import { type AbilityVfxTextures, OVERLAY_CELL } from './fx_textures';
 import { slashWidthScale } from './spectacle';
+import { type SteelSweepRange, steelSweepGain } from './steel_sweep';
 
 // Camera-facing ribbon trails, ported from the gallery's RibbonMesh +
 // genBolt/smoothArc (arc_bolt_preview.js, ribbons section). One pooled dynamic
@@ -195,6 +196,7 @@ export interface PathMotion {
 }
 
 interface ArcSlot {
+  sweep: SteelSweepRange | null;
   refill: ((pts: THREE.Vector3[]) => number) | null;
   motion: PathMotion | null;
   brushed: boolean;
@@ -381,6 +383,7 @@ export class AbilityVfxRibbons {
     }
     for (let i = 0; i < ARC_SLOTS; i++) {
       this.arcs.push({
+        sweep: null,
         refill: null,
         motion: null,
         brushed: false,
@@ -498,10 +501,12 @@ export class AbilityVfxRibbons {
     preserveActive = false,
     follow = false,
     priority: 0 | 1 = 0,
+    sweep: SteelSweepRange | null = null,
   ): boolean {
     const slot = this.chooseArcSlot(priority, preserveActive);
     if (!slot) return false;
     slot.sample = null;
+    slot.sweep = sweep;
     slot.motion = motion;
     slot.refill = follow ? fill : null;
     slot.brushed = brushed;
@@ -532,6 +537,7 @@ export class AbilityVfxRibbons {
     slot.priority = 1;
     slot.sample = sample;
     slot.motion = null;
+    slot.sweep = null;
     slot.refill = null;
     slot.brushed = true;
     slot.active = true;
@@ -750,6 +756,7 @@ export class AbilityVfxRibbons {
     slot.priority = 0;
     slot.sample = null;
     slot.motion = null;
+    slot.sweep = null;
     slot.refill = null;
     slot.brushed = false;
     slot.active = true;
@@ -786,6 +793,7 @@ export class AbilityVfxRibbons {
     slot.priority = 0;
     slot.sample = null;
     slot.motion = null;
+    slot.sweep = null;
     slot.refill = null;
     slot.brushed = false;
     slot.active = true;
@@ -1002,6 +1010,7 @@ export class AbilityVfxRibbons {
         a.active = false;
         a.sample = null;
         a.motion = null;
+        a.sweep = null;
         a.refill = null;
         continue;
       }
@@ -1034,8 +1043,29 @@ export class AbilityVfxRibbons {
         this.arcCurve.points = a.pts;
         for (let i = 0; i < this.arcSmooth.length; i++)
           this.arcCurve.getPoint(i / (this.arcSmooth.length - 1), this.arcSmooth[i]);
-        this.add(this.arcSmooth, this.arcSmooth.length, a.width * 2.8, a.glow, 0.55 * k, 1);
-        this.add(this.arcSmooth, this.arcSmooth.length, a.width * 0.38, a.core, 0.95 * k, 1);
+        const sweep = reducedMotion ? null : a.sweep;
+        this.add(
+          this.arcSmooth,
+          this.arcSmooth.length,
+          a.width * 2.8,
+          a.glow,
+          0.55 * k,
+          1,
+          3,
+          sweep,
+          a.age / a.life,
+        );
+        this.add(
+          this.arcSmooth,
+          this.arcSmooth.length,
+          a.width * 0.38,
+          a.core,
+          0.95 * k,
+          1,
+          3,
+          sweep,
+          a.age / a.life,
+        );
       } else {
         this.add(a.pts, ARC_PTS, a.width * 2.4, a.glow, 1.1 * k, 0.9);
         this.add(a.pts, ARC_PTS, a.width, a.core, 2.4 * k, 0.9);
@@ -1071,6 +1101,7 @@ export class AbilityVfxRibbons {
       a.active = false;
       a.sample = null;
       a.motion = null;
+      a.sweep = null;
       a.refill = null;
     }
     this.geo.setDrawRange(0, 0);
@@ -1354,6 +1385,7 @@ export class AbilityVfxRibbons {
     slot.priority = 0;
     slot.sample = null;
     slot.motion = null;
+    slot.sweep = null;
     slot.refill = null;
     slot.brushed = false;
     slot.active = true;
@@ -1416,6 +1448,8 @@ export class AbilityVfxRibbons {
     mul: number,
     taper: number,
     uvRepeats = 3,
+    sweep: SteelSweepRange | null = null,
+    age = 0,
   ): void {
     if (n < 2 || this.v + n * 2 > MAX_VERTS || this.i + (n - 1) * 6 > MAX_INDICES) return;
     const base = this.v;
@@ -1438,9 +1472,10 @@ export class AbilityVfxRibbons {
       this.pos[vi + 3] = p.x - this.t1.x * w;
       this.pos[vi + 4] = p.y - this.t1.y * w;
       this.pos[vi + 5] = p.z - this.t1.z * w;
-      const r = color.r * mul;
-      const g = color.g * mul;
-      const bl = color.b * mul;
+      const gain = sweep ? steelSweepGain(sweep.from + (sweep.to - sweep.from) * u, age) : 1;
+      const r = color.r * mul * gain;
+      const g = color.g * mul * gain;
+      const bl = color.b * mul * gain;
       this.col[vi] = r;
       this.col[vi + 1] = g;
       this.col[vi + 2] = bl;

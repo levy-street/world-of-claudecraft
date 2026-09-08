@@ -1,8 +1,12 @@
-import { clearFuryAudioClaim, isMeleeAudioId } from '../../fury_audio_core';
+import { claimFuryAudio, clearFuryAudioClaim, isMeleeAudioId } from '../../fury_audio_core';
 import { DAMAGE_CAST_RELEASES } from '../characters/cast_performance';
 import { isBleedContinuation, meleeImpactProfile } from '../melee_impact_core';
 import { SIGNATURE_ABILITIES } from './signature_core';
-import { drawWarriorAreaContact, drawWarriorStormPulse } from './warrior_area';
+import {
+  drawWarriorAreaContact,
+  drawWarriorStormPulse,
+  isWarriorAreaInstant,
+} from './warrior_area';
 import { WARRIOR_BLADE_STYLES } from './warrior_blades';
 // Thin painter for the per-ability spell VFX system: resolves an event's
 // ability id against the authored spec table (ability_vfx_specs.ts), asks the
@@ -753,7 +757,9 @@ export class AbilityVfx {
         break;
       }
       case 'nova': {
-        const sequenceTier = ability === 'cleave' && tier === 2 ? 1 : tier;
+        if (isWarriorAreaInstant(ability) && isMeleeAudioId(ability) && this.deps.audioReady)
+          fx.reserveFuryAudio(ev, ability, ev.sourceId, ev.sourceId, 1, this.deps.audioReady);
+        const sequenceTier = isWarriorAreaInstant(ability) && tier === 2 ? 1 : tier;
         if (sequenceTier < 2 && full) {
           const delay = this.windupDelayFor(ability, full, ev.sourceId);
           // a staged release carries the boom itself: firing the pooled nova
@@ -1185,20 +1191,32 @@ export class AbilityVfx {
     if (ev.abilityId && DAMAGE_CAST_RELEASES.has(ev.abilityId))
       this.releaseGesture(ev.sourceId, ev.abilityId);
     const compoundId = attackAbilityId(ev.ability);
-    if (compoundId === 'bladestorm' || compoundId === 'cleave') {
+    if (compoundId === 'bladestorm' || isWarriorAreaInstant(compoundId)) {
+      if (
+        isMeleeAudioId(compoundId) &&
+        this.deps.fx.hasRetainedAreaAudio?.(compoundId, ev.sourceId)
+      )
+        claimFuryAudio(ev);
       const tier = this.biasFor(ev.sourceId, this.budget.peek(ev.sourceId, this.now()));
       const outcome = ev.kind === 'hit' ? (ev.amount > 0 ? 1 : (ev.absorbed ?? 0) > 0 ? 2 : 0) : 0;
-      if (compoundId === 'cleave') {
+      if (compoundId && isWarriorAreaInstant(compoundId)) {
         if (!outcome) return true;
-        const full = abilityVfxFullSpecFor('cleave');
+        const full = abilityVfxFullSpecFor(compoundId);
         return (
           !!full &&
-          this.deps.fx.sequenceWarriorAreaContact(full, ev.sourceId, ev.targetId, tier, outcome)
+          this.deps.fx.sequenceWarriorAreaContact(
+            full,
+            ev.sourceId,
+            ev.targetId,
+            tier,
+            outcome,
+            compoundId,
+          )
         );
       }
       return drawWarriorAreaContact(
         this.deps.fx,
-        compoundId,
+        compoundId!,
         ev.sourceId,
         ev.targetId,
         outcome,
@@ -1259,7 +1277,9 @@ export class AbilityVfx {
     // Authored weapons still collide when a ward absorbs all damage. Retain
     // their absorb response while explicitly withholding a flesh imprint.
     if (
-      (compoundId === 'shield_slam' || (compoundId && WARRIOR_BLADE_STYLES[compoundId])) &&
+      (compoundId === 'shield_slam' ||
+        compoundId === 'breachmaker' ||
+        (compoundId && WARRIOR_BLADE_STYLES[compoundId])) &&
       ev.kind === 'hit' &&
       ev.amount <= 0 &&
       (ev.absorbed ?? 0) > 0
@@ -1267,7 +1287,8 @@ export class AbilityVfx {
       const appearance = this.deps.visualVariantOf?.(compoundId, ev.sourceId) ?? compoundId;
       const spec = abilityVfxSpecFor(appearance),
         full = abilityVfxFullSpecFor(appearance);
-      const tier = this.castTier(ev.sourceId, compoundId);
+      let tier = this.castTier(ev.sourceId, compoundId);
+      if (compoundId === 'breachmaker' && tier === 2) tier = 1;
       if (appearance === compoundId && spec && full && tier < 2) {
         this.deps.fx.sequenceInstant(
           compoundId,
@@ -1374,6 +1395,7 @@ export class AbilityVfx {
       if (tier >= 1) return; // degraded accents vanish first; casts keep priority
       if (!this.budget.admitAccent(nowSec)) return;
     }
+    if (abilityId === 'breachmaker' && tier === 2) tier = 1;
     const plan = planImpact(spec, ev.crit, this.quality, tier);
     const at = this.deps.anchor(ev.targetId, 0.55);
     if (!at) return;
@@ -1407,6 +1429,7 @@ export class AbilityVfx {
       this.spawned++;
     }
     this.recordStat(abilityId, false);
+    if (abilityId === 'breachmaker') return true;
   }
 
   // Spec-colored buff swirl for an aura gain. Only an exact ability id (from
@@ -1537,6 +1560,17 @@ export class AbilityVfx {
     for (let i = 0; i < e.auras.length; i++) {
       const aura = e.auras[i];
       const auraWasHeld = held.auraStamps.has(aura.id);
+      if (aura.id === 'breachmaker_vuln' || aura.id === 'thunder_clap_as') {
+        if (
+          (aura.remaining ?? 0) > 0 &&
+          !isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 })
+        ) {
+          if (aura.id === 'thunder_clap_as') fx.orbit(e.id, 'quakeBurden', 0x93bfdb, undefined, 0);
+          else if (aura.sourceId !== undefined && aura.sourceId === this.deps.localPlayerId?.())
+            fx.orbit(e.id, 'breachMark', 0xe9ad79, undefined, 0);
+        }
+        continue;
+      }
       if (aura.kind === 'overpower_charge') {
         if (!isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 }))
           fx.holdBladeCharges?.(e.id, aura.stacks ?? 1);

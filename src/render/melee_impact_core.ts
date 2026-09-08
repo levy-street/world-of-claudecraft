@@ -1,5 +1,11 @@
 export type MeleeContactStyle =
-  'edge' | 'split' | 'crush' | 'pierce' | 'cross' | 'reap' | 'serrated';
+  | 'edge'
+  | 'split'
+  | 'crush'
+  | 'pierce'
+  | 'cross'
+  | 'reap'
+  | 'serrated';
 export interface MeleeImpactProfile {
   /** Fraction of the actual recipient's displayed height; independent of the weapon arc. */
   height: number;
@@ -39,6 +45,8 @@ export const MELEE_IMPACTS: Readonly<Record<string, MeleeImpactProfile>> = {
   bloodthirst: contact(0.56, 'reap', 0.5, 1.35, 0.085, 1.15, true),
   cleave: contact(0.52, 'edge', 0.08, 1.85, 0.095, 1.25),
   revenge: contact(0.54, 'cross', -0.45, 1.55, 0.09, 1.3),
+  thunder_clap: contact(0.35, 'crush', 0.15, 1.8, 0.13, 1.5),
+  faultline: contact(0.42, 'split', 0, 2.2, 0.16, 1.9),
   hamstring: contact(0.2, 'edge', 0.15, 0.9, 0.05, 0.65),
   pummel: contact(0.73, 'crush', 0.1, 0.8, 0.08, 0.85),
   sunder_armor: contact(0.57, 'split', 0.3, 1.15, 0.08, 1.15),
@@ -58,22 +66,19 @@ export const MELEE_IMPACTS: Readonly<Record<string, MeleeImpactProfile>> = {
   wing_clip: contact(0.23, 'reap', -0.12, 1.4, 0.075, 0.9, true),
   mongoose_bite: contact(0.58, 'pierce', 1.1, 1.6, 0.1, 1.5, true),
   bloodhook: contact(0.57, 'pierce', 0.15, 1.2, 0.085, 1.15, true),
-  body_blow: contact(.48,'crush',.12,1.25,.11,1.45),
-  knockout_blow: contact(.7,'crush',.4,1.65,.14,1.8),
-  gouge: contact(.78,'pierce',0,.65,.035,.65),
-  cheap_shot: contact(.42,'crush',.15,.9,.07,.8),
-  maul: contact(.55,'crush',.28,1.8,.12,1.5),
-  marrowbreak: contact(.57,'crush',-.2,2.1,.15,1.85),
-  swipe: contact(.5,'cross',.15,1.9,.1,1.2,true),
-  bash: contact(.64,'crush',.12,1.2,.1,1.25),
+  body_blow: contact(0.48, 'crush', 0.12, 1.25, 0.11, 1.45),
+  knockout_blow: contact(0.7, 'crush', 0.4, 1.65, 0.14, 1.8),
+  gouge: contact(0.78, 'pierce', 0, 0.65, 0.035, 0.65),
+  cheap_shot: contact(0.42, 'crush', 0.15, 0.9, 0.07, 0.8),
+  maul: contact(0.55, 'crush', 0.28, 1.8, 0.12, 1.5),
+  marrowbreak: contact(0.57, 'crush', -0.2, 2.1, 0.15, 1.85),
+  swipe: contact(0.5, 'cross', 0.15, 1.9, 0.1, 1.2, true),
+  bash: contact(0.64, 'crush', 0.12, 1.2, 0.1, 1.25),
 };
 
 /** Label-only periodic/consumption outcomes must never replay a new weapon action.
  * Stable ID-bearing primary hits retain their action, even on the same victim. */
-export function isBleedContinuation(
-  id: string | undefined,
-  primaryId?: string | null,
-): boolean {
+export function isBleedContinuation(id: string | undefined, primaryId?: string | null): boolean {
   return (
     !primaryId &&
     (id === 'garrote' ||
@@ -89,12 +94,8 @@ export function meleeImpactProfile(id: string): MeleeImpactProfile | undefined {
 }
 
 /** Each real contact of a compound attack visits a deliberate anatomical band. */
-export function meleeContactHeight(
-  profile: MeleeImpactProfile,
-  beat: number,
-): number {
-  if (profile.style === 'reap')
-    return profile.height + [0, 0.13, -0.055][beat % 3];
+export function meleeContactHeight(profile: MeleeImpactProfile, beat: number): number {
+  if (profile.style === 'reap') return profile.height + [0, 0.13, -0.055][beat % 3];
   if (profile.style === 'cross') return profile.height + (beat % 2 ? 0.08 : 0);
   return profile.height;
 }
@@ -114,8 +115,7 @@ export function meleeContactPoint(
     z = Math.sin(u * Math.PI) * 0.055;
   if (profile.style === 'split') {
     y = t * span;
-    x =
-      Math.sin(u * 19 + strand) * 0.065 * Math.sin(u * Math.PI) + strand * 0.12;
+    x = Math.sin(u * 19 + strand) * 0.065 * Math.sin(u * Math.PI) + strand * 0.12;
   } else if (profile.style === 'crush') {
     x = (strand % 2 ? -1 : 1) * (0.06 + u * span * 0.48);
     y = Math.sin(strand * 2.3) * u * span * 0.38 + Math.sin(u * 16) * u * 0.05;
@@ -130,8 +130,7 @@ export function meleeContactPoint(
   } else if (profile.style === 'reap') {
     y = Math.sin(u * Math.PI) * span * 0.17 - 0.12;
     x *= beat % 2 ? -1 : 1;
-  } else if (profile.style === 'cross')
-    y = t * span * (beat % 2 ? -1 : 1) * 0.45;
+  } else if (profile.style === 'cross') y = t * span * (beat % 2 ? -1 : 1) * 0.45;
   const angle = profile.angle + (profile.style === 'reap' ? beat * 0.28 : 0);
   out.x = x * Math.cos(angle) - y * Math.sin(angle);
   out.y = x * Math.sin(angle) + y * Math.cos(angle);

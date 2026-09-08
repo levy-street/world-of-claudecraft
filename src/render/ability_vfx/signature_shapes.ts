@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { buildFuryCutShape } from './fury_shapes';
+import { buildIronguardShape, type IronguardShape } from './ironguard_shapes';
 import { buildRitualSculpture } from './ritual_sculptures';
 import type { Substance } from './signature_core';
 import { buildWarriorArea, type WarriorAreaShape } from './warrior_area_shapes';
@@ -17,6 +18,7 @@ export type CrestKind =
   | 'shield_contact'
   | 'steel_cut'
   | WarriorAreaShape
+  | IronguardShape
   | WarriorPressureKind;
 
 /** Open, directional surfaces with genuinely different topology. Generated once
@@ -28,6 +30,8 @@ export function buildSignatureShapes(): Map<CrestKind, THREE.BufferGeometry> {
   shapes.set('steel_cut', buildWarriorBlade());
   shapes.set('steel_storm', buildWarriorArea('steel_storm'));
   shapes.set('steel_reap', buildWarriorArea('steel_reap'));
+  for (const kind of ['iron_counter', 'iron_quake', 'iron_fault', 'breach_wedge'] as const)
+    shapes.set(kind, buildIronguardShape(kind));
   for (const kind of ['rally_pressure', 'dread_pressure', 'challenge_pressure'] as const)
     shapes.set(kind, buildWarriorPressure(kind));
   for (const kind of ['ice', 'water', 'fire', 'shadow', 'light', 'nature', 'arcane'] as const) {

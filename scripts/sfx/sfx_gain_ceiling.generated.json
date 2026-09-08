@@ -995,6 +995,23 @@
       }
     ]
   },
+  "impact_warrior_breachmaker": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "impact_warrior_breachmaker_1.mp3",
+        "sha256": "d0cbacbc3ef23fa6b036a96861d3b1aecf0aef57f3cad6685d3d1ce27c8dd1c0",
+        "size": 8821,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "impact_warrior_breachmaker_2.mp3",
+        "sha256": "d7a9413f8a3d10c33745426699d55afe7a22d027419f54f0ea8c2ec24422246c",
+        "size": 8821,
+        "peakDb": -6.2
+      }
+    ]
+  },
   "impact_warrior_brute": {
     "ceilingDb": 5.2,
     "tracks": [
@@ -1029,6 +1046,23 @@
       }
     ]
   },
+  "impact_warrior_faultline": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "impact_warrior_faultline_1.mp3",
+        "sha256": "0d925cf1499849dd42f5d0a8ac685377dbfb1bb249ed460bf638b918a1a7a24e",
+        "size": 11955,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "impact_warrior_faultline_2.mp3",
+        "sha256": "bf672826adefa4f10ced5cf3a5633a8a96c89c3f28e7e4061eda89bd8ab229c1",
+        "size": 11955,
+        "peakDb": -6.2
+      }
+    ]
+  },
   "impact_warrior_maiming": {
     "ceilingDb": 5.2,
     "tracks": [
@@ -1043,6 +1077,23 @@
         "sha256": "741fdce59e741d95349399062081b29c569b5cd0cfb6e588f864b748e85958aa",
         "size": 6940,
         "peakDb": -6.2
+      }
+    ]
+  },
+  "impact_warrior_quake": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "impact_warrior_quake_1.mp3",
+        "sha256": "ac7ca9bca34deb16b943f668e7488d09e60d4393996b6a3ce14289f3022450e3",
+        "size": 10075,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "impact_warrior_quake_2.mp3",
+        "sha256": "eef720bb38e299344fcdcf31ec3e12f2825b9c022ae59adb474cc92d60cf4e51",
+        "size": 10075,
+        "peakDb": -6.3
       }
     ]
   },
@@ -1110,6 +1161,23 @@
         "filename": "impact_warrior_redhand_2.mp3",
         "sha256": "f4ed2b4250c3e1f737e4c7cc2a40f74dd653d73d77a06ac75f153518be311f20",
         "size": 6940,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "impact_warrior_revenge": {
+    "ceilingDb": 5.1,
+    "tracks": [
+      {
+        "filename": "impact_warrior_revenge_1.mp3",
+        "sha256": "72acaf5b1d9fa4e3f4231f6e553a105ea8ad4499f90efb845dd51eaa99933af6",
+        "size": 8194,
+        "peakDb": -6.1
+      },
+      {
+        "filename": "impact_warrior_revenge_2.mp3",
+        "sha256": "a19dea0a0a96d71dd725785d22f4515adfbb7f37cdc5eed692ab9257c77cf4e7",
+        "size": 8194,
         "peakDb": -6.3
       }
     ]
@@ -1587,6 +1655,23 @@
       }
     ]
   },
+  "melee_warrior_breachmaker_release": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "melee_warrior_breachmaker_release_1.mp3",
+        "sha256": "01837521d430516b1f60cf28796b6ce3209e538f406420523f78f69c118c9280",
+        "size": 4432,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "melee_warrior_breachmaker_release_2.mp3",
+        "sha256": "5a2992b4e959c3f84f874990e4e12ee7fdd996d5b8dec3b4202224979f4b0ae6",
+        "size": 4432,
+        "peakDb": -6.3
+      }
+    ]
+  },
   "melee_warrior_brute_release": {
     "ceilingDb": 5.3,
     "tracks": [
@@ -1621,6 +1706,23 @@
       }
     ]
   },
+  "melee_warrior_faultline_release": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "melee_warrior_faultline_release_1.mp3",
+        "sha256": "62d36486a649c68cb301c4a4c52b0683993ab4aa4e4b11a4719e919a1344eb5a",
+        "size": 5059,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "melee_warrior_faultline_release_2.mp3",
+        "sha256": "cabfc74d62d6145de01836fd75cd265dac06c572228369c18f7aa4661fa99ad7",
+        "size": 5059,
+        "peakDb": -6.2
+      }
+    ]
+  },
   "melee_warrior_maiming_release": {
     "ceilingDb": 5.3,
     "tracks": [
@@ -1635,6 +1737,23 @@
         "sha256": "350545b745776601091f6d328c7624faa887006fde9ac20f8817e71e73c10b4d",
         "size": 4432,
         "peakDb": -6.3
+      }
+    ]
+  },
+  "melee_warrior_quake_release": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "melee_warrior_quake_release_1.mp3",
+        "sha256": "a3bd8c941833e1c0b52ed2abeef6616c8fda19d7586ee24c49a993316d0e30c8",
+        "size": 4432,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "melee_warrior_quake_release_2.mp3",
+        "sha256": "20cb97926a40b74175efcc1cdde5cb6c19dd7ddac0b1f0257b7ecf19687e52f4",
+        "size": 4432,
+        "peakDb": -6.4
       }
     ]
   },
@@ -1667,6 +1786,23 @@
       {
         "filename": "melee_warrior_redhand_release_2.mp3",
         "sha256": "63f80784a19ccee8b78b1dac79e6284b4ac5e6d14dc6fa7e7a2e632f0e549a88",
+        "size": 4432,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "melee_warrior_revenge_release": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "melee_warrior_revenge_release_1.mp3",
+        "sha256": "556fd9f1974cde1db6113941fc7e7f7c1d6aceca3d075a921a00d2aaa015b75d",
+        "size": 4432,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "melee_warrior_revenge_release_2.mp3",
+        "sha256": "10dbea89dec1831b172566b29487e0e277b54e0b026a81771ea4fd2538d5b271",
         "size": 4432,
         "peakDb": -6.3
       }

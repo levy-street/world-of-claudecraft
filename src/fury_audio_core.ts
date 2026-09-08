@@ -17,6 +17,11 @@ export const FURY_AUDIO = {
 } as const;
 export type FuryAudioId = keyof typeof FURY_AUDIO;
 export const WARRIOR_CONTACT_AUDIO = {
+  breachmaker: {
+    release: 'melee_warrior_breachmaker_release',
+    impacts: ['impact_warrior_breachmaker'],
+    times: [0.15],
+  },
   slam: {
     release: 'melee_warrior_brute_release',
     impacts: ['impact_warrior_brute'],
@@ -53,7 +58,24 @@ export const WARRIOR_CONTACT_AUDIO = {
     times: [0.15],
   },
 } as const;
-export const MELEE_AUDIO = { ...FURY_AUDIO, ...WARRIOR_CONTACT_AUDIO };
+export const WARRIOR_AREA_AUDIO = {
+  revenge: {
+    release: 'melee_warrior_revenge_release',
+    impacts: ['impact_warrior_revenge'],
+    times: [0.15],
+  },
+  thunder_clap: {
+    release: 'melee_warrior_quake_release',
+    impacts: ['impact_warrior_quake'],
+    times: [0.15],
+  },
+  faultline: {
+    release: 'melee_warrior_faultline_release',
+    impacts: ['impact_warrior_faultline'],
+    times: [0.15],
+  },
+} as const;
+export const MELEE_AUDIO = { ...FURY_AUDIO, ...WARRIOR_CONTACT_AUDIO, ...WARRIOR_AREA_AUDIO };
 export type MeleeAudioId = keyof typeof MELEE_AUDIO;
 export function isMeleeAudioId(id: string | undefined): id is MeleeAudioId {
   return id !== undefined && Object.hasOwn(MELEE_AUDIO, id);

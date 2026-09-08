@@ -27,6 +27,7 @@ import type { Substance } from './signature_core';
 import { SIGNATURE_ABILITIES, SIGNATURE_CONTACT_TIME } from './signature_core';
 import type { CrestKind } from './signature_shapes';
 import { SPECTACLE, usesCrescendoScale } from './spectacle';
+import type { SteelSweepRange } from './steel_sweep';
 
 // The archetype sequencer, ported from the gallery interpreters
 // (arc_bolt_preview.js): each claimed cast becomes one pooled sequence slot
@@ -250,6 +251,7 @@ export interface SequencerHost {
     motion?: null,
     preserveActive?: boolean,
     priority?: 0 | 1,
+    sweep?: SteelSweepRange | null,
   ): void;
   pushOverlay(
     x: number,

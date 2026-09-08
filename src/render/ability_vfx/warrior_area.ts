@@ -6,6 +6,10 @@ const source = { x: 0, y: 0, z: 0 },
   target = { x: 0, y: 0, z: 0 },
   point = { x: 0, y: 0, z: 0 };
 
+export function isWarriorAreaInstant(id: string | undefined): boolean {
+  return id === 'cleave' || id === 'revenge' || id === 'thunder_clap' || id === 'faultline';
+}
+
 /** Exactly one sweep belongs to the cast, regardless of recipient count. */
 export function drawReapingArc(host: SequencerHost, slot: SeqSlot, beat: number): boolean {
   if (slot.abilityId !== 'cleave') return false;
@@ -74,7 +78,7 @@ export function drawWarriorAreaContact(
   outcome: 0 | 1 | 2,
   tier: number,
 ): boolean {
-  if (id !== 'bladestorm' && id !== 'cleave') return false;
+  if (id !== 'bladestorm' && !isWarriorAreaInstant(id)) return false;
   if (!outcome || sourceId === targetId) return true;
   const profile = meleeImpactProfile(id);
   if (!profile) return false;
@@ -86,7 +90,7 @@ export function drawWarriorAreaContact(
     at.z,
     outcome === 2 ? 2.4 : 2.8,
     outcome === 2 ? 0xcadce8 : 0xeac6a4,
-    outcome === 2 ? 'contact_crush' : 'contact_cut',
+    outcome === 2 || id === 'thunder_clap' || id === 'faultline' ? 'contact_crush' : 'contact_cut',
     1.7,
     0.21,
     0.3,
@@ -113,8 +117,8 @@ export function drawWarriorAreaContact(
     },
     true,
     null,
-    false,
-    1,
+    true,
+    0,
   );
   if (tier === 0)
     host.fragmentsAt?.('metal_splinter', at.x, at.y, at.z, 0xc6aa8f, 8, 0.9, dx, dz, 0.22);

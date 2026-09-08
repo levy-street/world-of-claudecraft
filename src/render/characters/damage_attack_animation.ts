@@ -46,7 +46,14 @@ export function damageEventStartsAttackAnimation(
   if (!abilityLabel && !primaryAbilityId && sourceVisual?.isPerformingAbility) return false;
   // Every pulse, including the last one after castStop, belongs to the channel.
   const area = primaryAbilityId ?? attackAbilityId(abilityLabel ?? null);
-  if (source?.castingAbility === 'bladestorm' || area === 'bladestorm' || area === 'cleave')
+  if (
+    source?.castingAbility === 'bladestorm' ||
+    area === 'bladestorm' ||
+    area === 'cleave' ||
+    area === 'revenge' ||
+    area === 'thunder_clap' ||
+    area === 'faultline'
+  )
     return false;
   if (isBleedContinuation(attackAbilityId(abilityLabel ?? null), primaryAbilityId)) return false;
   if (

@@ -12,6 +12,7 @@ const abilities = [
   'execute',
   'bloodthirst',
   'victory_rush',
+  'breachmaker',
 ] as const;
 const outcomes = ['hit', 'absorbed', 'miss', 'dodge', 'parry'] as const;
 it.each(

@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { paintWarriorMark } from './warrior_mark_atlas';
 
 // Procedural canvas textures for the ability VFX primitives, ported from the
 // Ability VFX Gallery (arc_bolt_preview.js texture section). Built once at
@@ -285,10 +286,17 @@ function charTexture(): THREE.CanvasTexture {
   });
 }
 
-// 2x2 overlay sprite atlas: soft glow, four-point star, rune diamond, spark.
-// Cell indices are the OVERLAY_CELL constants; append means a bigger grid.
-export const OVERLAY_ATLAS_GRID = 2;
-export const OVERLAY_CELL = { glow: 0, star: 1, rune: 2, spark: 3 } as const;
+// Stable numeric identities in a row-major atlas. New etched armor cells share
+// the existing upload/compile lane and the same bounded overlay draw.
+export const OVERLAY_ATLAS_GRID = 3;
+export const OVERLAY_CELL = {
+  glow: 0,
+  star: 1,
+  rune: 2,
+  spark: 3,
+  breachMark: 4,
+  quakeBurden: 5,
+} as const;
 
 function overlayAtlasTexture(): THREE.CanvasTexture {
   const cell = 64;
@@ -322,7 +330,7 @@ function overlayAtlasTexture(): THREE.CanvasTexture {
       g.fill();
     });
     // rune: hollow diamond with a center tick
-    at(0, 1, (cx, cy) => {
+    at(2, 0, (cx, cy) => {
       g.translate(cx, cy);
       g.strokeStyle = 'rgba(255,255,255,0.95)';
       g.lineWidth = 4;
@@ -339,7 +347,7 @@ function overlayAtlasTexture(): THREE.CanvasTexture {
       g.stroke();
     });
     // spark: thin elongated flash
-    at(1, 1, (cx, cy) => {
+    at(0, 1, (cx, cy) => {
       g.translate(cx, cy);
       const grad = g.createLinearGradient(0, -cell * 0.42, 0, cell * 0.42);
       grad.addColorStop(0, 'rgba(255,255,255,0)');
@@ -349,6 +357,8 @@ function overlayAtlasTexture(): THREE.CanvasTexture {
       g.fillRect(-cell * 0.07, -cell * 0.42, cell * 0.14, cell * 0.84);
       g.fillRect(-cell * 0.24, -cell * 0.07, cell * 0.48, cell * 0.14);
     });
+    at(1, 1, (cx, cy) => paintWarriorMark(g, cx, cy, cell, true));
+    at(2, 1, (cx, cy) => paintWarriorMark(g, cx, cy, cell, false));
   });
 }
 

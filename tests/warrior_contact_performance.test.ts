@@ -130,6 +130,10 @@ it.each([
   ['slam', 'Warrior_Brute_Swing'],
   ['overpower', 'Warrior_Redhand'],
   ['cleave', 'Warrior_Reaping_Arc'],
+  ['revenge', 'Warrior_Revenge'],
+  ['thunder_clap', 'Warrior_Quaking_Blow'],
+  ['faultline', 'Warrior_Faultline'],
+  ['breachmaker', 'Warrior_Breachmaker'],
 ])('preserves native %s loading, contact and planted recovery', async (id, name) => {
   const f = await fixture(name);
   const bones = ['footl', 'footr', 'toesl', 'toesr', 'root'].map(f.bone);
@@ -197,6 +201,30 @@ it('keeps both feet and toes planted between baked frames while driving the shie
       expect(position(b).distanceTo(held[i].position)).toBeLessThan(1e-5);
       expect(rotation(b).angleTo(held[i].rotation)).toBeLessThan(1e-5);
     });
+  }
+});
+
+it('keeps Breachmaker left handslot on right socket minus .15 Y-axis through contact range', async () => {
+  const f = await fixture('Warrior_Breachmaker');
+  const left = f.bone('handslotl');
+  const right = f.bone('handslotr');
+  f.pose(0.085);
+  const rightZ0 = position(right).z;
+  f.pose(0.15);
+  expect(position(right).z - rightZ0).toBeGreaterThanOrEqual(0.1);
+  const steps = Math.round((0.34 - 0.085) / 0.005);
+  for (let i = 0; i <= steps; i++) {
+    const t = 0.085 + i * 0.005;
+    f.pose(t);
+    const lp = position(left);
+    const rp = position(right);
+    const rightY = new THREE.Vector3(0, 1, 0).applyQuaternion(rotation(right));
+    const target = rp.clone().addScaledVector(rightY, -0.15);
+    expect(lp.distanceTo(target), `left-to-target at t=${t.toFixed(3)}`).toBeLessThan(0.001);
+    expect(
+      Math.abs(lp.distanceTo(rp) - 0.15),
+      `left-right distance at t=${t.toFixed(3)}`,
+    ).toBeLessThan(0.001);
   }
 });
 

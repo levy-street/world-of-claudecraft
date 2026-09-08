@@ -1,6 +1,54 @@
 /** Distinct material voices for native Warrior contacts; never bulk-regenerated. */
 export const WARRIOR_CONTACT_SFX = [
   {
+    key: 'melee_warrior_revenge_release',
+    duration: 0.13,
+    prompt:
+      'One extremely short broad armored sword countersweep loading behind a braced shield, dense leather strap creak and fast steel air scrape. Crisp dry physical movement. No hit, voice, music, ambience or ringing.',
+  },
+  {
+    key: 'impact_warrior_revenge',
+    duration: 0.28,
+    prompt:
+      'One immediate wide sword counterstrike, dense low iron punch with a sharp horizontal shearing steel crack and brief scattering rivet clicks. Weighty controlled knight combat, dry compact ending. No explosion, voice, music or long ringing.',
+  },
+  {
+    key: 'melee_warrior_quake_release',
+    duration: 0.13,
+    prompt:
+      'One extremely short armored knight planting weight and loading a broad heavy shield, leather straps tighten and iron plates compress, sharp inhaling air. Crisp close dry movement. No voice, impact, music or ambience.',
+  },
+  {
+    key: 'impact_warrior_quake',
+    duration: 0.36,
+    prompt:
+      'One immediate broad heavy shield slamming fractured stone, deep compact physical thud, hard iron crack and a fast spreading rattle of gritty small stone chips. Weighty grounded fantasy combat shockwave with brief dry decay. No explosion, thunder, voice, music or sustained rumble.',
+  },
+  {
+    key: 'melee_warrior_faultline_release',
+    duration: 0.14,
+    prompt:
+      'One extremely short powerful armored shield loading forward, heavy plate scrape with leather strain and a tight accelerating rush of air. A decisive grounded knight blow. No impact, voice, music or ringing.',
+  },
+  {
+    key: 'impact_warrior_faultline',
+    duration: 0.42,
+    prompt:
+      'One immediate huge heavy shield impact into bedrock, deep dense body slam beneath a sharp iron crack, followed by two rapid branching stone fractures and falling gritty fragments. Powerful controlled physical fantasy finisher, dry compact clean tail. No explosion, thunder, voice, music or long reverb.',
+  },
+  {
+    key: 'melee_warrior_breachmaker_release',
+    duration: 0.13,
+    prompt:
+      'One extremely short two-handed sword driving straight forward from a tight chamber, a focused accelerating air hiss with taut leather grip strain. Disciplined piercing thrust, close dry recording. No hit, voice, music or ambience.',
+  },
+  {
+    key: 'impact_warrior_breachmaker',
+    duration: 0.3,
+    prompt:
+      'One immediate heavy sword thrust breaking armor, a hard narrow steel puncture crack and dense low body punch, two armor plates splitting outward with short brittle metal shards. Powerful decisive physical melee hit, dry compact ending. No explosion, voice, music, ambience or long ringing.',
+  },
+  {
     key: 'melee_warrior_brute_release',
     duration: 0.12,
     prompt:

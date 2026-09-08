@@ -1363,7 +1363,7 @@ export const VISUALS: Record<string, VisualDef> = {
         execute: 'Warrior_Early_Grave',
         slam: 'Warrior_Brute_Swing',
         red_harvest: 'Fury_Red_Harvest',
-        breachmaker: '2H_Melee_Attack_Chop',
+        breachmaker: 'Warrior_Breachmaker',
         // Native shield drive with a planted lower body and a held contact.
         // scripts/build_warrior_contact_anims.mjs bakes foot locking offline.
         shield_slam: 'Warrior_Shieldcrack',
@@ -1371,9 +1371,9 @@ export const VISUALS: Record<string, VisualDef> = {
         bloodthirst: 'Warrior_Bloodletting',
         // Reaping Arc turns through all surrounding enemies; Revenge is frontal.
         cleave: 'Warrior_Reaping_Arc',
-        revenge: '1H_Melee_Attack_Slice_Horizontal',
-        thunder_clap: '1H_Melee_Attack_Chop',
-        faultline: '1H_Melee_Attack_Chop',
+        revenge: 'Warrior_Revenge',
+        thunder_clap: 'Warrior_Quaking_Blow',
+        faultline: 'Warrior_Faultline',
         heroic_strike: '1H_Melee_Attack_Slice_Diagonal',
         overpower: 'Warrior_Redhand',
         hamstring: '1H_Melee_Attack_Slice_Diagonal',

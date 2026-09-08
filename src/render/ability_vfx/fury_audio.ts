@@ -21,6 +21,19 @@ export class FuryAudioQueue {
   }));
   private readonly scratch = { x: 0, y: 0, z: 0 };
 
+  ownsCast(id: MeleeAudioId, caster: number): boolean {
+    for (const slot of this.slots)
+      if (
+        slot.active &&
+        !slot.secondary &&
+        slot.id === id &&
+        slot.caster === caster &&
+        slot.age < 0.025
+      )
+        return true;
+    return false;
+  }
+
   reserve(
     host: SequencerHost,
     event: object,

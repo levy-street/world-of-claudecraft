@@ -55,6 +55,8 @@ import {
   type SpiritBuildScheduler,
   type SpiritCompileGate,
 } from './spirits';
+import type { SteelSweepRange } from './steel_sweep';
+import { drawWarriorWornMark } from './warrior_worn_marks';
 import { RestorativeWaterVolumes } from './water_volumes';
 
 export type { DecalStyle } from './decals';
@@ -105,6 +107,8 @@ export type OrbitStyle =
   | 'conduction'
   | 'weaponGlow'
   | 'bladeCharges'
+  | 'breachMark'
+  | 'quakeBurden'
   | 'leaves';
 
 const ORBIT_STYLE_SET = new Set<string>([
@@ -362,6 +366,24 @@ const ORBIT_DNA: Record<
     frac: 0.46,
     size: 0.2,
     cell: OVERLAY_CELL.star,
+  },
+  breachMark: {
+    n: 8,
+    rate: 0,
+    radius: 0,
+    weave: 0,
+    frac: 0.36,
+    size: 0.16,
+    cell: OVERLAY_CELL.spark,
+  },
+  quakeBurden: {
+    n: 8,
+    rate: 0,
+    radius: 0,
+    weave: 0,
+    frac: 0.36,
+    size: 0.16,
+    cell: OVERLAY_CELL.spark,
   },
   leaves: {
     n: 6,
@@ -792,6 +814,10 @@ export class AbilityVfxFx implements SequencerHost {
     );
   }
 
+  hasRetainedAreaAudio(id: MeleeAudioId, caster: number): boolean {
+    return this.furyAudio.ownsCast(id, caster);
+  }
+
   // ---- archetype sequences (the gallery phase anatomy; see sequencer.ts) --
 
   // Instant cast: release now (or after a synthetic windup phase of
@@ -844,11 +870,12 @@ export class AbilityVfxFx implements SequencerHost {
     targetId: number,
     tier: number,
     outcome: 0 | 1 | 2,
+    abilityId = 'cleave',
   ): boolean {
     if (this.disposed) return false;
     this.sequencer.start(
       this,
-      'cleave',
+      abilityId,
       spec,
       casterId,
       targetId,
@@ -1469,6 +1496,7 @@ export class AbilityVfxFx implements SequencerHost {
     motion: PathMotion | null = null,
     preserveActive = false,
     priority: 0 | 1 = 0,
+    sweep: SteelSweepRange | null = null,
   ): boolean {
     if (this.disposed) return false;
     return this.ribbons.spawnPath(
@@ -1481,6 +1509,7 @@ export class AbilityVfxFx implements SequencerHost {
       preserveActive,
       false,
       priority,
+      sweep,
     );
   }
 
@@ -2716,6 +2745,21 @@ export class AbilityVfxFx implements SequencerHost {
     const halve = band.tier >= 1;
     const color = band.colorHex;
     const t = this.time;
+    if (band.style === 'breachMark' || band.style === 'quakeBurden') {
+      drawWarriorWornMark(
+        this.overlay,
+        band.style === 'breachMark',
+        at,
+        this.camRightX,
+        this.camRightZ,
+        band.style === 'breachMark' ? OVERLAY_CELL.breachMark : OVERLAY_CELL.quakeBurden,
+        Math.min(1, band.age / 0.12),
+        -camFwdScratch.x,
+        -camFwdScratch.y,
+        -camFwdScratch.z,
+      );
+      return;
+    }
     if (band.style === 'heartbeat') {
       // pounding pulse rings off the chest: frenzy buffs race (Recklessness
       // bpm 170), fortitude thumps slow

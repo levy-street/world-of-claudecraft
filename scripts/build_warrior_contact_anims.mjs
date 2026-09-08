@@ -203,7 +203,145 @@ const stormA = bladePose(3, 0.83, [0, -0.025, 0], -6, -3, -8);
 const stormB = bladePose(3, 0.83, [0, -0.025, 0], 6, -3, -8);
 const stormC = bladePose(3, 0.83, [0, -0.025, 0], 6, 3, -8);
 const stormD = bladePose(3, 0.83, [0, -0.025, 0], -6, 3, -8);
+function guardedCounter(time, turn, lean) {
+  const pose = bladePose(5, time, [0, -0.03, 0.025], turn, lean);
+  const brace = shieldPose(0.14, [0, 0, 0]);
+  for (const key of keys)
+    if (/^(upperarm|lowerarm|wrist|hand)\.l\|rotation$/.test(key))
+      pose.set(key, [...brace.get(key)]);
+  return pose;
+}
+function compressShield(time, hip, lean, turn = 0) {
+  const pose = shieldPose(time, hip);
+  for (const [name, weight] of [
+    ['chest', 1],
+    ['spine', 0.3],
+    ['head', -0.65],
+  ]) {
+    const key = `${name}|rotation`;
+    pose.set(
+      key,
+      new Quaternion()
+        .fromArray(pose.get(key))
+        .multiply(
+          new Quaternion().setFromEuler(
+            new Euler((lean * weight * Math.PI) / 180, (turn * weight * Math.PI) / 180, 0),
+          ),
+        )
+        .normalize()
+        .toArray(),
+    );
+  }
+  return pose;
+}
+const revengeLoad = guardedCounter(0.12, -28, -5);
+const revengeHit = guardedCounter(0.28, 18, 6);
+const revengeFollow = guardedCounter(0.5, 35, 3);
+const quakeLoad = compressShield(0.14, [0, -0.025, -0.03], -8);
+const quakeHit = compressShield(0.32, [0, -0.085, 0.04], 14);
+const quakeRecover = compressShield(0.5, [0, -0.025, 0.015], 6);
+const faultLoad = compressShield(0.14, [0, -0.04, -0.045], -12, -12);
+const faultHit = compressShield(0.32, [0, -0.09, 0.05], 18, 8);
+const faultRecover = compressShield(0.5, [0, -0.035, 0.025], 4, 6);
+const breachLoad = bladePose(3, 0.8331, [0, -0.035, -0.055], -18, -4);
+const breachHit = bladePose(3, 0.8331, [0, -0.035, 0.07], 0, 0);
+const breachRecover = bladePose(3, 0.8331, [0, -0.02, 0.015], 7, -5);
+
+let maxGripError = 0;
+/** Offline two-bone support-hand IK. Native bone lengths, hand and socket
+ * transforms stay intact; the right hand remains the authority for the blade. */
+function gripBlade(pose, weight) {
+  if (weight <= 0) return pose;
+  applyPose(pose);
+  const upper = bones.get('upperarm.l'),
+    lower = bones.get('lowerarm.l');
+  const wrist = bones.get('wrist.l'),
+    hand = bones.get('hand.l');
+  const slot = bones.get('handslot.l'),
+    right = bones.get('handslot.r');
+  const rightQ = orientation(right),
+    axis = new Vector3(0, 1, 0).applyQuaternion(rightQ);
+  const target = position(slot).lerp(position(right).addScaledVector(axis, -0.15), weight);
+  const socketQ = orientation(slot).slerp(
+    rightQ
+      .clone()
+      .multiply(new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), (160 * Math.PI) / 180)),
+    weight,
+  );
+  const wristQ = socketQ
+    .multiply(slot.quaternion.clone().invert())
+    .multiply(hand.quaternion.clone().invert());
+  const offset = hand.position.clone().add(slot.position.clone().applyQuaternion(hand.quaternion));
+  const wristTarget = target.clone().sub(offset.applyQuaternion(wristQ));
+  const shoulder = position(upper),
+    a = shoulder.distanceTo(position(lower)),
+    b = position(lower).distanceTo(position(wrist));
+  const aim = wristTarget.clone().sub(shoulder),
+    distance = aim.length();
+  if (distance >= a + b || distance <= Math.abs(a - b))
+    throw new Error(`Breachmaker grip out of reach: ${distance}`);
+  aim.normalize();
+  const along = (a * a - b * b + distance * distance) / (2 * distance);
+  const height = Math.sqrt(Math.max(0, a * a - along * along));
+  const pole = new Vector3(1, -0.25, -0.2);
+  const bend = pole.addScaledVector(aim, -pole.dot(aim)).normalize();
+  pointJoint(
+    upper,
+    lower,
+    shoulder.clone().addScaledVector(aim, along).addScaledVector(bend, height),
+  );
+  pointJoint(lower, wrist, wristTarget);
+  setWorldRotation(wrist, wristQ);
+  maxGripError = Math.max(maxGripError, position(slot).distanceTo(target));
+  for (const bone of [upper, lower, wrist])
+    pose.set(`${bone.name}|rotation`, bone.quaternion.toArray());
+  return pose;
+}
 const performances = [
+  [
+    'Warrior_Revenge',
+    [
+      [0, idle],
+      [0.085, revengeLoad],
+      [0.15, revengeHit],
+      [0.18, revengeHit],
+      [0.34, revengeFollow],
+      [0.66, idle],
+    ],
+  ],
+  [
+    'Warrior_Quaking_Blow',
+    [
+      [0, idle],
+      [0.085, quakeLoad],
+      [0.15, quakeHit],
+      [0.19, quakeHit],
+      [0.36, quakeRecover],
+      [0.68, idle],
+    ],
+  ],
+  [
+    'Warrior_Faultline',
+    [
+      [0, idle],
+      [0.09, faultLoad],
+      [0.15, faultHit],
+      [0.205, faultHit],
+      [0.4, faultRecover],
+      [0.72, idle],
+    ],
+  ],
+  [
+    'Warrior_Breachmaker',
+    [
+      [0, idle],
+      [0.085, breachLoad],
+      [0.15, breachHit],
+      [0.19, breachHit],
+      [0.34, breachRecover],
+      [0.68, idle],
+    ],
+  ],
   [
     'Warrior_Reaping_Arc',
     [
@@ -307,9 +445,18 @@ for (const [name, beats] of performances) {
     for (let step = 1; step <= steps; step++) {
       const t = step / steps;
       const weight = end === 0.15 ? t * t : t * t * (3 - 2 * t);
-      const pose = plantFeet(
+      let pose = plantFeet(
         new Map(keys.map((key) => [key, blendValue(key, from.get(key), to.get(key), weight)])),
       );
+      if (name === 'Warrior_Breachmaker') {
+        const time = start + (end - start) * t;
+        const blend = Math.min(
+          1,
+          Math.max(0, (time - 0.015) / 0.06),
+          Math.max(0, (0.66 - time) / 0.26),
+        );
+        pose = gripBlade(pose, blend * blend * (3 - 2 * blend));
+      }
       timeline.push([start + (end - start) * t, (key) => pose.get(key)]);
     }
   }
@@ -337,6 +484,7 @@ const report = {
   clips: reports,
   channels: keys.length,
   maxFootError,
+  maxGripError,
 };
 await writeFile(
   'tmp/warrior-contact-authoring/report.json',

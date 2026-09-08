@@ -394,6 +394,7 @@ export function impactCueForDamage(event: DamageEvent, target: Entity): SfxId | 
 }
 
 export function spellFxCue(event: SpellFxEvent): { key: SfxId; anchorId: number } | null {
+  if (furyAudioClaimed(event)) return null;
   if (event.fx === 'projectile') {
     if (event.school === 'physical') return { key: 'melee_bow', anchorId: event.sourceId };
     const school = magicSchool(event.school);
