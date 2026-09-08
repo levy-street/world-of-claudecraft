@@ -103,6 +103,7 @@ export type OrbitStyle =
   | 'speedlines'
   | 'conduction'
   | 'weaponGlow'
+  | 'bladeCharges'
   | 'leaves';
 
 const ORBIT_STYLE_SET = new Set<string>([
@@ -131,6 +132,7 @@ export type OrbitDna = NonNullable<AbilityVfxBuffSpec['o']>;
 // Private identity marker: shares the existing held-band budget, but draws only
 // at the real weapon tip. It never enters the decorative orbit path.
 const QUEUED_WEAPON_DNA: OrbitDna = Object.freeze({ radius: 0, size: 0.16 });
+const BLADE_CHARGE_DNA: readonly OrbitDna[] = [Object.freeze({ n: 1 }), Object.freeze({ n: 2 })];
 
 const MAX_ORBITS_PER_ENTITY = 3;
 const MAX_ORBIT_BANDS = 24;
@@ -349,6 +351,15 @@ const ORBIT_DNA: Record<
     weave: 0,
     frac: 0.46,
     size: 0.24,
+    cell: OVERLAY_CELL.star,
+  },
+  bladeCharges: {
+    n: 2,
+    rate: 0,
+    radius: 0,
+    weave: 0,
+    frac: 0.46,
+    size: 0.2,
     cell: OVERLAY_CELL.star,
   },
   leaves: {
@@ -2013,6 +2024,12 @@ export class AbilityVfxFx implements SequencerHost {
     return this.orbit(entityId, 'weaponGlow', colorHex, QUEUED_WEAPON_DNA, tier);
   }
 
+  /** Redhand's live empowerment count, separate from an armed next-swing cue. */
+  holdBladeCharges(entityId: number, stacks: number): boolean {
+    if (!(stacks > 0)) return false;
+    return this.orbit(entityId, 'bladeCharges', 0xe6b17d, BLADE_CHARGE_DNA[stacks >= 2 ? 1 : 0], 0);
+  }
+
   // Holds the persistent CC band on the entity while a worn hard-CC aura
   // lives: the painter re-feeds it every frame from its aura scan, and the
   // update sweep drops it the frame the feed stops (aura faded, entity left
@@ -2550,7 +2567,7 @@ export class AbilityVfxFx implements SequencerHost {
   // pulse, which rides the pooled shock rings at its authored bpm. buff.o
   // overrides the style DNA so same-band buffs still read as different spells.
   private drawOrbit(entityId: number, band: OrbitBand): void {
-    if (band.o === QUEUED_WEAPON_DNA) {
+    if (band.o === QUEUED_WEAPON_DNA || band.style === 'bladeCharges') {
       if (!band.weaponSample && this.time >= band.weaponRetryAt) {
         band.weaponSample = this.weaponAnchor?.(entityId, 0) ?? null;
         band.weaponRetryAt = this.time + 0.25;
@@ -2563,6 +2580,19 @@ export class AbilityVfxFx implements SequencerHost {
       }
       const { x, y, z } = anchorScratchA;
       const alpha = Math.min(1, band.age / 0.12);
+      if (band.style === 'bladeCharges') {
+        const charges = band.o?.n ?? 1;
+        // Fixed camera-right separation preserves an honest count from every
+        // view without orbiting the character. Both marks follow the real blade.
+        for (let i = 0; i < charges; i++) {
+          const spread = (i - (charges - 1) * 0.5) * 0.32;
+          const px = x + this.camRightX * spread,
+            pz = z + this.camRightZ * spread;
+          this.overlay.push(px, y + 0.13, pz, 0x966142, 0.34, OVERLAY_CELL.glow, alpha * 0.65, 1.1);
+          this.overlay.push(px, y + 0.13, pz, band.colorHex, 0.2, OVERLAY_CELL.star, alpha, 2);
+        }
+        return;
+      }
       this.overlay.push(x, y, z, band.colorHex, 0.25, OVERLAY_CELL.glow, alpha * 0.55, 1.3);
       this.overlay.push(x, y, z, band.colorHex, 0.16, OVERLAY_CELL.star, alpha * 0.9, 1.8);
       return;

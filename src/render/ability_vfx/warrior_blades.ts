@@ -10,8 +10,12 @@ interface BladeStyle {
   roll: number;
   blood?: boolean;
   heavy?: boolean;
+  groundChop?: boolean;
+  rising?: boolean;
 }
 export const WARRIOR_BLADE_STYLES: Readonly<Record<string, BladeStyle | undefined>> = {
+  slam: { span: 4.8, height: 1.4, roll: -1.35, groundChop: true },
+  overpower: { span: 5.1, height: 1.25, roll: 1.05, rising: true },
   mortal_strike: { span: 5.2, height: 1.4, roll: -0.65 },
   execute: { span: 6.4, height: 1.65, roll: -1.25, heavy: true },
   bloodthirst: { span: 4.6, height: 1.45, roll: -0.8, blood: true },
@@ -112,14 +116,14 @@ export function drawWarriorBlade(host: SequencerHost, slot: SeqSlot, beat: numbe
         'sparks',
         duration,
       );
-    if (style.heavy) {
+    if (style.heavy || style.groundChop) {
       const floor = host.groundYAt(at.x, at.z);
       host.bakedAt?.(
         'shout_dust',
         at.x,
         floor + 0.08,
         at.z,
-        4.2,
+        style.heavy ? 4.2 : 3.4,
         0xa39482,
         0xc2b7a1,
         0.42,
@@ -128,6 +132,23 @@ export function drawWarriorBlade(host: SequencerHost, slot: SeqSlot, beat: numbe
         facing,
       );
       host.fragmentsAt?.('stone_chip', at.x, floor + 0.08, at.z, 0x8b8173, 9, 0.85, dx, dz, 0.3);
+    }
+    if (style.rising) {
+      // Two split splinter fans rise along the cut. They sit on the receiving
+      // silhouette rather than turning the Warrior's whole model red.
+      for (const side of [-1, 1])
+        host.fragmentsAt?.(
+          'metal_splinter',
+          at.x + dz * side * 0.22,
+          at.y + 0.35,
+          at.z - dx * side * 0.22,
+          0xd8aa80,
+          6,
+          1.25,
+          dx + dz * side * 0.4,
+          dz - dx * side * 0.4,
+          0.28,
+        );
     }
   }
   host.contact?.(
@@ -141,7 +162,10 @@ export function drawWarriorBlade(host: SequencerHost, slot: SeqSlot, beat: numbe
   host.pulseLight(slot.targetId, slot.spec.palette, style.heavy ? 1.7 : 1.1, 0.06, 3);
   host.countPrimitive(
     slot.abilityId,
-    count + contacts + 3 + (slot.tier === 0 ? (style.heavy ? 4 : 2) : 0),
+    count +
+      contacts +
+      3 +
+      (slot.tier === 0 ? (style.heavy || style.groundChop || style.rising ? 4 : 2) : 0),
   );
   return true;
 }

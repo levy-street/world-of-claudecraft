@@ -17,6 +17,16 @@ export const FURY_AUDIO = {
 } as const;
 export type FuryAudioId = keyof typeof FURY_AUDIO;
 export const WARRIOR_CONTACT_AUDIO = {
+  slam: {
+    release: 'melee_warrior_brute_release',
+    impacts: ['impact_warrior_brute'],
+    times: [0.15],
+  },
+  overpower: {
+    release: 'melee_warrior_redhand_release',
+    impacts: ['impact_warrior_redhand'],
+    times: [0.15],
+  },
   mortal_strike: {
     release: 'melee_warrior_maiming_release',
     impacts: ['impact_warrior_maiming'],

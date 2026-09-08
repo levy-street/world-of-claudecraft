@@ -187,7 +187,37 @@ const victoryLoad = bladePose(2, 0.5, [0, -0.027, -0.025], -18, 7, -5);
 const victoryCross = bladePose(2, 0.42, [0, -0.02, 0.02], 6, 5, 3);
 const victoryCut = bladePose(2, 0.39, [0, -0.015, 0.035], 20, 0, 9);
 const victoryRise = bladePose(2, 0.27, [0, -0.005, 0.01], 6, -9, 0);
+// Opposite travel directions from the native two-handed grip. The follow poses
+// keep the actual greatblade above the ground, not merely the hand sockets.
+const bruteLoad = bladePose(3, 0.3, [0, -0.025, -0.025], 8, -6, -10);
+const bruteCut = bladePose(3, 0.83, [0, -0.025, 0.035], 8, 12, -10);
+const bruteFollow = bladePose(3, 1, [0, -0.012, 0.02], 8, 0, -10);
+const redhandLoad = bladePose(3, 0.95, [-0.012, -0.03, -0.02], -20, 6, -22);
+const redhandCut = bladePose(3, 0.81, [-0.012, -0.02, 0.03], -20, 6, -22);
+const redhandRise = bladePose(3, 0.7, [-0.004, -0.01, 0.015], -20, -12, 0);
 const performances = [
+  [
+    'Warrior_Brute_Swing',
+    [
+      [0, idle],
+      [0.085, bruteLoad],
+      [0.15, bruteCut],
+      [0.18, bruteCut],
+      [0.32, bruteFollow],
+      [0.64, idle],
+    ],
+  ],
+  [
+    'Warrior_Redhand',
+    [
+      [0, idle],
+      [0.075, redhandLoad],
+      [0.15, redhandCut],
+      [0.175, redhandCut],
+      [0.31, redhandRise],
+      [0.62, idle],
+    ],
+  ],
   ['Warrior_Shieldcrack', shieldBeats],
   [
     'Warrior_Maiming_Strike',

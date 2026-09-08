@@ -31,6 +31,8 @@ const SOURCE_ALIASES: Readonly<Record<string, string>> = {
   abyssal_rift: 'shadow_bolt',
 };
 const WARRIOR_CONTACT_SOURCES: Readonly<Record<string, string>> = {
+  slam: 'Warrior_Brute_Swing',
+  overpower: 'Warrior_Redhand',
   shield_slam: 'Warrior_Shieldcrack',
   mortal_strike: 'Warrior_Maiming_Strike',
   execute: 'Warrior_Early_Grave',

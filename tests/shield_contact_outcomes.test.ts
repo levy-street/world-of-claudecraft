@@ -5,6 +5,8 @@ import type { AbilityVfxFullSpec } from '../src/render/ability_vfx_core';
 import { ABILITIES } from '../src/sim/data';
 
 const abilities = [
+  'slam',
+  'overpower',
   'shield_slam',
   'mortal_strike',
   'execute',

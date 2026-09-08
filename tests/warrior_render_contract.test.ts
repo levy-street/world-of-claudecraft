@@ -30,7 +30,7 @@ describe('winning Warrior attack animation routing', () => {
     expect(VISUALS.player_warrior.clips.attackByAbility).toMatchObject({
       mortal_strike: 'Warrior_Maiming_Strike',
       execute: 'Warrior_Early_Grave',
-      slam: '2H_Melee_Attack_Chop',
+      slam: 'Warrior_Brute_Swing',
       red_harvest: 'Fury_Red_Harvest',
       breachmaker: '2H_Melee_Attack_Chop',
       // Authored shield drive retains its planted feet and contact hold.
@@ -44,7 +44,7 @@ describe('winning Warrior attack animation routing', () => {
       thunder_clap: '1H_Melee_Attack_Chop',
       faultline: '1H_Melee_Attack_Chop',
       heroic_strike: '1H_Melee_Attack_Slice_Diagonal',
-      overpower: '1H_Melee_Attack_Slice_Diagonal',
+      overpower: 'Warrior_Redhand',
       hamstring: '1H_Melee_Attack_Slice_Diagonal',
       sanguine_aura: 'Spellcast_Raise',
       raised_guard: 'Block',

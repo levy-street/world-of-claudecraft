@@ -995,6 +995,23 @@
       }
     ]
   },
+  "impact_warrior_brute": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "impact_warrior_brute_1.mp3",
+        "sha256": "82473d1d1faada17da2d42636fa07a057b5ecc92823adc31114c1f55d52a1683",
+        "size": 6940,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "impact_warrior_brute_2.mp3",
+        "sha256": "fe69127dc27a2a40eabab296468cc578ad6cb6153cc9973eeae04cd0ae5d9421",
+        "size": 6940,
+        "peakDb": -6.2
+      }
+    ]
+  },
   "impact_warrior_early_grave": {
     "ceilingDb": 5.1,
     "tracks": [
@@ -1076,6 +1093,23 @@
         "filename": "impact_warrior_red_harvest_second_2.mp3",
         "sha256": "f29be1aab1d722781784645c25f4aebcc469814d977e252368753366adfcfcab",
         "size": 5686,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "impact_warrior_redhand": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "impact_warrior_redhand_1.mp3",
+        "sha256": "dfc35196a9cfda7fe6ecdf68b240b83a3b2e918a4460a854542a67e8a697b823",
+        "size": 6940,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "impact_warrior_redhand_2.mp3",
+        "sha256": "f4ed2b4250c3e1f737e4c7cc2a40f74dd653d73d77a06ac75f153518be311f20",
+        "size": 6940,
         "peakDb": -6.3
       }
     ]
@@ -1553,6 +1587,23 @@
       }
     ]
   },
+  "melee_warrior_brute_release": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "melee_warrior_brute_release_1.mp3",
+        "sha256": "cb27437013c5e5b21db392e20f21538dbf2537de6303fd857020ea713df2f652",
+        "size": 4432,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "melee_warrior_brute_release_2.mp3",
+        "sha256": "cbe623d76b58b627a658b3b4485777ec241030ce0d5e17eb1c643747be0c084f",
+        "size": 4432,
+        "peakDb": -6.3
+      }
+    ]
+  },
   "melee_warrior_early_grave_release": {
     "ceilingDb": 5.2,
     "tracks": [
@@ -1600,6 +1651,23 @@
         "filename": "melee_warrior_red_harvest_release_2.mp3",
         "sha256": "b97e8b402e6516d57a6937bd8ddb9fc395e90f5387e6fb3b701cd9e21aa51ae4",
         "size": 5059,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "melee_warrior_redhand_release": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "melee_warrior_redhand_release_1.mp3",
+        "sha256": "1e319d395276e679dd2cafe1207168781ed8f75388f6a10f9e186f541e2f6af6",
+        "size": 4432,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "melee_warrior_redhand_release_2.mp3",
+        "sha256": "63f80784a19ccee8b78b1dac79e6284b4ac5e6d14dc6fa7e7a2e632f0e549a88",
+        "size": 4432,
         "peakDb": -6.3
       }
     ]

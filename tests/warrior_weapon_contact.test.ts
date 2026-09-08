@@ -22,6 +22,8 @@ it.each([
   ['warrior_contact_anims', 'Warrior_Early_Grave', 0.15, 'r'],
   ['warrior_contact_anims', 'Warrior_Bloodletting', 0.15, 'r'],
   ['warrior_contact_anims', 'Warrior_Victory_Rush', 0.15, 'r'],
+  ['warrior_contact_anims', 'Warrior_Brute_Swing', 0.15, 'r'],
+  ['warrior_contact_anims', 'Warrior_Redhand', 0.15, 'r'],
 ])(
   '%s %s at %s puts the %s blade through the forward torso region',
   async (file, name, time, side) => {

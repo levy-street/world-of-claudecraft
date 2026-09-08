@@ -101,6 +101,8 @@ it.each([
   ['execute', 'Warrior_Early_Grave'],
   ['bloodthirst', 'Warrior_Bloodletting'],
   ['victory_rush', 'Warrior_Victory_Rush'],
+  ['slam', 'Warrior_Brute_Swing'],
+  ['overpower', 'Warrior_Redhand'],
 ])('preserves native %s loading, contact and planted recovery', async (id, name) => {
   const f = await fixture(name);
   const bones = ['footl', 'footr', 'toesl', 'toesr', 'root'].map(f.bone);

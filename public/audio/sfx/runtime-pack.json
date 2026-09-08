@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "7d082f03c8d6e236ffdbe132faffdd49331596cf51961df12b36f4f0653f6a62",
-  "catalogHash": "50f74c1ac66c917dcac7f824bf44f17affc470ba9030a867a9fca4d4e3eb861c",
+  "bundleId": "805c7b44bbb2586451894c7c9f0cca2a7ddb9ebad3bf6168344fe80c74f635e5",
+  "catalogHash": "22ff553aee0f7d712edb5004652cb7cb3e6ae298413f5e9b56a5e498ad8a69ed",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -1246,6 +1246,24 @@
       "gain": 1,
       "playbackRate": 1
     },
+    "impact_warrior_brute": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_brute_1.mp3?v=82473d1d1faa",
+          "bytes": 6940,
+          "sha256": "82473d1d1faada17da2d42636fa07a057b5ecc92823adc31114c1f55d52a1683"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_brute_2.mp3?v=fe69127dc27a",
+          "bytes": 6940,
+          "sha256": "fe69127dc27a2a40eabab296468cc578ad6cb6153cc9973eeae04cd0ae5d9421"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
     "impact_warrior_early_grave": {
       "variants": [
         {
@@ -1331,6 +1349,24 @@
           "url": "/audio/sfx/impact_warrior_red_harvest_second_2.mp3?v=f29be1aab1d7",
           "bytes": 5686,
           "sha256": "f29be1aab1d722781784645c25f4aebcc469814d977e252368753366adfcfcab"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "impact_warrior_redhand": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_redhand_1.mp3?v=dfc35196a9cf",
+          "bytes": 6940,
+          "sha256": "dfc35196a9cfda7fe6ecdf68b240b83a3b2e918a4460a854542a67e8a697b823"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_redhand_2.mp3?v=f4ed2b4250c3",
+          "bytes": 6940,
+          "sha256": "f4ed2b4250c3e1f737e4c7cc2a40f74dd653d73d77a06ac75f153518be311f20"
         }
       ],
       "gain": 1,
@@ -1834,6 +1870,24 @@
       "gain": 1,
       "playbackRate": 1
     },
+    "melee_warrior_brute_release": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/melee_warrior_brute_release_1.mp3?v=cb27437013c5",
+          "bytes": 4432,
+          "sha256": "cb27437013c5e5b21db392e20f21538dbf2537de6303fd857020ea713df2f652"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/melee_warrior_brute_release_2.mp3?v=cbe623d76b58",
+          "bytes": 4432,
+          "sha256": "cbe623d76b58b627a658b3b4485777ec241030ce0d5e17eb1c643747be0c084f"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
     "melee_warrior_early_grave_release": {
       "variants": [
         {
@@ -1883,6 +1937,24 @@
           "url": "/audio/sfx/melee_warrior_red_harvest_release_2.mp3?v=b97e8b402e65",
           "bytes": 5059,
           "sha256": "b97e8b402e6516d57a6937bd8ddb9fc395e90f5387e6fb3b701cd9e21aa51ae4"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "melee_warrior_redhand_release": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/melee_warrior_redhand_release_1.mp3?v=1e319d395276",
+          "bytes": 4432,
+          "sha256": "1e319d395276e679dd2cafe1207168781ed8f75388f6a10f9e186f541e2f6af6"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/melee_warrior_redhand_release_2.mp3?v=63f80784a19c",
+          "bytes": 4432,
+          "sha256": "63f80784a19ccee8b78b1dac79e6284b4ac5e6d14dc6fa7e7a2e632f0e549a88"
         }
       ],
       "gain": 1,

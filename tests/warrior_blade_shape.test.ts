@@ -42,7 +42,7 @@ describe('buildWarriorBlade geometry', () => {
   it('bounding box is nondegenerate in all three axes', () => {
     expect(box.max.x - box.min.x).toBeGreaterThan(2);
     expect(box.max.y - box.min.y).toBeGreaterThan(0.3);
-    expect(box.max.z - box.min.z).toBeGreaterThan(0);
+    expect(box.max.z - box.min.z).toBeGreaterThan(0.8);
   });
 
   it('front and back faces have solid nonzero z thickness', () => {

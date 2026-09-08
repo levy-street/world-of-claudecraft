@@ -215,6 +215,7 @@ export interface AbilityVfxEntityState {
     breakThreshold?: number;
     value?: number;
     charges?: number;
+    stacks?: number;
     sourceId?: number;
   }[];
   // dead + hp gate the stun tell off a corpse through isVisuallyDead; both
@@ -1490,6 +1491,11 @@ export class AbilityVfx {
     for (let i = 0; i < e.auras.length; i++) {
       const aura = e.auras[i];
       const auraWasHeld = held.auraStamps.has(aura.id);
+      if (aura.kind === 'overpower_charge') {
+        if (!isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 }))
+          fx.holdBladeCharges?.(e.id, aura.stacks ?? 1);
+        continue;
+      }
       if (aura.id === 'bloodhook_pending') {
         if (!auraWasHeld && typeof aura.value === 'number') {
           this.deps.triggerAttack(e.id, 'bloodhook');

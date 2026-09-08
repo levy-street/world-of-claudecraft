@@ -12,7 +12,9 @@ export function warriorBladePoint(
   const taper = Math.sin(u * Math.PI);
   out.x = (Math.sin(angle) * 2.2) / Math.sin(1.275);
   out.y = arch * 0.62 - v * taper * (0.82 + u * 0.3);
-  out.z = arch * 0.55 - v * 0.05;
+  // Roll the broad face back behind the cutting edge. A nearly planar strip
+  // disappears when seen along the swing; this forged curl retains side area.
+  out.z = arch * 0.75 - v * taper * 0.8;
 }
 
 export function buildWarriorBlade(): THREE.BufferGeometry {

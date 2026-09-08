@@ -1,6 +1,30 @@
 /** Distinct material voices for native Warrior contacts; never bulk-regenerated. */
 export const WARRIOR_CONTACT_SFX = [
   {
+    key: 'melee_warrior_brute_release',
+    duration: 0.12,
+    prompt:
+      'One extremely short heavy two-handed sword sweeping down through air, taut leather creak into a broad dense downward whoosh. Grounded armored warrior movement. Crisp dry start and cutoff. No impact, voice, music, ambience or ringing.',
+  },
+  {
+    key: 'impact_warrior_brute',
+    duration: 0.23,
+    prompt:
+      'One immediate blunt-edged greatsword chop into hard armor, a thick low wooden body knock under a crisp steel crack, short scattering stone grit and leather compression. Weighty repeatable martial combat hit, compact clean dry ending. No explosion, voice, music, ambience or long metallic ring.',
+  },
+  {
+    key: 'melee_warrior_redhand_release',
+    duration: 0.12,
+    prompt:
+      'One extremely short reverse greatsword rising from a low guard, taut leather pull and thin accelerating steel-air hiss. Controlled powerful warrior levering a heavy blade upward. Crisp dry close perspective. No impact, voice, music, ambience or ringing.',
+  },
+  {
+    key: 'impact_warrior_redhand',
+    duration: 0.22,
+    prompt:
+      'One immediate rising sword cleave through armor, sharp bright shearing edge, solid low body punch, short upward metal scrape with two tiny brittle splinter clicks. Disciplined powerful fantasy warrior combat, crisp close and dry with no sustain. No explosion, voice, music, ambience or magical shimmer.',
+  },
+  {
     key: 'melee_warrior_maiming_release',
     duration: 0.13,
     prompt:

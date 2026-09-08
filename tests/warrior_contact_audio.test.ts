@@ -18,7 +18,7 @@ it.each(Object.keys(WARRIOR_CONTACT_AUDIO) as (keyof typeof WARRIOR_CONTACT_AUDI
       spec:
         id === 'shield_slam'
           ? 'prot'
-          : id === 'mortal_strike' || id === 'execute'
+          : id === 'mortal_strike' || id === 'execute' || id === 'slam' || id === 'overpower'
             ? 'arms'
             : 'fury',
     });

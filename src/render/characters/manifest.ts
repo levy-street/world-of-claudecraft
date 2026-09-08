@@ -1359,7 +1359,7 @@ export const VISUALS: Record<string, VisualDef> = {
       attackByAbility: {
         mortal_strike: 'Warrior_Maiming_Strike',
         execute: 'Warrior_Early_Grave',
-        slam: '2H_Melee_Attack_Chop',
+        slam: 'Warrior_Brute_Swing',
         red_harvest: 'Fury_Red_Harvest',
         breachmaker: '2H_Melee_Attack_Chop',
         // Native shield drive with a planted lower body and a held contact.
@@ -1375,7 +1375,7 @@ export const VISUALS: Record<string, VisualDef> = {
         thunder_clap: '1H_Melee_Attack_Chop',
         faultline: '1H_Melee_Attack_Chop',
         heroic_strike: '1H_Melee_Attack_Slice_Diagonal',
-        overpower: '1H_Melee_Attack_Slice_Diagonal',
+        overpower: 'Warrior_Redhand',
         hamstring: '1H_Melee_Attack_Slice_Diagonal',
         sanguine_aura: 'Spellcast_Raise',
         raised_guard: 'Block',

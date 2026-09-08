@@ -19,6 +19,7 @@ function makePainter(now: () => number = () => 12.5) {
     holdShell: vi.fn(),
     holdGroundAura: vi.fn().mockReturnValue(true),
     holdQueuedWeapon: vi.fn().mockReturnValue(true),
+    holdBladeCharges: vi.fn().mockReturnValue(true),
     holdControlSignals: vi.fn(),
     orbit: vi.fn().mockReturnValue(true),
     bodyGlow: vi.fn(),
@@ -58,6 +59,33 @@ function ent(auras: string[], id = 7, queuedOnSwing: string | null = null): Abil
 }
 
 describe('long-worn buffs are silent while held', () => {
+  it('reads Redhand empowerment from current aura stacks, independently of the armed swing', () => {
+    const { painter, fx, vfx } = makePainter();
+    const state = ent([], 7, 'heroic_strike');
+    const charge = {
+      id: 'overpower',
+      kind: 'overpower_charge',
+      stacks: undefined as number | undefined,
+    };
+    state.auras = [charge];
+    painter.syncEntity(state);
+    expect(fx.holdBladeCharges).toHaveBeenLastCalledWith(7, 1);
+    charge.stacks = 2;
+    painter.syncEntity(state);
+    expect(fx.holdBladeCharges).toHaveBeenLastCalledWith(7, 2);
+    expect(fx.holdQueuedWeapon).toHaveBeenCalled();
+    expect(fx.bodyGlow).not.toHaveBeenCalled();
+    expect(fx.holdGroundAura).not.toHaveBeenCalled();
+    expect(vfx.buffSwirl).not.toHaveBeenCalled();
+    fx.holdBladeCharges.mockClear();
+    state.auras = [];
+    painter.syncEntity(state);
+    expect(fx.holdBladeCharges).not.toHaveBeenCalled();
+    state.auras = [charge];
+    state.hp = 0;
+    painter.syncEntity(state);
+    expect(fx.holdBladeCharges).not.toHaveBeenCalled();
+  });
   it('holds no orbit band, ground disc, or shell for a 30 minute stat buff', () => {
     const { painter, fx } = makePainter();
 

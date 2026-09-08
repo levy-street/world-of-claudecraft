@@ -116,6 +116,38 @@ function queuedWeaponHarness() {
 }
 
 describe('queued physical weapon readiness', () => {
+  it('shows two separate Redhand charges on the blade and drops both on consumption', () => {
+    const h = queuedWeaponHarness();
+    try {
+      h.fx.holdBladeCharges(7, 1);
+      h.step(false);
+      expect(h.push).toHaveBeenCalledTimes(2);
+      h.fx.holdBladeCharges(7, 2);
+      h.step(false);
+      expect(h.push).toHaveBeenCalledTimes(4);
+      expect(h.push.mock.calls[1][0]).not.toBe(h.push.mock.calls[3][0]);
+      h.holder.rotation.z = Math.PI / 2;
+      for (let i = 0; i < 100; i++) {
+        h.fx.holdBladeCharges(7, 2);
+        h.step(false, 1 / 60, true);
+      }
+      expect(h.push.mock.calls[1][0]).toBeCloseTo(-1.16);
+      expect(h.push.mock.calls[3][0]).toBeCloseTo(-0.84);
+      expect(h.resolve).toHaveBeenCalledTimes(1);
+      h.fx.holdBladeCharges(7, 2);
+      h.step();
+      expect(h.push).toHaveBeenCalledTimes(6);
+      expect(h.probe.orbitBandCount).toBe(2);
+      h.step();
+      expect(h.push).toHaveBeenCalledTimes(2);
+      expect(h.probe.orbitBandCount).toBe(1);
+      h.step(false);
+      expect(h.push).not.toHaveBeenCalled();
+      expect(h.probe.orbitBandCount).toBe(0);
+    } finally {
+      h.dispose();
+    }
+  });
   it('retains its sampler when a normal aura feeds the same slot before the held queue', () => {
     const h = queuedWeaponHarness();
     try {
@@ -497,7 +529,8 @@ it('reclaims expiring crest slots before admitting a contact and displays the ne
     expect(live).toHaveLength(1);
     expect(live[0].mesh.visible).toBe(true);
     expect(live[0].age).toBe(0);
-    expect(live[0].mesh.position.x).toBe(4);
+    // The curved wake sits toward the caster; the target imprint stays at x=4.
+    expect(live[0].mesh.position.x).toBe(3.35);
   } finally {
     fx.dispose();
   }
