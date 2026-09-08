@@ -907,6 +907,150 @@ const dotsOffSeed = async (page) => {
   );
 };
 
+// Hub practice lessons (hub_lesson_controller.ts / hub_lesson_view.ts): shared
+// drivers for the two recipes below. Every one of these is a REAL interaction
+// through the actual control the coach names, never a synthetic completion of
+// its own internal state, which is what these exist to keep honest across two
+// tracks and two device variants.
+
+/** Open the Damage/Healing Meters window the same way the player actually
+ *  would: the real Shift+H keybind on desktop, or the real touch path on
+ *  mobile (there is deliberately no keyboard shortcut on touch) -- the real
+ *  labelled Actions anchor (#mobile-menu-anchor, "Actions" in-game, never
+ *  "Menu": confirmed against an actual touch playtest) -> More (#mobile-more)
+ *  -> Meters (#mobile-meters, the same entry hub_lesson_controller.ts's
+ *  open-window step glows via visibleMobileControl). Each tap is a REAL
+ *  `page.tap()` (genuine touch input, not a page.evaluate() `.click()`), and
+ *  each waits for its target to actually be visible first. */
+async function openHubMetersWindow(page, variant) {
+  if (variant?.key === 'mobile') {
+    const anchorVisible = await pollForSize(page, '#mobile-menu-anchor');
+    if (!anchorVisible) throw new Error('mobile Actions anchor is not visible');
+    await clickOrTap(page, variant, '#mobile-menu-anchor');
+    const stripOpen = await pollForSize(page, '#mobile-more');
+    if (!stripOpen) throw new Error('mobile Actions strip did not open');
+    await clickOrTap(page, variant, '#mobile-more');
+    const moreOpen = await pollForSize(page, '#mobile-meters');
+    if (!moreOpen) throw new Error('mobile More tray did not open');
+    await clickOrTap(page, variant, '#mobile-meters');
+  } else {
+    await page.keyboard.down('Shift');
+    await page.keyboard.press('KeyH');
+    await page.keyboard.up('Shift');
+  }
+  const opened = await pollForSize(page, '#meters-window');
+  if (!opened) {
+    throw new Error(
+      variant?.key === 'mobile'
+        ? 'meters window did not open through Actions -> More -> Meters'
+        : 'meters window did not open through the Shift+H keybind',
+    );
+  }
+}
+
+/** The coach's ack/replay buttons and every meter-window tab/history click in
+ *  these two recipes: a real `page.tap()` on mobile, a real `page.click()` on
+ *  desktop -- never a `page.evaluate()` synthetic `.click()`. Caller waits
+ *  for the target's real visibility first. */
+async function clickOrTap(page, variant, selector) {
+  if (variant?.key === 'mobile') {
+    const el = await page.$(selector);
+    if (!el) throw new Error(`missing touch control: ${selector}`);
+    await el.scrollIntoView();
+    const point = await el.evaluate((node) => {
+      const r = node.getBoundingClientRect();
+      return { x: r.x + r.width / 2, y: r.y + r.height / 2 };
+    });
+    const session = await page.createCDPSession();
+    try {
+      // Queue both edges in order before waiting for renderer acknowledgments.
+      // Slow software GL must not turn a short tap into a 180ms hold.
+      const down = session.send('Input.dispatchTouchEvent', {
+        type: 'touchStart',
+        touchPoints: [point],
+      });
+      const up = session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+      await Promise.all([down, up]);
+    } finally {
+      await session.detach();
+    }
+  } else {
+    await page.click(selector);
+  }
+}
+
+/** The coach's current one-line prompt text, or null while it is not
+ *  rendering at all (`#hub-lesson-coach` empty/hidden). */
+async function hlcLineText(page) {
+  return page.evaluate(
+    () => document.querySelector('#hub-lesson-coach .hlc-line')?.textContent ?? null,
+  );
+}
+
+/** Poll for the coach's explicit acknowledgment button (hub_lesson_view.ts:
+ *  a row merely rendering is never enough, the player has to press Continue/
+ *  Done while it is visible), matched by its real rendered label so the two
+ *  acks in the damage track (read-row's "Continue", review-comparison's
+ *  "Done") are never confused for each other. */
+async function waitForHlcAck(page, expectedText, attempts = 30, intervalMs = 300) {
+  for (let i = 0; i < attempts; i++) {
+    const found = await page.evaluate((text) => {
+      const btn = document.querySelector('#hub-lesson-coach .hlc-ack');
+      return !!btn && btn.textContent === text;
+    }, expectedText);
+    if (found) return true;
+    await wait(intervalMs);
+  }
+  return false;
+}
+
+/** Poll until the coach's line actually changes from `previousText`: the only
+ *  honest proof a real interaction (an ack click, a hover/long-press) moved
+ *  the lesson to its next step, since this recipe cannot read the
+ *  controller's private HubLessonProgress directly. Returns the new text, or
+ *  null on timeout. */
+async function waitForHlcLineChange(page, previousText, attempts = 30, intervalMs = 300) {
+  for (let i = 0; i < attempts; i++) {
+    const now = await hlcLineText(page);
+    if (now !== null && now !== previousText) return now;
+    await wait(intervalMs);
+  }
+  return null;
+}
+
+/** Reveal a meter row's per-ability breakdown through its OWN real
+ *  interaction (src/ui/hud.ts attachTooltip): a real mouse hover on desktop
+ *  (mouseenter), or a real held touch long-press on mobile -- raw CDP
+ *  `Input.dispatchTouchEvent` at the row's actual screen bounds, held past
+ *  TOOLTIP_PEEK_MS (src/ui/touch_peek.ts), never a dispatched synthetic
+ *  PointerEvent (attachTooltip's mobile gate and its touch-only pointerdown
+ *  listener need a real touch input source, which only the CDP protocol
+ *  actually produces). */
+async function triggerRowBreakdown(page, rowSelector, variant) {
+  if (variant?.key === 'mobile') {
+    const box = await page.evaluate((sel) => {
+      const el = document.querySelector(sel);
+      if (!el) return null;
+      const r = el.getBoundingClientRect();
+      return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    }, rowSelector);
+    if (!box) throw new Error(`row not found for the touch long-press: ${rowSelector}`);
+    const cdp = await page.createCDPSession();
+    try {
+      await cdp.send('Input.dispatchTouchEvent', {
+        type: 'touchStart',
+        touchPoints: [{ x: box.x, y: box.y }],
+      });
+      await wait(1100); // > TOOLTIP_PEEK_MS (950ms): a real held press
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    } finally {
+      await cdp.detach();
+    }
+  } else {
+    await page.hover(rowSelector);
+  }
+}
+
 export const TARGETS = [
   ...masterwroughtReviewTargets({
     beforeLoad: lowGraphicsSeed,
@@ -14550,6 +14694,596 @@ export const TARGETS = [
         await wait(400);
       }
       await wait(800);
+      return { clip: '#ui' };
+    },
+  },
+  {
+    key: 'hub-sparring-master',
+    label: 'Drillmaster Hale beside the Eastbrook hub dummy, his greeting and quest open',
+    when: ['tutorial/dummy_drill'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.camera-prompt-backdrop')?.remove();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+      });
+      // The loading curtain: observe it rise, then wait for it to lift with
+      // the HUD painted (the entry-flow idiom used by the loading-screen
+      // targets), or the shutter photographs "Entering the world".
+      try {
+        await page.waitForFunction(
+          () => document.querySelector('#loading-screen')?.classList.contains('visible'),
+          { timeout: 10000 },
+        );
+      } catch {
+        // A warm load can finish before this recipe starts.
+      }
+      // The curtain rises more than once (the world load, the "Entering the
+      // world" arrival warmup a beat later, and again for a few seconds after
+      // the teleport below re-prepares the zone), so a single hidden check
+      // can pass in a gap: require it to stay hidden for 3 continuous seconds.
+      const curtainSettled = async () => {
+        let hiddenStreak = 0;
+        for (let i = 0; i < 450 && hiddenStreak < 15; i++) {
+          const settled = await page.evaluate(() => {
+            const loading = document.querySelector('#loading-screen');
+            const ui = document.querySelector('#ui');
+            return (
+              document.body.classList.contains('game-active') &&
+              !!ui &&
+              getComputedStyle(ui).display !== 'none' &&
+              !!loading &&
+              !loading.classList.contains('visible') &&
+              !!window.__game?.sim
+            );
+          });
+          hiddenStreak = settled ? hiddenStreak + 1 : 0;
+          await wait(200);
+        }
+        if (hiddenStreak < 15) throw new Error('loading curtain never settled');
+      };
+      await curtainSettled();
+      // Stand a few yards south of Hale, facing north across him and the
+      // dummy, then open his dialog (the gossip-crafting-shortcut idiom:
+      // window.__game attaches a beat after the entry flow, so retry).
+      let setup = { ok: false, reason: 'staging never ran' };
+      for (let attempt = 0; attempt < 20 && !setup.ok; attempt++) {
+        setup = await page.evaluate(() => {
+          const game = window.__game;
+          const sim = game?.sim;
+          const player = sim?.player;
+          if (!game || !sim || !player) return { ok: false, reason: 'no sim' };
+          const hale = [...sim.entities.values()].find((e) => e.templateId === 'drillmaster_hale');
+          if (!hale) return { ok: false, reason: 'no drillmaster_hale entity' };
+          player.pos.x = hale.pos.x;
+          player.pos.z = hale.pos.z + 3;
+          player.pos.y = hale.pos.y;
+          if (player.prevPos) {
+            player.prevPos.x = player.pos.x;
+            player.prevPos.y = player.pos.y;
+            player.prevPos.z = player.pos.z;
+          }
+          player.facing = 0;
+          game.input.camYaw = 0;
+          sim.rebucket?.(player);
+          player.targetId = hale.id;
+          game.hud.openQuestDialog(hale.id);
+          return { ok: true };
+        });
+        if (!setup.ok) await wait(500);
+      }
+      if (!setup.ok) throw new Error(`sparring master setup failed: ${setup.reason}`);
+      await curtainSettled();
+      const open = await pollForSize(page, '#quest-dialog');
+      if (!open) throw new Error('quest dialog did not open');
+      // The Proving Shore greeting (Ferryman Odo) can land over the scene;
+      // dismiss it so the shot shows Hale's dialog, not the island's.
+      await page.evaluate(() => {
+        for (const button of document.querySelectorAll('button')) {
+          if (/understood/i.test(button.textContent ?? '')) button.click();
+        }
+        document.querySelector('.camera-prompt-backdrop')?.remove();
+        document.querySelector('#gpu-notice')?.remove();
+      });
+      await wait(800);
+      return { clip: '#ui' };
+    },
+  },
+  {
+    key: 'practice-dps-tracker',
+    label: 'Eastbrook hub training dummy with the practice DPS tracker (live run + a previous run)',
+    when: ['ui/hud/practice', 'content/practice_dummies'],
+    // Desktop and the landscape mobile HUD: the strip rides #right-tracker-stack,
+    // which re-seats on the touch layout, so both arms are evidence.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      const staged = await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!game || !sim || !player) return { ok: false, reason: 'offline world is unavailable' };
+        // Prefer the hub's own level-5 damage dummy (content/practice_dummies.ts
+        // HUB_TRAINING_DUMMY_ID) once it exists; fall back to the nearest shared
+        // training_dummy so a capture run before that content lands still finds
+        // the hub's dummy (the Highwatch one is 700 yards north, so nearest is
+        // still the hub's). Read the level off the dummy itself rather than
+        // assuming one: the two templates level differently.
+        let dummy = null;
+        for (const e of sim.entities.values()) {
+          if (e.kind === 'mob' && e.templateId === 'hub_training_dummy' && !e.dead) {
+            dummy = e;
+            break;
+          }
+        }
+        if (!dummy) {
+          let best = Infinity;
+          for (const e of sim.entities.values()) {
+            if (e.kind !== 'mob' || e.templateId !== 'training_dummy' || e.dead) continue;
+            const d = (e.pos.x - player.pos.x) ** 2 + (e.pos.z - player.pos.z) ** 2;
+            if (d < best) {
+              best = d;
+              dummy = e;
+            }
+          }
+        }
+        if (!dummy) return { ok: false, reason: 'no hub training dummy in the offline world' };
+        // Stand two yards south of it, facing north onto the dummy, so both the
+        // post and the tracker are in frame.
+        player.pos.x = dummy.pos.x;
+        player.pos.z = dummy.pos.z - 2.5;
+        player.pos.y = dummy.pos.y;
+        if (player.prevPos) {
+          player.prevPos.x = player.pos.x;
+          player.prevPos.y = player.pos.y;
+          player.prevPos.z = player.pos.z;
+        }
+        player.facing = 0;
+        game.input.camYaw = 0;
+        sim.rebucket?.(player);
+        sim.setPlayerLevel?.(dummy.maxLevel, player.id);
+        player.targetId = dummy.id;
+        player.autoAttack = true;
+        return { ok: true };
+      }, {});
+      if (!staged.ok) throw new Error(staged.reason);
+      // First run: swing for a few seconds, stop, and let the meters close the
+      // segment (their idle window is 5s), so the strip has a "previous run".
+      await wait(6000);
+      await page.evaluate(() => {
+        window.__game.sim.player.autoAttack = false;
+      });
+      await wait(6500);
+      // Second run, live at shutter time.
+      await page.evaluate(() => {
+        const sim = window.__game.sim;
+        sim.player.autoAttack = true;
+      });
+      await wait(4500);
+      await pollForSize(page, '#practice-tracker');
+      // The Proving Shore greeting (Ferryman Odo) lands over the scene during
+      // the wait above; dismiss it so the shot shows the HUD, not the dialog.
+      await page.evaluate(() => {
+        for (const button of document.querySelectorAll('button')) {
+          if (/understood/i.test(button.textContent ?? '')) button.click();
+        }
+      });
+      await wait(400);
+      return { clip: '#ui' };
+    },
+  },
+  {
+    key: 'hub-practice-lessons-damage',
+    label:
+      "Eastbrook hub damage dummy: Drillmaster Hale's guided Damage Meters coaching " +
+      '(row read, ability breakdown, and the finished-run history comparison)',
+    // hub_lesson_controller.ts (mounting #hub-lesson-coach in index.html, Meters-
+    // driven) and the hub's own level-5 dummies both exist now: this recipe drives
+    // the real damage track end to end and requires the coach container to
+    // actually render, never captures an empty shell.
+    when: [
+      'content/practice_dummies',
+      'sim/hub_practice',
+      'sim/tutorial/dummy_drill',
+      'ui/hud/practice',
+    ],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page, variant) {
+      const staged = await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!game || !sim || !player) return { ok: false, reason: 'offline world is unavailable' };
+        sim.setPlayerLevel?.(5, player.id);
+
+        const hale = [...sim.entities.values()].find((e) => e.templateId === 'drillmaster_hale');
+        if (!hale) return { ok: false, reason: 'no drillmaster_hale entity' };
+
+        // Prefer the hub's own level-5 damage dummy (content/practice_dummies.ts
+        // HUB_TRAINING_DUMMY_ID); fall back to the nearest shared training_dummy
+        // so a capture run taken before that content existed (the original PR,
+        // before this image) still finds a target rather than failing outright.
+        let dummy = null;
+        for (const e of sim.entities.values()) {
+          if (e.kind === 'mob' && e.templateId === 'hub_training_dummy' && !e.dead) {
+            dummy = e;
+            break;
+          }
+        }
+        if (!dummy) {
+          let best = Infinity;
+          for (const e of sim.entities.values()) {
+            if (e.kind !== 'mob' || e.templateId !== 'training_dummy' || e.dead) continue;
+            const d = (e.pos.x - hale.pos.x) ** 2 + (e.pos.z - hale.pos.z) ** 2;
+            if (d < best) {
+              best = d;
+              dummy = e;
+            }
+          }
+        }
+        if (!dummy) return { ok: false, reason: 'no hub damage dummy in the offline world' };
+
+        // Stand on Hale so acceptQuest's giver-proximity gate passes, accept
+        // the real quest through the real command (no direct questLog/
+        // questsDone poke), then move to the dummy and target it.
+        player.pos.x = hale.pos.x;
+        player.pos.z = hale.pos.z;
+        player.pos.y = hale.pos.y;
+        if (player.prevPos) {
+          player.prevPos.x = player.pos.x;
+          player.prevPos.y = player.pos.y;
+          player.prevPos.z = player.pos.z;
+        }
+        sim.rebucket?.(player);
+        sim.acceptQuest?.('q_hub_know_your_numbers');
+        if (sim.questState?.('q_hub_know_your_numbers') !== 'active') {
+          return { ok: false, reason: 'q_hub_know_your_numbers did not accept' };
+        }
+
+        player.pos.x = dummy.pos.x;
+        player.pos.z = dummy.pos.z - 2.5;
+        player.pos.y = dummy.pos.y;
+        if (player.prevPos) {
+          player.prevPos.x = player.pos.x;
+          player.prevPos.y = player.pos.y;
+          player.prevPos.z = player.pos.z;
+        }
+        player.facing = 0;
+        game.input.camYaw = 0;
+        sim.rebucket?.(player);
+        sim.targetEntity?.(dummy.id, player.id);
+        return { ok: true };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+
+      // The teleport above can raise the loading veil again after the shared
+      // entry flow already dismissed it once: a real touch playtest caught
+      // this exact recipe tapping through a still-visible loading curtain.
+      // Wait for it to actually settle before the first click.
+      await awaitVeilSettled(page);
+
+      await openHubMetersWindow(page, variant);
+      // Opening a mobile modal can clear the staged world target. Stage it
+      // again before the real casts; all meter observations still come from play.
+      await page.evaluate(() => {
+        const sim = window.__game.sim;
+        const dummy = [...sim.entities.values()].find((e) => e.templateId === 'hub_training_dummy');
+        sim.targetEntity(dummy.id, sim.player.id);
+      });
+      await page.evaluate(() => {
+        document.querySelector('.mt-tab[data-tab="dmg"]')?.click();
+      });
+      await wait(300);
+
+      // First attempt: swing the real dummy through the real auto-attack flag
+      // (the same idiom practice-dps-tracker above uses).
+      const attacked = await page.evaluate(() => {
+        const player = window.__game?.sim?.player;
+        if (!player) return false;
+        player.autoAttack = true;
+        return true;
+      });
+      if (!attacked) throw new Error('auto-attack command reached no sim');
+      await wait(3500);
+      const rowVisible = await pollForSize(page, '#meters-window .mt-row');
+      if (!rowVisible) throw new Error('no meter row rendered for a landed attack');
+
+      // Read-row: the coach only latches "read" on an explicit ack while the
+      // row is actually visible (hub_lesson_view.ts), never merely because it
+      // rendered, so wait for that real ack control before pressing it.
+      const readRowAcked = await waitForHlcAck(page, 'Continue');
+      if (!readRowAcked) throw new Error('coach never reached the read-row step (no Continue ack)');
+      const beforeBreakdown = await hlcLineText(page);
+      await clickOrTap(page, variant, '#hub-lesson-coach .hlc-ack');
+
+      // View the breakdown through the row's OWN real interaction (a mouse
+      // hover on desktop, a real touch long-press on mobile): never a
+      // dispatched focus/mouseenter event, which attachTooltip's listeners
+      // (src/ui/hud.ts) do not treat as either path at all.
+      await triggerRowBreakdown(page, '#meters-window .mt-row', variant);
+      const tooltipShown = await pollForSize(page, '#tooltip');
+      if (!tooltipShown) throw new Error('tooltip did not appear from the row interaction');
+      const afterBreakdown = await waitForHlcLineChange(page, beforeBreakdown);
+      if (afterBreakdown === null) {
+        throw new Error('coach did not progress past view-breakdown after the row interaction');
+      }
+
+      // Stop and let the encounter close (meters.ts ENCOUNTER_END_SECONDS = 5),
+      // then use the real history "older segment" control to inspect the
+      // finished run: the sequence hub_lesson_view.ts's damage track requires
+      // before it will ask for a second, comparable attempt.
+      await page.evaluate(() => {
+        window.__game.sim.player.autoAttack = false;
+      });
+      await wait(5800);
+      await page.evaluate(() => {
+        document.querySelector('.mt-prev')?.click();
+      });
+      await wait(300);
+
+      // Page back to the live view and land the comparison attempt.
+      await page.evaluate(() => {
+        document.querySelector('.mt-next')?.click();
+      });
+      await wait(300);
+      const attacked2 = await page.evaluate(() => {
+        const player = window.__game?.sim?.player;
+        if (!player) return false;
+        player.autoAttack = true;
+        return true;
+      });
+      if (!attacked2) throw new Error('second auto-attack command reached no sim');
+      await wait(3500);
+      await page.evaluate(() => {
+        window.__game.sim.player.autoAttack = false;
+      });
+      await wait(5800);
+
+      // Real quest credit, not just a rendered row: creditDummyDrill only
+      // advances q_hub_know_your_numbers off an actual landed blow on THIS
+      // dummy, so a positive count is proof the attempts above really landed.
+      const progressed = await page.evaluate(() => {
+        const counts = window.__game?.sim?.questLog?.get('q_hub_know_your_numbers')?.counts;
+        return (counts?.[0] ?? 0) > 0;
+      });
+      if (!progressed) throw new Error('no positive quest credit landed on the training dummy');
+
+      // Review the finished comparison attempt and complete the track: the
+      // coach only shows the replay affordance after an explicit "Done" ack
+      // of that second, comparable run.
+      const compareAcked = await waitForHlcAck(page, 'Done');
+      if (!compareAcked) {
+        throw new Error('coach never reached the review-comparison step (no Done ack)');
+      }
+      await clickOrTap(page, variant, '#hub-lesson-coach .hlc-ack');
+      const replayShown = await pollForSize(page, '#hub-lesson-coach .hlc-replay');
+      if (!replayShown) {
+        throw new Error('coach did not complete the damage track (no replay affordance)');
+      }
+
+      // The Proving Shore greeting can land over the scene during staging;
+      // dismiss it so the shot shows the yard, not the dialog.
+      await page.evaluate(() => {
+        for (const button of document.querySelectorAll('button')) {
+          if (/understood/i.test(button.textContent ?? '')) button.click();
+        }
+        document.querySelector('.camera-prompt-backdrop')?.remove();
+        document.querySelector('#gpu-notice')?.remove();
+      });
+      await wait(500);
+      return { clip: '#ui' };
+    },
+  },
+  {
+    key: 'hub-practice-lessons-healing',
+    label:
+      "Eastbrook hub healing dummy: Drillmaster Hale's guided Healing Meters coaching " +
+      '(effective-heal row read and the ability breakdown)',
+    // Same controller as the damage track above; the healing track has no
+    // end-run/history steps (hub_lesson_view.ts: healing asks for no second,
+    // comparable attempt), so this recipe stops after the row + breakdown.
+    when: [
+      'content/practice_dummies',
+      'sim/hub_practice',
+      'sim/tutorial/hub_healing_lesson',
+      'sim/tutorial/hub_healing_drill',
+      'ui/hud/practice',
+    ],
+    variants: [
+      {
+        key: 'desktop',
+        charClass: 'priest',
+        charName: 'Averil',
+        beforeLoad: seedLowGraphicsPreset,
+      },
+      {
+        key: 'mobile',
+        charClass: 'priest',
+        charName: 'Averil',
+        mobile: true,
+        beforeLoad: seedLowGraphicsPreset,
+      },
+    ],
+    async capture(page, variant) {
+      const staged = await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!game || !sim || !player) return { ok: false, reason: 'offline world is unavailable' };
+        sim.setPlayerLevel?.(5, player.id);
+
+        const hale = [...sim.entities.values()].find((e) => e.templateId === 'drillmaster_hale');
+        if (!hale) return { ok: false, reason: 'no drillmaster_hale entity' };
+        const healingDummy = [...sim.entities.values()].find(
+          (e) => e.kind === 'mob' && e.templateId === 'hub_healing_dummy' && !e.dead,
+        );
+        if (!healingDummy)
+          return { ok: false, reason: 'no hub healing dummy in the offline world' };
+
+        // The healing quest requiresQuest the damage one (practice_dummies.ts):
+        // stage only that PREREQUISITE directly, and only because a fresh
+        // capture character has no realistic way to have already run the
+        // damage lesson in this same session. The healing quest itself goes
+        // through the real sim.acceptQuest path below, so its class/level/
+        // heal-known/proximity gates all actually run (quest_commands.ts,
+        // hub_healing_lesson.ts). Flag for parent: this is the one staged
+        // step in this recipe that is not a real player action.
+        sim.questsDone.add('q_hub_know_your_numbers');
+
+        // Stand on Hale so acceptQuest's giver-proximity gate passes.
+        player.pos.x = hale.pos.x;
+        player.pos.z = hale.pos.z;
+        player.pos.y = hale.pos.y;
+        if (player.prevPos) {
+          player.prevPos.x = player.pos.x;
+          player.prevPos.y = player.pos.y;
+          player.prevPos.z = player.pos.z;
+        }
+        sim.rebucket?.(player);
+        sim.acceptQuest?.('q_hub_healing_numbers');
+        if (sim.questState?.('q_hub_healing_numbers') !== 'active') {
+          return {
+            ok: false,
+            reason: 'q_hub_healing_numbers did not accept (class/level/heal-known gate?)',
+          };
+        }
+
+        player.pos.x = healingDummy.pos.x;
+        player.pos.z = healingDummy.pos.z - 2.5;
+        player.pos.y = healingDummy.pos.y;
+        if (player.prevPos) {
+          player.prevPos.x = player.pos.x;
+          player.prevPos.y = player.pos.y;
+          player.prevPos.z = player.pos.z;
+        }
+        player.facing = 0;
+        game.input.camYaw = 0;
+        sim.rebucket?.(player);
+
+        // Target the healing dummy through the real targeting path, then
+        // resolve THIS character's own live direct-heal binding rather than
+        // assuming an ability id: the same earliest-learned-friendly-heal
+        // rule sim/tutorial/hub_healing_lesson.ts hubHealingAbilityId
+        // applies, read here off the character's actual RESOLVED known
+        // abilities (sim.known's own `effects`, not the unresolved `def.effects`
+        // a lower rank could carry) since that sim module is not reachable
+        // from this Node-side script.
+        sim.targetEntity?.(healingDummy.id, player.id);
+        const heals = (sim.known ?? []).filter(
+          (k) => k.def.targetType === 'friendly' && k.effects?.some((e) => e.type === 'heal'),
+        );
+        if (heals.length === 0)
+          return { ok: false, reason: 'priest knows no direct heal at level 5' };
+        const healAbilityId = heals.reduce((a, b) => (b.def.learnLevel < a.def.learnLevel ? b : a))
+          .def.id;
+        player.resource = player.maxResource;
+
+        return { ok: true, healAbilityId };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+
+      // The teleport above can raise the loading veil again after the shared
+      // entry flow already dismissed it once: a real touch playtest caught
+      // this exact recipe tapping through a still-visible loading curtain.
+      // Wait for it to actually settle before the first click.
+      await awaitVeilSettled(page);
+
+      await openHubMetersWindow(page, variant);
+      await page.evaluate(() => {
+        const sim = window.__game.sim;
+        const dummy = [...sim.entities.values()].find((e) => e.templateId === 'hub_healing_dummy');
+        sim.targetEntity(dummy.id, sim.player.id);
+      });
+      await page.evaluate(() => {
+        document.querySelector('.mt-tab[data-tab="heal"]')?.click();
+      });
+      await wait(300);
+
+      // Land real heals on the dummy (its own effective-heal credit: tutorial/
+      // hub_healing_drill.ts, three landed), through the real cast command,
+      // polling the GCD/cast state exactly like the other ability-press
+      // recipes in this file rather than a fixed sleep per cast.
+      for (let i = 0; i < 3; i++) {
+        const cast = await page.evaluate((abilityId) => {
+          const sim = window.__game?.sim;
+          const player = sim?.player;
+          if (!sim || !player) return false;
+          sim.castAbility?.(abilityId, player.id);
+          return true;
+        }, staged.healAbilityId);
+        if (!cast) throw new Error('cast command reached no sim');
+        await page.waitForFunction(
+          () => {
+            const p = window.__game?.sim?.player;
+            return !!p && p.gcdRemaining <= 0 && p.castingAbility === null;
+          },
+          { timeout: 15000, polling: 100 },
+        );
+        await wait(200);
+      }
+
+      // Real quest credit, not just a rendered row: creditHubHealingDrill only
+      // advances q_hub_healing_numbers off a genuine EFFECTIVE direct heal, so
+      // a positive count is proof the casts above actually restored health
+      // rather than fully overhealing or missing the dummy.
+      const progressed = await page.evaluate(() => {
+        const counts = window.__game?.sim?.questLog?.get('q_hub_healing_numbers')?.counts;
+        return (counts?.[0] ?? 0) > 0;
+      });
+      if (!progressed) throw new Error('no positive effective-heal credit landed on the dummy');
+
+      const rowVisible = await pollForSize(page, '#meters-window .mt-row');
+      if (!rowVisible) throw new Error('no meter row rendered for an effective heal');
+
+      // Read-row: the coach only latches "read" on an explicit ack while the
+      // row is actually visible (hub_lesson_view.ts), never merely because it
+      // rendered, so wait for that real ack control before pressing it.
+      const readRowAcked = await waitForHlcAck(page, 'Continue');
+      if (!readRowAcked) throw new Error('coach never reached the read-row step (no Continue ack)');
+      const beforeBreakdown = await hlcLineText(page);
+      await clickOrTap(page, variant, '#hub-lesson-coach .hlc-ack');
+
+      // View the breakdown through the row's OWN real interaction (a mouse
+      // hover on desktop, a real touch long-press on mobile): never a
+      // dispatched focus/mouseenter event, which attachTooltip's listeners
+      // (src/ui/hud.ts) do not treat as either path at all. Healing has no
+      // second-attempt round (hub_lesson_view.ts): an actual breakdown view
+      // completes the whole track by itself, straight to the replay step.
+      await triggerRowBreakdown(page, '#meters-window .mt-row', variant);
+      const tooltipShown = await pollForSize(page, '#tooltip');
+      if (!tooltipShown) throw new Error('tooltip did not appear from the row interaction');
+      const afterBreakdown = await waitForHlcLineChange(page, beforeBreakdown);
+      if (afterBreakdown === null) {
+        throw new Error('coach did not progress past view-breakdown after the row interaction');
+      }
+      const replayShown = await pollForSize(page, '#hub-lesson-coach .hlc-replay');
+      if (!replayShown) {
+        throw new Error('coach did not complete the healing track (no replay affordance)');
+      }
+
+      // The Proving Shore greeting can land over the scene during staging;
+      // dismiss it so the shot shows the yard, not the dialog.
+      await page.evaluate(() => {
+        for (const button of document.querySelectorAll('button')) {
+          if (/understood/i.test(button.textContent ?? '')) button.click();
+        }
+        document.querySelector('.camera-prompt-backdrop')?.remove();
+        document.querySelector('#gpu-notice')?.remove();
+      });
+      await wait(500);
       return { clip: '#ui' };
     },
   },

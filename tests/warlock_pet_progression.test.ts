@@ -3,6 +3,7 @@ import { ABILITIES, abilitiesKnownAt, CLASSES } from '../src/sim/content/classes
 import { emptyModifiers } from '../src/sim/content/talents';
 import { WARLOCK_PET_MOBS } from '../src/sim/content/warlock_pets';
 import { Sim } from '../src/sim/sim';
+import { WORLD_WITHOUT_HUB_YARD } from './helpers/hub_yard';
 
 const RETIRED_SUMMONS = [
   'summon_succubus',
@@ -19,7 +20,12 @@ function knownAt(level: number, spec?: 'affliction' | 'demonology' | 'destructio
 }
 
 function summonStarterEmberkin(): Sim {
-  const sim = new Sim({ seed: 2632, playerClass: 'warlock', autoEquip: true });
+  const sim = new Sim({
+    seed: 2632,
+    playerClass: 'warlock',
+    autoEquip: true,
+    world: WORLD_WITHOUT_HUB_YARD,
+  });
   sim.setPlayerLevel(4);
   sim.castAbility('summon_imp');
   for (let i = 0; i < 20 * 6 && sim.player.castingAbility; i++) sim.tick();

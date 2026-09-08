@@ -15,7 +15,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1004,
+      "nextId": 1007,
       "state": "b8206c6f",
       "events": "741638a5",
       "rng": {
@@ -167,9 +167,9 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 1013,
-      "state": "259dab22",
-      "events": "6ade6f8e",
+      "nextId": 1016,
+      "state": "d701be80",
+      "events": "e1e8af12",
       "rng": {
         "draws": 5,
         "digest": "59be7c21"
@@ -178,8 +178,8 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 1013,
-      "state": "309728f3",
+      "nextId": 1016,
+      "state": "07b45ca1",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -189,8 +189,8 @@
     {
       "tick": 15,
       "time": 0.75,
-      "nextId": 1013,
-      "state": "b3549bfa",
+      "nextId": 1016,
+      "state": "e129f544",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -200,8 +200,8 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 1013,
-      "state": "f6fc3013",
+      "nextId": 1016,
+      "state": "5e260f59",
       "events": "82b32424",
       "rng": {
         "draws": 5,
@@ -211,8 +211,8 @@
     {
       "tick": 25,
       "time": 1.25,
-      "nextId": 1013,
-      "state": "d540e4af",
+      "nextId": 1016,
+      "state": "ecbb38c5",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -222,9 +222,9 @@
     {
       "tick": 30,
       "time": 1.5,
-      "nextId": 1013,
-      "state": "2050c390",
-      "events": "0deba3c0",
+      "nextId": 1016,
+      "state": "18645c3e",
+      "events": "93a1790e",
       "rng": {
         "draws": 8,
         "digest": "6d2e6d5a"
@@ -233,8 +233,8 @@
     {
       "tick": 35,
       "time": 1.75,
-      "nextId": 1013,
-      "state": "a5fadc02",
+      "nextId": 1016,
+      "state": "2a1e65a0",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -244,8 +244,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 1013,
-      "state": "1f2bb456",
+      "nextId": 1016,
+      "state": "bff6728c",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -255,8 +255,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 1013,
-      "state": "1f2bb456",
+      "nextId": 1016,
+      "state": "bff6728c",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -408,7 +408,7 @@
             "sta": 35,
             "str": 35
           },
-          "targetId": 1009,
+          "targetId": 1012,
           "templateId": "warrior",
           "weapon": {
             "max": 5,
@@ -426,7 +426,7 @@
           "facing": -1.570796,
           "fiveSecondRule": 99,
           "hp": 119,
-          "id": 1008,
+          "id": 1011,
           "inCombat": true,
           "kind": "mob",
           "level": 5,
@@ -459,7 +459,7 @@
           }
         },
         {
-          "aggroTargetId": 1008,
+          "aggroTargetId": 1011,
           "aiState": "attack",
           "autoAttack": true,
           "combatTimer": 0.55,
@@ -471,7 +471,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 39983,
-          "id": 1009,
+          "id": 1012,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -503,7 +503,7 @@
           "templateId": "deacon_varric",
           "threat": [
             [
-              1008,
+              1011,
               18
             ]
           ],
@@ -518,9 +518,9 @@
     {
       "tick": 41,
       "time": 2.05,
-      "nextId": 1013,
-      "state": "cba9b70d",
-      "events": "bd92f911",
+      "nextId": 1016,
+      "state": "e11f7aff",
+      "events": "6165afef",
       "rng": {
         "draws": 16,
         "digest": "d89e0835"
@@ -672,7 +672,7 @@
             "sta": 35,
             "str": 35
           },
-          "targetId": 1009,
+          "targetId": 1012,
           "templateId": "warrior",
           "weapon": {
             "max": 5,
@@ -690,7 +690,7 @@
           "facing": -1.570796,
           "fiveSecondRule": 99,
           "hp": 119,
-          "id": 1008,
+          "id": 1011,
           "inCombat": true,
           "kind": "mob",
           "level": 5,
@@ -723,7 +723,7 @@
           }
         },
         {
-          "aggroTargetId": 1008,
+          "aggroTargetId": 1011,
           "aiState": "attack",
           "autoAttack": true,
           "combatTimer": 0.6,
@@ -735,7 +735,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 39983,
-          "id": 1009,
+          "id": 1012,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -767,7 +767,7 @@
           "templateId": "deacon_varric",
           "threat": [
             [
-              1008,
+              1011,
               18
             ]
           ],
@@ -782,8 +782,8 @@
     {
       "tick": 45,
       "time": 2.25,
-      "nextId": 1013,
-      "state": "c9d3dd8c",
+      "nextId": 1016,
+      "state": "7af86762",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -793,8 +793,8 @@
     {
       "tick": 49,
       "time": 2.45,
-      "nextId": 1013,
-      "state": "249c2283",
+      "nextId": 1016,
+      "state": "042dafa5",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -963,7 +963,7 @@
           "facing": 1.570796,
           "fiveSecondRule": 99,
           "hp": 119,
-          "id": 1008,
+          "id": 1011,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -999,8 +999,8 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 1013,
-      "state": "7c439ded",
+      "nextId": 1016,
+      "state": "4986c027",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -1010,8 +1010,8 @@
     {
       "tick": 51,
       "time": 2.55,
-      "nextId": 1013,
-      "state": "854f3eb6",
+      "nextId": 1016,
+      "state": "1dbce9e4",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -1180,7 +1180,7 @@
           "facing": 1.570796,
           "fiveSecondRule": 99,
           "hp": 119,
-          "id": 1008,
+          "id": 1011,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -1217,8 +1217,8 @@
     {
       "tick": 51,
       "time": 2.55,
-      "nextId": 1013,
-      "state": "854f3eb6",
+      "nextId": 1016,
+      "state": "1dbce9e4",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -1387,7 +1387,7 @@
           "facing": 1.570796,
           "fiveSecondRule": 99,
           "hp": 119,
-          "id": 1008,
+          "id": 1011,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",

@@ -424,7 +424,7 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_sparring: {
     name: 'Murövningar',
-    desc: 'Tillfoga träningsdockan ovanför Högvakten sammanlagt 1 000 skada.',
+    desc: 'Tillfoga en träningsdocka sammanlagt 1 000 skada.',
   },
   chr_peaks_glimmer_cast: {
     name: 'Kallt vatten, kallare ljus',

@@ -2308,8 +2308,12 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     );
     expect(bramblehideDelta).toEqual({ deeds: 35, deedStats: 742, reliquary: 771 });
     expect(Object.values(bramblehideDelta).reduce((sum, value) => sum + value, 0)).toBe(1548);
+    // Plus 50 for the two Eastbrook hub practice quests (q_hub_know_your_numbers,
+    // q_hub_healing_numbers) joining questsDone in this maximal fixture: 23 and
+    // 21 characters as `"<id>",` in the sorted array (26 + 24 bytes). MEASURED,
+    // not inferred, same as every other row this equation names.
     expect(counterfactualBytes - 156144).toBe(
-      Object.values(fixtureDelta).reduce((sum, value) => sum + value, 0) + 183 + 1548 + 49,
+      Object.values(fixtureDelta).reduce((sum, value) => sum + value, 0) + 183 + 1548 + 50 + 49,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2328,27 +2332,34 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
           ) - previous,
         ]),
       ),
-    ).toEqual({ questsDone: 50, knownRecipes: 30, deeds: 32, deedStats: 21, reliquary: 80 });
+      // questsDone moved from 50 to 100 against the SAME forgeBaseline reference
+      // point: the +50 hub practice quest delta above, on top of the prior +50
+      // this row already carried.
+    ).toEqual({ questsDone: 100, knownRecipes: 30, deeds: 32, deedStats: 21, reliquary: 80 });
     // Removing field_kit AND the Bramblehide release content reproduces the
     // pre-field-kit, pre-Bramblehide baseline WITH the hammer content still
     // applied: 3884 alone measured 209,261 here (hammer content absent); the
     // hammer content adds its own +213 on top (composed, not inferred: 3885
     // alone recorded that same +213 against its pre-field-kit tree). MEASURED
-    // after the real merge settle: 209,474.
+    // after the real merge settle: 209,474. RE-MEASURED at 209,524 once the
+    // hub training dummy and hub healing dummy PRs landed their two guided
+    // practice quests (+50, attributed above; neither dummy nor its NPC touches
+    // any other field this fixture tracks).
     expect(
       Buffer.byteLength(JSON.stringify(preReleaseCounterfactual), 'utf8'),
       'field_kit and the Bramblehide release content removed, must reproduce the recorded pre-field-kit Crucible+hammer baseline',
-    ).toBe(209474);
+    ).toBe(209524);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
-    // 209,474 plus the 1,548-byte Bramblehide delta plus the 49-byte
-    // dev-mount delta attributed above: 211,071. OSSBrain integration
-    // (goblin_rocket_sled, rallycart_rxt) is the mover, MEASURED via the
-    // devMountReleaseDelta isolation, not inferred.
+    // 209,524 plus the 1,548-byte Bramblehide delta plus the 49-byte
+    // dev-mount delta attributed above: 211,121. OSSBrain integration
+    // (goblin_rocket_sled, rallycart_rxt) is the dev-mount mover, MEASURED
+    // via the devMountReleaseDelta isolation, not inferred; the hub practice
+    // quests are the +50 above it.
     expect(
       counterfactualBytes,
       'field_kit removed, must reproduce the current staged Crucible+hammer+Bramblehide+dev-mount baseline',
-    ).toBe(211071);
+    ).toBe(211121);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2379,17 +2390,16 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // Bramblehide content attributed above accounts for the full +1,548
     // difference).
     //
-    // RE-BASED for the OSSBrain v0.42.0 integration merge: 211,083 bytes,
-    // exactly +49. The mover is the two new developer-only mount reins items
-    // attributed above (devMountReleaseDelta), and nothing else: every other
-    // assertion in this arm (fixtureDelta, bramblehideDelta, contentDelta,
-    // metadataDelta, the 4,520 Crucible-content delta) held at its prior
-    // measured value unchanged, which is what proves the +49 is the whole of
-    // this merge's content movement rather than a partial measurement. Re-
-    // based per the standing rule (floor measurement minus 380, edge
-    // measurement plus one, band width unchanged at 381): 210,703..211,084.
-    expect(bytes, reMint).toBeGreaterThan(210703);
-    expect(bytes, reMint).toBeLessThan(211084);
+    // RE-BASED for the merge of the OSSBrain v0.42.0 integration into the
+    // hub practice branch: 211,133 bytes, exactly +50 (the two hub practice
+    // quests in questsDone) plus +49 (the two developer-only mount reins
+    // items, devMountReleaseDelta), each attributed above and each already
+    // measured alone on its own parent (211,084 and 211,083 against the
+    // shared 211,034). Re-based per the standing rule (floor measurement
+    // minus 380, edge measurement plus one, band width unchanged at 381):
+    // 210,753..211,134.
+    expect(bytes, reMint).toBeGreaterThan(210753);
+    expect(bytes, reMint).toBeLessThan(211134);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was
@@ -2397,8 +2407,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // step was derived from, not this arm's measurement). The previous
     // 163,840-byte threshold warned on this legal modeled state. Measured here,
     // after this release merge's settle: this combined fixture (hammer
-    // content, field_kit, and the Bramblehide release content) is 211,034
-    // bytes, 18,342 bytes of headroom below the threshold. Pin the measured
+    // content, field_kit, the Bramblehide release content, and the two hub
+    // practice quests) is 211,084 bytes, 18,292 bytes of headroom below the
+    // threshold. Pin the measured
     // relation: a lower threshold or further content growth crossing it
     // requires re-measuring and reviewing both sides together, never silently
     // widening this test's narrow tracking band or the warn threshold itself.

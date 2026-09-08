@@ -10654,6 +10654,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sunder_armor.description':
     'Retalha a armadura do alvo, reduzindo-a em {damage}% por aplicação. Acumula até 5 vezes. Gera uma grande quantidade de ameaça.',
   'entities.mobs.training_dummy.name': 'Boneco de Treino',
+  'entities.mobs.hub_training_dummy.name': 'Boneco de Treino',
   'entities.mobs.yumi_cat.name': 'Yumi',
   'entities.mobs.water_elemental.name': 'Elemental da Água',
   'entities.mobs.ancient_guardian.name': 'Guardião Antigo',

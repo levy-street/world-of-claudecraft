@@ -10663,6 +10663,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sunder_armor.description':
     'Scheurt het pantser van het doelwit open en verlaagt het met {damage}% per toepassing. Stapelt tot 5 keer. Genereert veel dreiging.',
   'entities.mobs.training_dummy.name': 'Oefenpop',
+  'entities.mobs.hub_training_dummy.name': 'Oefenpop',
   'entities.mobs.yumi_cat.name': 'Yumi',
   'hudChrome.archetypeTitle.hobbyLabel': 'Liefhebberij',
   'hudChrome.auraEffect.armorPct': 'Vermindert pantser met {pct}%',

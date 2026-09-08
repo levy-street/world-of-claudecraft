@@ -33,6 +33,7 @@ import { planGradeRemoval } from '../professions/material_grades';
 import { questFallbackGrants } from '../quest_fallback';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
+import { hubHealingAbilityId } from '../tutorial/hub_healing_lesson';
 import {
   dist2d,
   type Entity,
@@ -82,6 +83,16 @@ export function computeQuestState(
   // other class. A missing class fails closed so a class-less caller never opens it.
   if (quest.requiredClass && (!playerClass || !quest.requiredClass.includes(playerClass)))
     return 'unavailable';
+  // The hub's optional healing lesson: unavailable until the SAME resolver its
+  // credit arm and the UI coach read (hub_healing_lesson.ts) says this class
+  // has actually learned a usable direct heal at this level, so an eligible
+  // class never sees the quest before their kit has anything to teach it with.
+  if (
+    quest.requiresUsableHealAbility &&
+    (!playerClass || hubHealingAbilityId(playerClass, playerLevel) === null)
+  ) {
+    return 'unavailable';
+  }
   if (
     quest.completionEffect &&
     professionState &&

@@ -10479,6 +10479,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.items.goldleaf_herb.name': 'Zlatolist',
   'entities.items.sunpetal_herb.name': 'Sluncokvět',
   'entities.mobs.training_dummy.name': 'Cvičný panák',
+  'entities.mobs.hub_training_dummy.name': 'Cvičný panák',
   'entities.mobs.yumi_cat.name': 'Yumi',
   'hudChrome.archetypeTitle.hobbyLabel': 'Koníček',
   'hudChrome.auraEffect.armorPct': 'Snižuje brnění o {pct} %',

@@ -10505,6 +10505,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sunder_armor.description':
     'Klyver målets rustning och sänker den med {damage}% per applicering. Stackas upp till 5 gånger. Vållar en stor mängd hot.',
   'entities.mobs.training_dummy.name': 'Träningsdocka',
+  'entities.mobs.hub_training_dummy.name': 'Träningsdocka',
   'entities.mobs.yumi_cat.name': 'Yumi',
   'hudChrome.archetypeTitle.hobbyLabel': 'Fritidssyssla',
   'hudChrome.auraEffect.armorPct': 'Minskar rustningen med {pct}%',

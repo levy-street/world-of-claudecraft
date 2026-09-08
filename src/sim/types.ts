@@ -4510,6 +4510,13 @@ export interface QuestDef {
   // quest needs; re-granted on accept if the player no longer has them, to avoid a progression block
   requiredClass?: PlayerClass[]; // class-locked quest: only these classes see/accept it
   // (e.g. the paladin-only Divine Tome chain). Availability enforced in computeQuestState.
+  // Additionally requires a resolvable ability beyond class/level alone. The ONE
+  // user today is the hub's optional healing lesson (q_hub_healing_numbers),
+  // which needs the SAME resolver its credit arm and the UI coach read
+  // (sim/tutorial/hub_healing_lesson.ts hubHealingAbilityId) so a class that is
+  // nominally eligible never sees the quest before their kit has anything to
+  // teach the lesson with. Enforced in computeQuestState.
+  requiresUsableHealAbility?: boolean;
   minLevel?: number;
   retired?: boolean; // remains finishable if already accepted, but cannot be newly accepted
   // OWNERSHIP collect objectives instead of DELIVERY ones: the collect count

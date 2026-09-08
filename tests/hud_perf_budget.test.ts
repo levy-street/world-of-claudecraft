@@ -1248,6 +1248,20 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   // countdown bucket change, once a second inside the anti-snipe window, so
   // without the pair the browse list yanks itself to the top while it is read.
   { file: 'woc_market_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
+  // The hub practice coach's mobile-control visibility probe: on a step that must
+  // glow a mobile-only control (the Meters entry under Actions > More, or the
+  // Spellbook fallback when the taught ability is not on the bar), it walks up to
+  // three fixed candidate ids (the control, then its More tray, then the menu
+  // anchor) and reads ONE rect per candidate to find the first one actually
+  // rendered. Entered at most once per `update()` call, itself throttled to a
+  // 250ms cadence (CHECK_INTERVAL_MS) and short-circuited to nothing while the
+  // player is outside the hub practice yard, so this never runs on the render or
+  // sim frame budget.
+  {
+    file: 'hud/practice/hub_lesson_controller.ts',
+    reflowAllow: { '.getClientRects': 1 },
+    driverAllow: {},
+  },
 ];
 
 function stripComments(src: string): string {

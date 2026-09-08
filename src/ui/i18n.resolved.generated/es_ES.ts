@@ -1257,6 +1257,43 @@ export const es_ES: EnTranslations = {
       "heroicName": "{name} Heroico",
       "heroicLocked": "Estás bloqueado en {name} Heroico."
     },
+    "practiceDps": {
+      "title": "Practice Dummy",
+      "liveDps": "{value} DPS",
+      "liveLabel": "This run",
+      "prompt": "Attack the dummy to start a run",
+      "previous": "Previous runs",
+      "runLabel": "Run {index}",
+      "runSummary": "{total} in {time}"
+    },
+    "hubLesson": {
+      "target": "Target the dummy to begin.",
+      "openWindow": "Open {meters}.",
+      "openWindowTouch": "Open {menu} → {more} → {meters}.",
+      "openTab": "Switch to the right tab.",
+      "openTabDamage": "Switch to the Damage tab.",
+      "openTabHealing": "Switch to the Healing tab.",
+      "act": "Land a hit to start the measurement.",
+      "actDamage": "Attack the dummy to start the measurement.",
+      "actHealing": "Cast a heal on the dummy to start the measurement.",
+      "addToBar": "Add your heal to your action bar from your Spellbook, then cast it on the dummy.",
+      "readRow": "Read your row, then press Continue.",
+      "readRowDamage": "Total is all your damage this run. DPS is damage per second over the run. Watch your row, then Continue.",
+      "readRowHealing": "Total counts health restored; healing past full health adds zero. HPS is health restored per second over the run. Read your row, then Continue.",
+      "findRun": "Use the meter arrows to return to your practice run.",
+      "addAttackToBar": "Add your attack from your Spellbook to the action bar, then use it on the dummy.",
+      "ackContinue": "Continue",
+      "viewBreakdown": "Hover, focus, or hold your row for the per-ability split.",
+      "endRun": "Turn off Attack and stop casting. After 5 seconds without a hit, this run ends.",
+      "endHealingRun": "Stop healing for 5 seconds to finish this run, then you can replay the lesson.",
+      "inspectHistory": "Use the history arrow to look back at that finished run.",
+      "compareAgain": "Return to Current with the right arrow, then attack the same dummy for about the same time.",
+      "reviewComparison": "Use the arrows to compare Total, DPS, and duration with your first run. Return to this run, then Done.",
+      "ackDone": "Done",
+      "replay": "Lesson complete. Practice freely, or replay these instructions.",
+      "replayAction": "Practice again",
+      "replayTarget": "Target it again"
+    },
     "riftTracker": {
       "title": "Brecha",
       "floor": "Piso {current} de {total}",
@@ -1292,6 +1329,8 @@ export const es_ES: EnTranslations = {
     },
     "meters": {
       "perSecond": "{value}/s",
+      "thousands": "{value}k",
+      "millions": "{value}m",
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m} min {s} s",
       "seconds": "{s} s",
@@ -6006,6 +6045,7 @@ export const es_ES: EnTranslations = {
       "mapBody": "M abre el mapa del mundo: el continente dibujado, con tu propia flecha en él, las zonas y sus nombres, los puntos de interés a tu alrededor, los portales de viaje y los nodos de recolección que has encontrado. Tu grupo también aparece en él. Dentro de una expedición, el mapa cambia a un esquema de las salas que has explorado hasta el momento.\n\nEn el lado derecho, bajo el minimapa, una pila de rastreadores mantiene a la vista tus asuntos actuales sin necesidad de abrir nada: tus misiones en seguimiento y sus objetivos, tu progreso de gestas, la expedición en la que estás y cualquier brecha en la que participes. El rastreador de misiones se contrae cuando quieres recuperar la pantalla.",
       "mapBodyZoneFirst": "M opens the world map on the zone you are standing in, with your own arrow on it, the points of interest around you, the quest givers with their marks and the areas your objectives sit in, the crafting stations, mailboxes, noticeboards and garden beds, the dungeon entrances, and every gathering node in the zone, grayed out while it regrows and marked when your tools are not up to it. Your party shows on it too. Right-click the map, or press its World map button, and it pulls back to the continent, every zone drawn with its name, where a click on a zone opens that zone's map. Step into a delve, a dungeon, a rift or a castle keep and the map switches to a floor plan of where you stand; the Thornhollow Fields battleground gets a field map of its own.\n\nDown the right side, under the minimap, a stack of trackers keeps your current business in view without opening anything: your tracked quests and their objectives, your deed progress, your Reliquary pages, the delve you are in, and any rift you are taking part in. The quest tracker collapses when you want the screen back.",
       "gatheringGoalTrackerBody": "A gathering goal tracker joins the stack once you Track a recipe in the crafting window or a commission on the board: it names the recipe or commission you are tracking, how many you are collecting for, and how far your held and stored materials get you there. Track replaces your current goal, and Clear drops it explicitly; neither one ever changes your harvest preference.",
+      "hubPracticeTrackerBody": "Near the Eastbrook hub, a practice tracker joins the stack once you take the guided practice lessons there: it keeps your best runs against the practice dummies in view. While a lesson is active, a coaching strip beside it walks you through the current step of the lesson, from opening the Damage Meters to comparing a second run.",
       "chatTitle": "La caja de chat",
       "chatBody": "Abajo a la izquierda. Pulsa Intro para empezar a escribir y de nuevo Intro para enviar.\n\nDos pestañas están siempre presentes: Chat, el registro combinado de cuanto se dice a tu alrededor, y Combate, el registro escrito de tu combate. El botón más añade otras, una por canal: Decir, Gritar, Grupo, General, Mundo, BdG, Hermandad y Oficiales, además de una pestaña de Susurro que reúne en un solo lugar cada susurro que envías y recibes. Escribir en la pestaña de un canal envía el mensaje a ese canal sin que tengas que volver a escribir el comando.\n\nLa caja entera se puede arrastrar a otro lugar y redimensionar, y recuerda dónde la dejaste.",
       "keyWindowsTitle": "Ventanas que abres con una tecla",
@@ -16319,6 +16359,12 @@ export const es_ES: EnTranslations = {
       "heroic_boss_dummy": {
         "name": "Muñeco de jefe heroico"
       },
+      "hub_training_dummy": {
+        "name": "Muñeco de entrenamiento"
+      },
+      "hub_healing_dummy": {
+        "name": "Healing Dummy"
+      },
       "ridge_stalker": {
         "name": "Acechador de la cresta"
       },
@@ -17504,6 +17550,11 @@ export const es_ES: EnTranslations = {
         "name": "Guardiana de la Marea Nel",
         "title": "Guardiana de la Playa",
         "greeting": "La marea quita y la marea paga, {playerName}. Yo llevo la cuenta de las dos cosas: lo que los correteadores rapiñan de los naufragios, y lo que las manos honestas traen de vuelta por este sendero."
+      },
+      "drillmaster_hale": {
+        "name": "Drillmaster Hale",
+        "title": "Quay Sparring Master",
+        "greeting": "That dummy behind me never swings back and never goes down, {className}. What matters is the tally: your Damage Meters count every blow you land on it. Target it and open the meters, and I will walk you through the rest."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -19750,6 +19801,26 @@ export const es_ES: EnTranslations = {
         "objectives": {
           "0": {
             "label": "El Guardián del Naufragio abatido"
+          }
+        }
+      },
+      "q_hub_know_your_numbers": {
+        "title": "Know Your Numbers",
+        "text": "Strength you cannot measure is strength you cannot improve, {playerName}. Target the training dummy, open your Damage Meters, and land ten blows on it, swings or spells, while you watch the window count what you deal. When the ten are in, come back and tell me the number.",
+        "completion": "Ten blows, and now you know what they are worth. Every time you take a new weapon, a new talent or a new idea, {playerName}, come back to this post and put a number on it. The meters are honest even when the vale is not.",
+        "objectives": {
+          "0": {
+            "label": "Blow landed on the Training Dummy"
+          }
+        }
+      },
+      "q_hub_healing_numbers": {
+        "title": "Numbers That Heal",
+        "text": "A post is not the only thing worth measuring, {playerName}. Target the Healing Dummy beside it, open your Damage Meters, and switch to the Healing tab. Land three heals that actually restore health while you watch the window count them the same way it counted blows.",
+        "completion": "Healed numbers, not hurt ones, but numbers all the same, {playerName}. A healer who never watches those meters is guessing at their own worth.",
+        "objectives": {
+          "0": {
+            "label": "Effective heal landed on the Healing Dummy"
           }
         }
       },

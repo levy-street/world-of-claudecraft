@@ -2591,6 +2591,16 @@
     overflow-y: auto;
     pointer-events: auto;
   }
+  /* The practice DPS tracker (src/ui/hud/practice/) is a live child of this
+     stack too: a dummy run's live number is what a player changes a build
+     against, so it stays up in this seat under the same bound and affordance
+     as the two above (its own rule so the pinned two-selector rule above stays
+     byte-stable for tests/mobile_touch_xhb_exclusivity.test.ts). */
+  body.mobile-touch.xhb-mode #practice-tracker {
+    max-height: calc((var(--app-vh, 100vh) - 128px) / var(--ui-scale, 1) - 172px);
+    overflow-y: auto;
+    pointer-events: auto;
+  }
   /* Trimmed to the launchers with no other pad-reachable path: Quick Actions'
      own strip (#mobile-menu-strip, kept up alongside this rail per the review
      above) already covers Character, Spellbook, World Map, Bags, Quest Log,
@@ -3787,6 +3797,61 @@
     right: max(10px, env(safe-area-inset-right));
     top: max(150px, env(safe-area-inset-top));
     width: calc(190px * var(--mobile-chrome-scale, 1));
+  }
+  /* The practice DPS tracker leaves the stack on touch: the stack's seat runs
+     down into the action ring, and this strip is tall (a live number plus a
+     run list). It re-seats under the target frame in the left column, the
+     one span the touch HUD leaves clear between the frame and the move zone,
+     compacted (smaller live number, the per-run total/time detail line
+     dropped; the per-second figures a build is compared on stay). */
+  body.mobile-touch #practice-tracker {
+    position: fixed;
+    left: max(18px, env(safe-area-inset-left));
+    right: auto;
+    top: max(96px, env(safe-area-inset-top));
+    width: calc(170px * var(--mobile-chrome-scale, 1));
+    font-size: 11px;
+  }
+  body.mobile-touch #practice-tracker .pt-live {
+    font-size: 16px;
+  }
+  body.mobile-touch #practice-tracker .pt-run-sum {
+    display: none;
+  }
+  /* Keep lesson prose clear of the touch combat ring and readable against
+     the world. The centre lane also leaves the meter row and its history
+     arrows reachable below; buttons retain a 40px touch target. */
+  body.mobile-touch #hub-lesson-coach {
+    position: fixed;
+    top: max(96px, env(safe-area-inset-top));
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: min(280px, calc(100vw - 360px));
+    padding: 8px;
+    margin: 0;
+    border: 1px solid #776344;
+    border-radius: 6px;
+    background: #100d09e8;
+    font-size: 11px;
+  }
+  body.mobile-touch #hub-lesson-coach .hlc-ack,
+  body.mobile-touch #hub-lesson-coach .hlc-replay {
+    min-height: 40px;
+  }
+  /* The world-anchored echo (hub_lesson_controller.ts updateWorldPrompt)
+     carries its own copy of the same Continue/Done button: the 40px touch
+     target floor applies wherever the control actually renders, not only in
+     the tracker card. */
+  body.mobile-touch .tut-prompt.tut-prompt-hub-lesson .hlc-ack {
+    min-height: 40px;
+  }
+  /* Touch shows ONE coaching copy at a time: while the world bubble is
+     actually on screen (hub_lesson_controller.ts toggles this class), the
+     central card hides so the two never overlap; it reappears once the
+     bubble cannot be shown (missing dummy, off-viewport, replay). */
+  body.mobile-touch #hub-lesson-coach.hlc-bubble-visible {
+    display: none !important;
   }
   /* The right-anchored tracker is REPLACED on touch by #quest-strip above, not
      restyled: it is fixed-width per tier and unbounded in height, so every extra
@@ -8199,7 +8264,7 @@
       bottom: calc(26px + env(safe-area-inset-bottom));
       width: min(190px, calc(50vw - 142px));
       min-width: 128px;
-      max-height: min(135px, calc(var(--app-vh) / var(--ui-scale, 1) - 112px));
+      max-height: min(170px, calc(var(--app-vh) / var(--ui-scale, 1) - 112px));
       transform: none;
     }
     /* The centre-top lane is clear of the target/party stack on the left and

@@ -90,7 +90,9 @@ describe('mob portrait source manifest', () => {
     // the ember sentinel, cinder artificer, crucible warden, heart of the
     // end, Varkhul the Forgefather, and the derelict mech bomber), plus the
     // Nythraxis Bone Spike the mechanics redo raises under impaled raiders.
-    expect(liveIds).toHaveLength(243);
+    // 245: plus the Eastbrook hub practice yard's own two dummies
+    // (hub_training_dummy, hub_healing_dummy).
+    expect(liveIds).toHaveLength(245);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);

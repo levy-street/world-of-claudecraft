@@ -46,6 +46,7 @@ import {
 import { abilityEffectText } from '../src/ui/ability_description';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
 import { hudChromeStrings } from '../src/ui/i18n.catalog/hud_chrome';
+import { WORLD_WITHOUT_HUB_YARD } from './helpers/hub_yard';
 
 const SC: AbilityScaling = { spellPower: 200, healPower: 200, rangedPower: 300, attackPower: 250 };
 
@@ -407,7 +408,12 @@ describe('v0.42.0 Skulduggery/Coldsight tooltip drift fixes', () => {
 // would otherwise pass a self-consistent-but-wrong test).
 describe('actual runtime -> formatted tooltip, real Sim casts (Groveheart druid)', () => {
   function freshGroveheartDruid(seed: number): Sim {
-    const sim = new Sim({ seed, playerClass: 'druid', autoEquip: true });
+    const sim = new Sim({
+      seed,
+      playerClass: 'druid',
+      autoEquip: true,
+      world: WORLD_WITHOUT_HUB_YARD,
+    });
     sim.setPlayerLevel(MAX_LEVEL);
     expect(sim.setSpec('restoration')).toBe(true);
     sim.player.resource = sim.player.maxResource;

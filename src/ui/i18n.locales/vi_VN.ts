@@ -11257,6 +11257,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sunder_armor.description':
     'Xẻ toạc giáp của mục tiêu, giảm {damage}% mỗi lần áp dụng. Cộng dồn tối đa 5 lần. Tạo ra lượng đe dọa lớn.',
   'entities.mobs.training_dummy.name': 'Hình Nộm Tập Luyện',
+  'entities.mobs.hub_training_dummy.name': 'Hình Nộm Tập Luyện',
   'entities.mobs.yumi_cat.name': 'Yumi',
   'hudChrome.archetypeTitle.hobbyLabel': 'Sở Thích',
   'hudChrome.auraEffect.armorPct': 'Giảm giáp đi {pct}%',

@@ -60,6 +60,7 @@ import { stunDrCategory } from '../stun_dr';
 import { resolveTalentHitMult } from '../talent_hit_mult';
 import { addThreat, dropThreat } from '../threat';
 import { creditAbilityDrill } from '../tutorial/ability_drill';
+import { creditHubHealingDrill } from '../tutorial/hub_healing_drill';
 import type { AbilityDef, Aura, Entity } from '../types';
 import {
   angleTo,
@@ -1356,6 +1357,13 @@ export function runEffects(
           true,
           true,
         );
+        // The hub's optional healing lesson (tutorial/hub_healing_drill.ts):
+        // one credit per effective heal, from THIS primary direct-heal
+        // resolution only, before the Power Echo repeat below runs. That
+        // ordering is what keeps an echoed copy of this same cast (and every
+        // other derived/chained/procced applyHeal call, none of which run
+        // through this case) from ever double-crediting a single real cast.
+        creditHubHealingDrill(ctx, p, healTarget, healed, ability.id);
         if (ability.id === 'scouring_mercy') {
           doctrineScouringMercyRescue(ctx, p, meta, healTarget, healed);
         }

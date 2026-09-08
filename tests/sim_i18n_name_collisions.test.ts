@@ -31,6 +31,12 @@ const EXPECTED: readonly {
 }[] = [
   {
     kind: 'mob',
+    name: 'Training Dummy',
+    ids: ['hub_training_dummy', 'training_dummy'],
+    resolved: 'hub_training_dummy',
+  },
+  {
+    kind: 'mob',
     name: 'Raised Bonewalker',
     ids: ['raised_bonewalker', 'reliquary_bonewalker'],
     resolved: 'raised_bonewalker',

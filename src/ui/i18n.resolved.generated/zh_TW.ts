@@ -1257,6 +1257,43 @@ export const zh_TW: EnTranslations = {
       "heroicName": "英雄難度:{name}",
       "heroicLocked": "你已被鎖定至英雄難度的{name}。"
     },
+    "practiceDps": {
+      "title": "訓練假人",
+      "liveDps": "{value} DPS",
+      "liveLabel": "This run",
+      "prompt": "攻擊假人以開始一輪測試",
+      "previous": "先前的測試",
+      "runLabel": "Run {index}",
+      "runSummary": "{total} in {time}"
+    },
+    "hubLesson": {
+      "target": "先將假人設為目標。",
+      "openWindow": "打開{meters}。",
+      "openWindowTouch": "打開{menu} → {more} → {meters}。",
+      "openTab": "切換到正確的頁籤。",
+      "openTabDamage": "切換到傷害頁籤。",
+      "openTabHealing": "切換到治療頁籤。",
+      "act": "打出一擊以開始測量。",
+      "actDamage": "攻擊假人以開始測量。",
+      "actHealing": "對假人施放一次治療以開始測量。",
+      "addToBar": "從你的法術書把治療技能放上快捷列，然後對假人施放它。",
+      "readRow": "讀一下你的那一列，然後按繼續。",
+      "readRowDamage": "總計是本輪你造成的全部傷害，DPS是本輪的每秒傷害。看看你的那一列，然後按繼續。",
+      "readRowHealing": "總計是恢復的生命值；超過滿血的治療計為零。HPS是本輪每秒恢復的生命值。讀一下你的那一列，然後按繼續。",
+      "findRun": "用統計視窗的箭頭回到你的練習紀錄。",
+      "addAttackToBar": "從你的法術書把攻擊技能放上快捷列，然後對假人使用它。",
+      "ackContinue": "繼續",
+      "viewBreakdown": "懸停、聚焦或長按你的那一列，查看逐技能明細。",
+      "endRun": "關閉攻擊，停止施法。5秒無命中後，這一輪就會結束。",
+      "endHealingRun": "停止治療5秒以結束這一輪，之後就能重新練習這一課。",
+      "inspectHistory": "用歷史箭頭回看那已經結束的一輪。",
+      "compareAgain": "用右箭頭回到目前，再對同一具假人打大約相同的時長。",
+      "reviewComparison": "用箭頭比較總計、DPS和時長與你第一輪的差別。回到這一輪，然後按完成。",
+      "ackDone": "完成",
+      "replay": "這一課已經學完。隨意練習，或重新播放這些說明。",
+      "replayAction": "再練一次",
+      "replayTarget": "再次將它設為目標"
+    },
     "riftTracker": {
       "title": "裂隙",
       "floor": "第 {current} 層，共 {total} 層",
@@ -1292,6 +1329,8 @@ export const zh_TW: EnTranslations = {
     },
     "meters": {
       "perSecond": "{value}/秒",
+      "thousands": "{value}k",
+      "millions": "{value}m",
       "perSecondRow": "{total}（{rate}）",
       "minutesSeconds": "{m}分{s}秒",
       "seconds": "{s}秒",
@@ -6006,6 +6045,7 @@ export const zh_TW: EnTranslations = {
       "mapBody": "M 會開啟世界地圖：整片大陸攤在眼前，上頭有你自己的箭頭、各個區域與它們的名稱、你周遭的興趣地點、傳送門，以及你已經發現的採集節點。你的隊伍也會顯示在上面。進入秘探之後，地圖會切換成你目前已探索房間的示意圖。\n\n右側、小地圖下方，一疊追蹤面板讓你不必打開任何東西就能看見手邊的事務：你追蹤中的任務與它們的目標、你的功績進度、你所在的秘探，以及你正參與的任何裂隙。想把畫面要回來時，任務追蹤面板可以收合。",
       "mapBodyZoneFirst": "M 會開啟世界地圖，直接落在你所站的區域上，上頭有你自己的箭頭、你周遭的興趣地點、帶著標記的任務發布者與你任務目標所在的範圍、製作站、郵箱、告示板與菜畦、地城入口，以及這個區域裡的每一個採集節點：重新長出之前它會呈灰色，你的工具還應付不了時則會加上標示。你的隊伍也會顯示在上面。在地圖上按右鍵，或按下它的「世界地圖」按鈕，地圖便會拉遠到整片大陸，每個區域都連同名稱一起畫出，點擊某個區域即可開啟那個區域的地圖。踏進秘探、地城、裂隙或城堡要塞，地圖會切換成你所在之處的平面圖；荊谷原野戰場則有一張自己專屬的戰場地圖。\n\n右側、小地圖下方，一疊追蹤面板讓你不必打開任何東西就能看見手邊的事務：你追蹤中的任務與它們的目標、你的功績進度、你的聖物庫頁面、你所在的秘探，以及你正參與的任何裂隙。想把畫面要回來時，任務追蹤面板可以收合。",
       "gatheringGoalTrackerBody": "在製作視窗追蹤一個配方，或在委託公告欄追蹤一個委託後，採集目標追蹤器就會加入這個堆疊：它會顯示你正在追蹤的配方或委託、你要收集的數量，以及你隨身攜帶和倉庫中的材料能滿足多少。追蹤會取代你目前的目標，清除則會明確取消它；兩者都不會改變你的採集偏好。",
+      "hubPracticeTrackerBody": "在 Eastbrook 樞紐附近，一旦你開始那裡的引導式練習課程，練習追蹤器就會加入這個堆疊：它會讓你隨時看到自己對練習假人的最佳戰績。課程進行中時，它旁邊的指導條會引導你完成目前步驟，從開啟傷害統計到比較第二輪成績。",
       "chatTitle": "聊天框",
       "chatBody": "位於左下角。按 Enter 開始輸入，再按一次 Enter 送出。\n\n有兩個分頁始終都在：「聊天」，也就是你周遭一切發言的合併紀錄；以及「戰鬥」，你這場戰鬥的文字紀錄。加號按鈕可以再添更多分頁，一個頻道一個：說話、大喊、隊伍、綜合、世界、尋求組隊、公會與幹部，另外還有一個密語分頁，把你收發的每一則密語都集中在同一處。在頻道分頁中輸入，就會直接送到那個頻道，不必再重打一次指令。\n\n整個聊天框都能拖到別的位置並調整大小，而且它會記住你把它留在哪裡。",
       "keyWindowsTitle": "用按鍵開啟的視窗",
@@ -16319,6 +16359,12 @@ export const zh_TW: EnTranslations = {
       "heroic_boss_dummy": {
         "name": "英雄首領假人"
       },
+      "hub_training_dummy": {
+        "name": "訓練假人"
+      },
+      "hub_healing_dummy": {
+        "name": "治療假人"
+      },
       "ridge_stalker": {
         "name": "山脊潛獵者"
       },
@@ -17504,6 +17550,11 @@ export const zh_TW: EnTranslations = {
         "name": "守潮人奈爾",
         "title": "海灘的看守",
         "greeting": "潮水會拿走，潮水也會償還，{playerName}。這兩筆帳都由我來記：掠蟹從殘骸裡夾走的，和誠實的雙手沿這條路扛上來的。"
+      },
+      "drillmaster_hale": {
+        "name": "操練官黑爾",
+        "title": "碼頭陪練師",
+        "greeting": "我身後那具假人從不還手，也永遠打不倒，{className}。真正重要的是帳目：你的傷害統計會記下你落在它身上的每一擊。把它設為目標，打開傷害統計視窗，剩下的交給我來教你。"
       },
       "tidewatcher_ondrel": {
         "name": "翁德瑞爾·韋恩",
@@ -19750,6 +19801,26 @@ export const zh_TW: EnTranslations = {
         "objectives": {
           "0": {
             "label": "已擊倒沉船守衛"
+          }
+        }
+      },
+      "q_hub_know_your_numbers": {
+        "title": "認清你的數字",
+        "text": "量不出的力量，就是提不高的力量，{playerName}。把訓練假人設為目標，打開你的傷害統計，往它身上打滿十擊，揮砍或施法都算，邊打邊看著視窗記錄你造成的傷害。打滿十擊後回來，把那個數字告訴我。",
+        "completion": "十擊打完，現在你知道它們值多少了。以後每拿到一件新武器、一個新天賦或一個新想法，{playerName}，就回到這根樁子前，給它記上一個數字。山谷未必誠實，統計永遠誠實。",
+        "objectives": {
+          "0": {
+            "label": "命中訓練假人"
+          }
+        }
+      },
+      "q_hub_healing_numbers": {
+        "title": "能治癒的數字",
+        "text": "值得衡量的不只是拳頭，{playerName}。把旁邊的治療假人設為目標，打開你的傷害統計，切換到治療頁籤。往它身上打出三次真正恢復生命值的治療，邊治邊看著視窗像數拳頭一樣數著它們。",
+        "completion": "治癒的數字，不是打傷的數字，但終究都是數字，{playerName}。從不看那些統計的治療者，是在瞎猜自己的價值。",
+        "objectives": {
+          "0": {
+            "label": "在治療假人身上打出一次有效治療"
           }
         }
       },

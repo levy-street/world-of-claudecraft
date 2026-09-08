@@ -139,6 +139,10 @@ export interface MobileControlCallbacks {
   onQuestLog(): void;
   onCharacter(): void;
   onBags(): void;
+  /** Open the Damage Meters window, folded into the More tray on mobile (the
+   *  only touch entry point to it: the tabbed window has no fixed touch
+   *  button of its own, unlike the desktop Shift+H keybind). */
+  onMeters(): void;
   /** Open the Crafting window, folded into the More tray on mobile. */
   onCrafting(): void;
   onSpellbook(): void;
@@ -537,6 +541,7 @@ export class MobileControls {
     this.bindButton('mobile-quest', () => this.callbacks.onQuestLog());
     this.bindButton('mobile-char', () => this.callbacks.onCharacter());
     this.bindButton('mobile-bags', () => this.callbacks.onBags());
+    this.bindButton('mobile-meters', () => this.callbacks.onMeters());
     this.bindButton('mobile-crafting', () => this.callbacks.onCrafting());
     this.bindButton('mobile-spellbook', () => this.callbacks.onSpellbook());
     this.bindButton('mobile-bar-editor', () => this.callbacks.onBarEditor());

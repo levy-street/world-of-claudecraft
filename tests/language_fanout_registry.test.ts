@@ -639,6 +639,18 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
       'lastHtml retains the last BUILT html (the repaint memo compares against it rather than the live innerHTML, so the island coach decorating painted rows in place no longer forces a rewrite-and-strobe every update). The built html embeds every localized string through t(), so a locale switch changes the freshly built side of the comparison and the tracker repaints by itself. Write-elision, not a data signature.',
   },
   {
+    file: 'hud/practice/practice_dps_controller.ts',
+    memos: ['lastHtml'],
+    reason:
+      'lastHtml retains the last BUILT markup of the practice DPS strip (the quest tracker idiom above): every string in it is resolved through t() and formatNumber at build time, so a locale switch changes the freshly built side of the comparison and the strip repaints on its next 250ms tick by itself. Write-elision over resolved text, not a data signature.',
+  },
+  {
+    file: 'hud/practice/hub_lesson_controller.ts',
+    memos: ['lastHtml', 'lastPromptHtml'],
+    reason:
+      "The same write-elision idiom as its sibling practice_dps_controller.ts above: lastHtml retains the tracker card markup and lastPromptHtml the world-anchored bubble markup, both freshly built by markup(step) on the coach's own 250ms poll (Meters.update) and both resolved entirely through t() at build time. A locale switch changes the freshly built side of each comparison, so the coach repaints its next tick by itself with no fan-out arm.",
+  },
+  {
     file: 'claudium_window.ts',
     memos: ['paintedWalletMarkup'],
     reason:
@@ -1585,9 +1597,17 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
       // hover row: movable_frame's `lastHoverCursor` elides an inline CSS
       // cursor-keyword write and can never hold text; the frame's t() labels
       // already ride the interface_unlock relocalize() arm.
+      // 34 as of the practice DPS tracker's `lastHtml`: the quest tracker's
+      // built-markup idiom again (every string in it is resolved at build
+      // time, so the fresh side of the compare moves with the locale).
+      // 35 as of the hub lesson coach's `lastHtml`/`lastPromptHtml`: the
+      // same built-markup idiom, one row for both memos since both are
+      // built by the same markup(step) call and answered by the same
+      // reasoning.
       // OSSBrain integration: authored freed-slot ability cache and the health-mode
       // arm sharing the already-cleared HP gate add two explicit classifications.
-    ).toBe(35);
+      // 37 on the merged tree: both pairs above are present.
+    ).toBe(37);
   });
 
   it('gives every relocalize() in src/ui a caller in the fan-out', () => {

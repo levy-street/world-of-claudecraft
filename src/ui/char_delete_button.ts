@@ -36,3 +36,11 @@ function escapeAttr(value: string): string {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
 }
+
+/** The confirm modal demands the character's name typed back. Both sides of that
+ *  comparison run through this, so case and surrounding whitespace never block a
+ *  deliberate delete, while a different name still mismatches (interior spacing
+ *  is kept as typed). */
+export function normalizeDeleteConfirmation(name: string): string {
+  return name.trim().toLowerCase();
+}

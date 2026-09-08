@@ -4246,6 +4246,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.friendly_player_dummy.name': '아군 플레이어 허수아비',
   'entities.mobs.normal_boss_dummy.name': '일반 보스 허수아비',
   'entities.mobs.heroic_boss_dummy.name': '영웅 보스 허수아비',
+  'entities.mobs.hub_training_dummy.name': '훈련용 허수아비',
+  'entities.mobs.hub_healing_dummy.name': '치유용 허수아비',
   'entities.mobs.ridge_stalker.name': '산등성이 추적자',
   'entities.mobs.deeprock_kobold.name': '깊은바위 굴꾼',
   'entities.mobs.thornpeak_ogre.name': '쏜피크 오우거',
@@ -5298,6 +5300,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.makers_ember.name': '장인의 불씨',
   'hudChrome.raidLockout.heroicName': '영웅: {name}',
   'hudChrome.raidLockout.heroicLocked': '영웅 난이도 {name}에 귀속되었습니다.',
+  'hudChrome.practiceDps.title': '훈련용 허수아비',
+  'hudChrome.practiceDps.prompt': '허수아비를 공격하여 측정을 시작하세요',
+  'hudChrome.practiceDps.previous': '이전 측정',
   'hudChrome.riftTracker.title': '균열',
   'hudChrome.riftTracker.floor': '{total}층 중 {current}층',
   'hudChrome.riftTracker.closesIn': '균열이 {time} 후 닫힙니다',
@@ -5725,6 +5730,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_gc_the_wreck_warden.completion':
     '그것이 쓰러지는 순간 백사장이 침묵했다네, {playerName}. 이 물가에서 십 년을 일하며 처음 듣는 침묵이었지. 선원들은 이제 그저 뼈일 뿐이야. 쉬고 있는 뼈지. 보물 더미 맨 위의 어깨덮개를 가져가게. 어차피 산 사람의 등에 더 잘 맞을 물건이었으니.',
   'entities.quests.q_gc_the_wreck_warden.objectives.0.label': '난파선 감시자 처치',
+  'entities.quests.q_hub_know_your_numbers.title': '네 숫자를 알아라',
+  'entities.quests.q_hub_know_your_numbers.text':
+    '잴 수 없는 힘은 키울 수 없는 힘이다, {playerName}. 훈련용 허수아비를 대상으로 삼고 피해량 미터를 열어라. 그다음 열 번 맞혀라, 베기든 주문이든 상관없다. 치는 동안 창을 지켜봐라, 네가 입힌 피해를 세어 준다. 열 번을 채우면 돌아와서 그 숫자를 말해라.',
+  'entities.quests.q_hub_know_your_numbers.completion':
+    '열 번을 쳤으니 이제 그 값어치를 알겠지. 새 무기, 새 특성, 새 생각을 얻을 때마다, {playerName}, 이 기둥 앞으로 돌아와서 숫자를 매겨라. 골짜기는 거짓말을 해도 미터는 정직하다.',
+  'entities.quests.q_hub_know_your_numbers.objectives.0.label': '훈련용 허수아비에 일격 명중',
   'entities.quests.q_gc_wind_against_the_wick.title': '심지를 노리는 바람',
   'entities.quests.q_gc_wind_against_the_wick.text':
     '돌풍 정령은 심술이 난 바람이라네, {playerName}. 거울 호수 옆 높은 구릉에 모여들어서는, 눈에 띄는 불꽃마다 꺼 버리지. 등불 하나, 화롯불 하나, 그리고 언젠가는 이 등불까지. 삼십구 년을 이 올드 비컨의 불을 지켜 왔는데, 앙심 품은 날씨 따위에 잃을 수는 없네. 여덟을 흩어 버리게.',
@@ -15792,6 +15803,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.tidewarden_nel.title': '바닷가의 파수꾼',
   'entities.npcs.tidewarden_nel.greeting':
     '조수는 앗아 가고, 조수는 값을 치릅니다, {playerName}. 나는 그 양쪽 장부를 다 맡고 있죠. 종종게들이 난파선에서 집어 가는 것과, 정직한 손이 이 길로 날라 오는 것을요.',
+  'entities.npcs.drillmaster_hale.name': '교관 헤일',
+  'entities.npcs.drillmaster_hale.title': '부두 대련 사범',
+  'entities.npcs.drillmaster_hale.greeting':
+    '내 뒤에 있는 허수아비는 되받아치지도, 쓰러지지도 않는다, {className}. 중요한 건 장부다. 네가 저기에 꽂은 일격은 하나도 빠짐없이 피해량 미터가 세어 준다. 저것을 대상으로 삼고 미터를 열어라, 나머지는 내가 알려주마.',
   'entities.quests.q_ps_the_gauntlet.title': '건틀릿 완주',
   'entities.quests.q_ps_the_gauntlet.text':
     '골짜기가 인정하는 다리는 모두 이 길부터 달렸습니다, {playerName}. 첫 번째 길을 서쪽 깃발까지 걷고, 몸을 빙 돌려 남쪽 길을 두 번째 깃발까지 걸은 다음, 마지막 길은 옆걸음으로 붉은 깃발까지 가세요. 깃발은 순서대로 지나야 합니다. 화면 위의 카드가 그때그때 필요한 버튼을 보여 줄 거예요. 감독관 펠이 길 끝에서 모든 완주를 재고 있습니다. 붉은 깃발을 지나면 바로 그 자리에 서서 당신의 완주를 받아 줄 겁니다.',
@@ -16494,6 +16509,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     'M을 누르면 세계 지도가 지금 서 있는 지역에 맞춰 열립니다. 그 위에 내 화살표가, 주변의 명소가, 표식을 단 퀘스트 제공자와 퀘스트 목표가 놓인 구역이, 작업대와 우편함, 게시판, 텃밭이, 던전 입구가, 그리고 그 지역의 모든 채집 노드가 표시됩니다. 노드는 다시 자라는 동안에는 회색으로 흐려지고, 도구가 아직 감당하지 못하는 노드에는 표시가 붙습니다. 파티원도 함께 나타납니다. 지도를 오른쪽 클릭하거나 세계 지도 버튼을 누르면 대륙으로 물러나 모든 지역이 이름과 함께 그려지며, 거기서 지역을 클릭하면 그 지역의 지도가 열립니다. 탐굴이나 던전, 균열, 성채 안으로 들어서면 지도는 지금 서 있는 곳의 도면으로 바뀌고, 쏜할로우 평원 전장은 저만의 전장 지도를 가집니다.\n\n오른쪽 가장자리 미니맵 아래로는 추적기들이 쌓여, 창을 열지 않고도 지금 하는 일을 눈앞에 붙들어 둡니다. 추적 중인 퀘스트와 그 목표, 업적 진행도, 성물고 페이지, 지금 들어와 있는 탐굴, 참여 중인 균열이 여기에 놓입니다. 화면을 되찾고 싶을 때는 퀘스트 추적기를 접을 수 있습니다.',
   'guide.interfacePage.gatheringGoalTrackerBody':
     '제작 창에서 제작법을, 또는 의뢰 게시판에서 의뢰를 "추적"하면 채집 목표 트래커가 이 스택에 추가됩니다. 추적 중인 제작법이나 의뢰의 이름, 목표 수량, 그리고 소지 중이거나 보관 중인 재료로 얼마나 채울 수 있는지를 보여줍니다. "추적"은 현재 목표를 대체하고, "지우기"는 명시적으로 해제합니다. 둘 다 채집 설정을 바꾸지 않습니다.',
+  'guide.interfacePage.hubPracticeTrackerBody':
+    'Eastbrook 거점 근처에서 그곳의 안내형 연습 레슨을 받으면 연습 트래커가 스택에 추가되어, 연습용 허수아비를 상대로 한 최고 기록을 계속 보여줍니다. 레슨이 진행 중일 때는 옆의 코칭 스트립이 피해량 미터 열기부터 두 번째 실행 비교까지, 현재 단계를 안내해 줍니다.',
   'guide.interfacePage.mobileBodyTwoPages':
     '터치 조작은 알아서 나타나며, 배치는 화면 크기에 맞춰 스스로 조절됩니다. 작은 휴대전화에서는 촘촘하게, 큰 휴대전화에서는 표준으로, 태블릿에서는 한결 여유롭게 놓입니다.\n\n능력은 숫자 줄 대신 원환에 놓입니다. 공격 버튼 곁에 행동 버튼 네 개가 붙고, 페이지 전환 버튼이 원환을 페이지 {pages}개 사이에서 넘겨 줍니다. 이 페이지들을 합치면 데스크톱의 추가 단축바를 켜 두었든 아니든 능력 슬롯 {slots}칸 전부에 닿습니다. 그 원환의 다섯째 호 자리는 소모품 자리입니다. 탭하면 거기 놓인 것을 쓰고, 길게 누르거나 안쪽으로 밀면 지니고 있는 물품에서 스스로 채워지는 줄이 열립니다. 그 둘레에는 터치로 플레이할 때 가장 자주 찾는 버튼들이 놓입니다. 대상 바꾸기, 눈앞의 것 사용하기, 점프하기입니다.\n\n아래 가장자리에는 버튼 줄 대신 빠른 실행 조작 하나가 자리합니다. 나머지 모든 것이 여기서 열립니다. 탈것, 대화, 지도, 가방, 사교, 퀘스트, 캐릭터, 주문서, 게임 메뉴, 그리고 나머지 창을 담은 더보기 항목이 있으며, 던전 찾기와 PvP, 감정 표현, 위키가 그 안에 들어 있습니다. 이곳에서 창은 화면 위에 떠 있는 대신 화면을 가득 채웁니다.\n\n유닛 프레임을 옮기는 것은 데스크톱에서만 하는 일입니다. 터치에서는 배치가 알아서 자리를 잡아 줍니다.',
   'guide.interfacePage.winMoreBodyNoValeCup':
@@ -16538,6 +16555,49 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.realmBuilder.pastEmpty': '아직 명단에 이름이 없습니다.',
   'hudChrome.realmBuilder.close': '닫기',
   'worldContent.realmBuilderMonumentName': '왕국 건설자 기념비',
+  'hudChrome.hubLesson.target': '먼저 허수아비를 대상으로 삼으세요.',
+  'hudChrome.hubLesson.openWindow': '{meters}을(를) 여세요.',
+  'hudChrome.hubLesson.openWindowTouch': '{menu} → {more} → {meters}을(를) 여세요.',
+  'hudChrome.hubLesson.openTab': '올바른 탭으로 전환하세요.',
+  'hudChrome.hubLesson.openTabDamage': '피해량 탭으로 전환하세요.',
+  'hudChrome.hubLesson.openTabHealing': '치유 탭으로 전환하세요.',
+  'hudChrome.hubLesson.act': '한 번 명중시켜 측정을 시작하세요.',
+  'hudChrome.hubLesson.actDamage': '허수아비를 공격해 측정을 시작하세요.',
+  'hudChrome.hubLesson.actHealing': '허수아비에게 치유를 걸어 측정을 시작하세요.',
+  'hudChrome.hubLesson.addToBar':
+    '주문서에서 치유 마법을 액션바에 추가한 다음, 허수아비에게 사용하세요.',
+  'hudChrome.hubLesson.readRow': '내 행을 확인한 다음 계속을 누르세요.',
+  'hudChrome.hubLesson.readRowDamage':
+    '합계는 이번 판에서 입힌 전체 피해량이고, DPS는 이번 판의 초당 피해량입니다. 내 행을 지켜본 다음 계속을 누르세요.',
+  'hudChrome.hubLesson.readRowHealing':
+    '합계는 회복시킨 체력이며, 최대 체력을 넘는 치유는 0으로 계산됩니다. HPS는 이번 판의 초당 회복량입니다. 내 행을 확인한 다음 계속을 누르세요.',
+  'hudChrome.hubLesson.findRun': '미터의 화살표를 사용해 연습 기록으로 돌아가세요.',
+  'hudChrome.hubLesson.addAttackToBar':
+    '주문서에서 공격을 액션바에 추가한 다음, 허수아비에게 사용하세요.',
+  'hudChrome.hubLesson.ackContinue': '계속',
+  'hudChrome.hubLesson.viewBreakdown':
+    '내 행에 마우스를 올리거나 포커스하거나 길게 눌러 기술별 내역을 확인하세요.',
+  'hudChrome.hubLesson.endRun':
+    '공격을 끄고 시전을 멈추세요. 5초 동안 명중이 없으면 이번 판이 끝납니다.',
+  'hudChrome.hubLesson.endHealingRun':
+    '5초 동안 치유를 멈춰 이번 판을 끝내면, 이 레슨을 다시 연습할 수 있습니다.',
+  'hudChrome.hubLesson.inspectHistory': '기록 화살표를 사용해 방금 끝난 판을 되돌아보세요.',
+  'hudChrome.hubLesson.compareAgain':
+    '오른쪽 화살표로 현재로 돌아간 다음, 같은 허수아비를 비슷한 시간 동안 공격하세요.',
+  'hudChrome.hubLesson.reviewComparison':
+    '화살표로 합계, DPS, 지속 시간을 첫 판과 비교하세요. 이 판으로 돌아온 다음 완료를 누르세요.',
+  'hudChrome.hubLesson.ackDone': '완료',
+  'hudChrome.hubLesson.replay':
+    '레슨을 마쳤습니다. 자유롭게 연습하거나, 이 설명을 다시 재생하세요.',
+  'hudChrome.hubLesson.replayAction': '다시 연습하기',
+  'hudChrome.hubLesson.replayTarget': '다시 대상으로 삼기',
+  'entities.quests.q_hub_healing_numbers.title': '치유하는 숫자',
+  'entities.quests.q_hub_healing_numbers.text':
+    '잴 가치가 있는 건 주먹만이 아닙니다, {playerName}. 옆에 있는 치유용 허수아비를 대상으로 삼고, 피해량 미터를 열어 치유 탭으로 전환하세요. 실제로 체력을 회복시키는 치유를 세 번 명중시키세요, 주먹을 셌던 것과 같은 방식으로 창이 세어 줄 겁니다.',
+  'entities.quests.q_hub_healing_numbers.completion':
+    '때린 숫자가 아니라 치유한 숫자지만, 숫자인 건 매한가지입니다, {playerName}. 그 미터를 보지 않는 치유사는 자기 가치를 추측만 하고 있는 겁니다.',
+  'entities.quests.q_hub_healing_numbers.objectives.0.label':
+    '치유용 허수아비에게 유효한 치유 명중',
   'apiError.discord.invalid_input': '입력이 올바르지 않습니다.',
   'apiError.kick.admin_target': '운영자 계정은 추방할 수 없습니다.',
   'apiError.kick.reason_required': '사유를 입력해야 합니다.',

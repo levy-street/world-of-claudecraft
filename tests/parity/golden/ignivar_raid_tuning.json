@@ -15,7 +15,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1004,
+      "nextId": 1007,
       "state": "e76f736a",
       "events": "741638a5",
       "rng": {
@@ -166,9 +166,9 @@
     {
       "tick": 1,
       "time": 0.05,
-      "nextId": 1015,
-      "state": "4586422f",
-      "events": "ea23a2ef",
+      "nextId": 1018,
+      "state": "db631b55",
+      "events": "088cd9f6",
       "rng": {
         "draws": 1,
         "digest": "3650680b"
@@ -177,9 +177,9 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 1015,
-      "state": "bb6b6aa1",
-      "events": "e7ccc8cd",
+      "nextId": 1018,
+      "state": "22c9c30f",
+      "events": "db0d8abe",
       "rng": {
         "draws": 1,
         "digest": "3650680b"
@@ -188,9 +188,9 @@
     {
       "tick": 3,
       "time": 0.15,
-      "nextId": 1015,
-      "state": "bd3fc150",
-      "events": "19cd74bb",
+      "nextId": 1018,
+      "state": "33c3b874",
+      "events": "b59f9a68",
       "rng": {
         "draws": 1,
         "digest": "3650680b"
@@ -199,8 +199,8 @@
     {
       "tick": 4,
       "time": 0.2,
-      "nextId": 1015,
-      "state": "8b3a8f45",
+      "nextId": 1018,
+      "state": "607c8b8d",
       "events": "741638a5",
       "rng": {
         "draws": 1,
@@ -210,8 +210,8 @@
     {
       "tick": 4,
       "time": 0.2,
-      "nextId": 1015,
-      "state": "8b3a8f45",
+      "nextId": 1018,
+      "state": "607c8b8d",
       "events": "741638a5",
       "rng": {
         "draws": 1,
@@ -384,7 +384,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1012,
+          "entityId": 1015,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -486,7 +486,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1013,
+          "entityId": 1016,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -588,7 +588,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1014,
+          "entityId": 1017,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -711,13 +711,13 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 210000,
-          "id": 1004,
+          "id": 1007,
           "ignivar": {
             "attemptParticipantIds": [
               999,
-              1012,
-              1013,
-              1014
+              1015,
+              1016,
+              1017
             ],
             "brandTimer": 998.95,
             "conduitTimers": {},
@@ -788,7 +788,7 @@
           "fiveSecondRule": 99.2,
           "healPower": 41,
           "hp": 1000,
-          "id": 1012,
+          "id": 1015,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -837,7 +837,7 @@
           "fiveSecondRule": 99.2,
           "healPower": 41,
           "hp": 1000,
-          "id": 1013,
+          "id": 1016,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -886,7 +886,7 @@
           "fiveSecondRule": 99.2,
           "healPower": 41,
           "hp": 1000,
-          "id": 1014,
+          "id": 1017,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -929,9 +929,9 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 1015,
-      "state": "eab024ca",
-      "events": "1df75ce4",
+      "nextId": 1018,
+      "state": "b19c7a8f",
+      "events": "e31789fa",
       "rng": {
         "draws": 4,
         "digest": "6869608b"
@@ -940,8 +940,8 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 1015,
-      "state": "eab024ca",
+      "nextId": 1018,
+      "state": "b19c7a8f",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -1114,7 +1114,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1012,
+          "entityId": 1015,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1216,7 +1216,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1013,
+          "entityId": 1016,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1318,7 +1318,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1014,
+          "entityId": 1017,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1445,13 +1445,13 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 210000,
-          "id": 1004,
+          "id": 1007,
           "ignivar": {
             "attemptParticipantIds": [
               999,
-              1012,
-              1013,
-              1014
+              1015,
+              1016,
+              1017
             ],
             "brandTimer": 12,
             "conduitTimers": {},
@@ -1528,7 +1528,7 @@
               "name": "Brand of the Pyre",
               "remaining": 600,
               "school": "fire",
-              "sourceId": 1004,
+              "sourceId": 1007,
               "stacks": 1,
               "tickInterval": 2,
               "tickTimer": 2,
@@ -1543,7 +1543,7 @@
           "fiveSecondRule": 99.25,
           "healPower": 41,
           "hp": 418,
-          "id": 1012,
+          "id": 1015,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1595,7 +1595,7 @@
               "name": "Brand of the Pyre",
               "remaining": 600,
               "school": "fire",
-              "sourceId": 1004,
+              "sourceId": 1007,
               "stacks": 1,
               "tickInterval": 2,
               "tickTimer": 2,
@@ -1610,7 +1610,7 @@
           "fiveSecondRule": 99.25,
           "healPower": 41,
           "hp": 418,
-          "id": 1013,
+          "id": 1016,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1662,7 +1662,7 @@
               "name": "Brand of the Pyre",
               "remaining": 600,
               "school": "fire",
-              "sourceId": 1004,
+              "sourceId": 1007,
               "stacks": 1,
               "tickInterval": 2,
               "tickTimer": 2,
@@ -1677,7 +1677,7 @@
           "fiveSecondRule": 99.25,
           "healPower": 41,
           "hp": 418,
-          "id": 1014,
+          "id": 1017,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1720,8 +1720,8 @@
     {
       "tick": 6,
       "time": 0.3,
-      "nextId": 1015,
-      "state": "81b25432",
+      "nextId": 1018,
+      "state": "18ff3da3",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -1731,8 +1731,8 @@
     {
       "tick": 6,
       "time": 0.3,
-      "nextId": 1015,
-      "state": "81b25432",
+      "nextId": 1018,
+      "state": "18ff3da3",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -1905,7 +1905,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1012,
+          "entityId": 1015,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -2007,7 +2007,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1013,
+          "entityId": 1016,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -2109,7 +2109,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1014,
+          "entityId": 1017,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -2229,7 +2229,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 210000,
-          "id": 1004,
+          "id": 1007,
           "kind": "mob",
           "level": 22,
           "lootFfaTimer": "Infinity",
@@ -2273,7 +2273,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 99.3,
           "healPower": 41,
-          "id": 1012,
+          "id": 1015,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -2322,7 +2322,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 99.3,
           "healPower": 41,
-          "id": 1013,
+          "id": 1016,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -2371,7 +2371,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 99.3,
           "healPower": 41,
-          "id": 1014,
+          "id": 1017,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -2414,8 +2414,8 @@
     {
       "tick": 6,
       "time": 0.3,
-      "nextId": 1015,
-      "state": "81b25432",
+      "nextId": 1018,
+      "state": "18ff3da3",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -2588,7 +2588,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1012,
+          "entityId": 1015,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -2690,7 +2690,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1013,
+          "entityId": 1016,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -2792,7 +2792,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1014,
+          "entityId": 1017,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -2912,7 +2912,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 210000,
-          "id": 1004,
+          "id": 1007,
           "kind": "mob",
           "level": 22,
           "lootFfaTimer": "Infinity",
@@ -2956,7 +2956,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 99.3,
           "healPower": 41,
-          "id": 1012,
+          "id": 1015,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -3005,7 +3005,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 99.3,
           "healPower": 41,
-          "id": 1013,
+          "id": 1016,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -3054,7 +3054,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 99.3,
           "healPower": 41,
-          "id": 1014,
+          "id": 1017,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",

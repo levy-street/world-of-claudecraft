@@ -443,7 +443,16 @@ const MONOLITHS: MonolithRow[] = [
     // The aura-tracks release sync (186dd8fe7f) composes its system-text
     // extraction with the OSSBrain long-press and tooltip modules. The
     // measured combined count is below both parent pins (18574 / 18489).
-    ceiling: 18486,
+    // RESOLVED for the merge of release/v0.42.0 (tip 723752ea5c, the OSSBrain
+    // integration #3781 and #3918) into feature/hub-training-dummy-dps. Our
+    // own arm had lowered to 18481 (formatLockoutDuration moved out to
+    // src/ui/raid_lockout_format.ts to pay for the hub practice coach's
+    // Meters deps); the incoming arm lowered its copy to 18486. Neither
+    // parent pin fits the resolved tree: `wc -l < src/ui/hud.ts` on the
+    // reconciled file measures 18478, below both arms, so the ceiling
+    // follows it down. Exact merged count, zero slack: any further growth
+    // reds again.
+    ceiling: 18478,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1198,7 +1207,16 @@ const MONOLITHS: MonolithRow[] = [
     // merged count, zero slack: any further growth reds again.
     // OSSBrain integration: mobile preflight detection and copy moved to game/mobile_preflight.ts.
     // Measured after formatting; lower the ratchet with the extraction.
-    ceiling: 11366,
+    // RESOLVED for the merge of release/v0.42.0 (tip 723752ea5c, the OSSBrain
+    // integration #3781 and #3918) into feature/hub-training-dummy-dps. Our
+    // own arm had lowered to 11382 (normalizeDeleteConfirmation moved out
+    // to src/ui/char_delete_button.ts to pay for the touch More-tray Damage
+    // Meters entry); the incoming arm lowered its copy to 11366. Neither
+    // parent pin fits the resolved tree: `wc -l < src/main.ts` on the
+    // reconciled file measures 11363, below both arms, so the ceiling
+    // follows it down. Exact merged count, zero slack: any further growth
+    // reds again.
+    ceiling: 11363,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

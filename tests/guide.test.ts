@@ -6671,6 +6671,8 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
       'delve-tracker': 'the delve you are in',
       'rift-tracker': 'any rift you are taking part in',
       'gathering-goal-tracker': 'the recipe or commission you are tracking',
+      'practice-tracker': 'it keeps your best runs against the practice dummies in view',
+      'hub-lesson-coach': 'walks you through the current step of the lesson',
     };
     expect([...trackerIds].sort()).toEqual(Object.keys(trackerPhrase).sort());
     for (const id of trackerIds) {

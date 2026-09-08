@@ -16,7 +16,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1004,
+      "nextId": 1007,
       "state": "b8206c6f",
       "events": "741638a5",
       "rng": {
@@ -168,9 +168,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 1010,
-      "state": "c43976eb",
-      "events": "51f7de3c",
+      "nextId": 1013,
+      "state": "7f406934",
+      "events": "b1dcb1ac",
       "rng": {
         "draws": 55,
         "digest": "56ee185d"
@@ -179,9 +179,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 1010,
-      "state": "0c60ca71",
-      "events": "d7fb6439",
+      "nextId": 1013,
+      "state": "083d5912",
+      "events": "7278df1c",
       "rng": {
         "draws": 100,
         "digest": "81fe35c6"
@@ -190,9 +190,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 1010,
-      "state": "22238ff7",
-      "events": "b0b5228a",
+      "nextId": 1013,
+      "state": "4ee2684d",
+      "events": "d26b3d14",
       "rng": {
         "draws": 326,
         "digest": "5baa2bec"
@@ -201,8 +201,8 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 1010,
-      "state": "28d4280c",
+      "nextId": 1013,
+      "state": "a2608842",
       "events": "741638a5",
       "rng": {
         "draws": 326,
@@ -329,7 +329,7 @@
               "name": "Sticky Web",
               "remaining": 0.5,
               "school": "nature",
-              "sourceId": 1005
+              "sourceId": 1008
             },
             {
               "duration": 10,
@@ -338,7 +338,7 @@
               "name": "Grave Blight",
               "remaining": 8.5,
               "school": "shadow",
-              "sourceId": 1006,
+              "sourceId": 1009,
               "value": 120
             },
             {
@@ -348,7 +348,7 @@
               "name": "Spider Venom",
               "remaining": 9.5,
               "school": "nature",
-              "sourceId": 1005,
+              "sourceId": 1008,
               "tickInterval": 2,
               "tickTimer": 1.5,
               "value": 2
@@ -360,7 +360,7 @@
               "name": "Silencing Shriek",
               "remaining": 3.5,
               "school": "shadow",
-              "sourceId": 1006
+              "sourceId": 1009
             }
           ],
           "blockChance": 0.05,
@@ -416,7 +416,7 @@
           }
         },
         {
-          "aggroTargetId": 1008,
+          "aggroTargetId": 1011,
           "aiState": "attack",
           "autoAttack": true,
           "combatTimer": 0.95,
@@ -429,7 +429,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 199991,
-          "id": 1004,
+          "id": 1007,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -464,7 +464,7 @@
           "templateId": "mogger_lackey",
           "threat": [
             [
-              1008,
+              1011,
               9
             ]
           ],
@@ -488,7 +488,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 200000,
-          "id": 1005,
+          "id": 1008,
           "inCombat": true,
           "kind": "mob",
           "level": 18,
@@ -533,7 +533,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 200000,
-          "id": 1006,
+          "id": 1009,
           "inCombat": true,
           "kind": "mob",
           "level": 18,
@@ -577,7 +577,7 @@
               "name": "Mounting Rage",
               "remaining": 9.65,
               "school": "physical",
-              "sourceId": 1007,
+              "sourceId": 1010,
               "stacks": 5,
               "value": 100
             }
@@ -593,7 +593,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 200000,
-          "id": 1007,
+          "id": 1010,
           "inCombat": true,
           "kind": "mob",
           "level": 18,
@@ -628,7 +628,7 @@
           }
         },
         {
-          "aggroTargetId": 1004,
+          "aggroTargetId": 1007,
           "aiState": "idle",
           "autoAttack": true,
           "combatTimer": 0.5,
@@ -640,7 +640,7 @@
           "fallStartY": -2.838397,
           "fiveSecondRule": 99,
           "hp": 77,
-          "id": 1008,
+          "id": 1011,
           "inCombat": true,
           "kind": "mob",
           "level": 8,
@@ -674,7 +674,7 @@
           }
         },
         {
-          "aggroTargetId": 1008,
+          "aggroTargetId": 1011,
           "aiState": "attack",
           "autoAttack": true,
           "combatTimer": 0.5,
@@ -687,7 +687,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 199910,
-          "id": 1009,
+          "id": 1012,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -721,7 +721,7 @@
           "templateId": "forest_wolf",
           "threat": [
             [
-              1008,
+              1011,
               91
             ]
           ],
@@ -736,8 +736,8 @@
     {
       "tick": 64,
       "time": 3.2,
-      "nextId": 1010,
-      "state": "21be93f2",
+      "nextId": 1013,
+      "state": "6da67d50",
       "events": "741638a5",
       "rng": {
         "draws": 363,
@@ -864,7 +864,7 @@
               "name": "Sticky Web",
               "remaining": 0.3,
               "school": "nature",
-              "sourceId": 1005
+              "sourceId": 1008
             },
             {
               "duration": 10,
@@ -873,7 +873,7 @@
               "name": "Grave Blight",
               "remaining": 8.3,
               "school": "shadow",
-              "sourceId": 1006,
+              "sourceId": 1009,
               "value": 120
             },
             {
@@ -883,7 +883,7 @@
               "name": "Spider Venom",
               "remaining": 9.3,
               "school": "nature",
-              "sourceId": 1005,
+              "sourceId": 1008,
               "tickInterval": 2,
               "tickTimer": 1.3,
               "value": 2
@@ -895,7 +895,7 @@
               "name": "Silencing Shriek",
               "remaining": 3.3,
               "school": "shadow",
-              "sourceId": 1006
+              "sourceId": 1009
             }
           ],
           "blockChance": 0.05,
@@ -951,7 +951,7 @@
           }
         },
         {
-          "aggroTargetId": 1008,
+          "aggroTargetId": 1011,
           "aiState": "attack",
           "autoAttack": true,
           "combatTimer": 1.15,
@@ -964,7 +964,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 199991,
-          "id": 1004,
+          "id": 1007,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -999,7 +999,7 @@
           "templateId": "mogger_lackey",
           "threat": [
             [
-              1008,
+              1011,
               9
             ]
           ],
@@ -1023,7 +1023,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 200000,
-          "id": 1005,
+          "id": 1008,
           "inCombat": true,
           "kind": "mob",
           "level": 18,
@@ -1068,7 +1068,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 200000,
-          "id": 1006,
+          "id": 1009,
           "inCombat": true,
           "kind": "mob",
           "level": 18,
@@ -1112,7 +1112,7 @@
               "name": "Mounting Rage",
               "remaining": 9.45,
               "school": "physical",
-              "sourceId": 1007,
+              "sourceId": 1010,
               "stacks": 5,
               "value": 100
             }
@@ -1128,7 +1128,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 200000,
-          "id": 1007,
+          "id": 1010,
           "inCombat": true,
           "kind": "mob",
           "level": 18,
@@ -1163,7 +1163,7 @@
           }
         },
         {
-          "aggroTargetId": 1004,
+          "aggroTargetId": 1007,
           "aiState": "idle",
           "autoAttack": true,
           "combatTimer": 0.7,
@@ -1175,7 +1175,7 @@
           "fallStartY": -2.838397,
           "fiveSecondRule": 99,
           "hp": 77,
-          "id": 1008,
+          "id": 1011,
           "inCombat": true,
           "kind": "mob",
           "level": 8,
@@ -1209,7 +1209,7 @@
           }
         },
         {
-          "aggroTargetId": 1008,
+          "aggroTargetId": 1011,
           "aiState": "attack",
           "autoAttack": true,
           "combatTimer": 0.7,
@@ -1222,7 +1222,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 199910,
-          "id": 1009,
+          "id": 1012,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -1256,7 +1256,7 @@
           "templateId": "forest_wolf",
           "threat": [
             [
-              1008,
+              1011,
               91
             ]
           ],

@@ -2446,9 +2446,16 @@ describe('client HTML shell', () => {
     expect(shellCss).not.toContain('trailer-fade-out');
   });
 
-  it('omits Meters from the mobile More tray while keeping the desktop window', () => {
-    expect(html).toContain('id="meters-window"');
-    expect(html).not.toContain('id="mobile-meters"');
+  it('gives Meters a real mobile More-tray entry point (touch has no other way to reach it)', () => {
+    for (const entry of [html, playHtml]) {
+      expect(entry).toContain('id="meters-window"');
+      expect(entry).toMatch(
+        /<button[^>]* class="mobile-btn" id="mobile-meters"[^>]*data-icon="meters"><span class="mobile-label" data-i18n="hud\.keybinds\.actions\.meters">/,
+      );
+      expect(entry).toContain(
+        'id="mobile-meters" data-i18n-title="hud.keybinds.actions.meters" data-i18n-aria="hud.keybinds.actions.meters"',
+      );
+    }
   });
 
   it('keeps the World Market to one scroll container with browse filters below the tabs', () => {

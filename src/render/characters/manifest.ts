@@ -2405,9 +2405,10 @@ export const VISUALS: Record<string, VisualDef> = {
   // biped skeleton, KAYKIT_CLIP_PLAN vocabulary. The dummy never casts or
   // jumps (sim's dummy handling holds it stationary and ability-less), so
   // those two clips are stripped from the shipped GLB rather than carried as
-  // dead weight. Shared by the whole Highwatch practice row (MOB_VISUALS below
-  // points all four dummy templates here), which is still exactly one hub, so
-  // it stays lazy-preloaded rather than joining every client's eager boot set.
+  // dead weight. Shared by the whole Highwatch practice row and the Eastbrook
+  // hub dummy (MOB_VISUALS below points all four dummy templates here): two
+  // fixed spots in the whole world, so it stays lazy-preloaded (fetched on
+  // first sight, renderer.ts) rather than joining every client's eager boot set.
   mob_training_dummy: {
     url: `${CREATURES}/training_dummy.glb`,
     height: 2.3,
@@ -3735,6 +3736,14 @@ const MOB_KEYS: Record<string, string> = {
   friendly_player_dummy: 'mob_training_dummy',
   normal_boss_dummy: 'mob_training_dummy',
   heroic_boss_dummy: 'mob_training_dummy',
+  // The Eastbrook hub's two level-5 practice targets (sim/content/
+  // practice_dummies.ts): the same shared body again, told apart the same
+  // way as the row above (tint: 'entity' on mob_training_dummy). The healing
+  // dummy carries a friendly ally color from its template, exactly like
+  // friendly_player_dummy above; nothing here decides friend or foe, that is
+  // the template's `hostile`/`friendlyPracticeTarget` fields.
+  hub_training_dummy: 'mob_training_dummy',
+  hub_healing_dummy: 'mob_training_dummy',
   emberkin: 'mob_emberkin',
   gloomshade: 'mob_gloomshade',
   pyre_colossus: 'mob_pyre_colossus',

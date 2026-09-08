@@ -4112,6 +4112,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.friendly_player_dummy.name': '友方玩家假人',
   'entities.mobs.normal_boss_dummy.name': '普通首領假人',
   'entities.mobs.heroic_boss_dummy.name': '英雄首領假人',
+  'entities.mobs.hub_training_dummy.name': '訓練假人',
+  'entities.mobs.hub_healing_dummy.name': '治療假人',
   'entities.mobs.ridge_stalker.name': '山脊潛獵者',
   'entities.mobs.deeprock_kobold.name': '深岩鑿道者',
   'entities.mobs.thornpeak_ogre.name': '荊峰食人魔',
@@ -5123,6 +5125,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.makers_ember.name': '匠人餘燼',
   'hudChrome.raidLockout.heroicName': '英雄難度:{name}',
   'hudChrome.raidLockout.heroicLocked': '你已被鎖定至英雄難度的{name}。',
+  'hudChrome.practiceDps.title': '訓練假人',
+  'hudChrome.practiceDps.prompt': '攻擊假人以開始一輪測試',
+  'hudChrome.practiceDps.previous': '先前的測試',
   'hudChrome.riftTracker.title': '裂隙',
   'hudChrome.riftTracker.floor': '第 {current} 層，共 {total} 層',
   'hudChrome.riftTracker.closesIn': '裂隙將在 {time} 後關閉',
@@ -5560,6 +5565,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_gc_the_wreck_warden.completion':
     '它倒下的那一刻，海灘瞬間沒了聲息，{playerName}。在這片岸上幹了十年，這是我聽見的頭一次寂靜。船員們如今只是骸骨了，安息的骸骨。把財寶頂上那件披風拿去吧，它本來就更合一副活人的肩背。',
   'entities.quests.q_gc_the_wreck_warden.objectives.0.label': '已擊倒沉船守衛',
+  'entities.quests.q_hub_know_your_numbers.title': '認清你的數字',
+  'entities.quests.q_hub_know_your_numbers.text':
+    '量不出的力量，就是提不高的力量，{playerName}。把訓練假人設為目標，打開你的傷害統計，往它身上打滿十擊，揮砍或施法都算，邊打邊看著視窗記錄你造成的傷害。打滿十擊後回來，把那個數字告訴我。',
+  'entities.quests.q_hub_know_your_numbers.completion':
+    '十擊打完，現在你知道它們值多少了。以後每拿到一件新武器、一個新天賦或一個新想法，{playerName}，就回到這根樁子前，給它記上一個數字。山谷未必誠實，統計永遠誠實。',
+  'entities.quests.q_hub_know_your_numbers.objectives.0.label': '命中訓練假人',
   'entities.quests.q_hollow_the_huntsman.title': '鹿群守望者',
   'entities.quests.q_hollow_the_huntsman.text':
     '你看起來是個能對付比光靈更棘手之物的人，{playerName}。獵人德拉爾在東邊的鹿群草地上守著他的瞭望哨，好幾週來一直在打聽能幹的幫手。無論他在那裡追蹤著什麼，他都不肯在村子裡說出口。',
@@ -15051,6 +15062,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.tidewarden_nel.title': '海灘的看守',
   'entities.npcs.tidewarden_nel.greeting':
     '潮水會拿走，潮水也會償還，{playerName}。這兩筆帳都由我來記：掠蟹從殘骸裡夾走的，和誠實的雙手沿這條路扛上來的。',
+  'entities.npcs.drillmaster_hale.name': '操練官黑爾',
+  'entities.npcs.drillmaster_hale.title': '碼頭陪練師',
+  'entities.npcs.drillmaster_hale.greeting':
+    '我身後那具假人從不還手，也永遠打不倒，{className}。真正重要的是帳目：你的傷害統計會記下你落在它身上的每一擊。把它設為目標，打開傷害統計視窗，剩下的交給我來教你。',
   'entities.quests.q_ps_the_gauntlet.title': '跑過試煉跑道',
   'entities.quests.q_ps_the_gauntlet.text':
     '谷地敬重的每一雙腿，都是先從這幾條跑道跑出來的，{playerName}。沿第一條跑道向西走到旗幟處，原地轉過身來，沿南邊的跑道走到第二面旗，最後沿末尾的跑道橫移到紅旗處。旗幟要按順序經過；螢幕上方的卡片會隨時告訴你該按哪個鍵。監工佩爾在跑道盡頭掐著每一趟的錶：等紅旗被你甩在身後，他就站在那裡等著收你的成績。',
@@ -15713,6 +15728,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     'M 會開啟世界地圖，直接落在你所站的區域上，上頭有你自己的箭頭、你周遭的興趣地點、帶著標記的任務發布者與你任務目標所在的範圍、製作站、郵箱、告示板與菜畦、地城入口，以及這個區域裡的每一個採集節點：重新長出之前它會呈灰色，你的工具還應付不了時則會加上標示。你的隊伍也會顯示在上面。在地圖上按右鍵，或按下它的「世界地圖」按鈕，地圖便會拉遠到整片大陸，每個區域都連同名稱一起畫出，點擊某個區域即可開啟那個區域的地圖。踏進秘探、地城、裂隙或城堡要塞，地圖會切換成你所在之處的平面圖；荊谷原野戰場則有一張自己專屬的戰場地圖。\n\n右側、小地圖下方，一疊追蹤面板讓你不必打開任何東西就能看見手邊的事務：你追蹤中的任務與它們的目標、你的功績進度、你的聖物庫頁面、你所在的秘探，以及你正參與的任何裂隙。想把畫面要回來時，任務追蹤面板可以收合。',
   'guide.interfacePage.gatheringGoalTrackerBody':
     '在製作視窗追蹤一個配方，或在委託公告欄追蹤一個委託後，採集目標追蹤器就會加入這個堆疊：它會顯示你正在追蹤的配方或委託、你要收集的數量，以及你隨身攜帶和倉庫中的材料能滿足多少。追蹤會取代你目前的目標，清除則會明確取消它；兩者都不會改變你的採集偏好。',
+  'guide.interfacePage.hubPracticeTrackerBody':
+    '在 Eastbrook 樞紐附近，一旦你開始那裡的引導式練習課程，練習追蹤器就會加入這個堆疊：它會讓你隨時看到自己對練習假人的最佳戰績。課程進行中時，它旁邊的指導條會引導你完成目前步驟，從開啟傷害統計到比較第二輪成績。',
   'guide.interfacePage.mobileBodyTwoPages':
     '觸控操作會自己出現，版面也會依你的螢幕自行調整大小：小手機用緊湊的排法，大手機用標準的排法，平板則用寬鬆一些的排法。\n\n你的技能排成一圈，而不是一排數字鍵：攻擊按鈕旁邊有四顆動作按鈕，還有一顆換頁鈕，讓這一圈在它的 {pages} 頁之間切換，這幾頁合起來便能觸及你全部 {slots} 個技能格位，不論桌機版的額外動作列有沒有開啟。那一圈的第五個弧形位置是你的消耗品座位：點一下就使用座位上放著的東西，或者按住它、或把它向內滑，即可展開一排會自動從你身上帶的東西補上的消耗品。圈的周圍則是觸控玩家最常伸手去按的按鈕：切換目標、使用眼前的東西，以及跳躍。\n\n底部邊緣有一顆「快捷操作」控制鈕，取代了一整排按鈕。它通往其餘的一切：坐騎、聊天、地圖、背包、社交、任務、角色、法術書、遊戲選單，還有一個「更多」項目，收著你其餘的視窗，包括地城搜尋器、PvP、表情，以及這個 wiki。這裡的視窗會填滿整個畫面，而不是浮在畫面上。\n\n移動你的單位框架是桌機才有的事：在觸控裝置上，版面會替你安排好它們的位置。',
   'guide.interfacePage.winMoreBodyNoValeCup':
@@ -15757,6 +15774,41 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.realmBuilder.pastEmpty': '榮譽榜上還沒有名字。',
   'hudChrome.realmBuilder.close': '關閉',
   'worldContent.realmBuilderMonumentName': '王國建造者紀念碑',
+  'hudChrome.hubLesson.target': '先將假人設為目標。',
+  'hudChrome.hubLesson.openWindow': '打開{meters}。',
+  'hudChrome.hubLesson.openWindowTouch': '打開{menu} → {more} → {meters}。',
+  'hudChrome.hubLesson.openTab': '切換到正確的頁籤。',
+  'hudChrome.hubLesson.openTabDamage': '切換到傷害頁籤。',
+  'hudChrome.hubLesson.openTabHealing': '切換到治療頁籤。',
+  'hudChrome.hubLesson.act': '打出一擊以開始測量。',
+  'hudChrome.hubLesson.actDamage': '攻擊假人以開始測量。',
+  'hudChrome.hubLesson.actHealing': '對假人施放一次治療以開始測量。',
+  'hudChrome.hubLesson.addToBar': '從你的法術書把治療技能放上快捷列，然後對假人施放它。',
+  'hudChrome.hubLesson.readRow': '讀一下你的那一列，然後按繼續。',
+  'hudChrome.hubLesson.readRowDamage':
+    '總計是本輪你造成的全部傷害，DPS是本輪的每秒傷害。看看你的那一列，然後按繼續。',
+  'hudChrome.hubLesson.readRowHealing':
+    '總計是恢復的生命值；超過滿血的治療計為零。HPS是本輪每秒恢復的生命值。讀一下你的那一列，然後按繼續。',
+  'hudChrome.hubLesson.findRun': '用統計視窗的箭頭回到你的練習紀錄。',
+  'hudChrome.hubLesson.addAttackToBar': '從你的法術書把攻擊技能放上快捷列，然後對假人使用它。',
+  'hudChrome.hubLesson.ackContinue': '繼續',
+  'hudChrome.hubLesson.viewBreakdown': '懸停、聚焦或長按你的那一列，查看逐技能明細。',
+  'hudChrome.hubLesson.endRun': '關閉攻擊，停止施法。5秒無命中後，這一輪就會結束。',
+  'hudChrome.hubLesson.endHealingRun': '停止治療5秒以結束這一輪，之後就能重新練習這一課。',
+  'hudChrome.hubLesson.inspectHistory': '用歷史箭頭回看那已經結束的一輪。',
+  'hudChrome.hubLesson.compareAgain': '用右箭頭回到目前，再對同一具假人打大約相同的時長。',
+  'hudChrome.hubLesson.reviewComparison':
+    '用箭頭比較總計、DPS和時長與你第一輪的差別。回到這一輪，然後按完成。',
+  'hudChrome.hubLesson.ackDone': '完成',
+  'hudChrome.hubLesson.replay': '這一課已經學完。隨意練習，或重新播放這些說明。',
+  'hudChrome.hubLesson.replayAction': '再練一次',
+  'hudChrome.hubLesson.replayTarget': '再次將它設為目標',
+  'entities.quests.q_hub_healing_numbers.title': '能治癒的數字',
+  'entities.quests.q_hub_healing_numbers.text':
+    '值得衡量的不只是拳頭，{playerName}。把旁邊的治療假人設為目標，打開你的傷害統計，切換到治療頁籤。往它身上打出三次真正恢復生命值的治療，邊治邊看著視窗像數拳頭一樣數著它們。',
+  'entities.quests.q_hub_healing_numbers.completion':
+    '治癒的數字，不是打傷的數字，但終究都是數字，{playerName}。從不看那些統計的治療者，是在瞎猜自己的價值。',
+  'entities.quests.q_hub_healing_numbers.objectives.0.label': '在治療假人身上打出一次有效治療',
   'apiError.discord.invalid_input': '輸入無效。',
   'apiError.kick.admin_target': '管理員帳號無法被踢出。',
   'apiError.kick.reason_required': '必須填寫原因。',

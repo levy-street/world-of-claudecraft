@@ -4277,6 +4277,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.friendly_player_dummy.name': '味方プレイヤーダミー',
   'entities.mobs.normal_boss_dummy.name': 'ノーマルボスダミー',
   'entities.mobs.heroic_boss_dummy.name': 'ヒロイックボスダミー',
+  'entities.mobs.hub_training_dummy.name': '訓練用ダミー',
+  'entities.mobs.hub_healing_dummy.name': '治療用ダミー',
   'entities.mobs.ridge_stalker.name': '尾根の追跡者',
   'entities.mobs.deeprock_kobold.name': 'ディープロックの坑夫',
   'entities.mobs.thornpeak_ogre.name': 'ソーンピーク・オーガ',
@@ -5325,6 +5327,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.makers_ember.name': '匠の残り火',
   'hudChrome.raidLockout.heroicName': 'ヒロイック:{name}',
   'hudChrome.raidLockout.heroicLocked': 'ヒロイックの{name}にロックされています。',
+  'hudChrome.practiceDps.title': '練習用ダミー',
+  'hudChrome.practiceDps.prompt': 'ダミーを攻撃して計測を開始',
+  'hudChrome.practiceDps.previous': 'これまでの計測',
   'hudChrome.riftTracker.title': 'リフト',
   'hudChrome.riftTracker.floor': 'フロア {current}/{total}',
   'hudChrome.riftTracker.closesIn': 'リフトは{time}後に閉じます',
@@ -5754,6 +5759,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_gc_the_wreck_warden.completion':
     '奴が倒れた瞬間、浜が静まり返った、{playerName}。この岸で働いて十年、初めて聞く静けさだった。船員たちはもうただの骨だ。休んでいる骨だよ。ほら、山のてっぺんのマントをお取り。もともと、生きた背中にこそ似合うものだったのさ。',
   'entities.quests.q_gc_the_wreck_warden.objectives.0.label': 'レックウォーデンを打ち倒した',
+  'entities.quests.q_hub_know_your_numbers.title': '己の数字を知れ',
+  'entities.quests.q_hub_know_your_numbers.text':
+    '測れない力は伸ばせない力だ、{playerName}。訓練用人形を標的にして、ダメージメーターを開け。それから十回当てろ、剣でも呪文でも構わん。打ちながら窓を見ていろ、与えたダメージを数えてくれる。十回入ったら戻ってきて、その数字を教えろ。',
+  'entities.quests.q_hub_know_your_numbers.completion':
+    '十発、これでそれぞれの値打ちが分かったな。新しい武器、新しい才能、新しい思いつきを手にするたびに、{playerName}、この柱の前に戻って数字を付けろ。谷は嘘をつくこともあるが、メーターは嘘をつかない。',
+  'entities.quests.q_hub_know_your_numbers.objectives.0.label': '訓練用人形に一撃を当てた',
   'entities.quests.q_gc_wind_against_the_wick.title': '灯芯に逆らう風',
   'entities.quests.q_gc_wind_against_the_wick.text':
     'ゲイルウィスプは、性悪になった風だ、{playerName}。ミラーターンのそばの高い丘陵に集まって、見つけた炎を片端から吹き消していく。ランタンを、炉の火を、そしていつかは、このランプをな。三十九年、わたしはビーコンを灯し続けてきた。逆恨みした天気なんぞに、消させてたまるか。八体、散らしてこい。',
@@ -15831,6 +15842,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.tidewarden_nel.title': '浜辺の番人',
   'entities.npcs.tidewarden_nel.greeting':
     '潮は奪い、潮は払う、{playerName}。私はその両方の帳簿をつけている。蟹どもが難破船から掠め取るものと、正直な手がこの道を運び上げてくるものとをね。',
+  'entities.npcs.drillmaster_hale.name': '教練官ヘイル',
+  'entities.npcs.drillmaster_hale.title': '波止場の稽古師範',
+  'entities.npcs.drillmaster_hale.greeting':
+    '後ろのダミーは打ち返しもしなければ倒れもしない、{className}。大事なのは記録だ。お前が当てた一撃は残らずダメージメーターが数えてくれる。あれを標的にしてメーターを開け、あとは俺が教えてやる。',
   'entities.quests.q_ps_the_gauntlet.title': 'ガントレットを走れ',
   'entities.quests.q_ps_the_gauntlet.text':
     '渓谷に名を知られた者は皆、まずこのレーンを走った、{playerName}。最初のレーンを西へ旗まで歩き、その場で向きを変え、南のレーンを二本目の旗まで歩き、それから最後のレーンを赤い旗まで横歩きで進むんだ。旗は順番どおりに通ること。画面上部のカードが、そのつど必要なボタンを見せてくれる。監督官ペルがレーンの先で走りをすべて計っている。赤い旗を越えれば、彼がすぐそこに立って走りを受け取ってくれるよ。',
@@ -16529,6 +16544,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'Mを押すと、今立っているゾーンのワールドマップが開きます。自分の矢印、周囲の名所、印を掲げたクエストの依頼人と目標のあるエリア、作業場、メールボックス、掲示板、菜園、ダンジョン入口、そしてそのゾーンにあるすべての採集ノードが載り、ノードは再生を待つ間は灰色になり、手持ちの道具では採れないものには印が付きます。パーティの位置も表示されます。マップを右クリックするか「ワールドマップ」ボタンを押すと大陸全体まで引き、すべてのゾーンが名前とともに描かれ、ゾーンをクリックするとそのゾーンのマップが開きます。デルヴ、ダンジョン、リフト、城砦に足を踏み入れると、マップは今いる場所の見取り図に切り替わり、ソーンホロウ平原の戦場には専用の戦場マップがあります。\n\n画面の右側、ミニマップの下には、何も開かなくても今の用事が見えるようにトラッカーが積み重なります。追跡中のクエストとその目標、功績の進み具合、聖遺物庫のページ、潜っているデルヴ、そして参加中のリフトです。クエストトラッカーは、画面を広く使いたいときに折りたためます。',
   'guide.interfacePage.gatheringGoalTrackerBody':
     '製作ウィンドウでレシピを、または依頼ボードで依頼を「追跡」すると、採集目標トラッカーがこのスタックに加わります。追跡中のレシピまたは依頼の名前、目標の個数、そして所持・保管している素材でどこまで届くかを表示します。「追跡」は現在の目標を置き換え、「クリア」で明示的に解除します。どちらも採取設定を変えることはありません。',
+  'guide.interfacePage.hubPracticeTrackerBody':
+    'Eastbrookの拠点付近では、そこでのガイド付き練習レッスンを受けると練習トラッカーがスタックに加わり、練習用ダミーに対する自己ベストの記録を表示し続けます。レッスンが進行中は、その隣のコーチングストリップが現在のステップを、ダメージメーターを開くことから2回目の記録を比較することまで案内します。',
   'guide.interfacePage.mobileBodyTwoPages':
     'タッチ操作は自動的に現れ、配置は画面の大きさに合わせて整えられます。小さなスマートフォンではコンパクトに、大きなスマートフォンでは標準に、タブレットではゆったりと並びます。\n\nアビリティは数字列ではなく輪の形に並びます。攻撃ボタンとその脇の4つのアクションボタン、そして輪を{pages}つのページの間で切り替えるページトグルです。ページを合わせると{slots}個あるアビリティスロットのすべてに届き、デスクトップ用の追加バーを有効にしているかどうかは関係ありません。輪の5番目の弧の位置は消耗品の席です。タップすればそこに据えた品を使い、長押しするか内側へスワイプすれば、持ち物から自動で埋まる列が開きます。その周りには、タッチで遊ぶ人がいちばんよく使うボタン、ターゲットの切り替え、目の前のものへの対話、ジャンプが並びます。\n\n画面の下辺には、ボタンの列の代わりに「クイック操作」のコントロールが一つ置かれています。ここからそれ以外のすべてが開きます。騎乗、チャット、マップ、バッグ、ソーシャル、クエスト、キャラクター、スペルブック、ゲームメニュー、そして残りのウィンドウを収めた「その他」で、ダンジョンファインダー、PvP、エモート、ウィキもそこに入っています。ここではウィンドウは浮かぶのではなく、画面いっぱいに開きます。\n\nユニットフレームの移動はデスクトップだけのものです。タッチでは、配置はゲームの側が決めてくれます。',
   'guide.interfacePage.winMoreBodyNoValeCup':
@@ -16574,6 +16591,45 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.realmBuilder.pastEmpty': 'まだ名前が刻まれていません。',
   'hudChrome.realmBuilder.close': '閉じる',
   'worldContent.realmBuilderMonumentName': '王国建設者の記念碑',
+  'hudChrome.hubLesson.target': 'まずダミーを標的にしよう。',
+  'hudChrome.hubLesson.openWindow': '{meters}を開こう。',
+  'hudChrome.hubLesson.openWindowTouch': '{menu} → {more} → {meters}を開こう。',
+  'hudChrome.hubLesson.openTab': '正しいタブに切り替えよう。',
+  'hudChrome.hubLesson.openTabDamage': 'ダメージタブに切り替えよう。',
+  'hudChrome.hubLesson.openTabHealing': 'ヒーリングタブに切り替えよう。',
+  'hudChrome.hubLesson.act': '一撃当てて計測を始めよう。',
+  'hudChrome.hubLesson.actDamage': 'ダミーを攻撃して計測を始めよう。',
+  'hudChrome.hubLesson.actHealing': 'ダミーに回復魔法をかけて計測を始めよう。',
+  'hudChrome.hubLesson.addToBar': '呪文書から回復魔法をアクションバーに追加し、ダミーにかけよう。',
+  'hudChrome.hubLesson.readRow': '自分の行を確認して、続けるを押そう。',
+  'hudChrome.hubLesson.readRowDamage':
+    '合計はこの回で与えた総ダメージ、DPSはこの回の秒間ダメージだ。自分の行を見て、続けるを押そう。',
+  'hudChrome.hubLesson.readRowHealing':
+    '合計は回復した体力の量で、満タンを超える回復は0として数える。HPSはこの回の秒間回復量だ。自分の行を確認して、続けるを押そう。',
+  'hudChrome.hubLesson.findRun': 'メーターの矢印を使って練習の記録に戻ろう。',
+  'hudChrome.hubLesson.addAttackToBar': '呪文書から攻撃をアクションバーに追加し、ダミーに使おう。',
+  'hudChrome.hubLesson.ackContinue': '続ける',
+  'hudChrome.hubLesson.viewBreakdown':
+    '自分の行にカーソルを合わせる、フォーカスする、または長押しして技能ごとの内訳を見よう。',
+  'hudChrome.hubLesson.endRun': '攻撃を止めて詠唱もやめよう。5秒間命中がなければ、この回は終わる。',
+  'hudChrome.hubLesson.endHealingRun':
+    '5秒間回復を止めてこの回を終えれば、レッスンをやり直せるようになる。',
+  'hudChrome.hubLesson.inspectHistory': '履歴の矢印を使って、終わったその回を振り返ろう。',
+  'hudChrome.hubLesson.compareAgain':
+    '右矢印で現在に戻り、同じダミーにだいたい同じ時間だけ攻撃しよう。',
+  'hudChrome.hubLesson.reviewComparison':
+    '矢印で合計、DPS、時間を最初の回と比べよう。この回に戻ったら、完了を押そう。',
+  'hudChrome.hubLesson.ackDone': '完了',
+  'hudChrome.hubLesson.replay':
+    'このレッスンは完了だ。自由に練習するか、この説明をもう一度再生しよう。',
+  'hudChrome.hubLesson.replayAction': 'もう一度練習する',
+  'hudChrome.hubLesson.replayTarget': 'もう一度これを標的にしよう',
+  'entities.quests.q_hub_healing_numbers.title': '癒やしの数字',
+  'entities.quests.q_hub_healing_numbers.text':
+    '測るべきは殴った数字だけじゃない、{playerName}。すぐそばの治療用ダミーを標的にして、ダメージメーターを開き、ヒーリングタブに切り替えろ。実際に体力を回復させる治療を三回当てろ、殴った数を数えたときと同じように窓がそれを数えてくれる。',
+  'entities.quests.q_hub_healing_numbers.completion':
+    '殴った数字じゃなく、癒やした数字だが、数字であることに変わりはない、{playerName}。あのメーターを見ない治療役は、自分の値打ちを当てずっぽうで測っているだけだ。',
+  'entities.quests.q_hub_healing_numbers.objectives.0.label': '治療用ダミーに有効な治療が当たった',
   'apiError.discord.invalid_input': '入力が無効です。',
   'apiError.kick.admin_target': '管理者アカウントはキックできません。',
   'apiError.kick.reason_required': '理由の入力が必要です。',

@@ -6,17 +6,17 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "86a329a4dc072c581c4640fe104eb3d9dc673b321eedbc8a35010bc3029fcb26",
+  "rendererFingerprint": "a5570569a067278741f78c499fcb011ee35994966bb580d2e478660307dddb32",
   "renderEnv": {
     "schemaVersion": 1,
-    "platform": "darwin",
-    "arch": "arm64",
+    "platform": "linux",
+    "arch": "x64",
     "gpuVendor": "Google Inc. (Google)",
-    "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
-    "browserMajor": "151",
-    "browserVersion": "Chrome/151.0.7922.175",
+    "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "browserMajor": "152",
+    "browserVersion": "Chrome/152.0.7977.82",
     "requestedBackend": "swiftshader",
-    "fingerprint": "aae859fdabb9b3c929eac99e3f49e921ef7eb648e1e4ab42942654490a20fb96"
+    "fingerprint": "9b8a5174625ffd9f2dfa2d6d72599c3e5e71bbc0bef8e8831715f3141701ffa2"
   },
   "renderer": {
     "trackedFiles": [
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 4793178,
-      "sha256": "8eaa8e9e23116321a481d617b558a09b48b97ed97eb2bc0117f0375d3bc9fdf4",
+      "bytes": 4864529,
+      "sha256": "1d10073657417c627d0bffdd39c3f58953aff57ef821dfa5a6ee70079369caed",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -51,7 +51,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 243,
+  "portraitCount": 245,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -3098,6 +3098,74 @@
         "path": "public/ui/mobs/hollow_acolyte.webp",
         "bytes": 2212,
         "sha256": "9b83e91c6b011333430659f2efd128a09db28b0536a0cf35495d73935c66b31f"
+      }
+    },
+    {
+      "id": "hub_healing_dummy",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "mob_training_dummy",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/training_dummy.glb",
+          "path": "public/models/creatures/training_dummy.glb",
+          "bytes": 885308,
+          "sha256": "e29aa3fb8ea7472d51f86176bdf5051c921794f62ac7af5941e0cd3fa560ab92"
+        },
+        "idle": "Idle",
+        "height": 2.3,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.35
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#74c476",
+        "strength": 0.35
+      },
+      "sourceFingerprint": "e9fa47b31ad3c092566a54dd3ecab9cd9eeac17e40fe6a397e1766577b8dbb26",
+      "output": {
+        "path": "public/ui/mobs/hub_healing_dummy.webp",
+        "bytes": 1750,
+        "sha256": "ec5ee875012334ded214b00791b8332a109b64eda71352a0461d0fd4b40c15ff"
+      }
+    },
+    {
+      "id": "hub_training_dummy",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "mob_training_dummy",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/training_dummy.glb",
+          "path": "public/models/creatures/training_dummy.glb",
+          "bytes": 885308,
+          "sha256": "e29aa3fb8ea7472d51f86176bdf5051c921794f62ac7af5941e0cd3fa560ab92"
+        },
+        "idle": "Idle",
+        "height": 2.3,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.35
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#b8924a",
+        "strength": 0.35
+      },
+      "sourceFingerprint": "2b45c3ab5c106f0bcda1101a6c31f56a61148e76d43ecec1fa0444b51ba64ac6",
+      "output": {
+        "path": "public/ui/mobs/hub_training_dummy.webp",
+        "bytes": 1788,
+        "sha256": "d5acd85d81045c7507277060fcfbe56e398e4cddbd4d5c4b3520efa30603504e"
       }
     },
     {

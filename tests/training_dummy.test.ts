@@ -19,9 +19,15 @@ type RebucketSim = Sim & {
 // noPlayer+devCommands, spawned unconditionally regardless of cfg.world). No other
 // camp, npc, or ground object is ever targeted or asserted on, so the full built-in
 // world was pure Sim-construction overhead here.
+// Two `training_dummy` camps exist (the Highwatch hill and the Eastbrook hub,
+// content/practice_dummies.ts HUB_PRACTICE_DUMMY_CAMPS); this world keeps only
+// the Highwatch one so dummyOf() cannot pick up the hub's.
+const HIGHWATCH_DUMMY_Z = 648;
 const TRAINING_DUMMY_TEST_WORLD: WorldContent = {
   ...BUILTIN_WORLD,
-  camps: BUILTIN_WORLD.camps.filter((camp) => camp.mobId === 'training_dummy'),
+  camps: BUILTIN_WORLD.camps.filter(
+    (camp) => camp.mobId === 'training_dummy' && camp.center.z === HIGHWATCH_DUMMY_Z,
+  ),
   npcs: {},
   groundObjects: [],
 };

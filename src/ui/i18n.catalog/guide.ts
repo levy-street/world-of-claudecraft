@@ -776,6 +776,12 @@ export const guideStrings = {
     gatheringGoalTrackerBody:
       'A gathering goal tracker joins the stack once you Track a recipe in the crafting window or a commission on the board: it names the recipe or commission you are tracking, how many you are collecting for, and how far your held and stored materials get you there. Track replaces your current goal, and Clear drops it explicitly; neither one ever changes your harvest preference.',
 
+    // The Eastbrook hub practice dummies and Drillmaster Hale's lessons: added
+    // ALONGSIDE the two trackers above for the same reason, a standing tracker
+    // is a standing tracker regardless of where it is earned.
+    hubPracticeTrackerBody:
+      'Near the Eastbrook hub, a practice tracker joins the stack once you take the guided practice lessons there: it keeps your best runs against the practice dummies in view. While a lesson is active, a coaching strip beside it walks you through the current step of the lesson, from opening the Damage Meters to comparing a second run.',
+
     chatTitle: 'The chat box',
     chatBody:
       'Bottom left. Press Enter to start typing and Enter again to send.\n\nTwo tabs are always there: Chat, the combined log of everything said around you, and Combat, the written record of your fight. The plus button adds more, one per channel: Say, Yell, Party, General, World, LFG, Guild, and Officer, plus a Whisper tab that gathers every whisper you send and receive in one place. Typing in a channel tab sends to that channel without you retyping the command.\n\nThe whole box can be dragged to another spot and resized, and it remembers where you left it.',

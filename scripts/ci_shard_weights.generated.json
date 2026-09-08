@@ -2,9 +2,131 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 3950,
+    "files": 3961,
     "harvestedFiles": 3950,
-    "carried": {}
+    "carried": {
+      "tests/hub_dummy_drill.test.ts": {
+        "ms": 3069,
+        "method": "local-median",
+        "measured": "2026-09-08",
+        "reason": "PR 3830 hub practice suites and the raid lockout format extraction, local carry pending the branch's first full-mode harvest",
+        "runs": [
+          3018,
+          3069,
+          3101
+        ]
+      },
+      "tests/hub_dummy_visual_alias.test.ts": {
+        "ms": 2,
+        "method": "local-median",
+        "measured": "2026-09-08",
+        "reason": "PR 3830 hub practice suites and the raid lockout format extraction, local carry pending the branch's first full-mode harvest",
+        "runs": [
+          3,
+          2,
+          2
+        ]
+      },
+      "tests/hub_healing_drill.test.ts": {
+        "ms": 768,
+        "method": "local-median",
+        "measured": "2026-09-08",
+        "reason": "PR 3830 hub practice suites and the raid lockout format extraction, local carry pending the branch's first full-mode harvest",
+        "runs": [
+          756,
+          768,
+          769
+        ]
+      },
+      "tests/hub_healing_dummy.test.ts": {
+        "ms": 965,
+        "method": "local-median",
+        "measured": "2026-09-08",
+        "reason": "PR 3830 hub practice suites and the raid lockout format extraction, local carry pending the branch's first full-mode harvest",
+        "runs": [
+          1002,
+          965,
+          948
+        ]
+      },
+      "tests/hub_healing_lesson.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-09-08",
+        "reason": "PR 3830 hub practice suites and the raid lockout format extraction, local carry pending the branch's first full-mode harvest",
+        "runs": [
+          4,
+          4,
+          3
+        ]
+      },
+      "tests/hub_lesson_controller.test.ts": {
+        "ms": 30,
+        "method": "local-median",
+        "measured": "2026-09-08",
+        "reason": "PR 3830 hub practice suites and the raid lockout format extraction, local carry pending the branch's first full-mode harvest",
+        "runs": [
+          30,
+          32,
+          22
+        ]
+      },
+      "tests/hub_lesson_view.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-09-08",
+        "reason": "PR 3830 hub practice suites and the raid lockout format extraction, local carry pending the branch's first full-mode harvest",
+        "runs": [
+          5,
+          6,
+          5
+        ]
+      },
+      "tests/hub_training_dummy.test.ts": {
+        "ms": 805,
+        "method": "local-median",
+        "measured": "2026-09-08",
+        "reason": "PR 3830 hub practice suites and the raid lockout format extraction, local carry pending the branch's first full-mode harvest",
+        "runs": [
+          801,
+          843,
+          805
+        ]
+      },
+      "tests/practice_dps_controller.test.ts": {
+        "ms": 13,
+        "method": "local-median",
+        "measured": "2026-09-08",
+        "reason": "PR 3830 hub practice suites and the raid lockout format extraction, local carry pending the branch's first full-mode harvest",
+        "runs": [
+          13,
+          13,
+          13
+        ]
+      },
+      "tests/practice_dps_view.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-09-08",
+        "reason": "PR 3830 hub practice suites and the raid lockout format extraction, local carry pending the branch's first full-mode harvest",
+        "runs": [
+          3,
+          4,
+          4
+        ]
+      },
+      "tests/raid_lockout_format.test.ts": {
+        "ms": 11,
+        "method": "local-median",
+        "measured": "2026-09-08",
+        "reason": "PR 3830 hub practice suites and the raid lockout format extraction, local carry pending the branch's first full-mode harvest",
+        "runs": [
+          11,
+          11,
+          11
+        ]
+      }
+    }
   },
   "tests/abilities_command.test.ts": 2213,
   "tests/ability_audio_defers_to_recordings.test.ts": 66,
@@ -1531,6 +1653,14 @@
   "tests/hotbar.test.ts": 23,
   "tests/hotbar_drop_tooltip.test.ts": 8,
   "tests/http_util.test.ts": 11,
+  "tests/hub_dummy_drill.test.ts": 3069,
+  "tests/hub_dummy_visual_alias.test.ts": 2,
+  "tests/hub_healing_drill.test.ts": 768,
+  "tests/hub_healing_dummy.test.ts": 965,
+  "tests/hub_healing_lesson.test.ts": 4,
+  "tests/hub_lesson_controller.test.ts": 30,
+  "tests/hub_lesson_view.test.ts": 5,
+  "tests/hub_training_dummy.test.ts": 805,
   "tests/hud_chrome_i18n.test.ts": 22,
   "tests/hud_confirm_gates.test.ts": 48,
   "tests/hud_frame_coverage.test.ts": 608,
@@ -2568,6 +2698,8 @@
   "tests/potion_command.test.ts": 2680,
   "tests/pr_shot_entry_opts.test.ts": 7,
   "tests/pr_shot_targets.test.ts": 40,
+  "tests/practice_dps_controller.test.ts": 13,
+  "tests/practice_dps_view.test.ts": 4,
   "tests/practice_dummies.test.ts": 2834,
   "tests/presence_zone.test.ts": 3092,
   "tests/presentation_gate.test.ts": 5,
@@ -2807,6 +2939,7 @@
   "tests/raid_boss_voice_processing.test.ts": 112,
   "tests/raid_buffs.test.ts": 2359,
   "tests/raid_lockout.test.ts": 9,
+  "tests/raid_lockout_format.test.ts": 11,
   "tests/raid_lockout_view.test.ts": 7,
   "tests/raid_lockout_world.test.ts": 2420,
   "tests/raid_music_themes.test.ts": 7,

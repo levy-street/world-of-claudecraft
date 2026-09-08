@@ -284,7 +284,27 @@ export class StripGesture {
         if (open) this.deps.onPick(press.index, 'item');
       });
     });
+    // A genuine touchstart+touchend release on the ANCHOR that resolves to
+    // 'open' (see onUp below) seats this cancel X on top of the anchor
+    // synchronously, inside the same event, before the browser dispatches
+    // the release's compatibility/synthetic click: that click then hit-tests
+    // against the now-topmost cancel button instead of the anchor that was
+    // actually pressed, and without a guard here it closes the row the SAME
+    // gesture just opened. onUp already raises suppressClick for exactly
+    // this window, so the cancel click reads and consumes the same flag the
+    // anchor's own click listener already does, rather than a second one:
+    // one retargeted click is swallowed, but never a second, independent
+    // press (a real pointerdown on cancel clears any stale flag first, and a
+    // plain assistive-technology click that never had a pointerdown at all
+    // finds the flag already false and closes normally).
+    cancel.addEventListener('pointerdown', () => {
+      this.suppressClick = false;
+    });
     cancel.addEventListener('click', () => {
+      if (this.suppressClick) {
+        this.suppressClick = false;
+        return;
+      }
       if (!this.sticky) return;
       this.closeSticky();
       this.deps.onCancel();

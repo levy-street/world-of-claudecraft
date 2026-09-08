@@ -7,7 +7,7 @@
 
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { deleteCharButtonHtml } from '../src/ui/char_delete_button';
+import { deleteCharButtonHtml, normalizeDeleteConfirmation } from '../src/ui/char_delete_button';
 
 const main = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
 const shell = readFileSync(new URL('../src/styles/shell.css', import.meta.url), 'utf8');
@@ -74,5 +74,18 @@ describe('char-delete-btn styling', () => {
     const touch = shell.slice(shell.indexOf('body.mobile-touch .char-delete-btn {'));
     expect(touch.slice(0, 160)).toContain('width: 40px;');
     expect(touch.slice(0, 160)).toContain('height: 40px;');
+  });
+});
+
+describe('normalizeDeleteConfirmation', () => {
+  it('ignores case and surrounding whitespace so the typed name matches the character', () => {
+    expect(normalizeDeleteConfirmation('  Thrallwyn ')).toBe('thrallwyn');
+    expect(normalizeDeleteConfirmation('THRALLWYN')).toBe(normalizeDeleteConfirmation('thrallwyn'));
+  });
+
+  it('keeps interior spacing as typed, so a different name still mismatches', () => {
+    expect(normalizeDeleteConfirmation('Thrall wyn')).not.toBe(
+      normalizeDeleteConfirmation('Thrallwyn'),
+    );
   });
 });

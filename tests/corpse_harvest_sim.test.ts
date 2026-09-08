@@ -2506,7 +2506,11 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
     // redo added ships untagged (a stationary pillar, not a butcherable corpse), so it
     // grows MOBS without touching `tagged`. Full documented chain: tests/gathering.test.ts,
     // 'answers for every shipped template, and none is excluded any more'.
-    expect(Object.keys(MOBS).length - tagged.length).toBe(189);
+    // 191, not 189: the Eastbrook hub practice dummies (src/sim/content/practice_dummies.ts,
+    // hub_training_dummy and hub_healing_dummy) ship untagged too, the same shape as the
+    // Bone Spike above: they are struck or healed, never harvested, so they grow MOBS
+    // without touching `tagged` either.
+    expect(Object.keys(MOBS).length - tagged.length).toBe(191);
     withMixedTemplates(() => {
       const mixed = mixedTemplates();
       expect(mixed.map(([id]) => id).sort()).toEqual(

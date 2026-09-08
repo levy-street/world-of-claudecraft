@@ -784,7 +784,7 @@ import {
 import { questProgressEventText } from './quest_progress_text';
 import { RaidBossGuideWindow, raidBossGuideContextFallback } from './raid_boss_guide_window';
 import { raidCalloutKey } from './raid_callout';
-import { lockoutParts, lockoutShape } from './raid_lockout';
+import { formatLockoutDuration } from './raid_lockout_format';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
 import { presentRealmBuilder, RealmBuilderPopup } from './realm_builder_popup';
 import {
@@ -2200,6 +2200,21 @@ export class Hud {
           bindActions: (onActivate) => this.bindContextMenuActions(onActivate),
           isMobileLayout: () => this.isMobileLayout(),
         }),
+      // The hub practice coach's deps (src/ui/hud/practice/): the bar's LIVE
+      // slot array (so the healing lesson always resolves the heal's current
+      // slot) and the renderer's raw worldToScreen, like bootcamp.ts's own
+      // .tut-prompt bubble. No gamepad seam yet (see meters.ts
+      // MetersDeps.padLabel), so the coach's pad chip stays absent.
+      keybinds: this.keybinds,
+      actionBarSlots: () => this.hotbarActions,
+      actionButtonForSlot: (slot) =>
+        this.isMobileLayout()
+          ? (this.mobileRingButtonForSlot(slot) ??
+            document.getElementById('mobile-action-page-toggle'))
+          : (this.abilityButtons[slot]?.btn ?? null),
+      tooltipVisibleFor: (el) =>
+        this.tooltipOwner.current() === el && this.tooltipEl.style.display !== 'none',
+      worldToScreen: (x, y, z) => this.renderer.worldToScreen(x, y, z),
     });
     this.targetAurasWindow = new TargetAurasWindow({
       root: $('#target-auras-window'),
@@ -7668,22 +7683,22 @@ export class Hud {
     if (btn) this.flashActionButton(btn);
     // Mirror the used-flash onto the mobile ring (the desktop bar is
     // display:none under body.mobile-touch, so without this a ring cast gave
-    // no visual acknowledgment at all). barSlot 0 is the attack toggle; the 4
-    // radial buttons cover 5 slots each on the CURRENT page.
-    if (barSlot === 0 && this.mobileRingAttackBtn) {
-      this.flashActionButton(this.mobileRingAttackBtn);
-      return;
-    }
-    for (let i = 0; i < this.mobileRingSlotBtns.length; i++) {
-      // Every direction, not just the centre: a flick casts a slot the resting
-      // button does not show, and without this a directional cast landed with
-      // no visual acknowledgment at all.
-      for (const direction of RADIAL_DIRECTIONS) {
-        if (this.mobileSourceSlotForButton(i, direction) !== barSlot) continue;
-        this.flashActionButton(this.mobileRingSlotBtns[i]);
-        return;
-      }
-    }
+    // no visual acknowledgment at all).
+    const ringBtn = this.mobileRingButtonForSlot(barSlot);
+    if (ringBtn) this.flashActionButton(ringBtn);
+  }
+
+  // Every direction, not just the centre: a flick casts a slot the resting
+  // ring button does not show. Shared by the used-flash mirror above and the
+  // hub practice coach's glow anchor (Meters deps, above the constructor).
+  private mobileRingButtonForSlot(barSlot: number): HTMLButtonElement | null {
+    if (barSlot === 0) return this.mobileRingAttackBtn;
+    const i = this.mobileRingSlotBtns.findIndex((_, index) =>
+      RADIAL_DIRECTIONS.some(
+        (direction) => this.mobileSourceSlotForButton(index, direction) === barSlot,
+      ),
+    );
+    return i === -1 ? null : this.mobileRingSlotBtns[i];
   }
 
   private flashActionButton(btn: HTMLButtonElement): void {
@@ -9995,32 +10010,9 @@ export class Hud {
         }
         return dungeonDisplayName(id);
       },
-      duration: (ms) => this.formatLockoutDuration(ms),
+      duration: formatLockoutDuration,
     };
     return raidLockoutPanelHtml(this.sim.raidLockouts(), i18n);
-  }
-
-  // Localized "Xd Yh" / "Xh Ym" / "Xm" / "<1m" for a remaining-ms span; the
-  // digits run through formatNumber and the units reorder via the t() template.
-  private formatLockoutDuration(ms: number): string {
-    const { days, hours, minutes } = lockoutParts(ms);
-    const n = (v: number) => formatNumber(v, { maximumFractionDigits: 0, useGrouping: false });
-    switch (lockoutShape(ms)) {
-      case 'daysHours':
-        return t('hudChrome.raidLockout.daysHours', {
-          d: n(days),
-          h: n(hours),
-        });
-      case 'hoursMinutes':
-        return t('hudChrome.raidLockout.hoursMinutes', {
-          h: n(hours),
-          m: n(minutes),
-        });
-      case 'minutes':
-        return t('hudChrome.raidLockout.minutes', { m: n(minutes) });
-      default:
-        return t('hudChrome.raidLockout.lessThanMinute');
-    }
   }
 
   private updateQuestTracker(now: number): void {
@@ -14420,7 +14412,7 @@ export class Hud {
   // panel is its other consumer).
   private readonly errorTextDeps: ErrorTextLockoutDeps = {
     raidLockouts: () => this.sim.raidLockouts(),
-    formatLockoutDuration: (ms) => this.formatLockoutDuration(ms),
+    formatLockoutDuration,
   };
 
   private localizeErrorText(text: string): string {

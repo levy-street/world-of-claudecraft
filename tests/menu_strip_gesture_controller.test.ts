@@ -388,6 +388,58 @@ describe('MenuStripGesture: the sticky path Phase 6 promotes', () => {
   });
 });
 
+// The touch retarget bug: a GENUINE touchstart+touchend on the anchor that
+// opens the sticky menu (see 'OPENS the row on a bare tap' above) seats the
+// cancel X on top of the anchor synchronously, inside the SAME pointerup
+// handler that calls openSticky(), before the browser ever dispatches the
+// release's own synthetic click. That click then hit-tests against the
+// now-topmost cancel button instead of the anchor that was actually pressed,
+// and without a guard it closed the row the same gesture had just opened
+// (confirmed against a real Chrome instance via paired CDP touch input, not
+// just SwiftShader render-timing noise). The fix reads and consumes the SAME
+// suppressClick flag the anchor's own click listener already guards with,
+// rather than a second one.
+describe('MenuStripGesture: a release-retargeted click on cancel does not close what it just opened', () => {
+  it('ignores the phantom click, but a genuinely NEW cancel press still closes normally', () => {
+    const rig = makeRig();
+    // The real gesture: a bare touch tap on the anchor opens the sticky menu.
+    rig.anchor.dispatchEvent(pointer('pointerdown', 1, 100));
+    rig.anchor.dispatchEvent(pointer('pointerup', 1, 100));
+    expect(rig.gesture.isOpen()).toBe(true);
+
+    // The browser's own synthetic click for that SAME release, retargeted by
+    // its now-current hit-test onto the cancel X that openSticky() just
+    // seated over the anchor: no pointerdown ever landed on cancel, so this
+    // is exactly the phantom click the bug produced. It must be ignored.
+    rig.cancel.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(rig.gesture.isOpen()).toBe(true);
+    expect(rig.cancels).toBe(0);
+
+    // A genuinely NEW press on cancel (a real pointerdown precedes its click
+    // this time) must still close the menu normally: the suppression is a
+    // one-shot guard against the retargeted click, never a lock on the
+    // control that would strand the player unable to back out at all.
+    rig.cancel.dispatchEvent(pointer('pointerdown', 2, 100));
+    rig.cancel.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(rig.gesture.isOpen()).toBe(false);
+    expect(rig.cancels).toBe(1);
+  });
+
+  it('still closes on a plain assistive-technology click with no pointerdown at all', () => {
+    const rig = makeRig();
+    // Opened by assistive activation (a bare click, no pointer events at
+    // all), exactly like 'opens a focusable menu ... on an assistive
+    // activation' above: suppressClick is never raised on this path, so a
+    // later plain click on cancel must not be mistaken for the phantom one.
+    rig.anchor.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(rig.gesture.isOpen()).toBe(true);
+
+    rig.cancel.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(rig.gesture.isOpen()).toBe(false);
+    expect(rig.cancels).toBe(1);
+  });
+});
+
 // The touchTapMenus setting: the same sticky path VoiceOver already used, now a
 // player option. The RULES are tap_menu_core.ts's (its own suite); what is pinned
 // here is that the anchor's pointer path routes to them and arms no drag.

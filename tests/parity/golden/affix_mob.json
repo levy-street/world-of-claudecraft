@@ -15,7 +15,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1004,
+      "nextId": 1007,
       "state": "b8206c6f",
       "events": "741638a5",
       "rng": {
@@ -167,9 +167,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 1006,
-      "state": "84ff9655",
-      "events": "b5807d6d",
+      "nextId": 1009,
+      "state": "e20ef315",
+      "events": "e1c4b170",
       "rng": {
         "draws": 15,
         "digest": "d60aed87"
@@ -178,9 +178,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 1006,
-      "state": "8896beee",
-      "events": "871472ab",
+      "nextId": 1009,
+      "state": "da3c1c20",
+      "events": "e5d1ca8d",
       "rng": {
         "draws": 29,
         "digest": "492e0874"
@@ -189,9 +189,9 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 1006,
-      "state": "9c4caf01",
-      "events": "a3be5f1d",
+      "nextId": 1009,
+      "state": "8d9c5086",
+      "events": "4b0cdabd",
       "rng": {
         "draws": 104,
         "digest": "795cead3"
@@ -316,7 +316,7 @@
               "name": "Rending Claws",
               "remaining": 8.5,
               "school": "physical",
-              "sourceId": 1005,
+              "sourceId": 1008,
               "tickInterval": 3,
               "tickTimer": 2.5,
               "value": 5
@@ -372,7 +372,7 @@
             "sta": 47,
             "str": 47
           },
-          "targetId": 1004,
+          "targetId": 1007,
           "templateId": "warrior",
           "weapon": {
             "max": 5,
@@ -391,7 +391,7 @@
               "name": "Blood Frenzy",
               "remaining": 7.5,
               "school": "physical",
-              "sourceId": 1004,
+              "sourceId": 1007,
               "value": 1.3
             }
           ],
@@ -410,7 +410,7 @@
           "forcedTargetTimer": 3,
           "hostile": true,
           "hp": 59800,
-          "id": 1004,
+          "id": 1007,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -469,7 +469,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 60000,
-          "id": 1005,
+          "id": 1008,
           "inCombat": true,
           "kind": "mob",
           "level": 13,
@@ -507,8 +507,8 @@
     {
       "tick": 54,
       "time": 2.7,
-      "nextId": 1006,
-      "state": "fa831652",
+      "nextId": 1009,
+      "state": "eff6068f",
       "events": "741638a5",
       "rng": {
         "draws": 134,
@@ -634,7 +634,7 @@
               "name": "Rending Claws",
               "remaining": 8.3,
               "school": "physical",
-              "sourceId": 1005,
+              "sourceId": 1008,
               "tickInterval": 3,
               "tickTimer": 2.3,
               "value": 5
@@ -691,7 +691,7 @@
             "sta": 47,
             "str": 47
           },
-          "targetId": 1004,
+          "targetId": 1007,
           "templateId": "warrior",
           "weapon": {
             "max": 5,
@@ -710,7 +710,7 @@
               "name": "Blood Frenzy",
               "remaining": 7.3,
               "school": "physical",
-              "sourceId": 1004,
+              "sourceId": 1007,
               "value": 1.3
             }
           ],
@@ -730,7 +730,7 @@
           "forcedTargetTimer": 2.8,
           "hostile": true,
           "hp": 59800,
-          "id": 1004,
+          "id": 1007,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -789,7 +789,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 60000,
-          "id": 1005,
+          "id": 1008,
           "inCombat": true,
           "kind": "mob",
           "level": 13,

@@ -14,7 +14,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1004,
+      "nextId": 1007,
       "state": "66339138",
       "events": "741638a5",
       "rng": {
@@ -161,9 +161,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 1005,
-      "state": "6da5474e",
-      "events": "0cef2eca",
+      "nextId": 1008,
+      "state": "165bdfe2",
+      "events": "21d375e2",
       "rng": {
         "draws": 12,
         "digest": "f30c489f"
@@ -172,9 +172,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 1005,
-      "state": "4b2bccdb",
-      "events": "076c0f7c",
+      "nextId": 1008,
+      "state": "f37bb829",
+      "events": "10dc6fe5",
       "rng": {
         "draws": 19,
         "digest": "d68c35cb"
@@ -183,9 +183,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 1005,
-      "state": "3a8f3d16",
-      "events": "438d10ab",
+      "nextId": 1008,
+      "state": "9e0efcb0",
+      "events": "57ebf831",
       "rng": {
         "draws": 162,
         "digest": "fe151d49"
@@ -194,8 +194,8 @@
     {
       "tick": 72,
       "time": 3.6,
-      "nextId": 1005,
-      "state": "a9f76f8c",
+      "nextId": 1008,
+      "state": "8d3c8cee",
       "events": "741638a5",
       "rng": {
         "draws": 249,
@@ -359,7 +359,7 @@
             "str": 26
           },
           "swingTimer": 0.05,
-          "targetId": 1004,
+          "targetId": 1007,
           "templateId": "rogue",
           "weapon": {
             "dagger": true,
@@ -382,7 +382,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 8896,
-          "id": 1004,
+          "id": 1007,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {

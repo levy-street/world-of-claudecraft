@@ -1366,6 +1366,78 @@ export const hudChromeStrings = {
     // mirrored yet ({name} = dungeon name).
     heroicLocked: 'You are locked to Heroic {name}.',
   },
+  // The practice DPS tracker (src/ui/hud/practice/): the compact readout that
+  // appears while the player targets or hits a training dummy. It reads the
+  // Damage Meters' own encounter ledger, so its numbers are the meters' numbers
+  // for the local player; the per-second unit reuses hudChrome.meters.perSecond.
+  practiceDps: {
+    // Fallback header when no dummy name is known; normally the header is the
+    // localized dummy name (entities.mobs.<id>.name).
+    title: 'Practice Dummy',
+    // The big live number. {value} is a compacted damage-per-second figure.
+    liveDps: '{value} DPS',
+    liveLabel: 'This run',
+    // Shown while the player targets a dummy with no run in progress.
+    prompt: 'Attack the dummy to start a run',
+    // Sub-header above the finished-run list (newest first).
+    previous: 'Previous runs',
+    // {index} is 1-based, newest first ("Run 1" is the most recent).
+    runLabel: 'Run {index}',
+    // {total} is compacted total damage, {time} a pre-built "Xm Ys" duration.
+    runSummary: '{total} in {time}',
+  },
+  // Drillmaster Hale's guided practice coaching (src/ui/hud/practice/
+  // hub_lesson_controller.ts): the hub's own damage-meters lesson, plus the
+  // optional healing one for druid/shaman/paladin/priest. One line at a
+  // time, beside a real control (a keybind, a tab, a row, the history
+  // arrow), never a wall of text. Wordy (M16): the five non-Latin fills
+  // land in this same change.
+  hubLesson: {
+    target: 'Target the dummy to begin.',
+    openWindow: 'Open {meters}.',
+    // Touch has no keyboard shortcut: the real path is the labels the actual
+    // touch controls carry (hudChrome.mobile.quickActionsLabel "Actions",
+    // hud.core.mobileMore "More", hud.keybinds.actions.meters "Damage
+    // Meters"), not a guessed "Menu" name for the anchor.
+    openWindowTouch: 'Open {menu} → {more} → {meters}.',
+    // Neutral fallback for a track this file forgets to override (never
+    // shown in practice: every real step below resolves through the
+    // track-specific pair instead).
+    openTab: 'Switch to the right tab.',
+    openTabDamage: 'Switch to the Damage tab.',
+    openTabHealing: 'Switch to the Healing tab.',
+    act: 'Land a hit to start the measurement.',
+    actDamage: 'Attack the dummy to start the measurement.',
+    actHealing: 'Cast a heal on the dummy to start the measurement.',
+    // Shown only when the resolved heal exists but sits on no action-bar
+    // slot: names the real fix (the Spellbook), never glows an unrelated
+    // slot (see hub_lesson_controller.ts healChip()).
+    addToBar: 'Add your heal to your action bar from your Spellbook, then cast it on the dummy.',
+    readRow: 'Read your row, then press Continue.',
+    readRowDamage:
+      'Total is all your damage this run. DPS is damage per second over the run. Watch your row, then Continue.',
+    readRowHealing:
+      'Total counts health restored; healing past full health adds zero. HPS is health restored per second over the run. Read your row, then Continue.',
+    findRun: 'Use the meter arrows to return to your practice run.',
+    addAttackToBar:
+      'Add your attack from your Spellbook to the action bar, then use it on the dummy.',
+    ackContinue: 'Continue',
+    viewBreakdown: 'Hover, focus, or hold your row for the per-ability split.',
+    endRun: 'Turn off Attack and stop casting. After 5 seconds without a hit, this run ends.',
+    endHealingRun: 'Stop healing for 5 seconds to finish this run, then you can replay the lesson.',
+    inspectHistory: 'Use the history arrow to look back at that finished run.',
+    compareAgain:
+      'Return to Current with the right arrow, then attack the same dummy for about the same time.',
+    reviewComparison:
+      'Use the arrows to compare Total, DPS, and duration with your first run. Return to this run, then Done.',
+    ackDone: 'Done',
+    replay: 'Lesson complete. Practice freely, or replay these instructions.',
+    replayAction: 'Practice again',
+    // The world-anchored bubble over the dummy while the ask is to target
+    // it (no keycap: a click or a target-cycle press has no single fixed
+    // key worth naming, like the Proving Shore coach's own "select" ask).
+    replayTarget: 'Target it again',
+  },
   // In-rift HUD tracker (issue #2655): floor position + a live "closes in"
   // countdown on the rift's backing world event. Digits run through
   // formatNumber; the clock templates are pre-built mm:ss / h:mm:ss so the
@@ -1421,6 +1493,9 @@ export const hudChromeStrings = {
   // through formatNumber; these carry the localizable unit/parenthesization).
   meters: {
     perSecond: '{value}/s',
+    // Compact number units for the meters and the practice tracker: 12.3k, 1.2m.
+    thousands: '{value}k',
+    millions: '{value}m',
     perSecondRow: '{total} ({rate})',
     minutesSeconds: '{m}m {s}s',
     seconds: '{s}s',

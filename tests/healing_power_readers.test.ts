@@ -36,6 +36,7 @@ import { castAbility, updateCasting } from '../src/sim/combat/casting_lifecycle'
 import { resolveDruidOverbloom } from '../src/sim/combat/druid_engines';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
+import { WORLD_WITHOUT_HUB_YARD } from './helpers/hub_yard';
 
 const BASE_POWER = 70;
 const HEALING_POWER_DELTA = 140; // the flat Healing Power robe of the boost arm
@@ -195,7 +196,12 @@ describe('direct AoE heal reads healPower (effect_dispatch aoeHeal)', () => {
   // multiplier reaches a non-crit heal), but the v0.42.0 Sunmender primary
   // factor (1.10) now scales the whole raw packet once: round((100 + rider) * 1.10).
   function selfAoeHeal(arm: StatArm): number {
-    const sim = new Sim({ seed: 17, playerClass: 'paladin', autoEquip: true });
+    const sim = new Sim({
+      seed: 17,
+      playerClass: 'paladin',
+      autoEquip: true,
+      world: WORLD_WITHOUT_HUB_YARD,
+    });
     sim.setPlayerLevel(14);
     expect(sim.setSpec('holy')).toBe(true);
     const p = sim.player;
