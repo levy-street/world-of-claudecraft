@@ -30,6 +30,7 @@ import { GFX, ZONE_FEATURE_CELL_SIZE_CLASSIC } from './gfx';
 import { renderLayerDisabled } from './render_dev_flags';
 import { thinLeanDressing } from './zone_dressing_lod_core';
 import { partitionByCell } from './zone_feature_cells_core';
+import { ZONE_FEATURE_EXTENT_KEY } from './zone_feature_sweep';
 
 export interface FenFeaturesView {
   group: THREE.Group;
@@ -44,19 +45,36 @@ export interface FenFeaturesBuildOptions {
   /** XZ cell size in yd; 0 keeps each family as one whole mesh straight
    *  under the parent group, the pre-split scene graph byte for byte. */
   cellSize: number;
+  /** Keep the collider-backed family (the willows) as one whole mesh even
+   *  when the dressing splits: on the far-vista arm a split willow family
+   *  adds draws in the idle town view for no triangle, since the willows
+   *  are never shed by size. */
+  colliderFamiliesWhole: boolean;
+  /** Give every dressing cell its apparent-size reach (the sweep sheds a
+   *  cell once its largest instance is below the pixel threshold). The
+   *  far-vista arm's lever: there the cull distance is the detail horizon
+   *  and nothing else hides a 6-pixel raft at 500 yd. Never on the classic
+   *  arm, whose fog already owns the far end, so low stays byte-identical. */
+  apparentSizeReach: boolean;
 }
 
-/** The live build options. Cells on the classic (fogged) arm, whole meshes
- *  where the far vista runs (zone features cull at the detail horizon there,
- *  which no fen cell is beyond from town); the arm is farFieldPolicy's one
- *  decision, the same read as the renderer's vista arm, so the lean medium
- *  session and every constrained-memory profile take cells like low. Whole
- *  meshes too under the `?fencells=off` dev arm (both arms of one build for
- *  the scene census). */
+/** The live build options. The arm is farFieldPolicy's one decision, the
+ *  same read as the renderer's vista arm. Classic (fogged) arm, which the
+ *  lean medium session and every constrained-memory profile run like low:
+ *  cells for every family, the fog sheds them. Far-vista arm: cells for the
+ *  dressing with the apparent-size reach (the only thing that hides a
+ *  6-pixel raft at 500 yd there), the willows whole. `?fencells=off` builds
+ *  today's whole layout on any session (both arms of one build for the
+ *  scene census). */
 export function fenFeaturesBuildOptions(): FenFeaturesBuildOptions {
+  if (renderLayerDisabled('fencells')) {
+    return { cellSize: 0, colliderFamiliesWhole: true, apparentSizeReach: false };
+  }
   const vista = farFieldPolicy(GFX.vistaTier, GFX).vista.enabled;
   return {
-    cellSize: renderLayerDisabled('fencells') || vista ? 0 : ZONE_FEATURE_CELL_SIZE_CLASSIC,
+    cellSize: ZONE_FEATURE_CELL_SIZE_CLASSIC,
+    colliderFamiliesWhole: vista,
+    apparentSizeReach: vista,
   };
 }
 
@@ -104,7 +122,12 @@ interface Placement {
 
 // bake a loaded scene into (geometry, material) parts: world matrices
 // applied, the whole model re-based so xz is centered and min-y sits at 0
-function extractParts(scene: THREE.Group): { geo: THREE.BufferGeometry; mat: THREE.Material }[] {
+interface ExtractedModel {
+  parts: { geo: THREE.BufferGeometry; mat: THREE.Material }[];
+  /** The model's largest world-space dimension at unit scale (yd). */
+  extent: number;
+}
+function extractParts(scene: THREE.Group): ExtractedModel {
   scene.updateMatrixWorld(true);
   const parts: { geo: THREE.BufferGeometry; mat: THREE.Material }[] = [];
   scene.traverse((o) => {
@@ -126,7 +149,8 @@ function extractParts(scene: THREE.Group): { geo: THREE.BufferGeometry; mat: THR
     p.geo.computeBoundingBox();
     p.geo.computeBoundingSphere();
   }
-  return parts;
+  const size = box.getSize(new THREE.Vector3());
+  return { parts, extent: Math.max(size.x, size.y, size.z) };
 }
 
 // One geometry OBJECT per cell over the family's shared vertex data: three
@@ -193,14 +217,31 @@ export function buildFenFeatures(
 
   // instance every part of a loaded prop model at the given placements, one
   // cull group per cell of the family (whole meshes under the parent when
-  // the build does not split)
-  const split = options.cellSize > 0;
-  const instanceProp = (key: FenPropKey, spots: readonly Placement[]): void => {
+  // the family does not split); a dressing cell under the apparent-size
+  // reach carries its largest instance's extent, so a one-off giant keeps
+  // its whole cell out to the horizon and a clump of small ones sheds where
+  // it is a few pixels
+  const instanceProp = (
+    key: FenPropKey,
+    spots: readonly Placement[],
+    split: boolean,
+    sizeReach = false,
+  ): void => {
     const scene = propScenes[key];
     if (!scene || spots.length === 0) return;
-    const parts = extractParts(scene);
+    const { parts, extent } = extractParts(scene);
     if (!split) {
-      for (const part of parts) instance(part.geo, part.mat, spots, group);
+      // a whole family in a split build still gets its own cull group (the
+      // distance rule must keep applying to it); in a whole build the meshes
+      // sit straight under the parent, the pre-split scene graph
+      let parent = group;
+      if (options.cellSize > 0) {
+        parent = new THREE.Group();
+        parent.name = `fen-features:${key}:whole`;
+        group.add(parent);
+        cullGroups.push(parent);
+      }
+      for (const part of parts) instance(part.geo, part.mat, spots, parent);
       return;
     }
     for (const cell of partitionByCell(spots, options.cellSize)) {
@@ -210,6 +251,11 @@ export function buildFenFeatures(
         instance(cellGeometry(part.geo), part.mat, cell.spots, cellGroup);
       }
       if (cellGroup.children.length === 0) continue;
+      if (sizeReach) {
+        let maxScale = 0;
+        for (const sp of cell.spots) maxScale = Math.max(maxScale, sp.s);
+        cellGroup.userData[ZONE_FEATURE_EXTENT_KEY] = extent * maxScale;
+      }
       group.add(cellGroup);
       cullGroups.push(cellGroup);
     }
@@ -221,8 +267,9 @@ export function buildFenFeatures(
   // town frame pays). The willows below never come through here: their trunks
   // are the sim's own colliders. The thin runs over the WHOLE family before
   // the cell split, so the surviving set does not depend on the cell size.
+  const split = options.cellSize > 0;
   const instanceDressing = (key: FenPropKey, spots: readonly Placement[]): void => {
-    instanceProp(key, thinLeanDressing(spots, GFX.leanFoliage));
+    instanceProp(key, thinLeanDressing(spots, GFX.leanFoliage), split, options.apparentSizeReach);
   };
 
   const hub = WILLOWFEN_ZONE.hub;
@@ -274,9 +321,12 @@ export function buildFenFeatures(
   // --- the willows: instanced at the shared sim placements (fenWillowSpots
   // in sim/fen_willows.ts), so every trunk the renderer draws is exactly a
   // trunk the sim's colliders block ---
+  // Never given the apparent-size reach either: the trunks are colliders,
+  // and their size carries them to the horizon anyway.
   instanceProp(
     'willow',
     fenWillowSpots(seed).map((w) => ({ x: w.x, y: w.y, z: w.z, s: w.s, rot: w.rot })),
+    split && !options.colliderFamiliesWhole,
   );
 
   // --- the water lilies: modeled lily rafts drifting on every pool ---

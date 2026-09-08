@@ -1054,7 +1054,8 @@ async function triggerRowBreakdown(page, rowSelector, variant) {
 export const TARGETS = [
   {
     key: 'fen-features-cull',
-    label: 'Willowfen dressing under the per-cell distance cull (low preset, pixel-identical)',
+    label:
+      'Willowfen dressing under the per-cell cull (low: no fen content moves; medium: the far clutter sheds by apparent size)',
     when: ['render/fen_features', 'render/zone_feature_cells_core'],
     variants: [
       // Eastbrook, facing the fen: on low the whole dressing sits past the 340 yd
@@ -1069,6 +1070,19 @@ export const TARGETS = [
       {
         key: 'bridgemere-hub-low',
         beforeLoad: lowGraphicsSeed,
+        spot: { x: -360, z: 362, facing: 0 },
+      },
+      // Medium, the far-vista arm: the dressing cells shed by apparent size
+      // there (a raft below 8 px at the reference view), so this pair is the
+      // one that SHOWS a difference and is judged on it.
+      {
+        key: 'eastbrook-facing-fen-medium',
+        beforeLoad: seedMediumGraphicsPreset,
+        spot: { x: 0, z: -14, facing: -0.764 },
+      },
+      {
+        key: 'bridgemere-hub-medium',
+        beforeLoad: seedMediumGraphicsPreset,
         spot: { x: -360, z: 362, facing: 0 },
       },
     ],
@@ -1087,6 +1101,14 @@ export const TARGETS = [
         },
         { timeout: 90000, polling: 200 },
       );
+      // Midday through the render-only override the /daynight dev command
+      // drives (the reliquary targets' idiom), set BEFORE the teleport so the
+      // grade has the whole streaming wait to settle: both arms of a pair
+      // share one light and the far clutter is judged in full daylight.
+      await page.evaluate(async () => {
+        const clock = await import('/src/render/day_night_clock.ts');
+        clock.setDayNightPhaseOverride(0.5);
+      });
       const staged = await page.evaluate((spot) => {
         document.querySelector('.camera-prompt-confirm')?.click();
         document.querySelector('.tut-skip')?.click();
@@ -1100,6 +1122,9 @@ export const TARGETS = [
         player.facing = spot.facing;
         game.input.camYaw = player.facing;
         game.input.camDist = 9;
+        // A fixed pitch as well: the chase boom otherwise settles a little
+        // differently per run and the pair stops comparing frame to frame.
+        game.input.camPitch = 0.35;
         sim.rebucket?.(player);
         // Wandering hostiles walk into the frame and aggro the player mid-shot
         // (a wolf pack at the Eastbrook spot); relocate every mob nearby, the

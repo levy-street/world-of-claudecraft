@@ -16,10 +16,12 @@ import {
 } from '../src/render/fen_features';
 import { GFX, ZONE_FEATURE_CELL_SIZE_CLASSIC } from '../src/render/gfx';
 import { measureFeatureFootprint } from '../src/render/renderer_diagnostics';
+import { ZONE_FEATURE_EXTENT_KEY, zoneFeatureEntryFor } from '../src/render/zone_feature_sweep';
 import {
   featureEdgeDistance,
   hasUnseededInstanceMatrix,
   isZoneFeatureVisible,
+  zoneFeatureReach,
 } from '../src/render/zone_feature_visibility_core';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
@@ -105,6 +107,19 @@ function positionsOf(root: THREE.Object3D): string[] {
   return out.sort();
 }
 
+// The three option sets fenFeaturesBuildOptions answers with (pinned below).
+const CLASSIC_ARM = {
+  cellSize: ZONE_FEATURE_CELL_SIZE_CLASSIC,
+  colliderFamiliesWhole: false,
+  apparentSizeReach: false,
+};
+const VISTA_ARM = {
+  cellSize: ZONE_FEATURE_CELL_SIZE_CLASSIC,
+  colliderFamiliesWhole: true,
+  apparentSizeReach: true,
+};
+const WHOLE_ARM = { cellSize: 0, colliderFamiliesWhole: true, apparentSizeReach: false };
+
 describe('fen features per-cell cull groups', () => {
   let cells: FenFeaturesView;
   let whole: FenFeaturesView;
@@ -114,8 +129,8 @@ describe('fen features per-cell cull groups', () => {
 
   function build(): void {
     seedStandIns();
-    cells = buildFenFeatures(WORLD_SEED, { cellSize: ZONE_FEATURE_CELL_SIZE_CLASSIC });
-    whole = buildFenFeatures(WORLD_SEED, { cellSize: 0 });
+    cells = buildFenFeatures(WORLD_SEED, CLASSIC_ARM);
+    whole = buildFenFeatures(WORLD_SEED, WHOLE_ARM);
     cells.group.updateMatrixWorld(true);
     whole.group.updateMatrixWorld(true);
   }
@@ -252,10 +267,10 @@ describe('fen features per-cell cull groups', () => {
     // decision (the renderer's own vista read), mocked here on both answers.
     expect(ZONE_FEATURE_CELL_SIZE_CLASSIC).toBe(180);
     farField.vistaEnabled = false;
-    expect(fenFeaturesBuildOptions()).toEqual({ cellSize: ZONE_FEATURE_CELL_SIZE_CLASSIC });
+    expect(fenFeaturesBuildOptions()).toEqual(CLASSIC_ARM);
     expect(farField.calls.at(-1)).toEqual([GFX.vistaTier, GFX]);
     farField.vistaEnabled = true;
-    expect(fenFeaturesBuildOptions()).toEqual({ cellSize: 0 });
+    expect(fenFeaturesBuildOptions()).toEqual(VISTA_ARM);
     // render_dev_flags reads location once at module load, so the dev arm is
     // exercised on a fresh module graph (the render_dev_flags test's idiom).
     farField.vistaEnabled = false;
@@ -263,11 +278,49 @@ describe('fen features per-cell cull groups', () => {
     vi.stubGlobal('location', { search: '?fencells=off' });
     try {
       const fresh = await import('../src/render/fen_features');
-      expect(fresh.fenFeaturesBuildOptions()).toEqual({ cellSize: 0 });
+      expect(fresh.fenFeaturesBuildOptions()).toEqual(WHOLE_ARM);
     } finally {
       vi.unstubAllGlobals();
       vi.resetModules();
     }
+  });
+
+  it('on the far-vista arm keeps the willows whole and gives the dressing cells their reach', () => {
+    build();
+    const vista = buildFenFeatures(WORLD_SEED, VISTA_ARM);
+    vista.group.updateMatrixWorld(true);
+    // the willow family is one registered cull group of its own (the
+    // distance rule still applies to it), never a cell, never sized
+    const willow = vista.cullGroups.filter((g) => familyOf(g) === TWO_PART_FAMILY);
+    expect(willow).toHaveLength(1);
+    expect(willow[0].name).toBe(`fen-features:${TWO_PART_FAMILY}:whole`);
+    expect(willow[0].userData[ZONE_FEATURE_EXTENT_KEY]).toBeUndefined();
+    expect(meshesOf(willow[0])).toHaveLength(2);
+    expect(instanceCount(willow[0])).toBe(wholeCount(TWO_PART_FAMILY) * 2);
+    // every dressing cell carries its largest instance's extent: the box
+    // stand-in is 1 yd at unit scale, so the extent is the cell's max scale
+    const dressing = vista.cullGroups.filter((g) => familyOf(g) !== TWO_PART_FAMILY);
+    expect(dressing.length).toBeGreaterThan(0);
+    expect(vista.group.children).toHaveLength(vista.cullGroups.length);
+    const m = new THREE.Matrix4();
+    const sc = new THREE.Vector3();
+    for (const g of dressing) {
+      const mesh = meshesOf(g)[0];
+      let maxScale = 0;
+      for (let i = 0; i < mesh.count; i++) {
+        mesh.getMatrixAt(i, m);
+        sc.setFromMatrixScale(m);
+        maxScale = Math.max(maxScale, sc.x);
+      }
+      // (float32 matrix round trip: three decimals)
+      expect(g.userData[ZONE_FEATURE_EXTENT_KEY]).toBeCloseTo(maxScale, 3);
+      expect(zoneFeatureEntryFor(g, measureFeatureFootprint(g)).reach).toBeCloseTo(
+        zoneFeatureReach(maxScale),
+        2,
+      );
+    }
+    // the classic arm sizes nothing: its fog owns the far end
+    for (const g of cells.cullGroups) expect(g.userData[ZONE_FEATURE_EXTENT_KEY]).toBeUndefined();
   });
 
   it('keeps every cell footprint inside the fen rectangle', () => {
