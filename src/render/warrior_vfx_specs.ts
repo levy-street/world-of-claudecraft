@@ -40,7 +40,7 @@ export const WARRIOR_CHOREOGRAPHY: Readonly<Record<string, PhysicalChoreography>
   thunder_clap: motion('fault', 8, 0.15, 0.035, 0.4, 1.5, 'steel', one, 1),
   faultline: motion('fault', 8, 0.18, 0.045, -0.3, 1.9, 'stone', one, 1),
   charge: motion('rush', 5.2, 0.08, 0.18, 0.2, 0.9, 'air', [0, 0.14, 0.3]),
-  heroic_leap: motion('fault', 4.6, 0.13, 0.04, 0.5, 1.5, 'stone', [0, 0.13, 0.3]),
+  heroic_leap: motion('fault', 6, 0.19, 0.04, 0.5, 1.65, 'stone', [0]),
   intervene: motion('rush', 4.4, 0.09, 0.8, 0.65, 0.85, 'steel', [0, 0.2]),
   shield_slam: motion('shield', 1.65, 0.15, 0.7, 0.2, 1.3, 'steel', one, 1),
   raised_guard: motion('shield', 1.4, 0.07, 0.6, -0.2, 0.6, 'steel', one, 1),

@@ -17,6 +17,7 @@ import { drawFuriousMending } from './warrior_fury_feedback';
 import { drawWarriorGoad } from './warrior_goad';
 import { drawWarriorGuardCast } from './warrior_guard_cast';
 import { drawWarriorGyre } from './warrior_gyre';
+import { drawWarriorRushArrival, drawWarriorRushWake } from './warrior_mobility';
 import { drawWarriorPowerCast, warriorPowerRelease } from './warrior_power_cast';
 import { drawWarriorShield } from './warrior_shield';
 import { drawWarriorShout } from './warrior_shouts';
@@ -64,6 +65,7 @@ export function physicalTravel(host: SequencerHost, slot: SeqSlot, dt: number): 
     const direction = retreat
       ? Math.atan2(from.x - slot.sourceX, from.z - slot.sourceZ)
       : Math.atan2(to.x - from.x, to.z - from.z);
+    if (drawWarriorRushWake(host, slot, from, direction)) return false;
     const side = slot.motifLoops++ % 2 ? 0.23 : -0.23;
     const x = from.x + Math.cos(direction) * side;
     const z = from.z - Math.sin(direction) * side;
@@ -192,6 +194,7 @@ export function physicalFollowThrough(host: SequencerHost, slot: SeqSlot): void 
 }
 
 function physicalBeat(host: SequencerHost, slot: SeqSlot, beat: number): void {
+  if (drawWarriorRushArrival(host, slot, beat)) return;
   if (drawFuriousMending(host, slot, beat)) return;
   if (drawWarriorGyre(host, slot, beat)) return;
   if (drawWarriorGoad(host, slot, beat)) return;

@@ -69,6 +69,8 @@ export interface ClipMap {
   combatIdle?: string;
   walk: string;
   run: string;
+  /** Native braced rush, selected by a cast window plus displayed movement. */
+  rush?: string;
   /** one-shot swing clips, rotated per attack */
   attack: string[];
   /** Optional per-ability swing or cast-gesture override. */
@@ -1357,8 +1359,12 @@ export const VISUALS: Record<string, VisualDef> = {
         dualwield: 'Dualwield_Melee_Attack_Chop',
       },
       castByAbility: { bladestorm: 'Warrior_Bladestorm_Loop' },
+      rush: 'Warrior_Rush_Loop',
       castTimeScaleByAbility: { bladestorm: 1 },
+      attackTimeScaleByAbility: { heroic_leap: 1 },
       attackByAbility: {
+        charge: 'Warrior_Rush_Loop',
+        intervene: 'Warrior_Rush_Loop',
         mortal_strike: 'Warrior_Maiming_Strike',
         execute: 'Warrior_Early_Grave',
         slam: 'Warrior_Brute_Swing',

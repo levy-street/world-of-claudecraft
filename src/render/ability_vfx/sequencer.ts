@@ -255,7 +255,7 @@ export interface SequencerHost {
     preserveActive?: boolean,
     priority?: 0 | 1,
     sweep?: SteelSweepRange | null,
-  ): void;
+  ): boolean | void;
   pushOverlay(
     x: number,
     y: number,

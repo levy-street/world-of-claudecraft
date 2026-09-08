@@ -19,6 +19,7 @@ import {
 import { warriorAttentionSource } from './warrior_attention_core';
 import { WARRIOR_BLADE_STYLES } from './warrior_blades';
 import { warriorGuardKind } from './warrior_guard_plates';
+import { drawWarriorLeapLanding, drawWarriorLeapLaunch } from './warrior_leap';
 // Thin painter for the per-ability spell VFX system: resolves an event's
 // ability id against the authored spec table (ability_vfx_specs.ts), asks the
 // pure core (ability_vfx_core.ts) for a plan, and drives the pooled Vfx
@@ -891,7 +892,14 @@ export class AbilityVfx {
           (contact || friendly || arch === 'burst' || arch === 'shout' || arch === 'dash')
             ? ev.targetId
             : ev.sourceId;
-        const utilityTier = Object.hasOwn(WARRIOR_UTILITY_AUDIO, ability) && tier === 2 ? 1 : tier;
+        const utilityTier =
+          (Object.hasOwn(WARRIOR_UTILITY_AUDIO, ability) ||
+            ability === 'charge' ||
+            ability === 'intervene') &&
+          tier === 2
+            ? 1
+            : tier;
+        if (ability === 'heroic_leap') this.spawned += drawWarriorLeapLaunch(fx, ev.sourceId);
         if (utilityTier < 2 && full && ability !== 'heroic_leap') {
           fx.sequenceInstant(
             ability,
@@ -1052,6 +1060,12 @@ export class AbilityVfx {
         this.deps.abilityAudio?.('pulse', 'physical', 1, ev.x, gy, ev.z, { abilityId: ev.ability });
       }
       this.recordStat(ev.ability, true);
+      return true;
+    }
+    if (ev.ability === 'heroic_leap' && ev.fx === 'nova') {
+      const tier = this.biasFor(casterId, this.budget.peek(casterId, nowSec));
+      this.spawned = drawWarriorLeapLanding(fx, ev.x, ev.z, ev.radius ?? 6, tier);
+      this.recordStat('heroic_leap', true);
       return true;
     }
     if (ev.ability === 'bladestorm') {
@@ -1232,6 +1246,18 @@ export class AbilityVfx {
       return true;
     if (ev.abilityId && DAMAGE_CAST_RELEASES.has(ev.abilityId))
       this.releaseGesture(ev.sourceId, ev.abilityId);
+    if ((ev.abilityId ?? attackAbilityId(ev.ability)) === 'heroic_leap') {
+      const tier = this.biasFor(ev.sourceId, this.budget.peek(ev.sourceId, this.now()));
+      const outcome = ev.kind === 'hit' ? (ev.amount > 0 ? 1 : (ev.absorbed ?? 0) > 0 ? 2 : 0) : 0;
+      return drawWarriorAreaContact(
+        this.deps.fx,
+        'heroic_leap',
+        ev.sourceId,
+        ev.targetId,
+        outcome,
+        tier,
+      );
+    }
     const compoundId = attackAbilityId(ev.ability);
     if (compoundId === 'bladestorm' || isWarriorAreaInstant(compoundId)) {
       if (

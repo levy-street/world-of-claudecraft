@@ -84,7 +84,7 @@ export function drawWarriorAreaContact(
   outcome: 0 | 1 | 2,
   tier: number,
 ): boolean {
-  if (id !== 'bladestorm' && !isWarriorAreaInstant(id)) return false;
+  if (id !== 'heroic_leap' && id !== 'bladestorm' && !isWarriorAreaInstant(id)) return false;
   if (!outcome || sourceId === targetId) return true;
   const profile = meleeImpactProfile(id);
   if (!profile) return false;
@@ -96,7 +96,9 @@ export function drawWarriorAreaContact(
     at.z,
     outcome === 2 ? 2.4 : 2.8,
     outcome === 2 ? 0xcadce8 : 0xeac6a4,
-    outcome === 2 || id === 'thunder_clap' || id === 'faultline' ? 'contact_crush' : 'contact_cut',
+    outcome === 2 || id === 'heroic_leap' || id === 'thunder_clap' || id === 'faultline'
+      ? 'contact_crush'
+      : 'contact_cut',
     1.7,
     0.21,
     0.3,
@@ -127,7 +129,18 @@ export function drawWarriorAreaContact(
     0,
   );
   if (tier === 0)
-    host.fragmentsAt?.('metal_splinter', at.x, at.y, at.z, 0xc6aa8f, 8, 0.9, dx, dz, 0.22);
+    host.fragmentsAt?.(
+      id === 'heroic_leap' ? 'stone_chip' : 'metal_splinter',
+      at.x,
+      at.y,
+      at.z,
+      0xc6aa8f,
+      8,
+      0.9,
+      dx,
+      dz,
+      0.22,
+    );
   host.contact?.(sourceId, targetId, 'physical', profile.force, id, 0);
   host.countPrimitive(id, tier === 0 ? 3 : 2);
   return true;

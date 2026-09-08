@@ -26,6 +26,7 @@ function fakeTex(): AbilityVfxTextures {
     ember: t(),
     rime: t(),
     crack: t(),
+    leapFracture: t(),
     char: t(),
     overlay: t(),
   };

@@ -1,0 +1,54 @@
+{
+  "scope": "Development checkpoint, not final Warrior acceptance",
+  "quality": "preset 4 (Ultra)",
+  "captures": [
+    {
+      "abilityId": "charge",
+      "phase": "before",
+      "file": "charge-before.png",
+      "sha256": "e97331b3cddb62b6054027ccbf6ceeda82df671c1ed7f88b88dc1a1c9568ca89",
+      "capture": "..\\studio-contact-pass\\warrior-mobility-before-1\\p4-charge-live-arms-yaw1.9-tick6.png"
+    },
+    {
+      "abilityId": "charge",
+      "phase": "after",
+      "file": "charge-after.png",
+      "sha256": "a71255018416ddad647eb92d22be5064490e54f694b05de9fc63aa7dbb6ffa59",
+      "capture": "..\\studio-contact-pass\\warrior-mobility-after-1\\p4-charge-live-arms-yaw1.9-tick6.png"
+    },
+    {
+      "abilityId": "intervene",
+      "phase": "before",
+      "file": "intervene-before.png",
+      "sha256": "eda3b2ab20730cdc4ebb5c1fe6dda8df1ef8c7508f2e9d0c763410851c927537",
+      "capture": "..\\studio-contact-pass\\warrior-mobility-before-1\\p4-intervene-ally-arms-yaw1.9-tick13.png"
+    },
+    {
+      "abilityId": "intervene",
+      "phase": "after",
+      "file": "intervene-after.png",
+      "sha256": "91dbe25427fe566dd534424cc0609dc44b0da347631af6a8b332ff1509cc46bd",
+      "capture": "..\\studio-contact-pass\\warrior-mobility-after-1\\p4-intervene-ally-arms-yaw1.9-tick13.png"
+    },
+    {
+      "abilityId": "heroic_leap",
+      "phase": "before",
+      "file": "heroic_leap-before.png",
+      "sha256": "487e4922db506d2b4127fa7b4ab7a7de65f2c874e87c575d0692a3ea3124d908",
+      "capture": "..\\studio-contact-pass\\warrior-mobility-before-1\\p4-heroic_leap-dummy-arms-yaw1.9-tick13.png"
+    },
+    {
+      "abilityId": "heroic_leap",
+      "phase": "after",
+      "file": "heroic_leap-after.png",
+      "sha256": "576b7fffded98634f1b7fd2ea0878f714d2096374ec3a624b6e4a62fcdcca6e6",
+      "capture": "..\\studio-contact-pass\\warrior-mobility-after-1\\p4-heroic_leap-dummy-arms-yaw1.9-tick13.png"
+    }
+  ],
+  "afterEvidence": "warrior-mobility-after-1/report.json",
+  "notes": [
+    "9 actual casts across three specs, 90 frames; no console errors and capture sources stayed unchanged.",
+    "Later corrections end rush at normal run speed and retain paired guard silhouettes with four simultaneous defenses; covered by focused regression checks.",
+    "All quality settings, crowded world, continued movement and final sound review remain pending."
+  ]
+}

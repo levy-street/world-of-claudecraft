@@ -22,7 +22,7 @@ const DECAL_SLOTS = 12;
 const DECAL_SEGMENTS = 24;
 const DRAPE_LIFT = 0.06; // yards above the sampled ground, against z-fighting
 
-export type DecalStyle = 'ember' | 'rime' | 'rune' | 'crack' | 'char';
+export type DecalStyle = 'ember' | 'rime' | 'rune' | 'crack' | 'char' | 'leap_fracture';
 
 interface DecalSlot {
   mesh: THREE.Mesh;
@@ -31,6 +31,7 @@ interface DecalSlot {
   dur: number;
   spin: number;
   active: boolean;
+  immediate: boolean;
   drapeY: Float32Array; // scratch per-vertex drape heights, reused per spawn
 }
 
@@ -57,6 +58,7 @@ export class GroundDecals {
       rime: tex.rime,
       rune: tex.rune,
       crack: tex.crack,
+      leap_fracture: tex.leapFracture,
       char: tex.char,
     };
     // Rotation baked into the geometry (instead of mesh.rotation.x) so the
@@ -77,6 +79,7 @@ export class GroundDecals {
         uDissolve: { value: 1 },
         uHdr: { value: 1.6 },
         uSpin: { value: 0 },
+        uStone: { value: 0 },
       },
       vertexShader: `
         varying vec2 vUv;
@@ -91,6 +94,7 @@ export class GroundDecals {
         uniform float uDissolve;
         uniform float uHdr;
         uniform float uSpin;
+        uniform float uStone;
         varying vec2 vUv;
         void main() {
           vec2 c = vUv - 0.5;
@@ -102,6 +106,11 @@ export class GroundDecals {
           float edge = (smoothstep(uDissolve - 0.02, uDissolve + 0.04, n)
             - smoothstep(uDissolve + 0.08, uDissolve + 0.16, n)) * tex.a;
           vec3 col = tex.rgb * uColor * uHdr + vec3(0.92, 0.95, 1.0) * edge * uHdr * 2.0;
+          if (uStone > 0.5) {
+            col = tex.rgb;
+            body = tex.a * (1.0 - smoothstep(0.0, 1.0, uDissolve));
+            edge = 0.0;
+          }
           gl_FragColor = vec4(col, clamp(body + edge, 0.0, 1.0));
         }`,
       transparent: true,
@@ -126,6 +135,7 @@ export class GroundDecals {
         dur: 3,
         spin: 0,
         active: false,
+        immediate: false,
         drapeY: new Float32Array(basePos.count),
       });
     }
@@ -156,9 +166,12 @@ export class GroundDecals {
     slot.age = 0;
     slot.dur = dur;
     slot.spin = style === 'rune' ? 0.35 : 0;
+    slot.immediate = style === 'leap_fracture';
+    slot.mat.uniforms.uStone.value = slot.immediate ? 1 : 0;
+    slot.mat.blending = slot.immediate ? THREE.NormalBlending : THREE.AdditiveBlending;
     slot.mat.uniforms.uMap.value = this.maps[style];
     (slot.mat.uniforms.uColor.value as THREE.Color).setHex(colorHex);
-    slot.mat.uniforms.uDissolve.value = 1;
+    slot.mat.uniforms.uDissolve.value = slot.immediate ? 0 : 1;
     slot.mat.uniforms.uSpin.value = 0;
     slot.mesh.position.set(x, y, z);
     slot.mesh.scale.setScalar(radius);
@@ -203,7 +216,9 @@ export class GroundDecals {
       // etch in over the first 18%, hold, then dissolve away over the last 45%
       const dissolve =
         t < 0.18 ? 1 - (t / 0.18) * 0.85 : t < 0.55 ? 0.15 : 0.15 + ((t - 0.55) / 0.45) * 0.85;
-      slot.mat.uniforms.uDissolve.value = dissolve;
+      slot.mat.uniforms.uDissolve.value = slot.immediate
+        ? Math.max(0, (t - 0.35) / 0.65)
+        : dissolve;
       if (slot.spin > 0) slot.mat.uniforms.uSpin.value = slot.age * slot.spin;
     }
   }

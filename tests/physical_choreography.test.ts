@@ -198,15 +198,23 @@ describe('authored physical compositions', () => {
       expect(paths).toHaveLength(0);
       x = 4;
       seq.update(host, 0.15);
-      expect(paths).toHaveLength(0);
+      // Shoulder trails now belong to travel. Braking plumes and the actual
+      // impact transition still require reaching the destination.
+      expect(paths).toHaveLength(2);
+      const arrivalPlumes = () =>
+        vi.mocked(host.bakedAt!).mock.calls.filter((call) => call[4] === 3.8);
+      expect(arrivalPlumes()).toHaveLength(0);
+      expect(slot.impactDone).toBe(false);
       if (arrival) {
         x = 8;
         seq.update(host, 0.15);
-        expect(paths.length).toBeGreaterThan(0);
+        expect(arrivalPlumes()).toHaveLength(2);
         expect(slot.impactDone).toBe(true);
       } else {
         seq.update(host, 0.3);
-        expect(paths).toHaveLength(0);
+        expect(paths).toHaveLength(2);
+        expect(arrivalPlumes()).toHaveLength(0);
+        expect(slot.impactDone).toBe(false);
         expect(slot.active).toBe(false);
       }
     }

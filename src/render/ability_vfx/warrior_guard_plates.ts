@@ -7,7 +7,7 @@ import { warriorSteelTexture } from './production_assets';
 import type { AbilityVfxRibbons, RibbonAnchor } from './ribbons';
 import { warriorGuardGeometry } from './warrior_guard_geometry';
 
-export type WarriorGuardKind = 0 | 1 | 2;
+export type WarriorGuardKind = 0 | 1 | 2 | 3;
 export interface WarriorGuardAura {
   id: string;
   kind?: string;
@@ -19,6 +19,7 @@ export function warriorGuardKind(aura: WarriorGuardAura): WarriorGuardKind | nul
   if (aura.id === 'raised_guard_dr' && aura.kind === 'buff_dr_phys') return 0;
   if (aura.id === 'iron_resolve' && aura.kind === 'absorb') return 1;
   if (aura.id === 'die_by_sword' && aura.kind === 'die_by_sword') return 2;
+  if (aura.id === 'intervene' && aura.kind === 'absorb') return 3;
   return null;
 }
 interface GuardState {
@@ -39,7 +40,7 @@ interface Wearer {
 const WEARERS = 64,
   SOLID_WEARERS = 16,
   PLATES = 6;
-const COLORS = [0xd8e6ed, 0xe3ecf3, 0xe8f7ff];
+const COLORS = [0xd8e6ed, 0xe3ecf3, 0xe8f7ff, 0x91cce6];
 const UP = new THREE.Vector3(0, 1, 0);
 
 /** Separate from attack crests: defenses cannot occupy their eight burst slots.
@@ -117,7 +118,11 @@ export class WarriorGuardPlates {
     frame: number,
     priority: boolean,
   ): void {
-    if (this.disposed || !((aura.remaining ?? 0) > 0) || (kind === 1 && !((aura.value ?? 0) > 0)))
+    if (
+      this.disposed ||
+      !((aura.remaining ?? 0) > 0) ||
+      ((kind === 1 || kind === 3) && !((aura.value ?? 0) > 0))
+    )
       return;
     let wearer = this.wearers.get(id);
     if (!wearer) {
@@ -133,7 +138,7 @@ export class WarriorGuardPlates {
       wearer = {
         id,
         priority,
-        states: Array.from({ length: 3 }, () => ({
+        states: Array.from({ length: 4 }, () => ({
           stamp: -1,
           age: 0,
           remaining: 0,
@@ -153,7 +158,7 @@ export class WarriorGuardPlates {
     if (state.remaining <= 0 || state.stamp < frame - 1 || remaining > state.remaining + 0.1) {
       state.age = 0;
       state.hitAge = 1;
-    } else if (kind === 1 && value < state.value) state.hitAge = 0;
+    } else if ((kind === 1 || kind === 3) && value < state.value) state.hitAge = 0;
     state.stamp = frame;
     state.remaining = remaining;
     state.value = value;
@@ -198,7 +203,7 @@ export class WarriorGuardPlates {
         wearer.retry -= dt;
         let kinds = 0;
         for (const state of wearer.states) if (state.stamp === frame) kinds++;
-        for (let kind = 0; kind < 3; kind++) {
+        for (let kind = 0; kind < 4; kind++) {
           const state = wearer.states[kind];
           if (state.stamp !== frame) continue;
           const angle = facing(wearer.id) ?? 0;
@@ -215,15 +220,15 @@ export class WarriorGuardPlates {
           }
           // Plates represent absolute reserve chunks, NOT percentage of an
           // inferred initial pool. A first snapshot may already include damage.
-          const available = kinds === 1 ? 6 : kinds === 2 ? 3 : 2;
+          // Four concurrent states divide as 1/1/2/2. The two paired
+          // protections keep their silhouette without exceeding six plates.
+          const available = kinds === 4 ? (kind < 2 ? 1 : 2) : Math.floor(PLATES / kinds);
           const count =
             kind === 1
               ? Math.min(available, Math.max(1, Math.ceil(state.value / 30)))
               : kind === 0
-                ? kinds === 1
-                  ? 3
-                  : 2
-                : 2;
+                ? Math.min(available, kinds === 1 ? 3 : 2)
+                : Math.min(available, 2);
           const assembly = reduced ? 1 : Math.min(1, state.age / 0.24);
           for (let plate = 0; plate < count; plate++) {
             let x = 0,
@@ -257,6 +262,18 @@ export class WarriorGuardPlates {
               sx = 0.64;
               sy = 0.91;
               if (!reduced) z += Math.max(0, 1 - state.hitAge / 0.16) * 0.12;
+            } else if (kind === 3) {
+              // A companion's two broad shoulder guards reach forward around
+              // the wearer. This is separate from Iron Resolve's open collar.
+              const side = plate ? 1 : -1;
+              x = side * 0.78;
+              y = 0.26;
+              z = 0.34;
+              roll = side * -0.9;
+              yaw = side * -0.38;
+              sx = 0.72;
+              sy = 1.25;
+              if (!reduced) z += Math.max(0, 1 - state.hitAge / 0.16) * 0.12;
             } else {
               x = (plate ? 1 : -1) * 0.35;
               // Long parallel cutting rails extend beyond the tip. Avoid the
@@ -283,14 +300,14 @@ export class WarriorGuardPlates {
             if (solid && this.used < SOLID_WEARERS * PLATES) {
               this.mesh.setMatrixAt(this.used, this.matrix);
               this.color.setHex(COLORS[kind]);
-              if (kind === 1 && state.hitAge < 0.16)
+              if ((kind === 1 || kind === 3) && state.hitAge < 0.16)
                 this.color.lerp(this.flash, (1 - state.hitAge / 0.16) * 0.65);
               this.mesh.setColorAt(this.used++, this.color);
             }
             // A quiet bright seam keeps the material legible against dark scenery.
             // Cold/overflow uses a complete kite outline in the same exact frame.
             // One representative full outline per aura bounds all 64 cold
-            // wearers to 1920 vertices even with all three protections active.
+            // wearers to 2560 vertices with all four protections active.
             if (plate === 0) this.outline(ribbons, solid, COLORS[kind]);
           }
         }

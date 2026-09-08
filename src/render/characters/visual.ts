@@ -111,6 +111,7 @@ import { applySoulRendOverlay } from './soul_rend_overlay';
 import { soulRendPrewarmTargets } from './soul_rend_prewarm_core';
 import { createStowTransition, forceStow, requestStow, tickStow } from './stow_transition';
 import { CharacterSurfaceResponse, SURFACE_RESPONSE_PROGRAM } from './surface_response';
+import { WarriorRushPose } from './warrior_rush_pose';
 import { SPIN_ATTACK_VISUAL_DURATION, weaponAttackStyle } from './weapon_attack_style_core';
 import {
   disposeOwnedWeaponSkinMaterials,
@@ -715,6 +716,7 @@ export class CharacterVisual {
    *  aim pin can tell a drawn shot from a pet utility cast. */
   private castingAbility: string | null = null;
   private castLocomotion: CastLocomotion | null = null;
+  private readonly warriorRush = new WarriorRushPose();
   /** which ability's cast clip the current cast-state base action was chosen
    *  for; lets chained casts refresh their per-ability override */
   private castClipAbility: string | null = null;
@@ -1067,6 +1069,7 @@ export class CharacterVisual {
     this.wasAirborne = s.airborne;
 
     this.castingAbility = s.casting ? (s.castingAbility ?? null) : null;
+    const rushChanged = this.warriorRush.update(dt, s);
     if (!this.deadLock) {
       const desired = this.desiredBase(s);
       const baseChanged = desired !== this.baseState;
@@ -1107,7 +1110,7 @@ export class CharacterVisual {
         this.currentIsOneShot = false;
         this.currentOneShotIsCastExit = false;
         this.fadeTo(this.baseAction(), this.baseTransitionFade(desired), false);
-      } else if (baseChanged && !this.currentIsOneShot) {
+      } else if ((baseChanged || rushChanged) && !this.currentIsOneShot) {
         // a cast clip frozen at its hold point must never stay paused through
         // the exit, whichever exit path runs below
         if (previousBase === 'cast' && this.current?.paused) this.current.paused = false;
@@ -1713,7 +1716,13 @@ export class CharacterVisual {
     return this.currentIsOneShot;
   }
   get isPerformingAbility(): boolean {
-    return this.currentIsOneShot && this.current?.getClip().name.startsWith('Signature_') === true;
+    const name = this.current?.getClip().name;
+    return (
+      this.warriorRush.active ||
+      (this.currentIsOneShot &&
+        !!name &&
+        (name.startsWith('Signature_') || name === this.def.clips.attackByAbility?.heroic_leap))
+    );
   }
 
   /** A channel-start event can arrive just before its authoritative entity
@@ -1745,6 +1754,10 @@ export class CharacterVisual {
 
   playAttack(abilityId?: string): void {
     if (this.deadLock) return;
+    if ((abilityId === 'charge' || abilityId === 'intervene') && this.action(this.def.clips.rush)) {
+      this.warriorRush.begin();
+      return;
+    }
     if (abilityId === 'fire_blast' && this.castingAbility && this.castLocomotion?.triggerFlick())
       return;
     const signature = abilityId ? signatureClipName(abilityId) : null;
@@ -3540,7 +3553,11 @@ export class CharacterVisual {
       case 'walkBack':
         return this.action(c.walkBack) ?? this.action(c.walk);
       case 'run':
-        return this.action(c.run) ?? this.action(c.walk);
+        return (
+          (this.warriorRush.active ? this.action(c.rush) : null) ??
+          this.action(c.run) ??
+          this.action(c.walk)
+        );
       case 'cast':
         // A displayed bow holds its draw here instead of the shared caster
         // gesture; a per-ability authored cast clip beats the generic channel;

@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { paintWarriorAttention } from './warrior_attention_atlas';
+import { paintWarriorFracture } from './warrior_fracture_atlas';
 import { paintWarriorMark } from './warrior_mark_atlas';
 
 // Procedural canvas textures for the ability VFX primitives, ported from the
@@ -692,6 +693,7 @@ export interface AbilityVfxTextures {
   ember: THREE.CanvasTexture;
   rime: THREE.CanvasTexture;
   crack: THREE.CanvasTexture;
+  leapFracture: THREE.CanvasTexture;
   char: THREE.CanvasTexture;
   overlay: THREE.CanvasTexture;
 }
@@ -708,6 +710,7 @@ export function abilityVfxTextures(): AbilityVfxTextures {
       ember: emberRingTexture(),
       rime: rimeTexture(),
       crack: crackTexture(),
+      leapFracture: makeCanvas(512, paintWarriorFracture),
       char: charTexture(),
       overlay: overlayAtlasTexture(),
     };

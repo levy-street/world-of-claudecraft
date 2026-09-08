@@ -28,6 +28,7 @@ function fakeTextures(): AbilityVfxTextures {
     ember: texture(),
     rime: texture(),
     crack: texture(),
+    leapFracture: texture(),
     char: texture(),
     overlay: texture(),
   };

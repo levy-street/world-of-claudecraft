@@ -46,6 +46,7 @@ export const MELEE_IMPACTS: Readonly<Record<string, MeleeImpactProfile>> = {
   cleave: contact(0.52, 'edge', 0.08, 1.85, 0.095, 1.25),
   revenge: contact(0.54, 'cross', -0.45, 1.55, 0.09, 1.3),
   thunder_clap: contact(0.35, 'crush', 0.15, 1.8, 0.13, 1.5),
+  heroic_leap: contact(0.3, 'crush', 0.08, 1.8, 0.14, 1.65),
   faultline: contact(0.42, 'split', 0, 2.2, 0.16, 1.9),
   hamstring: contact(0.2, 'edge', 0.15, 0.9, 0.05, 0.65),
   pummel: contact(0.73, 'crush', 0.1, 0.8, 0.08, 0.85),

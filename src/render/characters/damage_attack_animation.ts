@@ -53,6 +53,7 @@ export function damageEventStartsAttackAnimation(
   if (
     source?.castingAbility === 'bladestorm' ||
     area === 'bladestorm' ||
+    area === 'heroic_leap' ||
     area === 'whirlwind' ||
     area === 'cleave' ||
     area === 'revenge' ||

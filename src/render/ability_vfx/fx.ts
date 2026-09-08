@@ -1393,7 +1393,11 @@ export class AbilityVfxFx implements SequencerHost {
   ): void {
     if (this.disposed) return;
     const s: DecalStyle =
-      style === 'ember' || style === 'rime' || style === 'crack' || style === 'char'
+      style === 'ember' ||
+      style === 'rime' ||
+      style === 'crack' ||
+      style === 'char' ||
+      style === 'leap_fracture'
         ? style
         : 'rune';
     this.decals.spawn(x, this.groundY(x, z), z, radius, colorHex, s, dur);
