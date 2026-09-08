@@ -433,7 +433,12 @@ const MONOLITHS: MonolithRow[] = [
     // `wc -l < src/ui/hud.ts` on the reconciled file measures 18577, below
     // both arms, so the ceiling follows it down. Exact merged count, zero
     // slack: any further growth reds again.
-    ceiling: 18577,
+    // LOWERED 18577 -> 18570 for the touch-peek jitter-tolerance fix: the whole
+    // long-press-to-peek touch gesture (the timer arm/clear plus the new
+    // move-tolerance stand-down) moved into src/ui/touch_peek.ts's
+    // bindTooltipTouchPeek, leaving attachTooltip a thin caller passing it
+    // isMobile/press/hide/showAt. Exact count, zero slack.
+    ceiling: 18570,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

@@ -2532,6 +2532,11 @@ const UI_DOM_MODULES = [
   'src/ui/target_swing_timer_bars.ts',
   'src/ui/theme.ts',
   'src/ui/touch_item_drag.ts',
+  // bindTooltipTouchPeek binds pointerdown/pointermove/pointerup/pointercancel
+  // to the caller's element and owns a window.setTimeout/clearTimeout peek
+  // timer: the same DOM-owning shape as touch_item_drag.ts's own long-press
+  // gesture above, for the identical scroll-vs-hold disambiguation.
+  'src/ui/touch_peek.ts',
   'src/ui/touch_tap.ts',
   'src/ui/town_focus_window.ts',
   // The tracker-stack seat applier: owns a resize listener and bounded
