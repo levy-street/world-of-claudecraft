@@ -1,14 +1,25 @@
 import * as THREE from 'three';
 import { beforeEach, expect, it, vi } from 'vitest';
-import { abilityVfxTexturePrewarmSteps } from '../src/render/ability_vfx/prewarm';
+import { BakedImpactLayers } from '../src/render/ability_vfx/baked_impact_layers';
+import {
+  abilityVfxBootTextureDependencies,
+  abilityVfxTexturePrewarmSteps,
+} from '../src/render/ability_vfx/prewarm';
 import { abilityPrimitivePrewarmEntry } from '../src/render/ability_vfx/primitive_prewarm';
+import { bakedTexture } from '../src/render/ability_vfx/production_assets';
 import type { PrewarmResumeUnit } from '../src/render/prewarm_resume';
 
 vi.mock('../src/render/ability_vfx/prewarm', () => ({
   abilityVfxTexturePrewarmSteps: vi.fn(() => []),
+  abilityVfxBootTextureDependencies: vi.fn(() => []),
   collectAbilityVfxCompileTargets: vi.fn(() => []),
   persistentClassVfxCompileTargets: vi.fn(() => []),
 }));
+vi.mock('../src/render/ability_vfx/production_assets', async () => {
+  const { Texture } = await import('three');
+  const texture = new Texture();
+  return { bakedTexture: () => texture };
+});
 
 function fixture() {
   const order: string[] = [];
@@ -81,7 +92,40 @@ it('gives a policy-skipped entry geometry preparation without any visible spawn'
 
 beforeEach(() => {
   vi.mocked(abilityVfxTexturePrewarmSteps).mockReset().mockReturnValue([]);
+  vi.mocked(abilityVfxBootTextureDependencies).mockReset().mockReturnValue([]);
 });
+
+it.each([false, true])(
+  'prepares a gated remote plume during non-Warrior boot (trimmed=%s)',
+  async (trimmed) => {
+    const h = fixture(),
+      ready = new WeakSet<THREE.Texture>();
+    const texture = bakedTexture('warrior_power')!;
+    vi.mocked(abilityVfxBootTextureDependencies).mockReturnValue([texture]);
+    const pool = new BakedImpactLayers(h.host.scene, (t) => ready.has(t));
+    const spawn = () => pool.spawn('warrior_power', 0, 1, 0, 5, 0xffffff, 0xffffff, 0.3, 0, 1, 0);
+    expect(spawn()).toBe(false);
+    h.host.texture.mockImplementation((t) => {
+      ready.add(t);
+    });
+    h.host.spawn.mockImplementation(() => {
+      expect(spawn()).toBe(true);
+    });
+    h.host.materialTextures.mockImplementation((materials) => {
+      for (const material of Array.isArray(materials) ? materials : [materials]) {
+        const map = (material as THREE.ShaderMaterial).uniforms?.uMap?.value;
+        if (map) ready.add(map);
+      }
+    });
+    h.host.withinDeadline = () => !trimmed;
+    await h.entry.run();
+    for (const unit of h.entry.resumePartialUnits()) await unit.run();
+    pool.clear();
+    expect(spawn()).toBe(true);
+    expect(h.host.spawn).toHaveBeenCalledTimes(1);
+    pool.dispose();
+  },
+);
 
 function recoveryFixture() {
   const h = fixture(),

@@ -15,6 +15,8 @@ import type { AbilityAudioKind, AbilityAudioOpts } from '../audio_sink';
 import type { ControlSubject } from '../combat_status_core';
 import { CombatStatusSignals } from '../combat_status_signals';
 import { drawRestorativeStream } from '../restorative_water';
+import type { WarriorPowerAnchor } from '../warrior_power_anchor';
+import type { WarriorPowerIntent, WarriorPowerKind } from '../warrior_power_core';
 import type { WeaponAnchorSampler } from '../weapon_trail_anchor';
 import { cancelActiveAbilityKit } from './active_kit_prewarm';
 import { BakedImpactLayers } from './baked_impact_layers';
@@ -62,6 +64,7 @@ import {
   type WarriorGuardKind,
   WarriorGuardPlates,
 } from './warrior_guard_plates';
+import { WarriorPowerForms } from './warrior_power_forms';
 import { drawWarriorWornMark } from './warrior_worn_marks';
 import { RestorativeWaterVolumes } from './water_volumes';
 
@@ -446,6 +449,7 @@ export class AbilityVfxFx implements SequencerHost {
   private readonly lightPoint = new THREE.Vector3();
   private crests: SignatureCrests;
   private guards: WarriorGuardPlates;
+  private powerForms: WarriorPowerForms;
   private guardDt = 0;
   private guardFacing = (id: number) => this.facingAt(id) ?? null;
   private rings: ShockRings;
@@ -568,6 +572,28 @@ export class AbilityVfxFx implements SequencerHost {
       this.weaponAnchor,
       this.ribbons,
     );
+    this.powerForms.draw(
+      this.frame,
+      this.guardDt,
+      this.reducedMotionActive,
+      this.anchor,
+      this.guardFacing,
+      this.ribbons,
+      this.powerDetail,
+      this.bodyAnchor,
+    );
+  };
+  private powerDetail = (kind: number, x: number, y: number, z: number): void => {
+    this.burstAt(
+      x,
+      y,
+      z,
+      kind === 0 ? 0xbcb69b : 0xee2748,
+      kind === 0 ? 2 : 4,
+      kind === 0 ? 0.25 : 0.38,
+      kind === 0 ? 'debris' : 'embers',
+      0.3,
+    );
   };
   private drawHeldConduction = (): void => {
     for (const [id, storm] of this.warriorStorms) {
@@ -643,6 +669,8 @@ export class AbilityVfxFx implements SequencerHost {
       hand: 0 | 1,
       out: { x: number; y: number; z: number },
     ) => boolean,
+    textureReady?: (texture: THREE.Texture) => boolean,
+    private bodyAnchor?: WarriorPowerAnchor,
   ) {
     const tex = abilityVfxTextures();
     this.ribbons = new AbilityVfxRibbons(scene, anchor, tex);
@@ -651,7 +679,8 @@ export class AbilityVfxFx implements SequencerHost {
     this.forms = new ElementalForms(scene);
     this.crests = new SignatureCrests(scene, this.groundY);
     this.guards = new WarriorGuardPlates(scene);
-    this.baked = new BakedImpactLayers(scene);
+    this.powerForms = new WarriorPowerForms(scene);
+    this.baked = new BakedImpactLayers(scene, textureReady);
     this.fragments = new SolidImpactFragments(scene);
     this.rings = new ShockRings(scene, tex, groundY);
     this.decals = new GroundDecals(scene, tex, groundY);
@@ -1222,7 +1251,11 @@ export class AbilityVfxFx implements SequencerHost {
   // now, and the flipbook prewarm does the same for the six impact sheets.
   // The prewarm's finally-block clear() hides everything again.
   authoredPrewarmUnits(host: CrestPrewarmHost, kinds?: readonly CrestKind[]) {
-    return [...this.crests.preparation.units(host, kinds), ...this.guards.units(host)];
+    return [
+      ...this.crests.preparation.units(host, kinds),
+      ...this.guards.units(host),
+      ...this.powerForms.units(host),
+    ];
   }
 
   prewarmSpawn(x: number, y: number, z: number, entityId: number): void {
@@ -1247,7 +1280,13 @@ export class AbilityVfxFx implements SequencerHost {
     this.crests.update(0.05, false);
     this.bakedAt('smoke', x, y, z, 1, 0xffffff, 0xffffff, 1, 0, 0);
     this.bakedAt('shockwave', x, gy + 0.08, z, 1, 0xffffff, 0xffffff, 1, 0, 0);
-    for (const kind of ['pyroblast', 'frost_nova', 'chain_heal', 'shout_dust'] as const)
+    for (const kind of [
+      'pyroblast',
+      'frost_nova',
+      'chain_heal',
+      'shout_dust',
+      'warrior_power',
+    ] as const)
       this.bakedAt(kind, x, gy + 0.08, z, 1, 0xffffff, 0xffffff, 1, 0, 0);
     for (const kind of ['ice_shard', 'stone_chip', 'metal_splinter'] as const)
       this.fragmentsAt(kind, x, y, z, 0xffffff, 1, 1, 0, 1);
@@ -1418,6 +1457,7 @@ export class AbilityVfxFx implements SequencerHost {
     if (this.disposed) return;
     this.controlSignals.sleep(entityId);
     this.guards.sleep(entityId);
+    this.powerForms.sleep(entityId);
     this.warriorStorms.delete(entityId);
     this.crests.releaseHeld(entityId);
     this.ccBands.delete(entityId);
@@ -1575,6 +1615,9 @@ export class AbilityVfxFx implements SequencerHost {
     delay: number,
     heat: number,
     angle = 0,
+    reverse = false,
+    roll = 0,
+    aspect = 1,
   ): boolean {
     return this.baked.spawn(
       kind,
@@ -1590,6 +1633,9 @@ export class AbilityVfxFx implements SequencerHost {
       this.groundY(x, z),
       angle,
       this.groundY,
+      reverse,
+      roll,
+      aspect,
     );
   }
   elementalImpact(
@@ -2052,6 +2098,16 @@ export class AbilityVfxFx implements SequencerHost {
 
   // ---- per-frame state (refreshed every frame by painter.syncEntity) ------
 
+  holdWarriorPower(
+    entityId: number,
+    kind: WarriorPowerKind,
+    aura: { remaining?: number; duration?: number },
+    intent: WarriorPowerIntent,
+    priority: boolean,
+  ): void {
+    this.powerForms.hold(entityId, kind, aura, intent, this.frame, priority);
+  }
+
   holdWarriorGuard(
     entityId: number,
     kind: WarriorGuardKind,
@@ -2404,6 +2460,7 @@ export class AbilityVfxFx implements SequencerHost {
 
   clear(): void {
     this.guards.clear();
+    this.powerForms.clear();
     this.warriorStorms.clear();
     this.furyAudio.clear();
     this.ribbons.clear();
@@ -2460,6 +2517,7 @@ export class AbilityVfxFx implements SequencerHost {
     release(() => this.forms.dispose());
     release(() => this.crests.dispose());
     release(() => this.guards.dispose());
+    release(() => this.powerForms.dispose());
     release(() => this.rings.dispose());
     release(() => this.flipbooks.dispose());
     release(() => this.decals.dispose());

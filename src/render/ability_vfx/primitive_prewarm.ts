@@ -9,6 +9,7 @@ export { resumeActiveAbilityKit } from './active_kit_prewarm';
 import type { PrewarmResumeUnit } from '../prewarm_resume';
 import type { CrestPrewarmHost } from './crest_prewarm';
 import {
+  abilityVfxBootTextureDependencies,
   abilityVfxTexturePrewarmSteps,
   collectAbilityVfxCompileTargets,
   persistentClassVfxCompileTargets,
@@ -57,6 +58,7 @@ export function abilityPrimitivePrewarmEntry(host: PrimitivePrewarmHost) {
     resumePartialUnits: () => (textureSweepDone ? geometry() : resumeUnits()),
     run: async () => {
       textureSweepDone = false;
+      for (const texture of abilityVfxBootTextureDependencies()) host.texture(texture);
       host.spawn();
       await host.stageMaterials();
       host.scene.traverse((child) => {

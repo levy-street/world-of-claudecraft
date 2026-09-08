@@ -3,6 +3,7 @@ import { type BackgroundGpuQueue, GPU_WORK_PRIORITY } from '../background_gpu_qu
 import type { PrewarmManifestEntry } from '../prewarm_entry';
 import type { PrewarmResumeUnit } from '../prewarm_resume';
 import {
+  bakedTexture,
   warriorBloodTexture,
   warriorPressureTexture,
   warriorSteelTexture,
@@ -61,6 +62,14 @@ function recipe(state: Preparation, cls: string): readonly PrewarmResumeUnit[] {
       run: () => {
         const texture = warriorPressureTexture();
         if (!texture) throw new Error('Active Warrior pressure texture was not loaded');
+        state.host.texture(texture);
+      },
+    },
+    {
+      id: 'upload-big:active-warrior-power',
+      run: () => {
+        const texture = bakedTexture('warrior_power');
+        if (!texture) throw new Error('Active Warrior power texture was not loaded');
         state.host.texture(texture);
       },
     },

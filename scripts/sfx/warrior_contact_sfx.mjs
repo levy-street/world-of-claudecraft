@@ -1,6 +1,54 @@
 /** Distinct material voices for native Warrior contacts; never bulk-regenerated. */
 export const WARRIOR_CONTACT_SFX = [
   {
+    key: 'melee_warrior_avatar_release',
+    duration: 0.14,
+    prompt:
+      'One short colossal armored body loading upward from a planted stance, ancient rough stone grinds under tense iron straps with deep compressed air. Close dry physical weight, no impact, voice, music or ambience.',
+  },
+  {
+    key: 'impact_warrior_avatar_rise',
+    duration: 0.44,
+    prompt:
+      'One immediate gigantic stone transformation locking into place, ascending broken granite slabs, dense low rock crunch under bright mineral fractures, short cascading gravel tail. Powerful monumental physical weight, tight dry finish. No explosion, voice, music or magical ringing.',
+  },
+  {
+    key: 'melee_warrior_reckless_release',
+    duration: 0.14,
+    prompt:
+      'One short aggressive armored warrior wrenching both arms outward, leather strain and a ripping coarse air intake with tense steel scrape. Fierce close dry physical preparation, no impact, voice, music or ambience.',
+  },
+  {
+    key: 'impact_warrior_reckless_tear',
+    duration: 0.36,
+    prompt:
+      'One immediate savage surge of physical fury, six serrated blood-red energy hooks tearing upward with a dense visceral low pressure punch, rough fabric ripping texture and brief hot ember hiss. Strong aggressive compact fantasy combat power-up, no enemy hit, voice, music or sustained tone.',
+  },
+  {
+    key: 'melee_warrior_toll_release',
+    duration: 0.13,
+    prompt:
+      'One very short leather gauntlet clenching firmly against an armored chest, tight strap creak and low inward breath-like air compression. Close intimate dry physical preparation, no voice, enemy hit, music or ambience.',
+  },
+  {
+    key: 'impact_warrior_toll_clench',
+    duration: 0.24,
+    prompt:
+      'One immediate inward blood-power conversion, compact deep heartbeat-like body thump with a tight wet thread pulling inward and a clipped gauntlet leather snap. Deliberate tactile self sacrifice, short dry finish. No enemy impact, scream, voice, music or magical chime.',
+  },
+  {
+    key: 'melee_warrior_seething_release',
+    duration: 0.13,
+    prompt:
+      'One short armored torso bracing for an explosive physical release, taut leather and cloth strain into a fast compressed air intake, coarse aggressive texture. Dry close perspective. No collision, voice, music or ambience.',
+  },
+  {
+    key: 'impact_warrior_seething_release',
+    duration: 0.3,
+    prompt:
+      'One immediate hot outward pressure release from a furious warrior, broad low air punch splitting into two sharp rough rushing jets with a brief crackling ember tail. Energetic explosive motion with a tight dry cutoff. No enemy hit, fireball boom, voice, music or long rumble.',
+  },
+  {
     key: 'melee_warrior_guard_release',
     duration: 0.13,
     prompt:

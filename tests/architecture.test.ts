@@ -565,11 +565,11 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // because the sim collides with the posts it lays out.)
 // post_bloom_shader_core is the host-agnostic GLSL source patch for the
 // identity tint terms in UnrealBloom's composite shader.
-  const RENDER_PURE_CORES = [
-    'src/render/hunter_shellskin_core.ts',
-    'src/render/support_recipient_core.ts',
-    'src/render/hunter_trap_core.ts',
-    'src/render/hourglass_field_core.ts',
+const RENDER_PURE_CORES = [
+  'src/render/hunter_shellskin_core.ts',
+  'src/render/support_recipient_core.ts',
+  'src/render/hunter_trap_core.ts',
+  'src/render/hourglass_field_core.ts',
   'src/render/hunter_pet_component_core.ts',
   'src/render/ability_vfx/physical_choreography_core.ts',
   'src/render/melee_impact_core.ts',
@@ -764,6 +764,7 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
   'src/render/sky_residency_core.ts',
   'src/render/player_aura_rings_core.ts',
   'src/render/warrior_cast_fx_core.ts',
+  'src/render/warrior_power_core.ts',
   'src/render/characters/form_visual_selection_core.ts',
   'src/render/characters/metamorph_wing_motion_core.ts',
   'src/render/warlock_meteor_fx_core.ts',

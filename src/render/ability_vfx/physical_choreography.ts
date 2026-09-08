@@ -14,6 +14,7 @@ import type { SeqSlot, SequencerHost } from './sequencer';
 import { drawReapingArc, drawWarriorAreaContact, isWarriorAreaInstant } from './warrior_area';
 import { drawWarriorBlade } from './warrior_blades';
 import { drawWarriorGuardCast } from './warrior_guard_cast';
+import { drawWarriorPowerCast, warriorPowerRelease } from './warrior_power_cast';
 import { drawWarriorShield } from './warrior_shield';
 import { drawWarriorShout } from './warrior_shouts';
 
@@ -100,6 +101,7 @@ export function physicalRelease(host: SequencerHost, slot: SeqSlot): void {
   const p = slot.spec.physical!;
   const at = host.anchorOf(slot.casterId, 0.6, origin);
   if (!at) return;
+  warriorPowerRelease(host, slot);
   if (p.weapon !== undefined) {
     const duration = physicalBeatTime(p, p.beats.length - 1) + 0.3;
     if (p.weapon === 'both' || p.weapon === 0)
@@ -187,6 +189,7 @@ export function physicalFollowThrough(host: SequencerHost, slot: SeqSlot): void 
 }
 
 function physicalBeat(host: SequencerHost, slot: SeqSlot, beat: number): void {
+  if (drawWarriorPowerCast(host, slot, beat)) return;
   if (drawWarriorGuardCast(host, slot, beat)) return;
   if (drawWarriorShout(host, slot, beat)) return;
   if (furyBeat(host, slot, beat)) return;

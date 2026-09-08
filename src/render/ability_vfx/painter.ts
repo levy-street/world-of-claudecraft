@@ -3,9 +3,11 @@ import {
   clearFuryAudioClaim,
   isMeleeAudioId,
   WARRIOR_GUARD_AUDIO,
+  WARRIOR_POWER_AUDIO,
 } from '../../fury_audio_core';
 import { DAMAGE_CAST_RELEASES } from '../characters/cast_performance';
 import { isBleedContinuation, meleeImpactProfile } from '../melee_impact_core';
+import { warriorPowerIntent, warriorPowerKind } from '../warrior_power_core';
 import { SIGNATURE_ABILITIES } from './signature_core';
 import {
   drawWarriorAreaContact,
@@ -118,6 +120,7 @@ export interface AbilityVfxDeps {
   isMidOneShot?: (entityId: number) => boolean;
   // The local player's entity id (cast-acknowledgment gestures).
   localPlayerId?: () => number;
+  warriorSpecOf?: (entityId: number) => string | null;
   visualVariantOf?: (abilityId: string, casterId: number) => string;
   // True when the entity's rig authors a per-ability one-shot clip
   // (manifest attackByAbility with a live action). Gates the ceremonial cast
@@ -207,6 +210,8 @@ export interface AbilityVfxAuraEvent {
 // kind/templateId are optional so tests can omit them; for players templateId
 // IS the class id, which warms that class's spirit models on first sighting.
 export interface AbilityVfxEntityState {
+  mainhandItemId?: string | null;
+  offhandItemId?: string | null;
   id: number;
   castingAbility: string | null;
   castRemaining: number;
@@ -811,7 +816,8 @@ export class AbilityVfx {
         break;
       case 'selfCast': {
         if (
-          Object.hasOwn(WARRIOR_GUARD_AUDIO, ability) &&
+          (Object.hasOwn(WARRIOR_GUARD_AUDIO, ability) ||
+            Object.hasOwn(WARRIOR_POWER_AUDIO, ability)) &&
           isMeleeAudioId(ability) &&
           this.deps.audioReady
         )
@@ -1208,6 +1214,13 @@ export class AbilityVfx {
   // special whose ONLY event is its hit - that contact IS its cast, so it
   // charges the cast budget (deduped) and runs the full sequence.
   onDamage(ev: AbilityVfxDamageEvent): boolean | void {
+    // The resource payment is already presented by selfCast. Claim only this
+    // self cost so the renderer retains health text without a duplicate hit.
+    if (
+      ev.sourceId === ev.targetId &&
+      (ev.abilityId ?? attackAbilityId(ev.ability)) === 'bloodrage'
+    )
+      return true;
     if (ev.abilityId && DAMAGE_CAST_RELEASES.has(ev.abilityId))
       this.releaseGesture(ev.sourceId, ev.abilityId);
     const compoundId = attackAbilityId(ev.ability);
@@ -1580,6 +1593,18 @@ export class AbilityVfx {
     for (let i = 0; i < e.auras.length; i++) {
       const aura = e.auras[i];
       const auraWasHeld = held.auraStamps.has(aura.id);
+      const power = warriorPowerKind(aura);
+      if (power !== null) {
+        if (!isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 }))
+          fx.holdWarriorPower?.(
+            e.id,
+            power,
+            aura,
+            warriorPowerIntent(this.deps.warriorSpecOf?.(e.id), e.mainhandItemId, e.offhandItemId),
+            this.deps.localPlayerId?.() === e.id,
+          );
+        continue;
+      }
       const guard = warriorGuardKind(aura);
       if (guard !== null) {
         if (!isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 }))

@@ -126,14 +126,12 @@ import {
 } from './character_effects';
 import {
   addCharacterEffectAura,
-  CHARACTER_EFFECT_RECKLESSNESS,
   CHARACTER_EFFECT_SOUL_REND,
   hasCharacterEffect,
 } from './character_effects_core';
 import { showHealingContact } from './character_healing_contact';
 import {
   characterPresentationCasting,
-  nextRecklessnessSkullsLatch,
   shouldRunCharacterPresentationWork,
 } from './character_presentation_core';
 import { characterViewOutsideHysteresis } from './character_view_core';
@@ -752,7 +750,7 @@ import {
   type WarriorCastVisualPlan,
   warriorCastVisualPlan,
 } from './warrior_cast_fx_core';
-import { RecklessSkullPainter } from './warrior_cast_fx_painter';
+import { sampleWarriorPowerBone } from './warrior_power_anchor';
 import { buildWater, setWaterDayNight, setWaterSunDirection, type WaterView } from './water';
 import { buildWaterFlora } from './water_flora';
 import { sampleHandAnchor, weaponTrailAnchor } from './weapon_trail_anchor';
@@ -1181,7 +1179,6 @@ export interface EntityView extends RickshawMountViewState {
   // form's root, cleared via settlePendingSwap, is enough. See #2571.
   formCompilePending: THREE.Object3D | null;
   lastOverheadEmoteKey: string | null;
-  recklessSkullsSpawned?: boolean;
   // render-space position last frame, for true u/s locomotion speed
   lastX: number;
   lastZ: number;
@@ -1335,7 +1332,6 @@ export class Renderer {
   private snapshotDemonicDrainVisualChannels = new Set<number>();
   private drainChannelStopLatch = new DrainChannelStopLatch();
   private aoeRingNext = 0;
-  private recklessSkulls = new RecklessSkullPainter();
   private groundAimReticle: GroundAimReticleVisual;
   raycaster = new THREE.Raycaster();
   private readonly raycastNdc = new THREE.Vector2();
@@ -2985,6 +2981,8 @@ export class Renderer {
         return root ? weaponTrailAnchor(root, hand) : null;
       },
       (id, hand, out) => { const view = this.views.get(id), root = view ? this.activeVisual(view)?.root : null; return root ? sampleHandAnchor(root, hand, out) : false; },
+      (texture) => this.gpuReadyTextures.has(texture),
+      (id, piece, out) => { const view = this.views.get(id), root = view ? this.activeVisual(view)?.root : null; return root ? sampleWarriorPowerBone(root, piece, out) : false; },
     );
     this.abilityVfxFx.setViewportScale(
       this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(),
@@ -3020,6 +3018,7 @@ export class Renderer {
         return v ? !!this.activeVisual(v)?.isMidOneShot : false;
       },
       localPlayerId: () => this.sim.player.id,
+      warriorSpecOf: (id) => id === this.sim.playerId ? this.sim.talentSpec : null,
       visualVariantOf: (id, caster) => ritualVariantAbilityId(id, this.sim.entities.get(caster)?.auras ?? []),
       hasGestureClip: (id, abilityId) => {
         const v = this.views.get(id);
@@ -7835,6 +7834,7 @@ export class Renderer {
           ev.attackAnimationStarted,
           ev.ability,
           ev.abilityId,
+          ev.sourceId === ev.targetId,
         );
         if (ev.school === 'physical' && ev.sourceId !== -1 && startsAttackAnimation)
           this.triggerAttack(ev.sourceId, attackAbilityId(ev.ability));
@@ -10385,7 +10385,6 @@ export class Renderer {
       const metamorphForm = requestedForm === 'metamorph';
       const _stealthed = hasStealth;
       const hasSoulRend = hasCharacterEffect(characterEffects, CHARACTER_EFFECT_SOUL_REND);
-      const hasRecklessness = hasCharacterEffect(characterEffects, CHARACTER_EFFECT_RECKLESSNESS);
       const displayScale = e.scale;
       if (displayScale !== v.liveScale) {
         v.liveScale = displayScale;
@@ -11659,13 +11658,6 @@ export class Renderer {
 
       // per-ability windup orb + buff-orbit bands (spec-driven; no-op for
       // entities with no spec'd cast or aura)
-      const recklessSkullsSpawned = v.recklessSkullsSpawned === true;
-      const nextRecklessSkullsLatch = nextRecklessnessSkullsLatch(
-        hasRecklessness,
-        runCharacterPresentation,
-        recklessSkullsSpawned,
-      );
-      const spawnRecklessnessSkulls = nextRecklessSkullsLatch && !recklessSkullsSpawned;
       if (!syncAbilityVfxCast(e.castingAbility, this.abilityVfx, e)) {
         this.abilityVfx.syncEntity(e, runCharacterPresentation);
       }
@@ -11697,12 +11689,6 @@ export class Renderer {
         if (tithefiendEmpoweredActive(e)) {
           this.vfx.castSparkle(e.id, 'shadow', dt * 2.4);
         }
-        if (hasRecklessness) {
-          this.vfx.recklessFlame(e.id, dt);
-          if (spawnRecklessnessSkulls) {
-            this.recklessSkulls.spawn(v.group, active.height * e.scale);
-          }
-        }
         // Shapeshift-form particle auras riding the tints above: metamorph fire,
         // moonkin star motes, shadowform gloom wisps. Suppressed for the dead
         // (the auras themselves drop, but a corpse must not smolder for a frame).
@@ -11724,10 +11710,6 @@ export class Renderer {
       );
       v.lichHeartbeatAt = heartbeat.nextAt;
       if (heartbeat.play) sink?.necromancy('lichHeartbeat', ax, ay, az, isSelf, e.id);
-      // Preserve the spawn latch while the aura is active and hidden. Camera
-      // re-entry must not replay the skull burst; a real aura end re-arms it.
-      v.recklessSkullsSpawned = nextRecklessSkullsLatch;
-
       // skip the draw for off-screen rigs (pose/audio above already ran)
       if (!charOnScreen) v.group.visible = false;
     }
@@ -11855,7 +11837,6 @@ export class Renderer {
     }
     this.updateClickMarkers(dt);
     this.updateAoeRings(dt);
-    this.recklessSkulls.update(dt);
     this.fishingBobbers.update(dt, this.sim.entities, this.sim.cfg.seed);
     this.updateGroundAimReticle(dt);
     // dev-only Tab-target cone overlay: re-drape the front cone on the terrain

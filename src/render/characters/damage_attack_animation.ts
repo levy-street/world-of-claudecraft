@@ -42,10 +42,14 @@ export function damageEventStartsAttackAnimation(
   attackAnimationStarted: boolean | undefined,
   abilityLabel?: string | null,
   primaryAbilityId?: string | null,
+  selfTargeted = false,
 ): boolean {
   if (!abilityLabel && !primaryAbilityId && sourceVisual?.isPerformingAbility) return false;
   // Every pulse, including the last one after castStop, belongs to the channel.
   const area = primaryAbilityId ?? attackAbilityId(abilityLabel ?? null);
+  // Blood Toll's health payment follows its successful cast ceremony. It is
+  // still damage for health/FCT, but never a second swing at the payer.
+  if (selfTargeted && area === 'bloodrage') return false;
   if (
     source?.castingAbility === 'bladestorm' ||
     area === 'bladestorm' ||

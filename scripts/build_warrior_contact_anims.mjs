@@ -23,6 +23,8 @@ const donors = [
   'Dualwield_Melee_Attack_Chop',
   '1H_Melee_Attack_Slice_Horizontal',
   'Block',
+  'Spellcast_Raise',
+  'Cheer',
 ].map((name) => indexClip(root, name));
 for (const donor of donors) {
   for (const channel of donor.values()) {
@@ -307,7 +309,57 @@ function gripBlade(pose, weight) {
     pose.set(`${bone.name}|rotation`, bone.quaternion.toArray());
   return pose;
 }
+// Candidate offensive-state poses: no gameplay or runtime body scaling.
+const avatarLoad = bladePose(7, 0.35, [0, -0.065, 0], -6, 9);
+const avatarRise = bladePose(7, 1.8, [0, -0.005, 0], 0, -8);
+const recklessLoad = bladePose(8, 0.18, [0, -0.04, 0], -12, 8);
+const recklessTear = bladePose(8, 0.76, [0, -0.008, 0], 12, -9);
+const tollLoad = bladePose(6, 0.14, [0, -0.018, 0], -8, 3);
+const tollClench = bladePose(6, 0.3, [0, -0.034, 0], -12, 9);
+const seethingLoad = bladePose(4, 0.28, [0, -0.04, 0], 0, 8);
+const seethingRelease = bladePose(8, 0.44, [0, -0.008, 0], 0, -5);
 const performances = [
+  [
+    'Warrior_Avatar',
+    [
+      [0, idle],
+      [0.08, avatarLoad],
+      [0.15, avatarRise],
+      [0.29, avatarRise],
+      [0.74, idle],
+    ],
+  ],
+  [
+    'Warrior_Recklessness',
+    [
+      [0, idle],
+      [0.075, recklessLoad],
+      [0.15, recklessTear],
+      [0.245, recklessTear],
+      [0.7, idle],
+    ],
+  ],
+  [
+    'Warrior_Blood_Toll',
+    [
+      [0, idle],
+      [0.075, tollLoad],
+      [0.15, tollClench],
+      [0.225, tollClench],
+      [0.58, idle],
+    ],
+  ],
+  [
+    'Warrior_Seething_Fury',
+    [
+      [0, idle],
+      [0.07, seethingLoad],
+      [0.15, seethingRelease],
+      [0.205, seethingRelease],
+      [0.62, idle],
+    ],
+  ],
+
   [
     'Warrior_Raised_Guard',
     [

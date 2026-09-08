@@ -6,6 +6,7 @@ import { GFX, type GfxSettings } from '../gfx';
 export type BakedKind =
   | 'smoke'
   | 'shout_dust'
+  | 'warrior_power'
   | 'shockwave'
   | 'pyroblast'
   | 'frost_nova'
@@ -14,6 +15,7 @@ export type FragmentKind = 'ice_shard' | 'stone_chip' | 'metal_splinter';
 export const BAKED_URLS = {
   smoke: '/textures/vfx/production/smoke.webp',
   shout_dust: '/textures/vfx/production/shout_dust.webp',
+  warrior_power: '/textures/vfx/production/warrior_power.webp',
   shockwave: '/textures/vfx/production/shockwave.webp',
   pyroblast: '/textures/vfx/production/pyroblast.ktx2',
   frost_nova: '/textures/vfx/production/frost_nova.ktx2',

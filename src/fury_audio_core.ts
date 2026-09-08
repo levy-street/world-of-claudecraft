@@ -92,11 +92,34 @@ export const WARRIOR_GUARD_AUDIO = {
     times: [0.15],
   },
 } as const;
+export const WARRIOR_POWER_AUDIO = {
+  avatar: {
+    release: 'melee_warrior_avatar_release',
+    impacts: ['impact_warrior_avatar_rise'],
+    times: [0.15],
+  },
+  recklessness: {
+    release: 'melee_warrior_reckless_release',
+    impacts: ['impact_warrior_reckless_tear'],
+    times: [0.15],
+  },
+  bloodrage: {
+    release: 'melee_warrior_toll_release',
+    impacts: ['impact_warrior_toll_clench'],
+    times: [0.15],
+  },
+  berserker_rage: {
+    release: 'melee_warrior_seething_release',
+    impacts: ['impact_warrior_seething_release'],
+    times: [0.15],
+  },
+} as const;
 export const MELEE_AUDIO = {
   ...FURY_AUDIO,
   ...WARRIOR_CONTACT_AUDIO,
   ...WARRIOR_AREA_AUDIO,
   ...WARRIOR_GUARD_AUDIO,
+  ...WARRIOR_POWER_AUDIO,
 };
 export type MeleeAudioId = keyof typeof MELEE_AUDIO;
 export function isMeleeAudioId(id: string | undefined): id is MeleeAudioId {

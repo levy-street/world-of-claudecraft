@@ -49,6 +49,13 @@ export interface AbilityVfxCompileTarget {
   object: THREE.Object3D;
 }
 
+/** Gated layers cannot bind their map in the boot spawn before upload. Prepare
+ * this small explicit dependency first, including observers of other classes. */
+export function abilityVfxBootTextureDependencies(): THREE.Texture[] {
+  const power = bakedTexture('warrior_power');
+  return power ? [power] : [];
+}
+
 // Retain one invisible set so its linked programs stay cached between casts.
 let persistentWarm: THREE.Group | null = null;
 const shellskinWarmVariants = new Map<string, HunterShellskinVisual>();
@@ -169,6 +176,7 @@ export function abilityVfxTexturePrewarmSteps(): AbilityVfxPrewarmTextureStep[] 
   for (const kind of [
     'smoke',
     'shout_dust',
+    'warrior_power',
     'shockwave',
     'pyroblast',
     'frost_nova',

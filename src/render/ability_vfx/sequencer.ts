@@ -100,6 +100,9 @@ export interface SequencerHost {
     delay: number,
     heat: number,
     angle?: number,
+    reverse?: boolean,
+    roll?: number,
+    aspect?: number,
   ): boolean | void;
   fragmentsAt?(
     kind: FragmentKind,

@@ -15,6 +15,9 @@ interface Slot {
   rise: number;
   y: number;
   authored: boolean;
+  power: boolean;
+  reverse: boolean;
+  roll: number;
   dust: boolean;
   x: number;
   z: number;
@@ -29,7 +32,10 @@ export class BakedImpactLayers {
   private readonly slots: Slot[] = [];
   private disposed = false;
   private readonly unbind: Array<() => void> = [];
-  constructor(scene: THREE.Scene) {
+  constructor(
+    scene: THREE.Scene,
+    private readonly textureReady?: (texture: THREE.Texture) => boolean,
+  ) {
     const geometry = new THREE.PlaneGeometry(1, 1, 8, 8);
     const proto = new THREE.ShaderMaterial({
       uniforms: {
@@ -123,6 +129,9 @@ export class BakedImpactLayers {
         rise: 0,
         y: 0,
         authored: false,
+        power: false,
+        reverse: false,
+        roll: 0,
         dust: false,
         x: 0,
         z: 0,
@@ -148,11 +157,18 @@ export class BakedImpactLayers {
     floor: number,
     angle = 0,
     groundY?: (x: number, z: number) => number,
+    reverse = false,
+    roll = 0,
+    aspect = 1,
   ): boolean {
     if (
       this.disposed ||
       !bakedTexture(kind) ||
-      ![x, y, z, size, duration, delay, heat, floor, angle].every(Number.isFinite) ||
+      // Decoding is not GPU preparation. The new large optional layer stays
+      // cold until this renderer's explicit upload has completed successfully.
+      (kind === 'warrior_power' && !this.textureReady?.(bakedTexture(kind)!)) ||
+      ![x, y, z, size, duration, delay, heat, floor, angle, roll, aspect].every(Number.isFinite) ||
+      aspect <= 0 ||
       size <= 0 ||
       duration <= 0
     )
@@ -165,7 +181,10 @@ export class BakedImpactLayers {
     s.size = Math.min(9, size);
     s.ground = kind === 'shockwave';
     s.authored = kind === 'pyroblast' || kind === 'frost_nova' || kind === 'chain_heal';
-    s.rise = s.ground || s.authored || kind === 'shout_dust' ? 0 : 0.18;
+    s.power = kind === 'warrior_power';
+    s.reverse = reverse;
+    s.roll = roll;
+    s.rise = s.ground || s.authored || s.power || kind === 'shout_dust' ? 0 : 0.18;
     s.y = y;
     s.x = x;
     s.z = z;
@@ -177,7 +196,7 @@ export class BakedImpactLayers {
       s.groundPath[i] = Number.isFinite(sampled) ? sampled : floor;
     }
     s.mesh.position.set(x, y, z);
-    s.mesh.scale.setScalar(s.size);
+    s.mesh.scale.set(s.size * Math.min(2, aspect), s.size, s.size);
     s.mesh.quaternion.identity();
     if (s.ground) s.mesh.rotation.set(-Math.PI / 2, 0, angle);
     // Prepared per-slot vertices drape once at spawn. Smoke resets the same
@@ -196,7 +215,7 @@ export class BakedImpactLayers {
     positions.needsUpdate = true;
     const u = s.mesh.material.uniforms;
     u.uMap.value = bakedTexture(kind);
-    u.uMirror.value = kind === 'shout_dust' && Math.cos(angle) < 0 ? -1 : 1;
+    u.uMirror.value = (kind === 'shout_dust' || s.power) && Math.cos(angle) < 0 ? -1 : 1;
     const surface = kind === 'chain_heal' ? liquidSurfaceMaps() : null;
     u.uSurface.value = surface ? 1 : 0;
     u.uNormal.value = surface?.normal ?? u.uMap.value;
@@ -211,9 +230,9 @@ export class BakedImpactLayers {
     u.uFloor.value = floor;
     u.uGround.value = s.ground ? 1 : 0;
     u.uAuthored.value = s.authored ? 1 : 0;
-    u.uGutter.value = s.authored || kind === 'shout_dust' ? 4 / 256 : 0.018;
+    u.uGutter.value = s.authored || s.power || kind === 'shout_dust' ? 4 / 256 : 0.018;
     u.uPivot.value.set(
-      0.5,
+      s.power ? 0.5 - (1.45 / 5.6) * u.uMirror.value : 0.5,
       kind === 'pyroblast'
         ? 0.8623381263
         : kind === 'frost_nova'
@@ -222,7 +241,9 @@ export class BakedImpactLayers {
             ? 0.7128991485
             : kind === 'shout_dust'
               ? 0.5 + 1.25 / 5.6
-              : 0.5,
+              : s.power
+                ? 0.5 + 0.8 / 5.6
+                : 0.5,
     );
     s.mesh.userData.heat = u.uHeat.value;
     return true;
@@ -239,14 +260,15 @@ export class BakedImpactLayers {
       if (!s.mesh.visible) continue;
       const u = s.mesh.material.uniforms;
       u.uMotion.value = reducedMotion ? 0 : 1;
-      u.uFrame.value = (reducedMotion ? 0.36 : p) * 63;
+      u.uFrame.value = (reducedMotion ? 0.36 : s.reverse ? 1 - p : p) * 63;
       u.uOpacity.value =
-        (s.authored ? 0.94 : s.ground ? 0.75 : 0.64) *
+        (s.authored ? 0.94 : s.ground || s.power ? 0.75 : 0.64) *
         Math.min(1, p / 0.045) *
         Math.min(1, (1 - p) / 0.25);
       u.uHeat.value = s.mesh.userData.heat * (1 - p) ** 3;
       if (!s.ground) {
         s.mesh.quaternion.copy(camera);
+        if (s.roll !== 0) s.mesh.rotateZ(s.roll);
         s.mesh.position.y = s.y + (reducedMotion ? 0 : p * s.rise);
         if (s.dust) {
           const advance = reducedMotion ? 0.65 : 1 - (1 - p) * (1 - p);

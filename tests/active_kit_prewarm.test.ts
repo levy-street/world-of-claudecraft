@@ -32,6 +32,10 @@ function fixture(cls = 'warrior') {
   vi.spyOn(assets, 'warriorBloodTexture').mockReturnValue(blood);
   const steel = new THREE.Texture();
   vi.spyOn(assets, 'warriorSteelTexture').mockReturnValue(steel);
+  const power = new THREE.Texture();
+  vi.spyOn(assets, 'bakedTexture').mockImplementation((kind) =>
+    kind === 'warrior_power' ? power : null,
+  );
   const queue = {
     run: vi.fn(async (work: PrewarmResumeUnit['run']) => {
       await work();
@@ -56,6 +60,7 @@ function fixture(cls = 'warrior') {
     texture,
     blood,
     steel,
+    power,
     close: () => {
       cancelActiveAbilityKit(scene);
       prep.dispose();
@@ -64,6 +69,7 @@ function fixture(cls = 'warrior') {
       texture.dispose();
       blood.dispose();
       steel.dispose();
+      power.dispose();
       vi.restoreAllMocks();
     },
   };
@@ -76,19 +82,20 @@ it('registers without GPU work and resumes only the twelve selected Warrior shap
     expect(f.entry).not.toHaveProperty('resumeUnits');
     expect(f.entry).not.toHaveProperty('deadlineExempt');
     expect(f.queue.run).not.toHaveBeenCalled();
-    expect(f.entry.progress()).toEqual({ done: 0, planned: 51, trimmed: true });
+    expect(f.entry.progress()).toEqual({ done: 0, planned: 52, trimmed: true });
     // A dropped/skipped manifest never ran entry.run(), but kept registration.
     resumeActiveAbilityKit(f.scene);
     await ensureActiveAbilityKit(f.scene);
-    expect(f.queue.run).toHaveBeenCalledTimes(51);
+    expect(f.queue.run).toHaveBeenCalledTimes(52);
     for (const call of f.queue.run.mock.calls as unknown[][]) {
       expect(call[1]).toBe(GPU_WORK_PRIORITY.ACTIONABLE_VIEW);
       expect(call[3]).toEqual({ releaseTail: true });
     }
-    expect(f.upload).toHaveBeenCalledTimes(3);
+    expect(f.upload).toHaveBeenCalledTimes(4);
     expect(f.upload).toHaveBeenNthCalledWith(1, f.blood);
     expect(f.upload).toHaveBeenNthCalledWith(2, f.steel);
     expect(f.upload).toHaveBeenNthCalledWith(3, f.texture);
+    expect(f.upload).toHaveBeenNthCalledWith(4, f.power);
     expect(f.host.draw).toHaveBeenCalledTimes(12);
     expect(ACTIVE_WARRIOR_CRESTS).toContain('steel_storm');
     expect(ACTIVE_WARRIOR_CRESTS).toContain('steel_reap');
@@ -99,7 +106,7 @@ it('registers without GPU work and resumes only the twelve selected Warrior shap
     for (const kind of ACTIVE_WARRIOR_CRESTS) expect(f.prep.ready(kind)).toBe(true);
     expect(f.prep.ready('fire')).toBe(false);
     await ensureActiveAbilityKit(f.scene);
-    expect(f.queue.run).toHaveBeenCalledTimes(51);
+    expect(f.queue.run).toHaveBeenCalledTimes(52);
     expect(f.entry.progress().trimmed).toBe(false);
   } finally {
     f.close();
@@ -126,7 +133,7 @@ it('surfaces a failed compile without blessing its buffers and retries only unpa
     expect(f.prep.ready('blood_cut')).toBe(false);
     expect(f.host.draw).not.toHaveBeenCalled();
     await ensureActiveAbilityKit(f.scene);
-    expect(f.upload).toHaveBeenCalledTimes(3);
+    expect(f.upload).toHaveBeenCalledTimes(4);
     expect(f.prep.ready('blood_cut')).toBe(true);
   } finally {
     f.close();

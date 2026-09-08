@@ -1394,16 +1394,15 @@ export const VISUALS: Record<string, VisualDef> = {
         heroic_leap: 'Warrior_Heroic_Leap',
         // A decisive cut followed by an upright, confident recovery.
         victory_rush: 'Warrior_Victory_Rush',
-        // Seething Fury and Recklessness are both a defiant roar of rage: no
-        // castFx, no target, so (like Heroic Leap above) the existing Cheer
-        // gesture only shows up once an attackByAbility entry exists for it.
-        berserker_rage: 'Cheer',
-        recklessness: 'Cheer',
+        // Native resource ceremonies: inward clench, outward pressure release,
+        // and an aggressive opening of both arms. Each recovers inside a GCD.
+        bloodrage: 'Warrior_Blood_Toll',
+        berserker_rage: 'Warrior_Seething_Fury',
+        recklessness: 'Warrior_Recklessness',
         // The actual blade supplies its distinct defensive presentation.
         die_by_sword: 'Warrior_Sword_Guard',
-        // Avatar's colossus transformation gets the raised-arm flourish
-        // (the longest clip on the rig, fits a dramatic moment), same path.
-        avatar: 'Spellcast_Raise',
+        // A planted rise carries Avatar's physical transformation.
+        avatar: 'Warrior_Avatar',
         // Piercing Howl's own description calls it "a piercing shout" even
         // though it carries no castFx (unlike the six castFx:'shout'
         // abilities below, which the painter's 'shout' case always plays as

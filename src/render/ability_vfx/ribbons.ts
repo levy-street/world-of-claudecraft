@@ -11,7 +11,10 @@ import { type SteelSweepRange, steelSweepGain } from './steel_sweep';
 // Vfx projectile, and slash arcs (melee strike reads). Hard caps on verts and
 // slots; every point buffer is preallocated, so steady state allocates nothing.
 
-const MAX_VERTS = 4096;
+// Preserve the former 4096-vertex allowance in full and reserve 768 more for
+// two complete three-point power outlines on each of 64 visible Warriors.
+// Fixed constructor allocation; no resize or GPU allocation during combat.
+const MAX_VERTS = 4864;
 const MAX_INDICES = MAX_VERTS * 3;
 const BOLT_SLOTS = 10;
 const BOLT_PTS = 17; // 4 midpoint-displacement passes on a 2-point seed
