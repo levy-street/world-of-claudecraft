@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { paintWarriorAttention } from './warrior_attention_atlas';
+import { paintWarriorControlMark, paintWarriorHammer } from './warrior_control_atlas';
 import { paintWarriorFracture } from './warrior_fracture_atlas';
 import { paintWarriorMark } from './warrior_mark_atlas';
 
@@ -290,7 +291,7 @@ function charTexture(): THREE.CanvasTexture {
 
 // Stable numeric identities in a row-major atlas. New etched armor cells share
 // the existing upload/compile lane and the same bounded overlay draw.
-export const OVERLAY_ATLAS_GRID = 3;
+export const OVERLAY_ATLAS_GRID = 5;
 export const OVERLAY_CELL = {
   glow: 0,
   star: 1,
@@ -301,6 +302,9 @@ export const OVERLAY_CELL = {
   attention0: 6,
   attention1: 7,
   attention2: 8,
+  hammer0: 9,
+  armorShear0: 17,
+  hamstring: 22,
 } as const;
 
 function overlayAtlasTexture(): THREE.CanvasTexture {
@@ -308,7 +312,11 @@ function overlayAtlasTexture(): THREE.CanvasTexture {
   return makeCanvas(cell * OVERLAY_ATLAS_GRID, (g) => {
     const at = (ix: number, iy: number, draw: (cx: number, cy: number) => void): void => {
       g.save();
-      draw(ix * cell + cell / 2, iy * cell + cell / 2);
+      const index = ix + iy * 3;
+      draw(
+        (index % OVERLAY_ATLAS_GRID) * cell + cell / 2,
+        Math.floor(index / OVERLAY_ATLAS_GRID) * cell + cell / 2,
+      );
       g.restore();
     };
     // glow: soft radial dot
@@ -366,6 +374,19 @@ function overlayAtlasTexture(): THREE.CanvasTexture {
     at(2, 1, (cx, cy) => paintWarriorMark(g, cx, cy, cell, false));
     for (let cel = 0; cel < 3; cel++)
       at(cel, 2, (cx, cy) => paintWarriorAttention(g, cx, cy, cell, cel));
+    for (let cel = 0; cel < 8; cel++) {
+      const index = OVERLAY_CELL.hammer0 + cel;
+      at(index % 3, Math.floor(index / 3), (cx, cy) => paintWarriorHammer(g, cx, cy, cell, cel));
+    }
+    for (let stacks = 1; stacks <= 5; stacks++) {
+      const index = OVERLAY_CELL.armorShear0 + stacks - 1;
+      at(index % 3, Math.floor(index / 3), (cx, cy) =>
+        paintWarriorControlMark(g, cx, cy, cell, stacks),
+      );
+    }
+    at(OVERLAY_CELL.hamstring % 3, Math.floor(OVERLAY_CELL.hamstring / 3), (cx, cy) =>
+      paintWarriorControlMark(g, cx, cy, cell, 0),
+    );
   });
 }
 

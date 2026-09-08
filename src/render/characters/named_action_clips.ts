@@ -170,6 +170,12 @@ export function prepareNamedActionClips(
       'unleash_beast',
     ].includes(id);
     if (warrior && id !== 'pummel' && id !== 'storm_bolt') continue;
+    if (
+      warrior &&
+      ((id === 'pummel' && clips.has('Warrior_Jawcrack')) ||
+        (id === 'storm_bolt' && clips.has('Warrior_Storm_Bolt')))
+    )
+      continue;
     if (!warrior && key !== 'player_mech' && (id === 'pummel' || id === 'storm_bolt')) continue;
     if (hunter && !hunterAction) continue;
     if (rogue && hunterAction) continue;

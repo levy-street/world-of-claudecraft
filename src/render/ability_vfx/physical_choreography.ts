@@ -1,3 +1,4 @@
+import { warriorControlReleaseSample } from '../../warrior_control_audio';
 import { meleeContactHeight, meleeImpactProfile } from '../melee_impact_core';
 import { drawDirtToss } from './action_contact';
 import { drawBloodhook } from './bloodhook';
@@ -13,6 +14,7 @@ import { physicalContact } from './physical_contact';
 import type { SeqSlot, SequencerHost } from './sequencer';
 import { drawReapingArc, drawWarriorAreaContact, isWarriorAreaInstant } from './warrior_area';
 import { drawWarriorBlade } from './warrior_blades';
+import { drawWarriorControlAttempt, drawWarriorControlSuccess } from './warrior_control';
 import { drawFuriousMending } from './warrior_fury_feedback';
 import { drawWarriorGoad } from './warrior_goad';
 import { drawWarriorGuardCast } from './warrior_guard_cast';
@@ -119,11 +121,20 @@ export function physicalRelease(host: SequencerHost, slot: SeqSlot): void {
     lite: slot.tier > 0,
     archetype: slot.spec.archetype,
     abilityId: slot.abilityId,
+    sample: warriorControlReleaseSample(slot.abilityId),
   });
 }
 
 export function physicalImpact(host: SequencerHost, slot: SeqSlot): void {
   const p = slot.spec.physical!;
+  if (slot.abilityId === 'pummel' || slot.abilityId === 'sunder_armor') {
+    if (!slot.physicalSecondary) drawWarriorControlAttempt(host, slot, 0);
+    if (slot.componentOutcomes === 1)
+      drawWarriorControlSuccess(host, slot.abilityId, slot.casterId, slot.targetId, slot.tier);
+    slot.lingerUntil = slot.t + 0.23;
+    slot.motifLoops = p.beats.length;
+    return;
+  }
   if (slot.physicalSecondary && isWarriorAreaInstant(slot.abilityId)) {
     const outcome = (slot.componentOutcomes === undefined ? 1 : slot.componentOutcomes & 3) as
       | 0
@@ -194,6 +205,7 @@ export function physicalFollowThrough(host: SequencerHost, slot: SeqSlot): void 
 }
 
 function physicalBeat(host: SequencerHost, slot: SeqSlot, beat: number): void {
+  if (drawWarriorControlAttempt(host, slot, beat)) return;
   if (drawWarriorRushArrival(host, slot, beat)) return;
   if (drawFuriousMending(host, slot, beat)) return;
   if (drawWarriorGyre(host, slot, beat)) return;

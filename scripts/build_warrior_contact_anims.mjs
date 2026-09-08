@@ -11,6 +11,7 @@ import {
   samplePose,
   stripToAnimationsOnly,
 } from './anim/pose_blend.mjs';
+import { warriorControlPerformances } from './anim/warrior_control_poses.mjs';
 
 const io = await createGlbIO();
 const doc = await io.read('public/models/chars/players/knight.glb');
@@ -25,6 +26,7 @@ const donors = [
   'Block',
   'Spellcast_Raise',
   'Cheer',
+  'Punch_A',
 ].map((name) => indexClip(root, name));
 for (const donor of donors) {
   for (const channel of donor.values()) {
@@ -690,6 +692,7 @@ const performances = [
     ],
   ],
 ];
+performances.push(...warriorControlPerformances(idle, bladePose, openAvatarArms));
 const clips = [],
   reports = [];
 for (const [name, beats] of performances) {

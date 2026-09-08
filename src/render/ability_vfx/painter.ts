@@ -6,6 +6,8 @@ import {
   WARRIOR_POWER_AUDIO,
   WARRIOR_UTILITY_AUDIO,
 } from '../../fury_audio_core';
+import type { SimEvent } from '../../sim/types';
+import { WARRIOR_CONTROL_AUDIO } from '../../warrior_control_audio';
 import { DAMAGE_CAST_RELEASES } from '../characters/cast_performance';
 import { isBleedContinuation, meleeImpactProfile } from '../melee_impact_core';
 import { warriorFuryStateKind } from '../warrior_fury_state_core';
@@ -18,7 +20,10 @@ import {
 } from './warrior_area';
 import { warriorAttentionSource } from './warrior_attention_core';
 import { WARRIOR_BLADE_STYLES } from './warrior_blades';
+import { drawWarriorControlAura } from './warrior_control';
+import { holdWarriorControlMark } from './warrior_control_marks';
 import { warriorGuardKind } from './warrior_guard_plates';
+import { drawWarriorHammerContact } from './warrior_hammer';
 import { drawWarriorLeapLanding, drawWarriorLeapLaunch } from './warrior_leap';
 // Thin painter for the per-ability spell VFX system: resolves an event's
 // ability id against the authored spec table (ability_vfx_specs.ts), asks the
@@ -667,7 +672,11 @@ export class AbilityVfx {
           else this.deps.triggerAttack(ev.sourceId, ability);
         }
         const scale = ev.fx === 'heavyBolt' ? Math.max(plan.projScale, 2) : plan.projScale;
-        if (tier < 2 && full?.bolt) {
+        if ((tier < 2 || ability === 'storm_bolt') && full?.bolt) {
+          const hammerAudio =
+            ability === 'storm_bolt' &&
+            !!this.deps.audioReady?.(WARRIOR_CONTROL_AUDIO.storm_bolt.release) &&
+            !!this.deps.anchor(ev.sourceId, 0.62);
           // The full spec's bolt DNA (style silhouette, authored speed, coils,
           // forks, tracer, leader, volley) drives the styled trail system,
           // whose head sprite IS the projectile - the generic Vfx comet would
@@ -682,7 +691,9 @@ export class AbilityVfx {
             tier,
             plan.volley,
             scale,
+            hammerAudio,
           );
+          if (hammerAudio) claimFuryAudio(originalEvent);
           this.spawned += plan.volley;
         } else if (plan.jagged) {
           this.deps.vfx.lightningProjectile(ev.sourceId, ev.targetId, plan.color);
@@ -894,6 +905,8 @@ export class AbilityVfx {
             : ev.sourceId;
         const utilityTier =
           (Object.hasOwn(WARRIOR_UTILITY_AUDIO, ability) ||
+            ability === 'pummel' ||
+            ability === 'sunder_armor' ||
             ability === 'charge' ||
             ability === 'intervene') &&
           tier === 2
@@ -1236,6 +1249,18 @@ export class AbilityVfx {
   // plain autos) never consume its cast slots. The one exception: a physical
   // special whose ONLY event is its hit - that contact IS its cast, so it
   // charges the cast budget (deduped) and runs the full sequence.
+  onWarriorControlAura(
+    ev: Extract<SimEvent, { type: 'aura' }>,
+    auras?: readonly { id: string; kind: string; remaining?: number }[],
+  ): boolean {
+    return drawWarriorControlAura(
+      this.deps.fx,
+      ev,
+      this.budget.peek(ev.sourceId ?? ev.targetId, this.now()),
+      auras,
+    );
+  }
+
   onDamage(ev: AbilityVfxDamageEvent): boolean | void {
     // The resource payment is already presented by selfCast. Claim only this
     // self cost so the renderer retains health text without a duplicate hit.
@@ -1256,6 +1281,26 @@ export class AbilityVfx {
         ev.targetId,
         outcome,
         tier,
+      );
+    }
+    if ((ev.abilityId ?? attackAbilityId(ev.ability)) === 'sunder_armor') return true;
+    if ((ev.abilityId ?? attackAbilityId(ev.ability)) === 'storm_bolt') {
+      this.deps.fx.cancelWarriorHammer(ev.sourceId, ev.targetId);
+      const tier = this.biasFor(ev.sourceId, this.budget.peek(ev.sourceId, this.now()));
+      const outcome = ev.kind === 'hit' ? (ev.amount > 0 ? 1 : (ev.absorbed ?? 0) > 0 ? 2 : 0) : 0;
+      const hammerAudio =
+        outcome === 1 &&
+        !!this.deps.audioReady?.(WARRIOR_CONTROL_AUDIO.storm_bolt.impacts[0]) &&
+        !!this.deps.anchor(ev.sourceId, 0.62) &&
+        !!this.deps.anchor(ev.targetId, 0.68);
+      if (hammerAudio) claimFuryAudio(ev);
+      return drawWarriorHammerContact(
+        this.deps.fx,
+        ev.sourceId,
+        ev.targetId,
+        outcome,
+        tier,
+        hammerAudio,
       );
     }
     const compoundId = attackAbilityId(ev.ability);
@@ -1356,7 +1401,7 @@ export class AbilityVfx {
       const spec = abilityVfxSpecFor(appearance),
         full = abilityVfxFullSpecFor(appearance);
       let tier = this.castTier(ev.sourceId, compoundId);
-      if (compoundId === 'breachmaker' && tier === 2) tier = 1;
+      if ((compoundId === 'breachmaker' || compoundId === 'hamstring') && tier === 2) tier = 1;
       if (appearance === compoundId && spec && full && tier < 2) {
         this.deps.fx.sequenceInstant(
           compoundId,
@@ -1463,7 +1508,7 @@ export class AbilityVfx {
       if (tier >= 1) return; // degraded accents vanish first; casts keep priority
       if (!this.budget.admitAccent(nowSec)) return;
     }
-    if (abilityId === 'breachmaker' && tier === 2) tier = 1;
+    if ((abilityId === 'breachmaker' || abilityId === 'hamstring') && tier === 2) tier = 1;
     const plan = planImpact(spec, ev.crit, this.quality, tier);
     const at = this.deps.anchor(ev.targetId, 0.55);
     if (!at) return;
@@ -1531,6 +1576,7 @@ export class AbilityVfx {
   // Allocation-free per call.
   syncEntity(e: AbilityVfxEntityState, renderEffects = true): void {
     const fx = this.deps.fx;
+    if (isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 })) fx.cancelWarriorHammer?.(e.id);
     let held = this.heldSemantic.get(e.id);
     if (!held) {
       held = {
@@ -1660,6 +1706,15 @@ export class AbilityVfx {
           fx.holdWarriorGuard?.(e.id, guard, aura, this.deps.localPlayerId?.() === e.id);
         continue;
       }
+      if (
+        holdWarriorControlMark(
+          fx,
+          e.id,
+          aura,
+          !isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 }),
+        )
+      )
+        continue;
       if (aura.id === 'breachmaker_vuln' || aura.id === 'thunder_clap_as') {
         if (
           (aura.remaining ?? 0) > 0 &&

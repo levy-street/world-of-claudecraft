@@ -3,6 +3,7 @@ import type { VfxAnchorResolver } from '../vfx_anchor';
 import { type AbilityVfxTextures, OVERLAY_CELL } from './fx_textures';
 import { slashWidthScale } from './spectacle';
 import { type SteelSweepRange, steelSweepGain } from './steel_sweep';
+import { warriorHammerCel } from './warrior_control_atlas';
 
 // Camera-facing ribbon trails, ported from the gallery's RibbonMesh +
 // genBolt/smoothArc (arc_bolt_preview.js, ribbons section). One pooled dynamic
@@ -35,6 +36,7 @@ const SHADOW_FANG_SAMPLE_YARDS = 0.4;
 export type BoltTrailStyle =
   | 'comet'
   | 'rock'
+  | 'warHammer'
   | 'shard'
   | 'arrow'
   | 'wisp'
@@ -50,6 +52,7 @@ const TRAIL_DNA: Record<
   { wGlow: number; mGlow: number; wCore: number; mCore: number }
 > = {
   comet: { wGlow: 1, mGlow: 1, wCore: 1, mCore: 1 },
+  warHammer: { wGlow: 0.75, mGlow: 0.55, wCore: 0.38, mCore: 0.95 },
   rock: { wGlow: 1.35, mGlow: 1, wCore: 1.2, mCore: 0.7 }, // fat dim molten wake
   shard: { wGlow: 0.65, mGlow: 0.85, wCore: 0.6, mCore: 1.3 }, // narrow crisp glint
   arrow: { wGlow: 0.4, mGlow: 0.55, wCore: 0.4, mCore: 1.1 }, // whisper-thin streak
@@ -859,6 +862,10 @@ export class AbilityVfxRibbons {
 
     for (const t of this.trails) {
       if (!t.active) continue;
+      if (t.style === 'warHammer' && !this.anchor(t.sourceId, 0.62, this.a1)) {
+        this.terminateTrail(t);
+        continue;
+      }
       if (t.delay > 0) {
         // staggered volley follower: ride the caster's hand until launch
         t.delay -= dt;
@@ -1093,6 +1100,18 @@ export class AbilityVfxRibbons {
     this.add(points, count, width, this.heldColor, light, 0.1, 1);
   }
 
+  /** End one resolved throw, or every throw involving a dead participant. */
+  cancelWarriorHammer(entityId: number, targetId?: number): void {
+    for (const t of this.trails) {
+      if (!t.active || t.style !== 'warHammer') continue;
+      const matches =
+        targetId === undefined
+          ? t.sourceId === entityId || t.targetId === entityId
+          : t.sourceId === entityId && t.targetId === targetId;
+      if (matches) this.terminateTrail(t);
+    }
+  }
+
   clear(): void {
     for (const b of this.bolts) b.active = false;
     for (const t of this.trails) {
@@ -1309,6 +1328,11 @@ export class AbilityVfxRibbons {
           sink(h.x, h.y, h.z, t.coreHex, 0.4 * hs * pulse, OVERLAY_CELL.spark, 0.95, 2.8);
           sink(h.x, h.y, h.z, t.colorHex, 0.3 * hs, OVERLAY_CELL.glow, 0.6, 1.1);
           break;
+        case 'warHammer': {
+          const cel = OVERLAY_CELL.hammer0 + warriorHammerCel(time, reducedMotion);
+          sink(h.x, h.y, h.z, 0xffffff, 1.5 * hs, cel, 1, 0.5);
+          break;
+        }
         case 'rock': {
           // molten boulder: a dim fat glow with two embers tumbling around it
           sink(h.x, h.y, h.z, t.colorHex, 0.5 * hs, OVERLAY_CELL.glow, 0.9, 1.15);

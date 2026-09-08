@@ -7,9 +7,11 @@ import { conformSfxAudio, probeSfxAudio } from './sfx/conform_audio.mjs';
 import { FFMPEG_PATH, FFPROBE_PATH } from './sfx/ffmpeg_paths.mjs';
 import { FURY_SFX } from './sfx/fury_sfx.mjs';
 import { WARRIOR_CONTACT_SFX } from './sfx/warrior_contact_sfx.mjs';
+import { WARRIOR_CONTROL_SFX } from './sfx/warrior_control_sfx.mjs';
 
-const contact = process.argv.includes('--warrior-contact');
-const cues = contact ? WARRIOR_CONTACT_SFX : FURY_SFX;
+const controls = process.argv.includes('--warrior-control');
+const contact = controls || process.argv.includes('--warrior-contact');
+const cues = controls ? WARRIOR_CONTROL_SFX : contact ? WARRIOR_CONTACT_SFX : FURY_SFX;
 const root = contact ? 'tmp/warrior-contact-audio' : 'tmp/fury-audio';
 mkdirSync(join(root, 'curated'), { recursive: true });
 const review = [];
@@ -72,5 +74,8 @@ for (const cue of cues)
       output: probeSfxAudio(outputFile, FFPROBE_PATH),
     });
   }
-writeFileSync(join(root, 'conformance-review.json'), JSON.stringify(review, null, 2) + '\n');
+writeFileSync(
+  join(root, controls ? 'control-conformance-review.json' : 'conformance-review.json'),
+  JSON.stringify(review, null, 2) + '\n',
+);
 console.log(`Conformed ${review.length} Fury takes; onset choices retained for auditory review`);

@@ -32,6 +32,10 @@ const SOURCE_ALIASES: Readonly<Record<string, string>> = {
 };
 const WARRIOR_CONTACT_SOURCES: Readonly<Record<string, string>> = {
   heroic_leap: 'Warrior_Heroic_Leap',
+  hamstring: 'Warrior_Hobbling_Cut',
+  pummel: 'Warrior_Jawcrack',
+  sunder_armor: 'Warrior_Armor_Shear',
+  storm_bolt: 'Warrior_Storm_Bolt',
   taunt: 'Warrior_Goad',
   furious_mending: 'Warrior_Furious_Mending',
   whirlwind: 'Warrior_Bladed_Gyre',

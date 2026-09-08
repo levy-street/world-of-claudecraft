@@ -1,0 +1,340 @@
+{
+  "purpose": "Matching gameplay-distance before/after Warrior control production checkpoint; not final full-kit acceptance",
+  "camera": {
+    "yaw": 1.9,
+    "pitch": 0.4,
+    "distance": 18
+  },
+  "viewport": {
+    "width": 1400,
+    "height": 900
+  },
+  "graphicsPreset": 4,
+  "environment": "studio",
+  "sources": {
+    "before": {
+      "directory": "warrior-control-before-1",
+      "reportSha256": "2ed19b5ecc1602d4c171c11da4c6703fe59117d3eb4a6100a3c55ec7aa007e85",
+      "sourceAtStart": {
+        "src/render/ability_vfx/decals.ts": "e03c11cfe05498918e419272b71f8bcf50eb5a098db2a238b7f75b0c4580c636",
+        "src/render/ability_vfx/warrior_fracture_atlas.ts": "f3eb364de2eecd08c714434f23ed93af26f2e9fcbf4afc1ad28e2c0eb3c171d9",
+        "src/render/ability_vfx/warrior_mobility.ts": "44dec1c71f2cd5f1d2b2300605baa5a27a85094db6a8d865a92d8b6cf12a0408",
+        "src/render/characters/warrior_rush_pose.ts": "4b9e4c6f73f12fb596404845774857583be552f8098a7c91f51b9961ed9aacf5",
+        "scripts/anim/warrior_rush.mjs": "fc3ad82708f398ec95a42e0d05ef02628a2f1c3d8705d0e17db50e1a88b06ba7",
+        "scripts/build_warrior_ability_anims.mjs": "6c4675fbd0c43012de31329bdae2f5b48bc2b1d510bfe1849fc0b686efac0260",
+        "public/models/chars/players/warrior_ability_anims.glb": "8aefecd84783b12220f87a09df76d9ea11d1b6c919f362742619b76f1d487edd",
+        "src/render/ability_vfx/sequencer.ts": "46c5ca2688e266331c1196f221a44fd15408edf9396b8ef625c7fc54a71bd6d9",
+        "src/render/ability_vfx/warrior_fury_states.ts": "0baf02a251eb0c67442bd53c6a7c0b7f4330358126c7541767e8599ea5976ecb",
+        "src/render/ability_vfx/warrior_fury_state_shapes.ts": "a9925d6cea199ca374f957d894aeb7277b48cd78625f01125b75ad7a83143ec6",
+        "src/render/ability_vfx/warrior_fury_feedback.ts": "4569c307e1353077b6533293400a51eb685388b899c4f4568b61f47bd84aa003",
+        "src/render/warrior_fury_state_core.ts": "72bf1081690cc906d03996dc5ed766c3fdda58e03d6da08f6d408f3db0b08e92",
+        "src/warrior_recovery_core.ts": "5f2eb1c2d1a190e45f9dead83c7e47839add3b234e8f5284ddf8d4a453e5f871",
+        "src/vfx_studio/studio.css": "b7282517130c9c027768f45b745be59e01b03a39f96bd62cbabc9e7e5b1f5fec",
+        "src/render/ability_vfx/warrior_attention_core.ts": "8b172951d67627a9589d962b92f8f8a09db326dbee7e8825d4580b5e17341d22",
+        "src/render/ability_vfx/warrior_attention_atlas.ts": "5034a79823303222878493a1aeba71f5431e70e93488a753de78d8e5b4468639",
+        "src/render/ability_vfx/warrior_attention.ts": "4b6e458fbf6754b99da0dfb3c6bca4e413f3393f33b06be6687942c22c61b932",
+        "src/render/ability_vfx/warrior_goad.ts": "c7f433bec6156f8c6b533d1a518005f211cbdd75789eff6d3a89a716ecf0c97f",
+        "src/render/ability_vfx/warrior_gyre.ts": "8313cf991d9f11ce6aecaa6779b82664e532b745667e33f321925c543930effa",
+        "src/render/ability_vfx/warrior_gyre_shape.ts": "976000c2227fec12dcc74d434cffb690d4b83c16a5f9a0dc74dd50f6942a01d8",
+        "src/render/ability_vfx/warrior_area.ts": "004789475d7980ceb952f50ce521e4fff4fc1595d9ddafffcc73ad6844e5ff10",
+        "src/render/ability_vfx/fx_textures.ts": "5cab2aba46388167b2fd4a6996a1b1c7a4689030ddc62560159ef54699e3086c",
+        "src/render/characters/visual.ts": "e46a0567ba0eb7b90ec5b638b6b13999359afabe23f0ce6cb236c37edb28487d",
+        "src/render/ability_vfx/warrior_avatar_bracer.ts": "6720b62db8269f4ebc148c865c7792cd35a3f64dd699ccd2527e6d20619f8fd7",
+        "src/render/ability_vfx/warrior_avatar_rupture.ts": "ebe5ac0abf1037c8646607066cb74ce57630301c097f300e0c01cf37239fc5ca",
+        "src/render/ability_vfx/signature_shapes.ts": "ac592327f6641d931d549b1d14ed8e6a07c8de848c88dc10f954ed879ccc6ee4",
+        "src/render/ability_vfx/signature_crests.ts": "97853517bee59743d31e3b3cdafa21ef3ceb4c8f99d89b74b8561ff4283db0a7",
+        "src/render/warrior_power_anchor.ts": "4d7d09da549f7346ea56a68cbebf99af671884b0c742691b0fa1a2c3c8521242",
+        "src/render/ability_vfx/warrior_rage_material.ts": "834e02a106f093951bce881fbc6ca42e0635dc923472cf1ee1496d950934fa99",
+        "src/render/ability_vfx/primitive_prewarm.ts": "b6c52af07a19145be6e3865441af548bf7ed33f47dd9545d017a581b75f9858b",
+        "src/render/ability_vfx/production_assets.ts": "7e32e8555510172faeb02bf7945a1ead40942a984f5f8abc0c6d3a4eb46bada2",
+        "src/render/ability_vfx/baked_impact_layers.ts": "ee2ac653cbc4c7b31775cf9fc21336f98a5b399e7afe77f28e19245b4a1386be",
+        "src/render/ability_vfx/active_kit_prewarm.ts": "e5d52fbe57a557072545ba312b6ae0862ed8e2192faa5779d73546d0f7642aa3",
+        "src/render/ability_vfx/prewarm.ts": "9e94eba55400e0e6987220340ff6f50ebd939495e9ca62dbdba45ea298d91f23",
+        "public/textures/vfx/production/warrior_power.webp": "68450efac5cc151da9592de459cf7b0b06994759fb85f2e68b1a3775794684ef",
+        "src/render/ability_vfx/warrior_avatar_shape.ts": "3c4ae1b3dc983945c7fcec594bb7ed6734041d7877b5cca62de4ef50d56be306",
+        "src/render/warrior_power_core.ts": "81053c4a37aec9ad05c27751721fb8a0222584590ea141d5f7422ad25f9485d0",
+        "src/render/ability_vfx/warrior_power_geometry.ts": "3fc2a0f51e4f83eb530088e853b6ce58d70c87936724f4d9baf7538fd8d564d5",
+        "src/render/ability_vfx/warrior_power_forms.ts": "fa913d46f9ba68f72103da3741bb184064f2bc8518bb4f0f3fa2d6edc60bbce0",
+        "src/render/ability_vfx/warrior_power_cast.ts": "2db69c34dd44a8876c545156dd81c25a8c2143253c1d0d822653f0c7696f64e7",
+        "src/render/ability_vfx/ribbons.ts": "6a9eb7066ab7e080f77ef4e2199ebfd707882fe5f53f531220b807eb5cfd5ca0",
+        "src/render/characters/damage_attack_animation.ts": "9f9088e458574106137182eacd965da04b6f0adc40264b8a9ca169b1e03f420c",
+        "src/fury_audio_core.ts": "49c11c0231006ba74abbde68cc6fb58e475bc122942cfa2cb7ce5e99455e3d72",
+        "src/render/warrior_vfx_specs.ts": "5b290f8ed592d25da6fdcf172a3bb8d8f68a334109d7702b0fe0c48a17fe1a96",
+        "src/render/ability_vfx/physical_choreography.ts": "46e9ab71cfd338e06977d733b1d0132a6b65839db5e8d9f74a505625bfebbf35",
+        "src/render/ability_vfx/painter.ts": "ae2256893ef7ba9dca050f25a5fc79d7dba5844dfbf5564d6cade62acda4e23c",
+        "src/render/ability_vfx/fx.ts": "fb64e9d99426f6e2d2cc192bbb794fd7aeb227e25418401929dd445d42520ac1",
+        "src/render/renderer.ts": "dfced9b5cc3c8f71c4cd5e82974b56395901bbf8b4acfbf8976d0f63cda68287",
+        "src/render/characters/manifest.ts": "741dfb6d6e0bc18419d6ab03a320167dac56c0bf576cfd46de732df59f40b212",
+        "src/render/characters/signature_clips.ts": "61efbe653dfb2b318f72f529d883e8a26dc553865710d77dd6a7678247438fc5",
+        "src/render/characters/cast_performance.ts": "d11e6f0c458355b2cd8d06f48ac9cd4037d1045a57ecc09dfc5a7c7185c9e6f2",
+        "src/vfx_studio/stage_cast.ts": "4694f2fbd5eee4c566ef786129f3a6eb57f93748dbeba6f1cc2c9d93b512c16d",
+        "src/vfx_studio/stage_prerequisites.ts": "c1ae6aeeef8e88dde24803e647baf180a740fac593605d598cbc9fdd72c8cdf0",
+        "src/vfx_studio/session.ts": "32f4285ed102c6dc153fe8fedd03578cfa2b30a5297760ce0720e6f602f79722",
+        "src/vfx_studio/loadout.ts": "2b8d442b11a7f9c6ef845ea7635d9f0974f7ecf60698b7d5309092cfb3c79f90",
+        "src/sim/content/classes.ts": "afcd0d765d530ce4f0cd6a7ac3b5b66a0a8eba3842460939df84309d9dae2e60",
+        "src/sim/content/warrior_rows.ts": "0a1c8127c31e317be6f35408409b99a03eb711fa8b0a1865b08eaccec2c69eec",
+        "src/sim/combat/effect_dispatch.ts": "39cef13ee9811a09de9ce0b75e277036a7dca0a301550671e132deb1552bc9db",
+        "public/models/chars/players/warrior_contact_anims.glb": "084400bfa620b0880a90d5a0e0e6a059a5cecca0fe850f0b66b776452d13087b",
+        "src/render/ability_vfx/warrior_guard_geometry.ts": "3e72a2d30252775375e65107cf2ec11c42a43cf33b38226b6e31987f7dfc3458",
+        "src/render/ability_vfx/warrior_guard_plates.ts": "3b1421accdaa2067369b739d858eabfbf84cb43238175a52cbc45cccb0753d8d",
+        "src/render/ability_vfx/guard_prewarm.ts": "34aa91d73b554016f540affff1705b7b34bca6b9c4ccdf850ff06fa2a77e1d18",
+        "src/render/ability_vfx/warrior_guard_cast.ts": "70dc9659acf84b16fd872943a250c449bddf40efaa98399e88ed87c1e478789c",
+        "src/render/weapon_trail_anchor.ts": "e2b4d8cc9dde304db761965fc16f28939d018e863a5c82b76e5f317dbe9d2eaa"
+      },
+      "errors": [
+        "sunder_armor: Fixture cannot resolve an active sunder_armor",
+        "sunder_armor: Fixture cannot resolve an active sunder_armor",
+        "Expected 12 complete casts; got 10",
+        "Expected 120 captures; got 100"
+      ],
+      "limitation": "Two attempted illegal Armor Shear fixtures excluded; all copied before takes are valid."
+    },
+    "after": {
+      "directory": "warrior-control-after-6",
+      "reportSha256": "bd52d4ca293e7af0965c156b4c55c0acad8e1db4b2d431a54d4c10d50f1f741b",
+      "sourceAtStart": {
+        "src/render/ability_vfx/overlay_sprites.ts": "29dee3c0cbd0a75b996f2f7dc523e487b8be525acc9e528a08ea64dd453c63a7",
+        "src/warrior_control_audio.ts": "6740e64581d2f13f55e25392254b320efc96606727a021dabc3a4bfb79a4b831",
+        "src/render/characters/named_action_clips.ts": "a2830572f5c895055a7f928d71d224757f28a3dda81ad8e5ae8dbcfb29b2b312",
+        "src/render/characters/action_props.ts": "b0b51b7f830a6738604f951b9bc47a4b0b0565bd7eb6b9066eaa6b4b47a85d73",
+        "src/render/ability_vfx/warrior_control.ts": "10c79dd557ff44a23dbba16f341ac319d59fbbf9c44583431594de9a2a8bf220",
+        "src/render/ability_vfx/warrior_control_marks.ts": "05546b2340f5a99f08d60e278859b4adc4ed1d8fe0ff9cc6d4ab9904ee9f5a3f",
+        "src/render/ability_vfx/warrior_control_atlas.ts": "74b413460bb4720d112e6b8dda937d030d12e3f120152bdbdb3489bd8d1b239e",
+        "src/render/ability_vfx/warrior_hammer.ts": "0427f21c581c0de820cc0652cc5dadc7475f449830f99e9b790d3189db6d2d84",
+        "src/render/ability_vfx/warrior_blades.ts": "423e3d46bd354965ade855ce6c99f099066b8a198178cff01890cfafd0a90464",
+        "scripts/anim/warrior_control_poses.mjs": "117e0d2ab9449950c60acc7b99e9a206cfde2cbb5a38f1c3697f76f8c83daf48",
+        "scripts/build_warrior_contact_anims.mjs": "a8ea346ce61307a7b82536d06e0d3d4406cdf440b75aeaa2e77770cc3380fa6f",
+        "src/render/ability_vfx/decals.ts": "e03c11cfe05498918e419272b71f8bcf50eb5a098db2a238b7f75b0c4580c636",
+        "src/render/ability_vfx/warrior_fracture_atlas.ts": "f3eb364de2eecd08c714434f23ed93af26f2e9fcbf4afc1ad28e2c0eb3c171d9",
+        "src/render/ability_vfx/warrior_mobility.ts": "44dec1c71f2cd5f1d2b2300605baa5a27a85094db6a8d865a92d8b6cf12a0408",
+        "src/render/characters/warrior_rush_pose.ts": "4b9e4c6f73f12fb596404845774857583be552f8098a7c91f51b9961ed9aacf5",
+        "scripts/anim/warrior_rush.mjs": "fc3ad82708f398ec95a42e0d05ef02628a2f1c3d8705d0e17db50e1a88b06ba7",
+        "scripts/build_warrior_ability_anims.mjs": "6c4675fbd0c43012de31329bdae2f5b48bc2b1d510bfe1849fc0b686efac0260",
+        "public/models/chars/players/warrior_ability_anims.glb": "8aefecd84783b12220f87a09df76d9ea11d1b6c919f362742619b76f1d487edd",
+        "src/render/ability_vfx/sequencer.ts": "d3464a4b7470e2f87a05cbcb877a316b00d6810f18ac73b3725471d68db6dee5",
+        "src/render/ability_vfx/warrior_fury_states.ts": "0baf02a251eb0c67442bd53c6a7c0b7f4330358126c7541767e8599ea5976ecb",
+        "src/render/ability_vfx/warrior_fury_state_shapes.ts": "a9925d6cea199ca374f957d894aeb7277b48cd78625f01125b75ad7a83143ec6",
+        "src/render/ability_vfx/warrior_fury_feedback.ts": "4569c307e1353077b6533293400a51eb685388b899c4f4568b61f47bd84aa003",
+        "src/render/warrior_fury_state_core.ts": "72bf1081690cc906d03996dc5ed766c3fdda58e03d6da08f6d408f3db0b08e92",
+        "src/warrior_recovery_core.ts": "5f2eb1c2d1a190e45f9dead83c7e47839add3b234e8f5284ddf8d4a453e5f871",
+        "src/vfx_studio/studio.css": "b7282517130c9c027768f45b745be59e01b03a39f96bd62cbabc9e7e5b1f5fec",
+        "src/render/ability_vfx/warrior_attention_core.ts": "8b172951d67627a9589d962b92f8f8a09db326dbee7e8825d4580b5e17341d22",
+        "src/render/ability_vfx/warrior_attention_atlas.ts": "5034a79823303222878493a1aeba71f5431e70e93488a753de78d8e5b4468639",
+        "src/render/ability_vfx/warrior_attention.ts": "4b6e458fbf6754b99da0dfb3c6bca4e413f3393f33b06be6687942c22c61b932",
+        "src/render/ability_vfx/warrior_goad.ts": "c7f433bec6156f8c6b533d1a518005f211cbdd75789eff6d3a89a716ecf0c97f",
+        "src/render/ability_vfx/warrior_gyre.ts": "8313cf991d9f11ce6aecaa6779b82664e532b745667e33f321925c543930effa",
+        "src/render/ability_vfx/warrior_gyre_shape.ts": "976000c2227fec12dcc74d434cffb690d4b83c16a5f9a0dc74dd50f6942a01d8",
+        "src/render/ability_vfx/warrior_area.ts": "004789475d7980ceb952f50ce521e4fff4fc1595d9ddafffcc73ad6844e5ff10",
+        "src/render/ability_vfx/fx_textures.ts": "3d83ad262c36a322393047d6b3bdb9d7b62adbd5769a4ffd3e83dd9994b400e4",
+        "src/render/characters/visual.ts": "e46a0567ba0eb7b90ec5b638b6b13999359afabe23f0ce6cb236c37edb28487d",
+        "src/render/ability_vfx/warrior_avatar_bracer.ts": "6720b62db8269f4ebc148c865c7792cd35a3f64dd699ccd2527e6d20619f8fd7",
+        "src/render/ability_vfx/warrior_avatar_rupture.ts": "ebe5ac0abf1037c8646607066cb74ce57630301c097f300e0c01cf37239fc5ca",
+        "src/render/ability_vfx/signature_shapes.ts": "ac592327f6641d931d549b1d14ed8e6a07c8de848c88dc10f954ed879ccc6ee4",
+        "src/render/ability_vfx/signature_crests.ts": "97853517bee59743d31e3b3cdafa21ef3ceb4c8f99d89b74b8561ff4283db0a7",
+        "src/render/warrior_power_anchor.ts": "4d7d09da549f7346ea56a68cbebf99af671884b0c742691b0fa1a2c3c8521242",
+        "src/render/ability_vfx/warrior_rage_material.ts": "834e02a106f093951bce881fbc6ca42e0635dc923472cf1ee1496d950934fa99",
+        "src/render/ability_vfx/primitive_prewarm.ts": "b6c52af07a19145be6e3865441af548bf7ed33f47dd9545d017a581b75f9858b",
+        "src/render/ability_vfx/production_assets.ts": "7e32e8555510172faeb02bf7945a1ead40942a984f5f8abc0c6d3a4eb46bada2",
+        "src/render/ability_vfx/baked_impact_layers.ts": "ee2ac653cbc4c7b31775cf9fc21336f98a5b399e7afe77f28e19245b4a1386be",
+        "src/render/ability_vfx/active_kit_prewarm.ts": "e5d52fbe57a557072545ba312b6ae0862ed8e2192faa5779d73546d0f7642aa3",
+        "src/render/ability_vfx/prewarm.ts": "9e94eba55400e0e6987220340ff6f50ebd939495e9ca62dbdba45ea298d91f23",
+        "public/textures/vfx/production/warrior_power.webp": "68450efac5cc151da9592de459cf7b0b06994759fb85f2e68b1a3775794684ef",
+        "src/render/ability_vfx/warrior_avatar_shape.ts": "3c4ae1b3dc983945c7fcec594bb7ed6734041d7877b5cca62de4ef50d56be306",
+        "src/render/warrior_power_core.ts": "81053c4a37aec9ad05c27751721fb8a0222584590ea141d5f7422ad25f9485d0",
+        "src/render/ability_vfx/warrior_power_geometry.ts": "3fc2a0f51e4f83eb530088e853b6ce58d70c87936724f4d9baf7538fd8d564d5",
+        "src/render/ability_vfx/warrior_power_forms.ts": "fa913d46f9ba68f72103da3741bb184064f2bc8518bb4f0f3fa2d6edc60bbce0",
+        "src/render/ability_vfx/warrior_power_cast.ts": "2db69c34dd44a8876c545156dd81c25a8c2143253c1d0d822653f0c7696f64e7",
+        "src/render/ability_vfx/ribbons.ts": "9619707b14cdfb8a9d0ad1229a426e8ab42e4c5573e2d3252bc707dc26b58ab7",
+        "src/render/characters/damage_attack_animation.ts": "9f9088e458574106137182eacd965da04b6f0adc40264b8a9ca169b1e03f420c",
+        "src/fury_audio_core.ts": "115b4a61f7c584e60202b47cad3cf09639b901517a2011ca0a7da61fc4703553",
+        "src/render/warrior_vfx_specs.ts": "e92b394394f8d37b8ded7418d1a8a65f620325b62b2d6d421ae164337dd860bc",
+        "src/render/ability_vfx/physical_choreography.ts": "db8ab2ca20a27e109f81dbf12ba47ba65f2f267f610d9b1c0d6e3d1fbfe976bf",
+        "src/render/ability_vfx/painter.ts": "5648e53d4ed824d46e5fcfc3e38a84eab709a1a65c350fd84c46d93fc3f6ba82",
+        "src/render/ability_vfx/fx.ts": "c6b9e5dd9ee162405a5e87bba2352f150c8c451e779c5c9722237b3ca79451f4",
+        "src/render/renderer.ts": "98be7481185267313d8285180cceedfecb226d4685998a009db95baeb7cc9449",
+        "src/render/characters/manifest.ts": "61eea7cd488a6e8b173ffbad79c3db31130c88157b60bfd17ed61928b27c7a0f",
+        "src/render/characters/signature_clips.ts": "71233e2c302dd251278d7f036231fd7f93bdddb75d03acf4134a1670d108137e",
+        "src/render/characters/cast_performance.ts": "d11e6f0c458355b2cd8d06f48ac9cd4037d1045a57ecc09dfc5a7c7185c9e6f2",
+        "src/vfx_studio/stage_cast.ts": "4694f2fbd5eee4c566ef786129f3a6eb57f93748dbeba6f1cc2c9d93b512c16d",
+        "src/vfx_studio/stage_prerequisites.ts": "c1ae6aeeef8e88dde24803e647baf180a740fac593605d598cbc9fdd72c8cdf0",
+        "src/vfx_studio/session.ts": "32f4285ed102c6dc153fe8fedd03578cfa2b30a5297760ce0720e6f602f79722",
+        "src/vfx_studio/loadout.ts": "2b8d442b11a7f9c6ef845ea7635d9f0974f7ecf60698b7d5309092cfb3c79f90",
+        "src/sim/content/classes.ts": "afcd0d765d530ce4f0cd6a7ac3b5b66a0a8eba3842460939df84309d9dae2e60",
+        "src/sim/content/warrior_rows.ts": "0a1c8127c31e317be6f35408409b99a03eb711fa8b0a1865b08eaccec2c69eec",
+        "src/sim/combat/effect_dispatch.ts": "39cef13ee9811a09de9ce0b75e277036a7dca0a301550671e132deb1552bc9db",
+        "public/models/chars/players/warrior_contact_anims.glb": "831db06e136d7f3e45c560b1155943527eb4a7b05c71498570d65e336ec3e055",
+        "src/render/ability_vfx/warrior_guard_geometry.ts": "3e72a2d30252775375e65107cf2ec11c42a43cf33b38226b6e31987f7dfc3458",
+        "src/render/ability_vfx/warrior_guard_plates.ts": "3b1421accdaa2067369b739d858eabfbf84cb43238175a52cbc45cccb0753d8d",
+        "src/render/ability_vfx/guard_prewarm.ts": "34aa91d73b554016f540affff1705b7b34bca6b9c4ccdf850ff06fa2a77e1d18",
+        "src/render/ability_vfx/warrior_guard_cast.ts": "70dc9659acf84b16fd872943a250c449bddf40efaa98399e88ed87c1e478789c",
+        "src/render/weapon_trail_anchor.ts": "e2b4d8cc9dde304db761965fc16f28939d018e863a5c82b76e5f317dbe9d2eaa"
+      },
+      "sourceUnchanged": true,
+      "errors": [
+        "Browser close timed out"
+      ],
+      "casts": 10,
+      "captures": 100,
+      "captureStatus": "All casts/captures complete, no console or gameplay errors; final browser shutdown exceeded10s and the harness terminated its own browser. Overall harness exit1, retained honestly."
+    }
+  },
+  "pairs": [
+    {
+      "ability": "hamstring",
+      "spec": "fury",
+      "relativeSeconds": 0.15000000000000002,
+      "files": {
+        "before": {
+          "file": "before-hamstring-fury-tick3.png",
+          "sha256": "884c52d1c1381a7f9c4735fb52f5f4119e573df788f74c4d6c7b08cf9b74139d"
+        },
+        "after": {
+          "file": "after-hamstring-fury-tick3.png",
+          "sha256": "48438db47bf6340def34b0f66fda4d6f86910d9d3a5e98ef7b2eaac05836f571"
+        }
+      }
+    },
+    {
+      "ability": "hamstring",
+      "spec": "fury",
+      "relativeSeconds": 1.5,
+      "files": {
+        "before": {
+          "file": "before-hamstring-fury-tick30.png",
+          "sha256": "8e1fc851e5aef12064040e55369c0804c6fa470d7c4d992c93ab32dbbfa82f46"
+        },
+        "after": {
+          "file": "after-hamstring-fury-tick30.png",
+          "sha256": "9f71d1f6510f48b2631a27e08c43fd514bf8f60930023d5e9f6b5965fc044a15"
+        }
+      }
+    },
+    {
+      "ability": "pummel",
+      "spec": "arms",
+      "relativeSeconds": 0.15000000000000002,
+      "files": {
+        "before": {
+          "file": "before-pummel-arms-tick3.png",
+          "sha256": "7e1506cb201d4656cd422c812228dccf311fa5ddb916d78e7b7cb7827d8dd8e1"
+        },
+        "after": {
+          "file": "after-pummel-arms-tick3.png",
+          "sha256": "6738742e9edfd8d546edf1cfa7c37a23580527131346b5b2b57e7a7266eef50c"
+        }
+      }
+    },
+    {
+      "ability": "pummel",
+      "spec": "arms",
+      "relativeSeconds": 0.30000000000000004,
+      "files": {
+        "before": {
+          "file": "before-pummel-arms-tick6.png",
+          "sha256": "326d87cab94d5b77921502c944e897d5dd7c51838335063bd92c057534267bcf"
+        },
+        "after": {
+          "file": "after-pummel-arms-tick6.png",
+          "sha256": "35d73d38080a18b2117d2c640f09b789ae1326f945609788a72d6818372c08e9"
+        }
+      }
+    },
+    {
+      "ability": "sunder_armor",
+      "spec": "prot",
+      "relativeSeconds": 0.15000000000000002,
+      "files": {
+        "before": {
+          "file": "before-sunder_armor-prot-tick3.png",
+          "sha256": "eeee682caee10a4fb18863410bebeef137412ab3fde2c3f51bbe369f45b3f6c0"
+        },
+        "after": {
+          "file": "after-sunder_armor-prot-tick3.png",
+          "sha256": "3c6322e7a82c0969370cade724aeec07a5597544227c6e8e7d6fae03f755f486"
+        }
+      }
+    },
+    {
+      "ability": "sunder_armor",
+      "spec": "prot",
+      "relativeSeconds": 1.5,
+      "files": {
+        "before": {
+          "file": "before-sunder_armor-prot-tick30.png",
+          "sha256": "24ca43eb17487188f22b4a826d0c791163e04a4d55c00f0c585df5eb52ee9074"
+        },
+        "after": {
+          "file": "after-sunder_armor-prot-tick30.png",
+          "sha256": "d8f98dae65dc3216b62fb257b707ebe5f6e0877a31b8b9d1b12610e0672fcc26"
+        }
+      }
+    },
+    {
+      "ability": "storm_bolt",
+      "spec": "arms",
+      "relativeSeconds": 0.05,
+      "files": {
+        "before": {
+          "file": "before-storm_bolt-arms-tick1.png",
+          "sha256": "a92e70527c73daf008ca4c342dfa3f3a78dbd05f98602a8b65f6310f9f1f277f"
+        },
+        "after": {
+          "file": "after-storm_bolt-arms-tick1.png",
+          "sha256": "7374468067cc8f4ecccd3608d7891f76a9e2f19b7c9fd571d7163f199351aa44"
+        }
+      }
+    },
+    {
+      "ability": "storm_bolt",
+      "spec": "arms",
+      "relativeSeconds": 0.30000000000000004,
+      "files": {
+        "before": {
+          "file": "before-storm_bolt-arms-tick6.png",
+          "sha256": "293d1705774a28fc01fdbaf08744c6ec741ccb215039f21563843bbd0fde0429"
+        },
+        "after": {
+          "file": "after-storm_bolt-arms-tick6.png",
+          "sha256": "bffea06da206417930e092ea72fbb1cb8fddaf42e457ca099794ec59fb08ab97"
+        }
+      }
+    }
+  ],
+  "pixelBlendProof": {
+    "additive": [
+      102,
+      96,
+      105,
+      255
+    ],
+    "physical": [
+      83,
+      64,
+      60,
+      255
+    ],
+    "expectedAdd": [
+      103,
+      96,
+      105
+    ],
+    "expectedPhysical": [
+      83,
+      64,
+      61
+    ],
+    "cameraCutOrder": [
+      0,
+      1
+    ],
+    "pass": true,
+    "errors": []
+  },
+  "remaining": [
+    "all six settings",
+    "bright/dark world backgrounds",
+    "sustained spam/crowds/moving opponents",
+    "sound listening",
+    "two whole-kit visual reviews"
+  ]
+}

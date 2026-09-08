@@ -7875,7 +7875,7 @@ export class Renderer {
       }
       case 'aura': {
         const tgt = this.sim.entities.get(ev.targetId);
-        if (isWarriorFuryAuraEvent(ev, tgt)) break;
+        if (isWarriorFuryAuraEvent(ev, tgt) || this.abilityVfx.onWarriorControlAura(ev, tgt?.auras)) break;
         // Set-proc auras announce themselves with a themed swirl: on the wearer
         // for the self buffs, on the struck mob for the bleeds (so this arm is
         // NOT player-gated). Everything else keeps the generic player swirl.
@@ -12065,6 +12065,7 @@ export class Renderer {
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'vfx', worldStart);
 
     this.updateCamera(selfPos, dt);
+    this.abilityVfxFx.finalizeOverlayCamera();
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'camera', worldStart);
     if (this.studioEnvironment) this.studioStage?.update();
     else

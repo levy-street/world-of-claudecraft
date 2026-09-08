@@ -1,5 +1,7 @@
+import { WARRIOR_CONTROL_SFX } from './warrior_control_sfx.mjs';
 /** Distinct material voices for native Warrior contacts; never bulk-regenerated. */
 export const WARRIOR_CONTACT_SFX = [
+  ...WARRIOR_CONTROL_SFX,
   {
     key: 'melee_warrior_gyre_release',
     duration: 0.13,

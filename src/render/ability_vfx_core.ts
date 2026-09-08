@@ -184,6 +184,7 @@ export interface AbilityVfxFullSpec {
     headScale?: number;
     style?:
       | 'rock'
+      | 'warHammer'
       | 'shard'
       | 'comet'
       | 'arrow'

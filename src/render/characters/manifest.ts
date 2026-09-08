@@ -1382,13 +1382,15 @@ export const VISUALS: Record<string, VisualDef> = {
         faultline: 'Warrior_Faultline',
         heroic_strike: '1H_Melee_Attack_Slice_Diagonal',
         overpower: 'Warrior_Redhand',
-        hamstring: '1H_Melee_Attack_Slice_Diagonal',
+        hamstring: 'Warrior_Hobbling_Cut',
+        sunder_armor: 'Warrior_Armor_Shear',
+        storm_bolt: 'Warrior_Storm_Bolt',
         sanguine_aura: 'Spellcast_Raise',
         raised_guard: 'Warrior_Raised_Guard',
         iron_resolve: 'Warrior_Iron_Resolve',
         // Jawcrack is a bare-fist interrupt: the synthesized punch
-        // (scripts/_add_pummel_punch_anim.mjs), not a weapon swing.
-        pummel: 'Punch_A',
+        // donor is rebaked with planted feet and a compact contact hold.
+        pummel: 'Warrior_Jawcrack',
         // Heroic Leap is a position-targeted jump, not a swing: the bespoke
         // pose-sample-and-blend clip (coil, airborne, driven two-hand slam on
         // landing). It carries no castFx and resolves no target entity, so it

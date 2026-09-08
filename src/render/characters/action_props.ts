@@ -9,6 +9,7 @@ const EMPTY_HANDS = new Set([
   'venom_dart',
   'melting_acid',
   'pummel',
+  'storm_bolt',
   'pack_command',
   'unleash_beast',
   'bloodhook',

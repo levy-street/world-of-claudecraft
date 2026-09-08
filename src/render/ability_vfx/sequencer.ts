@@ -640,6 +640,25 @@ export class ArchetypeSequencer {
     this.impact(host, slot);
   }
 
+  /** Confirmation changes the pending zero-damage action, never its clock. */
+  confirmWarriorControl(abilityId: string, casterId: number, targetId: number): boolean {
+    for (const slot of this.slots) {
+      if (
+        !slot.active ||
+        slot.impactDone ||
+        slot.physicalSecondary ||
+        slot.abilityId !== abilityId ||
+        slot.casterId !== casterId ||
+        slot.targetId !== targetId
+      )
+        continue;
+      slot.componentOutcomes = 1;
+      slot.componentCount = 1;
+      return true;
+    }
+    return false;
+  }
+
   update(host: SequencerHost, dt: number): void {
     // staggered motif beats fire before the slot walk so a beat scheduled last
     // frame lands on time even if its sequence ended

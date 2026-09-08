@@ -19,6 +19,7 @@ import { drawRestorativeStream } from '../restorative_water';
 import type { WarriorFuryStateAura, WarriorFuryStateKind } from '../warrior_fury_state_core';
 import type { WarriorPowerAnchor } from '../warrior_power_anchor';
 import type { WarriorPowerIntent, WarriorPowerKind } from '../warrior_power_core';
+import { WARRIOR_VFX_FULL_SPECS } from '../warrior_vfx_specs';
 import type { WeaponAnchorSampler } from '../weapon_trail_anchor';
 import { cancelActiveAbilityKit } from './active_kit_prewarm';
 import { BakedImpactLayers } from './baked_impact_layers';
@@ -62,6 +63,7 @@ import {
 } from './spirits';
 import type { SteelSweepRange } from './steel_sweep';
 import { WarriorAttention } from './warrior_attention';
+import { drawWarriorControlMark, evictDecorationForWarriorMark } from './warrior_control_marks';
 import { drawBloodlettingRecovery } from './warrior_fury_feedback';
 import { WarriorFuryStates } from './warrior_fury_states';
 import {
@@ -69,6 +71,7 @@ import {
   type WarriorGuardKind,
   WarriorGuardPlates,
 } from './warrior_guard_plates';
+import { launchWarriorHammer } from './warrior_hammer';
 import { WarriorPowerForms } from './warrior_power_forms';
 import { drawWarriorWornMark } from './warrior_worn_marks';
 import { RestorativeWaterVolumes } from './water_volumes';
@@ -123,6 +126,8 @@ export type OrbitStyle =
   | 'bladeCharges'
   | 'breachMark'
   | 'quakeBurden'
+  | 'armorShear'
+  | 'hamstringMark'
   | 'leaves';
 
 const ORBIT_STYLE_SET = new Set<string>([
@@ -389,6 +394,24 @@ const ORBIT_DNA: Record<
     frac: 0.36,
     size: 0.16,
     cell: OVERLAY_CELL.spark,
+  },
+  armorShear: {
+    n: 1,
+    rate: 0,
+    radius: 0,
+    weave: 0,
+    frac: 0.45,
+    size: 1.35,
+    cell: OVERLAY_CELL.armorShear0,
+  },
+  hamstringMark: {
+    n: 1,
+    rate: 0,
+    radius: 0,
+    weave: 0,
+    frac: 0.12,
+    size: 1.2,
+    cell: OVERLAY_CELL.hamstring,
   },
   quakeBurden: {
     n: 8,
@@ -951,6 +974,37 @@ export class AbilityVfxFx implements SequencerHost {
     this.sequencer.cancelOwned(casterId, abilityId);
   }
 
+  queueWarriorControl(
+    abilityId: 'sunder_armor' | 'pummel',
+    casterId: number,
+    targetId: number,
+    tier: number,
+  ): void {
+    if (this.disposed || this.sequencer.confirmWarriorControl(abilityId, casterId, targetId))
+      return;
+    const slot = this.sequencer.start(
+      this,
+      abilityId,
+      WARRIOR_VFX_FULL_SPECS[abilityId],
+      casterId,
+      targetId,
+      0xc6dce8,
+      Math.min(1, tier),
+      false,
+      0,
+      undefined,
+      1,
+      true,
+    );
+    // A late confirmation or first sighting has no pending weapon contact to
+    // wait for. Present its recipient-only success on the next update.
+    if (slot) slot.impactAt = 0;
+  }
+
+  cancelWarriorHammer(entityId: number, targetId?: number): void {
+    this.ribbons.cancelWarriorHammer(entityId, targetId);
+  }
+
   // Ground-aimed instant: the whole sequence anchors at the WORLD POINT (the
   // slot travels with targetId -1 and a pre-seeded impact anchor), so release
   // reads on the caster while motifs, decals, and lingers land where the cast
@@ -1001,8 +1055,13 @@ export class AbilityVfxFx implements SequencerHost {
     tier: number,
     volley = 1,
     headScale = 1,
+    playWarriorAudio = false,
   ): void {
     if (this.disposed) return;
+    if (abilityId === 'storm_bolt') {
+      launchWarriorHammer(this, this.ribbons, casterId, targetId, tier, playWarriorAudio);
+      return;
+    }
     // spectacle calibration: the measured crescendo gap was widest on bolts
     // (trail + head sparse inside a gallery-sized bbox), so the travel read
     // scales up at the one spawn seam every tier shares
@@ -1318,11 +1377,15 @@ export class AbilityVfxFx implements SequencerHost {
     this.groundAuras.hold(entityId, 0, 0xffffff, true, this.frame);
     this.ribbons.spawnSlashStyled({ x, y: y + 1.1, z }, 0xffffff, 'horizontal');
     this.overlay.push(x, y + 1.1, z, 0xffffff, 0.3, OVERLAY_CELL.glow, 0.6, 1.5);
-    this.overlay.commit();
+    this.overlay.commit(this.camera);
   }
 
   setQuality(q: number): void {
     this.qualityLevel = Math.min(1, Math.max(0, Number.isFinite(q) ? q : 1));
+  }
+
+  finalizeOverlayCamera(): void {
+    this.overlay.orderForCamera(this.camera);
   }
 
   setViewportScale(heightPx: number, fovDeg: number, cssHeight = heightPx): void {
@@ -2211,8 +2274,14 @@ export class AbilityVfxFx implements SequencerHost {
         return false;
       }
     }
-    if (bands.length >= MAX_ORBITS_PER_ENTITY || this.orbitBandCount >= MAX_ORBIT_BANDS)
-      return false;
+    if (bands.length >= MAX_ORBITS_PER_ENTITY || this.orbitBandCount >= MAX_ORBIT_BANDS) {
+      if (
+        (style !== 'armorShear' && style !== 'hamstringMark') ||
+        !evictDecorationForWarriorMark(this.orbits, entityId, bands.length >= MAX_ORBITS_PER_ENTITY)
+      )
+        return false;
+      this.orbitBandCount--;
+    }
     bands.push({
       style,
       colorHex,
@@ -2894,6 +2963,16 @@ export class AbilityVfxFx implements SequencerHost {
     const halve = band.tier >= 1;
     const color = band.colorHex;
     const t = this.time;
+    if (band.style === 'armorShear' || band.style === 'hamstringMark') {
+      drawWarriorControlMark(
+        this.overlay,
+        band.style === 'armorShear',
+        o?.n ?? 1,
+        at,
+        camFwdScratch,
+      );
+      return;
+    }
     if (band.style === 'breachMark' || band.style === 'quakeBurden') {
       drawWarriorWornMark(
         this.overlay,

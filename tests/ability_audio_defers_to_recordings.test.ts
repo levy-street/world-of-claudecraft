@@ -164,7 +164,7 @@ describe('moments no recording covers keep their procedural voice', () => {
       nodesFor(() =>
         sfx.abilityAudio('release', 'physical', 1, 0, 0, 0, {
           archetype: 'strike',
-          abilityId: 'mortal_strike',
+          abilityId: 'heroic_strike',
         }),
       ),
     ).toBeGreaterThan(0);

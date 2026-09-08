@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { type AbilityVfxTextures, OVERLAY_ATLAS_GRID } from './fx_textures';
+import { type AbilityVfxTextures, OVERLAY_ATLAS_GRID, OVERLAY_CELL } from './fx_textures';
 
 // One pooled point cloud for every persistent overlay sprite (windup orbs,
 // buff-orbit bands): positions are recomputed each frame by the owner, so this
@@ -18,6 +18,9 @@ export class OverlaySprites {
   private cell = new Float32Array(CAPACITY);
   private alpha = new Float32Array(CAPACITY);
   private count = 0;
+  private drawOrder = new Uint16Array(CAPACITY);
+  private depths = new Float32Array(CAPACITY);
+  private hasCoverage = false;
   private priorities = new Uint8Array(CAPACITY);
   private wasEmpty = true;
   private tmpColor = new THREE.Color();
@@ -44,11 +47,19 @@ export class OverlaySprites {
       'aAlpha',
       new THREE.BufferAttribute(this.alpha, 1).setUsage(THREE.DynamicDrawUsage),
     );
+    this.geo.setIndex(
+      new THREE.BufferAttribute(this.drawOrder, 1).setUsage(THREE.DynamicDrawUsage),
+    );
     this.geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(450, 0, 0), 2400);
     const mat = new THREE.ShaderMaterial({
       transparent: true,
       depthWrite: false,
-      blending: THREE.AdditiveBlending,
+      // Premultiplied output preserves the old additive cells (zero coverage)
+      // while physical steel and receiver scars can occlude the backdrop.
+      // Both share the already-prewarmed point cloud and its existing budget.
+      blending: THREE.CustomBlending,
+      blendSrc: THREE.OneFactor,
+      blendDst: THREE.OneMinusSrcAlphaFactor,
       uniforms: { uScale: { value: 600 }, uAtlas: { value: tex.overlay } },
       vertexShader: `
         attribute vec3 aColor;
@@ -80,7 +91,9 @@ export class OverlaySprites {
           vec4 tex = texture2D(uAtlas, uv);
           float lum = max(tex.r, max(tex.g, tex.b)) * tex.a;
           if (lum * vAlpha < 0.012) discard;
-          gl_FragColor = vec4(vColor * tex.rgb, tex.a * vAlpha);
+          float opacity = tex.a * vAlpha;
+          float physical = step(${OVERLAY_CELL.hammer0}.0, idx);
+          gl_FragColor = vec4(vColor * tex.rgb * opacity, opacity * physical);
         }`,
     });
     this.points = new THREE.Points(this.geo, mat);
@@ -97,6 +110,7 @@ export class OverlaySprites {
 
   beginFrame(): void {
     this.count = 0;
+    this.hasCoverage = false;
   }
 
   /** Reserve the already-drawn hard-control tells above projectile heads. */
@@ -131,10 +145,11 @@ export class OverlaySprites {
     this.col[i * 3 + 2] = this.tmpColor.b;
     this.size[i] = size;
     this.cell[i] = cell;
+    if (cell >= OVERLAY_CELL.hammer0) this.hasCoverage = true;
     this.alpha[i] = alpha;
   }
 
-  commit(): void {
+  commit(camera?: THREE.Camera): void {
     if (this.disposed) return;
     if (this.count === 0) {
       if (!this.wasEmpty) {
@@ -144,6 +159,7 @@ export class OverlaySprites {
       return;
     }
     this.wasEmpty = false;
+    this.orderForCamera(camera);
     // Upload only the prefix this frame wrote (the pooled cloud's idiom,
     // ../vfx.ts packRenderCloud): a frame showing two windup orbs re-uploaded
     // all CAPACITY points otherwise. Points past the prefix are stale by
@@ -154,6 +170,44 @@ export class OverlaySprites {
     this.upload(this.geo.attributes.aCell as THREE.BufferAttribute, this.count);
     this.upload(this.geo.attributes.aAlpha as THREE.BufferAttribute, this.count);
     this.geo.setDrawRange(0, this.count);
+  }
+
+  /** May run after the camera moves, without replaying effects or their clocks. */
+  orderForCamera(camera?: THREE.Camera): void {
+    if (this.disposed || this.count === 0) return;
+    // Admission priority stays attached to the original slot. Only draw indices
+    // move: solid sprites blend far-to-near, with hard-control tells last.
+    const view = camera?.matrixWorldInverse.elements;
+    for (let i = 0; i < this.count; i++) {
+      this.drawOrder[i] = i;
+      if (view)
+        this.depths[i] = -(
+          view[2] * this.pos[i * 3] +
+          view[6] * this.pos[i * 3 + 1] +
+          view[10] * this.pos[i * 3 + 2] +
+          view[14]
+        );
+    }
+    if (this.hasCoverage && view) {
+      for (let i = 1; i < this.count; i++) {
+        const next = this.drawOrder[i],
+          layer = this.priorities[next] === 2 ? 1 : 0;
+        let j = i;
+        while (j > 0) {
+          const previous = this.drawOrder[j - 1],
+            previousLayer = this.priorities[previous] === 2 ? 1 : 0;
+          if (
+            previousLayer < layer ||
+            (previousLayer === layer && this.depths[previous] >= this.depths[next])
+          )
+            break;
+          this.drawOrder[j] = previous;
+          j--;
+        }
+        this.drawOrder[j] = next;
+      }
+    }
+    this.upload(this.geo.index!, this.count);
   }
 
   // clearUpdateRanges first, so a range queued on a frame this cloud was never

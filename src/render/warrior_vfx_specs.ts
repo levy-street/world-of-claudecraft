@@ -119,6 +119,9 @@ for (const [id, physical] of Object.entries(WARRIOR_CHOREOGRAPHY)) {
           ? '#f2d5a1'
           : '#effaff',
   };
+  if (id === 'storm_bolt') {
+    full.bolt = { speed: 26, style: 'warHammer', core: '#e4f2ff', accent: '#c0a269' };
+  }
   WARRIOR_VFX_FULL_SPECS[id] = full;
   WARRIOR_VFX_SPECS[id] = {
     c: color,
@@ -131,6 +134,6 @@ for (const [id, physical] of Object.entries(WARRIOR_CHOREOGRAPHY)) {
     bo: 'none',
     spin: base.spin ? 1 : undefined,
     fin: base.finisher ? 1 : undefined,
-    b: base.bolt ? { h: 0.6, v: base.bolt.speed } : undefined,
+    b: full.bolt ? { h: 0.6, v: full.bolt.speed } : undefined,
   };
 }
