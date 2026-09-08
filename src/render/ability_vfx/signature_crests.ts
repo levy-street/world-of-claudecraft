@@ -1,14 +1,12 @@
 import * as THREE from 'three';
-import {
-  bindSceneSamples,
-  SCENE_SAMPLE_GLSL,
-  sceneKeyLightUniform,
-} from '../scene_sampling';
+import { bindSceneSamples, SCENE_SAMPLE_GLSL, sceneKeyLightUniform } from '../scene_sampling';
+import { CrestPrewarm } from './crest_prewarm';
 import { buildSignatureShapes, type CrestKind } from './signature_shapes';
 
 /** Prepared crystalline fans, curling water sheets, flame ribbons and torn
  * spectral fins. Eight slots share cached geometry families and one program. */
 export class SignatureCrests {
+  readonly preparation: CrestPrewarm;
   private readonly shapes = buildSignatureShapes();
   private readonly slots: {
     mesh: THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial>;
@@ -39,6 +37,7 @@ export class SignatureCrests {
           float expand=0.6+0.4*(1.0-pow(max(0.0,1.0-uAge),3.0));
           p.xz*=uKind>9.5 ? 1.0 : uKind>6.5 ? 0.86+0.14*smoothstep(0.0,0.25,uAge) : mix(0.88,expand,uMotion);
           p.y*=uKind>9.5 ? 1.0 : uKind>6.5 ? 0.96+0.04*smoothstep(0.0,0.2,uAge) : mix(0.85,sin(min(1.0,uAge*1.4)*3.14159265)*0.65+0.35,uMotion);
+          if(uKind>11.5){p.z+=uAge*(0.2+uv.y*0.6)*uMotion;p.y-=uAge*uAge*0.55*uMotion;}
           vec4 view=modelViewMatrix*vec4(p,1.0); vView=-view.xyz; vNormal=normalize(normalMatrix*normal);
           gl_Position=projectionMatrix*view;
         }`,
@@ -75,6 +74,15 @@ export class SignatureCrests {
               alpha*=smoothstep(0.0,0.1,vUv.y)*(1.0-smoothstep(0.94,1.0,vUv.y));
             }
           }
+          if(uKind>11.5){
+            float taper=sin(vUv.x*3.14159265);
+            float striation=sin(vUv.x*109.0+sin(vUv.y*17.0)*2.2);
+            float tear=sin(vUv.x*67.0+vUv.y*19.0)*sin(vUv.x*31.0-vUv.y*13.0);
+            float edge=1.0-smoothstep(0.015,0.08,vUv.y);
+            float dissolve=smoothstep(uAge*1.2-0.2,uAge*1.2+0.15,1.0-vUv.y*0.65+tear*0.28);
+            colour=colour*(0.82+striation*0.12)+uAccent*edge*0.85;
+            alpha=0.92*dissolve*smoothstep(0.0,0.16,taper)*(1.0-smoothstep(0.68,1.0,uAge));
+          }
           gl_FragColor=vec4(colour,alpha*sceneSoftness(vView.z,0.12));
           #include <tonemapping_fragment>
           #include <colorspace_fragment>
@@ -97,6 +105,7 @@ export class SignatureCrests {
       scene.add(mesh);
       this.slots.push({ mesh, age: 0, duration: 1.15, active: false });
     }
+    this.preparation = new CrestPrewarm(scene, this.shapes, this.slots[0].mesh.material);
     proto.dispose();
   }
   spawn(
@@ -119,49 +128,49 @@ export class SignatureCrests {
       height <= 0
     )
       return;
+    if (kind === 'blood_cut' && !this.preparation.ready(kind)) return;
     const s = this.slots.find((s) => !s.active);
     if (!s) return;
     s.active = true;
     s.age = 0;
     s.duration = Number.isFinite(duration) ? Math.max(0.05, duration) : 1.15;
-    s.mesh.visible = false;
+    s.mesh.visible = kind === 'blood_cut';
     const geometry = this.shapes.get(kind) ?? this.shapes.get('shadow');
     if (geometry) s.mesh.geometry = geometry;
     s.mesh.rotation.set(pitch, angle, 0, 'YXZ');
+    if (kind === 'blood_cut') s.mesh.rotation.set(0, angle, pitch, 'YXZ');
     s.mesh.position.set(x, y, z);
-    s.mesh.scale.set(
-      Math.min(3, radius),
-      Math.min(3, height),
-      Math.min(3, radius),
-    );
+    s.mesh.scale.set(Math.min(3, radius), Math.min(3, height), Math.min(3, radius));
     if (kind === 'chain') s.mesh.scale.set(height, height, radius);
     const u = s.mesh.material.uniforms;
     u.uTint.value.setHex(tint);
     u.uAccent.value.setHex(accent);
     u.uKind.value =
-      kind === 'chain'
-        ? 11
-        : kind === 'hook'
-          ? 10
-          : kind === 'bone'
-            ? 7
-            : kind === 'ward'
-              ? 8
-              : kind === 'feather'
-                ? 9
-                : kind === 'ice'
-                  ? 0
-                  : kind === 'water'
-                    ? 1
-                    : kind === 'fire'
-                      ? 3
-                      : kind === 'light'
-                        ? 4
-                        : kind === 'nature'
-                          ? 5
-                          : kind === 'arcane'
-                            ? 6
-                            : 2;
+      kind === 'blood_cut'
+        ? 12
+        : kind === 'chain'
+          ? 11
+          : kind === 'hook'
+            ? 10
+            : kind === 'bone'
+              ? 7
+              : kind === 'ward'
+                ? 8
+                : kind === 'feather'
+                  ? 9
+                  : kind === 'ice'
+                    ? 0
+                    : kind === 'water'
+                      ? 1
+                      : kind === 'fire'
+                        ? 3
+                        : kind === 'light'
+                          ? 4
+                          : kind === 'nature'
+                            ? 5
+                            : kind === 'arcane'
+                              ? 6
+                              : 2;
     u.uAge.value = 0;
   }
   update(dt: number, reducedMotion: boolean): void {
@@ -185,11 +194,21 @@ export class SignatureCrests {
     if (this.disposed) return;
     this.clear();
     this.disposed = true;
-    for (const unbind of this.unbind) unbind();
+    const errors: unknown[] = [];
+    const release = (work: () => void) => {
+      try {
+        work();
+      } catch (error) {
+        errors.push(error);
+      }
+    };
+    release(() => this.preparation.dispose());
+    for (const unbind of this.unbind) release(unbind);
     for (const s of this.slots) {
-      s.mesh.removeFromParent();
-      s.mesh.material.dispose();
+      release(() => s.mesh.removeFromParent());
+      release(() => s.mesh.material.dispose());
     }
-    for (const geometry of this.shapes.values()) geometry.dispose();
+    for (const geometry of this.shapes.values()) release(() => geometry.dispose());
+    if (errors.length) throw new AggregateError(errors, 'Signature crest cleanup failed');
   }
 }

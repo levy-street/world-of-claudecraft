@@ -1,22 +1,15 @@
 import * as THREE from 'three';
+import { buildFuryCutShape } from './fury_shapes';
 import { buildRitualSculpture } from './ritual_sculptures';
 import type { Substance } from './signature_core';
-export type CrestKind =
-  Substance | 'bone' | 'ward' | 'feather' | 'hook' | 'chain';
+export type CrestKind = Substance | 'bone' | 'ward' | 'feather' | 'hook' | 'chain' | 'blood_cut';
 
 /** Open, directional surfaces with genuinely different topology. Generated once
  * during preparation; all animation deforms these existing vertices. */
 export function buildSignatureShapes(): Map<CrestKind, THREE.BufferGeometry> {
   const shapes = new Map<CrestKind, THREE.BufferGeometry>();
-  for (const kind of [
-    'ice',
-    'water',
-    'fire',
-    'shadow',
-    'light',
-    'nature',
-    'arcane',
-  ] as const) {
+  shapes.set('blood_cut', buildFuryCutShape());
+  for (const kind of ['ice', 'water', 'fire', 'shadow', 'light', 'nature', 'arcane'] as const) {
     const positions: number[] = [],
       uvs: number[] = [],
       indices: number[] = [];
@@ -43,14 +36,7 @@ export function buildSignatureShapes(): Map<CrestKind, THREE.BufferGeometry> {
         }
       }
     } else {
-      const bands =
-          kind === 'water'
-            ? 1
-            : kind === 'arcane'
-              ? 3
-              : kind === 'fire'
-                ? 4
-                : 5,
+      const bands = kind === 'water' ? 1 : kind === 'arcane' ? 3 : kind === 'fire' ? 4 : 5,
         cols = kind === 'water' || kind === 'arcane' ? 40 : 8,
         rows = kind === 'arcane' ? 2 : 14;
       for (let band = 0; band < bands; band++) {
@@ -62,23 +48,16 @@ export function buildSignatureShapes(): Map<CrestKind, THREE.BufferGeometry> {
             let a: number, r: number, y: number;
             if (kind === 'water') {
               a = (u - 0.5) * Math.PI * 1.45;
-              r =
-                0.5 +
-                v * 0.7 +
-                Math.sin(v * Math.PI) * 0.23 -
-                Math.max(0, v - 0.72) * 1.1;
+              r = 0.5 + v * 0.7 + Math.sin(v * Math.PI) * 0.23 - Math.max(0, v - 0.72) * 1.1;
               y = v * (0.58 + 0.42 * Math.sin(u * Math.PI));
             } else if (kind === 'fire') {
-              a =
-                band * Math.PI * 0.5 + (u - 0.5) * (0.85 - v * 0.58) + v * 1.05;
+              a = band * Math.PI * 0.5 + (u - 0.5) * (0.85 - v * 0.58) + v * 1.05;
               r = 0.38 + (1 - v) * 0.55;
               y = v * (0.76 + 0.24 * Math.sin(u * Math.PI));
             } else if (kind === 'nature') {
-              a =
-                band * Math.PI * 0.4 + (u - 0.5) * Math.sin(v * Math.PI) * 0.9;
+              a = band * Math.PI * 0.4 + (u - 0.5) * Math.sin(v * Math.PI) * 0.9;
               r = 0.18 + Math.sin(v * Math.PI * 0.7) * 0.95;
-              y =
-                v * 1.25 + Math.sin(u * Math.PI) * Math.sin(v * Math.PI) * 0.1;
+              y = v * 1.25 + Math.sin(u * Math.PI) * Math.sin(v * Math.PI) * 0.1;
             } else if (kind === 'arcane') {
               a = (u - 0.5) * Math.PI * 1.55 + band * 2.094;
               r = 0.8 + v * 0.065;
@@ -92,23 +71,13 @@ export function buildSignatureShapes(): Map<CrestKind, THREE.BufferGeometry> {
             uvs.push(u, v);
             if (i < cols && j < rows) {
               const n = base + j * (cols + 1) + i;
-              indices.push(
-                n,
-                n + 1,
-                n + cols + 1,
-                n + 1,
-                n + cols + 2,
-                n + cols + 1,
-              );
+              indices.push(n, n + 1, n + cols + 1, n + 1, n + cols + 2, n + cols + 1);
             }
           }
       }
     }
     const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute(
-      'position',
-      new THREE.Float32BufferAttribute(positions, 3),
-    );
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
     geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
     geometry.setIndex(indices);
     geometry.computeVertexNormals();
@@ -162,10 +131,7 @@ export function buildSignatureShapes(): Map<CrestKind, THREE.BufferGeometry> {
       }
   }
   const chain = new THREE.BufferGeometry();
-  chain.setAttribute(
-    'position',
-    new THREE.Float32BufferAttribute(positions, 3),
-  );
+  chain.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
   chain.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
   chain.setIndex(indices);
   chain.computeVertexNormals();

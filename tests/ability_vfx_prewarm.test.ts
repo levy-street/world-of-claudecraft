@@ -193,20 +193,32 @@ describe('collectAbilityVfxCompileTargets', () => {
 
 describe('the renderer wires the units into the prewarm resume lane', () => {
   const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
-  const entryStart = renderer.indexOf("id: 'vfx.ability-primitives'");
-  const entry = renderer.slice(renderer.lastIndexOf('{', entryStart), entryStart + 2000);
+  const entry = readFileSync(
+    new URL('../src/render/ability_vfx/primitive_prewarm.ts', import.meta.url),
+    'utf8',
+  );
+  const entryStart = entry.indexOf("id: 'vfx.ability-primitives'");
 
   it('retains texture and program units, never the visible spawn', () => {
     expect(entryStart).toBeGreaterThan(-1);
-    const unitsStart = entry.indexOf('resumeUnits: () => [');
+    const unitsStart = entry.indexOf('const resumeUnits =');
     expect(unitsStart).toBeGreaterThan(-1);
-    const units = entry.slice(unitsStart, entry.indexOf('\n        ],', unitsStart));
+    const units = entry.slice(unitsStart, entry.indexOf('\n  ];', unitsStart));
     expect(units).toContain('abilityVfxTexturePrewarmSteps()');
-    expect(units).toContain('this.prewarmTexture(texture)');
-    expect(units).toContain('collectAbilityVfxCompileTargets(this.scene)');
-    expect(units).toContain('this.compilePrewarmColorPrograms(target.object, false)');
+    expect(units).toContain('host.texture(texture)');
+    expect(units).toContain('collectAbilityVfxCompileTargets(host.scene)');
+    expect(units).toContain('host.compile(target.object, false)');
+    expect(renderer).toContain('abilityPrimitivePrewarmEntry({');
+    expect(renderer).toContain('texture: (texture) => this.prewarmTexture(texture)');
+    expect(renderer).toContain(
+      'compile: (root, offscreen) => this.compilePrewarmColorPrograms(root, offscreen)',
+    );
+    expect(renderer).toContain(
+      'draw: (group, child) => this.renderBoundedPrewarmRoot(group, child)',
+    );
     // Replaying prewarmSpawn live would pop a white primitive burst.
     expect(units).not.toContain('prewarmSpawn');
+    expect(units).not.toContain('host.spawn');
   });
 
   it('hands a policy-skipped entry its units instead of dropping them', () => {

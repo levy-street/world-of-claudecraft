@@ -208,6 +208,7 @@ interface ArcSlot {
   core: THREE.Color;
   glow: THREE.Color;
   pts: THREE.Vector3[];
+  priority: 0 | 1;
 }
 
 // The shared VFX anchor resolver (src/render/vfx_anchor.ts). `out` lets a
@@ -278,6 +279,7 @@ export class AbilityVfxRibbons {
       new THREE.BufferAttribute(this.uv, 2).setUsage(THREE.DynamicDrawUsage),
     );
     this.geo.setIndex(new THREE.BufferAttribute(this.idx, 1).setUsage(THREE.DynamicDrawUsage));
+    this.geo.setDrawRange(0, 0);
     this.geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(450, 0, 0), 2400);
     // Energy visibly flows along the strip: scrolling fBm over the soft ribbon
     // cross-section (the gallery's aFlow collapsed to a constant scroll).
@@ -392,6 +394,7 @@ export class AbilityVfxRibbons {
         core: new THREE.Color(),
         glow: new THREE.Color(),
         pts: allocPts(ARC_PTS),
+        priority: 0,
       });
     }
   }
@@ -455,6 +458,33 @@ export class AbilityVfxRibbons {
     slot.count = 0;
   }
 
+  // Admission chooser for arc slots: no allocation, no closures.
+  // Prefers inactive slots; if preserveActive is true never evicts; otherwise
+  // selects among active slots with priority <= incomingPriority, choosing
+  // lowest priority first and oldest normalized age (age/life) as a tie-break.
+  private chooseArcSlot(incomingPriority: 0 | 1, preserveActive: boolean): ArcSlot | null {
+    for (const arc of this.arcs) if (!arc.active) return arc;
+    if (preserveActive) return null;
+    let best: ArcSlot | null = null;
+    for (const a of this.arcs) {
+      if (a.priority > incomingPriority) continue;
+      if (!best) {
+        best = a;
+        continue;
+      }
+      if (a.priority < best.priority) {
+        best = a;
+        continue;
+      }
+      if (a.priority === best.priority) {
+        const normAge = a.life > 0 ? a.age / a.life : 1;
+        const bestNormAge = best.life > 0 ? best.age / best.life : 1;
+        if (normAge > bestNormAge) best = a;
+      }
+    }
+    return best;
+  }
+
   // A generic short-lived path ribbon: the caller fills the slot's
   // preallocated points (helix climbs, chain sags, fountain streams, gavel
   // strokes) and returns how many it wrote. Spawn-time-only closure cost.
@@ -467,8 +497,9 @@ export class AbilityVfxRibbons {
     motion: PathMotion | null = null,
     preserveActive = false,
     follow = false,
+    priority: 0 | 1 = 0,
   ): boolean {
-    const slot = this.arcs.find((a) => !a.active) ?? (preserveActive ? null : this.arcs[0]);
+    const slot = this.chooseArcSlot(priority, preserveActive);
     if (!slot) return false;
     slot.sample = null;
     slot.motion = motion;
@@ -478,6 +509,7 @@ export class AbilityVfxRibbons {
     if (count < 2) return false;
     // pad the unwritten tail onto the last point so the strip stays degenerate
     for (let i = count; i < ARC_PTS; i++) slot.pts[i].copy(slot.pts[count - 1]);
+    slot.priority = priority;
     slot.active = true;
     slot.age = -(motion?.delay ?? 0);
     slot.life = life;
@@ -493,9 +525,11 @@ export class AbilityVfxRibbons {
     life: number,
     sample: (out: THREE.Vector3) => boolean,
   ): void {
-    const slot = this.arcs.find((a) => !a.active) ?? this.arcs[0];
+    const slot = this.chooseArcSlot(1, false);
+    if (!slot) return;
     if (!sample(slot.pts[0])) return;
     for (let i = 1; i < ARC_PTS; i++) slot.pts[i].copy(slot.pts[0]);
+    slot.priority = 1;
     slot.sample = sample;
     slot.motion = null;
     slot.refill = null;
@@ -711,7 +745,9 @@ export class AbilityVfxRibbons {
     life: number,
     width: number,
   ): void {
-    const slot = this.arcs.find((a) => !a.active) ?? this.arcs[0];
+    const slot = this.chooseArcSlot(0, false);
+    if (!slot) return;
+    slot.priority = 0;
     slot.sample = null;
     slot.motion = null;
     slot.refill = null;
@@ -745,7 +781,9 @@ export class AbilityVfxRibbons {
     lift: number,
     width: number,
   ): void {
-    const slot = this.arcs.find((a) => !a.active) ?? this.arcs[0];
+    const slot = this.chooseArcSlot(0, false);
+    if (!slot) return;
+    slot.priority = 0;
     slot.sample = null;
     slot.motion = null;
     slot.refill = null;
@@ -934,7 +972,11 @@ export class AbilityVfxRibbons {
       const previousAge = a.age;
       a.age += dt;
       if (a.age < 0) continue;
-      if (a.refill && a.refill(a.pts) < 2) { a.active = false; a.refill = null; continue; }
+      if (a.refill && a.refill(a.pts) < 2) {
+        a.active = false;
+        a.refill = null;
+        continue;
+      }
       if (a.motion) {
         const m = a.motion;
         const elapsed =
@@ -951,7 +993,7 @@ export class AbilityVfxRibbons {
         a.active = false;
         a.sample = null;
         a.motion = null;
-      a.refill = null;
+        a.refill = null;
         continue;
       }
       if (a.sample && dt > 0) {
@@ -1298,7 +1340,9 @@ export class AbilityVfxRibbons {
   // The etched flight path left behind on arrival: a slow-fading narrow
   // ribbon from the launch point to the impact, on an arc slot.
   private spawnTracer(t: TrailSlot, x: number, y: number, z: number): void {
-    const slot = this.arcs.find((a) => !a.active) ?? this.arcs[0];
+    const slot = this.chooseArcSlot(0, false);
+    if (!slot) return;
+    slot.priority = 0;
     slot.sample = null;
     slot.motion = null;
     slot.refill = null;

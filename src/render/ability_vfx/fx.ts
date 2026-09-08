@@ -17,6 +17,7 @@ import { drawRestorativeStream } from '../restorative_water';
 import { BakedImpactLayers } from './baked_impact_layers';
 import { drawClassCast, hasClassCast } from './cast_language';
 import { isContactSheet } from './contact_assets';
+import type { CrestPrewarmHost } from './crest_prewarm';
 import { type DecalStyle, GroundDecals } from './decals';
 import { ElementalForms } from './elemental_forms';
 import { ElementalContactMemory, elementalPerformance } from './elemental_performance_core';
@@ -537,6 +538,7 @@ export class AbilityVfxFx implements SequencerHost {
       cell,
       alpha,
       brightness,
+      1,
     );
   };
 
@@ -551,7 +553,11 @@ export class AbilityVfxFx implements SequencerHost {
      *  camera-relative behaviour. */
     private facingOf?: (id: number) => number | null,
     private weaponAnchor?: (id: number, hand: 0 | 1) => ((out: THREE.Vector3) => boolean) | null,
-    private handSample?: (id: number, hand: 0 | 1, out: {x:number;y:number;z:number}) => boolean,
+    private handSample?: (
+      id: number,
+      hand: 0 | 1,
+      out: { x: number; y: number; z: number },
+    ) => boolean,
   ) {
     const tex = abilityVfxTextures();
     this.ribbons = new AbilityVfxRibbons(scene, anchor, tex);
@@ -639,12 +645,27 @@ export class AbilityVfxFx implements SequencerHost {
   presentationMoment(id: string, phase: 'release' | 'impact', sourceId: number): void {
     this.onPresentationMoment?.(id, phase, sourceId);
   }
-  onContact: ((sourceId: number, targetId: number, school: string, weight: number, abilityId?: string, beat?: number) => void) | null =
-    null;
-  handPoint(id: number, hand: 0 | 1, out: {x:number;y:number;z:number}): typeof out | null {
-    return this.handSample?.(id,hand,out) ? out : null;
+  onContact:
+    | ((
+        sourceId: number,
+        targetId: number,
+        school: string,
+        weight: number,
+        abilityId?: string,
+        beat?: number,
+      ) => void)
+    | null = null;
+  handPoint(id: number, hand: 0 | 1, out: { x: number; y: number; z: number }): typeof out | null {
+    return this.handSample?.(id, hand, out) ? out : null;
   }
-  contact(sourceId: number, targetId: number, school: string, weight: number, abilityId?: string, beat?: number): void {
+  contact(
+    sourceId: number,
+    targetId: number,
+    school: string,
+    weight: number,
+    abilityId?: string,
+    beat?: number,
+  ): void {
     if (!this.disposed) this.onContact?.(sourceId, targetId, school, weight, abilityId, beat);
   }
   solarExecution(sourceId: number, targetId: number): void {
@@ -725,6 +746,7 @@ export class AbilityVfxFx implements SequencerHost {
     colorHex: number,
     tier: number,
     windupDelay = 0,
+    componentOutcome?: 0 | 1 | 2,
   ): void {
     if (this.disposed) return;
     this.sequencer.start(
@@ -737,6 +759,8 @@ export class AbilityVfxFx implements SequencerHost {
       tier,
       false,
       windupDelay,
+      undefined,
+      componentOutcome,
     );
     if (wantsScreenFx(spec, tier)) {
       // fire with the sequence's compressed impact; self-centered archetypes
@@ -1067,6 +1091,10 @@ export class AbilityVfxFx implements SequencerHost {
   // spec'd cast. Each decal style binds its texture so the whole set uploads
   // now, and the flipbook prewarm does the same for the six impact sheets.
   // The prewarm's finally-block clear() hides everything again.
+  crestPrewarmUnits(host: CrestPrewarmHost) {
+    return this.crests.preparation.units(host);
+  }
+
   prewarmSpawn(x: number, y: number, z: number, entityId: number): void {
     this.forms.spawn('glacier', x, y, z, 1, 1, 0xffffff, 0xffffff, 0, true);
     this.forms.update(0.08, false);
@@ -1354,14 +1382,29 @@ export class AbilityVfxFx implements SequencerHost {
     brushed = false,
     motion: PathMotion | null = null,
     preserveActive = false,
+    priority: 0 | 1 = 0,
   ): boolean {
     if (this.disposed) return false;
-    return this.ribbons.spawnPath(colorHex, width, life, fill, brushed, motion, preserveActive);
+    return this.ribbons.spawnPath(
+      colorHex,
+      width,
+      life,
+      fill,
+      brushed,
+      motion,
+      preserveActive,
+      false,
+      priority,
+    );
   }
 
-  tetherRibbon(color: number, width: number, life: number,
-    fill: (pts: {set(x:number,y:number,z:number):unknown}[])=>number): void {
-    if (!this.disposed) this.ribbons.spawnPath(color,width,life,fill,false,null,false,true);
+  tetherRibbon(
+    color: number,
+    width: number,
+    life: number,
+    fill: (pts: { set(x: number, y: number, z: number): unknown }[]) => number,
+  ): void {
+    if (!this.disposed) this.ribbons.spawnPath(color, width, life, fill, false, null, false, true);
   }
 
   facingAt(id: number): number | null {
@@ -2032,29 +2075,7 @@ export class AbilityVfxFx implements SequencerHost {
     // anything spawns into it. The shock rings deliberately do NOT thin: their
     // footprints are too wide for an interpolated drape to stay honest.
     this.decals.setCameraPosition(camPosScratch.x, camPosScratch.z);
-    this.ribbons.update(dt, camPosScratch, reducedMotion, this.drawHeldConduction);
-    this.water.update(dt, reducedMotion);
-    this.details.update(dt, this.camera.quaternion, reducedMotion);
-    this.forms.update(dt, reducedMotion);
-    this.contacts.advance(dt);
     this.crests.update(dt, reducedMotion);
-    this.baked.update(dt, this.camera.quaternion, reducedMotion);
-    this.fragments.update(dt, reducedMotion);
-    this.rings.update(dt, this.camera.quaternion);
-    this.flipbooks.update(dt, this.camera.quaternion);
-    this.decals.update(dt);
-    this.pillars.update(dt);
-    this.shells.update(dt, this.time, this.frame, this.anchor);
-    this.groundAuras.update(
-      dt,
-      this.time,
-      this.frame,
-      this.anchor,
-      this.groundY,
-      camPosScratch.x,
-      camPosScratch.z,
-    );
-    this.spirits.update(dt);
     this.overlay.beginFrame();
     this.controlSignals.update(dt, this.anchor);
     // The CC bands draw FIRST in the frame's overlay batch: a hard-CC tell is
@@ -2093,9 +2114,7 @@ export class AbilityVfxFx implements SequencerHost {
       const s = this.ccBands.get(this.ccPickIds[i]);
       if (s) this.drawCcBand(s);
     }
-    // styled bolt heads ride this frame's overlay batch (positions were just
-    // advanced by ribbons.update above)
-    this.ribbons.drawHeads(this.time, this.headSink, reducedMotion);
+    this.overlay.protectPrefix();
     for (const [id, w] of this.windups) {
       if (w.stamp !== this.frame) {
         this.windups.delete(id);
@@ -2124,6 +2143,31 @@ export class AbilityVfxFx implements SequencerHost {
     // the archetype sequences advance here so their transient draws (release
     // flash, gavel descent, stun stars) land inside this frame's overlay batch
     this.sequencer.update(this, dt);
+    // Pack after the sequence emits this frame's contacts, so the visible
+    // wound and native weapon contact share one frame. Advance each pool once.
+    this.ribbons.update(dt, camPosScratch, reducedMotion, this.drawHeldConduction);
+    this.water.update(dt, reducedMotion);
+    this.details.update(dt, this.camera.quaternion, reducedMotion);
+    this.forms.update(dt, reducedMotion);
+    this.contacts.advance(dt);
+    this.baked.update(dt, this.camera.quaternion, reducedMotion);
+    this.fragments.update(dt, reducedMotion);
+    this.rings.update(dt, this.camera.quaternion);
+    this.flipbooks.update(dt, this.camera.quaternion);
+    this.decals.update(dt);
+    this.pillars.update(dt);
+    this.shells.update(dt, this.time, this.frame, this.anchor);
+    this.groundAuras.update(
+      dt,
+      this.time,
+      this.frame,
+      this.anchor,
+      this.groundY,
+      camPosScratch.x,
+      camPosScratch.z,
+    );
+    this.spirits.update(dt);
+    this.ribbons.drawHeads(this.time, this.headSink, reducedMotion);
     this.overlay.commit();
     for (const [id, g] of this.glows) {
       if (g.stamp === this.frame) {
@@ -2181,25 +2225,33 @@ export class AbilityVfxFx implements SequencerHost {
    * cache geometry. */
   dispose(): void {
     if (this.disposed) return;
-    this.clear();
     this.disposed = true;
+    const errors: unknown[] = [];
+    const release = (work: () => void) => {
+      try {
+        work();
+      } catch (error) {
+        errors.push(error);
+      }
+    };
+    release(() => this.clear());
     this.worldLightCb = null;
-    this.ribbons.dispose();
-    this.water.dispose();
-    this.baked.dispose();
-    this.fragments.dispose();
-    this.details.dispose();
-    this.forms.dispose();
-    this.crests.dispose();
-    this.rings.dispose();
-    this.flipbooks.dispose();
-    this.decals.dispose();
-    this.pillars.dispose();
-    this.shells.dispose();
-    this.groundAuras.dispose();
-    this.spirits.dispose();
-    this.overlay.dispose();
-    this.controlSignals.dispose();
+    release(() => this.ribbons.dispose());
+    release(() => this.water.dispose());
+    release(() => this.baked.dispose());
+    release(() => this.fragments.dispose());
+    release(() => this.details.dispose());
+    release(() => this.forms.dispose());
+    release(() => this.crests.dispose());
+    release(() => this.rings.dispose());
+    release(() => this.flipbooks.dispose());
+    release(() => this.decals.dispose());
+    release(() => this.pillars.dispose());
+    release(() => this.shells.dispose());
+    release(() => this.groundAuras.dispose());
+    release(() => this.spirits.dispose());
+    release(() => this.overlay.dispose());
+    release(() => this.controlSignals.dispose());
     this.particleBurst = null;
     this.lightPulseCb = null;
     this.statSink = null;
@@ -2209,6 +2261,7 @@ export class AbilityVfxFx implements SequencerHost {
     this.screenImpactCb = null;
     this.abilityAudioCb = null;
     this.onPresentationMoment = null;
+    if (errors.length) throw new AggregateError(errors, 'Ability VFX cleanup failed');
   }
 
   private intensity(): number {

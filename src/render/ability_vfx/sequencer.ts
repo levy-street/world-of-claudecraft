@@ -66,7 +66,14 @@ export interface SeqPoint {
 // The host surface fx.ts implements: every primitive the sequences drive.
 export interface SequencerHost {
   handPoint?(id: number, hand: 0 | 1, out: SeqPoint): SeqPoint | null;
-  contact?(sourceId: number, targetId: number, school: string, weight: number, abilityId?: string, beat?: number): void;
+  contact?(
+    sourceId: number,
+    targetId: number,
+    school: string,
+    weight: number,
+    abilityId?: string,
+    beat?: number,
+  ): void;
   facingAt?(id: number): number | null;
   weaponTrail?(id: number, hand: 0 | 1, color: number, width: number, duration: number): void;
   elementalImpact?(
@@ -228,14 +235,21 @@ export interface SequencerHost {
     width: number,
     duration?: number,
   ): void;
-  tetherRibbon?(color: number, width: number, life: number,
-    fill: (pts: {set(x:number,y:number,z:number):unknown}[])=>number): void;
+  tetherRibbon?(
+    color: number,
+    width: number,
+    life: number,
+    fill: (pts: { set(x: number, y: number, z: number): unknown }[]) => number,
+  ): void;
   pathRibbon(
     colorHex: number,
     width: number,
     life: number,
     fill: (pts: { set(x: number, y: number, z: number): unknown }[]) => number,
     brushed?: boolean,
+    motion?: null,
+    preserveActive?: boolean,
+    priority?: 0 | 1,
   ): void;
   pushOverlay(
     x: number,
@@ -328,6 +342,9 @@ interface Beat {
 }
 
 export interface SeqSlot {
+  /** Ordered component outcomes: two bits per cut, 0 avoided, 1 wound, 2 absorbed. */
+  componentOutcomes?: number;
+  componentCount?: number;
   physicalSecondary: boolean;
   active: boolean;
   abilityId: string;
@@ -514,6 +531,7 @@ export class ArchetypeSequencer {
     awaitTravel: boolean,
     windupDelay = 0,
     at?: { x: number; y: number; z: number },
+    componentOutcome?: 0 | 1 | 2,
   ): SeqSlot | null {
     if (tier >= 2 || spec.presentation) return null;
     // One simulation cast can emit several damage components or hit several
@@ -525,7 +543,20 @@ export class ArchetypeSequencer {
       owned && !awaitTravel
         ? this.slots.find((s) => sameCast(s) && s.targetId === targetId)
         : undefined;
-    if (duplicate) return duplicate;
+    if (duplicate) {
+      if (componentOutcome !== undefined) {
+        const count = duplicate.componentCount ?? 0;
+        // A two-bit mask can hold sixteen results. Extra transport events must
+        // never wrap a shift and rewrite an earlier authored contact.
+        const limit = Math.min(16, spec.physical?.beats.length ?? 16);
+        if (count < limit) {
+          duplicate.componentOutcomes =
+            (duplicate.componentOutcomes ?? 0) | (componentOutcome << (count * 2));
+          duplicate.componentCount = count + 1;
+        }
+      }
+      return duplicate;
+    }
     const physicalPrimary = spec.physical && !awaitTravel ? this.slots.find(sameCast) : undefined;
     // steal the oldest running sequence when the pool is saturated: a fresh
     // cast always reads louder than a stale linger tail
@@ -537,6 +568,8 @@ export class ArchetypeSequencer {
     }
     if (!slot) return null;
     slot.active = true;
+    slot.componentOutcomes = componentOutcome;
+    slot.componentCount = componentOutcome === undefined ? undefined : 1;
     slot.physicalSecondary = !!physicalPrimary;
     slot.abilityId = abilityId;
     slot.casterId = casterId;
@@ -1331,7 +1364,11 @@ export class ArchetypeSequencer {
       }
     }
     // ground mark
-    if (spec.strike?.arc !== 'wire' && slot.tier === 0 && (spec.decal || (!gentle && (spec.linger ?? 0) >= 1.5))) {
+    if (
+      spec.strike?.arc !== 'wire' &&
+      slot.tier === 0 &&
+      (spec.decal || (!gentle && (spec.linger ?? 0) >= 1.5))
+    ) {
       host.decalXZ(
         slot.ix,
         slot.iz,
@@ -1409,7 +1446,9 @@ export class ArchetypeSequencer {
     if (spec.motifs && slot.tier <= 1) this.runMotifs(host, slot);
     // lingers honor the authored 1-6s dwell at tier 0 (dot drips, motif loops,
     // and the decal above all ride this window)
-    slot.lingerUntil = slot.t + (spec.strike?.arc === 'wire' ? 0.23 : slot.tier === 0 ? Math.min(6, spec.linger ?? 0.5) : 0);
+    slot.lingerUntil =
+      slot.t +
+      (spec.strike?.arc === 'wire' ? 0.23 : slot.tier === 0 ? Math.min(6, spec.linger ?? 0.5) : 0);
     // spectacle afterglow: crescendo impacts hold a readable aftermath (fading
     // dome + periodic embers in drawTransients) even when the authored linger
     // is short - the gallery's aftermath field the compressed stack dropped.

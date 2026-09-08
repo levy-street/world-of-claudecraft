@@ -56,12 +56,10 @@ import { buildAbilityMaterialPrewarmGroup } from './ability_material_prewarm';
 import {
   AbilityVfx,
   AbilityVfxFx,
-  abilityVfxTexturePrewarmSteps,
-  collectAbilityVfxCompileTargets,
-  persistentClassVfxCompileTargets,
   persistentClassVfxPrewarmGroup,
 } from './ability_vfx';
 import type { AbilityVfxTextures } from './ability_vfx/fx_textures';
+import { abilityPrimitivePrewarmEntry } from './ability_vfx/primitive_prewarm';
 import { ABILITY_VFX_FULL_SPECS } from './ability_vfx_full_specs';
 import { shouldDrawLegacyCastSparkle, syncAbilityVfxCast } from './ability_vfx_registry';
 import { ABILITY_VFX_SPECS } from './ability_vfx_specs';
@@ -6749,56 +6747,19 @@ export class Renderer {
         },
         detail: () => `objects=${weaponVfxPrewarmGroup?.children.length ?? 0}`,
       },
-      {
-        // Spawn one of every pooled ability-VFX primitive (rings, decals,
-        // pillar, shell, slash ribbon, overlay sprite). The pools build their
-        // meshes visible=false, so no render pass ever draws them: their
-        // textures and geometry stay un-uploaded, and the first spec'd cast in
-        // the open world used to pay for both synchronously. The spawns bind
-        // the per-style decal textures and the six impact sheets, so the
-        // texture re-walk below uploads the whole canvas set now.
-        // abilityVfxFx.clear() in the finally block hides everything again.
-        //
-        // resumeUnits deliberately does NOT replay the spawn: run live it
-        // would pop a white ring/decal/flipbook burst at the player's feet
-        // (the same reason vfx.atlas retains nothing). It carries the
-        // invisible half instead, one impact sheet per unit plus one program
-        // link per distinct pooled material. That is also the MINIMAL variant
-        // constrained devices get in place of this entry
-        // (CONSTRAINED_PREWARM_RESUME): there the whole entry is skipped, so
-        // each 512px sheet is otherwise drawn on the first impact of its
-        // school, i.e. mid-combat.
-        id: 'vfx.ability-primitives',
-        category: 'vfx',
-        priority: 62,
-        required: false,
-        resumeUnits: () => [
-          ...abilityVfxTexturePrewarmSteps().map((step) => ({
-            id: `texture:${step.id}`,
-            run: () => {
-              for (const texture of step.build()) this.prewarmTexture(texture);
-            },
-          })),
-          ...abilityMaterialSlot.resumeUnits(),
-          ...collectAbilityVfxCompileTargets(this.scene)
-            .concat(persistentClassVfxCompileTargets())
-            .map((target) => ({
-              id: `program:${target.id}`,
-              run: () => this.compilePrewarmColorPrograms(target.object, false),
-            })),
-        ],
-        run: () => {
-          this.abilityVfxFx.prewarmSpawn(p.pos.x, p.pos.y, p.pos.z - 5, p.id);
-          // The lazily-minted spell materials (ability_material_prewarm.ts):
-          // staged hidden here, linked by the compile lane with the rest.
-          abilityMaterialSlot.run();
-          this.scene.traverse((child) => {
-            const renderable = child as RenderableDiagnosticObject;
-            if (renderable.userData.renderCategory !== 'vfx' || !renderable.material) return;
-            this.prewarmMaterialTextures(renderable.material);
-          });
-        },
-      },
+      abilityPrimitivePrewarmEntry({
+        scene: this.scene,
+        properties: this.webgl.properties,
+        spawn: () => this.abilityVfxFx.prewarmSpawn(p.pos.x, p.pos.y, p.pos.z - 5, p.id),
+        stageMaterials: () => abilityMaterialSlot.run(),
+        materialUnits: () => abilityMaterialSlot.resumeUnits(),
+        geometryUnits: (host) => this.abilityVfxFx.crestPrewarmUnits(host),
+        texture: (texture) => this.prewarmTexture(texture),
+        materialTextures: (material) => this.prewarmMaterialTextures(material),
+        compile: (root, offscreen) => this.compilePrewarmColorPrograms(root, offscreen),
+        draw: (group, child) => this.renderBoundedPrewarmRoot(group, child),
+        withinDeadline: () => performance.now() < buildDeadline,
+      }),
       {
         // Rideable mounts: worn by whoever is riding one, so the FIRST
         // sighting of any given mount links its programs the moment it
@@ -7903,7 +7864,8 @@ export class Renderer {
         );
         if (ev.school === 'physical' && ev.sourceId !== -1 && startsAttackAnimation)
           this.triggerAttack(ev.sourceId, attackAbilityId(ev.ability));
-        if (ev.kind === 'hit' && ev.amount > 0) {
+        const authoredContact = this.abilityVfx.onDamage(ev) === true;
+        if (ev.kind === 'hit' && ev.amount > 0 && !authoredContact) {
           // landed blows flinch the victim (rate-limited inside the visual)
           this.triggerHit(ev.targetId);
           const affected = this.views.get(ev.targetId);
@@ -7917,7 +7879,6 @@ export class Renderer {
         }
         // spec-driven per-ability impact accent (no-op for unknown abilities)
         if (attackAbilityId(ev.ability) === 'drain_life') this.vfx.drainLifeTick(ev.sourceId);
-        this.abilityVfx.onDamage(ev);
         break;
       }
       case 'heal2': {

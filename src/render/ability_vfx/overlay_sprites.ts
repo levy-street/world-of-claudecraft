@@ -18,6 +18,7 @@ export class OverlaySprites {
   private cell = new Float32Array(CAPACITY);
   private alpha = new Float32Array(CAPACITY);
   private count = 0;
+  private priorities = new Uint8Array(CAPACITY);
   private wasEmpty = true;
   private tmpColor = new THREE.Color();
   private disposed = false;
@@ -98,6 +99,11 @@ export class OverlaySprites {
     this.count = 0;
   }
 
+  /** Reserve the already-drawn hard-control tells above projectile heads. */
+  protectPrefix(): void {
+    this.priorities.fill(2, 0, this.count);
+  }
+
   push(
     x: number,
     y: number,
@@ -107,9 +113,15 @@ export class OverlaySprites {
     cell: number,
     alpha: number,
     brightness = 1,
+    priority: 0 | 1 = 0,
   ): void {
-    if (this.count >= CAPACITY) return;
-    const i = this.count++;
+    let i = this.count;
+    if (i >= CAPACITY) {
+      if (priority === 0) return;
+      for (i = CAPACITY - 1; i >= 0; i--) if (this.priorities[i] < priority) break;
+      if (i < 0) return;
+    } else this.count++;
+    this.priorities[i] = priority;
     this.pos[i * 3] = x;
     this.pos[i * 3 + 1] = y;
     this.pos[i * 3 + 2] = z;

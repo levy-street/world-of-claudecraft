@@ -1343,7 +1343,11 @@ export const VISUALS: Record<string, VisualDef> = {
     // the warrior's real kit in src/sim/content/classes.ts, not assumed) is
     // authored by pose-sample-and-blend (scripts/build_warrior_ability_anims.mjs)
     // instead of pointed at an unused clip.
-    animUrls: [`${PLAYERS}/knight_hit_variety_anims.glb`, `${PLAYERS}/warrior_ability_anims.glb`],
+    animUrls: [
+      `${PLAYERS}/knight_hit_variety_anims.glb`,
+      `${PLAYERS}/warrior_ability_anims.glb`,
+      `${PLAYERS}/warrior_fury_anims.glb`,
+    ],
     height: HUMANOID_H,
     clips: {
       ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
@@ -1355,13 +1359,13 @@ export const VISUALS: Record<string, VisualDef> = {
         mortal_strike: '2H_Melee_Attack_Chop',
         execute: '2H_Melee_Attack_Chop',
         slam: '2H_Melee_Attack_Chop',
-        red_harvest: 'Dualwield_Melee_Attack_Chop',
+        red_harvest: 'Fury_Red_Harvest',
         breachmaker: '2H_Melee_Attack_Chop',
         // Shieldcrack slams the SHIELD (offhand arm), not the sword: the
         // synthesized bash (scripts/_add_shield_bash_anim.mjs) drives the
         // left arm carrying the handslot.l shield; the weapon hand stays back.
         shield_slam: 'Shield_Bash',
-        raging_gale: 'Dualwield_Melee_Attack_Chop',
+        raging_gale: 'Fury_Twinstrike',
         bloodthirst: 'Dualwield_Melee_Attack_Chop',
         // Reaping Arc and Revenge hit everything in the frontal arc: the
         // synthesized flat reap (scripts/_add_sweep_slice_anim.mjs), not the

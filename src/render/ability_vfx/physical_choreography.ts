@@ -1,6 +1,7 @@
-import { meleeImpactProfile, meleeContactHeight } from '../melee_impact_core';
+import { meleeContactHeight, meleeImpactProfile } from '../melee_impact_core';
 import { drawDirtToss } from './action_contact';
 import { drawBloodhook } from './bloodhook';
+import { furyBeat } from './fury_choreography';
 import {
   physicalBeatTime,
   physicalContactSheet,
@@ -15,11 +16,7 @@ const destination = { x: 0, y: 0, z: 0 };
 
 /** Follow displayed movement; only an actual arrival earns the contact. A
  * stopped, interrupted or vanished charge leaves its wake and ends quietly. */
-export function physicalTravel(
-  host: SequencerHost,
-  slot: SeqSlot,
-  dt: number,
-): boolean {
+export function physicalTravel(host: SequencerHost, slot: SeqSlot, dt: number): boolean {
   const from = host.anchorOf(slot.casterId, 0, origin);
   const retreat = slot.spec.physical?.shape === 'retreat';
   const to = retreat ? from : host.anchorOf(slot.targetId, 0, destination);
@@ -29,8 +26,7 @@ export function physicalTravel(
   }
   const moved = Math.hypot(from.x - slot.sourceX, from.z - slot.sourceZ);
   const remaining = Math.hypot(to.x - from.x, to.z - from.z);
-  if (Math.hypot(from.x - slot.ix, from.z - slot.iz) < 0.01)
-    slot.afterglowTimer += dt;
+  if (Math.hypot(from.x - slot.ix, from.z - slot.iz) < 0.01) slot.afterglowTimer += dt;
   else slot.afterglowTimer = 0;
   slot.ix = from.x;
   slot.iz = from.z;
@@ -39,9 +35,7 @@ export function physicalTravel(
     return false;
   }
   const arrived = retreat
-    ? slot.t > 0.3 &&
-      moved > 1 &&
-      from.y - host.groundYAt(from.x, from.z) < 0.12
+    ? slot.t > 0.3 && moved > 1 && from.y - host.groundYAt(from.x, from.z) < 0.12
     : slot.t > 0.08 && moved > 0.2 && remaining < 2.5;
   if (arrived && slot.abilityId !== 'bloodhook') {
     slot.ix = from.x;
@@ -102,41 +96,25 @@ export function physicalRelease(host: SequencerHost, slot: SeqSlot): void {
   if (p.weapon !== undefined) {
     const duration = physicalBeatTime(p, p.beats.length - 1) + 0.3;
     if (p.weapon === 'both' || p.weapon === 0)
-      host.weaponTrail?.(
-        slot.casterId,
-        0,
-        slot.accent,
-        p.width * 0.85,
-        duration,
-      );
+      host.weaponTrail?.(slot.casterId, 0, slot.accent, p.width * 0.85, duration);
     if (p.weapon === 'both' || p.weapon === 1)
-      host.weaponTrail?.(
-        slot.casterId,
-        1,
-        slot.accent,
-        p.width * 0.75,
-        duration,
-      );
+      host.weaponTrail?.(slot.casterId, 1, slot.accent, p.width * 0.75, duration);
   }
   host.presentationMoment?.(slot.abilityId, 'release', slot.casterId);
-  host.abilityAudio?.(
-    'release',
-    slot.spec.palette,
-    p.weight,
-    at.x,
-    at.y,
-    at.z,
-    {
-      lite: slot.tier > 0,
-      archetype: slot.spec.archetype,
-      abilityId: slot.abilityId,
-    },
-  );
+  host.abilityAudio?.('release', slot.spec.palette, p.weight, at.x, at.y, at.z, {
+    lite: slot.tier > 0,
+    archetype: slot.spec.archetype,
+    abilityId: slot.abilityId,
+  });
 }
 
 export function physicalImpact(host: SequencerHost, slot: SeqSlot): void {
   const p = slot.spec.physical!;
-  if (slot.physicalSecondary) {
+  if (
+    slot.physicalSecondary &&
+    slot.abilityId !== 'raging_gale' &&
+    slot.abilityId !== 'red_harvest'
+  ) {
     host.burstAt(
       slot.ix,
       slot.iy,
@@ -155,29 +133,22 @@ export function physicalImpact(host: SequencerHost, slot: SeqSlot): void {
   slot.lingerUntil = slot.t + physicalBeatTime(p, p.beats.length - 1) + 0.23;
   slot.motifLoops = 1;
   slot.motifTimer = slot.t;
+  if (slot.abilityId === 'raging_gale' || slot.abilityId === 'red_harvest') {
+    furyBeat(host, slot, 0);
+    return;
+  }
   if (slot.abilityId === 'blind') drawDirtToss(host, slot);
   else physicalBeat(host, slot, 0);
   host.presentationMoment?.(slot.abilityId, 'impact', slot.casterId);
-  host.abilityAudio?.(
-    'impact',
-    slot.spec.palette,
-    p.weight,
-    slot.ix,
-    slot.iy,
-    slot.iz,
-    {
-      lite: slot.tier > 0,
-      finisher: slot.spec.finisher,
-      archetype: slot.spec.archetype,
-      abilityId: slot.abilityId,
-    },
-  );
+  host.abilityAudio?.('impact', slot.spec.palette, p.weight, slot.ix, slot.iy, slot.iz, {
+    lite: slot.tier > 0,
+    finisher: slot.spec.finisher,
+    archetype: slot.spec.archetype,
+    abilityId: slot.abilityId,
+  });
 }
 
-export function physicalFollowThrough(
-  host: SequencerHost,
-  slot: SeqSlot,
-): void {
+export function physicalFollowThrough(host: SequencerHost, slot: SeqSlot): void {
   const p = slot.spec.physical!;
   while (
     slot.motifLoops < p.beats.length &&
@@ -188,15 +159,13 @@ export function physicalFollowThrough(
 }
 
 function physicalBeat(host: SequencerHost, slot: SeqSlot, beat: number): void {
+  if (furyBeat(host, slot, beat)) return;
   const authored = slot.spec.physical!;
   const p =
     authored.shape === 'rush' || authored.shape === 'retreat'
       ? {
           ...authored,
-          shape:
-            slot.abilityId === 'intervene'
-              ? ('shield' as const)
-              : ('breath' as const),
+          shape: slot.abilityId === 'intervene' ? ('shield' as const) : ('breath' as const),
           reach: 1.6,
           lift: slot.abilityId === 'intervene' ? 0.6 : 0.3,
         }
@@ -209,11 +178,7 @@ function physicalBeat(host: SequencerHost, slot: SeqSlot, beat: number): void {
   const profile = meleeImpactProfile(slot.abilityId);
   const recipient =
     profile && slot.targetId !== slot.casterId
-      ? host.anchorOf(
-          slot.targetId,
-          meleeContactHeight(profile, beat),
-          destination,
-        )
+      ? host.anchorOf(slot.targetId, meleeContactHeight(profile, beat), destination)
       : null;
   if (recipient) {
     slot.ix = recipient.x;
@@ -249,8 +214,7 @@ function physicalBeat(host: SequencerHost, slot: SeqSlot, beat: number): void {
     // Keep the full bright core when peripheral strips are shed under load.
     const strand = slot.tier > 0 ? 1 : index;
     const color = strand === 1 ? slot.accent : slot.color;
-    const thickness =
-      p.width * (strand === 1 ? (ground ? 1 : 3.4) : 0.65) * remaining;
+    const thickness = p.width * (strand === 1 ? (ground ? 1 : 3.4) : 0.65) * remaining;
     // Sparse broken ground forks are not a closed AoE boundary. Real gameplay
     // radius telegraphs remain owned by the renderer's event.radius path.
     const turn = ground ? (strand - 1) * 1.35 + beat * 1.17 : 0;
@@ -272,8 +236,7 @@ function physicalBeat(host: SequencerHost, slot: SeqSlot, beat: number): void {
             continue;
           }
           const u = j / (pts.length - 1);
-          const sweep =
-            p.shape === 'spin' || p.shape === 'cut' || p.shape === 'reap';
+          const sweep = p.shape === 'spin' || p.shape === 'cut' || p.shape === 'reap';
           physicalPathPoint(
             p,
             sweep && strand !== 1 ? 0.15 * strand + u * 0.48 : u,
@@ -283,11 +246,7 @@ function physicalBeat(host: SequencerHost, slot: SeqSlot, beat: number): void {
           );
           const px = x + fz * point.x + fx * point.z;
           const pz = z - fx * point.x + fz * point.z;
-          pts[j].set(
-            px,
-            ground ? host.groundYAt(px, pz) + 0.045 : y + point.y,
-            pz,
-          );
+          pts[j].set(px, ground ? host.groundYAt(px, pz) + 0.045 : y + point.y, pz);
         }
         return pts.length;
       },
@@ -304,8 +263,7 @@ function physicalBeat(host: SequencerHost, slot: SeqSlot, beat: number): void {
   const hitX = recipient?.x ?? (body ? cx + dx * 0.5 : slot.ix);
   const hitZ = recipient?.z ?? (body ? cz + dz * 0.5 : slot.iz);
   const gy = host.groundYAt(hitX, hitZ);
-  const hitY =
-    recipient?.y ?? (ground ? gy + 0.12 : body ? cy + p.lift : gy + p.lift);
+  const hitY = recipient?.y ?? (ground ? gy + 0.12 : body ? cy + p.lift : gy + p.lift);
   count += physicalContact(host, slot, beat, hitX, hitY, hitZ);
   if (p.shape === 'fault') {
     const branches = slot.tier > 0 ? 1 : 3;
@@ -351,9 +309,7 @@ function physicalBeat(host: SequencerHost, slot: SeqSlot, beat: number): void {
       const px = cx + dx * travel + dz * side;
       const pz = cz + dz * travel - dx * side;
       const py =
-        p.shape === 'rush'
-          ? host.groundYAt(px, pz) + 0.15
-          : cy + p.lift + k * p.tilt * 0.2;
+        p.shape === 'rush' ? host.groundYAt(px, pz) + 0.15 : cy + p.lift + k * p.tilt * 0.2;
       host.bakedAt?.(
         'smoke',
         px,
@@ -378,31 +334,11 @@ function physicalBeat(host: SequencerHost, slot: SeqSlot, beat: number): void {
       p.shape === 'venom' ? 0.065 : 0.025,
       0.23,
     );
-    host.burstAt(
-      hitX,
-      hitY,
-      hitZ,
-      slot.color,
-      Math.round(p.particles ?? 4),
-      0.23,
-      'embers',
-      0.23,
-    );
+    host.burstAt(hitX, hitY, hitZ, slot.color, Math.round(p.particles ?? 4), 0.23, 'embers', 0.23);
     count += 2;
   } else if (p.shape === 'inward' || p.shape === 'restore') {
     if (p.material === 'stone') {
-      host.fragmentsAt?.(
-        'stone_chip',
-        cx,
-        cy + 0.3,
-        cz,
-        0xa69883,
-        5,
-        0.45,
-        -dx,
-        -dz,
-        0.23,
-      );
+      host.fragmentsAt?.('stone_chip', cx, cy + 0.3, cz, 0xa69883, 5, 0.45, -dx, -dz, 0.23);
       count++;
     }
     host.glowPulse(slot.casterId, slot.color, 0.25 + p.weight * 0.2, false);
@@ -423,9 +359,7 @@ function physicalBeat(host: SequencerHost, slot: SeqSlot, beat: number): void {
       );
       count++;
     }
-    const particles = Math.round(
-      (p.particles ?? 8) * (slot.tier > 0 ? 0.5 : 1) * p.weight,
-    );
+    const particles = Math.round((p.particles ?? 8) * (slot.tier > 0 ? 0.5 : 1) * p.weight);
     if (particles > 0) {
       host.burstAt(
         hitX,
@@ -453,27 +387,12 @@ function physicalBeat(host: SequencerHost, slot: SeqSlot, beat: number): void {
         0,
         p.tilt,
       );
-      host.fragmentsAt?.(
-        'stone_chip',
-        hitX,
-        gy + 0.08,
-        hitZ,
-        0x8d7b67,
-        5,
-        0.75,
-        dx,
-        dz,
-        0.23,
-      );
+      host.fragmentsAt?.('stone_chip', hitX, gy + 0.08, hitZ, 0x8d7b67, 5, 0.75, dx, dz, 0.23);
       count += 2;
     }
   }
   if (p.weight >= 0.45 && p.shape !== 'quiet') {
-    if (
-      (beat > 0 || profile) &&
-      slot.targetId !== slot.casterId &&
-      slot.abilityId !== 'intervene'
-    )
+    if ((beat > 0 || profile) && slot.targetId !== slot.casterId && slot.abilityId !== 'intervene')
       host.contact?.(
         slot.casterId,
         slot.targetId,
@@ -490,15 +409,8 @@ function physicalBeat(host: SequencerHost, slot: SeqSlot, beat: number): void {
       );
     if (slot.targetId !== slot.casterId)
       host.glowPulse(slot.targetId, slot.accent, 0.18 * remaining, false);
-    host.pulseLight(
-      slot.targetId,
-      slot.spec.palette,
-      p.weight * 0.85 * remaining,
-      0.09,
-      3,
-    );
-    if (slot.tier === 0)
-      host.shakeAt(hitX, hitY, hitZ, Math.min(0.26, p.weight * 0.12));
+    host.pulseLight(slot.targetId, slot.spec.palette, p.weight * 0.85 * remaining, 0.09, 3);
+    if (slot.tier === 0) host.shakeAt(hitX, hitY, hitZ, Math.min(0.26, p.weight * 0.12));
     count += 2;
   }
   host.countPrimitive(slot.abilityId, count);

@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { SIGNATURE_ABILITIES, SIGNATURE_CONTACT_TIME } from '../ability_vfx/signature_core';
+import { poseFuryTracks } from './fury_poses';
 import { poseSignatureTracks } from './signature_poses';
 
 export { SIGNATURE_CONTACT_TIME } from '../ability_vfx/signature_core';
@@ -99,7 +100,11 @@ export function prepareSignatureClips(
           : (overrides?.[id] ?? overrides?.[SOURCE_ALIASES[id]]),
       source = name ? clips.get(name) : undefined;
     if (source && (id === 'raging_gale' || id === 'red_harvest')) {
-      clips.set(signatureClipName(id), createMultiStrikeClip(source, id));
+      const clip = source.name.startsWith('Fury_')
+        ? source.clone()
+        : createMultiStrikeClip(source, id);
+      clip.name = signatureClipName(id);
+      clips.set(clip.name, clip);
       continue;
     }
     if (source && (SIGNATURE_ABILITIES[id] || SOURCE_CONTACT[source.name] !== undefined)) {
@@ -134,6 +139,7 @@ export function createMultiStrikeClip(
     copy.values = new Float32Array(values);
     return copy;
   });
+  poseFuryTracks(tracks, harvest);
   return new THREE.AnimationClip(
     signatureClipName(id),
     times[times.length - 1],

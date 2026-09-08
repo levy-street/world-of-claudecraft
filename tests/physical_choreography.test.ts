@@ -1,9 +1,6 @@
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
-import {
-  ArchetypeSequencer,
-  type SequencerHost,
-} from '../src/render/ability_vfx/sequencer';
+import { ArchetypeSequencer, type SequencerHost } from '../src/render/ability_vfx/sequencer';
 import { abilityVfxFullSpec } from '../src/render/ability_vfx_registry';
 import { WARRIOR_VFX_FULL_SPECS } from '../src/render/warrior_vfx_specs';
 import { weaponTrailAnchor } from '../src/render/weapon_trail_anchor';
@@ -36,8 +33,7 @@ function recorder() {
     } as unknown as SequencerHost,
     {
       get(target, key) {
-        if (!(key in target))
-          (target as unknown as Record<PropertyKey, unknown>)[key] = vi.fn();
+        if (!(key in target)) (target as unknown as Record<PropertyKey, unknown>)[key] = vi.fn();
         return Reflect.get(target, key);
       },
     },
@@ -62,16 +58,7 @@ describe('authored physical compositions', () => {
   it('launches Bloodhook after an anchor-only preparation and reaches chest height at reduced detail', () => {
     const { host, paths } = recorder(),
       seq = new ArchetypeSequencer();
-    seq.start(
-      host,
-      'bloodhook',
-      abilityVfxFullSpec('bloodhook')!,
-      1,
-      2,
-      0xa93232,
-      1,
-      false,
-    );
+    seq.start(host, 'bloodhook', abilityVfxFullSpec('bloodhook')!, 1, 2, 0xa93232, 1, false);
     seq.update(host, 0);
     expect(paths).toHaveLength(0);
     seq.update(host, 0.04);
@@ -130,10 +117,8 @@ describe('authored physical compositions', () => {
     for (let i = 0; i < 75; i++) seq.update(host, 0.01);
     expect(slot.active).toBe(false);
     expect(host.contact).toHaveBeenCalledTimes(3);
-    for (const call of vi.mocked(host.burstAt).mock.calls)
-      expect(call[7]).toBe(0.23);
-    for (const call of vi.mocked(host.fragmentsAt!).mock.calls)
-      expect(call[9]).toBe(0.23);
+    for (const call of vi.mocked(host.burstAt).mock.calls) expect(call[7]).toBe(0.23);
+    for (const call of vi.mocked(host.fragmentsAt!).mock.calls) expect(call[9]).toBe(0.23);
   });
   it('keeps a retreat airborne until the displayed body lands on actual ground', () => {
     const { host, paths } = recorder();
@@ -173,34 +158,19 @@ describe('authored physical compositions', () => {
     const { host, paths } = recorder();
     const seq = new ArchetypeSequencer();
     const spec = WARRIOR_VFX_FULL_SPECS.red_harvest;
-    const first = seq.start(
-      host,
-      'red_harvest',
-      spec,
-      1,
-      2,
-      0xaa3333,
-      0,
-      false,
-    );
-    expect(seq.start(host, 'red_harvest', spec, 1, 2, 0xaa3333, 0, false)).toBe(
-      first,
-    );
-    const second = seq.start(
-      host,
-      'red_harvest',
-      spec,
-      1,
-      3,
-      0xaa3333,
-      0,
-      false,
-    )!;
+    const first = seq.start(host, 'red_harvest', spec, 1, 2, 0xaa3333, 0, false);
+    expect(seq.start(host, 'red_harvest', spec, 1, 2, 0xaa3333, 0, false)).toBe(first);
+    const second = seq.start(host, 'red_harvest', spec, 1, 3, 0xaa3333, 0, false)!;
     expect(second.physicalSecondary).toBe(true);
     seq.update(host, 0.16);
-    expect(paths).toHaveLength(6); // three weapon strips and three contact cuts
+    expect(paths).toHaveLength(6); // three primary strips, three secondary wound cuts
+    expect(vi.mocked(host.contact!).mock.calls.map((call) => [call[1], call[5]])).toEqual([
+      [2, 0],
+      [3, 0],
+    ]);
+    expect(host.shakeAt).toHaveBeenCalledTimes(1);
     expect(host.weaponTrail).toHaveBeenCalledTimes(2);
-    expect(host.burstAt).toHaveBeenCalledTimes(3);
+    expect(host.burstAt).toHaveBeenCalledTimes(2);
   });
 
   it('waits for actual rush arrival and cancels a stopped rush without contact', () => {
@@ -276,12 +246,12 @@ describe('authored physical compositions', () => {
       false,
     )!;
     seq.update(host, 0.16);
+    expect(paths).toHaveLength(3);
+    seq.update(host, 0.25);
     expect(paths).toHaveLength(6);
     seq.update(host, 0.25);
-    expect(paths).toHaveLength(12);
-    seq.update(host, 0.25);
-    expect(paths).toHaveLength(18);
-    expect(paths[0][0].distanceTo(paths[6][0])).toBeGreaterThan(0.5);
+    expect(paths).toHaveLength(9);
+    expect(paths[0][0].distanceTo(paths[3][0])).toBeGreaterThan(0.5);
     expect(host.ringAt).not.toHaveBeenCalled();
     expect(host.elementalImpact).not.toHaveBeenCalled();
     seq.update(host, 1);
@@ -291,36 +261,17 @@ describe('authored physical compositions', () => {
   it('grounds every fault point on real terrain and retains a different shield plane', () => {
     const { host, paths } = recorder();
     const seq = new ArchetypeSequencer();
-    seq.start(
-      host,
-      'faultline',
-      WARRIOR_VFX_FULL_SPECS.faultline,
-      1,
-      2,
-      0x998877,
-      0,
-      false,
-    );
+    seq.start(host, 'faultline', WARRIOR_VFX_FULL_SPECS.faultline, 1, 2, 0x998877, 0, false);
     seq.update(host, 0.16);
     for (const path of paths)
       for (const point of path)
         expect(point.y).toBeCloseTo(host.groundYAt(point.x, point.z) + 0.045);
     paths.length = 0;
     seq.clear();
-    seq.start(
-      host,
-      'shield_slam',
-      WARRIOR_VFX_FULL_SPECS.shield_slam,
-      1,
-      2,
-      0xffffff,
-      0,
-      false,
-    );
+    seq.start(host, 'shield_slam', WARRIOR_VFX_FULL_SPECS.shield_slam, 1, 2, 0xffffff, 0, false);
     seq.update(host, 0.16);
     expect(
-      Math.max(...paths[0].map((p) => p.y)) -
-        Math.min(...paths[0].map((p) => p.y)),
+      Math.max(...paths[0].map((p) => p.y)) - Math.min(...paths[0].map((p) => p.y)),
     ).toBeGreaterThan(0.5);
   });
 

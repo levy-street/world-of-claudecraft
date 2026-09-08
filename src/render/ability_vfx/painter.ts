@@ -1,6 +1,6 @@
 import { DAMAGE_CAST_RELEASES } from '../characters/cast_performance';
-import { SIGNATURE_ABILITIES } from './signature_core';
 import { isBleedContinuation, meleeImpactProfile } from '../melee_impact_core';
+import { SIGNATURE_ABILITIES } from './signature_core';
 // Thin painter for the per-ability spell VFX system: resolves an event's
 // ability id against the authored spec table (ability_vfx_specs.ts), asks the
 // pure core (ability_vfx_core.ts) for a plan, and drives the pooled Vfx
@@ -172,6 +172,7 @@ export interface AbilityVfxSpellfxAtEvent {
 }
 
 export interface AbilityVfxDamageEvent {
+  absorbed?: number;
   abilityId?: string | null;
   sourceId: number;
   targetId: number;
@@ -550,7 +551,8 @@ export class AbilityVfx {
     if (ability === 'bloodhook' && ev.fx === 'dotApply') {
       // A primary successful arrival, including refreshed wounds, owns this
       // cue. Snapshot timing, periodic ticks and splash wounds cannot fake it.
-      const fx = this.deps.fx, at = this.deps.anchor(ev.targetId, 0.55);
+      const fx = this.deps.fx,
+        at = this.deps.anchor(ev.targetId, 0.55);
       fx.cancelSequence(ev.sourceId, 'bloodhook');
       if (at) {
         fx.crestAt(at.x, at.y, at.z, 1.15, 1.15, 0x8f8374, 0xf2d5ad, 'hook', 0.6, 0.25);
@@ -571,7 +573,8 @@ export class AbilityVfx {
     if (full?.presentation) {
       // Live-state and dedicated event painters remain the sole visual owner.
       if (ev.fx === 'windup') this.deps.triggerAttack(ev.sourceId, ability);
-      else if (ev.fx === 'selfCast' || ev.fx === 'projectile') this.releaseGesture(ev.sourceId, ability);
+      else if (ev.fx === 'selfCast' || ev.fx === 'projectile')
+        this.releaseGesture(ev.sourceId, ability);
       return true;
     }
     // Beam-archetype channels (mind rays, drains) never fly a projectile:
@@ -594,7 +597,10 @@ export class AbilityVfx {
     if (ev.fx === 'selfCast') {
       // The actual pet's damage owns these contacts; the owner's completion
       // cue must not make the hunter perform a second animal attack.
-      if (ability === 'pack_command' || ability === 'unleash_beast') { this.releaseGesture(ev.sourceId, ability); return true; }
+      if (ability === 'pack_command' || ability === 'unleash_beast') {
+        this.releaseGesture(ev.sourceId, ability);
+        return true;
+      }
       const arch = full?.archetype ?? spec.a;
       const targeted = ev.targetId !== ev.sourceId;
       const ceremonial =
@@ -628,7 +634,8 @@ export class AbilityVfx {
         // A player ranged shot's draw animation rides the projectile launch
         // cue; keep it when this painter claims the event.
         if (ev.attackAnimation === 'ranged-shot' && !plan.whirl) {
-          if (this.deps.hasGestureClip?.(ev.sourceId, ability)) this.releaseGesture(ev.sourceId, ability);
+          if (this.deps.hasGestureClip?.(ev.sourceId, ability))
+            this.releaseGesture(ev.sourceId, ability);
           else this.deps.triggerAttack(ev.sourceId, ability);
         }
         const scale = ev.fx === 'heavyBolt' ? Math.max(plan.projScale, 2) : plan.projScale;
@@ -1150,8 +1157,34 @@ export class AbilityVfx {
   // plain autos) never consume its cast slots. The one exception: a physical
   // special whose ONLY event is its hit - that contact IS its cast, so it
   // charges the cast budget (deduped) and runs the full sequence.
-  onDamage(ev: AbilityVfxDamageEvent): void {
-    if (ev.abilityId && DAMAGE_CAST_RELEASES.has(ev.abilityId)) this.releaseGesture(ev.sourceId, ev.abilityId);
+  onDamage(ev: AbilityVfxDamageEvent): boolean | void {
+    if (ev.abilityId && DAMAGE_CAST_RELEASES.has(ev.abilityId))
+      this.releaseGesture(ev.sourceId, ev.abilityId);
+    const compoundId = attackAbilityId(ev.ability);
+    if (
+      (compoundId === 'raging_gale' || compoundId === 'red_harvest') &&
+      (this.deps.visualVariantOf?.(compoundId, ev.sourceId) ?? compoundId) === compoundId
+    ) {
+      const spec = abilityVfxSpecFor(compoundId);
+      const full = abilityVfxFullSpecFor(compoundId);
+      const tier = this.castTier(ev.sourceId, compoundId);
+      if (spec && full && tier < 2) {
+        const outcome =
+          ev.kind === 'hit' ? (ev.amount > 0 ? 1 : (ev.absorbed ?? 0) > 0 ? 2 : 0) : 0;
+        const plan = planImpact(spec, ev.crit, this.quality, tier);
+        this.deps.fx.sequenceInstant(
+          compoundId,
+          full,
+          ev.sourceId,
+          ev.targetId,
+          plan.color,
+          tier,
+          0,
+          outcome,
+        );
+        return true;
+      }
+    }
     if (ev.kind !== 'hit' || ev.amount <= 0) return;
     const nowSec = this.now();
     const local = this.deps.localPlayerId?.() === ev.sourceId;
@@ -1196,9 +1229,9 @@ export class AbilityVfx {
     if (isBleedContinuation(abilityId, ev.abilityId)) {
       // Periodic wounds and consumed-bleed payoffs belong to the struck body.
       // This also covers the last tick, when the aura has already been removed.
-      const wound = this.deps.anchor(ev.targetId, meleeImpactProfile(abilityId!)?.height ?? .55);
+      const wound = this.deps.anchor(ev.targetId, meleeImpactProfile(abilityId!)?.height ?? 0.55);
       if (wound && this.budget.admitAccent(nowSec))
-        this.deps.fx.burstAt(wound.x, wound.y, wound.z, 0x9e1526, 7, .5, 'blood', .23);
+        this.deps.fx.burstAt(wound.x, wound.y, wound.z, 0x9e1526, 7, 0.5, 'blood', 0.23);
       return;
     }
     const appearance = abilityId
@@ -1232,7 +1265,8 @@ export class AbilityVfx {
     if (local && isCastMoment && (arch === 'strike' || arch === 'dash')) {
       const dur = ev.crit ? 0.16 : 0.1;
       // Signature clips already hold their authored contact pose at 150ms.
-      if (!SIGNATURE_ABILITIES[abilityId] && !meleeImpactProfile(abilityId)) this.deps.animHold?.(ev.sourceId, 0.1, dur);
+      if (!SIGNATURE_ABILITIES[abilityId] && !meleeImpactProfile(abilityId))
+        this.deps.animHold?.(ev.sourceId, 0.1, dur);
       this.deps.animHold?.(ev.targetId, 0.1, dur);
     }
     let tier: 0 | 1 | 2;
@@ -1718,9 +1752,15 @@ export class AbilityVfx {
     if (d.isMob?.(sourceId)) return;
     // Channel projectiles include their final tick after cast state clears.
     // The canonical channel owns body posture, each tick owns only its VFX.
-    if (!completedChannel && ABILITIES[abilityId]?.channel && ABILITIES[abilityId]?.class !== 'hunter') return;
+    if (
+      !completedChannel &&
+      ABILITIES[abilityId]?.channel &&
+      ABILITIES[abilityId]?.class !== 'hunter'
+    )
+      return;
     if (!d.hasGestureClip?.(sourceId, abilityId)) return;
-    const key = `${sourceId}:${abilityId}`, now = this.now();
+    const key = `${sourceId}:${abilityId}`,
+      now = this.now();
     if (now - (this.gestureAt.get(key) ?? -Infinity) < 0.075) return;
     if (this.gestureAt.size >= 256) {
       for (const [id, at] of this.gestureAt) if (now - at > 0.075) this.gestureAt.delete(id);

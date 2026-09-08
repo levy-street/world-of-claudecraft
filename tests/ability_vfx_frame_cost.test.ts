@@ -5,8 +5,10 @@ import { abilityVfxTextures } from '../src/render/ability_vfx/fx_textures';
 import { GroundAuras } from '../src/render/ability_vfx/ground_auras';
 import { OverlaySprites } from '../src/render/ability_vfx/overlay_sprites';
 import { AbilityVfxRibbons } from '../src/render/ability_vfx/ribbons';
+import type { SignatureCrests } from '../src/render/ability_vfx/signature_crests';
 import { ABILITY_VFX_FULL_SPECS } from '../src/render/ability_vfx_full_specs';
 import { createVfxAnchor } from '../src/render/vfx_anchor';
+import { WARRIOR_VFX_FULL_SPECS } from '../src/render/warrior_vfx_specs';
 import { weaponTrailAnchor } from '../src/render/weapon_trail_anchor';
 
 // The steady-state combat cost of the ability-VFX subsystem: anchors resolved
@@ -420,4 +422,154 @@ describe('ability VFX steady-state frame cost', () => {
     expect(rangeOf(pos)).toEqual({ start: 0, count: 3 });
     expect(pos.updateRanges.length).toBe(1);
   });
+});
+
+it.each(['raging_gale', 'red_harvest'])(
+  'draws %s on its first contact frame and retains its edge under pool pressure',
+  (id) => {
+    installCanvasStub();
+    const { anchor } = countingAnchor(() => 2);
+    const fx = new AbilityVfxFx(new THREE.Scene(), new THREE.PerspectiveCamera(), anchor, () => 0);
+    const ribbons = (fx as unknown as { ribbons: AbilityVfxRibbons }).ribbons;
+    const probe = ribbons as unknown as {
+      geo: THREE.BufferGeometry;
+      arcs: Array<{ active: boolean; priority: number; glow: THREE.Color }>;
+    };
+    const fill = (pts: { set(x: number, y: number, z: number): unknown }[]) => {
+      pts[0].set(0, 0, -5);
+      pts[1].set(1, 1, -5);
+      return 2;
+    };
+    try {
+      fx.sequenceInstant(id, WARRIOR_VFX_FULL_SPECS[id], 1, 2, 0xffeecc, 0, 0, 1);
+      fx.update(0.14);
+      expect(probe.geo.drawRange.count).toBe(0);
+      fx.update(0.011);
+      // Inspect the actual packed draw, not just an admitted future slot.
+      expect(probe.geo.drawRange.count).toBeGreaterThan(0);
+      fx.clear();
+      fx.sequenceInstant(id, WARRIOR_VFX_FULL_SPECS[id], 1, 2, 0xffeecc, 0, 0, 1);
+      fx.update(0.14);
+      // Repeat with all twenty decorative slots occupied.
+      for (let i = 0; i < 20; i++) fx.pathRibbon(0x001122, 0.1, 1, fill);
+      fx.update(0.011);
+      const edges = probe.arcs.filter((a) => a.active && a.priority === 1);
+      expect(edges).toHaveLength(1);
+      expect(probe.geo.drawRange.count).toBeGreaterThan(0);
+      const edge = edges[0];
+      const color = edge.glow.getHex();
+      for (let i = 0; i < 40; i++) fx.pathRibbon(0x005566, 0.1, 1, fill);
+      expect(edge.priority).toBe(1);
+      expect(edge.glow.getHex()).toBe(color);
+      fx.update(0.01);
+      expect(probe.geo.drawRange.count).toBeGreaterThan(0);
+    } finally {
+      fx.dispose();
+    }
+  },
+);
+
+it('reclaims expiring crest slots before admitting a contact and displays the new crest immediately', async () => {
+  installCanvasStub();
+  const { anchor } = countingAnchor(() => 2);
+  const fx = new AbilityVfxFx(new THREE.Scene(), new THREE.PerspectiveCamera(), anchor, () => 0);
+  const crests = (fx as unknown as { crests: SignatureCrests }).crests;
+  const slots = (
+    crests as unknown as { slots: Array<{ active: boolean; age: number; mesh: THREE.Mesh }> }
+  ).slots;
+  const programs = new Map([
+    ['one', { isReady: () => true, getUniforms() {}, getAttributes() {} }],
+  ]);
+  try {
+    for (const unit of crests.preparation.units({
+      properties: { get: () => ({ programs }) },
+      compile: async () => {},
+      draw() {},
+    }))
+      await unit.run();
+    for (let i = 0; i < 8; i++)
+      crests.spawn(i, 1, 0, 1, 1, 0xff0000, 0xffffff, 'blood_cut', 0, 0.15);
+    fx.sequenceInstant('raging_gale', WARRIOR_VFX_FULL_SPECS.raging_gale, 1, 2, 0xffffff, 0, 0, 1);
+    fx.update(0.14);
+    expect(slots.filter((s) => s.active)).toHaveLength(8);
+    fx.update(0.011);
+    const live = slots.filter((s) => s.active);
+    expect(live).toHaveLength(1);
+    expect(live[0].mesh.visible).toBe(true);
+    expect(live[0].age).toBe(0);
+    expect(live[0].mesh.position.x).toBe(4);
+  } finally {
+    fx.dispose();
+  }
+});
+
+it('packs a travelling projectile head through a full decorative overlay while preserving hard-control tells', () => {
+  installCanvasStub();
+  const { anchor } = countingAnchor(() => 2);
+  const fx = new AbilityVfxFx(new THREE.Scene(), new THREE.PerspectiveCamera(), anchor, () => 0);
+  const overlay = (fx as unknown as { overlay: OverlaySprites }).overlay;
+  const probe = overlay as unknown as {
+    count: number;
+    priorities: Uint8Array;
+    geo: THREE.BufferGeometry;
+  };
+  const pushes = vi.spyOn(overlay, 'push');
+  try {
+    fx.holdCcBand(2, 'stun', 3);
+    for (let id = 1; id <= 40; id++) {
+      fx.windup(id, 0x123456, 0.7, 'runes');
+      fx.orbit(id, 'runes', 0x123456);
+    }
+    fx.sequenceBolt(
+      'fireball',
+      { ...FIREBALL_SPEC, bolt: { style: 'comet', speed: 1 } },
+      1,
+      10,
+      0xfedcba,
+      0.2,
+      0,
+    );
+    fx.update(0.05);
+    expect(probe.count).toBe(128);
+    expect(probe.priorities.includes(2)).toBe(true);
+    const head = pushes.mock.calls.find((c) => c[8] === 1)!;
+    expect(head).toBeDefined();
+    const positions = probe.geo.getAttribute('position');
+    const packed = Array.from({ length: probe.count }, (_, i) => i).some(
+      (i) =>
+        probe.priorities[i] === 1 &&
+        Math.abs(positions.getX(i) - head[0]) < 0.001 &&
+        Math.abs(positions.getY(i) - head[1]) < 0.001 &&
+        Math.abs(positions.getZ(i) - head[2]) < 0.001,
+    );
+    expect(packed).toBe(true);
+  } finally {
+    fx.dispose();
+  }
+});
+
+it('continues outer VFX teardown after a crest removal callback throws', () => {
+  installCanvasStub();
+  const fx = new AbilityVfxFx(
+    new THREE.Scene(),
+    new THREE.PerspectiveCamera(),
+    () => null,
+    () => 0,
+  );
+  const probe = fx as unknown as {
+    crests: SignatureCrests;
+    overlay: OverlaySprites;
+    controlSignals: { dispose(): void };
+    abilityAudioCb: unknown;
+  };
+  const overlay = vi.spyOn(probe.overlay, 'dispose');
+  const controls = vi.spyOn(probe.controlSignals, 'dispose');
+  probe.crests.preparation.group.addEventListener('removed', () => {
+    throw new Error('listener failed');
+  });
+  expect(() => fx.dispose()).toThrow('Ability VFX cleanup failed');
+  expect(overlay).toHaveBeenCalledTimes(1);
+  expect(controls).toHaveBeenCalledTimes(1);
+  expect(probe.abilityAudioCb).toBeNull();
+  expect(() => fx.dispose()).not.toThrow();
 });
