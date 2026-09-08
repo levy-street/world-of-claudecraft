@@ -10054,6 +10054,7 @@ export const fr_CA: EnTranslations = {
       "templates": {
         "battleground": "[Champs de Thornhollow] {name} : {message}",
         "party": "[Groupe] {name} : {message}",
+        "raidWarning": "[Raid Warning] {name}: {message}",
         "yell": "{name} crie : {message}",
         "whisper": "{name} chuchote : {message}",
         "toWhisper": "À {name} : {message}",

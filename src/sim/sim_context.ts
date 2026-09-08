@@ -67,6 +67,7 @@ import type {
   ItemInstancePayload,
   PendingResurrection,
   PlayerClass,
+  PullTimer,
   QuestProgress,
   ReadyCheck,
   SetProc,
@@ -317,6 +318,9 @@ export interface SimContextPrimitives {
   // Active party/raid ready checks (social/ready_check.ts), keyed by party id. Swept
   // in the end-of-tick block by updateReadyChecks. Sim-internal, never wired.
   readonly readyChecks: Map<number, ReadyCheck>;
+  // Active party/raid pull timers (social/pull_timer.ts), keyed by party id. Swept
+  // in the end-of-tick block by updatePullTimers.
+  readonly pullTimers: Map<number, PullTimer>;
   // Player-cast resurrection offers, keyed by the dead recipient. The spell and
   // response paths share this live authoritative map across all three hosts.
   readonly pendingResurrections: Map<number, PendingResurrection>;
@@ -653,6 +657,8 @@ export interface SimContextCallbacks {
   // Start a party/raid ready check as the actor (leader-gated); used by the chat
   // "/ready" command in social/chat.ts. Delegates to social/ready_check.ts.
   readyCheckStart(pid?: number): void;
+  pullTimerStart(rawCommand: string, pid?: number): void;
+  pullTimerCancel(pid?: number): void;
   removeFromParty(pid: number, verb: string): void;
   // Drop a disbanded party's whole raid-marker set (points at T1's targeting store).
   dropPartyMarkers(partyId: number): void;
@@ -1449,6 +1455,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     get readyChecks() {
       return host.readyChecks;
     },
+    get pullTimers() {
+      return host.pullTimers;
+    },
     get pendingResurrections() {
       return host.pendingResurrections;
     },
@@ -1592,6 +1601,8 @@ export function createSimContext(host: SimContextHost): SimContext {
     partyOf: host.partyOf,
     partyInvite: host.partyInvite,
     readyCheckStart: host.readyCheckStart,
+    pullTimerStart: host.pullTimerStart,
+    pullTimerCancel: host.pullTimerCancel,
     removeFromParty: host.removeFromParty,
     dropPartyMarkers: host.dropPartyMarkers,
     formDungeonFinderGroup: host.formDungeonFinderGroup,

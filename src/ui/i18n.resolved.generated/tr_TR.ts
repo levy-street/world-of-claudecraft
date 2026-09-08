@@ -10054,6 +10054,7 @@ export const tr_TR: EnTranslations = {
       "templates": {
         "battleground": "[Savaş Alanı] {name}: {message}",
         "party": "[Grup] {name}: {message}",
+        "raidWarning": "[Raid Warning] {name}: {message}",
         "yell": "{name} bağırıyor: {message}",
         "whisper": "{name} fısıldıyor: {message}",
         "toWhisper": "{name} kişisine: {message}",

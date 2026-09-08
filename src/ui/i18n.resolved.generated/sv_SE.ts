@@ -10054,6 +10054,7 @@ export const sv_SE: EnTranslations = {
       "templates": {
         "battleground": "[Slagfält] {name}: {message}",
         "party": "[Grupp] {name}: {message}",
+        "raidWarning": "[Raid Warning] {name}: {message}",
         "yell": "{name} ropar: {message}",
         "whisper": "{name} viskar: {message}",
         "toWhisper": "Till {name}: {message}",

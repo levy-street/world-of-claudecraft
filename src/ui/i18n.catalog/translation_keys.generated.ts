@@ -7608,6 +7608,7 @@ export type TranslationKeyFlat =
   | 'hud.chat.templates.lfg'
   | 'hud.chat.templates.officer'
   | 'hud.chat.templates.party'
+  | 'hud.chat.templates.raidWarning'
   | 'hud.chat.templates.roll'
   | 'hud.chat.templates.say'
   | 'hud.chat.templates.toWhisper'

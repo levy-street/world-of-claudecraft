@@ -6,11 +6,27 @@
 // (party id -> ReadyCheck); this module owns the logic. Draws NO rng, uses the sim
 // clock (ctx.time) not wall-clock, so replays and the parity gate stay byte-stable.
 import type { SimContext } from '../sim_context';
-import type { ReadyCheck } from '../types';
+import type { ReadyCheck, ReadyCheckMemberResponse } from '../types';
 
 // Classic-era ready checks give stragglers 30 seconds; anyone still pending then is
 // tallied as "no response".
 export const READY_CHECK_SECONDS = 30;
+
+function emitStatusToInitiator(ctx: SimContext, check: ReadyCheck, done: boolean): void {
+  const responses: ReadyCheckMemberResponse[] = [];
+  for (const [mPid, state] of check.responses) {
+    const name = ctx.players.get(mPid)?.name ?? 'Unknown';
+    responses.push({ pid: mPid, name, state });
+  }
+  ctx.emit({
+    type: 'readyCheckStatus',
+    initiatorPid: check.initiator,
+    partyId: check.partyId,
+    responses,
+    done,
+    pid: check.initiator,
+  });
+}
 
 export function readyCheckStart(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
@@ -33,12 +49,14 @@ export function readyCheckStart(ctx: SimContext, pid?: number): void {
     // The initiator is auto-ready (and gets no prompt), mirroring the classic client.
     responses.set(mPid, mPid === r.meta.entityId ? 'ready' : 'pending');
   }
-  ctx.readyChecks.set(party.id, {
+  const check: ReadyCheck = {
     partyId: party.id,
     initiator: r.meta.entityId,
     endsAt: ctx.time + READY_CHECK_SECONDS,
     responses,
-  });
+  };
+  ctx.readyChecks.set(party.id, check);
+  emitStatusToInitiator(ctx, check, false);
   const fromName = r.meta.name;
   for (const mPid of party.members) {
     // The initiator is auto-ready and gets no prompt; every other member does.
@@ -58,6 +76,7 @@ export function readyCheckRespond(ctx: SimContext, ready: boolean, pid?: number)
   let pending = false;
   for (const state of check.responses.values()) if (state === 'pending') pending = true;
   if (!pending) finalizeReadyCheck(ctx, check);
+  else emitStatusToInitiator(ctx, check, false);
 }
 
 // End-of-tick sweep: finalize any check whose timer has elapsed. Wired into the
@@ -73,6 +92,7 @@ export function updateReadyChecks(ctx: SimContext): void {
 }
 
 function finalizeReadyCheck(ctx: SimContext, check: ReadyCheck): void {
+  emitStatusToInitiator(ctx, check, true);
   ctx.readyChecks.delete(check.partyId);
   let ready = 0;
   let notReady = 0;

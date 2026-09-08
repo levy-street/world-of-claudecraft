@@ -108,7 +108,7 @@ export function chatOpenTabLabelKey(tab: ChatOpenTab): TranslationKey {
 // literals. Covers the send-capable tab channels plus the non-tab log channels
 // (whisper, emote, roll). `say` is the neutral default: it doubles as the
 // fallback for any unrecognized log channel and as the "no tint" signal below.
-export type ChatColorChannel = ChatTabChannel | WhisperTab | 'emote' | 'roll';
+export type ChatColorChannel = ChatTabChannel | WhisperTab | 'emote' | 'roll' | 'raidWarning';
 
 const CHAT_CHANNEL_COLORS: Record<ChatColorChannel, string> = {
   say: '#f0ead8',
@@ -122,6 +122,8 @@ const CHAT_CHANNEL_COLORS: Record<ChatColorChannel, string> = {
   // collides in practice because emotes render bare and this carries a
   // [Battleground] prefix.
   battleground: '#ff8c1a',
+  // Vibrant orange raid warning for leader alerts to the party/raid.
+  raidWarning: '#ff4800',
   general: '#ffc864',
   world: '#ff9d5c',
   lfg: '#5cd6a0',

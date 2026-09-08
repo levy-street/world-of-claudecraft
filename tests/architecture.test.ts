@@ -2546,6 +2546,7 @@ const UI_DOM_MODULES = [
   'src/ui/hud/professions/professions_window.ts',
   'src/ui/raid_boss_guide_window.ts',
   'src/ui/raid_boss_guide_model_controller.ts',
+  'src/ui/hud/chat/ready_check_leader_window.ts',
   // The binder that gives a purchase-intent ledger a durable half. It reaches
   // localStorage (through the safe_local_storage seam, the one sanctioned door)
   // and the clock, which is precisely why it is not in the pure record core it

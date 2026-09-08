@@ -10054,6 +10054,7 @@ export const ja_JP: EnTranslations = {
       "templates": {
         "battleground": "[戦場] {name}: {message}",
         "party": "[パーティ] {name}: {message}",
+        "raidWarning": "[Raid Warning] {name}: {message}",
         "yell": "{name}の叫び: {message}",
         "whisper": "{name}のささやき: {message}",
         "toWhisper": "{name}へ: {message}",

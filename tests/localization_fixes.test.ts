@@ -1689,6 +1689,7 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
       'fiesta.ts',
       'fiesta_bots.ts',
       'party.ts',
+      'pull_timer.ts',
       'ready_check.ts',
       'trade.ts',
       'trade_offer_sources.ts',

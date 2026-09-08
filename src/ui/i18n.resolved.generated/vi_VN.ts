@@ -10054,6 +10054,7 @@ export const vi_VN: EnTranslations = {
       "templates": {
         "battleground": "[Chiến Trường] {name}: {message}",
         "party": "[Tổ Đội] {name}: {message}",
+        "raidWarning": "[Raid Warning] {name}: {message}",
         "yell": "{name} hét: {message}",
         "whisper": "{name} nhắn riêng: {message}",
         "toWhisper": "Gửi {name}: {message}",

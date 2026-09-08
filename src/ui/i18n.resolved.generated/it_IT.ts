@@ -10054,6 +10054,7 @@ export const it_IT: EnTranslations = {
       "templates": {
         "battleground": "[Campo di battaglia] {name}: {message}",
         "party": "[Gruppo] {name}: {message}",
+        "raidWarning": "[Raid Warning] {name}: {message}",
         "yell": "{name} urla: {message}",
         "whisper": "{name} sussurra: {message}",
         "toWhisper": "A {name}: {message}",

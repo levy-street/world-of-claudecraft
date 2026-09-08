@@ -2642,6 +2642,7 @@
       rgba(255, 255, 255, 0.02) 45%,
       rgba(0, 0, 0, 0.15)
     );
+    z-index: 2;
   }
   .bar-text {
     position: absolute;
@@ -2654,6 +2655,7 @@
     color: #fff;
     text-shadow: 1px 1px 1px #000;
     font-weight: bold;
+    z-index: 4;
   }
   .hp .bar-fill {
     background-color: var(--color-hp);
@@ -2686,8 +2688,10 @@
     box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.4);
     pointer-events: none;
     transition: transform 0.12s linear;
+    z-index: 1;
   }
   .bar-absorb.overshield {
+    z-index: 3;
     background: repeating-linear-gradient(
       115deg,
       rgba(255, 236, 160, 0.55) 0 5px,
@@ -8616,6 +8620,149 @@
     width: 52px;
     height: 52px;
   }
+  /* Raid Warning alert stack (raid_warning_banner.ts).
+     High-contrast vibrant orange banners in the upper area of the screen,
+     mirroring the classic MMO raid warning presentation. */
+  #raid-warning-banner {
+    position: absolute;
+    left: 50%;
+    top: 15%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    pointer-events: none;
+    z-index: 100;
+    width: max-content;
+    max-width: calc(100vw - 48px);
+    box-sizing: border-box;
+  }
+  .raid-warning-line {
+    color: #ff5500;
+    font-size: 34px;
+    font-weight: bold;
+    font-family: var(--title-font);
+    letter-spacing: 0.8px;
+    padding: 8px 26px;
+    border: 1px solid rgba(255, 85, 0, 0.45);
+    border-radius: 8px;
+    background: rgba(20, 10, 5, 0.8);
+    box-shadow:
+      0 0 18px rgba(255, 85, 0, 0.35),
+      0 4px calc(18px * var(--fx-shadow, 1)) var(--color-art-shadow);
+    text-shadow:
+      0 0 16px rgba(255, 85, 0, 0.85),
+      2px 2px 6px #000;
+    text-align: center;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    opacity: 1;
+    transition:
+      opacity 0.4s ease,
+      transform 0.3s ease;
+  }
+  .raid-warning-line.fade {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  /* Ready Check Leader Window (ready_check_leader_window.ts).
+     Compact square window displaying member ready statuses for the party leader. */
+  #ready-check-leader-window {
+    position: absolute;
+    left: 50%;
+    top: 25%;
+    transform: translateX(-50%);
+    width: 220px;
+    min-height: 140px;
+    background: rgba(14, 18, 24, 0.95);
+    border: 1.5px solid #d4af37;
+    border-radius: 8px;
+    box-shadow:
+      0 6px 20px rgba(0, 0, 0, 0.75),
+      0 0 10px rgba(212, 175, 55, 0.25);
+    padding: 10px 14px;
+    z-index: 120;
+    pointer-events: auto;
+    font-family: var(--font-ui, sans-serif);
+    color: #e8e8e8;
+    box-sizing: border-box;
+  }
+  #ready-check-leader-window .rck-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+    padding-bottom: 6px;
+    margin-bottom: 8px;
+  }
+  #ready-check-leader-window .rck-title {
+    font-weight: bold;
+    font-size: 14px;
+    color: #ffd100;
+    letter-spacing: 0.5px;
+    font-family: var(--title-font, sans-serif);
+  }
+  #ready-check-leader-window .rck-close {
+    background: none;
+    border: none;
+    color: #999;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0 4px;
+    line-height: 1;
+  }
+  #ready-check-leader-window .rck-close:hover {
+    color: #fff;
+  }
+  #ready-check-leader-window .rck-roster {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 240px;
+    overflow-y: auto;
+  }
+  #ready-check-leader-window .rck-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 3px 6px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 4px;
+  }
+  #ready-check-leader-window .rck-name {
+    font-size: 13px;
+    font-weight: 500;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  #ready-check-leader-window .rck-status {
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: bold;
+  }
+  #ready-check-leader-window .rck-status.rck-yes {
+    color: #2ed573;
+    text-shadow: 0 0 8px rgba(46, 213, 115, 0.7);
+  }
+  #ready-check-leader-window .rck-status.rck-no {
+    color: #ff4757;
+    text-shadow: 0 0 8px rgba(255, 71, 87, 0.7);
+  }
+  #ready-check-leader-window .rck-status-line {
+    margin-top: 8px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 11px;
+    color: #aaa;
+    text-align: center;
+  }
   /* Reduced-motion celebrations (hud.ts showBanner motion=false): the banner
      appears and clears instantly, same text and duration, no fade. */
   #banner.banner-no-motion {
@@ -9477,7 +9624,7 @@
     border: 1px solid #050505;
     border-radius: 2px;
     background: #101010;
-    box-shadow: inset 0 0 0 1px #ffffff14;
+    box-shadow: none;
   }
   #party-frames.party-style-raid .party-frame .pfm-name {
     position: absolute;
@@ -9517,7 +9664,19 @@
   }
   #party-frames.party-style-raid .party-frame .bar.hp .bar-fill {
     background-color: var(--cls);
+    background-image: none;
     filter: saturate(0.82) brightness(0.82);
+    z-index: 2;
+  }
+  #party-frames.party-style-raid .party-frame .bar.hp .bar-absorb {
+    z-index: 1;
+    background: rgba(255, 255, 255, 0.28);
+    box-shadow: none;
+  }
+  #party-frames.party-style-raid .party-frame .bar.hp .bar-absorb.overshield {
+    z-index: 3;
+    background: rgba(255, 225, 140, 0.35);
+    box-shadow: none;
   }
   #party-frames.party-style-raid .party-frame > .bar:not(.hp) {
     position: absolute;

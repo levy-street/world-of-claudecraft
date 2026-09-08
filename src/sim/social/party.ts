@@ -492,6 +492,7 @@ export class PartyMachine {
           // members now resolve to the NEW party, so they could never answer it and it
           // would run the full timeout and report on a group that no longer exists.
           this.ctx.readyChecks.delete(old.id);
+          this.ctx.pullTimers.delete(old.id);
         }
       }
       for (const pid of unit.members) {
@@ -614,6 +615,7 @@ export class PartyMachine {
       // A disband mid-check would otherwise fire the counts-only summary to every
       // ex-member 30s later about a party that no longer exists.
       this.ctx.readyChecks.delete(party.id);
+      this.ctx.pullTimers.delete(party.id);
     } else if (party.leader === pid) {
       party.leader = party.members[0];
       const newLeader = this.ctx.players.get(party.leader);

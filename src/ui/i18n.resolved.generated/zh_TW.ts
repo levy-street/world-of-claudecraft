@@ -10054,6 +10054,7 @@ export const zh_TW: EnTranslations = {
       "templates": {
         "battleground": "[戰場] {name}：{message}",
         "party": "[隊伍] {name}：{message}",
+        "raidWarning": "[Raid Warning] {name}: {message}",
         "yell": "{name}大喊：{message}",
         "whisper": "{name}悄悄說：{message}",
         "toWhisper": "對{name}說：{message}",

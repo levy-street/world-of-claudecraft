@@ -10054,6 +10054,7 @@ export const en_XA: EnTranslations = {
       "templates": {
         "battleground": "[[Ɓáţţļéĝŕóúñð] {name}: {message}]",
         "party": "[[Þáŕţý] {name}: {message}]",
+        "raidWarning": "[[Ŕáíð Ŵáŕñíñĝ] {name}: {message}]",
         "yell": "[{name} ýéļļš: {message}]",
         "whisper": "[{name} ŵĥíšþéŕš: {message}]",
         "toWhisper": "[Ţó {name}: {message}]",

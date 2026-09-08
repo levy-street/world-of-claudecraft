@@ -10054,6 +10054,7 @@ export const da_DK: EnTranslations = {
       "templates": {
         "battleground": "[Slagmark] {name}: {message}",
         "party": "[Gruppe] {name}: {message}",
+        "raidWarning": "[Raid Warning] {name}: {message}",
         "yell": "{name} råber: {message}",
         "whisper": "{name} hvisker: {message}",
         "toWhisper": "Til {name}: {message}",

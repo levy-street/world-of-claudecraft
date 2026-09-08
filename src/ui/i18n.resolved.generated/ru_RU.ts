@@ -10054,6 +10054,7 @@ export const ru_RU: EnTranslations = {
       "templates": {
         "battleground": "[Поле боя] {name}: {message}",
         "party": "[Группа] {name}: {message}",
+        "raidWarning": "[Raid Warning] {name}: {message}",
         "yell": "{name} кричит: {message}",
         "whisper": "{name} шепчет: {message}",
         "toWhisper": "Кому {name}: {message}",

@@ -9641,7 +9641,7 @@ export class GameServer {
         if (sent.target) {
           this.rememberChatChannel(session, { channel: 'whisper', target: sent.target });
         }
-      } else {
+      } else if (sent.channel !== 'raidWarning') {
         this.rememberChatChannel(session, { channel: sent.channel });
       }
     }

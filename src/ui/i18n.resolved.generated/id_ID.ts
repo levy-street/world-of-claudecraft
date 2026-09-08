@@ -10054,6 +10054,7 @@ export const id_ID: EnTranslations = {
       "templates": {
         "battleground": "[Medan Thornhollow] {name}: {message}",
         "party": "[Party] {name}: {message}",
+        "raidWarning": "[Raid Warning] {name}: {message}",
         "yell": "{name} berteriak: {message}",
         "whisper": "{name} berbisik: {message}",
         "toWhisper": "Kepada {name}: {message}",

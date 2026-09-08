@@ -472,3 +472,15 @@ describe('chat channel tabs: the battleground channel', () => {
     }
   });
 });
+
+describe('chat channel tabs: raid warning channel', () => {
+  it('maps raidWarning to its distinct vibrant orange color', () => {
+    expect(chatChannelColor('raidWarning')).toBe('#ff4800');
+  });
+
+  it('does not stick after a /rw or /ab command (deliberate one-off alerts)', () => {
+    expect(sentLineChannel('/rw Focus adds')).toBeNull();
+    expect(sentLineChannel('/ab Cuidado')).toBeNull();
+    expect(sentLineChannel('/raidwarning Phase 2')).toBeNull();
+  });
+});

@@ -323,6 +323,7 @@ const hudStringsEn = {
       templates: {
         battleground: '[Battleground] {name}: {message}',
         party: '[Party] {name}: {message}',
+        raidWarning: '[Raid Warning] {name}: {message}',
         yell: '{name} yells: {message}',
         whisper: '{name} whispers: {message}',
         toWhisper: 'To {name}: {message}',

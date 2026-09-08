@@ -439,6 +439,8 @@ import {
 import { type ChatClock, clampChatClock, formatChatTimestamp } from './hud/chat/chat_timestamp';
 import { ChatWindowController } from './hud/chat/chat_window_controller';
 import { DEED_NAME_TOKEN, deedChatLinkEl, deedLineNodes } from './hud/chat/deed_chat_line';
+import { RaidWarningBanner } from './hud/chat/raid_warning_banner';
+import { ReadyCheckLeaderWindow } from './hud/chat/ready_check_leader_window';
 import { CosmeticsWindow } from './hud/cosmetics';
 import { SkinEventController } from './hud/cosmetics/skin_event_controller';
 import {
@@ -1194,6 +1196,7 @@ const CRAFTING_TAB_KEY = 'woc_crafting_tab';
 const CHAT_TEMPLATE_KEYS = {
   party: 'hud.chat.templates.party',
   battleground: 'hud.chat.templates.battleground',
+  raidWarning: 'hud.chat.templates.raidWarning',
   yell: 'hud.chat.templates.yell',
   whisper: 'hud.chat.templates.whisper',
   toWhisper: 'hud.chat.templates.toWhisper',
@@ -1438,6 +1441,10 @@ export class Hud {
   // top-center lines fed by the questProgress event, aria-hidden decoration
   // (the chat log + live region carry the announced copy).
   private readonly questBanner = new QuestProgressBanner($('#quest-banner'));
+  private readonly raidWarningBanner = new RaidWarningBanner($('#raid-warning-banner'));
+  private readonly readyCheckLeaderWindow = new ReadyCheckLeaderWindow(
+    $('#ready-check-leader-window'),
+  );
   private subzoneEl = $('#subzone-banner');
   private tooltipEl = $('#tooltip');
   // Which element last painted the shared #tooltip box, so a hovered slot can
@@ -12635,6 +12642,20 @@ export class Hud {
                 ev.classId,
               );
               break;
+            case 'raidWarning':
+              this.chatLogFrom(
+                ev.from,
+                ev.text,
+                CHAT_TEMPLATE_KEYS.raidWarning,
+                'raidWarning',
+                ev.fromPid,
+                ev.flair,
+                ev.fromTitle,
+                ev.classId,
+              );
+              audio.raidWarning();
+              this.raidWarningBanner.show(ev.text);
+              break;
             case 'yell':
               this.chatLogFrom(
                 localizeAuthoredYellSpeakerName(
@@ -12872,6 +12893,9 @@ export class Hud {
             // let the sim's own 30s timeout bucket the straggler.
             () => {},
           );
+          break;
+        case 'readyCheckStatus':
+          this.readyCheckLeaderWindow.update(ev);
           break;
         case 'resurrectionOffer':
           // An offer completing against a player who is no longer dead (they

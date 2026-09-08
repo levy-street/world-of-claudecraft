@@ -10054,6 +10054,7 @@ export const ko_KR: EnTranslations = {
       "templates": {
         "battleground": "[전장] {name}: {message}",
         "party": "[파티] {name}: {message}",
+        "raidWarning": "[Raid Warning] {name}: {message}",
         "yell": "{name} 외침: {message}",
         "whisper": "{name} 귓속말: {message}",
         "toWhisper": "{name}에게: {message}",

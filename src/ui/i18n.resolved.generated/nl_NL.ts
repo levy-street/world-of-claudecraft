@@ -10054,6 +10054,7 @@ export const nl_NL: EnTranslations = {
       "templates": {
         "battleground": "[Slagveld] {name}: {message}",
         "party": "[Groep] {name}: {message}",
+        "raidWarning": "[Raid Warning] {name}: {message}",
         "yell": "{name} schreeuwt: {message}",
         "whisper": "{name} fluistert: {message}",
         "toWhisper": "Aan {name}: {message}",

@@ -10054,6 +10054,7 @@ export const cs_CZ: EnTranslations = {
       "templates": {
         "battleground": "[Bitevní pole] {name}: {message}",
         "party": "[Skupina] {name}: {message}",
+        "raidWarning": "[Raid Warning] {name}: {message}",
         "yell": "{name} křičí: {message}",
         "whisper": "{name} šeptá: {message}",
         "toWhisper": "Pro {name}: {message}",

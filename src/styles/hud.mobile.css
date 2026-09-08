@@ -3387,6 +3387,10 @@
     height: max(40px, var(--party-frame-height, 42px));
     min-height: 40px;
     padding: 0;
+    box-shadow: none;
+  }
+  body.mobile-touch #party-frames.party-style-raid .party-frame .bar.hp .bar-fill {
+    background-image: none;
   }
   body.mobile-touch #party-frames.party-style-raid .party-frame .bar.hp {
     height: auto;
@@ -8864,5 +8868,33 @@
   body.mobile-touch .material-sources-dialog {
     width: min(460px, calc(var(--app-vw, 100vw) / var(--ui-scale, 1) - 20px));
     max-height: calc(var(--app-vh, 100dvh) / var(--ui-scale, 1) - 20px);
+  }
+
+  /* Raid Warning alert stack (raid_warning_banner.ts) on mobile touch */
+  body.mobile-touch #raid-warning-banner {
+    top: 6%;
+    max-width: calc(100vw - 24px);
+  }
+  body.mobile-touch .raid-warning-line {
+    font-size: 20px;
+    padding: 5px 14px;
+    letter-spacing: 0.4px;
+  }
+
+  /* Ready Check Leader Window (ready_check_leader_window.ts) touch layout:
+     compact popup centered at the upper-middle of the touch viewport. */
+  body.mobile-touch #ready-check-leader-window {
+    top: 28%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(220px, calc(100vw - 32px));
+    max-height: calc(var(--app-vh, 100dvh) - 120px);
+  }
+  body.mobile-touch #ready-check-leader-window .rck-close {
+    min-width: 36px;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
