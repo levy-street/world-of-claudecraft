@@ -842,7 +842,9 @@ const MONOLITHS: MonolithRow[] = [
     // merged count, zero slack: any further growth reds again.
     // OSSBrain integration: Fiesta effects moved to render/fiesta_effects.ts.
     // Measured after formatting; lower the ratchet with the extraction.
-    ceiling: 12879,
+    // Lowered after extracting the per-frame zone-feature sweep (fog rule,
+    // apparent-size reach, shadow-range flip) into src/render/zone_feature_sweep.ts.
+    ceiling: 12850,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

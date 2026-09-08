@@ -224,14 +224,23 @@ describe('zone-feature shadow casting range', () => {
   });
 
   it('is consumed by the per-frame feature sweep, toggling castShadow on state flips only', () => {
-    const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
-    const start = source.indexOf('private updateZoneFeatureVisibility(');
-    expect(start).toBeGreaterThan(-1);
-    const method = source.slice(start, source.indexOf('\n  private ensureZoneFeatures(', start));
-    expect(method).toContain('isZoneFeatureShadowCasting(');
+    const sweep = readFileSync(
+      new URL('../src/render/zone_feature_sweep.ts', import.meta.url),
+      'utf8',
+    );
+    expect(sweep).toContain('isZoneFeatureShadowCasting(');
     // The per-mesh castShadow writes happen only on a state flip, never as a
     // steady per-frame traversal.
-    expect(method).toContain('if (casting !== entry.shadowCasting)');
+    expect(sweep).toContain('if (casting !== entry.shadowCasting)');
+    // and the renderer drives that sweep from its per-frame method
+    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const start = renderer.indexOf('private updateZoneFeatureVisibility(');
+    expect(start).toBeGreaterThan(-1);
+    const method = renderer.slice(
+      start,
+      renderer.indexOf('\n  private ensureZoneFeatures(', start),
+    );
+    expect(method).toContain('sweepZoneFeatures(');
   });
 });
 

@@ -808,11 +808,11 @@ import { buildYumiMaze, type YumiMazeView } from './yumi_maze';
 import { YumiTeamMarkers } from './yumi_team_markers';
 import { zonesEligibleForEviction } from './zone_eviction_core';
 import {
-  type FeatureFootprint,
-  hasUnseededInstanceMatrix,
-  isZoneFeatureShadowCasting,
-  isZoneFeatureVisible,
-} from './zone_feature_visibility_core';
+  sweepZoneFeatures,
+  type ZoneFeatureEntry,
+  zoneFeatureEntryFor,
+} from './zone_feature_sweep';
+import { hasUnseededInstanceMatrix } from './zone_feature_visibility_core';
 import {
   reportZonePrepare,
   type ZonePrewarmStats,
@@ -4048,17 +4048,10 @@ export class Renderer {
   // are reset before the first prepare: those compile with the boot warmup.
   private lastAttachedFeatureGroups: THREE.Group[] = [];
 
-  // Every attached feature group with its world XZ footprint, for the
-  // per-frame distance cull in updateZoneFeatureVisibility. Measured ONCE here:
-  // these groups are static and matrix-frozen, so the bounds never move.
-  private zoneFeatureGroups: {
-    group: THREE.Group;
-    footprint: FeatureFootprint | null;
-    /** Whether this group currently casts into the sun shadow map. */
-    shadowCasting: boolean;
-    /** Meshes that carried castShadow at the first far flip, for restore. */
-    shadowCasters: THREE.Mesh[] | null;
-  }[] = [];
+  // Every attached feature cull group with its world XZ footprint, for the
+  // per-frame sweep (zone_feature_sweep.ts). Measured ONCE at attach: these
+  // groups are static and matrix-frozen, so the bounds never move.
+  private zoneFeatureGroups: ZoneFeatureEntry[] = [];
 
   private attachZoneFeature(
     view: { group: THREE.Group; glowLights?: THREE.PointLight[]; cullGroups?: THREE.Group[] },
@@ -4100,12 +4093,9 @@ export class Renderer {
             );
           }
         });
-        this.zoneFeatureGroups.push({
-          group: cullGroup,
-          footprint: measureFeatureFootprint(cullGroup),
-          shadowCasting: true,
-          shadowCasters: null,
-        });
+        this.zoneFeatureGroups.push(
+          zoneFeatureEntryFor(cullGroup, measureFeatureFootprint(cullGroup)),
+        );
       }
     };
     if (!gate) {
@@ -4119,39 +4109,20 @@ export class Renderer {
     });
   }
 
-  // Hide feature groups the fog has already swallowed. Terrain and foliage both
-  // did this; zone features never did, so ~40M triangles of towns, mazes and
-  // flora for zones the player could not see were submitted every frame (see
-  // zone_feature_visibility_core.ts for the measurements).
+  // Hide feature groups the fog has already swallowed (terrain and foliage
+  // both did this; zone features never did, so ~40M triangles of towns, mazes
+  // and flora for zones the player could not see were submitted every frame,
+  // see zone_feature_visibility_core.ts), shed the groups whose largest
+  // instance is below the apparent-size reach, and stop far groups casting
+  // into the sun shadow map. The sweep is zone_feature_sweep.ts.
   private updateZoneFeatureVisibility(fogFar: number): void {
-    const camX = this.camera.position.x;
-    const camZ = this.camera.position.z;
-    for (const entry of this.zoneFeatureGroups) {
-      entry.group.visible = isZoneFeatureVisible(entry.footprint, camX, camZ, fogFar);
-      // Shadow casting stops far before the fogless detail horizon: the merged
-      // feature meshes disable frustum culling, so the shadow pass would
-      // otherwise redraw whole neighbour towns that cannot land one texel in
-      // the 105 yd shadow volume. Per-mesh writes only on a state flip.
-      const casting = isZoneFeatureShadowCasting(
-        entry.footprint,
-        camX,
-        camZ,
-        entry.shadowCasting,
-        this.sun.shadow.camera.top,
-      );
-      if (casting !== entry.shadowCasting) {
-        entry.shadowCasting = casting;
-        if (!casting && !entry.shadowCasters) {
-          const casters: THREE.Mesh[] = [];
-          entry.group.traverse((obj) => {
-            const mesh = obj as THREE.Mesh;
-            if (mesh.isMesh && mesh.castShadow) casters.push(mesh);
-          });
-          entry.shadowCasters = casters;
-        }
-        for (const mesh of entry.shadowCasters ?? []) mesh.castShadow = casting;
-      }
-    }
+    sweepZoneFeatures(
+      this.zoneFeatureGroups,
+      this.camera.position.x,
+      this.camera.position.z,
+      fogFar,
+      this.sun.shadow.camera.top,
+    );
   }
 
   private ensureZoneFeatures(zone: ZoneDef): void {
