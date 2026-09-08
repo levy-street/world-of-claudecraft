@@ -19,6 +19,7 @@ import {
   type WocMarketViewModel,
   type WocSaleView,
   type WocSettlementView,
+  wocMarketScrollKeys,
   wocMarketViewSig,
   wocQuoteCountdownSig,
 } from '../src/ui/woc_market_view';
@@ -890,5 +891,22 @@ describe('wocQuoteCountdownSig: the pending quote repaint key', () => {
     expect(wocQuoteCountdownSig(500, 1_000)).toBe('0');
     expect(wocQuoteCountdownSig(null, 1_000)).toBe('');
     expect(wocQuoteCountdownSig(undefined, 1_000)).toBe('');
+  });
+});
+
+describe('wocMarketScrollKeys: what a kept scroll offset refers to', () => {
+  it('keys the body on the tab and the detail on tab plus listing', () => {
+    expect(wocMarketScrollKeys('browse', undefined)).toEqual({
+      body: 'browse',
+      detail: 'browse:',
+    });
+    expect(wocMarketScrollKeys('browse', 7)).toEqual({ body: 'browse', detail: 'browse:7' });
+    // A tab change moves BOTH keys, so both panes honestly restart at the top;
+    // a listing change moves only the detail key, so the browse list holds.
+    expect(wocMarketScrollKeys('activity', 7).body).not.toBe(wocMarketScrollKeys('browse', 7).body);
+    expect(wocMarketScrollKeys('browse', 8).body).toBe(wocMarketScrollKeys('browse', 7).body);
+    expect(wocMarketScrollKeys('browse', 8).detail).not.toBe(
+      wocMarketScrollKeys('browse', 7).detail,
+    );
   });
 });

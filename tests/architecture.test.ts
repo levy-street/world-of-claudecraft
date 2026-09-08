@@ -2507,6 +2507,7 @@ const UI_DOM_MODULES = [
   'src/ui/aura_overlay_controller.ts',
   'src/ui/aura_overlay_settings.ts',
   'src/ui/movable_frame.ts',
+  'src/ui/native_select_hold.ts',
   'src/ui/native_update_prompt.ts',
   'src/ui/noticeboard_popup.ts',
   'src/ui/realm_builder_popup.ts',

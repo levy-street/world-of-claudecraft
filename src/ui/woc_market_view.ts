@@ -651,3 +651,36 @@ export function wocMarketViewSig(model: WocMarketViewModel): string {
     activity,
   ].join('#');
 }
+
+/**
+ * The scroll containers the window's rebuild replaces, each with the state key
+ * that decides whether a saved position still refers to the same content. The
+ * keeper is load-bearing rather than cosmetic: the slow-band poll rebuilds on
+ * every countdown bucket change, once a minute at rest and once a SECOND
+ * inside the anti-snipe window, and without it the browse list yanked itself
+ * back to the top while the player was reading it. Keyed, so a genuine change
+ * of view still starts at the top: the body resets when the tab changes; the
+ * detail pane also resets when a different listing is selected, since its old
+ * offset means nothing in another listing's content.
+ */
+export interface WocMarketScrollKeys {
+  body: string;
+  detail: string;
+}
+
+export const WOC_MARKET_SCROLL_KEEPERS: ReadonlyArray<
+  readonly [keyof WocMarketScrollKeys, string]
+> = [
+  ['body', '.wm-body'],
+  ['detail', '.wm-detail'],
+];
+
+/** What each preserved scroll offset refers to. The detail key folds in the
+ *  selected listing as well as the tab, because an offset taken in one
+ *  listing's pane means nothing in another's. */
+export function wocMarketScrollKeys(
+  tab: WocMarketTab,
+  detailListingId: number | undefined,
+): WocMarketScrollKeys {
+  return { body: tab, detail: `${tab}:${detailListingId ?? ''}` };
+}

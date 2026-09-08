@@ -37,6 +37,7 @@ import type { TranslationKey } from './i18n';
 import { formatDateTime, formatDuration, formatNumber, t, tPlural } from './i18n';
 import { iconDataUrl } from './icons';
 import { itemNameColor } from './item_name_color';
+import { createNativeSelectHold, type NativeSelectHold } from './native_select_hold';
 import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
 import { tabStripHtml, tabStripModel } from './tab_strip_view';
 import { termsUrlFor } from './terms_link';
@@ -78,9 +79,12 @@ import {
   browseQualityOptions,
   buildWocMarketView,
   canCancelListing,
+  WOC_MARKET_SCROLL_KEEPERS,
+  type WocMarketScrollKeys,
   type WocMarketTab,
   type WocMarketViewModel,
   type WocSellRowModel,
+  wocMarketScrollKeys,
   wocMarketViewSig,
   wocQuoteCountdownSig,
 } from './woc_market_view';
@@ -116,32 +120,6 @@ export interface WocMarketWindowDeps {
   itemTooltip(item: ItemDef, instance?: ItemInstancePayload): string;
   captureFocus(): HTMLElement | null;
   restoreFocus(target: HTMLElement | null): void;
-}
-
-/**
- * The scroll containers a rebuild replaces, each with the state key that decides
- * whether a saved position still refers to the same content.
- *
- * This is the scroll pair the perf gate's cold allowance table documents as the
- * shape repeated across these windows (bags, bank, deeds and the rest): read the
- * position before the rebuild, write it back after, so the list does not jump
- * under the player. It is load-bearing here rather than cosmetic, because the
- * slow-band poll rebuilds on every countdown bucket change, which is once a
- * minute at rest and once a SECOND inside the anti-snipe window: without it the
- * browse list yanked itself back to the top while the player was reading it.
- *
- * Keyed, so a genuine change of view still starts at the top. The body resets
- * when the tab changes; the detail pane also resets when a different listing is
- * selected, since its old offset means nothing in another listing's content.
- */
-const SCROLL_KEEPERS: ReadonlyArray<readonly [keyof WocMarketScrollKeys, string]> = [
-  ['body', '.wm-body'],
-  ['detail', '.wm-detail'],
-];
-
-interface WocMarketScrollKeys {
-  body: string;
-  detail: string;
 }
 
 /** The sell picker's listbox id. One definition: the markup builds the option ids
@@ -229,9 +207,13 @@ export class WocMarketWindow {
   /** True for the duration of render(). Any focus movement inside that window is
    *  the rebuild tearing down its own nodes, never the user leaving the control. */
   private rendering = false;
-  /** What the scroll positions carried across the last rebuild referred to, so a
-   *  restore is skipped once it would point into different content. See
-   *  SCROLL_KEEPERS and scrollKeys(). */
+  /** The native-dropdown repaint hold (native_select_hold.ts has the rules), attached
+   *  on the first render rather than in the constructor: the deps are lazy closures. */
+  private selectHold: NativeSelectHold | null = null;
+  /** A wallet beat skipped under the hold; the next unheld poll tick repaints. */
+  private walletRepaintDue = false;
+  /** What the kept scroll positions referred to; a restore is skipped once it
+   *  would point into different content (wocMarketScrollKeys, the view core). */
   private renderedScrollKey: WocMarketScrollKeys = { body: '', detail: '' };
   private sellDurationHours: number | null = null;
   private sellOfferNext = false;
@@ -470,13 +452,16 @@ export class WocMarketWindow {
     // would then freeze the browse countdowns for the rest of the session, which
     // is a worse failure than the flicker it prevents.
     if (this.tab === 'sell' && this.sellOpen) return;
-    // Ask the server again on its own cadence, then fall through. The poll only
-    // MUTATES state and never paints: the signature compare below is the one
-    // render path, so a poll that changed nothing costs no rebuild, and one that
-    // did is picked up by the very next tick.
+    // Ask the server again on its own cadence, then fall through. The poll
+    // only MUTATES state and never paints: the signature compare below is the
+    // one render path, so a poll that changed nothing costs no rebuild.
     this.pollFromServer();
+    // Same no-rebuild rule for every NATIVE select here: a rebuild replaces
+    // the element and closes its open dropdown out from under the pointer.
+    // Held AFTER the poll, so only the PAINT waits (native_select_hold.ts).
+    if (this.selectHold?.holdRepaints()) return;
     const sig = `${wocMarketViewSig(this.buildModel())}|${this.quoteCountdownSig()}`;
-    if (sig === this.lastSig) return;
+    if (sig === this.lastSig && !this.walletRepaintDue) return;
     this.render();
   }
 
@@ -556,6 +541,13 @@ export class WocMarketWindow {
   /** Wallet fan-out arm: the card is module state the view digest never sees. */
   onWalletChanged(): void {
     if (wocWalletCardSig(walletConnectionView()) === this.paintedWalletSig) return;
+    // A balance beat is background work like the poll: never rebuild under
+    // an open dropdown. The beat has no retry, so a skipped one arms
+    // walletRepaintDue and the poll's first unheld tick repaints.
+    if (this.selectHold?.holdRepaints()) {
+      this.walletRepaintDue = true;
+      return;
+    }
     this.relocalize();
   }
 
@@ -592,6 +584,8 @@ export class WocMarketWindow {
     const root = this.deps.root();
     if (!this.built) {
       this.built = true;
+      // FIRST, so its change disarm runs before onChange's rebuild of the subtree.
+      this.selectHold = createNativeSelectHold(root);
       markDialogRoot(root, { labelledBy: 'woc-market-title' });
       root.addEventListener('click', (e) => this.onClick(e));
       root.addEventListener('change', (e) => this.onChange(e));
@@ -616,6 +610,7 @@ export class WocMarketWindow {
     // would leave the two permanently unequal, so every poll would rebuild the
     // window: the caret, the hover card and the scroll position with it.
     this.lastSig = `${wocMarketViewSig(model)}|${this.quoteCountdownSig()}`;
+    this.walletRepaintDue = false; // every paint latches the fresh card
     this.rendering = true;
     try {
       this.renderInner(root, model);
@@ -631,9 +626,12 @@ export class WocMarketWindow {
     const draft = captureFormDraft(root);
     // Read every scroll position BEFORE the markup that owns it is thrown away,
     // and only for the containers whose content this rebuild still describes.
-    const keys = this.scrollKeys(model);
+    const keys = wocMarketScrollKeys(
+      this.tab,
+      model.kind === 'ready' ? model.browse.detail?.row.id : undefined,
+    );
     const keptScroll: [string, number][] = [];
-    for (const [name, selector] of SCROLL_KEEPERS) {
+    for (const [name, selector] of WOC_MARKET_SCROLL_KEEPERS) {
       if (keys[name] !== this.renderedScrollKey[name]) continue;
       const top = root.querySelector<HTMLElement>(selector)?.scrollTop ?? 0;
       if (top > 0) keptScroll.push([selector, top]);
@@ -646,11 +644,6 @@ export class WocMarketWindow {
     root.innerHTML = this.html(model);
     this.wire(root, model);
     this.attachItemTooltips(root);
-    // After wire(), so the write lands on the container the fresh markup built.
-    for (const [selector, top] of keptScroll) {
-      const el = root.querySelector<HTMLElement>(selector);
-      if (el) el.scrollTop = top;
-    }
     restoreFormDraft(root, draft);
     if (focusKey) {
       // captureFocusKey returns the ATTRIBUTE VALUE, so it must be wrapped in
@@ -669,6 +662,21 @@ export class WocMarketWindow {
             ? [byKey(focusKey), root.querySelector<HTMLElement>('.wm-tab-selected')]
             : [byKey(focusKey)];
       restoreFirstEnabled(ladder);
+    }
+    // The scroll write-back runs LAST: after wire() (so it lands on the fresh
+    // container) AND after the focus restore, whose bare focus() scrolls the
+    // control into view in real browsers (focus_restore.ts; happy-dom models
+    // none): that yank pulled the browse pane to the top on every slow-band
+    // rebuild while the filter bar held focus. The carve-out is the seam's
+    // degrade contract: a ladder that landed on a DIFFERENT rung keeps the
+    // focus scroll, visible focus (WCAG 2.4.11); one that landed NOWHERE (the
+    // focused row sold or ended) ran no focus() and keeps the offset.
+    const degraded = focusKey !== null && (captureFocusKey(root) ?? focusKey) !== focusKey;
+    if (!degraded) {
+      for (const [selector, top] of keptScroll) {
+        const el = root.querySelector<HTMLElement>(selector);
+        if (el) el.scrollTop = top;
+      }
     }
   }
 
@@ -1699,14 +1707,6 @@ export class WocMarketWindow {
     this.sellOpen = false;
     this.sellActive = -1;
     this.render();
-  }
-
-  /** What each preserved scroll offset currently refers to. The detail key folds
-   *  in the selected listing as well as the tab, because an offset taken in one
-   *  listing's pane means nothing in another's. */
-  private scrollKeys(model: WocMarketViewModel): WocMarketScrollKeys {
-    const listing = model.kind === 'ready' ? model.browse.detail?.row.id : undefined;
-    return { body: this.tab, detail: `${this.tab}:${listing ?? ''}` };
   }
 
   /** The rows the current query matches. One definition, used by the markup and
