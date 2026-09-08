@@ -33,7 +33,7 @@ describe('mount skin catalog', () => {
     expect(MOUNT_SKINS.mech_bird).toEqual({
       id: 'mech_bird',
       name: 'Cluckwork Mech Bird',
-      rarity: 'rare',
+      rarity: 'epic',
       visualKey: 'mount_mech_bird',
       season: 1,
     });
@@ -48,6 +48,11 @@ describe('mount skin catalog', () => {
       visualKey: 'mount_rickshaw_mount',
       season: 1,
     });
+  });
+
+  it('classifies every paid mount skin as epic', () => {
+    expect(MOUNT_SKIN_IDS).toHaveLength(5);
+    for (const id of MOUNT_SKIN_IDS) expect(MOUNT_SKINS[id].rarity, id).toBe('epic');
   });
 
   it('is disjoint from the mount catalog: a skin id is never a MountKey', () => {

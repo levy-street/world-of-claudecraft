@@ -54,7 +54,7 @@ export const MOUNT_SKINS: Record<MountSkinId, MountSkinDef> = {
   mech_bird: {
     id: 'mech_bird',
     name: 'Cluckwork Mech Bird',
-    rarity: 'rare',
+    rarity: 'epic',
     visualKey: 'mount_mech_bird',
     season: 1,
   },

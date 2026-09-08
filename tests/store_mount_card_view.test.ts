@@ -116,6 +116,13 @@ describe('storeMountsSectionHtml', () => {
     expect(html).toContain('<div class="armory-grid"><article class="armory-card');
   });
 
+  it('groups all five paid skins in one epic Machine Stable section', () => {
+    const html = storeMountsSectionHtml(buildStoreMountRows(10000, [], []));
+    expect(html.match(/<section /g)).toHaveLength(1);
+    expect(html).toContain('store-mounts rarity-epic');
+    expect(html.match(/armory-card rarity-epic/g)).toHaveLength(5);
+  });
+
   it('is empty with no rows, so the store paints no empty strip', () => {
     expect(storeMountsSectionHtml([])).toBe('');
   });

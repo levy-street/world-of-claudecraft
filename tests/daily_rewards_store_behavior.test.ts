@@ -2951,7 +2951,7 @@ describe('WOC Store Machine Stable', () => {
     const h = charterHarness({ items: [MOUNT_ITEM], balance: 5_000 });
     await h.internals.renderStore(null);
 
-    expect(h.html()).toContain('<section class="armory-section store-mounts rarity-rare">');
+    expect(h.html()).toContain('<section class="armory-section store-mounts rarity-epic">');
     expect(h.html()).toContain('data-store-mount-buy="mech_bird"');
     expect(h.html()).toContain('/ui/store/mount_skins/mech_bird.webp');
     // The service price, in the shared cost slot, never a computed one.

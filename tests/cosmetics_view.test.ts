@@ -60,7 +60,7 @@ describe('mount skin cards', () => {
     );
     const bird = cards.find((c) => c.id === 'mech_bird');
     const tortoise = cards.find((c) => c.id === 'chimeglass_tortoise');
-    expect(bird).toMatchObject({ owned: true, worn: true, action: 'takeOff', rarity: 'rare' });
+    expect(bird).toMatchObject({ owned: true, worn: true, action: 'takeOff', rarity: 'epic' });
     expect(tortoise).toMatchObject({ owned: true, worn: false, action: 'wear', rarity: 'epic' });
   });
 

@@ -191,11 +191,10 @@ describe('both tiles hydrate and stay under the rail height budget', () => {
     }
   });
 
-  it('pins the 14 default tiles and fits the height budget with Town Focus visible', () => {
-    // Cosmetics joins the 13 default tiles. Town Focus is
-    // hidden in markup but the HUD reveals it in town, so budget for that
-    // extra tile too: 15 x 34px + 74px = 584px uncompacted, and
-    // 15 x 25px + 74px = 449px compacted. The authored pixel ceilings
+  it('pins the professions column and fits the height budget with Town Focus visible', () => {
+    // Cosmetics sits beside the shop in col-b. Town Focus is hidden in
+    // markup but the HUD reveals it in town, so budget for that extra tile
+    // alongside the default professions column. The authored pixel ceilings
     // remain those guarded against CSS in crafting_launcher.test.ts.
     const UNCOMPACTED_MICRO_PLUS_GAP_PX = 34;
     const COMPACT_MICRO_PLUS_GAP_PX = 25;
@@ -210,7 +209,6 @@ describe('both tiles hydrate and stay under the rail height budget', () => {
       'mm-deeds',
       'mm-reliquary',
       'mm-loot-explorer',
-      'mm-cosmetics',
       'mm-professions',
       'mm-harvest-journal',
       'mm-map',
@@ -225,6 +223,12 @@ describe('both tiles hydrate and stay under the rail height budget', () => {
       );
       const ids = visible.map((b) => /id="([^"]+)"/.exec(b)?.[1]);
       expect(ids, name).toEqual(EXPECTED_IDS);
+      const colB = html.slice(html.indexOf('id="side-buttons-col-b"'));
+      expect(colB.indexOf('id="mm-cosmetics"'), name).toBeGreaterThan(
+        colB.indexOf('id="daily-rewards-button"'),
+      );
+      expect(colB.indexOf('id="mm-cosmetics"'), name).toBeLessThan(colB.indexOf('id="mm-arena"'));
+      expect(html.match(/id="mm-cosmetics"/g), name).toHaveLength(1);
       const townFocus = buttons.filter((b) => /id="mm-town-focus"/.test(b));
       expect(townFocus, name).toHaveLength(1);
       const townVisibleCount = visible.length + townFocus.length;
