@@ -616,8 +616,11 @@ interface AttributionTargetFixture {
 // Nythraxis hazard-color renderer change): both arms had re-minted, so the
 // merged renderer.ts bytes replace either side's value. No capture was
 // retaken.
+// Re-minted for the movement wire v1 removal (issue 3649) on the moved
+// release/v0.42.0 base: renderer.ts lost the legacy predictor lead getter and
+// its onGround arm. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'a4907e5896c8b206841202db7a9c5ed93325e6d770592b5b096da5cfa5262722';
+  '09dc420d8ee94bfd70c7e9e19d8309b94f9d6c7849dfcaca3a61c0049f55cf5b';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

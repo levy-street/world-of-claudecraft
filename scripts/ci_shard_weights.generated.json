@@ -2,8 +2,8 @@
   "__provenance": {
     "run": "34101975474",
     "harvested": "2026-09-07",
-    "files": 3732,
-    "harvestedFiles": 3545,
+    "files": 3730,
+    "harvestedFiles": 3543,
     "carried": {
       "tests/ability_tooltip_lines.test.ts": {
         "ms": 20,
@@ -4293,9 +4293,7 @@
   "tests/seeker_rpc_transport.test.ts": 38,
   "tests/selection_ring.test.ts": 6,
   "tests/self_alpha_lead.test.ts": 7,
-  "tests/self_motion_frame_buffer.test.ts": 5,
   "tests/self_motion_gate.test.ts": 12,
-  "tests/self_motion_rift_lift.test.ts": 11,
   "tests/self_motion_wiring.test.ts": 5,
   "tests/self_motion.test.ts": 3560,
   "tests/self_prediction_core.test.ts": 11,

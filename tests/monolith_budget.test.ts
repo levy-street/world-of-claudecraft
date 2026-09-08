@@ -823,7 +823,9 @@ const MONOLITHS: MonolithRow[] = [
     // resolved tree: `wc -l < src/render/renderer.ts` on the reconciled file
     // measures 12903, below both arms, so the ceiling follows it down. Exact
     // merged count, zero slack: any further growth reds again.
-    ceiling: 12903,
+    // Lowered by the movement-wire-v1 removal (issue 3649): the legacy predictor
+    // lead getter and its onGround arm left with the v1 arm. Exact count, zero slack.
+    ceiling: 12887,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1186,7 +1188,9 @@ const MONOLITHS: MonolithRow[] = [
     // the resolved tree: `wc -l < src/main.ts` on the reconciled file
     // measures 11385, below both arms, so the ceiling follows it down. Exact
     // merged count, zero slack: any further growth reds again.
-    ceiling: 11385,
+    // Lowered by the movement-wire-v1 removal (issue 3649): the frame buffer, the
+    // display ternary and the perf-lead source left with it. Exact count, zero slack.
+    ceiling: 11363,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1399,7 +1403,9 @@ const MONOLITHS: MonolithRow[] = [
     // the exact `wc -l < server/game.ts` measurement on the resolved tree.
     // RE-CONFIRMED at the final line-budget reconciliation: still 10291,
     // below both parent pins. Exact merged count, zero slack.
-    ceiling: 10291,
+    // Movement-wire-v1 removal (issue 3649): the session wire state shrank and the
+    // hello echo plus its rationale paid for it. Exact count, zero slack.
+    ceiling: 10290,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1539,7 +1545,9 @@ const MONOLITHS: MonolithRow[] = [
     // `wc -l < src/net/online.ts` on the reconciled file measures 5788,
     // below both arms, so the ceiling follows it down. Exact merged count,
     // zero slack: any further growth reds again.
-    ceiling: 5788,
+    // Lowered by the movement-wire-v1 removal (issue 3649): sendInput, the flush
+    // gate and the transient-input retention left with it. Exact count, zero slack.
+    ceiling: 5670,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

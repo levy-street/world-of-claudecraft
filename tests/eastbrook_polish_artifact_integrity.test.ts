@@ -1298,8 +1298,11 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // source-only historical capture reseal, run over the fully resolved merge
 // via node scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
 // No capture was retaken and no new owner acceptance is implied.
+// Re-minted for the movement wire v1 removal (issue 3649) on the moved
+// release/v0.42.0 base: renderer.ts lost the legacy predictor lead getter and
+// its onGround arm. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '921d47e5d29f308c0613aca4f105cc4233a61aa8e046611f619a211bc61e8b73';
+  '3eace63652bb9b3420277809c7482320b7c1bbd62686186343c3180828dcc8f4';
 // Re-minted at the release/v0.42.0 sync of PR #3439: renderer.ts moved for the
 // mount lifecycle seam (mount_lifecycle.ts) and the rickshaw hooks it absorbed.
 // Re-minted again for the PR #3695 review fixes (the impostor fragment tail).
@@ -1312,8 +1315,11 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
 // into release/v0.42.0: a source-only historical capture reseal over the
 // fully merged renderer and release tree. No capture was retaken and no new
 // owner acceptance is implied.
+// Re-minted for the movement wire v1 removal (issue 3649) on the moved
+// release/v0.42.0 base: renderer.ts lost the legacy predictor lead getter and
+// its onGround arm. No capture was retaken.
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'a4907e5896c8b206841202db7a9c5ed93325e6d770592b5b096da5cfa5262722';
+  '09dc420d8ee94bfd70c7e9e19d8309b94f9d6c7849dfcaca3a61c0049f55cf5b';
 // RE-MINTED for this worktree's own base merge of the professions branch
 // into release/v0.42.0: a source-only historical capture reseal over the
 // fully merged renderer and release tree. No capture was retaken and no new
@@ -2642,7 +2648,10 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // on the same merged tree): a source-only historical capture reseal,
       // second-order over the swept evidence bytes. No capture was retaken
       // and no new owner acceptance is implied.
-    ).toBe('395bcfb2cb3c484ff8042f9e818e6e7b35a462fcc49265dbf1a7ad7c17f7c484');
+      // Re-minted for the movement wire v1 removal (issue 3649) on the moved
+      // release/v0.42.0 base: same order, the composite first, then this
+      // seal. No capture was retaken.
+    ).toBe('0bc7b786d338bc36144a6ef383d50ab80a328d36cdf1729337027a9575999972');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
