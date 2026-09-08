@@ -75,7 +75,29 @@ export const WARRIOR_AREA_AUDIO = {
     times: [0.15],
   },
 } as const;
-export const MELEE_AUDIO = { ...FURY_AUDIO, ...WARRIOR_CONTACT_AUDIO, ...WARRIOR_AREA_AUDIO };
+export const WARRIOR_GUARD_AUDIO = {
+  raised_guard: {
+    release: 'melee_warrior_guard_release',
+    impacts: ['impact_warrior_guard_lock'],
+    times: [0.15],
+  },
+  iron_resolve: {
+    release: 'melee_warrior_resolve_release',
+    impacts: ['impact_warrior_resolve_lock'],
+    times: [0.2],
+  },
+  die_by_sword: {
+    release: 'melee_warrior_sword_guard_release',
+    impacts: ['impact_warrior_sword_guard_lock'],
+    times: [0.15],
+  },
+} as const;
+export const MELEE_AUDIO = {
+  ...FURY_AUDIO,
+  ...WARRIOR_CONTACT_AUDIO,
+  ...WARRIOR_AREA_AUDIO,
+  ...WARRIOR_GUARD_AUDIO,
+};
 export type MeleeAudioId = keyof typeof MELEE_AUDIO;
 export function isMeleeAudioId(id: string | undefined): id is MeleeAudioId {
   return id !== undefined && Object.hasOwn(MELEE_AUDIO, id);

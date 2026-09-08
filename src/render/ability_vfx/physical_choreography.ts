@@ -13,6 +13,7 @@ import { physicalContact } from './physical_contact';
 import type { SeqSlot, SequencerHost } from './sequencer';
 import { drawReapingArc, drawWarriorAreaContact, isWarriorAreaInstant } from './warrior_area';
 import { drawWarriorBlade } from './warrior_blades';
+import { drawWarriorGuardCast } from './warrior_guard_cast';
 import { drawWarriorShield } from './warrior_shield';
 import { drawWarriorShout } from './warrior_shouts';
 
@@ -186,6 +187,7 @@ export function physicalFollowThrough(host: SequencerHost, slot: SeqSlot): void 
 }
 
 function physicalBeat(host: SequencerHost, slot: SeqSlot, beat: number): void {
+  if (drawWarriorGuardCast(host, slot, beat)) return;
   if (drawWarriorShout(host, slot, beat)) return;
   if (furyBeat(host, slot, beat)) return;
   if (drawWarriorShield(host, slot, beat)) return;

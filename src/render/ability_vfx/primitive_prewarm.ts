@@ -47,20 +47,23 @@ export function abilityPrimitivePrewarmEntry(host: PrimitivePrewarmHost) {
   ];
   let done = 0;
   let planned = 0;
+  let textureSweepDone = false;
   return {
     id: 'vfx.ability-primitives',
     category: 'vfx' as const,
     priority: 62,
     required: false,
     resumeUnits,
-    resumePartialUnits: geometry,
+    resumePartialUnits: () => (textureSweepDone ? geometry() : resumeUnits()),
     run: async () => {
+      textureSweepDone = false;
       host.spawn();
       await host.stageMaterials();
       host.scene.traverse((child) => {
         const material = (child as THREE.Mesh).material;
         if (child.userData.renderCategory === 'vfx' && material) host.materialTextures(material);
       });
+      textureSweepDone = true;
       const units = geometry();
       planned = units.length;
       done = 0;

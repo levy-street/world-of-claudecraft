@@ -46,7 +46,7 @@ describe('winning Warrior attack animation routing', () => {
       overpower: 'Warrior_Redhand',
       hamstring: '1H_Melee_Attack_Slice_Diagonal',
       sanguine_aura: 'Spellcast_Raise',
-      raised_guard: 'Block',
+      raised_guard: 'Warrior_Raised_Guard',
     });
   });
 

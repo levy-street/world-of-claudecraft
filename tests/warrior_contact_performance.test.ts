@@ -134,6 +134,9 @@ it.each([
   ['thunder_clap', 'Warrior_Quaking_Blow'],
   ['faultline', 'Warrior_Faultline'],
   ['breachmaker', 'Warrior_Breachmaker'],
+  ['raised_guard', 'Warrior_Raised_Guard'],
+  ['iron_resolve', 'Warrior_Iron_Resolve'],
+  ['die_by_sword', 'Warrior_Sword_Guard'],
 ])('preserves native %s loading, contact and planted recovery', async (id, name) => {
   const f = await fixture(name);
   const bones = ['footl', 'footr', 'toesl', 'toesr', 'root'].map(f.bone);
@@ -225,6 +228,21 @@ it('keeps Breachmaker left handslot on right socket minus .15 Y-axis through con
       Math.abs(lp.distanceTo(rp) - 0.15),
       `left-right distance at t=${t.toFixed(3)}`,
     ).toBeLessThan(0.001);
+  }
+});
+
+it('keeps Sword Guard support hand on the blade through the raised guard and controlled recovery', async () => {
+  const f = await fixture('Warrior_Sword_Guard');
+  const left = f.bone('handslotl'),
+    right = f.bone('handslotr');
+  for (let i = 0; i <= 65; i++) {
+    const t = 0.075 + i * 0.005;
+    f.pose(t);
+    const target = position(right).addScaledVector(
+      new THREE.Vector3(0, 1, 0).applyQuaternion(rotation(right)),
+      -0.15,
+    );
+    expect(position(left).distanceTo(target), `support grip at ${t}s`).toBeLessThan(0.001);
   }
 });
 

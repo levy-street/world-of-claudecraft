@@ -116,7 +116,7 @@ describe('warrior bespoke movement clip (issue #2889 warrior/kobold batch)', () 
     expect(map.victory_rush).toBe('Warrior_Victory_Rush');
     expect(map.berserker_rage).toBe('Cheer');
     expect(map.recklessness).toBe('Cheer');
-    expect(map.die_by_sword).toBe('Block');
+    expect(map.die_by_sword).toBe('Warrior_Sword_Guard');
     expect(map.avatar).toBe('Spellcast_Raise');
     expect(map.piercing_howl).toBe('Spellcast_Raise');
     // The dead-code traps this batch deliberately avoided: none of these got

@@ -1,6 +1,42 @@
 /** Distinct material voices for native Warrior contacts; never bulk-regenerated. */
 export const WARRIOR_CONTACT_SFX = [
   {
+    key: 'melee_warrior_guard_release',
+    duration: 0.13,
+    prompt:
+      'One short heavy shield raised into a strong defensive position, tense leather arm straps and solid forged plate movement with a tight upward air sweep. Powerful disciplined knight, close dry sound. No collision, voice, music or magical ringing.',
+  },
+  {
+    key: 'impact_warrior_guard_lock',
+    duration: 0.26,
+    prompt:
+      'One immediate heavy shield locking firmly into position: three compact iron latch clicks collapse into a broad low metallic thunk, a brief gritty rivet rattle. Dense reassuring fortified defense, dry clean finish. No weapon strike, explosion, voice, music or bell.',
+  },
+  {
+    key: 'melee_warrior_resolve_release',
+    duration: 0.17,
+    prompt:
+      'One short inward gathering of heavy overlapping armor plates, tightening leather straps under a deep compressed air intake, tactile scraping iron. Controlled powerful knight bracing for damage. No collision, voice, music, ambience or magical shimmer.',
+  },
+  {
+    key: 'impact_warrior_resolve_lock',
+    duration: 0.32,
+    prompt:
+      'One immediate armored body brace, six interlocking forged iron plates snapping together into a dense low pressure thump with short warm metal resonance and gritty surface scrape. Very solid protective weight, close dry ending. No explosion, weapon strike, voice or music.',
+  },
+  {
+    key: 'melee_warrior_sword_guard_release',
+    duration: 0.13,
+    prompt:
+      'One short two-handed greatsword raised diagonally into a defensive guard, taut leather hand grip creak and a clear crisp steel air slice. Agile controlled knight precision, dry close perspective. No hit, voice, music or ambience.',
+  },
+  {
+    key: 'impact_warrior_sword_guard_lock',
+    duration: 0.25,
+    prompt:
+      'One immediate tight greatsword guard setting into place, two clipped steel ticks over a firm leather grip snap and a low restrained armored body thump. Confident precise physical protection with a short dry metallic tail. No enemy hit, explosion, voice, music or long ringing.',
+  },
+  {
     key: 'melee_warrior_revenge_release',
     duration: 0.13,
     prompt:

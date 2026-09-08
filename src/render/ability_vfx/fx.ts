@@ -15,6 +15,7 @@ import type { AbilityAudioKind, AbilityAudioOpts } from '../audio_sink';
 import type { ControlSubject } from '../combat_status_core';
 import { CombatStatusSignals } from '../combat_status_signals';
 import { drawRestorativeStream } from '../restorative_water';
+import type { WeaponAnchorSampler } from '../weapon_trail_anchor';
 import { cancelActiveAbilityKit } from './active_kit_prewarm';
 import { BakedImpactLayers } from './baked_impact_layers';
 import { drawClassCast, hasClassCast } from './cast_language';
@@ -56,6 +57,11 @@ import {
   type SpiritCompileGate,
 } from './spirits';
 import type { SteelSweepRange } from './steel_sweep';
+import {
+  type WarriorGuardAura,
+  type WarriorGuardKind,
+  WarriorGuardPlates,
+} from './warrior_guard_plates';
 import { drawWarriorWornMark } from './warrior_worn_marks';
 import { RestorativeWaterVolumes } from './water_volumes';
 
@@ -439,6 +445,9 @@ export class AbilityVfxFx implements SequencerHost {
     | null = null;
   private readonly lightPoint = new THREE.Vector3();
   private crests: SignatureCrests;
+  private guards: WarriorGuardPlates;
+  private guardDt = 0;
+  private guardFacing = (id: number) => this.facingAt(id) ?? null;
   private rings: ShockRings;
   private decals: GroundDecals;
   private overlay: OverlaySprites;
@@ -550,6 +559,15 @@ export class AbilityVfxFx implements SequencerHost {
           this.reducedMotionActive,
         );
     }
+    this.guards.draw(
+      this.frame,
+      this.guardDt,
+      this.reducedMotionActive,
+      this.anchor,
+      this.guardFacing,
+      this.weaponAnchor,
+      this.ribbons,
+    );
   };
   private drawHeldConduction = (): void => {
     for (const [id, storm] of this.warriorStorms) {
@@ -619,7 +637,7 @@ export class AbilityVfxFx implements SequencerHost {
      *  screen space. Optional so a host that cannot supply it keeps the old
      *  camera-relative behaviour. */
     private facingOf?: (id: number) => number | null,
-    private weaponAnchor?: (id: number, hand: 0 | 1) => ((out: THREE.Vector3) => boolean) | null,
+    private weaponAnchor?: (id: number, hand: 0 | 1) => WeaponAnchorSampler | null,
     private handSample?: (
       id: number,
       hand: 0 | 1,
@@ -632,6 +650,7 @@ export class AbilityVfxFx implements SequencerHost {
     this.details = new SignatureDetails(scene);
     this.forms = new ElementalForms(scene);
     this.crests = new SignatureCrests(scene, this.groundY);
+    this.guards = new WarriorGuardPlates(scene);
     this.baked = new BakedImpactLayers(scene);
     this.fragments = new SolidImpactFragments(scene);
     this.rings = new ShockRings(scene, tex, groundY);
@@ -1202,8 +1221,8 @@ export class AbilityVfxFx implements SequencerHost {
   // spec'd cast. Each decal style binds its texture so the whole set uploads
   // now, and the flipbook prewarm does the same for the six impact sheets.
   // The prewarm's finally-block clear() hides everything again.
-  crestPrewarmUnits(host: CrestPrewarmHost, kinds?: readonly CrestKind[]) {
-    return this.crests.preparation.units(host, kinds);
+  authoredPrewarmUnits(host: CrestPrewarmHost, kinds?: readonly CrestKind[]) {
+    return [...this.crests.preparation.units(host, kinds), ...this.guards.units(host)];
   }
 
   prewarmSpawn(x: number, y: number, z: number, entityId: number): void {
@@ -1398,6 +1417,7 @@ export class AbilityVfxFx implements SequencerHost {
   sleepEntity(entityId: number): void {
     if (this.disposed) return;
     this.controlSignals.sleep(entityId);
+    this.guards.sleep(entityId);
     this.warriorStorms.delete(entityId);
     this.crests.releaseHeld(entityId);
     this.ccBands.delete(entityId);
@@ -2032,6 +2052,15 @@ export class AbilityVfxFx implements SequencerHost {
 
   // ---- per-frame state (refreshed every frame by painter.syncEntity) ------
 
+  holdWarriorGuard(
+    entityId: number,
+    kind: WarriorGuardKind,
+    aura: WarriorGuardAura,
+    priority: boolean,
+  ): void {
+    this.guards.hold(entityId, kind, aura, this.frame, priority);
+  }
+
   // Returns true when this call STARTED the windup (first frame of the cast),
   // so the painter can count and accent the moment.
   windup(
@@ -2196,6 +2225,7 @@ export class AbilityVfxFx implements SequencerHost {
 
   update(dt: number, reducedMotion = false): void {
     if (this.disposed) return;
+    this.guardDt = dt;
     this.time += dt;
     this.reducedMotionActive = reducedMotion;
     this.shakeRecent = Math.max(0, this.shakeRecent - dt * 0.8);
@@ -2373,6 +2403,7 @@ export class AbilityVfxFx implements SequencerHost {
   }
 
   clear(): void {
+    this.guards.clear();
     this.warriorStorms.clear();
     this.furyAudio.clear();
     this.ribbons.clear();
@@ -2428,6 +2459,7 @@ export class AbilityVfxFx implements SequencerHost {
     release(() => this.details.dispose());
     release(() => this.forms.dispose());
     release(() => this.crests.dispose());
+    release(() => this.guards.dispose());
     release(() => this.rings.dispose());
     release(() => this.flipbooks.dispose());
     release(() => this.decals.dispose());

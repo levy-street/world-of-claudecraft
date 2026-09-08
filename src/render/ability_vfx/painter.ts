@@ -1,4 +1,9 @@
-import { claimFuryAudio, clearFuryAudioClaim, isMeleeAudioId } from '../../fury_audio_core';
+import {
+  claimFuryAudio,
+  clearFuryAudioClaim,
+  isMeleeAudioId,
+  WARRIOR_GUARD_AUDIO,
+} from '../../fury_audio_core';
 import { DAMAGE_CAST_RELEASES } from '../characters/cast_performance';
 import { isBleedContinuation, meleeImpactProfile } from '../melee_impact_core';
 import { SIGNATURE_ABILITIES } from './signature_core';
@@ -8,6 +13,7 @@ import {
   isWarriorAreaInstant,
 } from './warrior_area';
 import { WARRIOR_BLADE_STYLES } from './warrior_blades';
+import { warriorGuardKind } from './warrior_guard_plates';
 // Thin painter for the per-ability spell VFX system: resolves an event's
 // ability id against the authored spec table (ability_vfx_specs.ts), asks the
 // pure core (ability_vfx_core.ts) for a plan, and drives the pooled Vfx
@@ -555,6 +561,7 @@ export class AbilityVfx {
   // Returns true when this painter fully handled the event (the renderer skips
   // its generic school-colored arm), false to fall through unchanged.
   handleSpellfx(ev: AbilityVfxSpellfxEvent): boolean {
+    const originalEvent = ev;
     const ability = ev.ability;
     if (!ability) return false;
     if (ability === 'bloodhook' && ev.fx === 'dotApply') {
@@ -803,6 +810,19 @@ export class AbilityVfx {
           );
         break;
       case 'selfCast': {
+        if (
+          Object.hasOwn(WARRIOR_GUARD_AUDIO, ability) &&
+          isMeleeAudioId(ability) &&
+          this.deps.audioReady
+        )
+          fx.reserveFuryAudio(
+            originalEvent,
+            ability,
+            ev.sourceId,
+            ev.sourceId,
+            1,
+            this.deps.audioReady,
+          );
         // The pre-switch gate guarantees a full ceremonial or utility spec.
         // A self cue runs the ceremony on the caster (spirits, shells, orbits
         // ride the sequence). A cue carrying a victim runs the utility read
@@ -1560,6 +1580,12 @@ export class AbilityVfx {
     for (let i = 0; i < e.auras.length; i++) {
       const aura = e.auras[i];
       const auraWasHeld = held.auraStamps.has(aura.id);
+      const guard = warriorGuardKind(aura);
+      if (guard !== null) {
+        if (!isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 }))
+          fx.holdWarriorGuard?.(e.id, guard, aura, this.deps.localPlayerId?.() === e.id);
+        continue;
+      }
       if (aura.id === 'breachmaker_vuln' || aura.id === 'thunder_clap_as') {
         if (
           (aura.remaining ?? 0) > 0 &&

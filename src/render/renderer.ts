@@ -6718,7 +6718,7 @@ export class Renderer {
         properties: this.webgl.properties,
         spawn: () => this.abilityVfxFx.prewarmSpawn(p.pos.x, p.pos.y, p.pos.z - 5, p.id),
         materialSlot: abilityMaterialSlot,
-        geometryUnits: (host, kinds) => this.abilityVfxFx.crestPrewarmUnits(host, kinds),
+        geometryUnits: (host, kinds) => this.abilityVfxFx.authoredPrewarmUnits(host, kinds),
         texture: (texture) => this.prewarmTexture(texture),
         materialTextures: (material) => this.prewarmMaterialTextures(material),
         compile: (root, offscreen) => this.compilePrewarmColorPrograms(root, offscreen),

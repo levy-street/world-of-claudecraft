@@ -22,6 +22,7 @@ const donors = [
   '2H_Melee_Attack_Chop',
   'Dualwield_Melee_Attack_Chop',
   '1H_Melee_Attack_Slice_Horizontal',
+  'Block',
 ].map((name) => indexClip(root, name));
 for (const donor of donors) {
   for (const channel of donor.values()) {
@@ -247,6 +248,15 @@ const breachLoad = bladePose(3, 0.8331, [0, -0.035, -0.055], -18, -4);
 const breachHit = bladePose(3, 0.8331, [0, -0.035, 0.07], 0, 0);
 const breachRecover = bladePose(3, 0.8331, [0, -0.02, 0.015], 7, -5);
 
+// Defense activations borrow only native upper-body rotations. The same
+// offline planted-foot solve owns their short transition, never a long gait lock.
+const guardLoad = bladePose(6, 0.12, [0, -0.015, 0], -5, -2);
+const guardLock = bladePose(6, 0.3, [0, -0.018, 0], 0, 0);
+const resolveLoad = compressShield(0.14, [0, -0.01, 0], -4);
+const resolveLock = compressShield(0.14, [0, -0.025, 0], 5);
+const swordLoad = bladePose(3, 0.8331, [0, -0.018, 0], -12, -3);
+const swordLock = bladePose(3, 0.8331, [0, -0.025, 0], -35, -25, 0);
+
 let maxGripError = 0;
 /** Offline two-bone support-hand IK. Native bone lengths, hand and socket
  * transforms stay intact; the right hand remains the authority for the blade. */
@@ -298,6 +308,37 @@ function gripBlade(pose, weight) {
   return pose;
 }
 const performances = [
+  [
+    'Warrior_Raised_Guard',
+    [
+      [0, idle],
+      [0.06, guardLoad],
+      [0.15, guardLock],
+      [0.24, guardLock],
+      [0.64, idle],
+    ],
+  ],
+  [
+    'Warrior_Iron_Resolve',
+    [
+      [0, idle],
+      [0.08, resolveLoad],
+      [0.2, resolveLock],
+      [0.31, resolveLock],
+      [0.68, idle],
+    ],
+  ],
+  [
+    'Warrior_Sword_Guard',
+    [
+      [0, idle],
+      [0.075, swordLoad],
+      [0.15, swordLock],
+      [0.25, swordLock],
+      [0.4, swordLoad],
+      [0.72, idle],
+    ],
+  ],
   [
     'Warrior_Revenge',
     [
@@ -448,14 +489,18 @@ for (const [name, beats] of performances) {
       let pose = plantFeet(
         new Map(keys.map((key) => [key, blendValue(key, from.get(key), to.get(key), weight)])),
       );
-      if (name === 'Warrior_Breachmaker') {
+      if (name === 'Warrior_Breachmaker' || name === 'Warrior_Sword_Guard') {
         const time = start + (end - start) * t;
         const blend = Math.min(
           1,
           Math.max(0, (time - 0.015) / 0.06),
           Math.max(0, (0.66 - time) / 0.26),
         );
-        pose = gripBlade(pose, blend * blend * (3 - 2 * blend));
+        try {
+          pose = gripBlade(pose, blend * blend * (3 - 2 * blend));
+        } catch (error) {
+          throw new Error(`${name} at ${time}s: ${error.message}`, { cause: error });
+        }
       }
       timeline.push([start + (end - start) * t, (key) => pose.get(key)]);
     }

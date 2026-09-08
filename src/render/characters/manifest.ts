@@ -1378,7 +1378,8 @@ export const VISUALS: Record<string, VisualDef> = {
         overpower: 'Warrior_Redhand',
         hamstring: '1H_Melee_Attack_Slice_Diagonal',
         sanguine_aura: 'Spellcast_Raise',
-        raised_guard: 'Block',
+        raised_guard: 'Warrior_Raised_Guard',
+        iron_resolve: 'Warrior_Iron_Resolve',
         // Jawcrack is a bare-fist interrupt: the synthesized punch
         // (scripts/_add_pummel_punch_anim.mjs), not a weapon swing.
         pummel: 'Punch_A',
@@ -1398,9 +1399,8 @@ export const VISUALS: Record<string, VisualDef> = {
         // gesture only shows up once an attackByAbility entry exists for it.
         berserker_rage: 'Cheer',
         recklessness: 'Cheer',
-        // Die by the Sword braces behind the blade: the existing raised_guard
-        // donor (Block) reads the same defensive beat, reached the same way.
-        die_by_sword: 'Block',
+        // The actual blade supplies its distinct defensive presentation.
+        die_by_sword: 'Warrior_Sword_Guard',
         // Avatar's colossus transformation gets the raised-arm flourish
         // (the longest clip on the rig, fits a dramatic moment), same path.
         avatar: 'Spellcast_Raise',
