@@ -286,7 +286,8 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered 18885 -> 18858 by the guild roster expansion (PR #3874), which
     // extracted 27 lines from this file into the roster page modules. Exact
     // merged count, zero slack; maintainer-review item.
-    ceiling: 18858,
+    // Healing sound ownership now lives in combat_sfx.healAudioPlan.
+    ceiling: 18840,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

@@ -9,6 +9,7 @@ import {
   consumeHealCue,
   dispatchVarkhulCalloutSfx,
   groundTickAbilityCue,
+  healAudioPlan,
   impactCueForDamage,
   MOB_VOICE_CUES,
   mobVoiceActionForDamage,
@@ -1044,5 +1045,20 @@ describe('playerVoiceCue', () => {
     ]) {
       expect(SFX_CLIPS, key).toHaveProperty(key);
     }
+  });
+});
+
+describe('extracted heal audio ownership', () => {
+  it.each([
+    ['frenzied_regeneration', true, true],
+    ['frenzied_regeneration', false, false],
+    ['rejuvenation', true, false],
+    ['healing_touch', false, true],
+  ])('%s hot=%s preserves its established playback', (abilityId, hot, audible) => {
+    const ev = { type: 'heal2', targetId: 2, sourceId: 1, amount: 10, abilityId, hot } as Extract<
+      SimEvent,
+      { type: 'heal2' }
+    >;
+    expect(healAudioPlan(ev)).toEqual(audible ? { cue: 'heal_impact', gain: 1 } : null);
   });
 });

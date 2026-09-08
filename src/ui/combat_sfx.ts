@@ -2,6 +2,7 @@ import { furyAudioClaimed } from '../fury_audio_core';
 import type { SfxId } from '../game/sfx_manifest.generated';
 import { ABILITIES, MOBS } from '../sim/data';
 import type { Aura, Entity, SimEvent } from '../sim/types';
+import { warriorRecoveryAudio } from '../warrior_recovery_core';
 import { isAuraDebuff } from './auras_view';
 
 type DamageEvent = Extract<SimEvent, { type: 'damage' }>;
@@ -476,6 +477,22 @@ export function auraApplyCue(event: AuraEvent, aura: Aura | null): SfxId | null 
 }
 
 type HealEvent = Extract<SimEvent, { type: 'heal' }>;
+
+/** Sound ownership for direct heals, consumables and periodic recovery.
+ * Ordinary HoTs sound on application only. Frenzied Regeneration preserves
+ * its tick-only cue, while actual Warrior recovery has its own quieter take. */
+export function healAudioPlan(
+  ev: Extract<SimEvent, { type: 'heal' | 'heal2' }>,
+): { cue: string; gain: number } | null {
+  const recovery = ev.type === 'heal2' ? warriorRecoveryAudio(ev) : undefined;
+  if (recovery !== undefined) return recovery ? { cue: recovery, gain: 0.75 } : null;
+  const cue = ev.type === 'heal' ? consumeHealCue(ev) : null;
+  if (ev.type === 'heal' && ev.source && !cue) return null;
+  const hot = ev.type === 'heal2' && ev.hot === true;
+  const regeneration = ev.type === 'heal2' && ev.abilityId === 'frenzied_regeneration';
+  if (hot ? !regeneration : regeneration) return null;
+  return { cue: cue ?? 'heal_impact', gain: 1 };
+}
 
 // A potion, eat, or drink heal (items.ts / combat/auras.ts) plays its own
 // dedicated cue instead of the generic heal_impact every other heal source
