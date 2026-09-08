@@ -3197,7 +3197,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Posuneš spojence okamžikem do budoucnosti a zacelíš {damage} zdraví, jak se tělo usadí do svého zdravějšího budoucího já. (Chronomagie: signaturní schopnost)',
   'entities.abilities.temporal_mend.name': 'Časové zacelení',
   'entities.abilities.temporal_reversal.description':
-    'Přetočíš časovou linku padlého spojence a navrátíš ho k životu u jeho těla se zlomkem zdraví a many, i uprostřed boje. (Chronomagie)',
+    'Přetočíš časovou linku padlého spojence a navrátíš ho k životu po tvém boku s 35% zdraví a many, i uprostřed boje. (Chronomagie)',
   'entities.abilities.temporal_reversal.name': 'Časový návrat',
   'entities.abilities.temporal_rewind.description':
     'Vyšleš arcanovou vlnu přes svou skupinu nebo raid a přetočíš čas, čímž obnovíš 30 % poškození, které každý spojenec do 40 yardů utrpěl za posledních 5 sekund (nejvýše 35 % jejich maximálního zdraví). Nemůže být kritický efekt. (Chronomagie)',
@@ -3753,7 +3753,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.abilityError.shieldRequired': 'Musíte mít nasazený štít.',
   'entities.abilities.collective_reversal.name': 'Hromadné navrácení',
   'entities.abilities.collective_reversal.description':
-    'Vrátí časovou osu každého padlého člena vaší skupiny nebo raidu a oživí ho u jeho těla s 30% zdraví a many. Nelze seslat v boji. (Chronomancie)',
+    'Vrátí časovou osu každého padlého člena vaší skupiny nebo raidu do 40 yardů a na dohled a oživí ho po vašem boku s 30% zdraví a many. Nelze seslat v boji. (Chronomancie)',
   'entities.abilities.sport_boot.description':
     'Dlouhý vysoký odkop směrem k zaměřovanému bodu. Dav to miluje.',
   'entities.abilities.sport_boot.name': 'Velký odkop',
@@ -13222,7 +13222,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.radiant_devotion.description':
     'Zvyšuje tvou sílu kouzel a sílu členů skupiny o 20 na 30 min. Nahrazuje tvou vlastní Oddanost úsvitu nebo milosti, ale koexistuje s Oddanostmi jiných paladinů.',
   'entities.abilities.recall_the_fallen.description':
-    'Vrátí mrtvého člena skupiny zpět k životu s 35% zdraví a many. Slunečný léčitel na úrovni 16 nebo vyšší místo toho povolá zpět každého padlého člena skupiny.',
+    'Vrátí mrtvého člena skupiny zpět k životu po tvém boku s 35% zdraví a many. Slunečný léčitel na úrovni 16 nebo vyšší místo toho povolá zpět každého padlého člena skupiny do 30 yardů a na dohled.',
   'entities.abilities.sacred_challenge.description':
     'Přinutí nepřítele, aby na tebe zaútočil. Během Vzestupu navíc sníží veškeré utrpěné poškození o 15% na 4 s bez spotřebování náboje.',
   'entities.abilities.sacred_form.description':
@@ -13296,6 +13296,15 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Spotřebuje 3 Zuřivosti smečky poté, co tvůj společník udeří za 83 až 105 Fyzického poškození a otřese každým nepřítelem do 6 metrů za 26 až 34. Úder i otřes používají plný 30% bonus k poškození společníka ze Zuřivosti smečky a rostou se silou útoku společníka. Po následujících 8 s společník způsobuje o 25% větší poškození, útočí o 35% rychleji a Prokletý výstřel zasáhne až 2 blízké nepřátele.',
   'entities.abilities.wildheart.description': 'Okamžitě obnoví 30% tvého maximálního zdraví.',
   'entities.abilities.ancestor_return.name': 'Návrat předků',
+  'entities.abilities.grove_awakening.description':
+    'Povolá zpět k životu po tvém boku každého padlého člena tvé skupiny nebo výpravy do 40 yardů a na dohled s 30% zdraví a many. Nelze seslat v boji. (Srdce háje)',
+  'entities.abilities.grove_awakening.name': 'Probuzení háje',
+  'entities.abilities.prayer_of_returning.description':
+    'Povolá zpět k životu po tvém boku každého padlého člena tvé skupiny nebo výpravy do 40 yardů a na dohled s 30% zdraví a many. Nelze seslat v boji. (Požehnání a Věrouka)',
+  'entities.abilities.prayer_of_returning.name': 'Modlitba návratu',
+  'entities.abilities.wildwake.description':
+    'Vyláká padlého spojence k náhlému rozkvětu a přivede ho zpět k životu po tvém boku s 35% zdraví a many, i uprostřed boje. (Srdce háje)',
+  'entities.abilities.wildwake.name': 'Divoké probuzení',
   'entities.abilities.galeheart_weapon.name': 'Zbraň srdce vichru',
   'entities.abilities.lifespring_weapon.name': 'Zbraň pramene života',
   'entities.abilities.primal_exaltation.name': 'Prvotní povznesení',
@@ -13306,7 +13315,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.unleash_weapon.name': 'Vypusť zbraň',
   'entities.abilities.warspirit_cadence.name': 'Kadence válečného ducha',
   'entities.abilities.ancestor_return.description':
-    'Povolá zpět k životu u jejich těla každého padlého člena tvé skupiny nebo výpravy s 30% zdraví a many. Nelze seslat v boji. (Duchovní látka)',
+    'Povolá zpět k životu po tvém boku každého padlého člena tvé skupiny nebo výpravy do 40 yardů a na dohled s 30% zdraví a many. Nelze seslat v boji. (Duchovní látka)',
   'entities.abilities.galeheart_weapon.description':
     'Očaruje obě zbraně na 30 min a umožní Kadenci válečného ducha.',
   'entities.abilities.lifespring_weapon.description':

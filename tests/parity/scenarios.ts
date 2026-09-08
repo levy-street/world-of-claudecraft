@@ -2620,18 +2620,20 @@ function multiClassHeal(): Scenario {
       // A pet owned by the tank, so a mob holding threat on the PET (not the tank
       // directly) still counts the tank as aware via threatEntryMatchesEntity's
       // owner branch. Friendly + no threat of its own, so it is never an aware mob.
-      const pet = spawnMob(sim, 'forest_wolf', 5, 80, tank.pos.y, 80);
+      const pet = spawnMob(sim, 'forest_wolf', 5, 60, tank.pos.y, 0);
       pet.ownerId = tankPid;
       pet.hostile = false;
       pet.inCombat = false;
 
       // Three hostile mobs in combat on the tank, far enough that they do not engage
-      // within the short HoT tick window. m1/m2 hold the tank directly; m3 holds the
-      // tank's pet (the owner branch). Threat is seeded directly so the split is
-      // deterministic and re-derivable for QA.
-      const m1 = spawnMob(sim, 'forest_wolf', 5, 90, tank.pos.y, 90);
-      const m2 = spawnMob(sim, 'forest_wolf', 5, -90, tank.pos.y, 90);
-      const m3 = spawnMob(sim, 'forest_wolf', 5, 90, tank.pos.y, -90);
+      // within the short HoT tick window, yet inside THREAT_DROP_RANGE of the tank,
+      // the pet, and every healer (the engaged pass drops an out-of-reach attacker
+      // off a hate table, so a mob staged further away would forget them). m1/m2
+      // hold the tank directly; m3 holds the tank's pet (the owner branch). Threat is
+      // seeded directly so the split is deterministic and re-derivable for QA.
+      const m1 = spawnMob(sim, 'forest_wolf', 5, 90, tank.pos.y, -30);
+      const m2 = spawnMob(sim, 'forest_wolf', 5, -40, tank.pos.y, -30);
+      const m3 = spawnMob(sim, 'forest_wolf', 5, 60, tank.pos.y, 40);
       for (const m of [m1, m2, m3]) {
         beef(m, 50000);
         m.hostile = true;

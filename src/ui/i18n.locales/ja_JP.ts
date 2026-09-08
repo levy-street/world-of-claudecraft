@@ -758,7 +758,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.inProgressError': '準備確認はすでに進行中です。',
   'entities.abilities.collective_reversal.name': '集団逆行',
   'entities.abilities.collective_reversal.description':
-    'グループまたはレイドの死亡した全メンバーの時間軸を巻き戻し、遺体のそばで体力とマナが30%の状態で蘇生する。戦闘中は詠唱できない。（時間魔法）',
+    'グループまたはレイドの、40ヤード以内で視線の通る死亡した全メンバーの時間軸を巻き戻し、あなたのそばで体力とマナが30%の状態で蘇生する。戦闘中は詠唱できない。（時間魔法）',
   'entities.abilities.temporal_hourglass.name': '停止の砂時計',
   'entities.abilities.temporal_hourglass.description':
     '選択地点に時の砂時計を置きます。敵の足元では PvE で {hostilePveDuration} 秒、PvP で {hostilePvpDuration} 秒間停止させ、ダメージを受けると解除されます。自分またはパーティの味方の足元では {duration} 秒間の停滞となり、ダメージを受けず行動不能になり、最大体力の {healing}% を回復します。自分のクールダウンは {selfCooldownRecovery}%、味方は {allyCooldownRecovery}% 速く回復します。空の地面に置くと {groundDuration} 秒間待機し、最初に踏んだ有効な対象へ効果を与えます。強化効果は手動で解除できます。',
@@ -11835,7 +11835,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '時の残響をパーティ内に連鎖させ、対象と最も近い味方最大4人を即座に回復し、それぞれに{duration}秒間印を付けます。あなたが与えた秘術ダメージの一部が残響を通じて戻り、印のついた味方を回復します。（クロノマンシー）',
   'entities.abilities.temporal_reversal.name': '時の逆転',
   'entities.abilities.temporal_reversal.description':
-    '倒れた味方の時間軸を巻き戻し、戦闘中でも、その遺体の場所で体力とマナの一部を持った状態で蘇生します。（クロノマンシー）',
+    '倒れた味方の時間軸を巻き戻し、戦闘中でも、体力とマナが35%の状態であなたのそばに蘇生します。（クロノマンシー）',
   'entities.abilities.temporal_rewind.name': '巻き戻し',
   'entities.abilities.temporal_rewind.description':
     'パーティまたはレイドに秘術の波を送り、時間を巻き戻します。40ヤード以内の各味方が過去5秒間に受けたダメージの30%を回復します（最大体力の35%まで）。この効果はクリティカルになりません。（クロノマンシー）',
@@ -14019,7 +14019,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ambush.specNote_subtlety':
     'ダスクヴェールから使うと薄闇の蓄えが1段階進む（最大3）。3段階のときはステルスなしで、どの角度からでも使用できる：その1回はコストなしで、薄闇の蓄えを3段階すべて消費し、6秒間のヴェールストライクを開始し、2倍のダメージを与える。',
   'entities.abilities.ancestor_return.description':
-    'グループまたはレイドの倒れたメンバー全員を遺体の場所で蘇生し、体力とマナを30%回復させる。戦闘中は使用できない。（霊癒）',
+    'グループまたはレイドの、40ヤード以内で視線の通る倒れたメンバー全員をあなたのそばに呼び戻し、体力とマナが30%の状態で蘇生する。戦闘中は詠唱できない。（霊癒）',
   'entities.abilities.ancestor_return.name': '祖霊の帰還',
   'entities.abilities.army_of_the_dead.description':
     '墓所の門を開き、選んだドミニオンの従者に加えて、スケルタル・ウォリアー、ボーン・メイジ、グレイヴウィングを20秒間召喚する。',
@@ -14230,7 +14230,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '魂の欠片を2個消費し、すべてのアンデッドの従者に一斉攻撃させる。墓守は挑発して身を固め、骸骨戦士は足止めし、骨魔導士は魔法防御を暴き、墓翼は命中した全敵を引き裂く。',
   'entities.abilities.reaping_command.name': '刈り取りの号令',
   'entities.abilities.recall_the_fallen.description':
-    '死亡したグループメンバーを、体力とマナが35%の状態で蘇生する。',
+    '死亡したグループメンバーを、体力とマナが35%の状態であなたのそばに蘇生する。レベル16以上のサンメンダーは代わりに、グループの30ヤード以内で視線の通る倒れたメンバー全員を呼び戻す。',
   'entities.abilities.recall_the_fallen.name': '倒れし者の呼び戻し',
   'entities.abilities.redharvest.description':
     '古き血を3消費する：{damage}のダメージを与え、皮剥ぎと血の亀裂が与えるはずだった残りダメージを即座にすべて与え、両方の出血を除去し、エネルギーを{rage}回復する。コンボポイントが0でも使用できる。',
@@ -16758,4 +16758,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'マウントスキンはこのキャラクターが乗るどのマウントにも重ねて描かれます。速度は変わりません。',
   'hudChrome.cosmetics.mechIntro':
     'コンバットメカはこのキャラクターの身体を置き換えます。装着できるクロマは一度に一つです。',
+  'entities.abilities.grove_awakening.description':
+    'グループまたはレイドの、40ヤード以内で視線の通る倒れたメンバー全員をあなたのそばに呼び戻し、体力とマナが30%の状態で蘇生する。戦闘中は詠唱できない。（回復）',
+  'entities.abilities.grove_awakening.name': '樹林の覚醒',
+  'entities.abilities.prayer_of_returning.description':
+    'グループまたはレイドの、40ヤード以内で視線の通る倒れたメンバー全員をあなたのそばに呼び戻し、体力とマナが30%の状態で蘇生する。戦闘中は詠唱できない。（聖なる・ディシプリン）',
+  'entities.abilities.prayer_of_returning.name': '帰還の祈り',
+  'entities.abilities.wildwake.description':
+    '倒れた味方を不意の開花へと促し、戦闘の最中でも、体力とマナが35%の状態であなたのそばに蘇生させる。（回復）',
+  'entities.abilities.wildwake.name': '野性の目覚め',
 };

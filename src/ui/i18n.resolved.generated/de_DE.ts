@@ -11420,7 +11420,7 @@ export const de_DE: EnTranslations = {
       },
       "recall_the_fallen": {
         "name": "Ruf der Gefallenen",
-        "description": "Erweckt ein totes Gruppenmitglied mit 35% Gesundheit und Mana wieder zum Leben. Ein Sonnenheiler der Stufe 16 oder höher ruft stattdessen alle gefallenen Mitglieder der Gruppe zurück."
+        "description": "Erweckt ein totes Gruppenmitglied mit 35% Gesundheit und Mana an Eurer Seite wieder zum Leben. Ein Sonnenheiler der Stufe 16 oder höher ruft stattdessen alle gefallenen Mitglieder der Gruppe innerhalb von 30 Metern und in Eurer Sichtlinie zurück."
       },
       "beacon_of_light": {
         "name": "Leuchtfeuer des Lichts",
@@ -12153,6 +12153,14 @@ export const de_DE: EnTranslations = {
         "name": "Markbrecher",
         "description": "Verbraucht 3 Altes Blut für einen schweren Schlag mit hoher Bedrohung und {damage} Schaden. Unter halber Gesundheit schützt er Euch stattdessen mit einem Schild von 18% Eurer maximalen Gesundheit für 8 Sek. und erstattet 15 Wut zurück."
       },
+      "wildwake": {
+        "name": "Wildwecken",
+        "description": "Lockt einen gefallenen Verbündeten zu plötzlicher Blüte und ruft ihn mit 35% seiner Gesundheit und seines Manas an Eure Seite ins Leben zurück, selbst mitten im Kampf. (Hainherz)"
+      },
+      "grove_awakening": {
+        "name": "Erwachen des Hains",
+        "description": "Ruft jedes gefallene Mitglied Eurer Gruppe oder Eures Schlachtzugs innerhalb von 40 Metern und in Eurer Sichtlinie mit 30% Gesundheit und Mana an Eure Seite ins Leben zurück. Kann nicht im Kampf gewirkt werden. (Hainherz)"
+      },
       "overbloom": {
         "name": "Überblüte",
         "description": "Verbraucht 5 Grünkraft. Erntet jede Eurer Heilungen über Zeit auf allen Verbündeten für {buff}% ihrer verbleibenden Heilung, entfernt diese Effekte und pflanzt eine frische Wildblüte auf das Ziel."
@@ -12463,15 +12471,15 @@ export const de_DE: EnTranslations = {
       },
       "temporal_reversal": {
         "name": "Temporale Umkehr",
-        "description": "Spult den Zeitstrang eines gefallenen Verbündeten zurück und erweckt ihn an seinem Körper mit einem Teil seiner Gesundheit und seines Manas, selbst mitten im Kampf. (Chronomantie)"
+        "description": "Spult den Zeitstrang eines gefallenen Verbündeten zurück und erweckt ihn an deiner Seite mit 35% seiner Gesundheit und seines Manas, selbst mitten im Kampf. (Chronomantie)"
       },
       "collective_reversal": {
         "name": "Kollektive Umkehr",
-        "description": "Spult die Zeitlinie jedes gefallenen Mitglieds eurer Gruppe oder Schlachtgruppe zurück und erweckt es bei seinem Körper mit 30% Gesundheit und Mana wieder. Kann nicht im Kampf gewirkt werden. (Chronomantie)"
+        "description": "Spult die Zeitlinie jedes gefallenen Mitglieds eurer Gruppe oder Schlachtgruppe innerhalb von 40 Metern und in eurer Sichtlinie zurück und erweckt es an eurer Seite mit 30% Gesundheit und Mana wieder. Kann nicht im Kampf gewirkt werden. (Chronomantie)"
       },
       "ancestor_return": {
         "name": "Rückkehr der Ahnen",
-        "description": "Ruft jedes gefallene Mitglied Eurer Gruppe oder Eures Schlachtzugs an seinem Körper mit 30% Gesundheit und Mana ins Leben zurück. Kann nicht im Kampf gewirkt werden. (Geistflickung)"
+        "description": "Ruft jedes gefallene Mitglied Eurer Gruppe oder Eures Schlachtzugs innerhalb von 40 Metern und in Eurer Sichtlinie mit 30% Gesundheit und Mana an Eure Seite ins Leben zurück. Kann nicht im Kampf gewirkt werden. (Geistflickung)"
       },
       "temporal_rewind": {
         "name": "Rückspulen",
@@ -12613,6 +12621,10 @@ export const de_DE: EnTranslations = {
       "martyrs_aegis": {
         "name": "Ägide des Märtyrers",
         "description": "Verringert den von einem Verbündeten erlittenen Schaden 8 Sek. lang um 40%."
+      },
+      "prayer_of_returning": {
+        "name": "Gebet der Rückkehr",
+        "description": "Ruft jedes gefallene Mitglied Eurer Gruppe oder Eures Schlachtzugs innerhalb von 40 Metern und in Eurer Sichtlinie mit 30% Gesundheit und Mana an Eure Seite ins Leben zurück. Kann nicht im Kampf gewirkt werden. (Heilig und Doktrin)"
       },
       "choir_of_deliverance": {
         "name": "Chor der Erlösung",

@@ -7460,12 +7460,11 @@ export class Renderer {
           this.vfx.paladinFinalEdict(ev.sourceId, ev.targetId);
           this.pulseAt(ev.targetId, 'holy', 11, 0.4);
         } else if (ev.fx === 'temporalGlyph') {
-          // Chronomancy Temporal Echo apply: a brief temporal glyph blooms
-          // directly OVER the marked ally (target-anchored, no projectile ever
-          // travels to them). A modest arcane bloom + glow, distinct from the
-          // per-hit heal-glow pulse the conversion heals emit.
-          this.vfx.wardBloom(ev.targetId, 'arcane');
-          this.pulseAt(ev.targetId, 'arcane', 5, 0.45);
+          // Temporal Echo and resurrection glyphs follow the event's school:
+          // Chronomancy stays arcane, Wildwake nature, and the Sunmender rite holy.
+          // The target-anchored bloom is distinct from the per-hit heal pulse.
+          this.vfx.wardBloom(ev.targetId, ev.school);
+          this.pulseAt(ev.targetId, ev.school, 5, 0.45);
         } else if (ev.fx === 'temporalClock') {
           // Audio-only cue. The authoritative Rewind nova is emitted separately.
         } else if (ev.fx === 'temporalRewindNova') {

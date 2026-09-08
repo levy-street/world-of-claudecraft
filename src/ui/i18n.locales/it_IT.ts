@@ -3293,7 +3293,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Porta un alleato un istante avanti nel tempo, curandolo di {damage} salute mentre il corpo si stabilizza nel suo io futuro più sano. (Firma della Cronomanzia)',
   'entities.abilities.temporal_mend.name': 'Cura Temporale',
   'entities.abilities.temporal_reversal.description':
-    'Riavvolge la linea temporale di un alleato caduto, riportandolo in vita accanto al suo corpo con una parte della sua salute e mana, anche nel pieno del combattimento. (Cronomanzia)',
+    'Riavvolge la linea temporale di un alleato caduto, riportandolo in vita al tuo fianco con il 35% della sua salute e mana, anche nel pieno del combattimento. (Cronomanzia)',
   'entities.abilities.temporal_reversal.name': 'Inversione Temporale',
   'entities.abilities.temporal_rewind.description':
     "Invia un'onda arcana attraverso il tuo gruppo o incursione, riavvolgendo il tempo per ripristinare il 30% dei danni che ogni alleato entro 40 metri ha subito negli ultimi 5 secondi (fino al 35% della loro salute massima). Non può essere un effetto critico. (Cronomanzia)",
@@ -3930,7 +3930,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.abilityError.shieldRequired': 'Devi avere uno scudo equipaggiato.',
   'entities.abilities.collective_reversal.name': 'Inversione collettiva',
   'entities.abilities.collective_reversal.description':
-    "Riavvolge la linea temporale di ogni membro morto del gruppo o dell'incursione, riportandolo in vita accanto al corpo con il 30% di salute e mana. Non può essere lanciata in combattimento. (Cronomanzia)",
+    "Riavvolge la linea temporale di ogni membro morto del gruppo o dell'incursione entro 40 metri e nella tua linea di vista, riportandolo in vita al tuo fianco con il 30% di salute e mana. Non può essere lanciata in combattimento. (Cronomanzia)",
   'entities.abilities.sport_boot.description':
     'Un calcione alto e lungo verso il punto mirato. La folla lo adora.',
   'entities.abilities.sport_boot.name': 'Calcione',
@@ -13588,7 +13588,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.radiant_devotion.description':
     "Aumenta di 20 la potenza magica tua e dei membri del gruppo per 30 min. Sostituisce la tua Devozione dell'Alba o della Grazia, ma coesiste con le Devozioni di altri paladini.",
   'entities.abilities.recall_the_fallen.description':
-    'Riporta in vita un membro morto del gruppo con il 35% di salute e mana. Un Sanasole di livello 16 o superiore richiama invece tutti i membri caduti del gruppo.',
+    'Riporta in vita al tuo fianco un membro morto del gruppo con il 35% di salute e mana. Un Sanasole di livello 16 o superiore richiama invece tutti i membri caduti del gruppo entro 30 metri e nella tua linea di vista.',
   'entities.abilities.sacred_challenge.description':
     "Costringe un nemico ad attaccarti. Durante l'Ascensione riduce anche del 15% tutti i danni subiti per 4 s senza consumare una carica.",
   'entities.abilities.sacred_form.description':
@@ -13664,6 +13664,15 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.wildheart.description':
     "Recupera all'istante il 30% della tua salute massima.",
   'entities.abilities.ancestor_return.name': 'Ritorno degli Antenati',
+  'entities.abilities.grove_awakening.description':
+    'Richiama in vita al tuo fianco tutti i membri caduti del tuo gruppo o incursione entro 40 metri e nella tua linea di vista, con il 30% di salute e mana. Non può essere lanciata in combattimento. (Groveheart)',
+  'entities.abilities.grove_awakening.name': 'Risveglio del Bosco',
+  'entities.abilities.prayer_of_returning.description':
+    'Richiama in vita al tuo fianco tutti i membri caduti del tuo gruppo o incursione entro 40 metri e nella tua linea di vista, con il 30% di salute e mana. Non può essere lanciata in combattimento. (Sacro e Dottrina)',
+  'entities.abilities.prayer_of_returning.name': 'Preghiera del Ritorno',
+  'entities.abilities.wildwake.description':
+    'Induce un alleato caduto a sbocciare improvvisamente, riportandolo in vita al tuo fianco con il 35% della sua salute e mana, anche nel pieno del combattimento. (Groveheart)',
+  'entities.abilities.wildwake.name': 'Risveglio Selvaggio',
   'entities.abilities.galeheart_weapon.name': 'Arma Cuore di Bufera',
   'entities.abilities.lifespring_weapon.name': 'Arma Fonte di Vita',
   'entities.abilities.primal_exaltation.name': 'Esaltazione Primordiale',
@@ -13674,7 +13683,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.unleash_weapon.name': "Scatena l'Arma",
   'entities.abilities.warspirit_cadence.name': 'Cadenza dello Spirito Guerriero',
   'entities.abilities.ancestor_return.description':
-    'Richiama in vita presso il loro corpo tutti i membri caduti del tuo gruppo o incursione con il 30% di salute e mana. Non può essere lanciata in combattimento. (Rammendo Spirituale)',
+    'Richiama in vita al tuo fianco tutti i membri caduti del tuo gruppo o incursione entro 40 metri e nella tua linea di vista, con il 30% di salute e mana. Non può essere lanciata in combattimento. (Rammendo Spirituale)',
   'entities.abilities.galeheart_weapon.description':
     'Incanta entrambe le armi per 30 min, abilitando la Cadenza dello Spirito Guerriero.',
   'entities.abilities.lifespring_weapon.description':

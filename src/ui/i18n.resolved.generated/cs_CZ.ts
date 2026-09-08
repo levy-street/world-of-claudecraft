@@ -11420,7 +11420,7 @@ export const cs_CZ: EnTranslations = {
       },
       "recall_the_fallen": {
         "name": "Povolej padlé",
-        "description": "Vrátí mrtvého člena skupiny zpět k životu s 35% zdraví a many. Slunečný léčitel na úrovni 16 nebo vyšší místo toho povolá zpět každého padlého člena skupiny."
+        "description": "Vrátí mrtvého člena skupiny zpět k životu po tvém boku s 35% zdraví a many. Slunečný léčitel na úrovni 16 nebo vyšší místo toho povolá zpět každého padlého člena skupiny do 30 yardů a na dohled."
       },
       "beacon_of_light": {
         "name": "Maják světla",
@@ -12153,6 +12153,14 @@ export const cs_CZ: EnTranslations = {
         "name": "Lámání morku",
         "description": "Spotřebuje 3 Staré krve na těžký úder s vysokou hrozbou za {damage} poškození. Pod polovinou zdraví tě místo toho chrání štítem za 18% maximálního zdraví na 8 s a vrátí 15 zuřivosti."
       },
+      "wildwake": {
+        "name": "Divoké probuzení",
+        "description": "Vyláká padlého spojence k náhlému rozkvětu a přivede ho zpět k životu po tvém boku s 35% zdraví a many, i uprostřed boje. (Srdce háje)"
+      },
+      "grove_awakening": {
+        "name": "Probuzení háje",
+        "description": "Povolá zpět k životu po tvém boku každého padlého člena tvé skupiny nebo výpravy do 40 yardů a na dohled s 30% zdraví a many. Nelze seslat v boji. (Srdce háje)"
+      },
       "overbloom": {
         "name": "Překvět",
         "description": "Spotřebuje 5 Zeleně. Sklidí každé tvé léčení v čase na všech spojencích za {buff}% zbývajícího léčení, odstraní tyto efekty a zasadí na cíl čerstvý Divoký květ."
@@ -12463,15 +12471,15 @@ export const cs_CZ: EnTranslations = {
       },
       "temporal_reversal": {
         "name": "Časový návrat",
-        "description": "Přetočíš časovou linku padlého spojence a navrátíš ho k životu u jeho těla se zlomkem zdraví a many, i uprostřed boje. (Chronomagie)"
+        "description": "Přetočíš časovou linku padlého spojence a navrátíš ho k životu po tvém boku s 35% zdraví a many, i uprostřed boje. (Chronomagie)"
       },
       "collective_reversal": {
         "name": "Hromadné navrácení",
-        "description": "Vrátí časovou osu každého padlého člena vaší skupiny nebo raidu a oživí ho u jeho těla s 30% zdraví a many. Nelze seslat v boji. (Chronomancie)"
+        "description": "Vrátí časovou osu každého padlého člena vaší skupiny nebo raidu do 40 yardů a na dohled a oživí ho po vašem boku s 30% zdraví a many. Nelze seslat v boji. (Chronomancie)"
       },
       "ancestor_return": {
         "name": "Návrat předků",
-        "description": "Povolá zpět k životu u jejich těla každého padlého člena tvé skupiny nebo výpravy s 30% zdraví a many. Nelze seslat v boji. (Duchovní látka)"
+        "description": "Povolá zpět k životu po tvém boku každého padlého člena tvé skupiny nebo výpravy do 40 yardů a na dohled s 30% zdraví a many. Nelze seslat v boji. (Duchovní látka)"
       },
       "temporal_rewind": {
         "name": "Přetočení",
@@ -12613,6 +12621,10 @@ export const cs_CZ: EnTranslations = {
       "martyrs_aegis": {
         "name": "Egida mučedníka",
         "description": "Snižuje poškození utrpěné spojencem o 40% na 8 s."
+      },
+      "prayer_of_returning": {
+        "name": "Modlitba návratu",
+        "description": "Povolá zpět k životu po tvém boku každého padlého člena tvé skupiny nebo výpravy do 40 yardů a na dohled s 30% zdraví a many. Nelze seslat v boji. (Požehnání a Věrouka)"
       },
       "choir_of_deliverance": {
         "name": "Sbor vysvobození",

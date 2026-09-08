@@ -561,6 +561,7 @@ export function startFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): void
   // session would fire unprompted one tick after it ends.
   p.queuedCastAbility = null;
   p.queuedCastAim = null;
+  p.queuedCastTargetId = null;
   p.fishCastZoneId = probeZoneId;
   ctx.emit({
     type: 'castStart',

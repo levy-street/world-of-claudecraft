@@ -3225,7 +3225,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Kéo một đồng minh tiến một khoảnh khắc vào tương lai, hồi phục {damage} máu khi cơ thể ổn định vào phiên bản tương lai khỏe mạnh hơn của mình. (Thời Thuật nguyên thủy)',
   'entities.abilities.temporal_mend.name': 'Hàn Gắn Thời Gian',
   'entities.abilities.temporal_reversal.description':
-    'Tua lại dòng thời gian của một đồng minh đã ngã xuống, đưa họ trở lại cuộc sống tại thân xác với một phần máu và mana, ngay cả giữa chiến đấu. (Thời Thuật)',
+    'Tua lại dòng thời gian của một đồng minh đã ngã xuống, đưa họ trở lại cuộc sống bên cạnh bạn với 35% máu và mana của họ, ngay cả giữa chiến đấu. (Thời Thuật)',
   'entities.abilities.temporal_reversal.name': 'Đảo Ngược Thời Gian',
   'entities.abilities.temporal_rewind.description':
     'Gửi một làn sóng bí thuật qua nhóm hoặc đột kích của bạn, tua lại thời gian để phục hồi 30% sát thương mỗi đồng minh trong phạm vi 40 thước đã nhận trong 5 giây qua (tối đa 35% máu tối đa của họ). Không thể là hiệu ứng chí mạng. (Thời Thuật)',
@@ -3928,7 +3928,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.inProgressError': 'Một lượt kiểm tra sẵn sàng đang diễn ra.',
   'entities.abilities.collective_reversal.name': 'Đảo ngược tập thể',
   'entities.abilities.collective_reversal.description':
-    'Tua ngược dòng thời gian của mọi thành viên đã chết trong nhóm hoặc đội đột kích, hồi sinh họ bên cạnh thi thể với 30% máu và năng lượng phép. Không thể thi triển khi đang chiến đấu. (Thời thuật)',
+    'Tua ngược dòng thời gian của mọi thành viên đã chết trong nhóm hoặc đội đột kích, trong phạm vi 40 mét và trong tầm nhìn thẳng của bạn, hồi sinh họ bên cạnh bạn với 30% máu và năng lượng phép. Không thể thi triển khi đang chiến đấu. (Thời thuật)',
   'entities.abilities.sport_boot.description':
     'Một cú sút bổng thật xa về phía điểm ngắm. Khán đài mê tít.',
   'entities.abilities.sport_boot.name': 'Cú Sút Lớn',
@@ -13331,7 +13331,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.radiant_devotion.description':
     'Tăng 20 sức mạnh phép thuật cho bạn và các thành viên nhóm trong 30 phút. Thay thế Sùng Tín Bình Minh hoặc Ân Điển của chính bạn, nhưng cùng tồn tại với Sùng Tín của các thánh kỵ sĩ khác.',
   'entities.abilities.recall_the_fallen.description':
-    'Đưa một thành viên nhóm đã chết trở lại sự sống với 35% máu và mana. Người Chữa Lành Mặt Trời cấp 16 trở lên sẽ thay vào đó gọi về mọi thành viên đã ngã xuống của nhóm.',
+    'Đưa một thành viên nhóm đã chết trở lại sự sống bên cạnh bạn với 35% máu và mana. Người Chữa Lành Mặt Trời cấp 16 trở lên sẽ thay vào đó gọi về mọi thành viên đã ngã xuống của nhóm trong phạm vi 30 mét và trong tầm nhìn thẳng của bạn.',
   'entities.abilities.sacred_challenge.description':
     'Buộc một kẻ địch tấn công bạn. Trong Thăng Thiên còn giảm 15% mọi sát thương phải chịu trong 4 giây mà không tiêu lượt.',
   'entities.abilities.sacred_form.description':
@@ -13405,6 +13405,15 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Tiêu 3 Hung Tính Bầy Đàn sau khi thú nuôi của bạn đánh gây 83 đến 105 sát thương Vật Lý và chấn động mọi kẻ địch trong 6 mét gây 26 đến 34. Đòn đánh và chấn động dùng trọn thưởng sát thương thú nuôi 30% của Hung Tính Bầy Đàn và tăng theo sức tấn công của thú nuôi. Trong 8 giây sau đó, thú nuôi gây thêm 25% sát thương, tấn công nhanh hơn 35% và khiến Bắn Tà Ác chém lan tới 2 kẻ địch gần đó.',
   'entities.abilities.wildheart.description': 'Tức thời hồi 30% máu tối đa của bạn.',
   'entities.abilities.ancestor_return.name': 'Tổ Tiên Hồi Quy',
+  'entities.abilities.grove_awakening.description':
+    'Gọi mọi thành viên đã ngã xuống trong nhóm hoặc đội của bạn, trong phạm vi 40 mét và trong tầm nhìn thẳng của bạn, trở lại sự sống bên cạnh bạn với 30% máu và mana. Không thể niệm khi đang chiến đấu. (Groveheart)',
+  'entities.abilities.grove_awakening.name': 'Thức Tỉnh Khu Rừng',
+  'entities.abilities.prayer_of_returning.description':
+    'Gọi mọi thành viên đã ngã xuống trong nhóm hoặc đội của bạn, trong phạm vi 40 mét và trong tầm nhìn thẳng của bạn, trở lại sự sống bên cạnh bạn với 30% máu và mana. Không thể niệm khi đang chiến đấu. (Thần Thánh và Giáo Lý)',
+  'entities.abilities.prayer_of_returning.name': 'Lời Nguyện Hồi Quy',
+  'entities.abilities.wildwake.description':
+    'Dỗ dành một đồng minh đã ngã xuống bừng nở đột ngột, đưa họ trở lại sự sống ngay bên cạnh bạn với 35% máu và mana của họ, ngay cả khi đang giao tranh ác liệt. (Groveheart)',
+  'entities.abilities.wildwake.name': 'Bừng Nở Hoang Dã',
   'entities.abilities.galeheart_weapon.name': 'Vũ Khí Tâm Phong',
   'entities.abilities.lifespring_weapon.name': 'Vũ Khí Suối Sinh',
   'entities.abilities.primal_exaltation.name': 'Tôn Vinh Nguyên Thủy',
@@ -13415,7 +13424,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.unleash_weapon.name': 'Thả Vũ Khí',
   'entities.abilities.warspirit_cadence.name': 'Nhịp Chiến Hồn',
   'entities.abilities.ancestor_return.description':
-    'Gọi mọi thành viên đã ngã xuống trong nhóm hoặc đội của bạn trở lại sự sống ngay tại thi thể với 30% máu và mana. Không thể niệm khi đang chiến đấu. (Vá Hồn)',
+    'Gọi mọi thành viên đã ngã xuống trong nhóm hoặc đội của bạn, trong phạm vi 40 mét và trong tầm nhìn thẳng của bạn, trở lại sự sống bên cạnh bạn với 30% máu và mana. Không thể niệm khi đang chiến đấu. (Vá Hồn)',
   'entities.abilities.galeheart_weapon.description':
     'Phù phép cả hai vũ khí trong 30 phút, kích hoạt Nhịp Chiến Hồn.',
   'entities.abilities.lifespring_weapon.description':

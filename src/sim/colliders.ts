@@ -2085,7 +2085,7 @@ export function supportHeightAt(
  *  object placement. Covers the battleground's flag podiums and stair landings
  *  (2.5yd) while leaving the ramparts (5.7yd) obstacles overhead, so a body
  *  seated under one lands beneath it rather than on top of it. */
-const DECK_FLOOR_REACH = 3;
+export const DECK_FLOOR_REACH = 3;
 
 /**
  * The surface an OBJECT placed at (x, z) rests on: the terrain, or an authored

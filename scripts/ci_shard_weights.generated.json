@@ -2,8 +2,8 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 3960,
-    "harvestedFiles": 3949,
+    "files": 3959,
+    "harvestedFiles": 3948,
     "carried": {
       "tests/hub_dummy_drill.test.ts": {
         "ms": 3069,
@@ -1796,7 +1796,6 @@
   "tests/inspect_instances.test.ts": 1719,
   "tests/inspect_view.test.ts": 24,
   "tests/inspect_window.test.ts": 128,
-  "tests/instance_exit_memory.test.ts": 8,
   "tests/instance_music.test.ts": 8,
   "tests/instance_provenance_boundaries.test.ts": 13372,
   "tests/instanced_occluder_ghosts.test.ts": 11,

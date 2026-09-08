@@ -11420,7 +11420,7 @@ export const fr_FR: EnTranslations = {
       },
       "recall_the_fallen": {
         "name": "Rappel des tombés",
-        "description": "Ramène à la vie un membre mort du groupe avec 35% de points de vie et de mana. Un Sagesoleil de niveau 16 ou plus rappelle à la place tous les membres tombés du groupe."
+        "description": "Ramène à la vie un membre mort du groupe à vos côtés avec 35% de points de vie et de mana. Un Sagesoleil de niveau 16 ou plus rappelle à la place tous les membres tombés du groupe à moins de 30 mètres et dans votre ligne de vue."
       },
       "beacon_of_light": {
         "name": "Phare de lumière",
@@ -12153,6 +12153,14 @@ export const fr_FR: EnTranslations = {
         "name": "Brise-moelle",
         "description": "Consomme vos 3 Sang ancien pour une frappe lourde à haute menace de {damage} points de dégâts. Sous la moitié des points de vie, vous protège à la place d'un bouclier égal à 18% de vos points de vie maximum pendant 8 s et rembourse 15 points de rage."
       },
+      "wildwake": {
+        "name": "Éveil sauvage",
+        "description": "Incite un allié tombé à fleurir soudainement, le ramenant à la vie à vos côtés avec 35% de points de vie et de mana, même en plein combat. (Cœur sylvestre)"
+      },
+      "grove_awakening": {
+        "name": "Éveil du bosquet",
+        "description": "Ramène à la vie tous les membres tombés de votre groupe ou raid à moins de 40 mètres et dans votre ligne de vue, de retour à vos côtés, avec 30% de points de vie et de mana. Ne peut pas être incanté en combat. (Cœur sylvestre)"
+      },
       "overbloom": {
         "name": "Surfloraison",
         "description": "Consomme 5 Verdoyance. Récolte chaque soin sur la durée que vous possédez sur tous les alliés pour {buff}% de ses soins restants, retire ces effets et plante une Floraison sauvage fraîche sur la cible."
@@ -12463,15 +12471,15 @@ export const fr_FR: EnTranslations = {
       },
       "temporal_reversal": {
         "name": "Inversion temporelle",
-        "description": "Rembobine la chronologie d'un allié tombé, le ramenant à la vie à l'emplacement de son corps avec une partie de sa vie et de son mana, même en plein combat. (Chromancie)"
+        "description": "Rembobine la chronologie d'un allié tombé, le ramenant à la vie à vos côtés avec 35% de sa vie et de son mana, même en plein combat. (Chromancie)"
       },
       "collective_reversal": {
         "name": "Réversion collective",
-        "description": "Rembobine la ligne temporelle de chaque membre mort de votre groupe ou raid et le ramène à la vie près de son corps avec 30% de ses points de vie et de mana. Ne peut pas être lancé en combat. (Chronomancie)"
+        "description": "Rembobine la ligne temporelle de chaque membre mort de votre groupe ou raid à moins de 40 mètres et dans votre ligne de vue, et le ramène à la vie à vos côtés avec 30% de ses points de vie et de mana. Ne peut pas être lancé en combat. (Chronomancie)"
       },
       "ancestor_return": {
         "name": "Retour des ancêtres",
-        "description": "Ramène à la vie auprès de leur corps tous les membres tombés de votre groupe ou raid avec 30% de points de vie et de mana. Ne peut pas être incanté en combat. (Reprise spirituelle)"
+        "description": "Ramène à la vie tous les membres tombés de votre groupe ou raid à moins de 40 mètres et dans votre ligne de vue, de retour à vos côtés, avec 30% de points de vie et de mana. Ne peut pas être incanté en combat. (Reprise spirituelle)"
       },
       "temporal_rewind": {
         "name": "Retour en arrière",
@@ -12613,6 +12621,10 @@ export const fr_FR: EnTranslations = {
       "martyrs_aegis": {
         "name": "Égide du martyr",
         "description": "Réduit de 40% les dégâts subis par un allié pendant 8 s."
+      },
+      "prayer_of_returning": {
+        "name": "Prière du retour",
+        "description": "Ramène à la vie tous les membres tombés de votre groupe ou raid à moins de 40 mètres et dans votre ligne de vue, de retour à vos côtés, avec 30% de points de vie et de mana. Ne peut pas être incanté en combat. (Bénison et Doctrine)"
       },
       "choir_of_deliverance": {
         "name": "Chœur de délivrance",

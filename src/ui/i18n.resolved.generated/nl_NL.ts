@@ -11420,7 +11420,7 @@ export const nl_NL: EnTranslations = {
       },
       "recall_the_fallen": {
         "name": "Roep de Gevallenen",
-        "description": "Brengt een dood groepslid terug tot leven met 35% gezondheid en mana. Een Zonneheler van niveau 16 of hoger roept in plaats daarvan elk gevallen groepslid terug."
+        "description": "Brengt een dood groepslid terug tot leven aan je zijde met 35% gezondheid en mana. Een Zonneheler van niveau 16 of hoger roept in plaats daarvan elk gevallen groepslid binnen 30 meter en in je zichtlijn terug."
       },
       "beacon_of_light": {
         "name": "Baken van Licht",
@@ -12153,6 +12153,14 @@ export const nl_NL: EnTranslations = {
         "name": "Mergbreker",
         "description": "Verbruikt je 3 Oud Bloed voor een zware slag met hoge dreiging van {damage} schade. Onder de helft van je gezondheid beschermt hij je in plaats daarvan met een schild van 18% van je maximale gezondheid gedurende 8 sec en geeft 15 woede terug."
       },
+      "wildwake": {
+        "name": "Wildwaak",
+        "description": "Verleidt een gevallen bondgenoot tot plotselinge bloei en brengt die aan je zijde terug tot leven met 35% gezondheid en mana, zelfs in het heetst van de strijd. (Herstel)"
+      },
+      "grove_awakening": {
+        "name": "Woudontwaken",
+        "description": "Roept elk gevallen lid van je groep of raid binnen 40 meter en in je zichtlijn terug naar je zijde met 30% gezondheid en mana. Kan niet in gevecht worden gespreukt. (Herstel)"
+      },
       "overbloom": {
         "name": "Overbloei",
         "description": "Verbruikt 5 Groenkracht. Oogst elke genezing over tijd die je op alle bondgenoten hebt voor {buff}% van de resterende genezing, verwijdert die effecten en plant een verse Wildbloei op het doelwit."
@@ -12463,15 +12471,15 @@ export const nl_NL: EnTranslations = {
       },
       "temporal_reversal": {
         "name": "Temporele Omkering",
-        "description": "Spoelt de tijdlijn van een gevallen bondgenoot terug en brengt hem bij zijn lichaam tot leven met een deel van zijn gezondheid en mana, zelfs middenin een gevecht. (Chronomantie)"
+        "description": "Spoelt de tijdlijn van een gevallen bondgenoot terug en brengt hem tot leven aan je zijde met 35% van zijn gezondheid en mana, zelfs middenin een gevecht. (Chronomantie)"
       },
       "collective_reversal": {
         "name": "Collectieve omkering",
-        "description": "Spoelt de tijdlijn van elk gesneuveld lid van je groep of raid terug en brengt hen bij hun lichaam tot leven met 30% gezondheid en mana. Kan niet tijdens een gevecht worden gebruikt. (Chronomantie)"
+        "description": "Spoelt de tijdlijn van elk gesneuveld lid van je groep of raid binnen 40 meter en in je zichtlijn terug en brengt hen weer tot leven aan je zijde met 30% gezondheid en mana. Kan niet tijdens een gevecht worden gebruikt. (Chronomantie)"
       },
       "ancestor_return": {
         "name": "Terugkeer der Voorouders",
-        "description": "Roept elk gevallen lid van je groep of raid bij hun lichaam terug tot leven met 30% gezondheid en mana. Kan niet in gevecht worden gespreukt. (Geestherstel)"
+        "description": "Roept elk gevallen lid van je groep of raid binnen 40 meter en in je zichtlijn terug naar je zijde met 30% gezondheid en mana. Kan niet in gevecht worden gespreukt. (Geestherstel)"
       },
       "temporal_rewind": {
         "name": "Terugspoelen",
@@ -12613,6 +12621,10 @@ export const nl_NL: EnTranslations = {
       "martyrs_aegis": {
         "name": "Aegis van de Martelaar",
         "description": "Vermindert 8 sec. lang de schade van een bondgenoot met 40%."
+      },
+      "prayer_of_returning": {
+        "name": "Terugkerend Gebed",
+        "description": "Roept elk gevallen lid van je groep of raid binnen 40 meter en in je zichtlijn terug naar je zijde met 30% gezondheid en mana. Kan niet in gevecht worden gespreukt. (Heilig en Discipline)"
       },
       "choir_of_deliverance": {
         "name": "Koor der Verlossing",

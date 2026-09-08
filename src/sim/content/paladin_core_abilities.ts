@@ -207,7 +207,8 @@ const common: AbilityDef[] = [
     learnLevel: 6,
     cost: 60,
     castTime: 8,
-    cooldown: 0,
+    // Shared five-minute healer resurrection cooldown.
+    cooldown: 300,
     range: 30,
     school: 'holy',
     requiresTarget: true,

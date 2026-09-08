@@ -12,17 +12,29 @@
 //   an overlay shows live percent progress with no dismiss action (a skipped
 //   update leaves the player on a stale bundle headed for the
 //   incompatible-version dead end, so the gate holds until the update lands);
-//   when the download completes and the player has not entered the world, the
-//   staged bundle is applied immediately via a WebView reload instead of
-//   waiting for a backgrounding.
+//   once the plugin has STAGED the finished download and the player has not
+//   entered the world, the bundle is applied immediately via a WebView reload
+//   instead of waiting for a backgrounding.
 // - The incompatible-version rejection: when the server refuses the bundle's
-//   world-layout epoch and a download is in flight (or already staged), the
-//   dead-end fatal overlay is replaced by this gate in "fatal" mode: progress,
-//   then auto-apply (there is nothing playable behind it).
+//   world-layout epoch, this gate claims the screen in "fatal" mode instead of
+//   the dead-end overlay: progress for a download in flight, then auto-apply
+//   once staged (there is nothing playable behind it). With nothing in flight
+//   it asks the plugin for a bundle staged before this context existed and
+//   hands the dead-end overlay back only on a miss.
+//
+// "Staged" is load-bearing. The plugin emits downloadComplete before it has
+// verified the bundle or recorded it as the next bundle, so an apply issued on
+// that event switches to nothing and merely reloads the stale client (the
+// "still incompatible until I force-quit the app" report). The apply keys on
+// the later updateAvailable event, which names the verified bundle, and
+// switches to it by id. A download can also finish before this JS context
+// exists (cold start, or the context an earlier apply reloaded), and no event
+// replays, so the gate asks the plugin for an already-staged bundle at install
+// and again when the incompatible rejection lands with nothing in flight.
 //
 // In-world sessions are never interrupted: while body is game-active the
-// overlay stays hidden and a completed download falls back to the plugin's
-// own apply-on-background behavior.
+// overlay stays hidden and a staged download falls back to the plugin's own
+// apply-on-background behavior.
 //
 // Split on the reconnect_policy.ts pattern: pure, directly-testable state
 // functions (reduce/model/decide) plus one thin installer that wires them to
@@ -31,7 +43,7 @@
 // stays DOM-free.
 
 import { ONLINE_WORLD_INCOMPATIBLE_MESSAGE } from '../world_api';
-import { applyPendingOtaUpdate, watchOtaUpdates } from './native_ota';
+import { applyPendingOtaUpdate, pendingOtaBundleId, watchOtaUpdates } from './native_ota';
 import { NATIVE_APP } from './online';
 
 export type OtaGatePhase = 'idle' | 'downloading' | 'ready' | 'applying' | 'failed';
@@ -46,11 +58,20 @@ export interface OtaGateState {
    * applies the bundle the moment it is ready.
    */
   fatal: boolean;
+  /**
+   * The plugin has verified the download and recorded (or is recording) it as
+   * the next bundle. The only state an apply is allowed from: before it, there
+   * is nothing to switch to and a reload would boot the same stale client.
+   */
+  staged: boolean;
+  /** The staged bundle's id when the plugin named one; null means "ask the plugin". */
+  stagedId: string | null;
 }
 
 export type OtaGateEvent =
   | { type: 'progress'; percent: number }
   | { type: 'complete' }
+  | { type: 'staged'; bundleId: string | null }
   | { type: 'failed' }
   | { type: 'incompatible' }
   | { type: 'applying' };
@@ -63,7 +84,7 @@ export interface OtaOverlayModel {
 }
 
 export function initialOtaGateState(): OtaGateState {
-  return { phase: 'idle', percent: 0, fatal: false };
+  return { phase: 'idle', percent: 0, fatal: false, staged: false, stagedId: null };
 }
 
 export function reduceOtaGateEvent(state: OtaGateState, event: OtaGateEvent): OtaGateState {
@@ -76,8 +97,19 @@ export function reduceOtaGateEvent(state: OtaGateState, event: OtaGateEvent): Ot
     case 'complete':
       if (state.phase === 'applying') return state;
       return { ...state, phase: 'ready', percent: 100 };
-    case 'failed':
+    case 'staged':
       if (state.phase === 'applying') return state;
+      return {
+        ...state,
+        phase: 'ready',
+        percent: 100,
+        staged: true,
+        stagedId: event.bundleId ?? state.stagedId,
+      };
+    case 'failed':
+      // A bundle already staged outlives a later failure report: it is still
+      // the fix, and the plugin still applies it on the next backgrounding.
+      if (state.phase === 'applying' || state.staged) return state;
       return { ...state, phase: 'failed' };
     case 'incompatible':
       return { ...state, fatal: true };
@@ -93,16 +125,33 @@ export function otaOverlayModel(state: OtaGateState, inWorld: boolean): OtaOverl
   if (state.phase === 'downloading') {
     return { phase: 'downloading', percent: state.percent, fatal: state.fatal };
   }
-  // 'ready' renders as applying: the auto-apply decision below fires in the
-  // same event turn, so the player never sees a stalled "ready" state.
+  // 'ready' renders as applying: the plugin is verifying and staging the
+  // downloaded bundle, and the auto-apply fires the moment it reports staged,
+  // so the player never sees a stalled "ready" state.
   return { phase: 'applying', percent: 100, fatal: state.fatal };
 }
 
 export function shouldAutoApplyOta(state: OtaGateState, inWorld: boolean): boolean {
-  if (state.phase !== 'ready') return false;
+  if (state.phase !== 'ready' || !state.staged) return false;
   if (state.fatal) return true;
   return !inWorld;
 }
+
+/**
+ * How long a completed download may sit unverified before the gate stops
+ * holding the screen for it: after this, it asks the plugin once for a staged
+ * bundle and otherwise steps aside (the plugin's own apply-on-background is
+ * still armed). Verification is a checksum over the downloaded files, so
+ * anything near this long means the plugin is not going to stage it.
+ */
+export const OTA_STAGING_GRACE_MS = 30_000;
+
+export type OtaGateScheduler = (fn: () => void, ms: number) => () => void;
+
+const defaultSchedule: OtaGateScheduler = (fn, ms) => {
+  const handle = setTimeout(fn, ms);
+  return () => clearTimeout(handle);
+};
 
 export interface OtaUpdateGateDeps {
   overlay: {
@@ -121,14 +170,21 @@ export interface OtaUpdateGateDeps {
   native?: boolean;
   watch?: typeof watchOtaUpdates;
   apply?: typeof applyPendingOtaUpdate;
+  pending?: typeof pendingOtaBundleId;
+  schedule?: OtaGateScheduler;
   incompatibleReason?: string;
 }
 
 export interface OtaUpdateGate {
   /**
    * Claim an ended session's disconnect reason: returns true (and takes over
-   * the screen) only for the incompatible-version rejection while an update
-   * is downloading or staged. On false the caller shows its usual overlay.
+   * the screen) for the incompatible-version rejection, false for any other
+   * reason, which the caller shows as usual. With an update downloading or
+   * staged the gate paints progress and applies; with nothing in flight it
+   * asks the plugin for a bundle it never heard about, applies a hit, and on
+   * a miss hands the screen back through onFatalRecoveryFailed. Claiming
+   * before the plugin answers keeps the caller's dead-end overlay, which
+   * clears the resume marker, off the screen until it is the truth.
    */
   handleIncompatibleDisconnect(reason: string | undefined): boolean;
   /** Snapshot for tests/diagnostics. */
@@ -145,9 +201,12 @@ export function installOtaUpdateGate(deps: OtaUpdateGateDeps): OtaUpdateGate {
   if (!native) return INERT_GATE;
   const watch = deps.watch ?? watchOtaUpdates;
   const apply = deps.apply ?? applyPendingOtaUpdate;
+  const pending = deps.pending ?? pendingOtaBundleId;
+  const schedule = deps.schedule ?? defaultSchedule;
   const incompatibleReason = deps.incompatibleReason ?? ONLINE_WORLD_INCOMPATIBLE_MESSAGE;
 
   let state = initialOtaGateState();
+  let cancelStagingWatch: (() => void) | null = null;
 
   const paint = (): void => {
     const model = otaOverlayModel(state, deps.isInWorld());
@@ -155,17 +214,23 @@ export function installOtaUpdateGate(deps: OtaUpdateGateDeps): OtaUpdateGate {
     else deps.overlay.hide();
   };
 
+  const disarmStagingWatch = (): void => {
+    cancelStagingWatch?.();
+    cancelStagingWatch = null;
+  };
+
   const maybeApply = (): void => {
     if (!shouldAutoApplyOta(state, deps.isInWorld())) {
       paint();
       return;
     }
+    disarmStagingWatch();
     state = reduceOtaGateEvent(state, { type: 'applying' });
     paint();
-    void apply().then((applied) => {
+    void apply({ bundleId: state.stagedId }).then((applied) => {
       // On success the WebView reloads and this context is gone; reaching
-      // here with false means the reload path is unavailable (plugin absent
-      // or the bridge call failed).
+      // here with false means nothing was switched (plugin absent, no bundle
+      // to name, or the bridge call failed).
       if (applied) return;
       state = { ...state, phase: 'ready' };
       if (state.fatal) {
@@ -184,6 +249,42 @@ export function installOtaUpdateGate(deps: OtaUpdateGateDeps): OtaUpdateGate {
     });
   };
 
+  const onStaged = (bundleId: string | null): void => {
+    disarmStagingWatch();
+    state = reduceOtaGateEvent(state, { type: 'staged', bundleId });
+    maybeApply();
+  };
+
+  const onFailed = (): void => {
+    disarmStagingWatch();
+    const wasFatal = state.fatal;
+    state = reduceOtaGateEvent(state, { type: 'failed' });
+    paint();
+    if (wasFatal && state.phase === 'failed') deps.onFatalRecoveryFailed?.();
+  };
+
+  // Ask the plugin for a bundle this context never saw download. Anything it
+  // names is staged by definition (the plugin only records verified bundles).
+  const probeStaged = (onNone?: () => void): void => {
+    void pending().then((bundleId) => {
+      if (bundleId) onStaged(bundleId);
+      else onNone?.();
+    });
+  };
+
+  const armStagingWatch = (): void => {
+    disarmStagingWatch();
+    cancelStagingWatch = schedule(() => {
+      cancelStagingWatch = null;
+      if (state.phase !== 'ready' || state.staged) return;
+      probeStaged(() => {
+        // Re-check: the staged event may have landed while the probe ran.
+        if (state.phase !== 'ready' || state.staged) return;
+        onFailed();
+      });
+    }, OTA_STAGING_GRACE_MS);
+  };
+
   watch({
     onProgress: (percent) => {
       state = reduceOtaGateEvent(state, { type: 'progress', percent });
@@ -191,27 +292,46 @@ export function installOtaUpdateGate(deps: OtaUpdateGateDeps): OtaUpdateGate {
     },
     onComplete: () => {
       state = reduceOtaGateEvent(state, { type: 'complete' });
+      // Nothing to switch to yet: hold the screen ("applying") until the
+      // plugin reports the bundle staged, bounded by the grace window.
+      if (!state.staged) armStagingWatch();
       maybeApply();
     },
-    onFailed: () => {
-      const wasFatal = state.fatal;
-      state = reduceOtaGateEvent(state, { type: 'failed' });
-      paint();
-      if (wasFatal) deps.onFatalRecoveryFailed?.();
-    },
+    onStaged,
+    onFailed,
   });
+
+  // A download that finished before this context booted left no event to
+  // catch; the plugin's own record is the only trace.
+  probeStaged();
+
+  const isUpdateInFlight = (): boolean =>
+    state.phase === 'downloading' || state.phase === 'ready' || state.phase === 'applying';
 
   return {
     handleIncompatibleDisconnect: (reason) => {
       if (reason !== incompatibleReason) return false;
-      // Only claim the recovery when an update is actually in flight or
-      // staged; with nothing to offer (no check answered yet, or the download
-      // already failed) the caller's overlay is the honest answer.
-      if (state.phase !== 'downloading' && state.phase !== 'ready' && state.phase !== 'applying') {
-        return false;
-      }
       state = reduceOtaGateEvent(state, { type: 'incompatible' });
-      maybeApply();
+      if (isUpdateInFlight()) {
+        maybeApply();
+        return true;
+      }
+      // Nothing known in flight (no check answered yet, the download already
+      // failed, or it finished before this context existed). The plugin may
+      // still hold the fix, so the screen is claimed NOW and the plugin asked.
+      // A hit applies in fatal mode (the session is dead either way) with the
+      // caller's resume marker intact, so the reload lands back in the world
+      // on the new bundle; a miss hands back through onFatalRecoveryFailed,
+      // whose dead-end overlay is what drops that marker, so it paints only
+      // once there is provably nothing to apply. Fatal outlives a miss: a
+      // download that starts later (the plugin re-checks on foreground)
+      // paints and applies in fatal mode over the same dead end.
+      probeStaged(() => {
+        // Re-check: a download may have started while the probe ran, and the
+        // gate then owns the screen through its own apply or failure paths.
+        if (isUpdateInFlight()) return;
+        deps.onFatalRecoveryFailed?.();
+      });
       return true;
     },
     state: () => state,

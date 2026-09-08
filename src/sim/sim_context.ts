@@ -379,6 +379,12 @@ export interface SimContextPrimitives {
   // reassigned), so a read-only live view; the fields themselves stay writable so
   // the hot paths can increment them. Feeds no gameplay branch and draws no rng.
   readonly mobScanCounters: MobScanCounters;
+  // The coordinator's engaged pass output (combat/engaged_combat.ts): every
+  // entity id an engaged mob or fighting pet held in combat on the most recent
+  // tick. Sim-owned, cleared and refilled in place each tick; a read-only live
+  // view so a command-driven readout (/combat) answers from the cached pass
+  // instead of re-walking every entity and hate table on demand.
+  readonly engagedPids: ReadonlySet<number>;
   // Commission order board (Professions 2.0, issue #1298): the live order
   // list, mutated in place by professions/commission_order.ts (push on open,
   // field updates on accept/deliver, splice on the retention sweep), like
@@ -1493,6 +1499,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get mobScanCounters() {
       return host.mobScanCounters;
+    },
+    get engagedPids() {
+      return host.engagedPids;
     },
     get commissionOrderBoard() {
       return host.commissionOrderBoard;

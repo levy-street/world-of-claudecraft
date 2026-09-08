@@ -11420,7 +11420,7 @@ export const zh_CN: EnTranslations = {
       },
       "recall_the_fallen": {
         "name": "唤回逝者",
-        "description": "使一名死亡的小队成员复活，并恢复 35% 的生命值和法力值。"
+        "description": "使一名死亡的小队成员回到你身边复活，并恢复 35% 的生命值和法力值。16 级或以上的黎明愈者则会改为呼唤小队中 30 码内且在你视线内的所有阵亡成员回到你身边复活。"
       },
       "beacon_of_light": {
         "name": "圣光道标",
@@ -12153,6 +12153,14 @@ export const zh_CN: EnTranslations = {
         "name": "碎髓",
         "description": "消耗你的3层古血，造成{damage}点伤害的高威胁重击。生命值低于一半时，改为吸收相当于最大生命值18%的伤害，持续8秒，并返还15点怒气。"
       },
+      "wildwake": {
+        "name": "野性复苏",
+        "description": "催发倒下的盟友骤然绽放，使其回到你身边复活，恢复35%生命值和法力值，即使激战正酣也可施放。（恢复）"
+      },
+      "grove_awakening": {
+        "name": "林地觉醒",
+        "description": "呼唤小队或团队中 40 码内且在你视线内的所有阵亡成员回到你身边复活，并恢复30%生命值和法力值。战斗中无法施放。（恢复）"
+      },
       "overbloom": {
         "name": "盛放",
         "description": "消耗你的5层繁茂：每个持有你的持续治疗效果的盟友立即恢复这些效果剩余治疗量的{buff}%，这些效果随之移除，并为目标种下一个新的野性绽放。"
@@ -12463,15 +12471,15 @@ export const zh_CN: EnTranslations = {
       },
       "temporal_reversal": {
         "name": "时光逆转",
-        "description": "倒转一名阵亡盟友的时间线，使其在遗体处以部分生命值和法力值复活，即使正在激烈战斗中也可使用。（时光术）"
+        "description": "倒转一名阵亡盟友的时间线，使其回到你身边以35%生命值和法力值复活，即使正在激烈战斗中也可使用。（时光术）"
       },
       "collective_reversal": {
         "name": "集体逆转",
-        "description": "倒转队伍或团队中每位阵亡成员的时间线，使其在遗体旁以30%生命值和法力值复活。无法在战斗中施放。（时空魔法）"
+        "description": "倒转队伍或团队中 40 码内且在你视线内的每位阵亡成员的时间线，使其回到你身边以30%生命值和法力值复活。无法在战斗中施放。（时空魔法）"
       },
       "ancestor_return": {
         "name": "先祖归来",
-        "description": "呼唤小队或团队中所有阵亡成员，使其在尸体处复活并恢复30%生命值和法力值。战斗中无法施放。（灵愈）"
+        "description": "呼唤小队或团队中 40 码内且在你视线内的所有阵亡成员回到你身边复活，并恢复30%生命值和法力值。战斗中无法施放。（灵愈）"
       },
       "temporal_rewind": {
         "name": "回溯",
@@ -12613,6 +12621,10 @@ export const zh_CN: EnTranslations = {
       "martyrs_aegis": {
         "name": "殉道者圣盾",
         "description": "使一名盟友受到的伤害降低 40%，持续 8 秒。"
+      },
+      "prayer_of_returning": {
+        "name": "归返祈祷",
+        "description": "呼唤小队或团队中 40 码内且在你视线内的所有阵亡成员回到你身边复活，并恢复30%生命值和法力值。战斗中无法施放。（神圣与戒律）"
       },
       "choir_of_deliverance": {
         "name": "救赎圣咏团",

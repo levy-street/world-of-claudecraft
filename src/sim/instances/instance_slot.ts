@@ -22,6 +22,5 @@ export function freshInstanceSlot(dungeonId: string, slot: number): InstanceSlot
     enteredBy: new Set(),
     raidReturnKeys: new Set(),
     raidBossWelcomeKeys: new Set(),
-    combatExitMemory: new Map(),
   };
 }

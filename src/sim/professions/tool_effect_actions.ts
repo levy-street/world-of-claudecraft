@@ -336,6 +336,7 @@ function beginToolRechargeCast(ctx: SimContext, p: Entity, professionId: string)
   }
   p.queuedCastAbility = null;
   p.queuedCastAim = null;
+  p.queuedCastTargetId = null;
   const duration = TOOL_RECHARGE_CAST_DURATION_SEC;
   p.castingAbility = TOOL_RECHARGE_CAST_ID;
   p.castTotal = duration;

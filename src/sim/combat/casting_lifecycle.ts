@@ -99,10 +99,7 @@ import {
   consumeFateThreadsForDrain,
   gainDoom,
 } from './affliction';
-import {
-  shouldBufferSentenceDuringGcd,
-  shouldPreserveQueuedSentence,
-} from './affliction_sentence_queue';
+import { shouldPreserveQueuedSentence } from './affliction_sentence_queue';
 import {
   hasUnbreakableMovementLock,
   isInStasis,
@@ -774,6 +771,28 @@ export function releaseEmpoweredAbility(ctx: SimContext, abilityId: string, pid?
   fireQueuedCast(ctx, p, true);
 }
 
+// An accepted on-GCD press is the player's latest intent: it discards any
+// stale GCD-held queued press still in the slot. Reachable only via the
+// one-tick gap after the GCD expires (gcdRemaining zeroes in updateTimers,
+// AFTER the updateCasting retry arm ran), where a fresh press passes the GCD
+// gate before the retry can fire the slot; without this clear the stale press
+// fires when the fresh cast completes. Off-GCD weaves never touch the slot,
+// and neither does a blink-through commit (excluded at its call site: the
+// escape weave leaves the cast in progress, and therefore the follow-up
+// queued behind it, untouched). Only the instant commit site carries that
+// exclusion: blinkThrough requires castTime 0, so the timed-cast and channel
+// commit sites are unreachable by a blink-through press today; a future
+// usableWhileCasting ability WITH a cast time or channel must extend the
+// guard to its commit site or it will eat the queued follow-up. The normal
+// queued fire is unaffected (fireQueuedCast empties the slot before calling
+// back in).
+function dropStaleHeldPressOnCommit(p: Entity, ability: AbilityDef): void {
+  if (ability.offGcd) return;
+  p.queuedCastAbility = null;
+  p.queuedCastAim = null;
+  p.queuedCastTargetId = null;
+}
+
 // Consumes the single-slot spell queue (see CAST_QUEUE_WINDOW_SEC), firing the
 // queued ability exactly as a fresh castAbility press. A cast shorter than the
 // flat GCD (the common hasted case) can complete before the GCD armed at its
@@ -813,9 +832,11 @@ function fireQueuedCast(ctx: SimContext, p: Entity, onComplete = false): void {
     }
   }
   const aim = p.queuedCastAim;
+  const targetOverride = p.queuedCastTargetId;
   p.queuedCastAbility = null;
   p.queuedCastAim = null;
-  castAbility(ctx, queued, p.id, aim ?? undefined);
+  p.queuedCastTargetId = null;
+  castAbility(ctx, queued, p.id, aim ?? undefined, targetOverride);
 }
 
 export function cancelCast(ctx: SimContext, p: Entity): void {
@@ -835,6 +856,7 @@ export function cancelCast(ctx: SimContext, p: Entity): void {
   // an interrupted cast never completed, so its queued follow-up is dropped too
   p.queuedCastAbility = null;
   p.queuedCastAim = null;
+  p.queuedCastTargetId = null;
   // Hidden per-cast fishing/gather/craft state: unconditional inert writes
   // (already '' / 0 / false on every non-profession cancel path), so every
   // existing cancel stays byte-identical while a cancelled profession cast
@@ -1077,6 +1099,7 @@ export function castAbility(
       if (p.castRemaining <= CAST_QUEUE_WINDOW_SEC && !isNonSpellCast(p.castingAbility)) {
         p.queuedCastAbility = abilityId;
         p.queuedCastAim = aim ?? null;
+        p.queuedCastTargetId = castTargetId;
         return;
       }
       ctx.error(p.id, 'You are busy.');
@@ -1088,11 +1111,18 @@ export function castAbility(
   // in when the GCD is still running, so this early return only fires for a
   // same-tick player press racing the GCD, not for a queued follow-up.
   if (!ability.offGcd && p.gcdRemaining > 0 && !blinkThrough) {
-    if (shouldBufferSentenceDuringGcd(abilityId, p.gcdRemaining)) {
+    // WotLK-style GCD-tail queue: a press inside the final CAST_QUEUE_WINDOW_SEC
+    // of a bare GCD loads the same single slot the cast-tail queue uses
+    // (last-press-wins), and the updateCasting retry arm fires it the tick the
+    // GCD clears. This generalizes the Sentence-only buffer that previously
+    // lived here; the Sentence preserve guard above still keeps a queued
+    // release from being overwritten by generator spam.
+    if (p.gcdRemaining <= CAST_QUEUE_WINDOW_SEC) {
       p.queuedCastAbility = abilityId;
       p.queuedCastAim = aim ?? null;
+      p.queuedCastTargetId = castTargetId;
     }
-    return; // silent, classic spams this
+    return; // an earlier press stays silent, classic spams this
   }
   const togglingOff = isToggleBuff(ability) && p.auras.some((a) => a.id === ability.id);
   // sharedCooldownIds generalizes the release's shaman-shock special case (it
@@ -1846,6 +1876,7 @@ export function castAbility(
       consumeFateThreadsForDrain(ctx, p, target, channelDuration);
     }
     p.gcdRemaining = Math.max(p.gcdRemaining, gcd);
+    dropStaleHeldPressOnCommit(p, ability);
     if (ability.id === 'rain_of_fire') {
       const center = ability.selfCentered ? p.pos : (p.castAim ?? p.pos);
       const radius = res.effects.find((effect) => effect.type === 'aoeDamage')?.radius;
@@ -1893,12 +1924,17 @@ export function castAbility(
     p.castTotal = stretchedCastTime;
     p.castRemaining = stretchedCastTime;
     p.gcdRemaining = Math.max(p.gcdRemaining, gcd);
+    dropStaleHeldPressOnCommit(p, ability);
     ctx.emit({ type: 'castStart', entityId: p.id, ability: ability.id, time: stretchedCastTime });
     coldsightReserveRead(ctx, p, ability.id);
     return;
   }
 
   if (!ability.offGcd) p.gcdRemaining = Math.max(p.gcdRemaining, gcd);
+  // A blink-through press is an escape weave DURING the cast in progress
+  // (Flickerstep is on-GCD but slips past the busy guard); it must not eat
+  // the follow-up queued behind that cast.
+  if (!blinkThrough) dropStaleHeldPressOnCommit(p, ability);
   const instantResolved = ability.empowerStages
     ? { ...res, empowerLevel: ability.empowerStages }
     : res;

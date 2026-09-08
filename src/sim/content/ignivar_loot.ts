@@ -3305,6 +3305,27 @@ export const IGNIVAR_ART_PENDING_ITEM_IDS: readonly string[] = [];
 // token serves its three classes and each class picks its spec's set.
 export const CRUCIBLE_VENDOR_NPC_ID = 'crucible_quartermaster';
 
+// Reserved so this overworld service NPC does not shift the sequential entity
+// ids pinned by replay parity. The other reserved NPC singletons occupy
+// 1_000_000_000 through 1_000_000_002.
+export const CRUCIBLE_VENDOR_ENTITY_ID = 1_000_000_003;
+
+/** Overworld entrance position, separate from the inert dynamic NPC definition.
+ *
+ *  The Forgefather's Isle keep door (IGNIVAR_KEEP_DOOR_POS, 503.05 / 2243.7) sits at
+ *  the top of a walled stair passage up the keep's south face, on the summit flat
+ *  at 18.85. The quartermaster stands on the LANDING COURT one flight below it
+ *  (the stair band's level run at 15.34, x 500.6 to 506.1, z 2236 to 2238.5), at
+ *  the west edge so the flight stays open, six yards from the door and outside its
+ *  2 yd walk-in trigger. Both hosts spawn him there (src/sim/sim.ts, reserved id).
+ *
+ *  The earlier spot, 510.5 / 2242.5, is OUTSIDE the passage's west wall on the
+ *  raw terrain shelf at 6.1, thirteen yards below the door with a wall between:
+ *  reachable only by leaving the fortress, swimming round the isle and walking
+ *  to the foot of the wall. tests/crucible_vendor_reach.test.ts walks the real
+ *  motion kernel from the door and from the tier-three court to pin this. */
+export const CRUCIBLE_VENDOR_ENTRANCE_POS = { x: 505.5, z: 2237.6 } as const;
+
 export interface CrucibleVendorOffer {
   itemId: string;
   sigilId: string;
@@ -3459,19 +3480,18 @@ export const CRUCIBLE_VENDOR_STOCK: readonly CrucibleVendorOffer[] = [
   { itemId: 'grovespring_legs', sigilId: 'sigil_anvil_legs' },
 ];
 
-// The Crucible Quartermaster herself. Dynamic on the Maelin pattern
-// (content/ignivar_raid_lore.ts): the overworld bootstrap never places her;
-// the Halls of the First Tempering lists her in its `npcs` array beside the
-// raid entrance. The crucibleVendor flag routes her dialog to the sigil shop.
+// The Crucible Quartermaster stands outside the Forgefather's Isle keep door,
+// so raiders can redeem sigils without entering an instance. The crucibleVendor
+// flag routes the dialog to the sigil shop.
 export const IGNIVAR_VENDOR_NPCS: Record<string, NpcDef> = {
   [CRUCIBLE_VENDOR_NPC_ID]: {
     id: CRUCIBLE_VENDOR_NPC_ID,
     name: 'Quartermaster Bronn Emberward',
     title: 'Crucible Quartermaster',
-    // Dynamic NPCs use an authored instance-local spawn; this placeholder is
-    // never read by the overworld placement loop.
+    // Dynamic definitions remain inert so the generic placement collider veto
+    // cannot suppress nearby raid-entrance structures or terrain edits.
     pos: { x: 0, z: 0 },
-    facing: 0,
+    facing: Math.PI,
     color: 0xb3702d,
     questIds: [],
     crucibleVendor: true,

@@ -112,6 +112,7 @@ export function resetCombatForDev(ctx: SimContext, pid: number): void {
   player.queuedOnSwing = null;
   player.queuedCastAbility = null;
   player.queuedCastAim = null;
+  player.queuedCastTargetId = null;
 
   for (const entity of ctx.entities.values()) {
     if (entity.kind !== 'mob') continue;

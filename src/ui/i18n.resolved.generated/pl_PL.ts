@@ -11420,7 +11420,7 @@ export const pl_PL: EnTranslations = {
       },
       "recall_the_fallen": {
         "name": "Przywołaj Poległych",
-        "description": "Przywraca do życia martwego członka drużyny z 35% zdrowia i many. Słoneczny Uzdrowiciel na poziomie 16 lub wyższym przywołuje zamiast tego każdego poległego członka drużyny."
+        "description": "Przywraca do życia u twojego boku martwego członka drużyny z 35% zdrowia i many. Słoneczny Uzdrowiciel na poziomie 16 lub wyższym przywołuje zamiast tego każdego poległego członka drużyny w promieniu 30 jardów i w zasięgu wzroku."
       },
       "beacon_of_light": {
         "name": "Latarnia Światła",
@@ -12153,6 +12153,14 @@ export const pl_PL: EnTranslations = {
         "name": "Łamacz szpiku",
         "description": "Zużywa twoje 3 Starej Krwi na ciężki cios o wysokim zagrożeniu, zadający {damage} obrażeń. Poniżej połowy zdrowia zamiast tego osłania cię tarczą równą 18% maksymalnego zdrowia na 8 s i zwraca 15 szału."
       },
+      "wildwake": {
+        "name": "Dzikie Przebudzenie",
+        "description": "Skłania poległego sojusznika do nagłego rozkwitu, przywracając go do życia u twojego boku z 35% zdrowia i many, nawet w środku walki. (Serce Gaju)"
+      },
+      "grove_awakening": {
+        "name": "Przebudzenie Gaju",
+        "description": "Przywraca do życia u twojego boku każdego poległego członka twojej drużyny lub rajdu w promieniu 40 jardów i w zasięgu wzroku, z 30% zdrowia i many. Nie można rzucić w walce. (Serce Gaju)"
+      },
       "overbloom": {
         "name": "Nadrozkwit",
         "description": "Zużywa 5 Zieleni. Zbiera każde twoje leczenie w czasie na wszystkich sojusznikach za {buff}% pozostałego leczenia, usuwa te efekty i sadzi świeży Dziki rozkwit na celu."
@@ -12463,15 +12471,15 @@ export const pl_PL: EnTranslations = {
       },
       "temporal_reversal": {
         "name": "Odwrócenie czasu",
-        "description": "Przewija oś czasu poległego sojusznika, przywracając go do życia przy jego ciele z częścią zdrowia i many, nawet w środku walki. (Chronomancja)"
+        "description": "Przewija oś czasu poległego sojusznika, przywracając go do życia u twojego boku z 35% zdrowia i many, nawet w środku walki. (Chronomancja)"
       },
       "collective_reversal": {
         "name": "Zbiorowe odwrócenie",
-        "description": "Cofa linię czasu każdego poległego członka grupy lub rajdu i przywraca go do życia przy ciele z 30% zdrowia i many. Nie można użyć podczas walki. (Chronomancja)"
+        "description": "Cofa linię czasu każdego poległego członka grupy lub rajdu w promieniu 40 jardów i w zasięgu wzroku, przywracając go do życia u twojego boku z 30% zdrowia i many. Nie można użyć podczas walki. (Chronomancja)"
       },
       "ancestor_return": {
         "name": "Powrót Przodków",
-        "description": "Przywraca do życia przy ciele każdego poległego członka twojej drużyny lub rajdu z 30% zdrowia i many. Nie można rzucić w walce. (Duchowe Cerowanie)"
+        "description": "Przywraca do życia u twojego boku każdego poległego członka twojej drużyny lub rajdu w promieniu 40 jardów i w zasięgu wzroku, z 30% zdrowia i many. Nie można rzucić w walce. (Duchowe Cerowanie)"
       },
       "temporal_rewind": {
         "name": "Cofnięcie czasu",
@@ -12613,6 +12621,10 @@ export const pl_PL: EnTranslations = {
       "martyrs_aegis": {
         "name": "Egida Męczennika",
         "description": "Zmniejsza obrażenia otrzymywane przez sojusznika o 40% przez 8 s."
+      },
+      "prayer_of_returning": {
+        "name": "Modlitwa Powrotu",
+        "description": "Przywraca do życia u twojego boku każdego poległego członka twojej drużyny lub rajdu w promieniu 40 jardów i w zasięgu wzroku, z 30% zdrowia i many. Nie można rzucić w walce. (Błogosławieństwo i Doktryna)"
       },
       "choir_of_deliverance": {
         "name": "Chór Wybawienia",

@@ -369,6 +369,7 @@ function makeFakeHost() {
     deedRuntime: createDeedRuntime(),
     fiestaBotPids: [],
     mobScanCounters: createMobScanCounters(),
+    engagedPids: new Set<number>(),
     bumpDeedStat: vi.fn(),
     bumpCommissionOrderBoardRev: vi.fn(),
     markItemDiscovered: vi.fn(),

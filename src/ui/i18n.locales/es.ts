@@ -3345,7 +3345,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Envía un eco en cascada por tu grupo: el objetivo y hasta cuatro de sus aliados más cercanos son sanados a la vez y quedan marcados durante {duration} s, convirtiendo parte del daño Arcano que causas en sanación a través de sus ecos. Oleada de éter y Dardos de éter generan una reserva de sanación equivalente por cada Eco grupal, repartida entre los aliados marcados con menos del 60% de salud según la salud que les falte. (Cronomancia)',
   'entities.abilities.temporal_cascade.name': 'Cascada Temporal',
   'entities.abilities.temporal_reversal.description':
-    'Rebobina la línea temporal de un aliado caído, devolviéndolo a la vida junto a su cuerpo con una parte de su salud y maná, incluso en pleno combate. (Cronomancia)',
+    'Rebobina la línea temporal de un aliado caído, devolviéndolo a la vida a tu lado con un 35% de su salud y maná, incluso en pleno combate. (Cronomancia)',
   'entities.abilities.temporal_reversal.name': 'Inversión Temporal',
   'entities.abilities.temporal_rewind.description':
     'Envía una onda arcana por tu grupo o banda, rebobinando el tiempo para restaurar el 30% del daño que cada aliado en un radio de 40 yardas sufrió durante los últimos 5 segundos (hasta el 35% de su salud máxima). No puede ser un efecto crítico. (Cronomancia)',
@@ -3984,7 +3984,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.abilityError.shieldRequired': 'Debes tener un escudo equipado.',
   'entities.abilities.collective_reversal.name': 'Reversión colectiva',
   'entities.abilities.collective_reversal.description':
-    'Rebobina a todos los miembros muertos de tu grupo o banda y los devuelve a la vida junto a sus cuerpos con un 30% de salud y maná. No se puede lanzar en combate. (Cronomancia)',
+    'Rebobina a todos los miembros muertos de tu grupo o banda en un radio de 40 yardas y dentro de tu línea de visión, y los devuelve a la vida a tu lado con un 30% de salud y maná. No se puede lanzar en combate. (Cronomancia)',
   'entities.abilities.temporal_hourglass.name': 'Reloj de suspensión',
   'entities.abilities.temporal_hourglass.description':
     'Coloca un reloj de arena temporal en la ubicación seleccionada. Bajo un enemigo, lo suspende {hostilePveDuration} s en JcE o {hostilePvpDuration} s en JcJ e impide que actúe; cualquier daño rompe el efecto. Sobre tus pies o bajo un aliado del grupo, concede estasis durante {duration} s, impide recibir daño y actuar, recupera un {healing}% de la salud máxima y hace que los tiempos de reutilización se recuperen un {selfCooldownRecovery}% más rápido para ti o un {allyCooldownRecovery}% más rápido para un aliado. Si la ubicación está vacía, espera {groundDuration} s y afecta a la primera unidad válida que lo pise. El aura beneficiosa puede eliminarse manualmente.',
@@ -13849,7 +13849,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.radiant_devotion.description':
     'Aumenta el poder con hechizos tuyo y de los miembros del grupo en 20 durante 30 min. Reemplaza tu propia Devoción del Alba o de Gracia, pero coexiste con las Devociones de otros paladines.',
   'entities.abilities.recall_the_fallen.description':
-    'Devuelve a la vida a un miembro muerto del grupo con un 35% de salud y maná. Un Sanador del Sol de nivel 16 o superior llama de vuelta a todos los miembros caídos del grupo.',
+    'Devuelve a la vida a un miembro muerto del grupo a tu lado con un 35% de salud y maná. Un Sanador del Sol de nivel 16 o superior llama de vuelta a todos los miembros caídos del grupo en un radio de 30 yardas y dentro de tu línea de visión.',
   'entities.abilities.sacred_challenge.description':
     'Obliga a un enemigo a atacarte. Durante la Ascensión también reduce un 15% todo el daño recibido durante 4 s sin consumir carga.',
   'entities.abilities.sacred_form.description':
@@ -13921,6 +13921,15 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Consume 3 de Ferocidad de Manada después de que tu mascota golpee por 83 a 105 de daño Físico y sacuda a todos los enemigos a menos de 6 metros por 26 a 34. El golpe y la sacudida usan la bonificación completa del 30% de daño de mascota de la Ferocidad de Manada y aumentan con el poder de ataque de la mascota. Durante los 8 s siguientes, la mascota inflige un 25% más de daño, ataca un 35% más rápido y hace que el Disparo Funesto alcance hasta a 2 enemigos cercanos.',
   'entities.abilities.wildheart.description': 'Restaura al instante el 30% de tu salud máxima.',
   'entities.abilities.ancestor_return.name': 'Retorno de los Ancestros',
+  'entities.abilities.grove_awakening.description':
+    'Devuelve a la vida a todos los miembros caídos de tu grupo o banda en un radio de 40 yardas y dentro de tu línea de visión, de vuelta a tu lado con un 30% de salud y maná. No puede lanzarse en combate. (Corazón del Bosque)',
+  'entities.abilities.grove_awakening.name': 'Despertar del Bosque',
+  'entities.abilities.prayer_of_returning.description':
+    'Devuelve a la vida a todos los miembros caídos de tu grupo o banda en un radio de 40 yardas y dentro de tu línea de visión, de vuelta a tu lado con un 30% de salud y maná. No puede lanzarse en combate. (Bendición y Doctrina)',
+  'entities.abilities.prayer_of_returning.name': 'Plegaria del Retorno',
+  'entities.abilities.wildwake.description':
+    'Incita a un aliado caído a florecer de pronto, devolviéndolo a la vida a tu lado con un 35% de su salud y maná, incluso en pleno combate. (Corazón del Bosque)',
+  'entities.abilities.wildwake.name': 'Despertar Silvestre',
   'entities.abilities.galeheart_weapon.name': 'Arma Corazón de Vendaval',
   'entities.abilities.lifespring_weapon.name': 'Arma Manantial de Vida',
   'entities.abilities.primal_exaltation.name': 'Exaltación Primigenia',
@@ -13931,7 +13940,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.unleash_weapon.name': 'Desatar Arma',
   'entities.abilities.warspirit_cadence.name': 'Cadencia del Espíritu Guerrero',
   'entities.abilities.ancestor_return.description':
-    'Devuelve a la vida junto a su cuerpo a todos los miembros caídos de tu grupo o banda con un 30% de salud y maná. No puede lanzarse en combate. (Remiendo Espiritual)',
+    'Devuelve a la vida a todos los miembros caídos de tu grupo o banda en un radio de 40 yardas y dentro de tu línea de visión, de vuelta a tu lado con un 30% de salud y maná. No puede lanzarse en combate. (Remiendo Espiritual)',
   'entities.abilities.galeheart_weapon.description':
     'Encanta ambas armas durante 30 min y habilita la Cadencia del Espíritu Guerrero.',
   'entities.abilities.lifespring_weapon.description':

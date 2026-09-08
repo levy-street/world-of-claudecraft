@@ -27,8 +27,9 @@ export interface LinkdeadSessionView {
   // re-acquires).
   left: boolean;
   // True once this session's guild bank escrow was ROLLED BACK: its live state
-  // was abandoned and it can never persist again (server/game.ts
-  // handleGuildBankEscrowRefusal). RESUMING it would hand the player a session
+  // was abandoned and it can never persist again
+  // (server/guild_bank_escrow_refusal.ts handleGuildBankEscrowRefusal).
+  // RESUMING it would hand the player a session
   // that plays normally and saves NOTHING, forever, with no error and no
   // signal: silent unbounded data loss, which is far worse than the reconnect
   // refusal below. The refused client retries into the fresh-join arm and

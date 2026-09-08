@@ -76,7 +76,7 @@ const SECOND_PASS_RECORD_SHA256 =
   // candidate's arm (78, its two disjoint reins items on the shared 76 base)
   // are additive, so 76 + 3 + 2 = 81. Substituted the two hotbarItems lines
   // by hand again, never a JSON round trip. No capture or asset was retaken.
-  '59aa41bd783c6a79d16178f3bd3f782b63a3b95e39f0803e7bd94e5343237b40';
+  '08348fb39f90a7074a3c9201811cb4bfd0905ec8b4bc534a3302e3e0e0a6a93e';
 const EVIDENCE = {
   'icon-art-before-after-desktop.png': {
     sha256: '61d19fb321f2b30eb3749e0966f26efea0fa4df53edae4b253cfd70edb82cd7a',
@@ -374,7 +374,7 @@ describe('release v0.39 icon-art second-pass lineage', () => {
         // the release arm's two new abilities riding the v0.40.0 sync merge.
         // The hotbar census stays at this branch's 75 (the release's own arm
         // read 72 without the three role foods).
-        abilities: { live: 402, painted: 402 },
+        abilities: { live: 405, painted: 405 },
         // 76 at the first v0.42.0 sync: the release's one new hotbar item, the
         // Bonebound Rickshaw reins (reins_rickshaw_mount, kind 'mount'), joins
         // the census and ships committed painted art, so painted moves with
@@ -468,7 +468,7 @@ describe('release v0.39 icon-art second-pass lineage', () => {
     expect(new Set(liveAbilityIds).size, 'live ability ids remain unique').toBe(
       liveAbilityIds.length,
     );
-    expect(liveAbilityIds, 'live production ability inventory').toHaveLength(402);
+    expect(liveAbilityIds, 'live production ability inventory').toHaveLength(405);
     expect(
       liveAbilityIds.filter((id) => !paintedAbilityIds.has(id)),
       'every live ability resolves through production to committed painted art',

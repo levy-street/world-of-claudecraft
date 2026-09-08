@@ -633,7 +633,7 @@ export function applyGuildBankDeltasTo(
       // later rung cannot commit before the rung under it) and would charge
       // the treasury for a grant the inverse then declines to undo, so it is
       // refused too. The save retries once the other officer commits, and is
-      // rolled back if they never can (server/game.ts
+      // rolled back if they never can (server/guild_bank_escrow_refusal.ts
       // handleGuildBankEscrowRefusal).
       if (book.purchasedSlots !== d.purchasedSlotsBefore) {
         return {
@@ -788,7 +788,9 @@ export function revertGuildBankDeltasTo(
  *  the inverse match on. EXPORTED so the server's log compactor
  *  (server/guild_bank_op_log.ts) nets on exactly this key rather than a second
  *  copy that could disagree about a payload's canonical form. */
-export function guildBankDeltaIdentityKey(d: GuildBankOpDelta): string {
+export function guildBankDeltaIdentityKey(
+  d: Pick<GuildBankOpDelta, 'itemId' | 'instance' | 'craftedRecipeId'>,
+): string {
   return `${d.itemId ?? ''}|${canonicalJson(d.instance ?? null)}|${d.craftedRecipeId ?? ''}`;
 }
 

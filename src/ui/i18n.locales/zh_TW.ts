@@ -739,7 +739,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.inProgressError': '就緒確認已在進行中。',
   'entities.abilities.collective_reversal.name': '集體逆轉',
   'entities.abilities.collective_reversal.description':
-    '倒轉隊伍或團隊中每位陣亡成員的時間線，使其在遺體旁以30%生命值和法力值復活。無法在戰鬥中施放。（時空魔法）',
+    '倒轉隊伍或團隊中 40 碼內且在你視線內的每位陣亡成員的時間線，使其在你身邊以30%生命值和法力值復活。無法在戰鬥中施放。（時空魔法）',
   'entities.abilities.temporal_hourglass.name': '懸停沙漏',
   'entities.abilities.temporal_hourglass.description':
     '在選定位置放置一個時間沙漏。置於敵人腳下時，在 PvE 中使其懸停 {hostilePveDuration} 秒，在 PvP 中懸停 {hostilePvpDuration} 秒；受到任何傷害都會解除效果。置於自己或隊伍盟友腳下時，進入 {duration} 秒的停滯，免疫傷害且無法行動，恢復 {healing}% 最大生命值，並使自己的冷卻恢復速度提高 {selfCooldownRecovery}%，盟友提高 {allyCooldownRecovery}%。若位置為空，沙漏會等待 {groundDuration} 秒並影響第一個踩上去的有效單位。增益光環可手動移除。',
@@ -11244,7 +11244,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '讓一道回音在隊伍中奔流：立即治療目標及其至多四名最近的盟友，並為每人施加持續 {duration} 秒的印記；你造成的部分秘法傷害會透過回音轉化為對他們的治療。（時光術）',
   'entities.abilities.temporal_reversal.name': '時光逆轉',
   'entities.abilities.temporal_reversal.description':
-    '倒轉一名陣亡盟友的時間線，使其在遺體處以部分生命值與法力值復活，即使正在激烈戰鬥中也能使用。（時光術）',
+    '倒轉一名陣亡盟友的時間線，使其在你身邊以35%生命值與法力值復活，即使正在激烈戰鬥中也能使用。（時光術）',
   'entities.abilities.temporal_rewind.name': '回溯',
   'entities.abilities.temporal_rewind.description':
     '向隊伍或團隊發出一道秘法波，回溯時間，為 40 碼內每名盟友恢復其過去 5 秒所受傷害的 30%（最多為其最大生命值的 35%）。此效果無法造成致命一擊。（時光術）',
@@ -13358,7 +13358,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ambush.specNote_subtlety':
     '自暮紗中使用時累積 1 層幽暝（最多 3 層）。幽暝達 3 層時，可在明處以任意角度使用：那一次施展不消耗資源，耗盡全部 3 層幽暝，開啟 6 秒的暗影纏身，並造成雙倍傷害。',
   'entities.abilities.ancestor_return.description':
-    '呼喚隊伍或團隊中所有陣亡成員，使其在屍體處復活並恢復30%生命值和法力值。戰鬥中無法施放。（靈癒）',
+    '呼喚隊伍或團隊中 40 碼內且在你視線內的所有陣亡成員回到你身邊復活，並恢復30%生命值和法力值。戰鬥中無法施放。（靈癒）',
   'entities.abilities.ancestor_return.name': '先祖歸來',
   'entities.abilities.army_of_the_dead.description':
     '開啟墓穴傳送門，在你選擇的統御僕從之外額外召喚一名骷髏戰士、骸骨法師和墓翼，持續 20 秒。',
@@ -13567,7 +13567,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '消耗2枚靈魂碎片，命令所有亡靈僕從同時攻擊。墓衛嘲諷並防禦，骷髏戰士牽制目標，骸骨法師暴露魔法防禦，墓翼撕裂所有被擊中的敵人。',
   'entities.abilities.reaping_command.name': '收割號令',
   'entities.abilities.recall_the_fallen.description':
-    '使一名死亡的隊伍成員復活，並恢復 35% 的生命值和法力值。',
+    '使一名死亡的隊伍成員回到你身邊復活，並恢復 35% 的生命值和法力值。16 級或以上的黎明癒者則會改為呼喚隊伍中 30 碼內且在你視線內的所有陣亡成員回到你身邊復活。',
   'entities.abilities.recall_the_fallen.name': '喚回逝者',
   'entities.abilities.redharvest.description':
     '消耗3層古血：造成{damage}點傷害，立即引爆你的剮擊與血裂的剩餘傷害，移除這兩個流血效果，並恢復{rage}點能量。沒有連擊點也能使用。',
@@ -15930,4 +15930,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cosmetics.mechEmpty': '尚未擁有戰鬥機甲配色。',
   'hudChrome.cosmetics.mountsIntro': '坐騎造型會覆蓋在此角色騎乘的任何坐騎上，絕不改變速度。',
   'hudChrome.cosmetics.mechIntro': '戰鬥機甲會取代此角色的身體。一次只能穿戴一種配色。',
+  'entities.abilities.grove_awakening.description':
+    '呼喚隊伍或團隊中 40 碼內且在你視線內的所有陣亡成員回到你身邊復活，並恢復30%生命值和法力值。戰鬥中無法施放。（恢復）',
+  'entities.abilities.grove_awakening.name': '林地覺醒',
+  'entities.abilities.prayer_of_returning.description':
+    '呼喚隊伍或團隊中 40 碼內且在你視線內的所有陣亡成員回到你身邊復活，並恢復30%生命值和法力值。戰鬥中無法施放。（聖光與戒律）',
+  'entities.abilities.prayer_of_returning.name': '歸返祈禱',
+  'entities.abilities.wildwake.description':
+    '催發倒下的盟友驟然綻放，使其回到你身邊復活，恢復35%生命值和法力值，即使激戰正酣也能施放。（恢復）',
+  'entities.abilities.wildwake.name': '野性復甦',
 };

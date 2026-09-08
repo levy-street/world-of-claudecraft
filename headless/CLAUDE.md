@@ -52,6 +52,12 @@ header comment of `env_server.ts`; that header is the reference, don't restate i
   an unknown class is rejected with `{error: ...}`. The obs/action space is
   identical for every class (ability slots pad to the largest kit), so switching
   `player_class` never changes a trained config's vector shape.
+- The sim's GCD-tail spell queue applies to env actions: an `ability_N` action
+  taken inside the final 0.4s of the GCD queues and fires a step or two later
+  instead of no-oping. The queued slot is deliberately NOT observed (the
+  per-ability ready flag ignores it), so it is hidden state that affects the
+  next transition; policies and benchmark baselines trained before the queue
+  landed see changed dynamics with an unchanged obs shape.
 
 ## Episode framing (this file's job)
 - **`step`**: `applyAction` once, then `sim.tick()` runs `frameSkip` times (default

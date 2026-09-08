@@ -11420,7 +11420,7 @@ export const it_IT: EnTranslations = {
       },
       "recall_the_fallen": {
         "name": "Richiamo dei Caduti",
-        "description": "Riporta in vita un membro morto del gruppo con il 35% di salute e mana. Un Sanasole di livello 16 o superiore richiama invece tutti i membri caduti del gruppo."
+        "description": "Riporta in vita al tuo fianco un membro morto del gruppo con il 35% di salute e mana. Un Sanasole di livello 16 o superiore richiama invece tutti i membri caduti del gruppo entro 30 metri e nella tua linea di vista."
       },
       "beacon_of_light": {
         "name": "Faro di Luce",
@@ -12153,6 +12153,14 @@ export const it_IT: EnTranslations = {
         "name": "Spezzamidollo",
         "description": "Consuma 3 Sangue Antico per un colpo pesante ad alta minaccia da {damage} danni. Sotto metà salute, ti protegge invece con uno scudo pari al 18% della tua salute massima per 8 sec e rimborsa 15 rabbia."
       },
+      "wildwake": {
+        "name": "Risveglio Selvaggio",
+        "description": "Induce un alleato caduto a sbocciare improvvisamente, riportandolo in vita al tuo fianco con il 35% della sua salute e mana, anche nel pieno del combattimento. (Groveheart)"
+      },
+      "grove_awakening": {
+        "name": "Risveglio del Bosco",
+        "description": "Richiama in vita al tuo fianco tutti i membri caduti del tuo gruppo o incursione entro 40 metri e nella tua linea di vista, con il 30% di salute e mana. Non può essere lanciata in combattimento. (Groveheart)"
+      },
       "overbloom": {
         "name": "Sovrafioritura",
         "description": "Consuma 5 Verzura. Raccoglie ogni tua cura nel tempo su tutti gli alleati per il {buff}% della cura restante, rimuove quegli effetti e pianta una Fioritura Selvaggia fresca sul bersaglio."
@@ -12463,15 +12471,15 @@ export const it_IT: EnTranslations = {
       },
       "temporal_reversal": {
         "name": "Inversione Temporale",
-        "description": "Riavvolge la linea temporale di un alleato caduto, riportandolo in vita accanto al suo corpo con una parte della sua salute e mana, anche nel pieno del combattimento. (Cronomanzia)"
+        "description": "Riavvolge la linea temporale di un alleato caduto, riportandolo in vita al tuo fianco con il 35% della sua salute e mana, anche nel pieno del combattimento. (Cronomanzia)"
       },
       "collective_reversal": {
         "name": "Inversione collettiva",
-        "description": "Riavvolge la linea temporale di ogni membro morto del gruppo o dell'incursione, riportandolo in vita accanto al corpo con il 30% di salute e mana. Non può essere lanciata in combattimento. (Cronomanzia)"
+        "description": "Riavvolge la linea temporale di ogni membro morto del gruppo o dell'incursione entro 40 metri e nella tua linea di vista, riportandolo in vita al tuo fianco con il 30% di salute e mana. Non può essere lanciata in combattimento. (Cronomanzia)"
       },
       "ancestor_return": {
         "name": "Ritorno degli Antenati",
-        "description": "Richiama in vita presso il loro corpo tutti i membri caduti del tuo gruppo o incursione con il 30% di salute e mana. Non può essere lanciata in combattimento. (Rammendo Spirituale)"
+        "description": "Richiama in vita al tuo fianco tutti i membri caduti del tuo gruppo o incursione entro 40 metri e nella tua linea di vista, con il 30% di salute e mana. Non può essere lanciata in combattimento. (Rammendo Spirituale)"
       },
       "temporal_rewind": {
         "name": "Riavvolgimento",
@@ -12613,6 +12621,10 @@ export const it_IT: EnTranslations = {
       "martyrs_aegis": {
         "name": "Egida del Martire",
         "description": "Riduce del 40% i danni subiti da un alleato per 8 s."
+      },
+      "prayer_of_returning": {
+        "name": "Preghiera del Ritorno",
+        "description": "Richiama in vita al tuo fianco tutti i membri caduti del tuo gruppo o incursione entro 40 metri e nella tua linea di vista, con il 30% di salute e mana. Non può essere lanciata in combattimento. (Sacro e Dottrina)"
       },
       "choir_of_deliverance": {
         "name": "Coro della Liberazione",

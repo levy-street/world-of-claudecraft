@@ -2894,7 +2894,7 @@ describe('Ignivar encounter', () => {
     expect(ally.hp).toBe(separatedAllyHp);
   });
 
-  it('preserves the exact pull during combat-exit memory but cleans brands outside on reset', () => {
+  it('cleans brands, conduits, and the encounter state the moment the room empties', () => {
     const { sim, boss, conduit } = claimedEncounter();
     updateIgnivarEncounter(sim.ctx, boss);
     if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
@@ -2911,17 +2911,13 @@ describe('Ignivar encounter', () => {
     });
     conduit.templateId = IGNIVAR_WATER_CONDUIT_TEMPLATES.active;
     boss.ignivar.conduitTimers.north_west = 7;
-    boss.combatExitHoldUntil = sim.ctx.time + 5;
     sim.player.pos = { x: 0, y: 0, z: 0 };
 
+    // Nothing defers the reset any more: the empty room resets the boss in the
+    // same call (home, idle, full health) and scrubs its encounter state.
     updateIgnivarEncounter(sim.ctx, boss);
-    expect(boss.aiState).toBe('evade');
-    expect(boss.ignivar).toBeDefined();
-    expect(conduit.templateId).toBe(IGNIVAR_WATER_CONDUIT_TEMPLATES.active);
-    expect(sim.player.auras.some((aura) => aura.id === IGNIVAR_BRAND_AURA_ID)).toBe(true);
-
-    boss.combatExitHoldUntil = sim.ctx.time;
-    updateIgnivarEncounter(sim.ctx, boss);
+    expect(boss.aiState).toBe('idle');
+    expect(boss.hp).toBe(boss.maxHp);
     expect(boss.ignivar).toBeUndefined();
     expect(conduit.templateId).toBe(IGNIVAR_WATER_CONDUIT_TEMPLATES.ready);
     expect(sim.player.auras.some((aura) => aura.id === IGNIVAR_BRAND_AURA_ID)).toBe(false);
@@ -3125,7 +3121,6 @@ describe('Ignivar encounter', () => {
 
     sim.ctx.handleDeath(sim.player, boss);
     sim.ctx.handleDeath(ally, boss);
-    boss.combatExitHoldUntil = sim.ctx.time;
     updateIgnivarEncounter(sim.ctx, boss);
 
     expect(boss.ignivar).toBeUndefined();

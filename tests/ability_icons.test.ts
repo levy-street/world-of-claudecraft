@@ -126,11 +126,11 @@ describe('ability icons', () => {
     const ids = abilityRecipeIds();
     expect(ids).toEqual([...new Set(ids)].sort((left, right) => left.localeCompare(right)));
     // 464: 450 plus the fourteen Nythraxis Raid Boss Guide mechanic recipes.
-    expect(ids).toHaveLength(464);
+    expect(ids).toHaveLength(467);
     for (const id of ids) expect(hasExplicitAbilityIcon(id), id).toBe(true);
 
     const identity = ids.map((id) => ({ id, recipe: abilityIconRecipe(id) }));
     const hash = createHash('sha256').update(stableSerialize(identity)).digest('hex');
-    expect(hash).toBe('b990e0cce35fe3732d8409ca735692c8760a092298ece5e239202b9832c95a22');
+    expect(hash).toBe('122a3893973e2252e41e7e25246cbd0553c354cc2696f287dc4007cff89d11d3');
   });
 });

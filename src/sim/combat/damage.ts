@@ -34,6 +34,7 @@ import {
   lockNormalDungeonResetOnBossKill,
   spawnBossExitPortal,
 } from '../instances/dungeons';
+import { isImmuneInPlace } from '../instances/instance_combat_hold';
 import { applyBossCorpseHold } from '../mob/boss_corpse_hold';
 import { spawnWidowHatchlingOnEggDeath } from '../mob/egg_hatchling';
 import { isEvadingWildMob } from '../mob/evade_immunity';
@@ -256,8 +257,12 @@ export function dealDamage(
   // Direct attacks report an Evade result (FCT word + combat log line); DoT and
   // reflect ticks stay silent so a dotted evader does not spam a word per tick.
   // The early return keeps every downstream effect off: no threat, no combat
-  // entry, no stealth break, no tap.
-  if (isEvadingWildMob(target)) {
+  // entry, no stealth break, no tap. A mob holding in place inside an instance
+  // is immune while stuck, then becomes attackable once it phases to its target.
+  if (
+    isEvadingWildMob(target) ||
+    (target.kind === 'mob' && target.ownerId === null && isImmuneInPlace(target))
+  ) {
     if (direct && source) {
       ctx.emit({
         type: 'damage',
@@ -1392,6 +1397,7 @@ export function handleDeath(
   e.castAim = null;
   e.queuedCastAbility = null;
   e.queuedCastAim = null;
+  e.queuedCastTargetId = null;
   clearRadiantResonanceReservation(e);
   // Hidden per-cast state: death ends any gather/fishing session, so
   // the fields must return to inert here too (the parity samplers rely on them
@@ -1492,6 +1498,7 @@ export function handleDeath(
     delete e.queuedOnSwingCostMultiplier;
     e.queuedCastAbility = null;
     e.queuedCastAim = null;
+    e.queuedCastTargetId = null;
     e.comboPoints = 0;
     e.eating = null;
     e.drinking = null;

@@ -11420,7 +11420,7 @@ export const zh_TW: EnTranslations = {
       },
       "recall_the_fallen": {
         "name": "喚回逝者",
-        "description": "使一名死亡的隊伍成員復活，並恢復 35% 的生命值和法力值。"
+        "description": "使一名死亡的隊伍成員回到你身邊復活，並恢復 35% 的生命值和法力值。16 級或以上的黎明癒者則會改為呼喚隊伍中 30 碼內且在你視線內的所有陣亡成員回到你身邊復活。"
       },
       "beacon_of_light": {
         "name": "聖光信標",
@@ -12153,6 +12153,14 @@ export const zh_TW: EnTranslations = {
         "name": "碎髓",
         "description": "消耗3層古血，造成{damage}點高威脅的重擊。生命值低於一半時，改為吸收相當於最大生命值18%的傷害，持續8秒，並恢復15點怒氣。"
       },
+      "wildwake": {
+        "name": "野性復甦",
+        "description": "催發倒下的盟友驟然綻放，使其回到你身邊復活，恢復35%生命值和法力值，即使激戰正酣也能施放。（恢復）"
+      },
+      "grove_awakening": {
+        "name": "林地覺醒",
+        "description": "呼喚隊伍或團隊中 40 碼內且在你視線內的所有陣亡成員回到你身邊復活，並恢復30%生命值和法力值。戰鬥中無法施放。（恢復）"
+      },
       "overbloom": {
         "name": "盛放",
         "description": "消耗5層繁茂。收割你在所有盟友身上的持續治療，以其剩餘治療量的{buff}%立即治療，移除這些效果，並在目標身上種下一次新的野性綻放。"
@@ -12463,15 +12471,15 @@ export const zh_TW: EnTranslations = {
       },
       "temporal_reversal": {
         "name": "時光逆轉",
-        "description": "倒轉一名陣亡盟友的時間線，使其在遺體處以部分生命值與法力值復活，即使正在激烈戰鬥中也能使用。（時光術）"
+        "description": "倒轉一名陣亡盟友的時間線，使其在你身邊以35%生命值與法力值復活，即使正在激烈戰鬥中也能使用。（時光術）"
       },
       "collective_reversal": {
         "name": "集體逆轉",
-        "description": "倒轉隊伍或團隊中每位陣亡成員的時間線，使其在遺體旁以30%生命值和法力值復活。無法在戰鬥中施放。（時空魔法）"
+        "description": "倒轉隊伍或團隊中 40 碼內且在你視線內的每位陣亡成員的時間線，使其在你身邊以30%生命值和法力值復活。無法在戰鬥中施放。（時空魔法）"
       },
       "ancestor_return": {
         "name": "先祖歸來",
-        "description": "呼喚隊伍或團隊中所有陣亡成員，使其在屍體處復活並恢復30%生命值和法力值。戰鬥中無法施放。（靈癒）"
+        "description": "呼喚隊伍或團隊中 40 碼內且在你視線內的所有陣亡成員回到你身邊復活，並恢復30%生命值和法力值。戰鬥中無法施放。（靈癒）"
       },
       "temporal_rewind": {
         "name": "回溯",
@@ -12613,6 +12621,10 @@ export const zh_TW: EnTranslations = {
       "martyrs_aegis": {
         "name": "殉道者聖盾",
         "description": "使一名盟友受到的傷害降低 40%，持續 8 秒。"
+      },
+      "prayer_of_returning": {
+        "name": "歸返祈禱",
+        "description": "呼喚隊伍或團隊中 40 碼內且在你視線內的所有陣亡成員回到你身邊復活，並恢復30%生命值和法力值。戰鬥中無法施放。（聖光與戒律）"
       },
       "choir_of_deliverance": {
         "name": "救贖聖詠團",

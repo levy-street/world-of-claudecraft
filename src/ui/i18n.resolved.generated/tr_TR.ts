@@ -11420,7 +11420,7 @@ export const tr_TR: EnTranslations = {
       },
       "recall_the_fallen": {
         "name": "Düşenleri Çağır",
-        "description": "Ölü bir grup üyesini 35% can ve manayla yaşama döndürür. 16. seviye ya da üzeri bir Güneş Şifacısı bunun yerine grubun düşmüş tüm üyelerini geri çağırır."
+        "description": "Ölü bir grup üyesini yanına, 35% can ve manayla yaşama döndürür. 16. seviye ya da üzeri bir Güneş Şifacısı bunun yerine grubun 30 yarda yakınındaki ve görüş hattındaki düşmüş tüm üyelerini geri çağırır."
       },
       "beacon_of_light": {
         "name": "Işık Feneri",
@@ -12153,6 +12153,14 @@ export const tr_TR: EnTranslations = {
         "name": "İlik Kıran",
         "description": "3 Kadim Kanı yüksek tehditli, {damage} hasar veren ağır bir vuruş için tüketir. Canın yarısının altındayken bunun yerine 8 sn boyunca azami canının %18 kadarı değerinde bir kalkanla seni korur ve 15 öfke iade eder."
       },
+      "wildwake": {
+        "name": "Yaban Uyanışı",
+        "description": "Düşmüş bir müttefiği ansızın çiçeğe durmaya çağırır ve savaşın tam ortasında bile yanına, canının ve manasının 35% kadarıyla hayata döndürür. (Koru Yüreği)"
+      },
+      "grove_awakening": {
+        "name": "Koru Uyanışı",
+        "description": "Grubunun ya da akınının, 40 yarda yakınındaki ve görüş hattındaki düşmüş her üyesini 30% can ve manayla yanına çağırır. Savaşta okunamaz. (Koru Yüreği)"
+      },
       "overbloom": {
         "name": "Taşkın Çiçeklenme",
         "description": "5 Yeşillik tüketir. Tüm müttefiklerdeki her süreli iyileştirmeni kalan iyileştirmesinin {buff}% kadarıyla hasat eder, o etkileri kaldırır ve hedefe taze bir Yaban Çiçeği eker."
@@ -12463,15 +12471,15 @@ export const tr_TR: EnTranslations = {
       },
       "temporal_reversal": {
         "name": "Zamansal Tersine Çevirme",
-        "description": "Düşmüş bir müttefikin zaman çizelgesini geri sararak onları savaşın tam ortasında bile bedeninin yanında, canının ve manasının bir kısmıyla hayata döndürür. (Kronomansi)"
+        "description": "Düşmüş bir müttefikin zaman çizelgesini geri sararak onları savaşın tam ortasında bile yanına, canının ve manasının 35% kadarıyla hayata döndürür. (Kronomansi)"
       },
       "collective_reversal": {
         "name": "Toplu Geri Sarım",
-        "description": "Grubunuzdaki veya baskınınızdaki her ölü üyenin zaman çizgisini geri sarar ve onları bedenlerinin yanında %30 sağlık ve mana ile hayata döndürür. Savaş sırasında kullanılamaz. (Kronomansi)"
+        "description": "Grubunuzdaki veya baskınınızdaki, 40 yarda yakınındaki ve görüş hattınızdaki her ölü üyenin zaman çizgisini geri sarar ve onları yanınıza %30 sağlık ve mana ile hayata döndürür. Savaş sırasında kullanılamaz. (Kronomansi)"
       },
       "ancestor_return": {
         "name": "Ataların Dönüşü",
-        "description": "Grubunun ya da akınının düşmüş her üyesini bedeninin başında 30% can ve manayla yaşama döndürür. Savaşta okunamaz. (Ruh Onarımı)"
+        "description": "Grubunun ya da akınının, 40 yarda yakınındaki ve görüş hattındaki düşmüş her üyesini 30% can ve manayla yanına çağırır. Savaşta okunamaz. (Ruh Onarımı)"
       },
       "temporal_rewind": {
         "name": "Geri Sar",
@@ -12613,6 +12621,10 @@ export const tr_TR: EnTranslations = {
       "martyrs_aegis": {
         "name": "Şehidin Kalkanı",
         "description": "Bir müttefikin aldığı hasarı 8 sn boyunca 40% azaltır."
+      },
+      "prayer_of_returning": {
+        "name": "Dönüş Duası",
+        "description": "Grubunun ya da akınının, 40 yarda yakınındaki ve görüş hattındaki düşmüş her üyesini 30% can ve manayla yanına çağırır. Savaşta okunamaz. (Kutsal ve Disiplin)"
       },
       "choir_of_deliverance": {
         "name": "Kurtuluş Korosu",

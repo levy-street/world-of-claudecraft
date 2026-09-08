@@ -3263,7 +3263,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Trekt een bondgenoot een moment vooruit in de tijd, waarbij {damage} gezondheid wordt hersteld terwijl het lichaam zijn gezondere toekomstige zelf vindt. (Chronomantie-handtekening)',
   'entities.abilities.temporal_mend.name': 'Temporele Heling',
   'entities.abilities.temporal_reversal.description':
-    'Spoelt de tijdlijn van een gevallen bondgenoot terug en brengt hem bij zijn lichaam tot leven met een deel van zijn gezondheid en mana, zelfs middenin een gevecht. (Chronomantie)',
+    'Spoelt de tijdlijn van een gevallen bondgenoot terug en brengt hem tot leven aan je zijde met 35% van zijn gezondheid en mana, zelfs middenin een gevecht. (Chronomantie)',
   'entities.abilities.temporal_reversal.name': 'Temporele Omkering',
   'entities.abilities.temporal_rewind.description':
     'Stuurt een arcanegolf door je groep of raid en spoelt de tijd terug om 30% van de schade te herstellen die elke bondgenoot binnen 40 meter de afgelopen 5 seconden heeft opgelopen (tot 35% van hun maximale gezondheid). Kan geen kritiek effect zijn. (Chronomantie)',
@@ -3939,7 +3939,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.abilityError.shieldRequired': 'Je moet een schild hebben uitgerust.',
   'entities.abilities.collective_reversal.name': 'Collectieve omkering',
   'entities.abilities.collective_reversal.description':
-    'Spoelt de tijdlijn van elk gesneuveld lid van je groep of raid terug en brengt hen bij hun lichaam tot leven met 30% gezondheid en mana. Kan niet tijdens een gevecht worden gebruikt. (Chronomantie)',
+    'Spoelt de tijdlijn van elk gesneuveld lid van je groep of raid binnen 40 meter en in je zichtlijn terug en brengt hen weer tot leven aan je zijde met 30% gezondheid en mana. Kan niet tijdens een gevecht worden gebruikt. (Chronomantie)',
   'entities.abilities.sport_boot.description':
     'Een lange, hoge uithaal richting het richtpunt. Het publiek smult ervan.',
   'entities.abilities.sport_boot.name': 'Grote Uithaal',
@@ -13297,7 +13297,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.radiant_devotion.description':
     'Verhoogt de spreukkracht van jou en je groepsleden 30 min. lang met 20. Vervangt je eigen Toewijding van de Dageraad of van Genade, maar bestaat naast de Toewijdingen van andere paladijnen.',
   'entities.abilities.recall_the_fallen.description':
-    'Brengt een dood groepslid terug tot leven met 35% gezondheid en mana. Een Zonneheler van niveau 16 of hoger roept in plaats daarvan elk gevallen groepslid terug.',
+    'Brengt een dood groepslid terug tot leven aan je zijde met 35% gezondheid en mana. Een Zonneheler van niveau 16 of hoger roept in plaats daarvan elk gevallen groepslid binnen 30 meter en in je zichtlijn terug.',
   'entities.abilities.sacred_challenge.description':
     'Dwingt een vijand jou aan te vallen. Tijdens Verheffing vermindert het ook 4 sec. lang alle ontvangen schade met 15% zonder een lading te verbruiken.',
   'entities.abilities.sacred_form.description':
@@ -13371,6 +13371,15 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Verbruikt 3 Roedelfelheid nadat je huisdier heeft toegeslagen voor 83 tot 105 fysieke schade en elke vijand binnen 6 meter heeft geschud voor 26 tot 34. De slag en de schok gebruiken de volledige huisdierschadebonus van 30% van Roedelfelheid en stijgen met de aanvalskracht van het huisdier. De volgende 8 sec. richt het huisdier 25% meer schade aan, valt 35% sneller aan en laat het Boosaardig Schot tot 2 nabije vijanden raken.',
   'entities.abilities.wildheart.description': 'Herstelt direct 30% van je maximale gezondheid.',
   'entities.abilities.ancestor_return.name': 'Terugkeer der Voorouders',
+  'entities.abilities.grove_awakening.description':
+    'Roept elk gevallen lid van je groep of raid binnen 40 meter en in je zichtlijn terug naar je zijde met 30% gezondheid en mana. Kan niet in gevecht worden gespreukt. (Herstel)',
+  'entities.abilities.grove_awakening.name': 'Woudontwaken',
+  'entities.abilities.prayer_of_returning.description':
+    'Roept elk gevallen lid van je groep of raid binnen 40 meter en in je zichtlijn terug naar je zijde met 30% gezondheid en mana. Kan niet in gevecht worden gespreukt. (Heilig en Discipline)',
+  'entities.abilities.prayer_of_returning.name': 'Terugkerend Gebed',
+  'entities.abilities.wildwake.description':
+    'Verleidt een gevallen bondgenoot tot plotselinge bloei en brengt die aan je zijde terug tot leven met 35% gezondheid en mana, zelfs in het heetst van de strijd. (Herstel)',
+  'entities.abilities.wildwake.name': 'Wildwaak',
   'entities.abilities.galeheart_weapon.name': 'Stormhartwapen',
   'entities.abilities.lifespring_weapon.name': 'Levensbronwapen',
   'entities.abilities.primal_exaltation.name': 'Oerverheffing',
@@ -13381,7 +13390,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.unleash_weapon.name': 'Ontketen Wapen',
   'entities.abilities.warspirit_cadence.name': 'Krijgsgeestcadans',
   'entities.abilities.ancestor_return.description':
-    'Roept elk gevallen lid van je groep of raid bij hun lichaam terug tot leven met 30% gezondheid en mana. Kan niet in gevecht worden gespreukt. (Geestherstel)',
+    'Roept elk gevallen lid van je groep of raid binnen 40 meter en in je zichtlijn terug naar je zijde met 30% gezondheid en mana. Kan niet in gevecht worden gespreukt. (Geestherstel)',
   'entities.abilities.galeheart_weapon.description':
     'Betovert beide wapens 30 min. lang en schakelt de Krijgsgeestcadans in.',
   'entities.abilities.lifespring_weapon.description':

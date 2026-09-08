@@ -3227,7 +3227,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Przyciąga sojusznika chwilę naprzód w czasie, lecząc {damage} punktów zdrowia, gdy ciało osiada w swym zdrowszym, przyszłym wcieleniu. (Sygnatura Chronomancji)',
   'entities.abilities.temporal_mend.name': 'Czasowe ukojenie',
   'entities.abilities.temporal_reversal.description':
-    'Przewija oś czasu poległego sojusznika, przywracając go do życia przy jego ciele z częścią zdrowia i many, nawet w środku walki. (Chronomancja)',
+    'Przewija oś czasu poległego sojusznika, przywracając go do życia u twojego boku z 35% zdrowia i many, nawet w środku walki. (Chronomancja)',
   'entities.abilities.temporal_reversal.name': 'Odwrócenie czasu',
   'entities.abilities.temporal_rewind.description':
     'Wysyła arkaniczną falę przez twoją grupę lub rajd, cofając czas, aby przywrócić 30% obrażeń zadanych każdemu sojusznikowi w zasięgu 40 jardów w ciągu ostatnich 5 sekund (maksymalnie 35% ich maksymalnego zdrowia). Nie może być trafieniem krytycznym. (Chronomancja)',
@@ -3913,7 +3913,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.abilityError.shieldRequired': 'Musisz mieć założoną tarczę.',
   'entities.abilities.collective_reversal.name': 'Zbiorowe odwrócenie',
   'entities.abilities.collective_reversal.description':
-    'Cofa linię czasu każdego poległego członka grupy lub rajdu i przywraca go do życia przy ciele z 30% zdrowia i many. Nie można użyć podczas walki. (Chronomancja)',
+    'Cofa linię czasu każdego poległego członka grupy lub rajdu w promieniu 40 jardów i w zasięgu wzroku, przywracając go do życia u twojego boku z 30% zdrowia i many. Nie można użyć podczas walki. (Chronomancja)',
   'entities.abilities.sport_boot.description':
     'Długie, wysokie wykopnięcie w stronę punktu celowania. Trybuny to uwielbiają.',
   'entities.abilities.sport_boot.name': 'Potężny Wykop',
@@ -13396,7 +13396,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.radiant_devotion.description':
     'Zwiększa moc zaklęć twoją i członków drużyny o 20 na 30 min. Zastępuje twoje własne Oddanie Świtu lub Łaski, ale współistnieje z Oddaniami innych paladynów.',
   'entities.abilities.recall_the_fallen.description':
-    'Przywraca do życia martwego członka drużyny z 35% zdrowia i many. Słoneczny Uzdrowiciel na poziomie 16 lub wyższym przywołuje zamiast tego każdego poległego członka drużyny.',
+    'Przywraca do życia u twojego boku martwego członka drużyny z 35% zdrowia i many. Słoneczny Uzdrowiciel na poziomie 16 lub wyższym przywołuje zamiast tego każdego poległego członka drużyny w promieniu 30 jardów i w zasięgu wzroku.',
   'entities.abilities.sacred_challenge.description':
     'Zmusza wroga do zaatakowania ciebie. Podczas Wzniesienia zmniejsza także wszystkie otrzymywane obrażenia o 15% przez 4 s bez zużywania ładunku.',
   'entities.abilities.sacred_form.description':
@@ -13471,6 +13471,15 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.wildheart.description':
     'Natychmiast odnawia 30% twojego maksymalnego zdrowia.',
   'entities.abilities.ancestor_return.name': 'Powrót Przodków',
+  'entities.abilities.grove_awakening.description':
+    'Przywraca do życia u twojego boku każdego poległego członka twojej drużyny lub rajdu w promieniu 40 jardów i w zasięgu wzroku, z 30% zdrowia i many. Nie można rzucić w walce. (Serce Gaju)',
+  'entities.abilities.grove_awakening.name': 'Przebudzenie Gaju',
+  'entities.abilities.prayer_of_returning.description':
+    'Przywraca do życia u twojego boku każdego poległego członka twojej drużyny lub rajdu w promieniu 40 jardów i w zasięgu wzroku, z 30% zdrowia i many. Nie można rzucić w walce. (Błogosławieństwo i Doktryna)',
+  'entities.abilities.prayer_of_returning.name': 'Modlitwa Powrotu',
+  'entities.abilities.wildwake.description':
+    'Skłania poległego sojusznika do nagłego rozkwitu, przywracając go do życia u twojego boku z 35% zdrowia i many, nawet w środku walki. (Serce Gaju)',
+  'entities.abilities.wildwake.name': 'Dzikie Przebudzenie',
   'entities.abilities.galeheart_weapon.name': 'Broń Serca Wichru',
   'entities.abilities.lifespring_weapon.name': 'Broń Źródła Życia',
   'entities.abilities.primal_exaltation.name': 'Pradawne Uniesienie',
@@ -13481,7 +13490,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.unleash_weapon.name': 'Spuść Broń',
   'entities.abilities.warspirit_cadence.name': 'Kadencja Ducha Wojny',
   'entities.abilities.ancestor_return.description':
-    'Przywraca do życia przy ciele każdego poległego członka twojej drużyny lub rajdu z 30% zdrowia i many. Nie można rzucić w walce. (Duchowe Cerowanie)',
+    'Przywraca do życia u twojego boku każdego poległego członka twojej drużyny lub rajdu w promieniu 40 jardów i w zasięgu wzroku, z 30% zdrowia i many. Nie można rzucić w walce. (Duchowe Cerowanie)',
   'entities.abilities.galeheart_weapon.description':
     'Zaklina obie bronie na 30 min, umożliwiając Kadencję Ducha Wojny.',
   'entities.abilities.lifespring_weapon.description':

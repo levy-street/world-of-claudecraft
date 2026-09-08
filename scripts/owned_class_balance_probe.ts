@@ -1304,7 +1304,14 @@ function incomingDamageForPosture(
     throw new Error('failed to apply enhancement');
   }
   equipExactLoadout(sim, WARSPIRIT_PBE_LOADOUT);
-  const attacker = createMob(sim.nextId++, MOBS.forest_wolf, 20, sim.groundPos(0, 3));
+  // Beside the anchored player (the druid probe's idiom): a mob spawned at the
+  // world origin sits beyond THREAT_DROP_RANGE and forgets the player at once.
+  const attacker = createMob(
+    sim.nextId++,
+    MOBS.forest_wolf,
+    20,
+    sim.groundPos(sim.player.pos.x, sim.player.pos.z + 3),
+  );
   attacker.hostile = true;
   attacker.hp = attacker.maxHp = 1_000_000;
   sim.addEntity(attacker);
@@ -1350,7 +1357,12 @@ export function runWarspiritOfftankProbe(
   sim.setPlayerLevel(20, rivalId);
   const rival = sim.entities.get(rivalId);
   if (!rival) throw new Error('missing threat rival');
-  const target = createMob(sim.nextId++, MOBS.forest_wolf, 20, sim.groundPos(0, 3));
+  const target = createMob(
+    sim.nextId++,
+    MOBS.forest_wolf,
+    20,
+    sim.groundPos(sim.player.pos.x, sim.player.pos.z + 3),
+  );
   target.hostile = true;
   target.hp = target.maxHp = 1_000_000;
   target.inCombat = true;

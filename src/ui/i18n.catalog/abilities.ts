@@ -1567,6 +1567,16 @@ const classAbilityNamesEn = {
         'Spends your 3 Old Blood for a heavy, high-threat strike of {damage} damage. Below half health it instead shields you for 18% of your maximum health for 8 sec and refunds 15 rage.',
       ],
       [
+        'wildwake',
+        'Wildwake',
+        'Coax a fallen ally into sudden bloom, returning them to life at your side with 35% of their health and mana, even in the thick of combat. (Groveheart)',
+      ],
+      [
+        'grove_awakening',
+        'Grove Awakening',
+        'Call every fallen member of your group or raid within 40 yards and in your line of sight back to your side with 30% health and mana. Cannot be cast in combat. (Groveheart)',
+      ],
+      [
         'overbloom',
         'Overbloom',
         'Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom.',
@@ -2118,6 +2128,11 @@ const classAbilityNamesEn = {
         'Consume all Gloomtithe to summon a Tithefiend. It lasts 6, 8, 10, 12, or 15 sec at 1 to 5 stacks and attacks every 2 sec. Each attack deals 20 to 24 Shadow damage plus 8 per extra stack and increases with your Spell Power. At 5 stacks, the fiend grows larger and deals 25% more damage. It prefers your Effigy. Each hit restores 1% maximum Mana and echoes 15% of its damage to up to 3 other enemies with your Dirge of Decay. (Vespers signature)',
       ],
       ['martyrs_aegis', "Martyr's Aegis", "Reduce one ally's incoming damage by 40% for 8 sec."],
+      [
+        'prayer_of_returning',
+        'Prayer of Returning',
+        'Call every fallen member of your group or raid within 40 yards and in your line of sight back to your side with 30% health and mana. Cannot be cast in combat. (Benison and Doctrine)',
+      ],
       [
         'choir_of_deliverance',
         'Choir of Deliverance',

@@ -317,6 +317,31 @@
         }
       ],
       "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for priest\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Hushword (silence)\nCanonical mechanic: Hushword silences a target at 30 yd for 4 sec; 30 sec cooldown.\nSubject: Sealed lips over a violet spell rune whose sound waves terminate abruptly.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "prayer_of_returning",
+      "sourcePack": "woc_openai_healer_rez_icons_2026_09_01",
+      "sourceFile": "public/ui/skills/priest/prayer_of_returning.png (converted in place by assets:skills, original deleted)",
+      "output": "prayer_of_returning.webp",
+      "source": "OpenAI gpt-image-2 (images/edits, style-referenced)",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A great downturned hand of golden light drawing three faint rising spirits upward from their fallen bodies.",
+      "references": [
+        {
+          "path": "public/ui/skills/priest/renew.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/priest/power_word_shield.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for priest\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Prayer of Returning (prayer_of_returning)\nCanonical mechanic: Prayer of Returning is a 7 sec out-of-combat prayer that calls every fallen group or raid member within 40 yd back to life at the caster with 30% health and mana; 5 min cooldown.\nSubject: A great downturned hand of golden light drawing three faint rising spirits upward from their fallen bodies.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
     }
   ],
   "deferredStayProcedural": {},

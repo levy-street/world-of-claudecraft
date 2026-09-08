@@ -1282,7 +1282,7 @@ export function runEffects(
           type: 'spellfx',
           sourceId: p.id,
           targetId: ally.id,
-          school: 'arcane',
+          school: ability.school,
           fx: 'temporalGlyph',
           ability: ability.id,
         });

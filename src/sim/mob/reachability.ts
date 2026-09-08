@@ -5,14 +5,19 @@
 // ledge exploit). This module watches for that shape: engaged, out of reach,
 // committing zero movement, with the straight step toward the target refused
 // by the same block modes moveToward enforces. After CHASE_STALL_TIMEOUT
-// seconds of that, the caller (combat_profile.ts) sends the mob home through
-// the existing evade state (immune, heals to full on arrival).
+// seconds of that, the caller (combat_profile.ts) sends an open-world mob home
+// through the existing evade state (immune, heals to full on arrival), while an
+// instance mob holds in place in the same immune stance with its aggro intact
+// and, after a grace, phases through the geometry to its target (the pinned
+// arm in combat_profile.ts holdPinnedMob, instances/instance_combat_hold.ts);
+// that arm re-checks reach and the same blocked probe every tick, so the hold
+// ends the moment reach or an open step is real.
 //
-// This applies to EVERY canLeash mob, bosses included: pinning a boss out of
-// reach force-resets the pull (full heal, loot rights dropped). That is the
-// intended classic behavior, the whole point being that an unreachable
-// attacker gets nothing; only canLeash false encounter scripts (Nythraxis)
-// opt out.
+// This applies to EVERY canLeash mob, bosses included: in the open world,
+// pinning a boss out of reach force-resets the pull (full heal, loot rights
+// dropped), the classic behavior, the whole point being that an unreachable
+// attacker gets nothing; inside an instance the boss comes for the perch
+// instead. Only canLeash false encounter scripts (Nythraxis) opt out.
 //
 // Draws NO rng and writes nothing but mob.chaseStall, so the parity goldens
 // are unaffected: the accumulator stays 0 in every scenario where mobs fight

@@ -3191,7 +3191,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Trækker en alliert et øjeblik fremad i tiden og gendanner {damage} helbred, mens kroppen falder til ro i sin sundere fremtidige form. (Kronomantik-signatur)',
   'entities.abilities.temporal_mend.name': 'Tidsheling',
   'entities.abilities.temporal_reversal.description':
-    'Tilbagespoler en falden allieredes tidslinje og bringer dem tilbage til livet ved deres krop med en del af deres helbred og mana, selv midt i kamp. (Kronomantik)',
+    'Tilbagespoler en falden allieredes tidslinje og bringer dem tilbage til livet ved din side med 35% af deres helbred og mana, selv midt i kamp. (Kronomantik)',
   'entities.abilities.temporal_reversal.name': 'Tidsvending',
   'entities.abilities.temporal_rewind.description':
     'Sender en arkan bølge gennem din gruppe eller raid og tilbagespoler tiden for at gendanne 30% af den skade, hver alliert inden for 40 yards tog de seneste 5 sekunder (op til 35% af deres maksimale helbred). Kan ikke være en kritisk effekt. (Kronomantik)',
@@ -3782,7 +3782,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.abilityError.shieldRequired': 'Du skal have et skjold udstyret.',
   'entities.abilities.collective_reversal.name': 'Kollektiv tilbagespoling',
   'entities.abilities.collective_reversal.description':
-    'Spoler tidslinjen tilbage for hvert faldet medlem af din gruppe eller dit raid og genopliver dem ved deres krop med 30% helbred og mana. Kan ikke kastes i kamp. (Kronomanti)',
+    'Spoler tidslinjen tilbage for hvert faldet medlem af din gruppe eller dit raid, som er inden for 40 meter og i din synsvidde, og genopliver dem ved din side med 30% helbred og mana. Kan ikke kastes i kamp. (Kronomanti)',
   'entities.abilities.sport_boot.description':
     'Et langt, højt spark mod sigtepunktet. Publikum elsker det.',
   'entities.abilities.sport_boot.name': 'Kæmpespark',
@@ -13116,7 +13116,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.radiant_devotion.description':
     'Øger besværgelseskraften hos dig og gruppemedlemmerne med 20 i 30 min. Erstatter din egen Daggryets eller Nådens Hengivenhed, men eksisterer side om side med Hengivenheder fra andre paladiner.',
   'entities.abilities.recall_the_fallen.description':
-    'Bringer et dødt gruppemedlem tilbage til livet med 35% sundhed og mana. En Solheler på niveau 16 eller derover kalder i stedet ethvert faldent medlem af gruppen tilbage.',
+    'Bringer et dødt gruppemedlem tilbage til livet ved din side med 35% sundhed og mana. En Solheler på niveau 16 eller derover kalder i stedet ethvert faldent medlem af gruppen, som er inden for 30 meter og i din synsvidde, tilbage.',
   'entities.abilities.sacred_challenge.description':
     'Tvinger en fjende til at angribe dig. Under Ophøjelse reducerer den også al modtaget skade med 15% i 4 sek. uden at forbruge en ladning.',
   'entities.abilities.sacred_form.description':
@@ -13190,6 +13190,15 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Forbruger 3 Flokvildskab, efter at dit kæledyr har slået for 83 til 105 fysisk skade og rystet enhver fjende inden for 6 meter for 26 til 34. Slaget og rystelsen bruger Flokvildskabets fulde kæledyrsskadebonus på 30% og stiger med kæledyrets angrebskraft. I de følgende 8 sek. gør kæledyret 25% mere skade, angriber 35% hurtigere og får Grumt Skud til at ramme op til 2 nærliggende fjender.',
   'entities.abilities.wildheart.description': 'Genopretter straks 30% af din maksimale sundhed.',
   'entities.abilities.ancestor_return.name': 'Forfædrenes Tilbagekomst',
+  'entities.abilities.grove_awakening.description':
+    'Kalder ethvert faldent medlem af din gruppe eller dit togt, som er inden for 40 meter og i din synsvidde, tilbage til din side med 30% sundhed og mana. Kan ikke kastes i kamp. (Lundhjerte)',
+  'entities.abilities.grove_awakening.name': 'Lundens Opvågnen',
+  'entities.abilities.prayer_of_returning.description':
+    'Kalder ethvert faldent medlem af din gruppe eller dit togt, som er inden for 40 meter og i din synsvidde, tilbage til din side med 30% sundhed og mana. Kan ikke kastes i kamp. (Velsignelse og Lære)',
+  'entities.abilities.prayer_of_returning.name': 'Tilbagekomstens Bøn',
+  'entities.abilities.wildwake.description':
+    'Lokker en falden allieret til pludselig blomstring og bringer vedkommende tilbage til livet ved din side med 35% sundhed og mana, selv midt i kampens hede. (Lundhjerte)',
+  'entities.abilities.wildwake.name': 'Vildopvågnen',
   'entities.abilities.galeheart_weapon.name': 'Stormhjertevåben',
   'entities.abilities.lifespring_weapon.name': 'Livskildevåben',
   'entities.abilities.primal_exaltation.name': 'Urgammel Ophøjelse',
@@ -13200,7 +13209,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.unleash_weapon.name': 'Slip Våbnet Løs',
   'entities.abilities.warspirit_cadence.name': 'Krigsåndens Kadence',
   'entities.abilities.ancestor_return.description':
-    'Kalder ethvert faldent medlem af din gruppe eller dit togt tilbage til livet ved deres krop med 30% sundhed og mana. Kan ikke kastes i kamp. (Åndelapning)',
+    'Kalder ethvert faldent medlem af din gruppe eller dit togt, som er inden for 40 meter og i din synsvidde, tilbage til din side med 30% sundhed og mana. Kan ikke kastes i kamp. (Åndelapning)',
   'entities.abilities.galeheart_weapon.description':
     'Fortryller begge våben i 30 min. og muliggør Krigsåndens Kadence.',
   'entities.abilities.lifespring_weapon.description':

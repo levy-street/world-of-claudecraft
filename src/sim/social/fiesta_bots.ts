@@ -276,7 +276,10 @@ function driveFiestaBot(sim: Sim, pid: number): void {
   // busy." (#1360's single-slot spell queue applies to every castAbility caller,
   // bots included); this is intended, not an accidental behavior change, and it stays
   // deterministic since bot presses derive from tickCount/pid, not rng.
-  if (sim.tickCount % 24 === pid % 24) {
+  // A bare-GCD press is skipped: it would load the GCD-tail queue and silently
+  // tighten bot cadence past the pre-queue tuning, so bots keep the classic
+  // press-when-the-GCD-is-clear rhythm the practice arena was balanced around.
+  if (sim.tickCount % 24 === pid % 24 && (e.castingAbility !== null || e.gcdRemaining <= 0)) {
     const ability = pickBotAbility(meta);
     if (ability) sim.castAbility(ability, pid);
   }

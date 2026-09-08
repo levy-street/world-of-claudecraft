@@ -836,7 +836,8 @@ const MONOLITHS: MonolithRow[] = [
     // OSSBrain integration: Fiesta effects moved to render/fiesta_effects.ts.
     // Measured after formatting; lower the ratchet with the extraction.
     // Mount skins: bank the coordinator extraction at its measured size.
-    ceiling: 12852,
+    // Restored per-ability resurrection school lookup removes one line.
+    ceiling: 12851,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1008,7 +1009,8 @@ const MONOLITHS: MonolithRow[] = [
     // the resolved tree: `wc -l < src/sim/sim.ts` on the reconciled file
     // measures 11923, below both arms, so the ceiling follows it down. Exact
     // merged count, zero slack: any further growth reds again.
-    ceiling: 11923,
+    // Main hotfix integration: combined extractions, exact merged count.
+    ceiling: 11879,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1417,7 +1419,8 @@ const MONOLITHS: MonolithRow[] = [
     // RE-CONFIRMED at the final line-budget reconciliation: still 10291,
     // below both parent pins. Exact merged count, zero slack.
     // Mount skins: bank the coordinator extraction at its measured size.
-    ceiling: 10150,
+    // Main hotfix integration: combined extractions, exact merged count.
+    ceiling: 10095,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1559,7 +1562,8 @@ const MONOLITHS: MonolithRow[] = [
     // zero slack: any further growth reds again.
     // OSSBrain integration: entity flair decoding moved to net/entity_flair_wire.ts.
     // Measured after formatting; lower the ratchet with the extraction.
-    ceiling: 5765,
+    // Main hotfix integration: combined extractions, exact merged count.
+    ceiling: 5540,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -1570,7 +1574,8 @@ const MONOLITHS: MonolithRow[] = [
     // the raid theme registrations were paid for by moving the Gravewyrm Sanctum composer to its sibling module; exact count.
     // Re-pinned 4943 -> 4935: the molten-assembly music row paid for itself by
     // moving the DUNGEON_MUSIC table to dungeon_music_zones.ts. Exact count.
-    ceiling: 4935,
+    // Pure location/rift routing moved to music_zones.ts; floor streams reuse the director.
+    ceiling: 4850,
     seam: 'a src/game sibling module (the refactor/game-music split is the template)',
   },
   {

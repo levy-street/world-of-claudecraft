@@ -15651,6 +15651,79 @@ export const TARGETS = [
       return { clip: '#rift-forge-window' };
     },
   },
+  {
+    key: 'crucible-quartermaster',
+    label: "Crucible Quartermaster at the raid entrance: the Forgefather keep's landing court",
+    // The SOURCE files that place him (the vendor content module and the deck-floor
+    // helper his spawn height rides on); the sim test suffixes stay non-visual.
+    when: ['sim/content/ignivar_loot.ts', 'sim/deck_floor.ts'],
+    variants: [
+      // Looking up the upper stair from the tier-three court: the landing court,
+      // the vendor at its west edge, and the keep flight to the raid door above.
+      { key: 'landing-court', x: 503.6, z: 2231.5, facing: 0, dist: 11, pitch: 0.22 },
+      // On the landing court itself, looking west over the parapet: the vendor
+      // stands beside the player after the fix; before it he was down on the
+      // terrain shelf outside the wall, thirteen yards under the door.
+      { key: 'landing-parapet', x: 504.4, z: 2238.2, facing: Math.PI / 2, dist: 7, pitch: 0.55 },
+    ],
+    async capture(page, variant) {
+      const placed = await page.evaluate(({ x, z, facing, dist, pitch }) => {
+        const g = window.__game;
+        if (!g?.sim?.player) return { ok: false, reason: 'offline world is unavailable' };
+        g.sim.setPlayerLevel(20); // the Drakelands' own level band; no roadside decision
+        const p = g.sim.player;
+        const idle = {
+          forward: false,
+          back: false,
+          turnLeft: false,
+          turnRight: false,
+          strafeLeft: false,
+          strafeRight: false,
+          jump: false,
+        };
+        p.pos.x = x;
+        p.pos.z = z;
+        p.pos.y = g.sim.groundPos(x, z).y + 2;
+        p.prevPos = { ...p.pos };
+        p.fallStartY = p.pos.y;
+        p.facing = facing;
+        p.prevFacing = facing;
+        p.vy = 0;
+        p.onGround = false;
+        g.sim.rebucket(p);
+        // Settle the drop through the sim's own motion; pin fallStartY so the
+        // teleport never counts as a fall.
+        for (let i = 0; i < 120 && !p.onGround; i++) {
+          p.fallStartY = p.pos.y;
+          Object.assign(g.sim.moveInput, idle);
+          g.sim.tick();
+        }
+        // A spawn-side NPC dialog and the zone banners would sit across the
+        // keep; the shot is evidence about the world, so hide them.
+        document.querySelector('#tutorial-greeting button')?.click();
+        for (const id of [
+          'tutorial-greeting',
+          'quest-dialog',
+          'banner',
+          'subzone-banner',
+          'quest-banner',
+        ]) {
+          const el = document.getElementById(id);
+          if (el) el.style.display = 'none';
+        }
+        // Chase camera behind the player, looking the way they face.
+        g.input.camYaw = facing + Math.PI;
+        g.input.camDist = dist;
+        g.input.camPitch = pitch;
+        return { ok: true, y: +p.pos.y.toFixed(2), onGround: p.onGround };
+      }, variant);
+      if (!placed.ok) return { skip: placed.reason };
+      // A far teleport streams new chunks and can raise the loading veil again.
+      await awaitWorldPainted(page);
+      await wait(6000); // the zone banner fades
+      return { clip: '#ui' };
+    },
+  },
 ];
 
 // Shared staging for the farming Phase 8 shots: stand in the Eastbrook patch,

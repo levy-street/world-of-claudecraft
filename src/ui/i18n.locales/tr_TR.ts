@@ -3193,7 +3193,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Bir müttefiki zamanda biraz ileri çekerek {damage} canı iyileştirir; beden daha sağlıklı geleceğine kavuşur. (Kronomansi imzası)',
   'entities.abilities.temporal_mend.name': 'Zamansal Onarım',
   'entities.abilities.temporal_reversal.description':
-    'Düşmüş bir müttefikin zaman çizelgesini geri sararak onları savaşın tam ortasında bile bedeninin yanında, canının ve manasının bir kısmıyla hayata döndürür. (Kronomansi)',
+    'Düşmüş bir müttefikin zaman çizelgesini geri sararak onları savaşın tam ortasında bile yanına, canının ve manasının 35% kadarıyla hayata döndürür. (Kronomansi)',
   'entities.abilities.temporal_reversal.name': 'Zamansal Tersine Çevirme',
   'entities.abilities.temporal_rewind.description':
     "Grup veya akın içinden bir gizemli dalga geçirerek 40 yarda yakınındaki her müttefikin son 5 saniyede aldığı hasarın %30'unu geri sarar (azami canlarının %35'ine kadar). Kritik etki olamaz. (Kronomansi)",
@@ -3877,7 +3877,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.inProgressError': 'Bir hazır kontrolü zaten sürüyor.',
   'entities.abilities.collective_reversal.name': 'Toplu Geri Sarım',
   'entities.abilities.collective_reversal.description':
-    'Grubunuzdaki veya baskınınızdaki her ölü üyenin zaman çizgisini geri sarar ve onları bedenlerinin yanında %30 sağlık ve mana ile hayata döndürür. Savaş sırasında kullanılamaz. (Kronomansi)',
+    'Grubunuzdaki veya baskınınızdaki, 40 yarda yakınındaki ve görüş hattınızdaki her ölü üyenin zaman çizgisini geri sarar ve onları yanınıza %30 sağlık ve mana ile hayata döndürür. Savaş sırasında kullanılamaz. (Kronomansi)',
   'entities.abilities.sport_boot.description':
     'Nişan noktasına doğru uzun, havadan bir vuruş. Seyirci buna bayılır.',
   'entities.abilities.sport_boot.name': 'Aşırtma',
@@ -13324,7 +13324,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.radiant_devotion.description':
     'Senin ve grup üyelerinin büyü gücünü 30 dk boyunca 20 artırır. Kendi Şafak veya Lütuf Adanmışlığının yerini alır, ancak diğer paladinlerin Adanmışlıklarıyla birlikte var olur.',
   'entities.abilities.recall_the_fallen.description':
-    'Ölü bir grup üyesini 35% can ve manayla yaşama döndürür. 16. seviye ya da üzeri bir Güneş Şifacısı bunun yerine grubun düşmüş tüm üyelerini geri çağırır.',
+    'Ölü bir grup üyesini yanına, 35% can ve manayla yaşama döndürür. 16. seviye ya da üzeri bir Güneş Şifacısı bunun yerine grubun 30 yarda yakınındaki ve görüş hattındaki düşmüş tüm üyelerini geri çağırır.',
   'entities.abilities.sacred_challenge.description':
     'Bir düşmanı sana saldırmaya zorlar. Yüceliş sırasında ayrıca şarj tüketmeden alınan tüm hasarı 4 sn boyunca 15% azaltır.',
   'entities.abilities.sacred_form.description':
@@ -13398,6 +13398,15 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Evcil hayvanın 83 ila 105 Fiziksel hasar vurup 6 metre içindeki her düşmanı 26 ila 34 sarsmasının ardından 3 Sürü Vahşeti tüketir. Vuruş ve sarsıntı, Sürü Vahşetinin tam 30% evcil hayvan hasar bonusunu kullanır ve evcil hayvanın saldırı gücüyle artar. Sonraki 8 sn boyunca evcil hayvan 25% daha fazla hasar verir, 35% daha hızlı saldırır ve Uğursuz Atışın yakındaki en fazla 2 düşmanı biçmesini sağlar.',
   'entities.abilities.wildheart.description': 'Azami canının 30% kadarını anında geri kazandırır.',
   'entities.abilities.ancestor_return.name': 'Ataların Dönüşü',
+  'entities.abilities.grove_awakening.description':
+    'Grubunun ya da akınının, 40 yarda yakınındaki ve görüş hattındaki düşmüş her üyesini 30% can ve manayla yanına çağırır. Savaşta okunamaz. (Koru Yüreği)',
+  'entities.abilities.grove_awakening.name': 'Koru Uyanışı',
+  'entities.abilities.prayer_of_returning.description':
+    'Grubunun ya da akınının, 40 yarda yakınındaki ve görüş hattındaki düşmüş her üyesini 30% can ve manayla yanına çağırır. Savaşta okunamaz. (Kutsal ve Disiplin)',
+  'entities.abilities.prayer_of_returning.name': 'Dönüş Duası',
+  'entities.abilities.wildwake.description':
+    'Düşmüş bir müttefiği ansızın çiçeğe durmaya çağırır ve savaşın tam ortasında bile yanına, canının ve manasının 35% kadarıyla hayata döndürür. (Koru Yüreği)',
+  'entities.abilities.wildwake.name': 'Yaban Uyanışı',
   'entities.abilities.galeheart_weapon.name': 'Fırtına Yüreği Silahı',
   'entities.abilities.lifespring_weapon.name': 'Yaşam Pınarı Silahı',
   'entities.abilities.primal_exaltation.name': 'İlksel Yüceltme',
@@ -13408,7 +13417,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.unleash_weapon.name': 'Silahı Salıver',
   'entities.abilities.warspirit_cadence.name': 'Savaş Ruhu Ritmi',
   'entities.abilities.ancestor_return.description':
-    'Grubunun ya da akınının düşmüş her üyesini bedeninin başında 30% can ve manayla yaşama döndürür. Savaşta okunamaz. (Ruh Onarımı)',
+    'Grubunun ya da akınının, 40 yarda yakınındaki ve görüş hattındaki düşmüş her üyesini 30% can ve manayla yanına çağırır. Savaşta okunamaz. (Ruh Onarımı)',
   'entities.abilities.galeheart_weapon.description':
     'Her iki silahı 30 dk büyüler ve Savaş Ruhu Ritmini etkinleştirir.',
   'entities.abilities.lifespring_weapon.description':

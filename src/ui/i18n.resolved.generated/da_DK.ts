@@ -11420,7 +11420,7 @@ export const da_DK: EnTranslations = {
       },
       "recall_the_fallen": {
         "name": "Kald de Faldne",
-        "description": "Bringer et dødt gruppemedlem tilbage til livet med 35% sundhed og mana. En Solheler på niveau 16 eller derover kalder i stedet ethvert faldent medlem af gruppen tilbage."
+        "description": "Bringer et dødt gruppemedlem tilbage til livet ved din side med 35% sundhed og mana. En Solheler på niveau 16 eller derover kalder i stedet ethvert faldent medlem af gruppen, som er inden for 30 meter og i din synsvidde, tilbage."
       },
       "beacon_of_light": {
         "name": "Lysets Bavn",
@@ -12153,6 +12153,14 @@ export const da_DK: EnTranslations = {
         "name": "Marvbrækker",
         "description": "Forbruger dine 3 Gammelt Blod til et tungt slag med høj trussel og {damage} skade. Under halvt helbred beskytter det dig i stedet med et skjold på 18% af dit maksimale helbred i 8 sek. og refunderer 15 raseri."
       },
+      "wildwake": {
+        "name": "Vildopvågnen",
+        "description": "Lokker en falden allieret til pludselig blomstring og bringer vedkommende tilbage til livet ved din side med 35% sundhed og mana, selv midt i kampens hede. (Lundhjerte)"
+      },
+      "grove_awakening": {
+        "name": "Lundens Opvågnen",
+        "description": "Kalder ethvert faldent medlem af din gruppe eller dit togt, som er inden for 40 meter og i din synsvidde, tilbage til din side med 30% sundhed og mana. Kan ikke kastes i kamp. (Lundhjerte)"
+      },
       "overbloom": {
         "name": "Overblomstring",
         "description": "Forbruger 5 Grønske. Høster hver af dine helbredelser over tid på alle allierede for {buff}% af den resterende helbredelse, fjerner de virkninger og planter en frisk Vildblomst på målet."
@@ -12463,15 +12471,15 @@ export const da_DK: EnTranslations = {
       },
       "temporal_reversal": {
         "name": "Tidsvending",
-        "description": "Tilbagespoler en falden allieredes tidslinje og bringer dem tilbage til livet ved deres krop med en del af deres helbred og mana, selv midt i kamp. (Kronomantik)"
+        "description": "Tilbagespoler en falden allieredes tidslinje og bringer dem tilbage til livet ved din side med 35% af deres helbred og mana, selv midt i kamp. (Kronomantik)"
       },
       "collective_reversal": {
         "name": "Kollektiv tilbagespoling",
-        "description": "Spoler tidslinjen tilbage for hvert faldet medlem af din gruppe eller dit raid og genopliver dem ved deres krop med 30% helbred og mana. Kan ikke kastes i kamp. (Kronomanti)"
+        "description": "Spoler tidslinjen tilbage for hvert faldet medlem af din gruppe eller dit raid, som er inden for 40 meter og i din synsvidde, og genopliver dem ved din side med 30% helbred og mana. Kan ikke kastes i kamp. (Kronomanti)"
       },
       "ancestor_return": {
         "name": "Forfædrenes Tilbagekomst",
-        "description": "Kalder ethvert faldent medlem af din gruppe eller dit togt tilbage til livet ved deres krop med 30% sundhed og mana. Kan ikke kastes i kamp. (Åndelapning)"
+        "description": "Kalder ethvert faldent medlem af din gruppe eller dit togt, som er inden for 40 meter og i din synsvidde, tilbage til din side med 30% sundhed og mana. Kan ikke kastes i kamp. (Åndelapning)"
       },
       "temporal_rewind": {
         "name": "Tilbagespoling",
@@ -12613,6 +12621,10 @@ export const da_DK: EnTranslations = {
       "martyrs_aegis": {
         "name": "Martyrens Ægide",
         "description": "Reducerer den skade, en allieret tager, med 40% i 8 sek."
+      },
+      "prayer_of_returning": {
+        "name": "Tilbagekomstens Bøn",
+        "description": "Kalder ethvert faldent medlem af din gruppe eller dit togt, som er inden for 40 meter og i din synsvidde, tilbage til din side med 30% sundhed og mana. Kan ikke kastes i kamp. (Velsignelse og Lære)"
       },
       "choir_of_deliverance": {
         "name": "Befrielsens Kor",

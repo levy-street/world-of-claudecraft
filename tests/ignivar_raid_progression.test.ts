@@ -134,7 +134,6 @@ describe('Ignivar raid progression', () => {
     expect(claim.npcIds.map((id) => sim.entities.get(id)?.templateId)).toEqual([
       IGNIVAR_MAELIN_NPC_ID,
       IGNIVAR_MAELIN_PROJECTION_NPC_ID,
-      'crucible_quartermaster',
     ]);
     const gate = claim.objectIds
       .map((id) => sim.entities.get(id))
@@ -310,7 +309,6 @@ describe('Ignivar raid progression', () => {
     expect(npcTemplatesByRoom.get(IGNIVAR_FORGE_APPROACH_ID)).toEqual([
       IGNIVAR_MAELIN_NPC_ID,
       IGNIVAR_MAELIN_PROJECTION_NPC_ID,
-      'crucible_quartermaster',
     ]);
     expect(npcTemplatesByRoom.get(IGNIVAR_RAID_ARENA_ID)).toEqual([
       IGNIVAR_MAELIN_PROJECTION_NPC_ID,

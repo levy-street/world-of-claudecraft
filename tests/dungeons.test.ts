@@ -18,7 +18,6 @@ import {
   MOBS,
 } from '../src/sim/data';
 import { spawnNythraxisAdds } from '../src/sim/encounters/nythraxis';
-import { COMBAT_EXIT_MEMORY_SECONDS } from '../src/sim/instance_exit_memory';
 import {
   awardHeroicMarks,
   enterDungeon,
@@ -339,14 +338,16 @@ describe('dungeons: door-trigger entry/exit', () => {
     expect(mob.aggroTargetId).toBe(b);
   });
 
-  // Issue #2653: a mid-combat door exit still scrubs the leaver immediately (the
-  // #1955 anti-exit-kiting fix above stays load-bearing), but the exact threat
-  // dropped is now remembered on the claim for a short window so the party
-  // cannot chain exits into a free, instant, unengaged combat reset.
-  describe('mid-combat exit memory (no free combat reset)', () => {
-    it('re-entering the same claim within the memory window resumes the fight', () => {
+  // A mid-combat door exit still scrubs the leaver immediately (the #1955
+  // anti-exit-kiting fix above stays load-bearing). With nobody left on the
+  // table the pack walks home and resets: full health, idle, empty table. That
+  // reset is the whole cost of leaving, and it is the ONLY way out of a fight
+  // inside a slot (instances/instance_combat_hold.ts): coming back is a fresh
+  // pull of a whole pack, never a resumed one.
+  describe('mid-combat exit is a classic zone-out reset', () => {
+    it('leaving, then walking back in, meets a healed, idle pack with an empty hate table', () => {
       const sim = makeSim();
-      const pid = sim.addPlayer('warrior', 'Fickle');
+      const pid = sim.addPlayer('warrior', 'Ticker');
       const p = sim.entities.get(pid) as AnyEntity;
       enterDungeon(sim.ctx, 'hollow_crypt', pid);
       const inst = claimedHollow(sim);
@@ -354,63 +355,33 @@ describe('dungeons: door-trigger entry/exit', () => {
       const mob = mobInInstance(sim, inst, 'crypt_shambler');
       teleport(sim, p, mob.pos.x + 3, mob.pos.z);
       p.maxHp = p.hp = 1_000_000;
-      sim.dealDamage(p, mob, 25, false, 'physical', 'Strike', 'hit', true);
-      expect(mob.inCombat).toBe(true);
-      const priorThreat = mob.threat.get(pid);
-      expect(priorThreat).toBeGreaterThan(0);
+      sim.dealDamage(p, mob, mob.maxHp - 40, false, 'physical', 'Strike', 'hit', true);
+      expect(mob.hp).toBeLessThan(mob.maxHp);
+      expect(mob.threat.get(pid)).toBeGreaterThan(0);
+      const epochBefore = mob.evadeEpoch;
 
       leaveDungeon(sim.ctx, pid);
       // The #1955 fix still stands: the leaver is dropped immediately, no dancing.
       expect(mob.threat.has(pid)).toBe(false);
       expect(mob.aggroTargetId).toBeNull();
 
-      // A prompt return, well inside the memory window.
-      sim.time += 5;
+      // The real tick loop: the mob gives up, walks home, and resets in full.
+      for (let i = 0; i < 20 * 15 && mob.evadeEpoch === epochBefore; i++) sim.tick();
+      expect(mob.evadeEpoch).toBe(epochBefore + 1);
+      expect(mob.hp).toBe(mob.maxHp);
+      expect(mob.aiState).toBe('idle');
+      expect(mob.inCombat).toBe(false);
+      expect(mob.threat.size).toBe(0);
+
+      // A prompt return is a fresh pull: nothing is restored.
       enterDungeon(sim.ctx, 'hollow_crypt', pid);
-
-      expect(mob.threat.get(pid)).toBe(priorThreat); // resumed, not a fresh pull
-      expect(mob.aggroTargetId).toBe(pid);
-      expect(mob.aiState).toBe('chase');
-      expect(mob.inCombat).toBe(true);
-      expect(inst.combatExitMemory.size).toBe(0); // consumed, not left dangling
-    });
-
-    it('waiting past the memory window earns a genuine reset, not a resumed fight', () => {
-      const sim = makeSim();
-      const pid = sim.addPlayer('warrior', 'Patient');
-      const p = sim.entities.get(pid) as AnyEntity;
-      enterDungeon(sim.ctx, 'hollow_crypt', pid);
-      const inst = claimedHollow(sim);
-
-      const mob = mobInInstance(sim, inst, 'crypt_shambler');
-      teleport(sim, p, mob.pos.x + 3, mob.pos.z);
-      p.maxHp = p.hp = 1_000_000;
-      sim.dealDamage(p, mob, 25, false, 'physical', 'Strike', 'hit', true);
-      expect(mob.threat.get(pid)).toBeGreaterThan(0);
-
-      leaveDungeon(sim.ctx, pid);
-
-      // Well past the memory window: the exit has genuinely lapsed.
-      sim.time += COMBAT_EXIT_MEMORY_SECONDS + 1;
-      enterDungeon(sim.ctx, 'hollow_crypt', pid);
-
-      expect(mob.threat.has(pid)).toBe(false); // no restore: a real fresh pull
+      sim.tick();
+      expect(mob.threat.has(pid)).toBe(false);
       expect(mob.aggroTargetId).toBeNull();
+      expect(mob.inCombat).toBe(false);
     });
 
-    it('an out-of-combat walk-out leaves no combat-exit memory (mob never aggroed)', () => {
-      const sim = makeSim();
-      const pid = sim.addPlayer('warrior', 'Casual');
-      enterDungeon(sim.ctx, 'hollow_crypt', pid);
-      const inst = claimedHollow(sim);
-      expect(inst.combatExitMemory.size).toBe(0);
-
-      leaveDungeon(sim.ctx, pid);
-
-      expect(inst.combatExitMemory.size).toBe(0);
-    });
-
-    it('a full party chaining exits and returning within the window resumes the SAME hate split, not a fresh pull', () => {
+    it('a full party chaining exits resets the whole pack, and returning re-pulls it whole', () => {
       const sim = makeSim();
       const a = sim.addPlayer('warrior', 'Left1');
       const b = sim.addPlayer('mage', 'Left2');
@@ -427,31 +398,29 @@ describe('dungeons: door-trigger entry/exit', () => {
       teleport(sim, eb, mob.pos.x - 3, mob.pos.z);
       ea.maxHp = ea.hp = 1_000_000;
       eb.maxHp = eb.hp = 1_000_000;
-      sim.dealDamage(ea, mob, 100, false, 'physical', 'Strike', 'hit', true);
+      sim.dealDamage(ea, mob, mob.maxHp - 100, false, 'physical', 'Strike', 'hit', true);
       sim.dealDamage(eb, mob, 10, false, 'fire', 'Bolt', 'hit', true);
       expect(mob.aggroTargetId).toBe(a);
-      const threatA = mob.threat.get(a);
-      const threatB = mob.threat.get(b);
+      const damagedHp = mob.hp;
 
       // Chained exits: the WHOLE pack is scrubbed, not just partially.
       leaveDungeon(sim.ctx, a);
       leaveDungeon(sim.ctx, b);
       expect(mob.threat.size).toBe(0);
       expect(mob.aggroTargetId).toBeNull();
+      for (let i = 0; i < 20 * 15 && mob.aiState !== 'idle'; i++) sim.tick();
+      expect(mob.hp).toBe(mob.maxHp);
+      expect(mob.hp).toBeGreaterThan(damagedHp);
 
-      // Both walk back in inside the window: the fight resumes with the SAME
-      // hate distribution instead of a free, unengaged full-pack reset.
-      sim.time += 5;
+      // Both walk back in: a whole, unengaged pack, not the fight they left.
       enterDungeon(sim.ctx, 'hollow_crypt', a);
       enterDungeon(sim.ctx, 'hollow_crypt', b);
-
-      expect(mob.threat.get(a)).toBe(threatA);
-      expect(mob.threat.get(b)).toBe(threatB);
-      expect(mob.aggroTargetId).toBe(a); // still the higher-threat attacker
-      expect(mob.inCombat).toBe(true);
+      sim.tick();
+      expect(mob.threat.size).toBe(0);
+      expect(mob.inCombat).toBe(false);
     });
 
-    it('a forced evade-home reset is deferred while a live exit memory could still apply, so a mid-window fresh re-pull can never happen', () => {
+    it('an evade-home reset is never deferred: it heals and clears the moment the mob is home', () => {
       const sim = makeSim();
       const a = sim.addPlayer('warrior', 'Wanderer');
       const ea = sim.entities.get(a) as AnyEntity;
@@ -462,99 +431,12 @@ describe('dungeons: door-trigger entry/exit', () => {
       teleport(sim, ea, mob.pos.x + 3, mob.pos.z);
       ea.maxHp = ea.hp = 1_000_000;
       sim.dealDamage(ea, mob, mob.maxHp - 40, false, 'physical', 'Strike', 'hit', true);
-      expect(mob.threat.get(a)).toBeGreaterThan(0);
-
       leaveDungeon(sim.ctx, a);
-      expect(inst.combatExitMemory.size).toBe(1);
 
-      // Something (a stray leash break, a manual call) tries to run the
-      // evade-home reset while A's exit memory is still live: it must defer
-      // rather than heal/clear the pack out from under a same-claim return.
       resetEvadingMob(sim.ctx, mob);
-      expect(mob.inCombat).toBe(true);
-      expect(mob.hp).toBeLessThan(mob.maxHp); // never healed
-
-      // A returns inside the window: the exact fight resumes, HP included.
-      sim.time += 5;
-      enterDungeon(sim.ctx, 'hollow_crypt', a);
-      expect(mob.threat.get(a)).toBeGreaterThan(0);
-      expect(mob.aggroTargetId).toBe(a);
-      expect(mob.inCombat).toBe(true);
-    });
-
-    it('re-entering after a REAL tick loop (leave, natural evade-home reset, return before expiry) resumes the exact fight, not a fresh healed pull', () => {
-      const sim = makeSim();
-      const pid = sim.addPlayer('warrior', 'Ticker');
-      const p = sim.entities.get(pid) as AnyEntity;
-      enterDungeon(sim.ctx, 'hollow_crypt', pid);
-      const inst = claimedHollow(sim);
-
-      const mob = mobInInstance(sim, inst, 'crypt_shambler');
-      teleport(sim, p, mob.pos.x + 3, mob.pos.z);
-      p.maxHp = p.hp = 1_000_000;
-      sim.dealDamage(p, mob, mob.maxHp - 40, false, 'physical', 'Strike', 'hit', true);
-      const damagedHp = mob.hp;
-      expect(damagedHp).toBeLessThan(mob.maxHp);
-      const priorThreat = mob.threat.get(pid);
-      expect(priorThreat).toBeGreaterThan(0);
-
-      leaveDungeon(sim.ctx, pid);
-
-      // Run the REAL tick loop well past the time the mob would normally have
-      // walked home and fully reset (a few seconds is plenty for a mob that
-      // never moved far from spawn), but still inside the memory window.
-      for (let i = 0; i < 20 * 10; i++) sim.tick();
-
-      // Held, not reset: no heal, no idle, no dropped hate table.
-      expect(mob.hp).toBe(damagedHp);
-      expect(mob.aiState).toBe('evade');
-      expect(mob.inCombat).toBe(true);
-
-      // Structurally unpullable while held: an 'evade' mob is damage-immune
-      // (combat/damage.ts), so nobody can fresh-pull it out from under the
-      // pending resume.
-      const strangerPid = sim.addPlayer('warrior', 'Stranger');
-      const stranger = sim.entities.get(strangerPid) as AnyEntity;
-      teleport(sim, stranger, mob.pos.x + 3, mob.pos.z);
-      stranger.maxHp = stranger.hp = 1_000_000;
-      sim.dealDamage(stranger, mob, 25, false, 'physical', 'Strike', 'hit', true);
-      expect(mob.threat.has(strangerPid)).toBe(false);
-      expect(mob.hp).toBe(damagedHp);
-
-      enterDungeon(sim.ctx, 'hollow_crypt', pid);
-
-      expect(mob.threat.get(pid)).toBe(priorThreat);
-      expect(mob.aggroTargetId).toBe(pid);
-      expect(mob.aiState).toBe('chase');
-      expect(mob.hp).toBe(damagedHp); // the exact fight resumed, not a fresh healed pack
-    });
-
-    it('re-entering after a REAL tick loop past the full window earns a genuine reset (full heal, idle, empty hate table)', () => {
-      const sim = makeSim();
-      const pid = sim.addPlayer('warrior', 'TooLate');
-      const p = sim.entities.get(pid) as AnyEntity;
-      enterDungeon(sim.ctx, 'hollow_crypt', pid);
-      const inst = claimedHollow(sim);
-
-      const mob = mobInInstance(sim, inst, 'crypt_shambler');
-      teleport(sim, p, mob.pos.x + 3, mob.pos.z);
-      p.maxHp = p.hp = 1_000_000;
-      sim.dealDamage(p, mob, mob.maxHp - 40, false, 'physical', 'Strike', 'hit', true);
-      expect(mob.hp).toBeLessThan(mob.maxHp);
-
-      leaveDungeon(sim.ctx, pid);
-
-      // Tick well past COMBAT_EXIT_MEMORY_SECONDS: the hold lapses and the
-      // deferred reset finally fires.
-      for (let i = 0; i < 20 * (COMBAT_EXIT_MEMORY_SECONDS + 5); i++) sim.tick();
-
-      expect(mob.hp).toBe(mob.maxHp);
-      expect(mob.aiState).toBe('idle');
       expect(mob.inCombat).toBe(false);
-
-      enterDungeon(sim.ctx, 'hollow_crypt', pid);
-      expect(mob.threat.has(pid)).toBe(false); // a real fresh pull, no restore
-      expect(inst.combatExitMemory.size).toBe(0); // the lapsed record was consumed, not left dangling
+      expect(mob.hp).toBe(mob.maxHp);
+      expect(mob.threat.size).toBe(0);
     });
   });
 });
