@@ -223,16 +223,10 @@ describe('zone-feature shadow casting range', () => {
     expect(isZoneFeatureShadowCasting(null, 0, 9999, false)).toBe(true);
   });
 
-  it('is consumed by the per-frame feature sweep, toggling castShadow on state flips only', () => {
-    const sweep = readFileSync(
-      new URL('../src/render/zone_feature_sweep.ts', import.meta.url),
-      'utf8',
-    );
-    expect(sweep).toContain('isZoneFeatureShadowCasting(');
-    // The per-mesh castShadow writes happen only on a state flip, never as a
-    // steady per-frame traversal.
-    expect(sweep).toContain('if (casting !== entry.shadowCasting)');
-    // and the renderer drives that sweep from its per-frame method
+  it('is consumed by the per-frame feature sweep the renderer drives', () => {
+    // The sweep's own contract (the flip-only castShadow writes) is pinned in
+    // tests/zone_feature_sweep.test.ts, beside the module it imports, so a
+    // sweep-only edit selects that suite; here only the renderer's delegate.
     const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
     const start = renderer.indexOf('private updateZoneFeatureVisibility(');
     expect(start).toBeGreaterThan(-1);

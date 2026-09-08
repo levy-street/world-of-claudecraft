@@ -489,6 +489,28 @@ player acts on, but the tree one deserves its reasoning written down rather than
   surviving leaf fragment, 0 below ultra, 3 on ultra (the AO half), 6 on insane. Fragment shading
   only, no displacement and no silhouette change, so it cannot move what a canopy occludes.
 
+### Zone-feature dressing sheds by apparent size on the far-vista arm (2026-09-08)
+
+The bespoke biome dressing (the Willowfen's lily rafts, reeds, mushroom and log
+patches) is culled per registered group against the fog on the classic arm and against
+the detail horizon (700 to 850 yd) on the far-vista arm, where the scene fog is parked
+past 924 yd, so a 6,000-triangle raft five yards across was drawn at 500 yd as a blob a
+few pixels wide. The sweep (`src/render/zone_feature_sweep.ts` over
+`zone_feature_visibility_core.ts`) now also sheds a DRESSING group once its largest
+instance would span under `ZONE_FEATURE_MIN_APPARENT_PX` (8) at a fixed reference view
+(720 px tall, the 60 degree base FOV), with a 10 percent hysteresis band. The reach is
+derived from the group's real instance size, never a per-family distance table, so a
+one-off giant model keeps its whole group to the horizon with nothing written anywhere.
+
+Why it is fair: the families it applies to carry no collider and no interaction (the
+Willowfen's collider family, the willows, is never sized and keeps the distance rule
+alone), so a shed only ever removes a few-pixel blob, never something a player walks into
+or acts on; the reference view is a constant, so what is drawn never depends on the
+window or on the FPS governor; and the reach for the smallest shipped scale sits far
+outside the range a player acts in (past 180 yd on a unit model at the fen's smallest
+scale). The cost is a visible pop at the reach on the vista tiers, larger on a 1440p or
+2160p client than at the reference view; the band keeps it from flapping.
+
 ## Enforcing guards
 
 - `tests/auras_painter.test.ts`: a debuff past the buff cap still renders; an all-debuff bar
@@ -591,6 +613,13 @@ player acts on, but the tree one deserves its reasoning written down rather than
   session's OWN chain carries (a chain with only AO steps 1 to 0 in one step, spending no
   cooldown on a dead rung; a governor handed no chain holds 1 until the built pipeline hands
   it one), the `?postshed=off` kill switch and the `?postshed=` pin with the governor on or off.
+- `tests/zone_feature_sweep.test.ts` and `tests/fen_features_cells.test.ts`: the
+  apparent-size reach. The reach formula and its 8 px threshold are pinned to literals at
+  the fixed reference view, a missing extent fails open, both hysteresis edges hold, the
+  sweep shows only what is inside the fog AND the reach; on the fen build the willow
+  (collider) group carries no extent while every dressing cell carries its largest
+  instance's, the classic arm carries none (low stays byte-identical), and no dressing
+  cell of the shipped placements reaches under 180 yd.
 - `tests/weapon_vfx_shed.test.ts`: the weapon-skin fade. Neither arm reaches zero and the
   lever's floor is proven to stay clear of the multiplier at which a part would stop drawing,
   so the fade can never be mistaken for a cull; the distance arm is anchored to the fixed

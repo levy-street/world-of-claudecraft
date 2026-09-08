@@ -187,7 +187,17 @@ export const ZONE_FEATURE_REF_FOV_DEG = 60;
 /** Pixels per radian at the reference view (the focal length in pixels). */
 export const ZONE_FEATURE_REF_PX_PER_RAD =
   ZONE_FEATURE_REF_VIEWPORT_HEIGHT_PX / 2 / Math.tan((ZONE_FEATURE_REF_FOV_DEG * Math.PI) / 360);
-/** Below this apparent height (px) at the reference view a group is shed. */
+/**
+ * Below this apparent size (px) at the reference view a group is shed. 8 is
+ * the art decision: a 5 yd lily raft then sheds at about 390 yd (429 with
+ * the band), a 3 yd mushroom clump at 235, both unfogged on the vista arm,
+ * where a raft at that distance is a blob a few pixels wide; a 12 yd willow
+ * or any one-off giant reaches past every cull horizon and is never shed.
+ * Two consequences of the fixed reference: a 1440p or 2160p client sees the
+ * object at 16 or 24 px when it goes (a visible pop, which the band keeps
+ * from flapping but does not hide), and a smaller window sees it go earlier
+ * than its own pixels would say. Retune here, never per family.
+ */
 export const ZONE_FEATURE_MIN_APPARENT_PX = 8;
 /** Relative band above the reach inside which a shown group stays shown. */
 export const ZONE_FEATURE_REACH_HYSTERESIS = 0.1;

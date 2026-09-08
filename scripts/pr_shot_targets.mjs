@@ -1055,8 +1055,13 @@ export const TARGETS = [
   {
     key: 'fen-features-cull',
     label:
-      'Willowfen dressing under the per-cell cull (low: no fen content moves; medium: the far clutter sheds by apparent size)',
-    when: ['render/fen_features', 'render/zone_feature_cells_core'],
+      'Willowfen dressing under the per-cell cull: expected visually identical on both tiers, judged on the census readout',
+    when: [
+      'render/fen_features',
+      'render/zone_feature_cells_core',
+      'render/zone_feature_sweep',
+      'render/zone_feature_visibility_core',
+    ],
     variants: [
       // Eastbrook, facing the fen: on low the whole dressing sits past the 340 yd
       // fog, so the frame must not change while the submitted triangles drop.

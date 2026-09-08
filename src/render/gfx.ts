@@ -62,18 +62,16 @@ export const GFX_TIER_RANK: Record<GfxTier, number> = {
 };
 
 /** XZ cell size (yd) the zone-feature dressing is split into for the
- *  per-group distance cull (zone_feature_cells_core.ts) on the classic
- *  (fogged) arm. Which arm a session runs is farFieldPolicy's decision
- *  (far_terrain_core.ts), read by the consumer, never restated here: the
- *  far-vista arm culls zone features at the detail horizon (700 to 850 yd)
- *  and no cell of the fen lies beyond it from Eastbrook, so a split there
- *  adds draws in the idle town view for no triangle. 180 yd on the
+ *  per-group cull (zone_feature_cells_core.ts), on both arms: the classic
+ *  arm's fog sheds the cells, the far-vista arm's apparent-size reach does
+ *  (which arm a session runs is farFieldPolicy's decision, far_terrain_core
+ *  .ts, read by the consumer, never restated here). 180 yd on the
  *  Willowfen: 6 cells and 26 meshes, one cell inside
  *  the 340 yd low fog from Eastbrook (34 of 324 placements). 130 yd isolated
  *  fewer placements (13) but cost 46 meshes, measured at up to 27 fen draws
  *  at the Bridgemere hub against 5 whole; 180 halves that growth for a town
  *  gain still above 90 percent. */
-export const ZONE_FEATURE_CELL_SIZE_CLASSIC = 180;
+export const ZONE_FEATURE_CELL_SIZE = 180;
 
 /** True when `tier` sits at or above `floor` on the quality ladder. */
 export function gfxTierAtLeast(tier: GfxTier, floor: GfxTier): boolean {

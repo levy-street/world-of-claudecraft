@@ -10,9 +10,9 @@
 // cull group per (family, cell), so the renderer's zone-feature sweep can hide
 // the cells the fog has swallowed instead of the whole zone at once: as one
 // mesh per family the fen's footprint edge sat inside the low fog from
-// Eastbrook and 1.49M fully fogged triangles were submitted every frame.
-// Whole meshes on the far-vista arm, where nothing of the fen is beyond the
-// cull horizon from town (fenFeaturesBuildOptions).
+// Eastbrook and 1.49M fully fogged triangles were submitted every frame. On
+// the far-vista arm the dressing cells also carry their apparent-size reach
+// and the willows stay one whole group (fenFeaturesBuildOptions).
 import * as THREE from 'three';
 import { WILLOWFEN_PROPS, WILLOWFEN_ZONE } from '../sim/content/willowfen';
 import { fenWillowSpots } from '../sim/fen_willows';
@@ -26,7 +26,7 @@ import {
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { farFieldPolicy } from './far_terrain_core';
-import { GFX, ZONE_FEATURE_CELL_SIZE_CLASSIC } from './gfx';
+import { GFX, ZONE_FEATURE_CELL_SIZE } from './gfx';
 import { renderLayerDisabled } from './render_dev_flags';
 import { thinLeanDressing } from './zone_dressing_lod_core';
 import { partitionByCell } from './zone_feature_cells_core';
@@ -72,7 +72,7 @@ export function fenFeaturesBuildOptions(): FenFeaturesBuildOptions {
   }
   const vista = farFieldPolicy(GFX.vistaTier, GFX).vista.enabled;
   return {
-    cellSize: ZONE_FEATURE_CELL_SIZE_CLASSIC,
+    cellSize: ZONE_FEATURE_CELL_SIZE,
     colliderFamiliesWhole: vista,
     apparentSizeReach: vista,
   };

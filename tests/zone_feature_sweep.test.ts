@@ -1,6 +1,7 @@
 // The per-frame zone-feature sweep (src/render/zone_feature_sweep.ts) over
 // plain entry objects: the fog rule, the apparent-size reach with its
 // hysteresis, and the shadow flip on state changes only.
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   sweepZoneFeatures,
@@ -53,6 +54,7 @@ describe('apparent-size reach', () => {
     // 720 px tall, 60 degree base FOV: 360 / tan(30 deg) px per radian
     expect(ZONE_FEATURE_REF_PX_PER_RAD).toBeCloseTo(360 / Math.tan(Math.PI / 6), 6);
     expect(ZONE_FEATURE_MIN_APPARENT_PX).toBe(8);
+    expect(ZONE_FEATURE_REACH_HYSTERESIS).toBe(0.1);
     // a 5 yd lily raft: about 390 yd; a 3 yd clump: about 234; a 12 yd
     // willow: about 935, past every cull horizon; a 30 yd giant: 2,338
     expect(zoneFeatureReach(5)).toBeCloseTo((5 * ZONE_FEATURE_REF_PX_PER_RAD) / 8, 6);
@@ -94,11 +96,15 @@ describe('zone feature sweep', () => {
   it('builds an entry from the group, infinite reach without an extent', () => {
     const plain = entryFor(group('plain'), 0);
     expect(plain.reach).toBe(Number.POSITIVE_INFINITY);
-    expect(plain.inReach).toBe(true);
+    expect(plain.inReach).toBe(false); // hidden until the first sweep says otherwise
     expect(plain.shadowCasting).toBe(true);
     expect(plain.shadowCasters).toBeNull();
     const sized = entryFor(group('sized', 5), 0);
     expect(sized.reach).toBeCloseTo(zoneFeatureReach(5), 6);
+    // a non-number extent is no extent
+    const odd = group('odd');
+    odd.userData[ZONE_FEATURE_EXTENT_KEY] = '5';
+    expect(entryFor(odd, 0).reach).toBe(Number.POSITIVE_INFINITY);
   });
 
   it('shows a group inside the fog and its reach, hides it past either', () => {
@@ -126,17 +132,35 @@ describe('zone feature sweep', () => {
   });
 
   it('keeps the reach state per entry across frames (hysteresis)', () => {
-    const g = group('raft', 5);
+    // Two entries with opposite histories in one sweep list, the camera the
+    // only thing that moves between frames: the shown one rides the band,
+    // the hidden one does not come back inside it.
     const reach = zoneFeatureReach(5);
-    const entry = entryFor(g, reach + 10 + reach * ZONE_FEATURE_REACH_HYSTERESIS * 0.5);
-    // first frame: never shown before at this distance, so hidden
-    entry.inReach = false;
-    sweepZoneFeatures([entry], 0, 0, 850, 105);
-    expect(g.visible).toBe(false);
-    // shown, then the camera moves the same distance into the band: kept
-    entry.inReach = true;
-    sweepZoneFeatures([entry], 0, 0, 850, 105);
-    expect(g.visible).toBe(true);
+    const band = reach * ZONE_FEATURE_REACH_HYSTERESIS;
+    const shown = group('shown', 5);
+    const hidden = group('hidden', 5);
+    // both footprints sit so that from camera x = 0 the edge is reach - 1
+    // (inside) and from x = -(band / 2 + 2) it is inside the band
+    const entries = [entryFor(shown, reach - 1 + 10), entryFor(hidden, reach - 1 + 10)];
+    // frame 1 at x = -(band + 2): both edges past the band, both hidden
+    sweepZoneFeatures(entries, -(band + 2), 0, 850, 105);
+    expect(shown.visible).toBe(false);
+    expect(hidden.visible).toBe(false);
+    // frame 2 at x = 0: both inside the reach, both shown
+    sweepZoneFeatures(entries, 0, 0, 850, 105);
+    expect(shown.visible).toBe(true);
+    expect(hidden.visible).toBe(true);
+    // frame 3, into the band: both stay shown (state carried, not hand-set)
+    sweepZoneFeatures(entries, -(band / 2 + 2), 0, 850, 105);
+    expect(shown.visible).toBe(true);
+    expect(entries[0].inReach).toBe(true);
+    // frame 4, hide the second one past the band, then back into the band:
+    // it stays hidden while the first, left inside, stays shown
+    sweepZoneFeatures([entries[1]], -(band + 2), 0, 850, 105);
+    expect(hidden.visible).toBe(false);
+    sweepZoneFeatures(entries, -(band / 2 + 2), 0, 850, 105);
+    expect(shown.visible).toBe(true);
+    expect(hidden.visible).toBe(false);
   });
 
   it('flips castShadow on the state change only and restores the original casters', () => {
@@ -146,13 +170,34 @@ describe('zone feature sweep', () => {
     expect(entry.shadowCasting).toBe(false);
     expect(g.meshes.map((m) => m.castShadow)).toEqual([false, false]);
     expect(entry.shadowCasters).toHaveLength(1); // only the mesh that cast
-    // steady state: no write (the non-caster stays off even if flipped by hand)
-    g.meshes[1].castShadow = true;
+    // steady state: no per-frame write over the captured casters (a hand
+    // flip on the caster survives the next far frame)
+    g.meshes[0].castShadow = true;
     sweepZoneFeatures([entry], 0, 0, 850, 105);
-    expect(g.meshes[1].castShadow).toBe(true);
-    // back inside the range: the original caster is restored, the other left
+    expect(g.meshes[0].castShadow).toBe(true);
+    g.meshes[0].castShadow = false;
+    // back inside the range: the original caster is restored, the mesh that
+    // never cast is left alone (a restore over every mesh would turn it on)
     sweepZoneFeatures([entry], entry.footprint?.centerX ?? 0, 0, 850, 105);
     expect(entry.shadowCasting).toBe(true);
-    expect(g.meshes[0].castShadow).toBe(true);
+    expect(g.meshes.map((m) => m.castShadow)).toEqual([true, false]);
+  });
+});
+
+describe('zone feature sweep module contract', () => {
+  const source = readFileSync(
+    new URL('../src/render/zone_feature_sweep.ts', import.meta.url),
+    'utf8',
+  );
+
+  it('imports three as types only: a thin consumer, never a scene owner', () => {
+    const threeImports = source.match(/^import[^;]*from 'three';/gm) ?? [];
+    expect(threeImports.length).toBeGreaterThan(0);
+    for (const line of threeImports) expect(line.startsWith('import type')).toBe(true);
+  });
+
+  it('flips castShadow on a state change only, never as a steady per-frame traversal', () => {
+    expect(source).toContain('isZoneFeatureShadowCasting(');
+    expect(source).toContain('if (casting !== entry.shadowCasting)');
   });
 });

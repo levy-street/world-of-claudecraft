@@ -16,12 +16,11 @@
 // The grid is world-aligned (cell index = floor(coordinate / size)) with no
 // origin parameter on purpose: one parameter, deterministic, and reusable by
 // every zone-feature module (farshore, gale) without a per-zone rectangle.
-// A non-positive size means "one cell": the caller's way of keeping a family
-// whole where the footprint cull cannot bite from the views that matter (the
-// far-vista arm culls zone features at the detail horizon, 700 to 850 yd,
-// and no cell of the fen lies beyond it from Eastbrook, so a split there adds
-// draws in the idle town view for no triangle; the in-zone frustum win it
-// forgoes there is a measured trade, recorded in the PR).
+// A non-positive size means "one cell": the caller's way of building the
+// pre-split layout (the `?fencells=off` census arm). On the far-vista arm the
+// cull distance is the detail horizon (700 to 850 yd) and no fen cell lies
+// beyond it from Eastbrook, so cells alone buy nothing there; the
+// apparent-size reach (zone_feature_visibility_core.ts) is what sheds them.
 //
 // Pure core contract: no three import, no DOM, no clocks, no randomness.
 // Registered in RENDER_PURE_CORES (tests/architecture.test.ts); tested by

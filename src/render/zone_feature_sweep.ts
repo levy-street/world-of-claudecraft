@@ -30,7 +30,8 @@ export interface ZoneFeatureEntry {
   /** Reach (yd) past which the group's largest instance is too small to draw;
    *  Infinity when the group carries no extent. */
   reach: number;
-  /** Whether the group was inside its reach on the last sweep (hysteresis). */
+  /** Whether the group was inside its reach on the last sweep (hysteresis);
+   *  false at attach, so the first sweep decides on the reach itself. */
   inReach: boolean;
   /** Whether this group currently casts into the sun shadow map. */
   shadowCasting: boolean;
@@ -47,7 +48,10 @@ export function zoneFeatureEntryFor(
     group,
     footprint,
     reach: typeof extent === 'number' ? zoneFeatureReach(extent) : Number.POSITIVE_INFINITY,
-    inReach: true,
+    // hidden until the first sweep finds it inside its reach: a group that
+    // attaches inside the hysteresis band then behaves as one approached from
+    // outside, and a group without a reach is in reach by definition
+    inReach: false,
     shadowCasting: true,
     shadowCasters: null,
   };
