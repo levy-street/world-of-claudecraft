@@ -12,6 +12,7 @@ import type { CrestKind } from './signature_shapes';
 export const ACTIVE_WARRIOR_CRESTS: readonly CrestKind[] = [
   'blood_cut',
   'shield_contact',
+  'steel_cut',
   'rally_pressure',
   'dread_pressure',
   'challenge_pressure',

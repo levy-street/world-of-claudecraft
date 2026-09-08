@@ -50,7 +50,7 @@ export class SignatureCrests {
             mix(uPressureGround[i+5],uPressureGround[i+6],f.x),f.y);
         }
         void main(){
-          vUv=uv; vSurface=position.xy*0.4+0.5; vec3 p=position;
+          vUv=uv; vSurface=position.xy*(uKind>14.5?vec2(0.22,0.55):vec2(0.4))+0.5; vec3 p=position;
           float angle=atan(p.z,p.x);
           float lip=uKind<0.5 || uKind>3.5 ? 1.0 : 0.9+sin(angle*5.0-uAge*5.0*uMotion)*0.1;
           p.y*=lip;
@@ -70,7 +70,7 @@ export class SignatureCrests {
             p.y+=sin(uv.x*19.0+uv.y*8.0-uAge*7.0)*uv.y*0.045*uMotion;
             p.y+=pressureGround(p.xz);
           }
-          if(uKind>13.5){
+          if(uKind>13.5 && uKind<14.5){
             p.xy*=0.88+0.12*smoothstep(0.0,0.16,uAge);
             p.x+=sign(p.x)*smoothstep(0.35,1.0,uAge)*0.17*uMotion;
             p.z-=uAge*uAge*0.18*uMotion;
@@ -189,7 +189,8 @@ export class SignatureCrests {
       height <= 0
     )
       return false;
-    const contactSurface = kind === 'blood_cut' || kind === 'shield_contact';
+    const contactSurface =
+      kind === 'blood_cut' || kind === 'shield_contact' || kind === 'steel_cut';
     const authoredSurface = contactSurface || kind.endsWith('_pressure');
     if (authoredSurface && !this.preparation.ready(kind)) return false;
     let s = this.slots.find((s) => !s.active);
@@ -209,7 +210,7 @@ export class SignatureCrests {
     const geometry = this.shapes.get(kind) ?? this.shapes.get('shadow');
     if (geometry) s.mesh.geometry = geometry;
     s.mesh.rotation.set(pitch, angle, 0, 'YXZ');
-    if (kind === 'blood_cut') s.mesh.rotation.set(0, angle, pitch, 'YXZ');
+    if (kind === 'blood_cut' || kind === 'steel_cut') s.mesh.rotation.set(0, angle, pitch, 'YXZ');
     s.mesh.position.set(x, y, z);
     s.mesh.scale.set(Math.min(3, radius), Math.min(3, height), Math.min(3, radius));
     if (kind === 'chain') s.mesh.scale.set(height, height, radius);
@@ -234,35 +235,37 @@ export class SignatureCrests {
     u.uTint.value.setHex(tint);
     u.uAccent.value.setHex(accent);
     u.uKind.value =
-      kind === 'shield_contact'
-        ? 14
-        : kind.endsWith('_pressure')
-          ? 13
-          : kind === 'blood_cut'
-            ? 12
-            : kind === 'chain'
-              ? 11
-              : kind === 'hook'
-                ? 10
-                : kind === 'bone'
-                  ? 7
-                  : kind === 'ward'
-                    ? 8
-                    : kind === 'feather'
-                      ? 9
-                      : kind === 'ice'
-                        ? 0
-                        : kind === 'water'
-                          ? 1
-                          : kind === 'fire'
-                            ? 3
-                            : kind === 'light'
-                              ? 4
-                              : kind === 'nature'
-                                ? 5
-                                : kind === 'arcane'
-                                  ? 6
-                                  : 2;
+      kind === 'steel_cut'
+        ? 15
+        : kind === 'shield_contact'
+          ? 14
+          : kind.endsWith('_pressure')
+            ? 13
+            : kind === 'blood_cut'
+              ? 12
+              : kind === 'chain'
+                ? 11
+                : kind === 'hook'
+                  ? 10
+                  : kind === 'bone'
+                    ? 7
+                    : kind === 'ward'
+                      ? 8
+                      : kind === 'feather'
+                        ? 9
+                        : kind === 'ice'
+                          ? 0
+                          : kind === 'water'
+                            ? 1
+                            : kind === 'fire'
+                              ? 3
+                              : kind === 'light'
+                                ? 4
+                                : kind === 'nature'
+                                  ? 5
+                                  : kind === 'arcane'
+                                    ? 6
+                                    : 2;
     u.uAge.value = 0;
     u.uMotion.value = this.reducedMotion ? 0 : 1;
     return true;

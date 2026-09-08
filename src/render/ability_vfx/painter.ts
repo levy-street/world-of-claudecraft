@@ -1,7 +1,8 @@
-import { clearFuryAudioClaim } from '../../fury_audio_core';
+import { clearFuryAudioClaim, isMeleeAudioId } from '../../fury_audio_core';
 import { DAMAGE_CAST_RELEASES } from '../characters/cast_performance';
 import { isBleedContinuation, meleeImpactProfile } from '../melee_impact_core';
 import { SIGNATURE_ABILITIES } from './signature_core';
+import { WARRIOR_BLADE_STYLES } from './warrior_blades';
 // Thin painter for the per-ability spell VFX system: resolves an event's
 // ability id against the authored spec table (ability_vfx_specs.ts), asks the
 // pure core (ability_vfx_core.ts) for a plan, and drives the pooled Vfx
@@ -1164,6 +1165,23 @@ export class AbilityVfx {
       this.releaseGesture(ev.sourceId, ev.abilityId);
     const compoundId = attackAbilityId(ev.ability);
     if (
+      isMeleeAudioId(compoundId) &&
+      compoundId !== 'raging_gale' &&
+      compoundId !== 'red_harvest' &&
+      (this.deps.visualVariantOf?.(compoundId, ev.sourceId) ?? compoundId) === compoundId
+    ) {
+      clearFuryAudioClaim(ev);
+      if (this.deps.audioReady)
+        this.deps.fx.reserveFuryAudio(
+          ev,
+          compoundId,
+          ev.sourceId,
+          ev.targetId,
+          ev.kind === 'hit' ? (ev.amount > 0 ? 1 : (ev.absorbed ?? 0) > 0 ? 2 : 0) : 0,
+          this.deps.audioReady,
+        );
+    }
+    if (
       (compoundId === 'raging_gale' || compoundId === 'red_harvest') &&
       (this.deps.visualVariantOf?.(compoundId, ev.sourceId) ?? compoundId) === compoundId
     ) {
@@ -1197,10 +1215,10 @@ export class AbilityVfx {
         return true;
       }
     }
-    // A shield still collides when a ward absorbs all its damage. Retain the
-    // authored steel contact while explicitly withholding a flesh imprint.
+    // Authored weapons still collide when a ward absorbs all damage. Retain
+    // their absorb response while explicitly withholding a flesh imprint.
     if (
-      compoundId === 'shield_slam' &&
+      (compoundId === 'shield_slam' || (compoundId && WARRIOR_BLADE_STYLES[compoundId])) &&
       ev.kind === 'hit' &&
       ev.amount <= 0 &&
       (ev.absorbed ?? 0) > 0

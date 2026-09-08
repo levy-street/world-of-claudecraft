@@ -100,7 +100,8 @@ export class StudioCombatAudio {
         const cue = impactCueForDamage(event, target);
         if (
           cue &&
-          !masterworkAudioKey(attackAbilityId(event.ability), 'impact') &&
+          (!masterworkAudioKey(attackAbilityId(event.ability), 'impact') ||
+            isMeleeAudioId(attackAbilityId(event.ability))) &&
           shouldPlayCombatImpactForTarget(target)
         )
           play(cue, target);
@@ -135,3 +136,5 @@ export class StudioCombatAudio {
     }
   }
 }
+
+import { isMeleeAudioId } from '../fury_audio_core';

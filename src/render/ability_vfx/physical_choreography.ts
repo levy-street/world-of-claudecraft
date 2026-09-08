@@ -9,6 +9,7 @@ import {
 } from './physical_choreography_core';
 import { physicalContact } from './physical_contact';
 import type { SeqSlot, SequencerHost } from './sequencer';
+import { drawWarriorBlade } from './warrior_blades';
 import { drawWarriorShield } from './warrior_shield';
 import { drawWarriorShout } from './warrior_shouts';
 
@@ -122,17 +123,20 @@ export function physicalImpact(host: SequencerHost, slot: SeqSlot): void {
     slot.abilityId !== 'raging_gale' &&
     slot.abilityId !== 'red_harvest'
   ) {
-    host.burstAt(
-      slot.ix,
-      slot.iy,
-      slot.iz,
-      slot.color,
-      5,
-      0.45,
-      p.material === 'blood' ? 'blood' : 'sparks',
-      0.23,
+    const outcome = slot.componentOutcomes === undefined ? 1 : slot.componentOutcomes & 3;
+    const profile = meleeImpactProfile(slot.abilityId);
+    const at = host.anchorOf(
+      slot.targetId,
+      profile ? meleeContactHeight(profile, 0) : 0.55,
+      destination,
     );
-    host.countPrimitive(slot.abilityId, 1);
+    const x = at?.x ?? slot.ix,
+      y = at?.y ?? slot.iy,
+      z = at?.z ?? slot.iz;
+    if (outcome === 2) host.flipbookAt(x, y, z, 2.3, 0xd3e2eb, 'contact_crush', 1.45, 0.2);
+    else if (outcome === 1)
+      host.burstAt(x, y, z, slot.color, 5, 0.45, p.material === 'blood' ? 'blood' : 'sparks', 0.23);
+    if (outcome) host.countPrimitive(slot.abilityId, 1);
     slot.lingerUntil = slot.t + 0.2;
     slot.motifLoops = p.beats.length;
     return;
@@ -172,6 +176,7 @@ function physicalBeat(host: SequencerHost, slot: SeqSlot, beat: number): void {
   if (drawWarriorShout(host, slot, beat)) return;
   if (furyBeat(host, slot, beat)) return;
   if (drawWarriorShield(host, slot, beat)) return;
+  if (drawWarriorBlade(host, slot, beat)) return;
   const authored = slot.spec.physical!;
   const p =
     authored.shape === 'rush' || authored.shape === 'retreat'

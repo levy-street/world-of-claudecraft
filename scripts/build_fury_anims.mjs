@@ -42,12 +42,13 @@ const q = new Quaternion(),
   offset = new Quaternion(),
   euler = new Euler();
 const degrees = Math.PI / 180;
-function pose(right, left, turn, lean, spread = 0) {
+function pose(right, left, turn, lean, spread = 0, torso = idle) {
   const result = new Map();
   for (const key of keys) {
     const [bone, path] = key.split('|');
     const arm = /arm|hand|wrist/.test(bone);
-    const source = arm ? (bone.endsWith('.r') ? right : left) : idle;
+    const lower = /leg|foot|toes/.test(bone) || bone === 'root' || bone === 'hips';
+    const source = lower ? idle : arm ? (bone.endsWith('.r') ? right : left) : torso;
     const value = [...(source.get(key) ?? idle.get(key))];
     if (path === 'rotation') {
       let x = 0,
@@ -77,12 +78,14 @@ function pose(right, left, turn, lean, spread = 0) {
   return result;
 }
 const rightCoil = pose(sample(1, 0.27), sample(2, 0.28), -32, -6, 8);
-const rightCut = pose(sample(1, 0.66), sample(2, 0.28), 30, 11, 2);
+const rightCut = pose(sample(1, 0.38), sample(2, 0.28), 30, 11, 2);
 const leftCoil = pose(sample(1, 0.78), sample(2, 0.32), 36, -3, 14);
 const leftCut = pose(sample(1, 0.88), sample(2, 0.87), -38, 14, 7);
-const reapCoil = pose(sample(3, 1.08), sample(3, 1.08), -45, 23, 24);
-const reapCut = pose(sample(3, 0.52), sample(3, 0.52), 42, -12, 29);
-const follow = pose(sample(3, 0.68), sample(3, 0.68), 23, -2, 15);
+const reapCoil = pose(sample(1, 0.41), sample(2, 1.08), 12, 8, 8, sample(2, 0.95));
+// Preserve the native torso with the arm chains: the old Idle torso plus chop
+// arms pointed both actual sword blades behind the caster at the impact peak.
+const reapCut = pose(sample(1, 0.38), sample(2, 0.87), 12, 8, 8, sample(2, 0.87));
+const follow = pose(sample(1, 0.37), sample(2, 0.87), 12, -8, 8, sample(2, 0.95));
 const clips = [];
 for (const [name, beats] of [
   [

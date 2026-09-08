@@ -169,16 +169,16 @@ describe('buildManifest', () => {
   // Lanternback Troll and the Chimeglass Tortoise deliberately have no stride
   // cue at all and borrow the player's surface footfall instead (see
   // Sfx.mountRun's fallback branch, and the coverage tests in sfx.test.ts).
-  it('keeps the release catalog, mount/UI cues, and signature performances in one 311-key inventory', () => {
+  it('keeps the release catalog, mount/UI cues, and signature performances in one 321-key inventory', () => {
     const keys = new Set(SFX.map((entry) => entry.key));
     // 268 = the release catalog plus the two gendered player-voice keys from
     // PR #2320 and the rickshaw mount's summon/loop cues.
     // 272 = the 268 above plus the Mech Bird's run/idle/jump/land take set.
     // Eight original signature material tails join the fixed inventory.
     // Twenty-four charge/release/contact clips extend the eight material tails.
-    // Seven individually timed Fury release/contact recordings.
-    expect(keys.size).toBe(311);
-    expect([...keys].filter((key) => key.includes('_warrior_'))).toHaveLength(7);
+    // Seven Fury and ten native heavy-strike release/contact recordings.
+    expect(keys.size).toBe(321);
+    expect([...keys].filter((key) => key.includes('_warrior_'))).toHaveLength(17);
     expect([...keys].filter((key) => key.includes('_masterwork_'))).toHaveLength(24);
     expect([...keys].filter((key) => key.startsWith('signature_'))).toHaveLength(8);
     expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(62);
@@ -264,7 +264,8 @@ describe('buildManifest', () => {
     // purely filesystem-discovered.
     const mobFamilyKeys = [...keys].filter((key) => key.startsWith('mob_'));
     expect(mobFamilyKeys).toHaveLength(65); // 13 families x 5 actions
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(311);
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(321);
+    expect([...SFX_FIXED_CATALOG_KEYS].sort()).toEqual([...keys].sort());
   });
 });
 

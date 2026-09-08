@@ -6,11 +6,14 @@ import { join } from 'node:path';
 import { conformSfxAudio, probeSfxAudio } from './sfx/conform_audio.mjs';
 import { FFMPEG_PATH, FFPROBE_PATH } from './sfx/ffmpeg_paths.mjs';
 import { FURY_SFX } from './sfx/fury_sfx.mjs';
+import { WARRIOR_CONTACT_SFX } from './sfx/warrior_contact_sfx.mjs';
 
-const root = 'tmp/fury-audio';
+const contact = process.argv.includes('--warrior-contact');
+const cues = contact ? WARRIOR_CONTACT_SFX : FURY_SFX;
+const root = contact ? 'tmp/warrior-contact-audio' : 'tmp/fury-audio';
 mkdirSync(join(root, 'curated'), { recursive: true });
 const review = [];
-for (const cue of FURY_SFX)
+for (const cue of cues)
   for (let take = 1; take <= cue.variants.length; take++) {
     const filename = `${cue.key}_${take}.mp3`;
     const raw = join(root, 'raw', filename);

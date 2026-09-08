@@ -30,6 +30,13 @@ const SOURCE_ALIASES: Readonly<Record<string, string>> = {
   chain_lightning: 'lightning_bolt',
   abyssal_rift: 'shadow_bolt',
 };
+const WARRIOR_CONTACT_SOURCES: Readonly<Record<string, string>> = {
+  shield_slam: 'Warrior_Shieldcrack',
+  mortal_strike: 'Warrior_Maiming_Strike',
+  execute: 'Warrior_Early_Grave',
+  bloodthirst: 'Warrior_Bloodletting',
+  victory_rush: 'Warrior_Victory_Rush',
+};
 
 /** Re-sample the rig's own authored gesture, preserving all tracks and joint conventions.
  * A crisp release/contact is held briefly, with a longer, smooth recovery. Runs at preparation only. */
@@ -99,7 +106,7 @@ export function prepareSignatureClips(
           ? 'Cast_Verdict'
           : (overrides?.[id] ?? overrides?.[SOURCE_ALIASES[id]]),
       source = name ? clips.get(name) : undefined;
-    if (source?.name === 'Warrior_Shieldcrack' && id === 'shield_slam') {
+    if (source && source.name === WARRIOR_CONTACT_SOURCES[id]) {
       const clip = source.clone();
       clip.name = signatureClipName(id);
       clips.set(clip.name, clip);

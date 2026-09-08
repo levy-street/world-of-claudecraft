@@ -5,14 +5,17 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { FURY_SFX } from './sfx/fury_sfx.mjs';
+import { WARRIOR_CONTACT_SFX } from './sfx/warrior_contact_sfx.mjs';
 
-const folder = 'tmp/fury-audio';
+const contact = process.argv.includes('--warrior-contact');
+const cues = contact ? WARRIOR_CONTACT_SFX : FURY_SFX;
+const folder = contact ? 'tmp/warrior-contact-audio' : 'tmp/fury-audio';
 mkdirSync(join(folder, 'raw'), { recursive: true });
 const ledgerPath = join(folder, 'generation-ledger.json');
 const ledger = existsSync(ledgerPath)
   ? JSON.parse(readFileSync(ledgerPath, 'utf8'))
   : { provider: 'ElevenLabs sound-generation', takes: [] };
-const planned = FURY_SFX.flatMap((cue) =>
+const planned = cues.flatMap((cue) =>
   Array.from({ length: cue.variants.length }, (_, index) => ({ ...cue, take: index + 1 })),
 );
 if (!process.argv.includes('--generate')) {
@@ -20,7 +23,7 @@ if (!process.argv.includes('--generate')) {
     JSON.stringify({
       planned: planned.length,
       generatedSeconds: planned.length * 0.5,
-      command: 'node scripts/gen_fury_sfx.mjs --generate',
+      command: `node scripts/gen_fury_sfx.mjs${contact ? ' --warrior-contact' : ''} --generate`,
     }),
   );
   process.exit(0);

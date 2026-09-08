@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { FURY_AUDIO, furyAudioClaimed } from '../src/fury_audio_core';
+import { FURY_AUDIO, furyAudioClaimed, MELEE_AUDIO } from '../src/fury_audio_core';
 import { FuryAudioQueue } from '../src/render/ability_vfx/fury_audio';
 import type { SequencerHost } from '../src/render/ability_vfx/sequencer';
 
@@ -13,36 +13,41 @@ function setup() {
 }
 
 describe('retained Fury audio', () => {
-  it.each(['raging_gale', 'red_harvest'] as const)(
-    'plays %s contacts once on the authored times',
-    (id) => {
-      const h = setup(),
-        cue = FURY_AUDIO[id];
-      for (const _key of cue.impacts) {
-        const event = {};
-        expect(h.queue.reserve(h.host, event, id, 1, 2, 1, () => true)).toBe(true);
-        expect(furyAudioClaimed(event)).toBe(true);
-      }
-      expect(h.abilityAudio.mock.calls.map((c) => c[6].sample)).toEqual([cue.release]);
-      for (const dt of [0, Number.NaN, -1]) h.queue.update(h.host, dt);
-      expect(h.abilityAudio).toHaveBeenCalledTimes(1);
-      let time = 0;
-      for (let beat = 0; beat < cue.times.length; beat++) {
-        h.queue.update(h.host, cue.times[beat] - time - 0.0001);
-        expect(h.abilityAudio).toHaveBeenCalledTimes(beat + 1);
-        h.queue.update(h.host, 0.00011);
-        time = cue.times[beat] + 0.00001;
-        expect(h.abilityAudio.mock.calls.at(-1)?.[6]).toEqual(
-          expect.objectContaining({
-            sample: cue.impacts[beat],
-            finisher: id === 'red_harvest' && beat === 2,
-          }),
-        );
-      }
-      h.queue.update(h.host, 2);
-      expect(h.abilityAudio).toHaveBeenCalledTimes(cue.impacts.length + 1);
-    },
-  );
+  it.each([
+    'raging_gale',
+    'red_harvest',
+    'mortal_strike',
+    'execute',
+    'bloodthirst',
+    'victory_rush',
+    'shield_slam',
+  ] as const)('plays %s contacts once on the authored times', (id) => {
+    const h = setup(),
+      cue = MELEE_AUDIO[id];
+    for (const _key of cue.impacts) {
+      const event = {};
+      expect(h.queue.reserve(h.host, event, id, 1, 2, 1, () => true)).toBe(true);
+      expect(furyAudioClaimed(event)).toBe(true);
+    }
+    expect(h.abilityAudio.mock.calls.map((c) => c[6].sample)).toEqual([cue.release]);
+    for (const dt of [0, Number.NaN, -1]) h.queue.update(h.host, dt);
+    expect(h.abilityAudio).toHaveBeenCalledTimes(1);
+    let time = 0;
+    for (let beat = 0; beat < cue.times.length; beat++) {
+      h.queue.update(h.host, cue.times[beat] - time - 0.0001);
+      expect(h.abilityAudio).toHaveBeenCalledTimes(beat + 1);
+      h.queue.update(h.host, 0.00011);
+      time = cue.times[beat] + 0.00001;
+      expect(h.abilityAudio.mock.calls.at(-1)?.[6]).toEqual(
+        expect.objectContaining({
+          sample: cue.impacts[beat],
+          finisher: (id === 'red_harvest' && beat === 2) || id === 'execute',
+        }),
+      );
+    }
+    h.queue.update(h.host, 2);
+    expect(h.abilityAudio).toHaveBeenCalledTimes(cue.impacts.length + 1);
+  });
 
   it('keeps miss and absorption outcomes separate from flesh impacts', () => {
     const h = setup();

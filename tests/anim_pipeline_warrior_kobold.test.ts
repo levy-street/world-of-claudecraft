@@ -113,7 +113,7 @@ describe('warrior bespoke movement clip (issue #2889 warrior/kobold batch)', () 
     // This batch's real additions, spot-checked: every one verified to
     // actually reach playAttack (see the build script's header trace).
     expect(map.heroic_leap).toBe('Warrior_Heroic_Leap');
-    expect(map.victory_rush).toBe('1H_Melee_Attack_Slice_Diagonal');
+    expect(map.victory_rush).toBe('Warrior_Victory_Rush');
     expect(map.berserker_rage).toBe('Cheer');
     expect(map.recklessness).toBe('Cheer');
     expect(map.die_by_sword).toBe('Block');

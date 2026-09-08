@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import type { FuryAudioId } from '../../fury_audio_core';
+import type { MeleeAudioId } from '../../fury_audio_core';
 import {
   type AbilityVfxBuffSpec,
   type AbilityVfxFullSpec,
@@ -740,7 +740,7 @@ export class AbilityVfxFx implements SequencerHost {
 
   reserveFuryAudio(
     event: object,
-    id: FuryAudioId,
+    id: MeleeAudioId,
     caster: number,
     target: number,
     outcome: 0 | 1 | 2,

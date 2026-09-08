@@ -16,12 +16,49 @@ export const FURY_AUDIO = {
   },
 } as const;
 export type FuryAudioId = keyof typeof FURY_AUDIO;
+export const WARRIOR_CONTACT_AUDIO = {
+  mortal_strike: {
+    release: 'melee_warrior_maiming_release',
+    impacts: ['impact_warrior_maiming'],
+    times: [0.15],
+  },
+  execute: {
+    release: 'melee_warrior_early_grave_release',
+    impacts: ['impact_warrior_early_grave'],
+    times: [0.15],
+  },
+  bloodthirst: {
+    release: 'melee_warrior_bloodletting_release',
+    impacts: ['impact_warrior_bloodletting'],
+    times: [0.15],
+  },
+  victory_rush: {
+    release: 'melee_warrior_victory_release',
+    impacts: ['impact_warrior_victory'],
+    times: [0.15],
+  },
+  shield_slam: {
+    release: 'melee_warrior_shieldcrack_release',
+    impacts: ['impact_warrior_shieldcrack'],
+    times: [0.15],
+  },
+} as const;
+export const MELEE_AUDIO = { ...FURY_AUDIO, ...WARRIOR_CONTACT_AUDIO };
+export type MeleeAudioId = keyof typeof MELEE_AUDIO;
+export function isMeleeAudioId(id: string | undefined): id is MeleeAudioId {
+  return id !== undefined && Object.hasOwn(MELEE_AUDIO, id);
+}
 export function isFuryAudioId(id: string | undefined): id is FuryAudioId {
   return id === 'raging_gale' || id === 'red_harvest';
 }
 export function furyAudioSample(id: string | undefined, key: string | undefined): boolean {
   if (!isFuryAudioId(id) || !key) return false;
   const cue = FURY_AUDIO[id];
+  return cue.release === key || (cue.impacts as readonly string[]).includes(key);
+}
+export function meleeAudioSample(id: string | undefined, key: string | undefined): boolean {
+  if (!isMeleeAudioId(id) || !key) return false;
+  const cue = MELEE_AUDIO[id];
   return cue.release === key || (cue.impacts as readonly string[]).includes(key);
 }
 // The renderer sees each event immediately before the HUD/Studio sound adapter.

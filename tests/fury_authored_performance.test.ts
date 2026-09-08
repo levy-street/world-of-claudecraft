@@ -73,6 +73,7 @@ describe('Fury authored performance', () => {
       burstAt: vi.fn(),
       fragmentsAt: vi.fn(),
       pulseLight: vi.fn(),
+      groundYAt: () => 0,
       shakeAt: vi.fn(),
       countPrimitive: vi.fn(),
     } as unknown as SequencerHost;
@@ -86,14 +87,17 @@ describe('Fury authored performance', () => {
       accent: 0xffd0ac,
     } as SeqSlot;
     furyBeat(host, slot, 0);
-    expect(crest.mock.calls[0][0]).toBe(3);
+    expect(crest.mock.calls[0][0]).toBeCloseTo(3 - (3 / 5) * 0.65);
     expect(crest.mock.calls[0][1]).toBeCloseTo(3 * 0.51 + 0.08);
     const firstWidth = crest.mock.calls[0][3];
     const core = vi.mocked(host.pathRibbon).mock.calls[0];
     targetX = 8;
     furyBeat(host, slot, 2);
-    expect(crest.mock.calls[1][0]).toBe(8);
+    expect(crest.mock.calls[1][0]).toBeCloseTo(8 - (8 / Math.hypot(8, 4)) * 0.65);
     expect(crest.mock.calls[1][3]).toBeGreaterThan(firstWidth * 1.3);
+    expect(crest.mock.calls).toHaveLength(3);
+    expect(crest.mock.calls[1][10]).toBeCloseTo(-crest.mock.calls[2][10]);
+    expect(crest.mock.calls[1][3]).toBe(crest.mock.calls[2][3]);
     expect(contact).toHaveBeenCalledTimes(2);
     vi.mocked(host.pathRibbon).mockClear();
     slot.tier = 1;

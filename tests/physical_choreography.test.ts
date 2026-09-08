@@ -250,7 +250,8 @@ describe('authored physical compositions', () => {
     seq.update(host, 0.25);
     expect(paths).toHaveLength(6);
     seq.update(host, 0.25);
-    expect(paths).toHaveLength(9);
+    // The third damage beat owns two opposed rising blade wakes.
+    expect(paths).toHaveLength(12);
     expect(paths[0][0].distanceTo(paths[3][0])).toBeGreaterThan(0.5);
     expect(host.ringAt).not.toHaveBeenCalled();
     expect(host.elementalImpact).not.toHaveBeenCalled();

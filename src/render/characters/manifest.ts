@@ -1357,8 +1357,8 @@ export const VISUALS: Record<string, VisualDef> = {
         dualwield: 'Dualwield_Melee_Attack_Chop',
       },
       attackByAbility: {
-        mortal_strike: '2H_Melee_Attack_Chop',
-        execute: '2H_Melee_Attack_Chop',
+        mortal_strike: 'Warrior_Maiming_Strike',
+        execute: 'Warrior_Early_Grave',
         slam: '2H_Melee_Attack_Chop',
         red_harvest: 'Fury_Red_Harvest',
         breachmaker: '2H_Melee_Attack_Chop',
@@ -1366,7 +1366,7 @@ export const VISUALS: Record<string, VisualDef> = {
         // scripts/build_warrior_contact_anims.mjs bakes foot locking offline.
         shield_slam: 'Warrior_Shieldcrack',
         raging_gale: 'Fury_Twinstrike',
-        bloodthirst: 'Dualwield_Melee_Attack_Chop',
+        bloodthirst: 'Warrior_Bloodletting',
         // Reaping Arc and Revenge hit everything in the frontal arc: the
         // synthesized flat reap (scripts/_add_sweep_slice_anim.mjs), not the
         // top-to-bottom chop (owner: "sideways sword sweep").
@@ -1391,11 +1391,8 @@ export const VISUALS: Record<string, VisualDef> = {
         // painter.ts's non-contact 'selfCast' branch); with no entry it plays
         // nothing at all on the body.
         heroic_leap: 'Warrior_Heroic_Leap',
-        // Victory Rush is a real weapon strike (weaponStrike effect, not a
-        // pure buff), so it lands through the ordinary damage-event attack
-        // trigger like every entry above it: a confident decisive swing, the
-        // same clip heroic_strike/overpower/hamstring already use.
-        victory_rush: '1H_Melee_Attack_Slice_Diagonal',
+        // A decisive cut followed by an upright, confident recovery.
+        victory_rush: 'Warrior_Victory_Rush',
         // Seething Fury and Recklessness are both a defiant roar of rage: no
         // castFx, no target, so (like Heroic Leap above) the existing Cheer
         // gesture only shows up once an attackByAbility entry exists for it.

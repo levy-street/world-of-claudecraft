@@ -1,4 +1,4 @@
-import { furyAudioSample, isFuryAudioId } from '../fury_audio_core';
+import { isMeleeAudioId, meleeAudioSample } from '../fury_audio_core';
 // Spatial sound-effect engine. Plays the generated ElevenLabs clips
 // (public/audio/sfx, see scripts/gen_sfx.mjs + docs/design/sound_effects.md) as
 // positioned 3D audio so other players' / creatures' footsteps and combat
@@ -1483,10 +1483,10 @@ class Sfx {
       master = this.master;
     if (!ctx || !master) return;
     if (this.tooFar(x, z)) return;
-    if (isFuryAudioId(opts?.abilityId)) {
+    if (isMeleeAudioId(opts?.abilityId)) {
       // Retained presentation-clock events own these recordings. Ordinary
       // sequencer accents carry no sample and must not double the same cut.
-      if (opts.sample && furyAudioSample(opts.abilityId, opts.sample))
+      if (opts.sample && meleeAudioSample(opts.abilityId, opts.sample))
         this.playAt(opts.sample, x, y, z, {
           gain: opts.lite ? 0.3 : opts.finisher ? 0.95 : kind === 'impact' ? 0.78 : 0.6,
           cooldown: 0,

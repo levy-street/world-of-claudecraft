@@ -2,7 +2,7 @@
 // node scripts/build_warrior_contact_anims.mjs [--preview]
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dedup, prune } from '@gltf-transform/functions';
-import { Object3D, Quaternion, Vector3 } from 'three';
+import { Euler, Object3D, Quaternion, Vector3 } from 'three';
 import {
   bakeClip,
   blendValue,
@@ -15,7 +15,13 @@ import {
 const io = await createGlbIO();
 const doc = await io.read('public/models/chars/players/knight.glb');
 const root = doc.getRoot();
-const donors = ['Idle', 'Shield_Bash'].map((name) => indexClip(root, name));
+const donors = [
+  'Idle',
+  'Shield_Bash',
+  '1H_Melee_Attack_Slice_Diagonal',
+  '2H_Melee_Attack_Chop',
+  'Dualwield_Melee_Attack_Chop',
+].map((name) => indexClip(root, name));
 for (const donor of donors) {
   for (const channel of donor.values()) {
     if (channel.path !== 'rotation') continue;
@@ -127,7 +133,7 @@ const guard = shieldPose(0, [0, -0.008, -0.01]);
 const chamber = shieldPose(0.14, [0, -0.025, -0.035]);
 const drive = shieldPose(0.32, [0, -0.008, 0.045]);
 const recoil = shieldPose(0.5, [0, -0.012, 0.015]);
-const beats = [
+const shieldBeats = [
   [0, idle],
   [0.045, guard],
   [0.085, chamber],
@@ -137,41 +143,139 @@ const beats = [
   [0.44, guard],
   [0.68, idle],
 ];
-const first = plantFeet(new Map([...idle].map(([key, value]) => [key, [...value]])));
-const timeline = [[0, (key) => first.get(key)]];
-for (let b = 1; b < beats.length; b++) {
-  const [start, from] = beats[b - 1],
-    [end, to] = beats[b];
-  // Dense offline sampling preserves the foot lock between exported keys too.
-  const steps = Math.max(2, Math.ceil((end - start) * 180));
-  for (let step = 1; step <= steps; step++) {
-    const t = step / steps;
-    const weight = b === 3 ? t * t : t * t * (3 - 2 * t);
-    const pose = plantFeet(
-      new Map(keys.map((key) => [key, blendValue(key, from.get(key), to.get(key), weight)])),
-    );
-    timeline.push([start + (end - start) * t, (key) => pose.get(key)]);
+function bladePose(donor, time, hipOffset, turn, lean, roll = 0, dualGuard = false) {
+  const source = samplePose(donors[donor], time);
+  const guard = dualGuard ? samplePose(donors[4], 0.28) : null;
+  const pose = new Map(
+    keys.map((key) => {
+      const [name, path] = key.split('|');
+      const lower = /leg|foot|toes/.test(name) || name === 'root' || name === 'hips';
+      const heldLeft = guard && /arm|hand|wrist/.test(name) && name.endsWith('.l');
+      const from = lower || path !== 'rotation' ? idle : heldLeft ? guard : source;
+      return [key, [...(from.get(key) ?? idle.get(key))]];
+    }),
+  );
+  pose.set(
+    'hips|translation',
+    idle.get('hips|translation').map((v, i) => v + hipOffset[i]),
+  );
+  for (const [name, weight] of [
+    ['chest', 1],
+    ['spine', 0.28],
+    ['head', -0.55],
+  ]) {
+    const key = `${name}|rotation`;
+    const radians = (Math.PI / 180) * weight;
+    const q = new Quaternion().fromArray(pose.get(key));
+    q.multiply(
+      new Quaternion().setFromEuler(new Euler(lean * radians, turn * radians, roll * radians)),
+    ).normalize();
+    pose.set(key, q.toArray());
   }
+  return pose;
+}
+const maimLoad = bladePose(3, 0.3, [0.012, -0.022, -0.025], -18, -5, -20);
+const maimCut = bladePose(3, 0.83, [-0.012, -0.025, 0.035], 24, 13, 25);
+const maimFollow = bladePose(3, 1.12, [-0.008, -0.015, 0.025], 30, 9, 18);
+const graveLoad = bladePose(3, 0.3, [0, -0.035, -0.03], 0, -11);
+const graveCut = bladePose(3, 0.82, [0, -0.035, 0.04], 0, 19);
+const graveExtract = bladePose(3, 1.14, [0, -0.02, 0.02], 0, 12);
+const bloodLoad = bladePose(2, 0.27, [0.008, -0.018, -0.02], -26, -4, -5, true);
+const bloodCut = bladePose(2, 0.39, [-0.01, -0.02, 0.03], 30, 10, 8, true);
+const bloodPull = bladePose(2, 0.88, [0, -0.01, 0.01], 8, -4, 0, true);
+const victoryLoad = bladePose(2, 0.5, [0, -0.027, -0.025], -18, 7, -5);
+const victoryCross = bladePose(2, 0.42, [0, -0.02, 0.02], 6, 5, 3);
+const victoryCut = bladePose(2, 0.39, [0, -0.015, 0.035], 20, 0, 9);
+const victoryRise = bladePose(2, 0.27, [0, -0.005, 0.01], 6, -9, 0);
+const performances = [
+  ['Warrior_Shieldcrack', shieldBeats],
+  [
+    'Warrior_Maiming_Strike',
+    [
+      [0, idle],
+      [0.085, maimLoad],
+      [0.15, maimCut],
+      [0.185, maimCut],
+      [0.36, maimFollow],
+      [0.68, idle],
+    ],
+  ],
+  [
+    'Warrior_Early_Grave',
+    [
+      [0, idle],
+      [0.095, graveLoad],
+      [0.15, graveCut],
+      [0.205, graveCut],
+      [0.36, graveExtract],
+      [0.7, idle],
+    ],
+  ],
+  [
+    'Warrior_Bloodletting',
+    [
+      [0, idle],
+      [0.075, bloodLoad],
+      [0.15, bloodCut],
+      [0.175, bloodCut],
+      [0.3, bloodPull],
+      [0.66, idle],
+    ],
+  ],
+  [
+    'Warrior_Victory_Rush',
+    [
+      [0, idle],
+      [0.085, victoryLoad],
+      [0.12, victoryCross],
+      [0.15, victoryCut],
+      [0.185, victoryCut],
+      [0.33, victoryRise],
+      [0.68, idle],
+    ],
+  ],
+];
+const clips = [],
+  reports = [];
+for (const [name, beats] of performances) {
+  const first = plantFeet(new Map([...idle].map(([key, value]) => [key, [...value]])));
+  const timeline = [[0, (key) => first.get(key)]];
+  for (let b = 1; b < beats.length; b++) {
+    const [start, from] = beats[b - 1],
+      [end, to] = beats[b];
+    // Dense offline sampling preserves the foot lock between exported keys too.
+    const steps = Math.max(2, Math.ceil((end - start) * 180));
+    for (let step = 1; step <= steps; step++) {
+      const t = step / steps;
+      const weight = end === 0.15 ? t * t : t * t * (3 - 2 * t);
+      const pose = plantFeet(
+        new Map(keys.map((key) => [key, blendValue(key, from.get(key), to.get(key), weight)])),
+      );
+      timeline.push([start + (end - start) * t, (key) => pose.get(key)]);
+    }
+  }
+  clips.push(
+    bakeClip(doc, {
+      clipName: name,
+      channelKeys: keys,
+      timeline,
+      donorFor: (key) => donors.find((donor) => donor.has(key))?.get(key),
+    }).animation,
+  );
+  reports.push({ name, frames: timeline.length });
 }
 if (!Number.isFinite(maxFootError) || maxFootError > 1e-5)
   throw new Error(`Foot lock error ${maxFootError}`);
-const clip = bakeClip(doc, {
-  clipName: 'Warrior_Shieldcrack',
-  channelKeys: keys,
-  timeline,
-  donorFor: (key) => donors.find((donor) => donor.has(key))?.get(key),
-}).animation;
 await mkdir('tmp/warrior-contact-authoring', { recursive: true });
 if (process.argv.includes('--preview'))
   await io.write('tmp/warrior-contact-authoring/knight_contact_preview.glb', doc);
-stripToAnimationsOnly(doc, [clip]);
+stripToAnimationsOnly(doc, clips);
 await doc.transform(prune(), dedup());
 const output = 'public/models/chars/players/warrior_contact_anims.glb';
 await io.write(output, doc);
 const report = {
   output,
-  clip: clip.getName(),
-  frames: timeline.length,
+  clips: reports,
   channels: keys.length,
   maxFootError,
 };

@@ -22,6 +22,7 @@ import { FURY_SFX } from './fury_sfx.mjs';
 import MASTERWORK_SFX from './masterwork_sfx.json' with { type: 'json' };
 import { SIGNATURE_SFX } from './signature_sfx.mjs';
 import { UI_SFX_CATALOG } from './ui_sfx.mjs';
+import { WARRIOR_CONTACT_SFX } from './warrior_contact_sfx.mjs';
 
 // UI cues in the baked-tone generator's list that already have a real
 // recording dropped in over the synth placeholder (see gen_ui_sfx.mjs's
@@ -88,6 +89,7 @@ const mob = (family, who, aggro, attack, death, hurt, idle) => {
 
 export const SFX = [
   ...FURY_SFX,
+  ...WARRIOR_CONTACT_SFX,
   ...SIGNATURE_SFX,
   ...MASTERWORK_SFX,
   // --- Movement & footsteps -------------------------------------------------

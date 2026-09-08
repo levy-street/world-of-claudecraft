@@ -4,13 +4,25 @@ import { ArchetypeSequencer, type SequencerHost } from '../src/render/ability_vf
 import type { AbilityVfxFullSpec } from '../src/render/ability_vfx_core';
 import { ABILITIES } from '../src/sim/data';
 
-it.each(['hit', 'absorbed', 'miss', 'dodge', 'parry'] as const)(
-  'routes a real Shieldcrack %s result without inventing a body wound',
-  (outcome) => {
+const abilities = [
+  'shield_slam',
+  'mortal_strike',
+  'execute',
+  'bloodthirst',
+  'victory_rush',
+] as const;
+const outcomes = ['hit', 'absorbed', 'miss', 'dodge', 'parry'] as const;
+it.each(
+  abilities.flatMap((id) =>
+    outcomes.flatMap((outcome) => [false, true].map((secondary) => ({ id, outcome, secondary }))),
+  ),
+)(
+  'routes $id $outcome secondary=$secondary without inventing a body wound',
+  ({ id, outcome, secondary }) => {
     const host = new Proxy(
       {
         anchorOf: (id: number, fraction: number, out = { x: 0, y: 0, z: 0 }) =>
-          Object.assign(out, { x: id === 1 ? 0 : 2, y: fraction * 2, z: 0 }),
+          Object.assign(out, { x: id === 1 ? 0 : id * 2, y: fraction * 2, z: 0 }),
         groundYAt: () => 0,
       } as unknown as SequencerHost,
       {
@@ -55,9 +67,20 @@ it.each(['hit', 'absorbed', 'miss', 'dodge', 'parry'] as const)(
       } as unknown as AbilityVfxDeps,
       () => 0,
     );
+    if (secondary)
+      painter.onDamage({
+        abilityId: id,
+        ability: ABILITIES[id].name,
+        sourceId: 1,
+        targetId: 3,
+        school: 'physical',
+        crit: false,
+        amount: 150,
+        kind: 'hit',
+      });
     painter.onDamage({
-      abilityId: 'shield_slam',
-      ability: ABILITIES.shield_slam.name,
+      abilityId: id,
+      ability: ABILITIES[id].name,
       sourceId: 1,
       targetId: 2,
       school: 'physical',
@@ -68,14 +91,24 @@ it.each(['hit', 'absorbed', 'miss', 'dodge', 'parry'] as const)(
     });
     for (let i = 0; i < 40; i++) sequencer.update(host, 0.025);
     const collision = outcome === 'hit' || outcome === 'absorbed';
-    expect(sequence).toHaveBeenCalledTimes(collision ? 1 : 0);
-    expect(host.crestAt).toHaveBeenCalledTimes(collision ? 1 : 0);
-    expect(host.contact).toHaveBeenCalledTimes(outcome === 'hit' ? 1 : 0);
-    expect(host.flipbookAt).toHaveBeenCalledTimes(collision ? 1 : 0);
+    expect(sequence).toHaveBeenCalledTimes((collision ? 1 : 0) + (secondary ? 1 : 0));
+    const recipientCalls = (fn: unknown) =>
+      vi.mocked(fn as ReturnType<typeof vi.fn>).mock.calls.filter((call) => call[0] === 4);
+    expect(host.crestAt).toHaveBeenCalledTimes(
+      secondary || outcome === 'hit' || (outcome === 'absorbed' && id === 'shield_slam') ? 1 : 0,
+    );
+    expect(vi.mocked(host.contact!).mock.calls.filter((call) => call[1] === 2)).toHaveLength(
+      !secondary && outcome === 'hit' ? 1 : 0,
+    );
+    expect(recipientCalls(host.flipbookAt)).toHaveLength(
+      (secondary ? outcome === 'absorbed' : collision) ? 1 : 0,
+    );
     if (outcome !== 'hit') {
-      expect(host.burstAt).not.toHaveBeenCalled();
-      expect(host.fragmentsAt).not.toHaveBeenCalled();
+      expect(recipientCalls(host.burstAt)).toHaveLength(0);
+      expect(vi.mocked(host.fragmentsAt!).mock.calls.filter((call) => call[1] === 4)).toHaveLength(
+        0,
+      );
     }
-    if (outcome === 'absorbed') expect(sequence.mock.calls[0][7]).toBe(2);
+    if (outcome === 'absorbed') expect(sequence.mock.calls.at(-1)![7]).toBe(2);
   },
 );

@@ -69,18 +69,18 @@ function fixture(cls = 'warrior') {
   };
 }
 
-it('registers without GPU work and resumes only the five selected Warrior shapes', async () => {
+it('registers without GPU work and resumes only the six selected Warrior shapes', async () => {
   const f = fixture();
   try {
     expect(f.entry.required).toBe(false);
     expect(f.entry).not.toHaveProperty('resumeUnits');
     expect(f.entry).not.toHaveProperty('deadlineExempt');
     expect(f.queue.run).not.toHaveBeenCalled();
-    expect(f.entry.progress()).toEqual({ done: 0, planned: 23, trimmed: true });
+    expect(f.entry.progress()).toEqual({ done: 0, planned: 27, trimmed: true });
     // A dropped/skipped manifest never ran entry.run(), but kept registration.
     resumeActiveAbilityKit(f.scene);
     await ensureActiveAbilityKit(f.scene);
-    expect(f.queue.run).toHaveBeenCalledTimes(23);
+    expect(f.queue.run).toHaveBeenCalledTimes(27);
     for (const call of f.queue.run.mock.calls as unknown[][]) {
       expect(call[1]).toBe(GPU_WORK_PRIORITY.ACTIONABLE_VIEW);
       expect(call[3]).toEqual({ releaseTail: true });
@@ -89,11 +89,11 @@ it('registers without GPU work and resumes only the five selected Warrior shapes
     expect(f.upload).toHaveBeenNthCalledWith(1, f.blood);
     expect(f.upload).toHaveBeenNthCalledWith(2, f.steel);
     expect(f.upload).toHaveBeenNthCalledWith(3, f.texture);
-    expect(f.host.draw).toHaveBeenCalledTimes(5);
+    expect(f.host.draw).toHaveBeenCalledTimes(6);
     for (const kind of ACTIVE_WARRIOR_CRESTS) expect(f.prep.ready(kind)).toBe(true);
     expect(f.prep.ready('fire')).toBe(false);
     await ensureActiveAbilityKit(f.scene);
-    expect(f.queue.run).toHaveBeenCalledTimes(23);
+    expect(f.queue.run).toHaveBeenCalledTimes(27);
     expect(f.entry.progress().trimmed).toBe(false);
   } finally {
     f.close();
