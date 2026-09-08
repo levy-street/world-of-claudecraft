@@ -2,13 +2,24 @@ import * as THREE from 'three';
 import { buildFuryCutShape } from './fury_shapes';
 import { buildRitualSculpture } from './ritual_sculptures';
 import type { Substance } from './signature_core';
-export type CrestKind = Substance | 'bone' | 'ward' | 'feather' | 'hook' | 'chain' | 'blood_cut';
+import { buildWarriorPressure, type WarriorPressureKind } from './warrior_shout_shapes';
+export type CrestKind =
+  | Substance
+  | 'bone'
+  | 'ward'
+  | 'feather'
+  | 'hook'
+  | 'chain'
+  | 'blood_cut'
+  | WarriorPressureKind;
 
 /** Open, directional surfaces with genuinely different topology. Generated once
  * during preparation; all animation deforms these existing vertices. */
 export function buildSignatureShapes(): Map<CrestKind, THREE.BufferGeometry> {
   const shapes = new Map<CrestKind, THREE.BufferGeometry>();
   shapes.set('blood_cut', buildFuryCutShape());
+  for (const kind of ['rally_pressure', 'dread_pressure', 'challenge_pressure'] as const)
+    shapes.set(kind, buildWarriorPressure(kind));
   for (const kind of ['ice', 'water', 'fire', 'shadow', 'light', 'nature', 'arcane'] as const) {
     const positions: number[] = [],
       uvs: number[] = [],

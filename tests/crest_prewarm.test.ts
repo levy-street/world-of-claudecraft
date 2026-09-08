@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { expect, it, vi } from 'vitest';
 import { CrestPrewarm } from '../src/render/ability_vfx/crest_prewarm';
 import { buildFuryCutShape } from '../src/render/ability_vfx/fury_shapes';
+import * as productionAssets from '../src/render/ability_vfx/production_assets';
 import { SignatureCrests } from '../src/render/ability_vfx/signature_crests';
 
 const programs = new Map([
@@ -193,4 +194,51 @@ it('releases every live crest resource even when a carrier removal listener thro
   expect(scene.children).toHaveLength(0);
   expect(crests.preparation.group.children).toHaveLength(0);
   expect(() => crests.dispose()).not.toThrow();
+});
+
+it('binds the exact shared pressure texture to every live slot and never owns its disposal', () => {
+  const texture = new THREE.Texture(),
+    dispose = vi.spyOn(texture, 'dispose');
+  const source = vi.spyOn(productionAssets, 'warriorPressureTexture').mockReturnValue(texture);
+  const scene = new THREE.Scene(),
+    crests = new SignatureCrests(scene);
+  try {
+    const slots = scene.children.filter((child) => child.name === 'signatureCrest') as THREE.Mesh<
+      THREE.BufferGeometry,
+      THREE.ShaderMaterial
+    >[];
+    expect(slots).toHaveLength(8);
+    for (const mesh of slots) expect(mesh.material.uniforms.uPressureMap.value).toBe(texture);
+  } finally {
+    crests.dispose();
+    source.mockRestore();
+  }
+  expect(dispose).not.toHaveBeenCalled();
+  texture.dispose();
+});
+
+it('shares an in-flight compile between selected-kit preparation and the ordinary catalogue', async () => {
+  const geometry = buildFuryCutShape();
+  const material = new THREE.MeshBasicMaterial();
+  const prep = new CrestPrewarm(new THREE.Scene(), new Map([['blood_cut', geometry]]), material);
+  let finish!: () => void;
+  const compile = vi.fn(
+    () =>
+      new Promise<void>((resolve) => {
+        finish = resolve;
+      }),
+  );
+  const draw = vi.fn();
+  const host = { properties, compile, draw };
+  const first = prep.units(host)[0].run();
+  const second = prep.units(host)[0].run();
+  expect(compile).toHaveBeenCalledTimes(1);
+  finish();
+  await Promise.all([first, second]);
+  for (const unit of prep.units(host)) await unit.run();
+  expect(draw).toHaveBeenCalledTimes(1);
+  expect(prep.ready('blood_cut')).toBe(true);
+  prep.dispose();
+  geometry.dispose();
+  material.dispose();
 });

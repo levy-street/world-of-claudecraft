@@ -2,6 +2,9 @@ import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { abilityVfxTextures } from '../src/render/ability_vfx/fx_textures';
 import { AbilityVfxRibbons } from '../src/render/ability_vfx/ribbons';
+import type { SeqSlot, SequencerHost } from '../src/render/ability_vfx/sequencer';
+import { drawWarriorShout } from '../src/render/ability_vfx/warrior_shouts';
+import { WARRIOR_VFX_FULL_SPECS } from '../src/render/warrior_vfx_specs';
 
 // Pooled-ribbon admission tests: verify that priority-1 tracked paths (weapon
 // motion) are shielded from eviction by priority-0 decorations, and that the
@@ -269,4 +272,52 @@ describe('ribbon contact admission', () => {
       ribbons.dispose();
     }
   });
+});
+
+it('real repeated shout accents cannot evict a retained blade contact ribbon', () => {
+  installCanvasStub();
+  const { ribbons, probe } = makeRibbons();
+  try {
+    ribbons.spawnPath(0xff1100, 0.16, 0.8, simpleFill, true, null, false, false, 1);
+    const contact = probe.arcs.find((slot) => slot.active)!;
+    const core = contact.core.clone();
+    for (let i = 1; i < 20; i++) ribbons.spawnPath(0x668899, 0.1, 1, simpleFill);
+    const pathRibbon: SequencerHost['pathRibbon'] = (
+      colour,
+      width,
+      life,
+      fill,
+      brushed,
+      motion,
+      preserve,
+      priority,
+    ) => ribbons.spawnPath(colour, width, life, fill, brushed, motion, preserve, false, priority);
+    const host = {
+      anchorOf: (_id: number, _fraction: number, out: THREE.Vector3) =>
+        Object.assign(out, { x: 0, y: 0, z: 0 }),
+      groundYAt: () => 0,
+      facingAt: () => 0,
+      crestAt: vi.fn(),
+      pulseLight: vi.fn(),
+      bakedAt: vi.fn(),
+      fragmentsAt: vi.fn(),
+      countPrimitive: vi.fn(),
+      pathRibbon,
+    } as unknown as SequencerHost;
+    const slot = {
+      abilityId: 'piercing_howl',
+      casterId: 1,
+      targetId: 1,
+      tier: 0,
+      spec: WARRIOR_VFX_FULL_SPECS.piercing_howl,
+    } as SeqSlot;
+    for (let cast = 0; cast < 10; cast++)
+      for (let beat = 0; beat < 3; beat++) drawWarriorShout(host, slot, beat);
+    expect(contact.active).toBe(true);
+    expect(contact.core.equals(core)).toBe(true);
+    expect(contact.priority).toBe(1);
+    expect(contact.life).toBe(0.8);
+  } finally {
+    ribbons.dispose();
+  }
 });

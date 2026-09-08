@@ -1,4 +1,11 @@
 import type * as THREE from 'three';
+import type { BackgroundGpuQueue } from '../background_gpu_queue';
+import type { PrewarmManifestEntry } from '../prewarm_entry';
+import { activeKitPrewarmEntry } from './active_kit_prewarm';
+import type { CrestKind } from './signature_shapes';
+
+export { resumeActiveAbilityKit } from './active_kit_prewarm';
+
 import type { PrewarmResumeUnit } from '../prewarm_resume';
 import type { CrestPrewarmHost } from './crest_prewarm';
 import {
@@ -12,7 +19,7 @@ interface PrimitivePrewarmHost extends CrestPrewarmHost {
   spawn(): void;
   stageMaterials(): void | Promise<void>;
   materialUnits(): readonly PrewarmResumeUnit[];
-  geometryUnits(host: CrestPrewarmHost): readonly PrewarmResumeUnit[];
+  geometryUnits(host: CrestPrewarmHost, kinds?: readonly CrestKind[]): readonly PrewarmResumeUnit[];
   texture(texture: THREE.Texture): void;
   materialTextures(material: THREE.Material | THREE.Material[]): void;
   withinDeadline(): boolean;
@@ -64,5 +71,27 @@ export function abilityPrimitivePrewarmEntry(host: PrimitivePrewarmHost) {
       }
     },
     progress: () => ({ done, planned, trimmed: done < planned }),
-  };
+  } satisfies PrewarmManifestEntry;
+}
+
+/** Keep the coordinator thin while both recipes borrow exactly the same host. */
+export function entries(
+  cls: string,
+  queue: Pick<BackgroundGpuQueue, 'run'>,
+  host: Omit<PrimitivePrewarmHost, 'stageMaterials' | 'materialUnits'> & {
+    materialSlot: { run(): void | Promise<void>; resumeUnits(): readonly PrewarmResumeUnit[] };
+  },
+) {
+  return [
+    activeKitPrewarmEntry(host.scene, cls, {
+      queue,
+      geometry: (kinds) => host.geometryUnits(host, kinds),
+      texture: host.texture,
+    }),
+    abilityPrimitivePrewarmEntry({
+      ...host,
+      stageMaterials: () => host.materialSlot.run(),
+      materialUnits: () => host.materialSlot.resumeUnits(),
+    }),
+  ];
 }

@@ -3,18 +3,26 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('../src/render/ability_vfx/production_assets', async () => {
   const three = await import('three');
-  const textures = { smoke: new three.Texture(), shockwave: new three.Texture() };
+  const textures = {
+    shout_dust: new three.Texture(),
+    smoke: new three.Texture(),
+    shockwave: new three.Texture(),
+  };
   const source = new three.IcosahedronGeometry(1, 0);
   return {
     bakedTexture: (kind: keyof typeof textures) => textures[kind],
     fragmentGeometry: () => source,
+    warriorPressureTexture: () => null,
   };
 });
 
 import { BakedImpactLayers } from '../src/render/ability_vfx/baked_impact_layers';
 import { bakedTexture, fragmentGeometry } from '../src/render/ability_vfx/production_assets';
+import type { SeqSlot, SequencerHost } from '../src/render/ability_vfx/sequencer';
 import { SignatureCrests } from '../src/render/ability_vfx/signature_crests';
 import { SolidImpactFragments } from '../src/render/ability_vfx/solid_impact_fragments';
+import { drawWarriorShout } from '../src/render/ability_vfx/warrior_shouts';
+import { WARRIOR_VFX_FULL_SPECS } from '../src/render/warrior_vfx_specs';
 
 function meshes(scene: THREE.Scene) {
   return scene.children as THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial>[];
@@ -171,4 +179,84 @@ it('uses distinct prepared silhouettes and preserves their direction without reb
   expect(active.map((m) => m.geometry)).toEqual(geometries);
   pool.dispose();
   expect(scene.children).toHaveLength(0);
+});
+
+it('two full shouts retain four dust quadrants each beside two other live spell volumes', () => {
+  const scene = new THREE.Scene(),
+    pool = new BakedImpactLayers(scene);
+  for (let i = 0; i < 2; i++) pool.spawn('smoke', i, 0, 0, 2, 0xffffff, 0, 1, 0, 0, 0);
+  const accepted: boolean[] = [];
+  const host = {
+    anchorOf: (_id: number, _fraction: number, out: THREE.Vector3) =>
+      Object.assign(out, { x: 0, y: 0, z: 0 }),
+    groundYAt: () => 0,
+    facingAt: () => 0,
+    crestAt: vi.fn(),
+    pulseLight: vi.fn(),
+    fragmentsAt: vi.fn(),
+    pathRibbon: vi.fn(),
+    countPrimitive: vi.fn(),
+    burstAt: vi.fn(),
+    bakedAt: (...args: Parameters<NonNullable<SequencerHost['bakedAt']>>) => {
+      const [kind, x, y, z, size, tint, hot, duration, delay, heat, angle] = args;
+      const success = pool.spawn(kind, x, y, z, size, tint, hot, duration, delay, heat, 0, angle);
+      accepted.push(success);
+      return success;
+    },
+  } as unknown as SequencerHost;
+  const slot = {
+    abilityId: 'piercing_howl',
+    casterId: 1,
+    targetId: 1,
+    tier: 0,
+    spec: WARRIOR_VFX_FULL_SPECS.piercing_howl,
+  } as SeqSlot;
+  for (let caster = 1; caster <= 2; caster++) {
+    slot.casterId = caster;
+    for (let beat = 0; beat < slot.spec.physical!.beats.length; beat++)
+      drawWarriorShout(host, slot, beat);
+  }
+  expect(accepted).toEqual(Array(8).fill(true));
+  pool.update(0.2, new THREE.Quaternion(), false);
+  expect(meshes(scene).filter((mesh) => mesh.visible)).toHaveLength(10);
+  const dust = meshes(scene).filter(
+    (mesh) => mesh.material.uniforms.uMap.value === bakedTexture('shout_dust'),
+  );
+  expect(dust).toHaveLength(8);
+  for (const mesh of dust) {
+    expect(mesh.position.y).toBeCloseTo(0.08);
+    expect(mesh.material.uniforms.uAuthored.value).toBe(0);
+    expect(mesh.material.uniforms.uGutter.value).toBe(4 / 256);
+    expect(mesh.material.uniforms.uPivot.value.y).toBeCloseTo(0.5 + 1.25 / 5.6);
+    expect(mesh.material.uniforms.uHeat.value).toBe(0);
+  }
+  drawWarriorShout(host, slot, 0);
+  expect(accepted.slice(8)).toEqual(Array(4).fill(false));
+  expect(host.burstAt).toHaveBeenCalledTimes(4);
+  pool.dispose();
+});
+
+
+it('plays the dust sprite frames while moving out across sampled ground, then holds motion when requested', () => {
+  const scene=new THREE.Scene(), pool=new BakedImpactLayers(scene);
+  const floor=vi.fn((x:number,z:number)=>x*.2+z*.3);
+  expect(pool.spawn('shout_dust',0,.08,0,8,0xd3bb95,0,1,0,0,0,Math.PI/2,floor)).toBe(true);
+  const mesh=meshes(scene)[0];
+  const samples=floor.mock.calls.length;
+  pool.update(.2,new THREE.Quaternion(),false);
+  const firstFrame=mesh.material.uniforms.uFrame.value;
+  const firstX=mesh.position.x;
+  expect(firstFrame).toBeGreaterThan(0);
+  expect(mesh.position.y).toBeCloseTo(.08+mesh.position.x*.2,5);
+  pool.update(.15,new THREE.Quaternion(),false);
+  expect(mesh.material.uniforms.uFrame.value).toBeGreaterThan(firstFrame);
+  expect(mesh.position.x).toBeGreaterThan(firstX);
+  pool.update(.1,new THREE.Quaternion(),true);
+  const frozenPosition=mesh.position.clone();
+  expect(mesh.material.uniforms.uFrame.value).toBeCloseTo(.36*63);
+  pool.update(.1,new THREE.Quaternion(),true);
+  expect(mesh.position.equals(frozenPosition)).toBe(true);
+  expect(mesh.material.uniforms.uFrame.value).toBeCloseTo(.36*63);
+  expect(floor).toHaveBeenCalledTimes(samples);
+  pool.dispose();
 });

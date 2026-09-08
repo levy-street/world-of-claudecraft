@@ -15,6 +15,12 @@ interface Slot {
   rise: number;
   y: number;
   authored: boolean;
+  dust: boolean;
+  x: number;
+  z: number;
+  dx: number;
+  dz: number;
+  groundPath: Float32Array;
 }
 /** Authored volume motion with premultiplied temporal blending, straight-alpha
  * output, scene-depth intersection softness and bounded heat refraction. */
@@ -43,14 +49,16 @@ export class BakedImpactLayers {
         uGround: { value: 0 },
         uMotion: { value: 1 },
         uAuthored: { value: 0 },
+        uGutter: { value: 0.018 },
+        uMirror: { value: 1 },
         uPivot: { value: new THREE.Vector2(0.5, 0.5) },
       },
       vertexShader: `uniform vec2 uPivot; varying vec2 vUv; varying float vHeight,vDistance,vViewDepth; void main(){vUv=uv;vec3 p=position;p.xy+=vec2(0.5-uPivot.x,uPivot.y-0.5);vec4 world=modelMatrix*vec4(p,1.);vec4 view=viewMatrix*world;vHeight=world.y;vDistance=length(view.xyz);vViewDepth=-view.z;gl_Position=projectionMatrix*view;}`,
       fragmentShader: `${SCENE_SAMPLE_GLSL}
       uniform sampler2D uNormal,uFlow,uLighting;uniform float uSurface,uSourceScale;uniform vec3 uSunWorld;
-      uniform sampler2D uMap;uniform float uFrame,uOpacity,uHeat,uFloor,uGround,uMotion,uAuthored;uniform vec3 uTint,uHot;varying vec2 vUv;varying float vHeight,vDistance,vViewDepth;
-      vec2 cellUv(float f,vec2 local){f=clamp(f,0.,63.);float gutter=mix(0.018,8.0/512.0,uAuthored);vec2 content=mix(vec2(gutter),vec2(1.0-gutter),clamp(local,vec2(0.),vec2(1.)));vec2 uv=(content+vec2(mod(f,8.),7.-floor(f/8.)))/8.;return uv;}
-      vec4 cell(float f){return texture2D(uMap,cellUv(f,vUv));}
+      uniform sampler2D uMap;uniform float uFrame,uOpacity,uHeat,uFloor,uGround,uMotion,uAuthored,uGutter,uMirror;uniform vec3 uTint,uHot;varying vec2 vUv;varying float vHeight,vDistance,vViewDepth;
+      vec2 cellUv(float f,vec2 local){f=clamp(f,0.,63.);float gutter=uGutter;vec2 content=mix(vec2(gutter),vec2(1.0-gutter),clamp(local,vec2(0.),vec2(1.)));vec2 uv=(content+vec2(mod(f,8.),7.-floor(f/8.)))/8.;return uv;}
+      vec4 cell(float f){return texture2D(uMap,cellUv(f,vec2(0.5+(vUv.x-0.5)*uMirror,vUv.y)));}
       void main(){vec4 a=cell(floor(uFrame)),b=cell(floor(uFrame)+1.);float t=fract(uFrame);float alpha=mix(a.a,b.a,t);vec3 premix=mix(a.rgb*a.a,b.rgb*b.a,t);vec3 shade=premix/max(alpha,0.001);
         float surfaceDepth=vViewDepth;
         vec3 normal=vec3(0.,0.,1.);
@@ -115,6 +123,12 @@ export class BakedImpactLayers {
         rise: 0,
         y: 0,
         authored: false,
+        dust: false,
+        x: 0,
+        z: 0,
+        dx: 0,
+        dz: 0,
+        groundPath: new Float32Array(5),
       });
     }
     proto.dispose();
@@ -151,8 +165,17 @@ export class BakedImpactLayers {
     s.size = Math.min(9, size);
     s.ground = kind === 'shockwave';
     s.authored = kind === 'pyroblast' || kind === 'frost_nova' || kind === 'chain_heal';
-    s.rise = s.ground || s.authored ? 0 : 0.18;
+    s.rise = s.ground || s.authored || kind === 'shout_dust' ? 0 : 0.18;
     s.y = y;
+    s.x = x;
+    s.z = z;
+    s.dust = kind === 'shout_dust';
+    s.dx = s.dust ? Math.sin(angle) * s.size * 0.7 : 0;
+    s.dz = s.dust ? Math.cos(angle) * s.size * 0.7 : 0;
+    for (let i = 0; i < 5; i++) {
+      const sampled = s.dust && groundY ? groundY(x + (s.dx * i) / 4, z + (s.dz * i) / 4) : floor;
+      s.groundPath[i] = Number.isFinite(sampled) ? sampled : floor;
+    }
     s.mesh.position.set(x, y, z);
     s.mesh.scale.setScalar(s.size);
     s.mesh.quaternion.identity();
@@ -173,6 +196,7 @@ export class BakedImpactLayers {
     positions.needsUpdate = true;
     const u = s.mesh.material.uniforms;
     u.uMap.value = bakedTexture(kind);
+    u.uMirror.value = kind === 'shout_dust' && Math.cos(angle) < 0 ? -1 : 1;
     const surface = kind === 'chain_heal' ? liquidSurfaceMaps() : null;
     u.uSurface.value = surface ? 1 : 0;
     u.uNormal.value = surface?.normal ?? u.uMap.value;
@@ -187,6 +211,7 @@ export class BakedImpactLayers {
     u.uFloor.value = floor;
     u.uGround.value = s.ground ? 1 : 0;
     u.uAuthored.value = s.authored ? 1 : 0;
+    u.uGutter.value = s.authored || kind === 'shout_dust' ? 4 / 256 : 0.018;
     u.uPivot.value.set(
       0.5,
       kind === 'pyroblast'
@@ -195,7 +220,9 @@ export class BakedImpactLayers {
           ? 0.64255944
           : kind === 'chain_heal'
             ? 0.7128991485
-            : 0.5,
+            : kind === 'shout_dust'
+              ? 0.5 + 1.25 / 5.6
+              : 0.5,
     );
     s.mesh.userData.heat = u.uHeat.value;
     return true;
@@ -221,6 +248,19 @@ export class BakedImpactLayers {
       if (!s.ground) {
         s.mesh.quaternion.copy(camera);
         s.mesh.position.y = s.y + (reducedMotion ? 0 : p * s.rise);
+        if (s.dust) {
+          const advance = reducedMotion ? 0.65 : 1 - (1 - p) * (1 - p);
+          const grid = Math.min(3.9999, advance * 4),
+            i = Math.floor(grid),
+            fraction = grid - i;
+          const floor = s.groundPath[i] * (1 - fraction) + s.groundPath[i + 1] * fraction;
+          s.mesh.position.set(
+            s.x + s.dx * advance,
+            s.y + floor - s.groundPath[0],
+            s.z + s.dz * advance,
+          );
+          u.uFloor.value = floor;
+        }
       }
     }
   }

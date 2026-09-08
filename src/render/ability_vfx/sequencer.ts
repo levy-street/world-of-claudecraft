@@ -99,7 +99,7 @@ export interface SequencerHost {
     delay: number,
     heat: number,
     angle?: number,
-  ): void;
+  ): boolean | void;
   fragmentsAt?(
     kind: FragmentKind,
     x: number,
@@ -144,7 +144,7 @@ export interface SequencerHost {
     angle?: number,
     duration?: number,
     pitch?: number,
-  ): void;
+  ): boolean | void;
   /** Resolve an entity anchor. Pass `out` from a per-frame path to fill a
    *  caller-owned point instead of allocating (see src/render/vfx_anchor.ts);
    *  the reading is only valid until that scratch is reused. */

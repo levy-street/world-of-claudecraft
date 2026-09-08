@@ -25,6 +25,7 @@ export class CrestPrewarm {
     THREE.Mesh<THREE.BufferGeometry, THREE.Material>
   >();
   private readonly compiled = new Map<CrestKind, LinkedProgramLike[]>();
+  private readonly compiling = new Map<CrestKind, Promise<void>>();
   private readonly touched = new Set<LinkedProgramLike>();
   private readonly uploaded = new Set<CrestKind>();
   private disposed = false;
@@ -52,31 +53,40 @@ export class CrestPrewarm {
     return !this.disposed && this.uploaded.has(kind);
   }
 
-  units(host: CrestPrewarmHost): PrewarmResumeUnit[] {
+  units(host: CrestPrewarmHost, kinds?: readonly CrestKind[]): PrewarmResumeUnit[] {
     if (this.disposed) return [];
     const units: PrewarmResumeUnit[] = [];
     for (const [kind, carrier] of this.carriers) {
-      if (this.uploaded.has(kind)) continue;
+      if (this.uploaded.has(kind) || (kinds && !kinds.includes(kind))) continue;
       units.push({
         id: `crest-compile:${kind}`,
-        run: async () => {
+        run: () => {
           if (this.disposed || this.compiled.has(kind)) return;
-          await host.compile(carrier, true);
-          if (this.disposed) return;
-          const owner = this;
-          const settled = await settleProgramVariants(host.properties, [carrier.material], {
-            get fired() {
-              return owner.disposed;
-            },
-          });
-          if (this.disposed) return;
-          if (!settled.settled) throw new Error(`Crest ${kind} has unsettled programs`);
-          const programs = collectLinkedPrograms(host.properties, carrier, isProgramKnownReady);
-          // This rigid, single-pass shader has canvas and offscreen colour
-          // variants only. Never silently bless an unexpected third variant.
-          if (programs.length < 1 || programs.length > 2)
-            throw new Error(`Crest ${kind} expected one or two output programs`);
-          this.compiled.set(kind, programs);
+          const existing = this.compiling.get(kind);
+          if (existing) return existing;
+          // Claim only when admitted, never while constructing a queued recipe.
+          const task = (async () => {
+            await host.compile(carrier, true);
+            if (this.disposed) return;
+            const owner = this;
+            const settled = await settleProgramVariants(host.properties, [carrier.material], {
+              get fired() {
+                return owner.disposed;
+              },
+            });
+            if (this.disposed) return;
+            if (!settled.settled) throw new Error(`Crest ${kind} has unsettled programs`);
+            const programs = collectLinkedPrograms(host.properties, carrier, isProgramKnownReady);
+            // This rigid, single-pass shader has canvas and offscreen colour
+            // variants only. Never silently bless an unexpected third variant.
+            if (programs.length < 1 || programs.length > 2)
+              throw new Error(`Crest ${kind} expected one or two output programs`);
+            this.compiled.set(kind, programs);
+          })();
+          this.compiling.set(kind, task);
+          const release = () => this.compiling.delete(kind);
+          void task.then(release, release);
+          return task;
         },
       });
       for (let index = 0; index < 2; index++)
@@ -125,6 +135,7 @@ export class CrestPrewarm {
     }
     this.carriers.clear();
     this.compiled.clear();
+    this.compiling.clear();
     this.touched.clear();
     this.uploaded.clear();
     // The live pool alone owns and disposes the borrowed buffers/material.

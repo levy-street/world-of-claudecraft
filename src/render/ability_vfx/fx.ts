@@ -15,6 +15,7 @@ import type { AbilityAudioKind, AbilityAudioOpts } from '../audio_sink';
 import type { ControlSubject } from '../combat_status_core';
 import { CombatStatusSignals } from '../combat_status_signals';
 import { drawRestorativeStream } from '../restorative_water';
+import { cancelActiveAbilityKit } from './active_kit_prewarm';
 import { BakedImpactLayers } from './baked_impact_layers';
 import { drawClassCast, hasClassCast } from './cast_language';
 import { isContactSheet } from './contact_assets';
@@ -546,7 +547,7 @@ export class AbilityVfxFx implements SequencerHost {
   };
 
   constructor(
-    scene: THREE.Scene,
+    private scene: THREE.Scene,
     private camera: THREE.Camera,
     private anchor: RibbonAnchor,
     private groundY: (x: number, z: number) => number,
@@ -567,7 +568,7 @@ export class AbilityVfxFx implements SequencerHost {
     this.water = new RestorativeWaterVolumes(scene);
     this.details = new SignatureDetails(scene);
     this.forms = new ElementalForms(scene);
-    this.crests = new SignatureCrests(scene);
+    this.crests = new SignatureCrests(scene, this.groundY);
     this.baked = new BakedImpactLayers(scene);
     this.fragments = new SolidImpactFragments(scene);
     this.rings = new ShockRings(scene, tex, groundY);
@@ -1107,8 +1108,8 @@ export class AbilityVfxFx implements SequencerHost {
   // spec'd cast. Each decal style binds its texture so the whole set uploads
   // now, and the flipbook prewarm does the same for the six impact sheets.
   // The prewarm's finally-block clear() hides everything again.
-  crestPrewarmUnits(host: CrestPrewarmHost) {
-    return this.crests.preparation.units(host);
+  crestPrewarmUnits(host: CrestPrewarmHost, kinds?: readonly CrestKind[]) {
+    return this.crests.preparation.units(host, kinds);
   }
 
   prewarmSpawn(x: number, y: number, z: number, entityId: number): void {
@@ -1133,7 +1134,7 @@ export class AbilityVfxFx implements SequencerHost {
     this.crests.update(0.05, false);
     this.bakedAt('smoke', x, y, z, 1, 0xffffff, 0xffffff, 1, 0, 0);
     this.bakedAt('shockwave', x, gy + 0.08, z, 1, 0xffffff, 0xffffff, 1, 0, 0);
-    for (const kind of ['pyroblast', 'frost_nova', 'chain_heal'] as const)
+    for (const kind of ['pyroblast', 'frost_nova', 'chain_heal', 'shout_dust'] as const)
       this.bakedAt(kind, x, gy + 0.08, z, 1, 0xffffff, 0xffffff, 1, 0, 0);
     for (const kind of ['ice_shard', 'stone_chip', 'metal_splinter'] as const)
       this.fragmentsAt(kind, x, y, z, 0xffffff, 1, 1, 0, 1);
@@ -1456,8 +1457,8 @@ export class AbilityVfxFx implements SequencerHost {
     delay: number,
     heat: number,
     angle = 0,
-  ): void {
-    this.baked.spawn(
+  ): boolean {
+    return this.baked.spawn(
       kind,
       x,
       y,
@@ -1625,8 +1626,20 @@ export class AbilityVfxFx implements SequencerHost {
     angle = 0,
     duration = 1.15,
     pitch = 0,
-  ): void {
-    this.crests.spawn(x, y, z, radius, height, tint, accent, substance, angle, duration, pitch);
+  ): boolean {
+    return this.crests.spawn(
+      x,
+      y,
+      z,
+      radius,
+      height,
+      tint,
+      accent,
+      substance,
+      angle,
+      duration,
+      pitch,
+    );
   }
 
   healStream(sourceId: number, targetId: number): void {
@@ -2243,6 +2256,7 @@ export class AbilityVfxFx implements SequencerHost {
    * cache geometry. */
   dispose(): void {
     if (this.disposed) return;
+    cancelActiveAbilityKit(this.scene);
     this.disposed = true;
     const errors: unknown[] = [];
     const release = (work: () => void) => {

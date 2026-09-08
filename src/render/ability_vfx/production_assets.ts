@@ -3,10 +3,17 @@ import { loadGltf, loadKtx2Texture, loadTexture, releaseGltf } from '../assets/l
 import { registerDeferredPreload } from '../assets/preload';
 import { GFX, type GfxSettings } from '../gfx';
 
-export type BakedKind = 'smoke' | 'shockwave' | 'pyroblast' | 'frost_nova' | 'chain_heal';
+export type BakedKind =
+  | 'smoke'
+  | 'shout_dust'
+  | 'shockwave'
+  | 'pyroblast'
+  | 'frost_nova'
+  | 'chain_heal';
 export type FragmentKind = 'ice_shard' | 'stone_chip' | 'metal_splinter';
 export const BAKED_URLS = {
   smoke: '/textures/vfx/production/smoke.webp',
+  shout_dust: '/textures/vfx/production/shout_dust.webp',
   shockwave: '/textures/vfx/production/shockwave.webp',
   pyroblast: '/textures/vfx/production/pyroblast.ktx2',
   frost_nova: '/textures/vfx/production/frost_nova.ktx2',
@@ -14,6 +21,11 @@ export const BAKED_URLS = {
 } as const;
 export const FRAGMENT_URL = '/models/vfx/production_fragments.glb';
 const textures = new Map<BakedKind, THREE.Texture>();
+const PRESSURE_URL = '/textures/vfx/production/warrior_pressure.png';
+let pressureTexture: THREE.Texture | null = null;
+export function warriorPressureTexture(): THREE.Texture | null {
+  return pressureTexture;
+}
 const profileTextures = new Map<string, Map<BakedKind, THREE.Texture>>();
 const pending = new Map<string, Promise<void>>();
 const quality = (target: Readonly<GfxSettings>): string =>
@@ -68,6 +80,10 @@ registerDeferredPreload(async () => {
         textures.set(kind as BakedKind, texture);
       }),
   );
+  pressureTexture = (await loadTexture(PRESSURE_URL, { srgb: false })).clone();
+  pressureTexture.colorSpace = THREE.NoColorSpace;
+  pressureTexture.generateMipmaps = false;
+  pressureTexture.minFilter = pressureTexture.magFilter = THREE.LinearFilter;
   const model = await loadGltf(FRAGMENT_URL);
   model.scene.updateMatrixWorld(true);
   for (const name of ['ice_shard', 'stone_chip', 'metal_splinter'] as const) {
@@ -81,6 +97,7 @@ registerDeferredPreload(async () => {
 export const productionPreloadInternalsForTest = {
   urls: [
     ...Object.values(BAKED_URLS),
+    PRESSURE_URL,
     '/textures/vfx/production/pyroblast_2k.ktx2',
     '/textures/vfx/production/chain_heal_2k.ktx2',
     FRAGMENT_URL,

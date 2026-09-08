@@ -25,6 +25,8 @@ export const CONSTRAINED_PREWARM_KEEP: readonly string[] = [
   'views.persistent-portals',
   'views.nearby',
   'world.settle-state',
+  // CPU-only recipe registration; its four local shapes resume independently.
+  'vfx.active-local-kit',
   'textures.scene',
   'programs.compile',
   'world.initial-frame',

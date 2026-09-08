@@ -24,12 +24,17 @@ vi.mock('../src/render/ability_vfx/production_assets', async () => {
   const { Texture } = await import('three');
   const textures = {
     smoke: new Texture(),
+    shout_dust: new Texture(),
     shockwave: new Texture(),
     pyroblast: new Texture(),
     frost_nova: new Texture(),
     chain_heal: new Texture(),
   };
-  return { bakedTexture: (kind: keyof typeof textures) => textures[kind] };
+  const pressure = new Texture();
+  return {
+    bakedTexture: (kind: keyof typeof textures) => textures[kind],
+    warriorPressureTexture: () => pressure,
+  };
 });
 
 vi.mock('../src/render/ability_vfx/signature_texture', async () => {
@@ -104,11 +109,12 @@ describe('abilityVfxTexturePrewarmSteps', () => {
     expect(ids).toContain('shared-canvases');
     expect(ids).toContain('signature-atlas');
     expect(ids).toContain('production:smoke');
+    expect(ids).toContain('production:shout_dust');
     expect(ids).toContain('production:shockwave');
     for (const key of ['normal', 'motion', 'lighting'])
       expect(ids).toContain(`liquid-surface:${key}`);
     for (const id of ['contact_cut', 'contact_crush', 'contact_pierce']) expect(ids).toContain(id);
-    expect(ids).toHaveLength(FLIPBOOK_STYLES.length + 13);
+    expect(ids).toHaveLength(FLIPBOOK_STYLES.length + 15);
     expect(new Set(ids).size).toBe(ids.length);
   });
 
@@ -208,7 +214,7 @@ describe('the renderer wires the units into the prewarm resume lane', () => {
     expect(units).toContain('host.texture(texture)');
     expect(units).toContain('collectAbilityVfxCompileTargets(host.scene)');
     expect(units).toContain('host.compile(target.object, false)');
-    expect(renderer).toContain('abilityPrimitivePrewarmEntry({');
+    expect(renderer).toContain('...abilityPreparation.entries(this.sim.cfg.playerClass,');
     expect(renderer).toContain('texture: (texture) => this.prewarmTexture(texture)');
     expect(renderer).toContain(
       'compile: (root, offscreen) => this.compilePrewarmColorPrograms(root, offscreen)',

@@ -31,12 +31,12 @@ describe('winning Warrior attack animation routing', () => {
       mortal_strike: '2H_Melee_Attack_Chop',
       execute: '2H_Melee_Attack_Chop',
       slam: '2H_Melee_Attack_Chop',
-      red_harvest: 'Dualwield_Melee_Attack_Chop',
+      red_harvest: 'Fury_Red_Harvest',
       breachmaker: '2H_Melee_Attack_Chop',
       // Shieldcrack drives the offhand SHIELD arm (synthesized clip,
       // scripts/_add_shield_bash_anim.mjs), never a sword chop.
       shield_slam: 'Shield_Bash',
-      raging_gale: 'Dualwield_Melee_Attack_Chop',
+      raging_gale: 'Fury_Twinstrike',
       bloodthirst: 'Dualwield_Melee_Attack_Chop',
       // The two frontal-arc AoE strikes reap sideways (synthesized clip,
       // scripts/_add_sweep_slice_anim.mjs), never the top-to-bottom chop.

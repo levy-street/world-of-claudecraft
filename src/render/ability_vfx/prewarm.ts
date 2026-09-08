@@ -23,13 +23,13 @@ import * as THREE from 'three';
 import { HunterShellskinVisual, shellskinMaterial } from '../hunter_shellskin_visual';
 import { hunterTrapMaterial } from '../hunter_trap_geometry';
 import { HunterTrapVisuals } from '../hunter_trap_visual';
-import { SupportRecipientVisual } from '../support_recipient_visual';
 import { PaladinAegisVisual } from '../paladin_aegis_visual';
-import { RuneOfPowerVisual } from '../rune_of_power_visual';
 import { syncPaladinAvengingWrathVisual } from '../paladin_avenging_wrath_visual';
+import { RuneOfPowerVisual } from '../rune_of_power_visual';
+import { SupportRecipientVisual } from '../support_recipient_visual';
 import { CONTACT_SHEETS, contactTexture } from './contact_assets';
 import { abilityVfxTextures, FLIPBOOK_STYLES, flipbookSheet } from './fx_textures';
-import { bakedTexture } from './production_assets';
+import { bakedTexture, warriorPressureTexture } from './production_assets';
 import { signatureTexture } from './signature_texture';
 import { liquidSurfaceMaps } from './simulation_assets';
 
@@ -62,8 +62,19 @@ export function persistentClassVfxCompileTargets(): AbilityVfxCompileTarget[] {
     recipient.update(7, 1.8, null);
     persistentWarm.add(recipient.group);
     const rune = new RuneOfPowerVisual();
-    rune.sync({ id: 'prewarm', sourceId: 1, disposition: 'eligible', x: 0, z: 0,
-      radius: 8, duration: 15, remaining: 15 }, () => 0);
+    rune.sync(
+      {
+        id: 'prewarm',
+        sourceId: 1,
+        disposition: 'eligible',
+        x: 0,
+        z: 0,
+        radius: 8,
+        duration: 15,
+        remaining: 15,
+      },
+      () => 0,
+    );
     persistentWarm.add(rune.group);
     syncPaladinAvengingWrathVisual(null, persistentWarm, 1.8, true, 0, true);
   }
@@ -150,7 +161,14 @@ export function abilityVfxTexturePrewarmSteps(): AbilityVfxPrewarmTextureStep[] 
         return maps ? [maps[key]] : [];
       },
     });
-  for (const kind of ['smoke', 'shockwave', 'pyroblast', 'frost_nova', 'chain_heal'] as const)
+  for (const kind of [
+    'smoke',
+    'shout_dust',
+    'shockwave',
+    'pyroblast',
+    'frost_nova',
+    'chain_heal',
+  ] as const)
     steps.push({
       id: `production:${kind}`,
       build: () => {
@@ -158,6 +176,13 @@ export function abilityVfxTexturePrewarmSteps(): AbilityVfxPrewarmTextureStep[] 
         return texture ? [texture] : [];
       },
     });
+  steps.push({
+    id: 'warrior-pressure',
+    build: () => {
+      const texture = warriorPressureTexture();
+      return texture ? [texture] : [];
+    },
+  });
   steps.push({
     id: 'shared-canvases',
     // ~140 KB of small canvases built in one memoized call, so they stay one

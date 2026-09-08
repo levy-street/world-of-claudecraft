@@ -1,4 +1,3 @@
-import { prepareStudioForms } from './studio_form_preparation';
 import * as THREE from 'three';
 import { NumberSampleRing } from '../game/sample_ring';
 import { coerceFxTier, nameplateIntervalSec } from '../game/ui_tier_knobs';
@@ -50,20 +49,14 @@ import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import type { ChatBubbleStyle } from '../ui/chat_bubble_style';
 import { tEntity } from '../ui/entity_i18n';
 import type { IWorld } from '../world_api';
-import { type HunterShellskinVisual, syncHunterShellskin } from './hunter_shellskin_visual';
-import { type SupportRecipientVisual, syncSupportRecipient } from './support_recipient_visual';
 import { buildAbilityMaterialPrewarmGroup } from './ability_material_prewarm';
-import {
-  AbilityVfx,
-  AbilityVfxFx,
-  persistentClassVfxPrewarmGroup,
-} from './ability_vfx';
+import { AbilityVfx, AbilityVfxFx, persistentClassVfxPrewarmGroup } from './ability_vfx';
 import type { AbilityVfxTextures } from './ability_vfx/fx_textures';
-import { abilityPrimitivePrewarmEntry } from './ability_vfx/primitive_prewarm';
+import * as abilityPreparation from './ability_vfx/primitive_prewarm';
 import { ABILITY_VFX_FULL_SPECS } from './ability_vfx_full_specs';
 import { shouldDrawLegacyCastSparkle, syncAbilityVfxCast } from './ability_vfx_registry';
 import { ABILITY_VFX_SPECS } from './ability_vfx_specs';
-import { AbyssalRiftFx } from './abyssal_rift_fx';
+import type { AbyssalRiftFx } from './abyssal_rift_fx';
 import { AfflictionFamiliar } from './affliction_familiar';
 import { type AmberFeaturesView, buildAmberFeatures } from './amber_features';
 import { isVisuallyDead } from './anim_state';
@@ -367,6 +360,8 @@ import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
 import { usedJsHeapMb } from './heap_sample';
 import { createHitchFrameAligner } from './hitch_frame_align_core';
 import { buildHollowGates, type HollowGatesView } from './hollow_gates';
+import { type HunterShellskinVisual, syncHunterShellskin } from './hunter_shellskin_visual';
+import type { HunterTrapVisuals } from './hunter_trap_visual';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { idleSlot } from './idle_queue';
 import {
@@ -448,8 +443,11 @@ import {
   isProjectedNameplateAnchorVisible,
   nameplateScreenTransform,
 } from './nameplate_projection';
-import { NecromancyArmyPortalFx, spawnArmyPortalBurstEvent } from './necromancy_army_portal_fx';
-import { NecromancyGroundFx } from './necromancy_ground_fx';
+import {
+  type NecromancyArmyPortalFx,
+  spawnArmyPortalBurstEvent,
+} from './necromancy_army_portal_fx';
+import type { NecromancyGroundFx } from './necromancy_ground_fx';
 import { NeedleOfFateVfx } from './needle_of_fate_vfx';
 import { isNeedleOfFateProjectile } from './needle_of_fate_vfx_core';
 import { facingAlpha, POS_EXTRAPOLATION_CAP, remoteEntityAlpha } from './net_interp_core';
@@ -480,7 +478,8 @@ import {
 import {
   PALADIN_AEGIS_DOME_RADIUS,
   type PaladinAegisVisual,
-  syncPaladinAegisVisual, routePaladinAegisCue,
+  routePaladinAegisCue,
+  syncPaladinAegisVisual,
 } from './paladin_aegis_visual';
 import {
   type PaladinAscensionVisualPlan,
@@ -510,6 +509,7 @@ import {
   syncPaladinSunVerdictVisual,
 } from './paladin_sun_verdict_visual';
 import { projectionScalePixels } from './perceptual_lod_core';
+import { createPersistentGroundFx } from './persistent_ground_fx';
 import { resolveDirectPickEntityId } from './pick_resolution';
 import { PlacedAssetsView } from './placed_assets';
 import { type PlayerAuraRingInput, PlayerAuraRings } from './player_aura_rings';
@@ -540,6 +540,7 @@ import {
   submitPrewarmCompileUnit,
 } from './prewarm_compile_submission_core';
 import { prewarmDepthMaterial } from './prewarm_depth_material';
+import type { PrewarmManifestEntry } from './prewarm_entry';
 import {
   boundedPrewarmVisibility,
   runBackgroundPrewarm,
@@ -640,8 +641,6 @@ import { collectRiftAmbientSources } from './rift_ambience';
 import { buildRiftRankBadge } from './rift_rank';
 import { syncRigMatrixFreeze, unfreezeRigMatrices } from './rig_visibility_freeze';
 import type { RingOfFrostVisuals } from './ring_of_frost_visual';
-import type { HunterTrapVisuals } from './hunter_trap_visual';
-import { createPersistentGroundFx } from './persistent_ground_fx';
 import { ritualVariantAbilityId } from './ritual_kit_vfx_specs';
 import {
   captureSceneCensus,
@@ -701,8 +700,10 @@ import { shouldRenderStealthGhost } from './stealth';
 import { createStepSmooth, type StepSmoothState, stepSmoothHeight } from './step_smooth_core';
 import { buildStreetlamps, type StreetlampsView } from './streetlamps';
 import { strideHit } from './stride_audio_core';
+import { prepareStudioForms } from './studio_form_preparation';
 import { resetStudioPresentation } from './studio_presentation';
 import { type StudioLighting, StudioStage, studioPrewarmEntry } from './studio_stage';
+import { type SupportRecipientVisual, syncSupportRecipient } from './support_recipient_visual';
 import { buildFlaredConeFan, buildRingXZ, drapeConeWorld } from './target_cone_debug';
 import {
   syncTemporalHourglassVisual,
@@ -5894,27 +5895,6 @@ export class Renderer {
     let compiledPrewarmRoots = 0;
     let diagnosticsBaseline: RendererPrewarmDiagnosticsBaselineStats | null = null;
 
-    type PrewarmManifestEntry = {
-      id: string;
-      category: RendererPrewarmCategory;
-      priority: number;
-      required: boolean;
-      /** This small entry still runs if an earlier required view consumed maxMs. */
-      deadlineExempt?: boolean;
-      /** Explicit small units that may resume after world entry. The absence of
-       * this hook is intentional: a whole manifest entry is never rerun live. */
-      resumeUnits?: () => readonly PrewarmResumeUnit[];
-      /** Optional remainder for a started entry that reports partial progress. */
-      resumePartialUnits?: () => readonly PrewarmResumeUnit[];
-      run: () => void | Promise<void>;
-      /** Read after run(): how much of the planned work actually happened. A
-       * trimmed report downgrades the entry to 'partial' (prewarm_policy.ts),
-       * so a deadline return can never masquerade as completed again. */
-      progress?: () => PrewarmEntryProgress | null;
-      budgetVariants?: () => NonNullable<RendererPrewarmManifestEntryStats['budgetVariants']>;
-      detail?: () => string;
-    };
-
     // Explicitly bounded units captured when their manifest entry misses the
     // loading deadline. Whole entry callbacks are never resumed live.
     const droppedEntries: PrewarmResumeEntry[] = [];
@@ -6747,13 +6727,12 @@ export class Renderer {
         },
         detail: () => `objects=${weaponVfxPrewarmGroup?.children.length ?? 0}`,
       },
-      abilityPrimitivePrewarmEntry({
+      ...abilityPreparation.entries(this.sim.cfg.playerClass, this.backgroundGpuWork, {
         scene: this.scene,
         properties: this.webgl.properties,
         spawn: () => this.abilityVfxFx.prewarmSpawn(p.pos.x, p.pos.y, p.pos.z - 5, p.id),
-        stageMaterials: () => abilityMaterialSlot.run(),
-        materialUnits: () => abilityMaterialSlot.resumeUnits(),
-        geometryUnits: (host) => this.abilityVfxFx.crestPrewarmUnits(host),
+        materialSlot: abilityMaterialSlot,
+        geometryUnits: (host, kinds) => this.abilityVfxFx.crestPrewarmUnits(host, kinds),
         texture: (texture) => this.prewarmTexture(texture),
         materialTextures: (material) => this.prewarmMaterialTextures(material),
         compile: (root, offscreen) => this.compilePrewarmColorPrograms(root, offscreen),
@@ -7184,6 +7163,7 @@ export class Renderer {
     } finally {
       cleanupPrewarmArtifacts({ clearVfx: true, publishPools: !deferPoolPublication });
     }
+    abilityPreparation.resumeActiveAbilityKit(this.scene, options.resumeAfterFirstPaint);
 
     // Deferred compile-submit units whose owner never drained them (the
     // compile entry itself was dropped, or its drain hit the deadline again):
@@ -7426,11 +7406,13 @@ export class Renderer {
     if (plan.fovPunch > 0) this.punchFov(plan.fovPunch);
   }
 
-  private readonly aegisCastRelease = (id: number) => this.abilityVfx.releaseGesture(id, 'aegis_first_dawn', true);
+  private readonly aegisCastRelease = (id: number) =>
+    this.abilityVfx.releaseGesture(id, 'aegis_first_dawn', true);
   handleEvent(ev: SimEvent): void {
     switch (ev.type) {
       case 'castStart': {
-        const view = this.views.get(ev.entityId); if (view) this.activeVisual(view)?.beginCastChannel(ev.ability);
+        const view = this.views.get(ev.entityId);
+        if (view) this.activeVisual(view)?.beginCastChannel(ev.ability);
         if (ev.ability === 'needle_of_fate') {
           this.needleOfFateVfx.beginCast(ev.entityId, ev.time);
         }
@@ -7718,7 +7700,12 @@ export class Renderer {
           // per-hit heal-glow pulse the conversion heals emit.
           this.vfx.wardBloom(ev.targetId, 'arcane');
           this.pulseAt(ev.targetId, 'arcane', 5, 0.45);
-        } else if (ev.fx === 'temporalClock' || ev.fx === 'ccImpact' || ev.fx === 'fearImpact' || ev.fx === 'dotApply') {
+        } else if (
+          ev.fx === 'temporalClock' ||
+          ev.fx === 'ccImpact' ||
+          ev.fx === 'fearImpact' ||
+          ev.fx === 'dotApply'
+        ) {
           // Audio/status cues have authored contacts; they never imply an extra area nova.
         } else if (ev.fx === 'temporalRewindNova') {
           this.vfx.nova(ev.targetId, ev.school);
@@ -7860,7 +7847,8 @@ export class Renderer {
           this.sim.entities.get(ev.sourceId),
           sourceView ? this.activeVisual(sourceView) : null,
           ev.attackAnimationStarted,
-          ev.ability, ev.abilityId,
+          ev.ability,
+          ev.abilityId,
         );
         if (ev.school === 'physical' && ev.sourceId !== -1 && startsAttackAnimation)
           this.triggerAttack(ev.sourceId, attackAbilityId(ev.ability));
@@ -7871,7 +7859,8 @@ export class Renderer {
           const affected = this.views.get(ev.targetId);
           if (affected && !this.lowGfx && ev.ability)
             damageContact(
-              this.activeVisual(affected), ev,
+              this.activeVisual(affected),
+              ev,
               ev.sourceId === this.sim.playerId,
               this.reducedMotion(),
             );
@@ -8960,8 +8949,16 @@ export class Renderer {
   private attackTriggerCount = 0;
 
   async prepareStudioActorForms(id: number, cls: string, current: () => boolean): Promise<void> {
-    const e = this.sim.entities.get(id), v = this.views.get(id);
-    if (e && v) await prepareStudioForms(cls, v, (key, slot) => this.buildFormVisual(e, v, key, slot, true), () => this.sync(1, 0, null, 0, null, true, false), current);
+    const e = this.sim.entities.get(id),
+      v = this.views.get(id);
+    if (e && v)
+      await prepareStudioForms(
+        cls,
+        v,
+        (key, slot) => this.buildFormVisual(e, v, key, slot, true),
+        () => this.sync(1, 0, null, 0, null, true, false),
+        current,
+      );
   }
 
   triggerAttack(entityId: number, abilityId?: string): void {
@@ -10693,13 +10690,14 @@ export class Renderer {
       );
       const paladinAegisActive = e.castingAbility === 'aegis_first_dawn' && e.channeling && !e.dead;
       v.paladinAegisVisual = syncPaladinAegisVisual(
-          v.paladinAegisVisual,
-          v.group,
-          paladinAegisActive,
-          dt,
-          this.reducedMotion(),
-          e.scale, this.scene,
-        );
+        v.paladinAegisVisual,
+        v.group,
+        paladinAegisActive,
+        dt,
+        this.reducedMotion(),
+        e.scale,
+        this.scene,
+      );
       if (!v.visual) continue;
       const veilboundState = characterVeilboundState(e);
       // Decide visibility from the real world position before presentation work.

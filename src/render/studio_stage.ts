@@ -107,6 +107,7 @@ const STAGE_PREWARM = new Set([
   'surface-detail.textures',
   'textures.scene',
   'vfx.atlas',
+  'vfx.active-local-kit',
   'vfx.ability-primitives',
   'world.initial-frame',
   'programs.compile',

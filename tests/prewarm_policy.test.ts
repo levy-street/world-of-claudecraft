@@ -1,5 +1,7 @@
 import { readFileSync } from 'node:fs';
+import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
+import { entries as abilityPreparationEntries } from '../src/render/ability_vfx/primitive_prewarm';
 import {
   BLOCKING_PREWARM_ENTRIES_WITHOUT_PARALLEL_COMPILE,
   CONSTRAINED_PREWARM_KEEP,
@@ -121,6 +123,7 @@ const MANIFEST_IDS = [
   'textures.scene',
   'vfx.atlas',
   'vfx.weapon-skins',
+  'vfx.active-local-kit',
   'vfx.ability-primitives',
   'vfx.mount-programs',
   'sky.nearby-biomes',
@@ -213,7 +216,39 @@ function parsedManifestEntries(): { id: string; required: boolean; deadlineExemp
   expect(start).toBeGreaterThan(-1);
   expect(end).toBeGreaterThan(start);
   const slice = renderer.slice(start, end);
-  const blocks = slice.split(/\n {6}\{\n/).slice(1);
+  const spread =
+    /\n {6}\.\.\.abilityPreparation\.entries\(this\.sim\.cfg\.playerClass, this\.backgroundGpuWork, \{[\s\S]*?\n {6}\}\),/g;
+  expect([...slice.matchAll(spread)]).toHaveLength(1);
+  const composed = abilityPreparationEntries(
+    'mage',
+    {
+      run: async (work) => await work(),
+    },
+    {
+      scene: new THREE.Scene(),
+      properties: { get: () => ({}) },
+      spawn: () => {},
+      materialSlot: { run: () => {}, resumeUnits: () => [] },
+      geometryUnits: () => [],
+      texture: () => {},
+      materialTextures: () => {},
+      compile: async () => {},
+      draw: () => {},
+      withinDeadline: () => true,
+    },
+  );
+  const expanded = slice.replace(
+    spread,
+    composed
+      .map((entry) => {
+        const exemption = 'deadlineExempt' in entry && entry.deadlineExempt === true;
+        return `\n      {\n        id: '${entry.id}',\n        required: ${entry.required},\n        deadlineExempt: ${exemption},\n      },`;
+      })
+      .join(''),
+  );
+  // Unknown future spreads cannot silently disappear from the policy inventory.
+  expect(expanded).not.toMatch(/\n {6}\.\.\./);
+  const blocks = expanded.split(/\n {6}\{\n/).slice(1);
   return blocks.map((block) => {
     const id = /id: '([^']+)'/.exec(block)?.[1];
     expect(id).toBeTruthy();
@@ -1340,6 +1375,8 @@ describe('the keep-list is the minimal entry set', () => {
         'programs.compile',
         'render.settle-passes',
         'textures.scene',
+        // CPU-only registration; GPU units wait for the shared first paint.
+        'vfx.active-local-kit',
         'views.landmarks',
         'views.nearby',
         'views.persistent-portals',

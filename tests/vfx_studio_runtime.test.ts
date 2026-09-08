@@ -8,6 +8,9 @@ import type { SimEvent } from '../src/sim/types';
 import { StudioRuntime } from '../src/vfx_studio/runtime';
 import { DEFAULT_STUDIO_CONFIG } from '../src/vfx_studio/session';
 
+vi.mock('../src/vfx_studio/prepare_ability_kit', () => ({
+  prepareStudioAbilityKit: vi.fn(async () => {}),
+}));
 vi.mock('../src/vfx_studio/prepare_views', () => ({ prepareStudioViews: vi.fn(async () => {}) }));
 vi.mock('../src/vfx_studio/prepare_assets', () => ({ prepareStudioAssets: vi.fn(async () => {}) }));
 
@@ -613,11 +616,25 @@ describe('studio renderer ownership', () => {
   });
 });
 
-it.each(['studio', 'world'] as const)('prepares the selected actor forms before accepting %s casts', async environment => {
-  const runtime = new StudioRuntime({} as HTMLCanvasElement, {} as HTMLDivElement, () => {}, () => {});
-  boundary.forms.mockImplementationOnce(async () => { expect(runtime.ready).toBe(false); });
-  await runtime.load({ ...DEFAULT_STUDIO_CONFIG, cls: 'druid', environment });
-  expect(boundary.forms).toHaveBeenCalledWith(runtime.session!.sim.player.id, 'druid', expect.any(Function));
-  expect(runtime.ready).toBe(true);
-  await runtime.dispose();
-});
+it.each(['studio', 'world'] as const)(
+  'prepares the selected actor forms before accepting %s casts',
+  async (environment) => {
+    const runtime = new StudioRuntime(
+      {} as HTMLCanvasElement,
+      {} as HTMLDivElement,
+      () => {},
+      () => {},
+    );
+    boundary.forms.mockImplementationOnce(async () => {
+      expect(runtime.ready).toBe(false);
+    });
+    await runtime.load({ ...DEFAULT_STUDIO_CONFIG, cls: 'druid', environment });
+    expect(boundary.forms).toHaveBeenCalledWith(
+      runtime.session!.sim.player.id,
+      'druid',
+      expect.any(Function),
+    );
+    expect(runtime.ready).toBe(true);
+    await runtime.dispose();
+  },
+);

@@ -9,6 +9,7 @@ import {
 } from './physical_choreography_core';
 import { physicalContact } from './physical_contact';
 import type { SeqSlot, SequencerHost } from './sequencer';
+import { drawWarriorShout } from './warrior_shouts';
 
 const origin = { x: 0, y: 0, z: 0 };
 const point = { x: 0, y: 0, z: 0 };
@@ -110,6 +111,11 @@ export function physicalRelease(host: SequencerHost, slot: SeqSlot): void {
 
 export function physicalImpact(host: SequencerHost, slot: SeqSlot): void {
   const p = slot.spec.physical!;
+  if (slot.physicalSecondary && drawWarriorShout(host, slot, 0)) {
+    slot.lingerUntil = slot.t;
+    slot.motifLoops = p.beats.length;
+    return;
+  }
   if (
     slot.physicalSecondary &&
     slot.abilityId !== 'raging_gale' &&
@@ -162,6 +168,7 @@ export function physicalFollowThrough(host: SequencerHost, slot: SeqSlot): void 
 }
 
 function physicalBeat(host: SequencerHost, slot: SeqSlot, beat: number): void {
+  if (drawWarriorShout(host, slot, beat)) return;
   if (furyBeat(host, slot, beat)) return;
   const authored = slot.spec.physical!;
   const p =

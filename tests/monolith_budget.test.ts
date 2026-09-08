@@ -379,7 +379,7 @@ const MONOLITHS: MonolithRow[] = [
     // so the ceiling does not move but the slack is now zero.
     // Studio reset and scenery setup moved into their owned modules.
     // Ability primitive preparation now owns its manifest and bounded uploads.
-    ceiling: 13035,
+    ceiling: 13033,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

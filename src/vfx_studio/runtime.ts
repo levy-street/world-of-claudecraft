@@ -22,6 +22,7 @@ import { StudioCinematicDirector } from './cinematic_director';
 import { StudioCombatAudio } from './combat_audio';
 import { createStudioGraphicsContext } from './graphics';
 import { StudioPlayback } from './playback_core';
+import { prepareStudioAbilityKit } from './prepare_ability_kit';
 import { prepareStudioAssets } from './prepare_assets';
 import { prepareStudioViews } from './prepare_views';
 import {
@@ -219,8 +220,19 @@ export class StudioRuntime {
           );
           if (generation !== this.generation || this.disposed) return;
         }
-        if (this.renderer) await this.renderer.prepareStudioActorForms(session.sim.player.id, config.cls,
-          () => generation === this.generation && !this.disposed);
+        if (this.renderer)
+          await this.renderer.prepareStudioActorForms(
+            session.sim.player.id,
+            config.cls,
+            () => generation === this.generation && !this.disposed,
+          );
+        if (generation !== this.generation || this.disposed) return;
+        if (this.renderer)
+          await prepareStudioAbilityKit(
+            this.renderer,
+            config.cls,
+            () => generation === this.generation && !this.disposed,
+          );
         if (generation !== this.generation || this.disposed) return;
         if (camera && this.renderer) {
           this.renderer.camYaw = camera.yaw;

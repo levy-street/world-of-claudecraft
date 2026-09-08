@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { bindSceneSamples, SCENE_SAMPLE_GLSL, sceneKeyLightUniform } from '../scene_sampling';
 import { CrestPrewarm } from './crest_prewarm';
+import { warriorPressureTexture } from './production_assets';
 import { buildSignatureShapes, type CrestKind } from './signature_shapes';
 
 /** Prepared crystalline fans, curling water sheets, flame ribbons and torn
@@ -13,22 +14,35 @@ export class SignatureCrests {
     age: number;
     duration: number;
     active: boolean;
+    pressure: boolean;
   }[] = [];
   private disposed = false;
+  private reducedMotion = false;
   private readonly unbind: Array<() => void> = [];
-  constructor(scene: THREE.Scene) {
+  constructor(
+    scene: THREE.Scene,
+    private readonly groundY?: (x: number, z: number) => number,
+  ) {
     const initialGeometry = this.shapes.get('water');
     if (!initialGeometry) throw new Error('Missing water crest geometry');
     const proto = new THREE.ShaderMaterial({
       uniforms: {
         uAge: { value: 0 },
+        uPressureMap: { value: null },
         uSunWorld: sceneKeyLightUniform(scene),
         uKind: { value: 0 },
         uMotion: { value: 1 },
+        uPressureGround: { value: new Float32Array(25) },
         uTint: { value: new THREE.Color() },
         uAccent: { value: new THREE.Color() },
       },
-      vertexShader: `uniform float uAge,uKind,uMotion; varying vec2 vUv; varying vec3 vNormal,vView;
+      vertexShader: `uniform float uAge,uKind,uMotion,uPressureGround[25]; varying vec2 vUv; varying vec3 vNormal,vView;
+        float pressureGround(vec2 p){
+          vec2 grid=clamp(vec2(p.x/12.0+0.5,p.y/10.0)*4.0,vec2(0.0),vec2(3.9999));
+          ivec2 cell=ivec2(floor(grid));vec2 f=fract(grid);int i=cell.y*5+cell.x;
+          return mix(mix(uPressureGround[i],uPressureGround[i+1],f.x),
+            mix(uPressureGround[i+5],uPressureGround[i+6],f.x),f.y);
+        }
         void main(){
           vUv=uv; vec3 p=position;
           float angle=atan(p.z,p.x);
@@ -37,12 +51,24 @@ export class SignatureCrests {
           float expand=0.6+0.4*(1.0-pow(max(0.0,1.0-uAge),3.0));
           p.xz*=uKind>9.5 ? 1.0 : uKind>6.5 ? 0.86+0.14*smoothstep(0.0,0.25,uAge) : mix(0.88,expand,uMotion);
           p.y*=uKind>9.5 ? 1.0 : uKind>6.5 ? 0.96+0.04*smoothstep(0.0,0.2,uAge) : mix(0.85,sin(min(1.0,uAge*1.4)*3.14159265)*0.65+0.35,uMotion);
-          if(uKind>11.5){p.z+=uAge*(0.2+uv.y*0.6)*uMotion;p.y-=uAge*uAge*0.55*uMotion;}
+          if(uKind>11.5 && uKind<12.5){
+            float peel=uv.y*uv.y*uAge*uMotion;
+            p.z+=uAge*uv.y*(0.2+uv.y*0.6)*uMotion+sin(uv.x*9.0+uv.y*3.0)*peel*0.3;
+            p.x+=(uv.x-0.5)*peel*0.7;
+            p.y-=uAge*uAge*uv.y*(0.35+uv.y*0.45)*uMotion;
+          }
+          if(uKind>12.5){
+            float advance=mix(0.72,0.38+0.62*(1.0-pow(1.0-uAge,3.0)),uMotion);
+            p.xz*=advance;
+            p.y*=mix(1.0,0.62+0.38*sin(min(1.0,uAge*1.3)*3.14159265),uMotion);
+            p.y+=sin(uv.x*19.0+uv.y*8.0-uAge*7.0)*uv.y*0.045*uMotion;
+            p.y+=pressureGround(p.xz);
+          }
           vec4 view=modelViewMatrix*vec4(p,1.0); vView=-view.xyz; vNormal=normalize(normalMatrix*normal);
           gl_Position=projectionMatrix*view;
         }`,
       fragmentShader: `${SCENE_SAMPLE_GLSL}
-        uniform float uAge,uKind,uMotion; uniform vec3 uTint,uAccent,uSunWorld;
+        uniform sampler2D uPressureMap; uniform float uAge,uKind,uMotion; uniform vec3 uTint,uAccent,uSunWorld;
         varying vec2 vUv; varying vec3 vNormal,vView;
         void main(){
           float fresnel=pow(max(0.0,1.0-abs(dot(normalize(cross(dFdx(vView),dFdy(vView))),normalize(vView)))),3.0);
@@ -74,14 +100,26 @@ export class SignatureCrests {
               alpha*=smoothstep(0.0,0.1,vUv.y)*(1.0-smoothstep(0.94,1.0,vUv.y));
             }
           }
-          if(uKind>11.5){
+          if(uKind>11.5 && uKind<12.5){
             float taper=sin(vUv.x*3.14159265);
             float striation=sin(vUv.x*109.0+sin(vUv.y*17.0)*2.2);
             float tear=sin(vUv.x*67.0+vUv.y*19.0)*sin(vUv.x*31.0-vUv.y*13.0);
             float edge=1.0-smoothstep(0.015,0.08,vUv.y);
             float dissolve=smoothstep(uAge*1.2-0.2,uAge*1.2+0.15,1.0-vUv.y*0.65+tear*0.28);
-            colour=colour*(0.82+striation*0.12)+uAccent*edge*0.85;
-            alpha=0.92*dissolve*smoothstep(0.0,0.16,taper)*(1.0-smoothstep(0.68,1.0,uAge));
+            float perforation=sin(vUv.x*91.0+vUv.y*23.0)*sin(vUv.x*47.0-vUv.y*19.0);
+            float ragged=smoothstep(-0.42,0.12,perforation+0.5-vUv.y*0.9-uAge*0.85);
+            float film=mix(1.0,ragged,smoothstep(0.18,0.65,vUv.y));
+            float vein=pow(max(0.0,striation),5.0)*(1.0-vUv.y)*0.16;
+            colour=colour*(0.82+striation*0.12)+uAccent*(edge*0.85+vein);
+            alpha=0.94*film*dissolve*smoothstep(0.0,0.16,taper)*(1.0-smoothstep(0.68,1.0,uAge));
+          }
+          if(uKind>12.5){
+            vec2 flowUv=vUv;
+            flowUv.y+=sin(vUv.x*13.0-uAge*4.0)*0.012*uMotion*uAge;
+            float density=texture2D(uPressureMap,clamp(flowUv,vec2(0.0),vec2(1.0))).r;
+            float dissolution=smoothstep(uAge*0.9-0.35,uAge*0.9+0.1,density);
+            colour=mix(uTint*(0.8+density*0.6),uAccent*1.3,pow(density,2.5));
+            alpha=density*0.72*dissolution*(1.0-smoothstep(0.55,1.0,uAge));
           }
           gl_FragColor=vec4(colour,alpha*sceneSoftness(vView.z,0.12));
           #include <tonemapping_fragment>
@@ -95,6 +133,8 @@ export class SignatureCrests {
     for (let i = 0; i < 8; i++) {
       const mesh = new THREE.Mesh(initialGeometry, proto.clone());
       mesh.material.uniforms.uSunWorld = sceneKeyLightUniform(scene);
+      mesh.material.uniforms.uPressureMap.value = warriorPressureTexture();
+      mesh.material.uniforms.uPressureGround.value = new Float32Array(25);
       this.unbind.push(bindSceneSamples(scene, mesh));
       mesh.name = 'signatureCrest';
       mesh.visible = false;
@@ -103,7 +143,7 @@ export class SignatureCrests {
       // Shader animation can move the surface beyond its prepared bounds.
       mesh.frustumCulled = false;
       scene.add(mesh);
-      this.slots.push({ mesh, age: 0, duration: 1.15, active: false });
+      this.slots.push({ mesh, age: 0, duration: 1.15, active: false, pressure: false });
     }
     this.preparation = new CrestPrewarm(scene, this.shapes, this.slots[0].mesh.material);
     proto.dispose();
@@ -120,21 +160,30 @@ export class SignatureCrests {
     angle = 0,
     duration = 1.15,
     pitch = 0,
-  ): void {
+  ): boolean {
     if (
       this.disposed ||
       ![x, y, z, radius, height, angle, pitch].every(Number.isFinite) ||
       radius <= 0 ||
       height <= 0
     )
-      return;
-    if (kind === 'blood_cut' && !this.preparation.ready(kind)) return;
-    const s = this.slots.find((s) => !s.active);
-    if (!s) return;
+      return false;
+    const authoredSurface = kind === 'blood_cut' || kind.endsWith('_pressure');
+    if (authoredSurface && !this.preparation.ready(kind)) return false;
+    let s = this.slots.find((s) => !s.active);
+    // A decorative voice wake can yield to the target's physical blade contact.
+    // Never displace another material family or another contact backing.
+    if (!s && kind === 'blood_cut') {
+      for (const candidate of this.slots)
+        if (candidate.pressure && (!s || candidate.age / candidate.duration > s.age / s.duration))
+          s = candidate;
+    }
+    if (!s) return false;
+    s.pressure = kind.endsWith('_pressure');
     s.active = true;
     s.age = 0;
     s.duration = Number.isFinite(duration) ? Math.max(0.05, duration) : 1.15;
-    s.mesh.visible = kind === 'blood_cut';
+    s.mesh.visible = authoredSurface;
     const geometry = this.shapes.get(kind) ?? this.shapes.get('shadow');
     if (geometry) s.mesh.geometry = geometry;
     s.mesh.rotation.set(pitch, angle, 0, 'YXZ');
@@ -143,10 +192,28 @@ export class SignatureCrests {
     s.mesh.scale.set(Math.min(3, radius), Math.min(3, height), Math.min(3, radius));
     if (kind === 'chain') s.mesh.scale.set(height, height, radius);
     const u = s.mesh.material.uniforms;
+    const ground = u.uPressureGround.value as Float32Array;
+    ground.fill(0);
+    if (s.pressure && this.groundY) {
+      const cosine = Math.cos(angle),
+        sine = Math.sin(angle),
+        sourceFloor = this.groundY(x, z);
+      for (let row = 0; row < 5; row++)
+        for (let column = 0; column < 5; column++) {
+          const lx = (column / 4 - 0.5) * 12 * s.mesh.scale.x;
+          const lz = (row / 4) * 10 * s.mesh.scale.z;
+          const heightAt = this.groundY(x + lx * cosine + lz * sine, z + lz * cosine - lx * sine);
+          ground[row * 5 + column] =
+            Number.isFinite(sourceFloor) && Number.isFinite(heightAt)
+              ? (heightAt - sourceFloor) / s.mesh.scale.y
+              : 0;
+        }
+    }
     u.uTint.value.setHex(tint);
     u.uAccent.value.setHex(accent);
-    u.uKind.value =
-      kind === 'blood_cut'
+    u.uKind.value = kind.endsWith('_pressure')
+      ? 13
+      : kind === 'blood_cut'
         ? 12
         : kind === 'chain'
           ? 11
@@ -172,9 +239,12 @@ export class SignatureCrests {
                               ? 6
                               : 2;
     u.uAge.value = 0;
+    u.uMotion.value = this.reducedMotion ? 0 : 1;
+    return true;
   }
   update(dt: number, reducedMotion: boolean): void {
     if (this.disposed) return;
+    this.reducedMotion = reducedMotion;
     for (const s of this.slots) {
       if (!s.active) continue;
       s.age += Number.isFinite(dt) ? Math.max(0, dt) : 0;

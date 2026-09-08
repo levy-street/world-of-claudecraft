@@ -1,9 +1,11 @@
 import { meleeContactHeight, meleeImpactProfile } from '../melee_impact_core';
+import { furyCutSurfacePoint } from './fury_shapes';
 import { physicalContact } from './physical_contact';
 import type { SeqPoint, SeqSlot, SequencerHost } from './sequencer';
 
 const source: SeqPoint = { x: 0, y: 0, z: 0 };
 const target: SeqPoint = { x: 0, y: 0, z: 0 };
+const seam: SeqPoint = { x: 0, y: 0, z: 0 };
 
 /** Two crossing cuts versus a three-part harvest. Replaces the generic path
  * composition completely; physicalImpact still owns timing and retirement. */
@@ -49,6 +51,10 @@ export function furyBeat(host: SequencerHost, slot: SeqSlot, beat: number): bool
   const tilt = harvest ? [-0.8, 0.16, 0.9][beat] : [-0.92, 0.85][beat];
   const red = harvest ? 0xc11130 : 0xb82237;
   const force = profile.force * (final ? 1.35 : 1);
+  const roll = tilt * 0.48,
+    cosine = Math.cos(roll),
+    sine = Math.sin(roll);
+  const height = final ? 1.35 : 0.95;
   const count = slot.tier > 0 ? 1 : 3;
   // Bright edge first: retained unchanged when peripheral material is shed.
   for (let strand = 0; strand < count; strand++) {
@@ -60,13 +66,15 @@ export function furyBeat(host: SequencerHost, slot: SeqSlot, beat: number): bool
       (points) => {
         for (let i = 0; i < points.length; i++) {
           const u = i / (points.length - 1);
-          const across = (u - 0.5) * span;
-          const torn = Math.sin(u * 24 + strand * 1.7) * Math.sin(u * Math.PI) * strand * 0.025;
-          const rise = across * tilt * 0.46 + Math.sin(u * Math.PI) * 0.18 - strand * 0.08 + torn;
-          const exit = Math.sin(u * Math.PI) * (0.16 + strand * 0.11);
+          furyCutSurfacePoint(u, strand * 0.12, seam);
+          const x = (seam.x * span) / 3.7,
+            y = seam.y * height;
+          const across = x * cosine - y * sine;
+          const rise = x * sine + y * cosine;
+          const exit = (seam.z * span) / 3.7;
           points[i].set(
             at.x + forwardZ * across + forwardX * exit,
-            at.y + rise,
+            at.y + 0.08 + rise,
             at.z - forwardX * across + forwardZ * exit,
           );
         }
