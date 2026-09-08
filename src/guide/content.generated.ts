@@ -6822,10 +6822,6 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "mount",
-        "name": "Cluckwork Mech Bird"
-      },
-      {
-        "kind": "mount",
         "name": "Aether-Jouster Hover-Cycle"
       },
       {
@@ -6838,27 +6834,11 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "mount",
-        "name": "Goblin Rocket Sled"
-      },
-      {
-        "kind": "mount",
-        "name": "Rallycart RXT"
-      },
-      {
-        "kind": "mount",
         "name": "Grumbol the Lanternback"
       },
       {
         "kind": "mount",
-        "name": "Tolliver the Chimeglass"
-      },
-      {
-        "kind": "mount",
         "name": "Dreadspark Groundshaker"
-      },
-      {
-        "kind": "mount",
-        "name": "Bonebound Rickshaw"
       }
     ]
   },

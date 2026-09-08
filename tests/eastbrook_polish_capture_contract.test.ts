@@ -664,7 +664,7 @@ interface AttributionTargetFixture {
 // Re-minted for the second v0.42.0 reconcile after the release branch advanced
 // with Drakelands/hotkey renderer work. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'ab1019ffc4c4608ac704ba7f791f77133c78d329b748be7829c8576147a8dab3';
+  '0f95f38e9b778956ad613ba7aa1a4eedf31a7d792ecb58183756b1d40c449afd';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

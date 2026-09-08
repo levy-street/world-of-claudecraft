@@ -1,5 +1,6 @@
 // The WOC Store's grant-SKU spend controllers (the Armory's weapon skins and
-// the Machine Stable's mounts) built over ONE set of window seams.
+// the Machine Stable's mount skins, both kind 'skin') built over ONE set of
+// window seams.
 // DailyRewardsWindow states its balance / surface / prompt / repaint seams once
 // here instead of once per controller; each controller adds only its own spend
 // kind and row model. A third grant family lands here as a third field, not as
@@ -15,7 +16,7 @@ export type { StoreSpendSeams };
 
 export interface StoreSpendControllerDeps extends StoreSpendSeams {
   /** The one service spend, keyed by the SKU family the controller owns. */
-  spend(itemId: string, kind: 'skin' | 'item', cost: number): Promise<StoreSpendResult | undefined>;
+  spend(itemId: string, kind: 'skin', cost: number): Promise<StoreSpendResult | undefined>;
   armoryRowById: StoreArmoryPurchaseDeps['rowById'];
   refreshInspector: StoreArmoryPurchaseDeps['refreshInspector'];
 }
@@ -36,7 +37,7 @@ export function storeSpendControllers(deps: StoreSpendControllerDeps): StoreSpen
     }),
     mounts: new StoreMountPurchase({
       ...seams,
-      spend: (itemId, cost) => spend(itemId, 'item', cost),
+      spend: (itemId, cost) => spend(itemId, 'skin', cost),
     }),
   };
 }

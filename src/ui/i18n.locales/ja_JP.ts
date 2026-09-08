@@ -16705,6 +16705,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.lootExplorer': '戦利品ブラウザ',
   'hudChrome.mounts.desc_goblin_rocket_sled':
     '危険なほど過剰に組み上げられたゴブリンのそり。二基のロケットと最悪の判断力で突き進む。',
+  'hudChrome.mounts.desc_rallycart_skin': '小さな車体から豪快なエンジン音を響かせるラリーカー。',
   'hudChrome.mounts.desc_rallycart_rxt': '小型ながら本格的なラリーマシン。移動速度を高めてくれる。',
   'hudChrome.mounts.name_goblin_rocket_sled': 'ゴブリンロケットそり',
   'hudChrome.mounts.name_rallycart_rxt': 'ラリーカートRXT',
@@ -16727,4 +16728,34 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'loading.kickedByModerator': 'モデレーターによって切断されました：{reason}',
   'loading.rendererContextLost':
     '3D レンダラーがグラフィックスコンテキストを失い、復旧できませんでした。再読み込みしてください。',
+
+  'hudChrome.wocStore.mountSkinType': 'マウントスキン',
+  'hudChrome.cosmetics.title': 'コスメティック',
+  'hudChrome.cosmetics.close': 'コスメティックを閉じる',
+  'hudChrome.cosmetics.tabsLabel': 'コスメティックの区分',
+  'hudChrome.cosmetics.tabMounts': 'マウント',
+  'hudChrome.cosmetics.tabSkins': 'スキン',
+  'hudChrome.cosmetics.tabMech': 'メカ',
+  'hudChrome.cosmetics.legend':
+    'アカウント：全キャラクターで共有。キャラクター：このキャラクターのみ。',
+  'hudChrome.cosmetics.scopeAccount': 'アカウント',
+  'hudChrome.cosmetics.scopeCharacter': 'キャラクター',
+  'hudChrome.cosmetics.wear': '装着',
+  'hudChrome.cosmetics.takeOff': '外す',
+  'hudChrome.cosmetics.worn': '装着中',
+  'hudChrome.cosmetics.apply': '適用',
+  'hudChrome.cosmetics.detach': '解除',
+  'hudChrome.cosmetics.applied': '適用中',
+  'hudChrome.cosmetics.owned': '所持',
+  'hudChrome.cosmetics.storeOnly': 'WOCストアで入手可能',
+  'hudChrome.cosmetics.cardAria': '{name}、{rarity}',
+  'hudChrome.cosmetics.mountsNoMount':
+    'まずマウントを入手してください。スキンには乗るものが必要です。',
+  'hudChrome.cosmetics.skinsEmpty': '武器スキンをまだ所持していません。WOCストアをご覧ください。',
+  'hudChrome.cosmetics.skinsApplyHint': '{type}を装備するとこのスキンを適用できます。',
+  'hudChrome.cosmetics.mechEmpty': 'コンバットメカのクロマをまだ所持していません。',
+  'hudChrome.cosmetics.mountsIntro':
+    'マウントスキンはこのキャラクターが乗るどのマウントにも重ねて描かれます。速度は変わりません。',
+  'hudChrome.cosmetics.mechIntro':
+    'コンバットメカはこのキャラクターの身体を置き換えます。装着できるクロマは一度に一つです。',
 };

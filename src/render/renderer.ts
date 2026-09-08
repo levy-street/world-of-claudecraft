@@ -6,6 +6,7 @@ import {
   emptyPriestMarkerState,
   priestMarkerStateForAuras,
 } from '../sim/combat/priest/presentation';
+import { mountPresentationKey } from '../sim/content/mount_skins';
 import {
   ABILITIES,
   ARENA_SLOT_COUNT,
@@ -450,12 +451,12 @@ import {
 } from './mount_lifecycle';
 import { updateMountPresentation } from './mount_presentation';
 import {
-  mountPrewarmKeys,
+  mountPrewarmKeysFor,
   stageMountPrewarmVisual,
   stageResidentMountPrewarmVisual,
 } from './mount_prewarm';
 import { releaseMountFx } from './mount_visual_lifecycle';
-import { mountVisualSpec } from './mount_visuals';
+import { mountVisualSpecFor } from './mount_visuals';
 import { createNameplateCadenceState, nameplateFullPassDue } from './nameplate_cadence_core';
 import { NameplatePainter } from './nameplate_painter';
 import {
@@ -659,6 +660,7 @@ import { createRevealCompileHost, REVEAL_GATE_PREP_KIND } from './reveal_compile
 import { createRevealGate } from './reveal_gate';
 import type { RevealGateCore } from './reveal_gate_core';
 import { type RickshawMountViewState, updateRollingMountLoop } from './rickshaw_mount';
+import { FOOT_RUN_SPEED, updateRiddenMountAudio } from './ridden_mount_audio';
 import { collectRiftAmbientSources } from './rift_ambience';
 import { buildRiftRankBadge } from './rift_rank';
 import { syncRigMatrixFreeze, unfreezeRigMatrices } from './rig_visibility_freeze';
@@ -985,9 +987,6 @@ const SFX_MOVE_RANGE_SQ = 42 * 42;
 // Stride length (world units travelled) between footfalls, longer at a run.
 const FOOT_STRIDE_WALK = 0.95;
 const FOOT_STRIDE_RUN = 1.55;
-// Mount clips contain a full gait beat (usually two contacts), so their cadence
-// is intentionally longer than an on-foot stride and leaves the one-shot tail clear.
-const MOUNT_STRIDE_RUN = 5.8;
 const SWIM_STRIDE = 2.4;
 // Surface kick: beats per second at a standstill, quickening with swim speed,
 // and how far behind the pivot the prone body's feet trail (as a fraction of
@@ -998,7 +997,6 @@ const SWIM_FOOT_TRAIL = 0.19;
 const UNDERWATER_FADE_DEPTH = 0.45;
 // How far under the line the chase camera is pulled while the player is submerged.
 const UNDERWATER_CAMERA_DIP = 0.5;
-const FOOT_RUN_SPEED = 4.5; // u/s — matches the run threshold in characters/anim_state.ts
 // fire/torch point lights beyond this never shine (their falloff range is
 // shorter anyway); the nearest GFX.maxPointLights within it win the budget
 const LIGHT_BUDGET_RANGE_SQ = 55 * 55;
@@ -1899,6 +1897,8 @@ export class Renderer {
   private fishingBobbers!: FishingBobberVisual;
   private weather: Weather;
   private weatherOn = true;
+  private readonly surfaceAtForAudio = (x: number, z: number, y: number): Surface =>
+    this.surfaceAt(x, z, y);
   private audioSink: SpatialAudioSink | null = null;
   private readonly ambientPointSources: readonly AmbientPointSource[];
   // Reused scratch buffers for the per-frame rift ambience merge in
@@ -5572,7 +5572,7 @@ export class Renderer {
     const castVfxUnits = (): PrewarmResumeUnit[] =>
       castVfxProgramUnits(this.scene, abilityMaterialSlot.group, this.compileArms, this.webgl);
     let mountPrewarmGroup: THREE.Group | null = null;
-    const mountPrewarmPlannedKeys = mountPrewarmKeys(this.sim.ownedMounts());
+    const mountPrewarmPlannedKeys = mountPrewarmKeysFor(this.sim);
     const mountPrewarmPendingKeys = new Set(mountPrewarmPlannedKeys);
     let mountPrewarmWarmed = 0;
     let surfaceDetailTexturesWarmed = 0;
@@ -8307,7 +8307,8 @@ export class Renderer {
     // entering interest range, or an already-mounted player logging in, is
     // born with a mountKey and no edge to detect, so without this it always
     // hits the cold path (see the edge-site comment near preloadMountEngine).
-    if (e.mountKey !== '') this.audioSink?.preloadMountEngine(e.mountKey);
+    const look = mountPresentationKey(e.mountKey, e.mountSkinId);
+    if (look !== '') this.audioSink?.preloadMountEngine(look);
   }
 
   // Shared core for every compile gate below: link `target`'s programs off the
@@ -10607,7 +10608,7 @@ export class Renderer {
       // the visual appears once ready. A druid form replaces the whole body,
       // so the form wins visually and the mount hides (the sim's speed math
       // is untouched either way).
-      const mountSpec = e.kind === 'player' && e.mountKey ? mountVisualSpec(e.mountKey) : null;
+      const mountSpec = e.kind === 'player' ? mountVisualSpecFor(e.mountKey, e.mountSkinId) : null;
       const mountShown = !!mountSpec && requestedForm === 'base' && !e.dead;
       const targetMountVisualKey = mountSpec?.visualKey ?? '';
       if (v.mountVisualKey !== targetMountVisualKey) {
@@ -10930,7 +10931,8 @@ export class Renderer {
       // A mounted rider stays planted in the saddle: the MOUNT carries the
       // jump arc (its anim scratch below keeps the real airborne flag), while
       // the rider holds the seated pose instead of replaying the jump clip.
-      const logicallyMounted = e.mountKey !== '';
+      const mountLook = mountPresentationKey(e.mountKey, e.mountSkinId);
+      const logicallyMounted = mountLook !== '';
       const riderMounted = v.mountLift > 0;
       st.airborne = airborne && !riderMounted;
       // Long-fall flail: displayed vertical speed past what any hop reaches
@@ -10973,6 +10975,7 @@ export class Renderer {
           mountCastKey: e.mountCastKey,
           mountCastRemaining: e.mountCastRemaining,
           mountKey: e.mountKey,
+          mountLook: mountPresentationKey(e.mountCastKey || e.mountKey, e.mountSkinId),
           poseAllowed: !visuallyDead && !swimming && runCharacterPresentation,
           present: runCharacterPresentation,
           playCallPose: (secs: number) => active.playCallPose(secs),
@@ -10980,24 +10983,23 @@ export class Renderer {
           engineReset: () => this.audioSink?.mountEngineReset(e.id),
           preloadSummon: (key: string) => this.audioSink?.preloadMountSummon(key),
           preloadEngine: (key: string) => this.audioSink?.preloadMountEngine(key),
-          summonCall: () => this.audioSink?.mountSummon(ax, ay, az, e.mountKey, isSelf, e.id),
+          summonCall: () => this.audioSink?.mountSummon(ax, ay, az, mountLook, isSelf, e.id),
         });
       }
       // --- spatial movement audio (self + others) --------------------------
       // All gated by audibility (squared distance) so far entities cost nothing.
       const sink = this.audioSink;
       if (sink && d2 < SFX_MOVE_RANGE_SQ) {
-        const rocketSledMounted = logicallyMounted && e.mountKey === 'goblin_rocket_sled';
+        const rocketSledMounted = logicallyMounted && mountLook === 'goblin_rocket_sled';
         // jump / land / water-entry edges
         if (airborne && !v.wasAirborne && !visuallyDead) {
-          if (!rocketSledMounted)
-            sink.movement('jump', ax, ay, az, isSelf, e.mountKey || undefined);
+          if (!rocketSledMounted) sink.movement('jump', ax, ay, az, isSelf, mountLook || undefined);
         } else if (!airborne && v.wasAirborne && !visuallyDead) {
           // A caught ledge is not a fall; anything softer than a plain jump's
           // landing speed gets a footfall. The sled carries landing on turbine audio.
           if (rocketSledMounted) {
           } else if (v.fallSpeed >= SOFT_LANDING_SPEED) {
-            sink.movement('land', ax, ay, az, isSelf, e.mountKey || undefined);
+            sink.movement('land', ax, ay, az, isSelf, mountLook || undefined);
           } else {
             sink.footstep(ax, ay, az, this.surfaceAt(ax, az, ay), false, isSelf);
           }
@@ -11018,52 +11020,23 @@ export class Renderer {
           sink.mountEngineReset(e.id); // a dead rider must not hold a frozen engine/idle loop
         } else if (swimming) {
           if (strideHit(v, loco.speed, dt, SWIM_STRIDE)) sink.movement('swim', ax, ay, az, isSelf);
-        } else if (logicallyMounted && moving && !airborne) {
-          // An engine mount (windup/loop/winddown take set, e.g. the tank
-          // mount) drives its own state machine every frame instead of the
-          // per-stride gait beat below; mountEngine reports whether this
-          // mountKey actually has one, so ordinary mounts fall through.
-          sink.mountIdle(ax, ay, az, e.mountKey, false, e.id); // moving: hum off
-          if (sink.mountEngine(ax, ay, az, e.mountKey, true, e.id, st.backwards, false)) {
-            // handled entirely by mountEngine
-          } else if (loco.speed >= FOOT_RUN_SPEED) {
-            if (strideHit(v, loco.speed, dt, MOUNT_STRIDE_RUN))
-              sink.mountRun(ax, ay, az, e.mountKey, this.surfaceAt(ax, az, ay), isSelf);
-          } else {
-            v.stepAccum = MOUNT_STRIDE_RUN * 0.6;
-          }
-        } else if (logicallyMounted && airborne) {
-          // Airborne while mounted (a jump, or hopping over a ledge): HOLD
-          // whatever engine-audio phase was already playing rather than
-          // polling mountEngine with moving=false, which would read the hop
-          // as a stop and run a full winddown-then-windup cycle for every
-          // little bump in the road. Skipping the poll entirely leaves the
-          // state machine (and any active loop) exactly where it was; the
-          // next grounded frame picks the state back up on its own branch.
-          // The standstill hum is a separate loop, however, and must stop at
-          // takeoff rather than remain spatialized at the launch point.
-          sink.mountIdle(ax, ay, az, e.mountKey, false, e.id);
-          // Two poll anyway, being never quiet: the sled, and any mount
-          // idling a loop.
-          if (rocketSledMounted || sink.mountEngineIdles(e.mountKey)) {
-            sink.mountEngine(
-              ax,
-              ay,
-              az,
-              e.mountKey,
-              moving,
-              e.id,
-              st.backwards,
-              true,
-              v.mountPivot,
-            );
-          }
-        } else if (logicallyMounted && !visuallyDead && !(st.sitting && !riderMounted)) {
-          // Not moving while mounted (grounded and stopped): still poll an
-          // engine mount every frame so the winddown fires on the stop edge;
-          // a non-engine mount has nothing to do here (mountEngine no-ops).
-          sink.mountEngine(ax, ay, az, e.mountKey, false, e.id, false, false, v.mountPivot);
-          sink.mountIdle(ax, ay, az, e.mountKey, true, e.id); // stopped: hum on
+        } else if (logicallyMounted) {
+          updateRiddenMountAudio(
+            sink,
+            v,
+            mountLook,
+            e.id,
+            ax,
+            ay,
+            az,
+            moving,
+            airborne,
+            st.backwards,
+            loco.speed,
+            dt,
+            isSelf,
+            this.surfaceAtForAudio,
+          );
         } else if (moving && !airborne) {
           const running = loco.speed >= FOOT_RUN_SPEED;
           if (strideHit(v, loco.speed, dt, running ? FOOT_STRIDE_RUN : FOOT_STRIDE_WALK))
@@ -11088,7 +11061,7 @@ export class Renderer {
         sink,
         v,
         e.id,
-        e.mountKey,
+        mountLook,
         ax,
         ay,
         az,
@@ -11303,7 +11276,7 @@ export class Renderer {
       updateMountPresentation(v, {
         spec: mountSpec,
         shown: mountShown,
-        mountKey: e.mountKey,
+        mountKey: mountLook,
         anim: mst,
         airborne,
         moving,

@@ -16673,6 +16673,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.lootExplorer': '전리품 탐색기',
   'hudChrome.mounts.desc_goblin_rocket_sled':
     '위험할 정도로 과하게 만들어진 고블린 썰매. 쌍발 로켓과 형편없는 판단력으로 내달린다.',
+  'hudChrome.mounts.desc_rallycart_skin': '작은 차체에서 우렁찬 굉음을 내뿜는 랠리카.',
   'hudChrome.mounts.desc_rallycart_rxt': '작지만 본격적인 랠리 머신. 이동 속도를 높여준다.',
   'hudChrome.mounts.name_goblin_rocket_sled': '고블린 로켓 썰매',
   'hudChrome.mounts.name_rallycart_rxt': '랠리카트 RXT',
@@ -16695,4 +16696,32 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'loading.kickedByModerator': '운영자가 연결을 끊었습니다: {reason}',
   'loading.rendererContextLost':
     '3D 렌더러가 그래픽 컨텍스트를 잃어 복구할 수 없습니다. 새로고침해 보세요.',
+
+  'hudChrome.wocStore.mountSkinType': '탈것 스킨',
+  'hudChrome.cosmetics.title': '외형',
+  'hudChrome.cosmetics.close': '외형 닫기',
+  'hudChrome.cosmetics.tabsLabel': '외형 구역',
+  'hudChrome.cosmetics.tabMounts': '탈것',
+  'hudChrome.cosmetics.tabSkins': '스킨',
+  'hudChrome.cosmetics.tabMech': '메카',
+  'hudChrome.cosmetics.legend': '계정: 모든 캐릭터가 공유. 캐릭터: 이 캐릭터만.',
+  'hudChrome.cosmetics.scopeAccount': '계정',
+  'hudChrome.cosmetics.scopeCharacter': '캐릭터',
+  'hudChrome.cosmetics.wear': '착용',
+  'hudChrome.cosmetics.takeOff': '벗기',
+  'hudChrome.cosmetics.worn': '착용 중',
+  'hudChrome.cosmetics.apply': '적용',
+  'hudChrome.cosmetics.detach': '해제',
+  'hudChrome.cosmetics.applied': '적용됨',
+  'hudChrome.cosmetics.owned': '보유 중',
+  'hudChrome.cosmetics.storeOnly': 'WOC 상점에서 구매 가능',
+  'hudChrome.cosmetics.cardAria': '{name}, {rarity}',
+  'hudChrome.cosmetics.mountsNoMount': '먼저 탈것을 얻으세요. 스킨에는 탈 대상이 필요합니다.',
+  'hudChrome.cosmetics.skinsEmpty': '아직 보유한 무기 스킨이 없습니다. WOC 상점을 방문하세요.',
+  'hudChrome.cosmetics.skinsApplyHint': '{type}을(를) 장착하면 이 스킨을 적용할 수 있습니다.',
+  'hudChrome.cosmetics.mechEmpty': '아직 보유한 전투 메카 크로마가 없습니다.',
+  'hudChrome.cosmetics.mountsIntro':
+    '탈것 스킨은 이 캐릭터가 타는 어떤 탈것 위에도 덧입혀집니다. 속도는 바뀌지 않습니다.',
+  'hudChrome.cosmetics.mechIntro':
+    '전투 메카는 이 캐릭터의 몸을 대체합니다. 한 번에 하나의 크로마만 착용합니다.',
 };

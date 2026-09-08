@@ -26,6 +26,7 @@ vi.mock('../server/db', () => ({
     mechChromaIds: [],
     weaponSkinIds: [],
     weaponSkinLoadout: {},
+    mountSkinIds: [],
   })),
   loadAccountFlair: vi.fn(async () => ({ ai: false, streamer: false, links: {} })),
 }));
@@ -1285,6 +1286,7 @@ describe('delta snapshots', () => {
         mechChromaIds: ['amber_crimson'],
         weaponSkinIds: [],
         weaponSkinLoadout: {},
+        mountSkinIds: [],
       },
     });
     if ('error' in joined) throw new Error(joined.error);
@@ -1297,6 +1299,7 @@ describe('delta snapshots', () => {
       mechChromaIds: ['amber_crimson'],
       weaponSkinIds: [],
       weaponSkinLoadout: {},
+      mountSkinIds: [],
     });
 
     const client = bareClient(session.pid);
@@ -1306,6 +1309,7 @@ describe('delta snapshots', () => {
       mechChromaIds: ['amber_crimson'],
       weaponSkinIds: [],
       weaponSkinLoadout: {},
+      mountSkinIds: [],
     });
   });
 
@@ -4362,6 +4366,7 @@ describe('weapon skin wire (weaponSkinId)', () => {
       mechChromaIds: [],
       weaponSkinIds: ['winterbite', 'meteorlatch_crossbow'],
       weaponSkinLoadout: {},
+      mountSkinIds: [],
     };
     internals.applySnapshot({
       t: 'snap',
@@ -4452,6 +4457,7 @@ describe('weapon skin wire (weaponSkinId)', () => {
         mechChromaIds: [],
         weaponSkinIds: ['ice_fang_sword'],
         weaponSkinLoadout: {},
+        mountSkinIds: [],
       },
     });
     if ('error' in joined) throw new Error(joined.error);
@@ -5558,6 +5564,7 @@ function dirtyEveryDeltaField(): {
     mechChromaIds: ['amber_crimson'],
     weaponSkinIds: [],
     weaponSkinLoadout: {},
+    mountSkinIds: [],
   };
   // Session-scoped stored action-bar layout (`hbl`, self-only): set the frozen
   // join-time wire view (the per-profile document plus the desktop `forms`
@@ -5838,6 +5845,7 @@ describe('full self-state snapshot delta fixture', () => {
       mechChromaIds: ['amber_crimson'],
       weaponSkinIds: [],
       weaponSkinLoadout: {},
+      mountSkinIds: [],
     });
     expect([...client.questLog.values()]).toEqual([
       { questId: 'q_widows', counts: [10, 0], state: 'active' },
@@ -9245,5 +9253,60 @@ describe('negotiated stable timer wire v3', () => {
     expect(internals.bcStableSerializes).toBe(1);
     expect(internals.wireCache.get(player.id).auraCache.rebuilds).toBe(1);
     expect(stableBytes).toBeLessThan(legacyBytes * 0.35);
+  });
+});
+
+describe('mount skin identity round trip', () => {
+  it.each([
+    'mech_bird',
+    'chimeglass_tortoise',
+    'rickshaw_mount',
+    'goblin_rocket_sled',
+    'rallycart_rxt',
+  ])('ships %s to another client and clears it on takeoff', (skin) => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const wearer = joinServer(server, fakeWs(), 1, 'Skinned');
+    const observer = joinServer(server, fc, 2, 'Observer');
+    const rider = server.sim.entities.get(wearer.pid)!;
+    wearer.accountCosmetics.mountSkinIds = [skin];
+    server.handleMessage(wearer, JSON.stringify({ t: 'cmd', cmd: 'change_mount_skin', skin }));
+    expect(rider.mountSkinId).toBe(skin);
+    expect(rider.mountKey).toBe('');
+    const viewer = bareClient(observer.pid);
+    server.sim.tick();
+    broadcast(server);
+    (viewer as unknown as SnapshotApplier).applySnapshot(lastSnap(fc.sent));
+    expect(viewer.entities.get(wearer.pid)?.mountSkinId).toBe(skin);
+    server.handleMessage(
+      wearer,
+      JSON.stringify({ t: 'cmd', cmd: 'change_mount_skin', skin: null }),
+    );
+    server.sim.tick();
+    broadcast(server);
+    (viewer as unknown as SnapshotApplier).applySnapshot(lastSnap(fc.sent));
+    expect(viewer.entities.get(wearer.pid)?.mountSkinId).toBeNull();
+  });
+  it('shares the identity-update rate limit with other cosmetics', () => {
+    const now = vi.spyOn(Date, 'now').mockReturnValue(1_700_000_000_000);
+    try {
+      const server = new GameServer();
+      const session = joinServer(server, fakeWs(), 1, 'Limiter');
+      session.accountCosmetics.mountSkinIds = ['rallycart_rxt'];
+      const setter = vi.spyOn(server.sim, 'setMountSkin');
+      for (let i = 0; i < COSMETIC_OP_BURST + 5; i++) {
+        server.handleMessage(
+          session,
+          JSON.stringify({
+            t: 'cmd',
+            cmd: 'change_mount_skin',
+            skin: i % 2 ? null : 'rallycart_rxt',
+          }),
+        );
+      }
+      expect(setter).toHaveBeenCalledTimes(COSMETIC_OP_BURST);
+    } finally {
+      now.mockRestore();
+    }
   });
 });

@@ -322,6 +322,7 @@ describe('CI workflow parity', () => {
       '            /docs/screenshots/aura-tracks/',
       '            /docs/screenshots/bank-storage-charters/',
       '            /docs/screenshots/bank-vault-tab/',
+      '            /docs/screenshots/cosmetics-window/',
       '            /docs/screenshots/deed-border-cartouche/',
       '            /docs/screenshots/eastbrook-grand-armoury/',
       '            /docs/screenshots/eastbrook-vale-rebuild/',

@@ -157,6 +157,7 @@ import {
   FARM_PATCHES,
   type FarmPatchDef,
 } from './content/farm_patches';
+import { normalizeMountSkinId } from './content/mount_skins';
 import { DEFAULT_MOUNT, type MountKey } from './content/mounts';
 import { GATHERING_PROFESSION_IDS, type GatheringProfessionId } from './content/professions';
 import { PROVING_SHORE_ARRIVAL } from './content/proving_shore';
@@ -383,6 +384,7 @@ import {
 import {
   forceDismount as forceDismountImpl,
   ownedMounts as ownedMountsImpl,
+  setMountSkin as setMountSkinImpl,
   toggleMount as toggleMountImpl,
   updateMountTransition,
 } from './mounts';
@@ -1369,6 +1371,9 @@ export interface PlayerMeta {
   deathPet?: PetReturnSnapshot;
   skin: number; // appearance index into the render SKINS[player_<cls>]; persisted, synced
   skinCatalog: SkinCatalog;
+  // Worn account mount skin (content/mount_skins.ts); persisted, mirrored to
+  // Entity.mountSkinId for the identity wire. null = the ridden mount's own look.
+  mountSkinId: string | null;
   // Cosmetic skin-select event: the rank rolled when the event token was used,
   // pending a lock-in. Set on use, cleared on claim. Persisted so the reward
   // survives reconnect; re-using the token re-shows the same rank (no reroll).
@@ -1972,6 +1977,7 @@ export class Sim {
     mechChromaIds: [],
     weaponSkinIds: [],
     weaponSkinLoadout: {},
+    mountSkinIds: [],
   };
   private nextLootRollId = 1;
   private pendingLootRolls = new Map<number, PendingLootRoll>();
@@ -2880,6 +2886,7 @@ export class Sim {
       name,
       skin: savedState?.skin ?? 0,
       skinCatalog: savedState?.skinCatalog === 'mech' ? 'mech' : 'class',
+      mountSkinId: normalizeMountSkinId(savedState?.mountSkinId),
       pendingSkinRank: savedState?.pendingSkinRank ?? null,
       pendingSkinCatalog: savedState?.pendingSkinCatalog ?? null,
       pendingSkinItemId: savedState?.pendingSkinItemId ?? null,
@@ -3032,6 +3039,7 @@ export class Sim {
     this.players.set(player.id, meta);
     player.skinCatalog = meta.skinCatalog;
     player.skin = meta.skin; // mirror onto the entity so the renderer + wire can read it
+    player.mountSkinId = meta.mountSkinId;
     this.accountCosmetics = accountCosmeticsWithWornMechChroma(
       this.accountCosmetics,
       meta.skinCatalog,
@@ -4219,6 +4227,8 @@ export class Sim {
       ...nodeReadinessSaveFragment(meta.nodeHarvestReadyAt, this.time),
       skin: meta.skin,
       skinCatalog: meta.skinCatalog,
+      // Absent while no mount skin is worn (zero-default omission; back-compat).
+      ...(meta.mountSkinId ? { mountSkinId: meta.mountSkinId } : {}),
       pendingSkinRank: meta.pendingSkinRank,
       pendingSkinCatalog: meta.pendingSkinCatalog,
       pendingSkinItemId: meta.pendingSkinItemId,
@@ -4500,6 +4510,18 @@ export class Sim {
 
   changeWeaponSkin(skinId: string | null, weaponType?: WeaponSkinType): void {
     this.setWeaponSkin(this.primaryId, skinId, weaponType);
+  }
+
+  /** Wear (skinId) or take off (null) a mount skin on a player. Rules live in
+   *  src/sim/mounts.ts (setMountSkin); the account-ownership gate is the
+   *  caller's (the server's session cosmetics; changeMountSkin below offline). */
+  setMountSkin(pid: number, skinId: string | null): boolean {
+    return setMountSkinImpl(this.ctx, pid, skinId);
+  }
+
+  changeMountSkin(skinId: string | null): void {
+    if (skinId !== null && !this.accountCosmetics.mountSkinIds.includes(skinId)) return;
+    this.setMountSkin(this.primaryId, skinId);
   }
 
   // IWorldActionBar (offline arm). The action-bar layout is client presentation
@@ -5073,6 +5095,12 @@ export class Sim {
       },
       get players() {
         return sim.players;
+      },
+      get accountCosmetics() {
+        return sim.accountCosmetics;
+      },
+      set accountCosmetics(value: AccountCosmetics) {
+        sim.accountCosmetics = value;
       },
       get stationPlacements() {
         return sim.stationPlacements;

@@ -60,6 +60,7 @@ const GROUPS: Group[] = [
       { keys: ['Z'], label: 'guide.controls.sheathe' },
       { keys: ['Shift+Z'], label: 'guide.controls.deeds' },
       { keys: ['Shift+X'], label: 'guide.controls.reliquary' },
+      { keys: ['Shift+Y'], label: 'hudChrome.cosmetics.title' },
       { keys: ['T'], label: 'guide.controls.crafting' },
       // Perfecting parks on crafting's shifted layer (masterwrought Phase 18,
       // the rail tile and keybind); the label reuses the window's own title

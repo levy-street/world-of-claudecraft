@@ -1316,6 +1316,18 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the Book of Deeds window',
   },
   {
+    call: 'this.cosmeticsWindow.refreshIfChanged',
+    band: 'slow',
+    gate: 'this.cosmeticsWindow.isOpen',
+    surface: 'window',
+    guard: {
+      kind: 'module',
+      module: 'hud/cosmetics/cosmetics_window.ts',
+      proof: 'const sig = cosmeticsSig(this.snapshot()); if (sig === this.lastSig) return;',
+    },
+    why: 'the Cosmetics window',
+  },
+  {
     call: 'this.reliquaryWindow.refreshIfChanged',
     band: 'slow',
     gate: 'this.reliquaryWindow.isOpen',
@@ -1767,7 +1779,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // chrome 88 -> 89 at the aura-tracks sync (PR #3925): this branch adds
       // the aura tracks' one chrome call on top of the release's 88; the
       // release's window 48 carries over untouched.
-    ).toEqual({ window: 48, chrome: 89, none: 17 });
+    ).toEqual({ window: 49, chrome: 89, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1790,7 +1802,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // loot window's corpse arm moved OUT of the `none` bucket below into
       // this one: it gained a corpseSig latch when the popup started
       // refreshing instead of only closing.
-      module: 26,
+      module: 27,
       // Phase 20's refreshCharSheetIfChanged and its siblings. Their latches are
       // HUD fields (lastCharSheetSig et al) because the cold char_window painter
       // holds no signature of its own to diff. The release's trade row left this
@@ -1840,6 +1852,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         'dungeon_finder_proposal_popup.ts: if (view.sig !== this.lastSig) {',
         'dungeon_finder_window.ts: if (sig === this.lastSig) {',
         'hud/battleground/battleground_proposal_popup.ts: if (view.sig !== this.lastSig) {',
+        'hud/cosmetics/cosmetics_window.ts: const sig = cosmeticsSig(this.snapshot()); if (sig === this.lastSig) return;',
         'hud.ts: if (craftCastActivitySig(session) !== this.lastCraftingCastSig) {',
         'hud.ts: if (craftingReagentSig(this.sim.inventory, this.sim.player.name, this.sim.craftVaultStock) === this.lastCraftingReagentSig) return;',
         'hud.ts: if (sig !== this.lastLootSettingsSig) {',

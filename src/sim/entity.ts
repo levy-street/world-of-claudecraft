@@ -238,6 +238,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     offhandItemId: null,
     weaponSkinLoadout: {},
     weaponSkinId: null,
+    mountSkinId: null,
     equippedItems: {},
     equippedInstances: {},
     guild: '',

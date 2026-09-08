@@ -102,6 +102,7 @@ export interface InputCallbacks {
       | 'harvestJournal'
       | 'perfecting'
       | 'lootExplorer'
+      | 'cosmetics'
       | 'crafting'
       | 'sheathe'
       | 'mount',
@@ -1225,6 +1226,9 @@ export class Input {
         return;
       case 'lootExplorer':
         this.cb.onUiKey('lootExplorer');
+        return;
+      case 'cosmetics':
+        this.cb.onUiKey('cosmetics');
         return;
       case 'chat':
         this.cb.onUiKey('chat');

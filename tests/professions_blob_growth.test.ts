@@ -237,6 +237,7 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
   'cooldowns',
   'skin',
   'skinCatalog',
+  'mountSkinId',
   'pendingSkinRank',
   'pendingSkinCatalog',
   'pendingSkinItemId',

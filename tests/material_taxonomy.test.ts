@@ -236,6 +236,12 @@ const ALLOWED_UNCLASSIFIED_JUNK = [
   'guardian_core',
   'harvest_feast',
   'last_keep_signet',
+  // Retired premium reins remain inert saved items, with no use or material role.
+  'reins_chimeglass_tortoise',
+  'reins_goblin_rocket_sled',
+  'reins_mech_bird',
+  'reins_rallycart_rxt',
+  'reins_rickshaw_mount',
   // masterwrought Phase 11k's three apex role feasts: kind 'junk' by the same
   // tonic precedent harvest_feast set, and nothing crafts FROM any of them, so
   // all three are deliberate non-materials on the harvest_feast footing above.

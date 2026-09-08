@@ -3,7 +3,12 @@
 import * as THREE from 'three';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { attachMountGlows, disposeMountGlows, updateMountGlows } from '../src/render/mount_glow';
-import { MOUNT_LENS_COLOR, MOUNT_VISUAL_SPECS, mountGlowBreath } from '../src/render/mount_visuals';
+import {
+  MOUNT_LENS_COLOR,
+  MOUNT_SKIN_VISUAL_SPECS,
+  MOUNT_VISUAL_SPECS,
+  mountGlowBreath,
+} from '../src/render/mount_visuals';
 
 function rigWith(...boneNames: string[]): THREE.Object3D {
   const root = new THREE.Object3D();
@@ -35,14 +40,14 @@ describe('mount glow billboards', () => {
   it('fails soft when no glow or no authored bone is available', () => {
     expect(attachMountGlows(rigWith('lens'), MOUNT_VISUAL_SPECS.valorsteed)).toBeNull();
     expect(
-      attachMountGlows(rigWith('renamed_lens'), MOUNT_VISUAL_SPECS.chimeglass_tortoise),
+      attachMountGlows(rigWith('renamed_lens'), MOUNT_SKIN_VISUAL_SPECS.chimeglass_tortoise),
     ).toBeNull();
   });
 
   it('attaches, breathes, and disposes both shipped Chimeglass lens halos', () => {
     const rig = rigWith('lens');
     const lens = rig.getObjectByName('lens');
-    const spec = MOUNT_VISUAL_SPECS.chimeglass_tortoise;
+    const spec = MOUNT_SKIN_VISUAL_SPECS.chimeglass_tortoise;
     const glows = attachMountGlows(rig, spec);
     expect(glows).not.toBeNull();
     if (!glows || !lens) throw new Error('the test rig carries the Chimeglass lens bone');

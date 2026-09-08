@@ -11,8 +11,7 @@
 // reaches these arms instead of sailing past a fixture.
 
 import { describe, expect, it } from 'vitest';
-import { MOUNTS } from '../src/sim/content/mounts';
-import { STORE_MOUNT_ITEM_IDS } from '../src/sim/content/store_mounts';
+import { MOUNT_SKIN_IDS, MOUNT_SKINS } from '../src/sim/content/mount_skins';
 import { t } from '../src/ui/i18n';
 import {
   STORE_MOUNT_BUY_ATTR,
@@ -26,13 +25,13 @@ import {
   type WocStoreItemInput,
 } from '../src/ui/woc_store_view';
 
-const REINS = STORE_MOUNT_ITEM_IDS[0];
+const REINS = MOUNT_SKIN_IDS[0];
 
 function service(over: Partial<WocStoreItemInput> = {}): WocStoreItemInput {
   return {
     itemId: REINS,
     name: 'service name',
-    kind: 'item',
+    kind: 'skin',
     costClaudium: 1200,
     owned: false,
     ...over,
@@ -50,7 +49,7 @@ function row(
 }
 
 function rarityOf(r: StoreMountRow): string {
-  return MOUNTS[r.mountKey as keyof typeof MOUNTS].rarity;
+  return MOUNT_SKINS[r.skinId].rarity;
 }
 
 describe('storeMountCardHtml', () => {
@@ -65,7 +64,7 @@ describe('storeMountCardHtml', () => {
     );
     // The art and copy slots the shipped .armory-card CSS lays out.
     expect(html).toContain(
-      `<span class="armory-card-art"><img src="/ui/items/${REINS}.webp" alt="" loading="lazy" decoding="async"></span>`,
+      `<span class="armory-card-art"><img src="/ui/store/mount_skins/${REINS}.webp" alt="" loading="lazy" decoding="async"></span>`,
     );
     expect(html).toContain('<span class="armory-card-copy"><span class="armory-card-type">');
     expect(html).toContain(`<h4>${storeMountName(REINS)}</h4>`);
@@ -89,14 +88,18 @@ describe('storeMountCardHtml', () => {
     expect(html).not.toContain('claudium_coin_64.webp');
   });
 
-  it('names the mount from the catalog, never from the service name', () => {
+  it('names the skin from the catalog, never from the service name', () => {
     const html = storeMountCardHtml(row(5000, [service({ name: '<script>service</script>' })]));
     expect(html).not.toContain('service');
     expect(html).toContain('armory-card-type');
   });
 
-  it('renders nothing for a row whose item the catalog does not declare', () => {
-    const bogus: StoreMountRow = { ...row(5000, [service()]), itemId: 'not_a_reins', mountKey: '' };
+  it('renders nothing for a row whose skin the catalog does not declare', () => {
+    const bogus: StoreMountRow = {
+      ...row(5000, [service()]),
+      itemId: 'not_a_skin',
+      skinId: 'not_a_skin' as never,
+    };
     expect(storeMountCardHtml(bogus)).toBe('');
   });
 });
@@ -119,8 +122,8 @@ describe('storeMountsSectionHtml', () => {
 });
 
 describe('storeMountName', () => {
-  it('falls back to the id only for an item the catalog does not declare', () => {
+  it('falls back to the id only for a skin the catalog does not declare', () => {
     expect(storeMountName(REINS)).not.toBe(REINS);
-    expect(storeMountName('not_an_item')).toBe('not_an_item');
+    expect(storeMountName('not_a_skin')).toBe('not_a_skin');
   });
 });

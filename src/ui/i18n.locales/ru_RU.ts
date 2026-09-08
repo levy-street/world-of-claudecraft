@@ -16158,6 +16158,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.lootExplorer': 'Обозреватель добычи',
   'hudChrome.mounts.desc_goblin_rocket_sled':
     'Опасно переусложнённые гоблинские сани на двух ракетах и полном отсутствии здравого смысла.',
+  'hudChrome.mounts.desc_rallycart_skin': 'Крохотный раллийный автомобиль с могучим рёвом.',
   'hudChrome.mounts.desc_rallycart_rxt':
     'Компактная, но самая настоящая раллийная машина, повышающая скорость передвижения.',
   'hudChrome.mounts.name_goblin_rocket_sled': 'Гоблинские ракетные сани',
@@ -16181,4 +16182,30 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'loading.kickedByModerator': 'Модератор отключил вас: {reason}',
   'loading.rendererContextLost':
     '3D-рендерер потерял графический контекст и не смог восстановиться. Попробуйте обновить страницу.',
+
+  'hudChrome.wocStore.mountSkinType': 'Облик ездового животного',
+  'hudChrome.cosmetics.title': 'Косметика',
+  'hudChrome.cosmetics.close': 'Закрыть косметику',
+  'hudChrome.cosmetics.tabsLabel': 'Разделы косметики',
+  'hudChrome.cosmetics.tabMounts': 'Ездовые животные',
+  'hudChrome.cosmetics.tabSkins': 'Облики',
+  'hudChrome.cosmetics.tabMech': 'Мех',
+  'hudChrome.cosmetics.legend': 'Аккаунт: общее для всех персонажей. Персонаж: только этот персонаж.',
+  'hudChrome.cosmetics.scopeAccount': 'Аккаунт',
+  'hudChrome.cosmetics.scopeCharacter': 'Персонаж',
+  'hudChrome.cosmetics.wear': 'Надеть',
+  'hudChrome.cosmetics.takeOff': 'Снять',
+  'hudChrome.cosmetics.worn': 'Надето',
+  'hudChrome.cosmetics.apply': 'Применить',
+  'hudChrome.cosmetics.detach': 'Отвязать',
+  'hudChrome.cosmetics.applied': 'Применено',
+  'hudChrome.cosmetics.owned': 'В коллекции',
+  'hudChrome.cosmetics.storeOnly': 'Доступно в магазине WOC',
+  'hudChrome.cosmetics.cardAria': '{name}, {rarity}',
+  'hudChrome.cosmetics.mountsNoMount': 'Сначала получите ездовое животное: облику нужно, на что садиться.',
+  'hudChrome.cosmetics.skinsEmpty': 'Обликов оружия пока нет. Загляните в магазин WOC.',
+  'hudChrome.cosmetics.skinsApplyHint': 'Экипируйте {type}, чтобы применить этот облик.',
+  'hudChrome.cosmetics.mechEmpty': 'Расцветок боевого меха пока нет.',
+  'hudChrome.cosmetics.mountsIntro': 'Облик ездового животного накладывается на любое животное, на котором ездит этот персонаж. Скорость не меняется.',
+  'hudChrome.cosmetics.mechIntro': 'Боевой мех заменяет тело этого персонажа. Одновременно надета одна расцветка.',
 };
