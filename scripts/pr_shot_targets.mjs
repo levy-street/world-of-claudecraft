@@ -1052,6 +1052,83 @@ async function triggerRowBreakdown(page, rowSelector, variant) {
 }
 
 export const TARGETS = [
+  {
+    key: 'fen-features-cull',
+    label: 'Willowfen dressing under the per-cell distance cull (low preset, pixel-identical)',
+    when: ['render/fen_features', 'render/zone_feature_cells_core'],
+    variants: [
+      // Eastbrook, facing the fen: on low the whole dressing sits past the 340 yd
+      // fog, so the frame must not change while the submitted triangles drop.
+      { key: 'eastbrook-facing-fen-desktop', spot: { x: 0, z: -14, facing: -0.764 } },
+      // The Bridgemere hub inside the fen: the cells behind the camera are
+      // frustum-culled now, nothing in view moves.
+      { key: 'bridgemere-hub-desktop', spot: { x: -360, z: 362, facing: 0 } },
+    ],
+    async capture(page, variant) {
+      await page.waitForFunction(
+        () => {
+          const loading = document.querySelector('#loading-screen');
+          const ui = document.querySelector('#ui');
+          return (
+            document.body.classList.contains('game-active') &&
+            !!ui &&
+            getComputedStyle(ui).display !== 'none' &&
+            !!loading &&
+            !loading.classList.contains('visible')
+          );
+        },
+        { timeout: 90000, polling: 200 },
+      );
+      const staged = await page.evaluate((spot) => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!game || !sim || !player) return { ok: false, reason: 'offline world is unavailable' };
+        player.pos.x = spot.x;
+        player.pos.z = spot.z;
+        player.prevPos = { ...player.pos };
+        player.facing = spot.facing;
+        game.input.camYaw = player.facing;
+        game.input.camDist = 9;
+        sim.rebucket?.(player);
+        // Wandering hostiles walk into the frame and aggro the player mid-shot
+        // (a wolf pack at the Eastbrook spot); relocate every mob nearby, the
+        // weapon-vfx target's idiom, so the pair compares scenery to scenery.
+        for (const e of sim.entities.values()) {
+          if (e.kind !== 'mob' || e.id === player.id) continue;
+          const dx = e.pos.x - player.pos.x;
+          const dz = e.pos.z - player.pos.z;
+          if (dx * dx + dz * dz > 90 * 90) continue;
+          e.pos.x += 400;
+          if (e.prevPos) {
+            e.prevPos.x = e.pos.x;
+            e.prevPos.y = e.pos.y;
+            e.prevPos.z = e.pos.z;
+          }
+          if (e.spawnPos) e.spawnPos = { ...e.pos };
+          if (e.leashAnchor) e.leashAnchor = { ...e.pos };
+          sim.rebucket?.(e);
+        }
+        player.inCombat = false;
+        player.combatTimer = 0;
+        player.hp = player.maxHp ?? player.hp;
+        return { ok: true };
+      }, variant.spot);
+      if (!staged.ok) throw new Error(staged.reason);
+      // Crossing the world raises the streaming veil; the fen itself is built by
+      // the background zone prepare a few seconds after the reveal.
+      await wait(1500);
+      await awaitWorldPainted(page);
+      await sweepOverlays(page, 8);
+      await wait(8000);
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      return { clip: '#ui' };
+    },
+  },
   ...masterwroughtReviewTargets({
     beforeLoad: lowGraphicsSeed,
     dismissOverlays: dismissEntryOverlays,
