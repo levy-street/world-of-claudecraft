@@ -171,8 +171,7 @@ export function hasUnseededInstanceMatrix(array: ArrayLike<number>, count: numbe
 // 2.34M fen triangles submitted from Eastbrook at medium. The props layer
 // draws a far bake at that distance and foliage draws impostors; the bespoke
 // dressing had no far representation at all. The rule below is size-driven,
-// never a
-// per-family table: a group's reach is the distance at which its largest
+// never a per-family table: a group's reach is the distance at which its largest
 // instance spans ZONE_FEATURE_MIN_APPARENT_PX at a fixed reference view (720
 // px tall, the 60 degree base FOV), so a giant one-off model pulls its whole
 // group out to the horizon with nothing to write anywhere, and a small clump

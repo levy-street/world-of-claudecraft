@@ -12,8 +12,7 @@
 // mesh per family the fen's footprint edge sat inside the low fog from
 // Eastbrook and 1.49M fully fogged triangles were submitted every frame. The
 // dressing cells carry their apparent-size reach on every profile, and the
-// willows stay one whole group where the far vista runs
-// (fenFeaturesBuildOptions).
+// willows stay one whole group (fenFeaturesBuildOptions).
 import * as THREE from 'three';
 import { WILLOWFEN_PROPS, WILLOWFEN_ZONE } from '../sim/content/willowfen';
 import { fenWillowSpots } from '../sim/fen_willows';
@@ -26,7 +25,6 @@ import {
 } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
-import { farFieldPolicy } from './far_terrain_core';
 import { GFX, ZONE_FEATURE_CELL_SIZE } from './gfx';
 import { renderLayerDisabled } from './render_dev_flags';
 import { thinLeanDressing } from './zone_dressing_lod_core';
@@ -46,17 +44,6 @@ export interface FenFeaturesBuildOptions {
   /** XZ cell size in yd; 0 keeps each family as one whole mesh straight
    *  under the parent group, the pre-split scene graph byte for byte. */
   cellSize: number;
-  /** Keep the collider-backed family (the willows) as one whole mesh even
-   *  when the dressing splits: on the far-vista arm a split willow family
-   *  adds draws in the idle town view for no triangle, since the willows
-   *  are never shed by size. */
-  colliderFamiliesWhole: boolean;
-  /** Give every dressing cell its apparent-size reach (the sweep sheds a
-   *  cell once its largest instance is below the pixel threshold). On every
-   *  profile: the reach and the cull distance are ANDed, so the stricter of
-   *  the two decides, and a session whose cull distance is short simply
-   *  never reaches its own reach. */
-  apparentSizeReach: boolean;
 }
 
 /** The live build options: cells for every family with their reach, on every
@@ -75,21 +62,19 @@ export interface FenFeaturesBuildOptions {
  *  lily rafts, whose reach is 406, and the reach is stricter for the reeds,
  *  mushrooms and logs, whose models put theirs at 224 to 287.
  *
- *  The willows stay whole where the far vista runs: they are the collider
- *  family, never shed by size, and splitting them there adds draws in the
- *  idle town view for no triangle.
+ *  The willows split like every other family and are simply never SIZED (the
+ *  collider rule): keeping them whole was measured and is worse, because the
+ *  family's own footprint then reaches inside the low tier's fog from
+ *  Eastbrook and drags all 54 trees with it (615,276 triangles against none).
+ *
+ *  Nothing here reads a tier, a memory profile or the far-field policy: the
+ *  build is one shape everywhere, and which of the reach or the cull distance
+ *  sheds a cell is the sweep's decision, per frame, per group.
  *
  *  `?fencells=off` builds today's whole layout on any session (both arms of
  *  one build for the scene census). */
 export function fenFeaturesBuildOptions(): FenFeaturesBuildOptions {
-  if (renderLayerDisabled('fencells')) {
-    return { cellSize: 0, colliderFamiliesWhole: true, apparentSizeReach: false };
-  }
-  return {
-    cellSize: ZONE_FEATURE_CELL_SIZE,
-    colliderFamiliesWhole: farFieldPolicy(GFX.vistaTier, GFX).vista.enabled,
-    apparentSizeReach: true,
-  };
+  return { cellSize: renderLayerDisabled('fencells') ? 0 : ZONE_FEATURE_CELL_SIZE };
 }
 
 const FEN_ZMIN = 180;
@@ -283,7 +268,8 @@ export function buildFenFeatures(
   // the cell split, so the surviving set does not depend on the cell size.
   const split = options.cellSize > 0;
   const instanceDressing = (key: FenPropKey, spots: readonly Placement[]): void => {
-    instanceProp(key, thinLeanDressing(spots, GFX.leanFoliage), split, options.apparentSizeReach);
+    // sized: a dressing family opts into the apparent-size reach
+    instanceProp(key, thinLeanDressing(spots, GFX.leanFoliage), split, true);
   };
 
   const hub = WILLOWFEN_ZONE.hub;
@@ -335,12 +321,13 @@ export function buildFenFeatures(
   // --- the willows: instanced at the shared sim placements (fenWillowSpots
   // in sim/fen_willows.ts), so every trunk the renderer draws is exactly a
   // trunk the sim's colliders block ---
-  // Never given the apparent-size reach either: the trunks are colliders,
-  // and their size carries them to the horizon anyway.
+  // Split like the dressing, but NEVER given the apparent-size reach: the
+  // trunks are the sim's colliders, so only the distance rule may hide them
+  // (their size would carry them past every cull horizon anyway).
   instanceProp(
     'willow',
     fenWillowSpots(seed).map((w) => ({ x: w.x, y: w.y, z: w.z, s: w.s, rot: w.rot })),
-    split && !options.colliderFamiliesWhole,
+    split,
   );
 
   // --- the water lilies: modeled lily rafts drifting on every pool ---

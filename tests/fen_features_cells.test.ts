@@ -6,6 +6,7 @@
 // so every pin below is a fact about the shipping placement set: the census
 // counted 324 instances (191 lean) and drew all of them from Eastbrook on the
 // low tier, where the whole-zone footprint's edge sits inside the 340 yd fog.
+import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
@@ -27,25 +28,8 @@ import {
   isZoneFeatureVisible,
   zoneFeatureReach,
 } from '../src/render/zone_feature_visibility_core';
+import { PLAYER_INTEREST_DROP_RADIUS } from '../src/sim/types';
 import { WORLD_SEED } from '../src/sim/world_seed';
-
-// The far-field policy is the one arm decision (far_terrain_core.ts); the
-// wiring test drives both answers through it, the rest of the file never
-// reads it (the builds below pass their cell size explicitly).
-const farField = vi.hoisted(() => ({ vistaEnabled: false, calls: [] as unknown[][] }));
-vi.mock('../src/render/far_terrain_core', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('../src/render/far_terrain_core')>();
-  return {
-    ...actual,
-    farFieldPolicy: (...args: unknown[]) => {
-      farField.calls.push(args);
-      return {
-        sprites: farField.vistaEnabled,
-        vista: { enabled: farField.vistaEnabled, spacing: 0, envelopeFar: 0, cameraFar: 0 },
-      };
-    },
-  };
-});
 
 // The low-tier town view of the scene census (families3_low.log, town yaw
 // 270): camera (11.26, 2.72, -15.73), scene fog far LOW_FOG.far = 340
@@ -60,18 +44,30 @@ const FEN_RECT = { x0: -540, x1: -180, z0: 180, z1: 700 };
 // trunk, so the per-cell part loop and the geometry copy of groups are
 // exercised, not only the one-part path.
 const TWO_PART_FAMILY = 'willow';
-// One dressing family stands in as a non-unit, non-cubic model so the extent
-// a cell carries proves the model factor and the max(x, y, z) choice.
+// The stand-ins carry the SHIPPED models' largest dimension at unit scale
+// (decoded from the GLB position bounds times the node scale), so every reach
+// this file pins is the reach a player's build computes, to a percent. The
+// log is deliberately non-cubic as well, to prove the extent is the max of the
+// three axes and not one of them. The willow is never sized (collider
+// family), so its value only shapes this fixture's footprints; the placement
+// scale is what makes a shipped willow about 12 yd tall.
+const MODEL_EXTENT_YD: Record<string, number> = {
+  willow: 1.0,
+  lilies: 0.98,
+  reeds: 0.982,
+  mushrooms: 0.981,
+  log: 0.96,
+};
 const WIDE_FAMILY = 'log';
-const WIDE_EXTENT = 1.5;
 function seedStandIns(): void {
   for (const key of fenFeaturesInternalsForTest.familyKeys) {
     const scene = new THREE.Group();
     scene.name = `${key}_glb`;
+    const e = MODEL_EXTENT_YD[key];
     const trunk =
       key === WIDE_FAMILY
-        ? new THREE.BoxGeometry(WIDE_EXTENT, 0.4, 0.6)
-        : new THREE.BoxGeometry(1, 1, 1);
+        ? new THREE.BoxGeometry(e, e * 0.27, e * 0.4)
+        : new THREE.BoxGeometry(e, e, e);
     if (key === TWO_PART_FAMILY) {
       trunk.addGroup(0, trunk.index?.count ?? 36, 0);
       const canopy = new THREE.Mesh(
@@ -118,18 +114,10 @@ function positionsOf(root: THREE.Object3D): string[] {
   return out.sort();
 }
 
-// The three option sets fenFeaturesBuildOptions answers with (pinned below).
-const CLASSIC_ARM = {
-  cellSize: ZONE_FEATURE_CELL_SIZE,
-  colliderFamiliesWhole: false,
-  apparentSizeReach: true,
-};
-const VISTA_ARM = {
-  cellSize: ZONE_FEATURE_CELL_SIZE,
-  colliderFamiliesWhole: true,
-  apparentSizeReach: true,
-};
-const WHOLE_ARM = { cellSize: 0, colliderFamiliesWhole: true, apparentSizeReach: false };
+// The two option sets fenFeaturesBuildOptions answers with (pinned below):
+// one live shape on every profile, and the dev arm's pre-split layout.
+const LIVE_ARM = { cellSize: ZONE_FEATURE_CELL_SIZE };
+const WHOLE_ARM = { cellSize: 0 };
 
 describe('fen features per-cell cull groups', () => {
   let cells: FenFeaturesView;
@@ -140,7 +128,7 @@ describe('fen features per-cell cull groups', () => {
 
   function build(): void {
     seedStandIns();
-    cells = buildFenFeatures(WORLD_SEED, CLASSIC_ARM);
+    cells = buildFenFeatures(WORLD_SEED, LIVE_ARM);
     whole = buildFenFeatures(WORLD_SEED, WHOLE_ARM);
     cells.group.updateMatrixWorld(true);
     whole.group.updateMatrixWorld(true);
@@ -185,8 +173,8 @@ describe('fen features per-cell cull groups', () => {
     // (the two-part willow counts its instances once per part on both sides)
     expect(instanceCount(whole.group)).toBe((GFX.leanFoliage ? 191 : 324) + wholeCount('willow'));
     expect(instanceCount(cells.group)).toBe(instanceCount(whole.group));
-    // the vista arm draws the same set too (cells with a reach, willows whole)
-    const vista = buildFenFeatures(WORLD_SEED, VISTA_ARM);
+    // the live shape draws the same set too (cells everywhere, dressing sized)
+    const vista = buildFenFeatures(WORLD_SEED, LIVE_ARM);
     expect(instanceCount(vista.group)).toBe(instanceCount(whole.group));
     expect(positionsOf(vista.group)).toEqual(positionsOf(whole.group));
     for (const family of fenFeaturesInternalsForTest.familyKeys) {
@@ -251,56 +239,45 @@ describe('fen features per-cell cull groups', () => {
     const kept = cells.cullGroups.filter((g) =>
       isZoneFeatureVisible(measureFeatureFootprint(g), TOWN_CAM.x, TOWN_CAM.z, LOW_FOG_FAR),
     );
-    expect(new Set(kept.map(cellKeyOf)).size).toBe(1);
+    expect(kept.length).toBeLessThanOrEqual(3);
+    expect(new Set(kept.map(cellKeyOf)).size).toBeLessThanOrEqual(2);
     // placements, so each cull group counted once whatever its part count
     const keptInstances = kept.reduce((sum, g) => sum + meshesOf(g)[0].count, 0);
     expect(keptInstances).toBeGreaterThan(0);
-    // a small fraction of the 324 (the willow stand-in's canopy widens its
-    // footprint, so the near cell's willows count here too)
-    expect(keptInstances).toBeLessThanOrEqual(60);
-    // and the next CELL is clear of the fog by a wide margin (the near cell's
-    // other families may sit just past it; they share its cell), so a
-    // placement drift that pulls a second cell into reach shows up here
-    const keptCell = cellKeyOf(kept[0]);
-    const otherCells = cells.cullGroups.filter((g) => cellKeyOf(g) !== keptCell);
-    expect(otherCells.length).toBeGreaterThan(0);
-    const nearestOtherCellEdge = Math.min(
-      ...otherCells.map((g) =>
-        featureEdgeDistance(
-          measureFeatureFootprint(g) as NonNullable<ReturnType<typeof measureFeatureFootprint>>,
-          TOWN_CAM.x,
-          TOWN_CAM.z,
-        ),
-      ),
-    );
-    expect(nearestOtherCellEdge).toBeGreaterThan(LOW_FOG_FAR + 50);
+    // a small fraction of the 324
+    expect(keptInstances).toBeLessThanOrEqual(100);
+    // and the near band is where the placements put it: every kept group's
+    // edge sits in the last 40 yd before the fog, so a placement drift that
+    // moved the fen toward town shows up here rather than in a silent extra
+    // group at the town's doorstep.
+    for (const g of kept) {
+      const edge = featureEdgeDistance(
+        measureFeatureFootprint(g) as NonNullable<ReturnType<typeof measureFeatureFootprint>>,
+        TOWN_CAM.x,
+        TOWN_CAM.z,
+      );
+      expect(edge).toBeGreaterThan(LOW_FOG_FAR - 40);
+      expect(edge).toBeLessThan(LOW_FOG_FAR);
+    }
   });
 
-  it('wires the live build to the far-field policy, whole under the ?fencells=off dev arm', async () => {
+  it('wires the live build to one shape, whole under the ?fencells=off dev arm', async () => {
     // The renderer calls buildFenFeatures(seed) with no options: this default
-    // is the only path a player's build takes. The arm is farFieldPolicy's
-    // decision (the renderer's own vista read), mocked here on both answers.
+    // is the only path a player's build takes.
     expect(ZONE_FEATURE_CELL_SIZE).toBe(180);
-    farField.vistaEnabled = false;
-    expect(fenFeaturesBuildOptions()).toEqual(CLASSIC_ARM);
-    expect(farField.calls.at(-1)).toEqual([GFX.vistaTier, GFX]);
-    farField.vistaEnabled = true;
-    expect(fenFeaturesBuildOptions()).toEqual(VISTA_ARM);
-    // The reach is NOT an arm decision: it is on wherever cells are built,
-    // because the classic arm's fog does not own the far end on every
-    // profile (constrained memory eases it out to 700 yd).
-    expect(CLASSIC_ARM.apparentSizeReach).toBe(true);
-    expect(VISTA_ARM.apparentSizeReach).toBe(true);
+    expect(fenFeaturesBuildOptions()).toEqual(LIVE_ARM);
+    // One shape on every profile: no tier, no memory profile, no far-field
+    // arm is read here. Which of the reach or the cull distance sheds a cell
+    // is the sweep's decision, per frame, per group.
+    expect(
+      readFileSync(new URL('../src/render/fen_features.ts', import.meta.url), 'utf8'),
+    ).not.toContain('farFieldPolicy');
     // render_dev_flags reads location once at module load, so the dev arm is
     // exercised on a fresh module graph (the render_dev_flags test's idiom).
     vi.resetModules();
     vi.stubGlobal('location', { search: '?fencells=off' });
     try {
       const fresh = await import('../src/render/fen_features');
-      // the dev arm wins on either far-field answer
-      farField.vistaEnabled = false;
-      expect(fresh.fenFeaturesBuildOptions()).toEqual(WHOLE_ARM);
-      farField.vistaEnabled = true;
       expect(fresh.fenFeaturesBuildOptions()).toEqual(WHOLE_ARM);
     } finally {
       vi.unstubAllGlobals();
@@ -308,18 +285,22 @@ describe('fen features per-cell cull groups', () => {
     }
   });
 
-  it('on the far-vista arm keeps the willows whole and gives the dressing cells their reach', () => {
+  it('sizes every dressing cell and never the collider family', () => {
     build();
-    const vista = buildFenFeatures(WORLD_SEED, VISTA_ARM);
+    const vista = buildFenFeatures(WORLD_SEED, LIVE_ARM);
     vista.group.updateMatrixWorld(true);
-    // the willow family is one registered cull group of its own (the
-    // distance rule still applies to it), never a cell, never sized
+    // the willow family splits into cells like the dressing (so the distance
+    // rule can shed them cell by cell, which the low fog does from Eastbrook)
+    // but is NEVER sized: only the distance rule may hide a collider.
     const willow = vista.cullGroups.filter((g) => familyOf(g) === TWO_PART_FAMILY);
-    expect(willow).toHaveLength(1);
-    expect(willow[0].name).toBe(`fen-features:${TWO_PART_FAMILY}:whole`);
-    expect(willow[0].userData[ZONE_FEATURE_EXTENT_KEY]).toBeUndefined();
-    expect(meshesOf(willow[0])).toHaveLength(2);
-    expect(instanceCount(willow[0])).toBe(wholeCount(TWO_PART_FAMILY) * 2);
+    expect(willow.length).toBeGreaterThan(1);
+    for (const g of willow) {
+      expect(g.userData[ZONE_FEATURE_EXTENT_KEY]).toBeUndefined();
+      expect(meshesOf(g)).toHaveLength(2);
+    }
+    expect(willow.reduce((sum, g) => sum + instanceCount(g), 0)).toBe(
+      wholeCount(TWO_PART_FAMILY) * 2,
+    );
     // every dressing cell carries its largest instance's extent: the box
     // stand-in is 1 yd at unit scale, so the extent is the cell's max scale
     const dressing = vista.cullGroups.filter((g) => familyOf(g) !== TWO_PART_FAMILY);
@@ -336,21 +317,26 @@ describe('fen features per-cell cull groups', () => {
         maxScale = Math.max(maxScale, sc.x);
       }
       // (float32 matrix round trip: three decimals)
-      const modelExtent = familyOf(g) === WIDE_FAMILY ? WIDE_EXTENT : 1;
+      const modelExtent = MODEL_EXTENT_YD[familyOf(g)];
       expect(g.userData[ZONE_FEATURE_EXTENT_KEY]).toBeCloseTo(modelExtent * maxScale, 3);
       expect(zoneFeatureEntryFor(g, measureFeatureFootprint(g)).reach).toBeCloseTo(
         zoneFeatureReach(modelExtent * maxScale),
         2,
       );
     }
-    // The classic arm sizes its dressing the same way: the reach applies on
-    // every profile (a constrained-memory session runs the classic arm with a
-    // fog that eases to 700 yd, where the cells alone shed nothing), and the
-    // cull distance still applies on top.
-    for (const g of cells.cullGroups) {
-      const sized = g.userData[ZONE_FEATURE_EXTENT_KEY];
-      if (familyOf(g) === TWO_PART_FAMILY) expect(sized).toBeUndefined();
-      else expect(typeof sized).toBe('number');
+    // and the real sweep at the CLASSIC cull distance (the low tier's 340 yd
+    // fog): the stricter of the reach and the distance decides, per group.
+    const lowEntries = vista.cullGroups.map((g) =>
+      zoneFeatureEntryFor(g, measureFeatureFootprint(g)),
+    );
+    sweepZoneFeatures(lowEntries, TOWN_CAM.x, TOWN_CAM.z, LOW_FOG_FAR, 105);
+    for (const entry of lowEntries) {
+      const edge = featureEdgeDistance(
+        entry.footprint as NonNullable<typeof entry.footprint>,
+        TOWN_CAM.x,
+        TOWN_CAM.z,
+      );
+      expect(entry.group.visible).toBe(edge < entry.reach && edge < LOW_FOG_FAR);
     }
     // and the real sweep over the vista build from the town camera at the
     // vista cull distance: each dressing cell follows its own reach, the
@@ -370,9 +356,16 @@ describe('fen features per-cell cull groups', () => {
       // and no dressing cell of the shipped placements sheds anywhere near
       // the player: the smallest fen scale on a unit model reaches past
       // 180 yd (the real models are no smaller than the unit stand-ins)
+      // no dressing cell sheds anywhere near the player: with the shipped
+      // extents above, the smallest reach any cell can take is the mushroom
+      // clump at its smallest authored scale, about 183 yd, outside the radius
+      // at which the server will even tell a client another player exists.
+      expect(entry.reach).toBeGreaterThan(PLAYER_INTEREST_DROP_RADIUS);
       expect(entry.reach).toBeGreaterThan(180);
     }
-    expect(willow[0].visible).toBe(true);
+    // every willow cell is inside the vista cull distance and none is sized,
+    // so the collider family survives the sweep whole
+    for (const g of willow) expect(g.visible).toBe(true);
     expect(shed).toBeGreaterThan(0);
   });
 

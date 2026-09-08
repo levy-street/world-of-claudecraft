@@ -519,8 +519,11 @@ alone), so a shed only ever removes a few-pixel blob, never something a player w
 or acts on; the reference view is a constant, so what is drawn never depends on the
 window or on the FPS governor; and the reach for the smallest shipped scale sits far
 outside the range a player acts in (past 180 yd on a unit model at the fen's smallest
-scale). The cost is a visible pop at the reach on the vista tiers, larger on a 1440p or
-2160p client than at the reference view; the band keeps it from flapping.
+scale). The cost is a pop at the reach, larger on a 1440p or 2160p client than at the reference
+view; the band keeps it from flapping. Where the reach fires inside the fog (at low a
+reed, mushroom or log cell goes at 224 to 287 yd against a 340 yd fog) the object was
+already 48 to 76 percent blended into it, so the pop is fainter there than on the vista
+tiers, where it happens in clear air.
 
 ## Enforcing guards
 
@@ -629,8 +632,11 @@ scale). The cost is a visible pop at the reach on the vista tiers, larger on a 1
   the fixed reference view, a missing extent fails open, both hysteresis edges hold, the
   sweep shows only what is inside the fog AND the reach; on the fen build the willow
   (collider) group carries no extent while every dressing cell carries its largest
-  instance's, the classic arm carries none (low stays byte-identical), and no dressing
-  cell of the shipped placements reaches under 180 yd.
+  instance's on every profile while the willow (collider) group carries none on any, and
+  the smallest reach the shipped models and placement scales can produce stays outside
+  the radius at which the server will even tell a client another player exists
+  (PLAYER_INTEREST_DROP_RADIUS, 100 yd; the real minimum is about 183 yd, the mushroom
+  clump at its smallest authored scale).
 - `tests/weapon_vfx_shed.test.ts`: the weapon-skin fade. Neither arm reaches zero and the
   lever's floor is proven to stay clear of the multiplier at which a part would stop drawing,
   so the fade can never be mistaken for a cull; the distance arm is anchored to the fixed

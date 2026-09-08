@@ -1063,8 +1063,9 @@ export const TARGETS = [
       'render/zone_feature_visibility_core',
     ],
     variants: [
-      // Eastbrook, facing the fen: on low the whole dressing sits past the 340 yd
-      // fog, so the frame must not change while the submitted triangles drop.
+      // Eastbrook, facing the fen: on low every fen cell is past the 340 yd fog
+      // or past its own apparent-size reach, so the frame must not change while
+      // the submitted triangles drop.
       {
         key: 'eastbrook-facing-fen-low',
         beforeLoad: lowGraphicsSeed,
@@ -1077,9 +1078,10 @@ export const TARGETS = [
         beforeLoad: lowGraphicsSeed,
         spot: { x: -360, z: 362, facing: 0 },
       },
-      // Medium, the far-vista arm: the dressing cells shed by apparent size
-      // there (a raft below 8 px at the reference view), so this pair is the
-      // one that SHOWS a difference and is judged on it.
+      // Medium: the dressing cells shed by apparent size (a raft below 8 px at
+      // the reference view) in clear air rather than behind fog, so this is the
+      // pair where a shed would show if it were ever visible. It is not: judge
+      // it on the census readout, like the low pair.
       {
         key: 'eastbrook-facing-fen-medium',
         beforeLoad: seedMediumGraphicsPreset,
