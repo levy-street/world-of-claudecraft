@@ -211,13 +211,17 @@ describe('gfx override application', () => {
     // (the post-processing shed, post_shed_core.ts): every profile gains the
     // band record in bucketBands and its baseline of 1 in bucketBaselines;
     // no pre-existing value moves.
+    // Regenerated across the board for the zoneFeatureCellSize field (the
+    // zone-feature dressing cell split, zone_feature_cells_core.ts): its VALUE
+    // is 180 on low (the classic arm, where the fog cull bites) and 0 on every
+    // vista profile here, so low moves by a value and the rest by the key name.
     expect(hashes).toEqual({
-      low: '7dc57596b0820d548a826592de1bffd69d9ba2ce0af78048c524f4ac663c3686',
-      medium: 'fb9c5c7cdd877d7fba34c05e99823e8e7af0bb128a88e1544ed29965565fcbe4',
-      high: '6e28cce36902fa461b0d459a95a1fd13763d838beb31887f3c15a8557b0e5e31',
-      ultra: '596161ef604ac83a31cb6ebc71c35146ff84d766255798de5079a204b35d712b',
-      insane: '498703d3245f7069597541e4f957c8005c3b28c5dd12a169be903808be4dea0a',
-      advanced: '4e785a654eac0e113bdb8b52a4e08964186011b5b3fe40cde235b7d0cd0af9ac',
+      low: '314fed5ad492456446d764f05d99b20087998991d93b4c97914b5995f1f020ba',
+      medium: '26f55c7d3206a388f6476b65b30b0ebeaf56fa4ca077f65b563b7104adc7c1c5',
+      high: '5142d8fe3601ed24262554315713e6a21bf7708124a90c999de7733b965eed4e',
+      ultra: '8b2892bba357b386d1bb5b2a40243907b1e30ecafaa853f33fc3334dd1f6a36f',
+      insane: '5cee59d79bca42c3644cef9ffe3a61e411e133045f213caf8cd4253dfb5ea35f',
+      advanced: '1dce0894387e267fe99d37d99d67ac6d8002f62de080eef2ee80141bc997b682',
     });
   });
 

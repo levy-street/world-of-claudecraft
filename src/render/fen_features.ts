@@ -5,6 +5,14 @@
 // pieces are GPU-instanced from five optimized GLBs (the flower-bed
 // fidelity recipe; scripts/assets/build_willowfen_props.mjs). Same contract
 // as the sibling realm modules: build once, update(time) animates gently.
+//
+// Every family is instanced per XZ cell (zone_feature_cells_core.ts), one
+// cull group per (family, cell), so the renderer's zone-feature sweep can hide
+// the cells the fog has swallowed instead of the whole zone at once: as one
+// mesh per family the fen's footprint edge sat inside the low fog from
+// Eastbrook and 1.49M fully fogged triangles were submitted every frame. The
+// cell size is the tier's (GFX.zoneFeatureCellSize): whole meshes on the
+// vista arm, where nothing of the fen is beyond the cull horizon from town.
 import * as THREE from 'three';
 import { WILLOWFEN_PROPS, WILLOWFEN_ZONE } from '../sim/content/willowfen';
 import { fenWillowSpots } from '../sim/fen_willows';
@@ -18,11 +26,29 @@ import {
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { GFX } from './gfx';
+import { renderLayerDisabled } from './render_dev_flags';
 import { thinLeanDressing } from './zone_dressing_lod_core';
+import { partitionByCell } from './zone_feature_cells_core';
 
 export interface FenFeaturesView {
   group: THREE.Group;
+  /** One group per (family, cell), registered with the distance cull; the
+   *  parent group alone (one whole-zone footprint, today's layout) when the
+   *  build keeps whole meshes. */
+  cullGroups: THREE.Group[];
   update(time: number): void;
+}
+
+export interface FenFeaturesBuildOptions {
+  /** XZ cell size in yd; 0 keeps each family as one whole mesh straight
+   *  under the parent group, the pre-split scene graph byte for byte. */
+  cellSize: number;
+}
+
+/** The live build options: the tier's cell size, whole meshes under the
+ *  `?fencells=off` dev arm (both arms of one build for the scene census). */
+export function fenFeaturesBuildOptions(): FenFeaturesBuildOptions {
+  return { cellSize: renderLayerDisabled('fencells') ? 0 : GFX.zoneFeatureCellSize };
 }
 
 const FEN_ZMIN = 180;
@@ -45,6 +71,18 @@ for (const key of Object.keys(FEN_PROP_URLS) as FenPropKey[]) {
     }),
   );
 }
+
+/** Test seam: stand-in scenes for the deferred GLBs, so the real build runs
+ *  in Node (tests/fen_features_cells.test.ts). */
+export const fenFeaturesInternalsForTest = {
+  familyKeys: Object.keys(FEN_PROP_URLS) as FenPropKey[],
+  seedPropScene(key: FenPropKey, scene: THREE.Group): void {
+    propScenes[key] = scene;
+  },
+  resetPropScenes(): void {
+    for (const key of Object.keys(FEN_PROP_URLS) as FenPropKey[]) delete propScenes[key];
+  },
+};
 
 interface Placement {
   x: number;
@@ -82,14 +120,38 @@ function extractParts(scene: THREE.Group): { geo: THREE.BufferGeometry; mat: THR
   return parts;
 }
 
-export function buildFenFeatures(seed: number): FenFeaturesView {
+// One geometry OBJECT per cell over the family's shared vertex data: three
+// keys its vertex-array binding on geometry.id and caches the instanceMatrix
+// in it, so cells of one family sharing a single geometry would re-run the
+// attribute setup on every consecutive draw. Distinct objects over the same
+// attribute objects give each cell its own binding at zero vertex memory
+// (the GPU buffers are cached per attribute, not per geometry).
+function cellGeometry(source: THREE.BufferGeometry): THREE.BufferGeometry {
+  const geo = new THREE.BufferGeometry();
+  if (source.index) geo.setIndex(source.index);
+  for (const name of Object.keys(source.attributes)) {
+    geo.setAttribute(name, source.attributes[name]);
+  }
+  geo.groups = source.groups.map((g) => ({ ...g }));
+  geo.setDrawRange(source.drawRange.start, source.drawRange.count);
+  geo.boundingBox = source.boundingBox ? source.boundingBox.clone() : null;
+  geo.boundingSphere = source.boundingSphere ? source.boundingSphere.clone() : null;
+  return geo;
+}
+
+export function buildFenFeatures(
+  seed: number,
+  options: FenFeaturesBuildOptions = fenFeaturesBuildOptions(),
+): FenFeaturesView {
   const group = new THREE.Group();
   group.name = 'fen-features';
+  const cullGroups: THREE.Group[] = [];
 
   const instance = (
     geo: THREE.BufferGeometry,
     material: THREE.Material,
     spots: readonly Placement[],
+    parent: THREE.Group,
     tinted = false,
   ) => {
     if (spots.length === 0) return;
@@ -111,15 +173,30 @@ export function buildFenFeatures(seed: number): FenFeaturesView {
     mesh.castShadow = true;
     mesh.receiveShadow = true;
     mesh.computeBoundingSphere();
-    group.add(mesh);
+    parent.add(mesh);
   };
 
-  // instance every part of a loaded prop model at the given placements
+  // instance every part of a loaded prop model at the given placements, one
+  // cull group per cell of the family (whole meshes under the parent when
+  // the build does not split)
+  const split = options.cellSize > 0;
   const instanceProp = (key: FenPropKey, spots: readonly Placement[]): void => {
     const scene = propScenes[key];
     if (!scene || spots.length === 0) return;
-    for (const part of extractParts(scene)) {
-      instance(part.geo, part.mat, spots);
+    const parts = extractParts(scene);
+    if (!split) {
+      for (const part of parts) instance(part.geo, part.mat, spots, group);
+      return;
+    }
+    for (const cell of partitionByCell(spots, options.cellSize)) {
+      const cellGroup = new THREE.Group();
+      cellGroup.name = `fen-features:${key}:${cell.key}`;
+      for (const part of parts) {
+        instance(cellGeometry(part.geo), part.mat, cell.spots, cellGroup);
+      }
+      if (cellGroup.children.length === 0) continue;
+      group.add(cellGroup);
+      cullGroups.push(cellGroup);
     }
   };
 
@@ -127,7 +204,8 @@ export function buildFenFeatures(seed: number): FenFeaturesView {
   // interaction, so a lean session draws an evenly thinned band of it (these
   // models are 5,000 to 11,400 triangles EACH, the largest triangle bucket a
   // town frame pays). The willows below never come through here: their trunks
-  // are the sim's own colliders.
+  // are the sim's own colliders. The thin runs over the WHOLE family before
+  // the cell split, so the surviving set does not depend on the cell size.
   const instanceDressing = (key: FenPropKey, spots: readonly Placement[]): void => {
     instanceProp(key, thinLeanDressing(spots, GFX.leanFoliage));
   };
@@ -281,6 +359,7 @@ export function buildFenFeatures(seed: number): FenFeaturesView {
 
   return {
     group,
+    cullGroups: split ? cullGroups : [group],
     update(): void {
       // everything modeled sits still; the fen's motion is the water's
     },

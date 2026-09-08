@@ -23,6 +23,7 @@ import {
   shouldUseAutoGovernor,
   surfaceMat,
   tierFromHints,
+  ZONE_FEATURE_CELL_SIZE_CLASSIC,
 } from '../src/render/gfx';
 import { tsFilesUnder } from './helpers/ts_files_under';
 
@@ -319,6 +320,14 @@ describe('graphics tier resolution', () => {
     expect(medium.dynamicShadows).toBe(true);
     expect(medium.leanFoliage).toBe(false);
     expect(medium.lowPlus).toBe(false);
+    // The zone-feature cell split follows the classic arm (fog cull), not
+    // leanFoliage: a lean medium session still runs the vista arm and culls
+    // zone features at the 700 yd horizon, where cells only add draws.
+    expect(low.zoneFeatureCellSize).toBe(ZONE_FEATURE_CELL_SIZE_CLASSIC);
+    expect(medium.zoneFeatureCellSize).toBe(0);
+    expect(mediumIris.zoneFeatureCellSize).toBe(0);
+    expect(high.zoneFeatureCellSize).toBe(0);
+    expect(ultra.zoneFeatureCellSize).toBe(0);
     expect(mediumIris.standardMaterials).toBe(true);
     expect(mediumIris.leanFoliage).toBe(true);
     expect(mediumIris.lowPlus).toBe(false);
@@ -618,6 +627,10 @@ describe('graphics tier resolution', () => {
 
     expect(medium.constrainedMemory).toBe(true);
     expect(desktopMedium.constrainedMemory).toBe(false);
+    // constrained memory runs the classic (fogged) arm like low, so its zone
+    // features take the cell split too (farVistaPlan is off there)
+    expect(medium.zoneFeatureCellSize).toBe(ZONE_FEATURE_CELL_SIZE_CLASSIC);
+    expect(desktopMedium.zoneFeatureCellSize).toBe(0);
     expect(medium.dynamicShadows).toBe(false);
     expect(high.dynamicShadows).toBe(false);
     expect(ultra.dynamicShadows).toBe(false);
