@@ -8,18 +8,20 @@
 // Willowfen dressing's footprint edge sits about 311 yd out, inside the 340 yd
 // low fog, and 1.49M triangles of fully fogged reeds, rafts and willows were
 // submitted for nine placements that were themselves fogged (scene census,
-// 2026-09-09, low, town yaw 270). Splitting the placements into cells gives
-// every cell its own tight footprint, so the sweep keeps only the cells that
-// really reach into the fog, and three's own frustum test culls the cells
-// behind the camera inside the zone.
+// 2026-09-08, low, the town view facing the fen). Splitting the placements
+// into cells gives every cell its own tight footprint, so the sweep keeps
+// only the cells that really reach into the fog, and three's own frustum
+// test culls the cells behind the camera inside the zone.
 //
 // The grid is world-aligned (cell index = floor(coordinate / size)) with no
 // origin parameter on purpose: one parameter, deterministic, and reusable by
 // every zone-feature module (farshore, gale) without a per-zone rectangle.
 // A non-positive size means "one cell": the caller's way of keeping a family
-// whole on the tiers where the footprint cull cannot bite (the vista tiers
-// cull at the 700 yd detail horizon, and no cell of the fen lies beyond it
-// from town, so a split there would only add draws).
+// whole where the footprint cull cannot bite from the views that matter (the
+// far-vista arm culls zone features at the detail horizon, 700 to 850 yd,
+// and no cell of the fen lies beyond it from Eastbrook, so a split there adds
+// draws in the idle town view for no triangle; the in-zone frustum win it
+// forgoes there is a measured trade, recorded in the PR).
 //
 // Pure core contract: no three import, no DOM, no clocks, no randomness.
 // Registered in RENDER_PURE_CORES (tests/architecture.test.ts); tested by

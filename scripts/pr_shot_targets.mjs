@@ -1059,10 +1059,18 @@ export const TARGETS = [
     variants: [
       // Eastbrook, facing the fen: on low the whole dressing sits past the 340 yd
       // fog, so the frame must not change while the submitted triangles drop.
-      { key: 'eastbrook-facing-fen-desktop', spot: { x: 0, z: -14, facing: -0.764 } },
+      {
+        key: 'eastbrook-facing-fen-low',
+        beforeLoad: lowGraphicsSeed,
+        spot: { x: 0, z: -14, facing: -0.764 },
+      },
       // The Bridgemere hub inside the fen: the cells behind the camera are
       // frustum-culled now, nothing in view moves.
-      { key: 'bridgemere-hub-desktop', spot: { x: -360, z: 362, facing: 0 } },
+      {
+        key: 'bridgemere-hub-low',
+        beforeLoad: lowGraphicsSeed,
+        spot: { x: -360, z: 362, facing: 0 },
+      },
     ],
     async capture(page, variant) {
       await page.waitForFunction(

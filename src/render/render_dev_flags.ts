@@ -27,6 +27,9 @@
 //                 to the draped ground-glow pools and the mob glow discs
 //   fardetail   - the far vista mesh's world-scale rock detail (far_terrain);
 //                 off returns the tiles to one flat baked colour per vertex
+//   fencells    - the Willowfen dressing's per-cell cull groups (fen_features);
+//                 off builds today's five whole meshes and one footprint on
+//                 any tier, the before arm of the scene census
 //   farvista    - the whole coarse far-vista terrain layer (far_terrain); off
 //                 is the A/B that says whether a suspect distant surface is
 //                 this layer or the real splat terrain underneath it

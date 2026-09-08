@@ -10,9 +10,9 @@
 // cull group per (family, cell), so the renderer's zone-feature sweep can hide
 // the cells the fog has swallowed instead of the whole zone at once: as one
 // mesh per family the fen's footprint edge sat inside the low fog from
-// Eastbrook and 1.49M fully fogged triangles were submitted every frame. The
-// cell size is the tier's (GFX.zoneFeatureCellSize): whole meshes on the
-// vista arm, where nothing of the fen is beyond the cull horizon from town.
+// Eastbrook and 1.49M fully fogged triangles were submitted every frame.
+// Whole meshes on the far-vista arm, where nothing of the fen is beyond the
+// cull horizon from town (fenFeaturesBuildOptions).
 import * as THREE from 'three';
 import { WILLOWFEN_PROPS, WILLOWFEN_ZONE } from '../sim/content/willowfen';
 import { fenWillowSpots } from '../sim/fen_willows';
@@ -25,7 +25,8 @@ import {
 } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
-import { GFX } from './gfx';
+import { farFieldPolicy } from './far_terrain_core';
+import { GFX, ZONE_FEATURE_CELL_SIZE_CLASSIC } from './gfx';
 import { renderLayerDisabled } from './render_dev_flags';
 import { thinLeanDressing } from './zone_dressing_lod_core';
 import { partitionByCell } from './zone_feature_cells_core';
@@ -45,10 +46,18 @@ export interface FenFeaturesBuildOptions {
   cellSize: number;
 }
 
-/** The live build options: the tier's cell size, whole meshes under the
- *  `?fencells=off` dev arm (both arms of one build for the scene census). */
+/** The live build options. Cells on the classic (fogged) arm, whole meshes
+ *  where the far vista runs (zone features cull at the detail horizon there,
+ *  which no fen cell is beyond from town); the arm is farFieldPolicy's one
+ *  decision, the same read as the renderer's vista arm, so the lean medium
+ *  session and every constrained-memory profile take cells like low. Whole
+ *  meshes too under the `?fencells=off` dev arm (both arms of one build for
+ *  the scene census). */
 export function fenFeaturesBuildOptions(): FenFeaturesBuildOptions {
-  return { cellSize: renderLayerDisabled('fencells') ? 0 : GFX.zoneFeatureCellSize };
+  const vista = farFieldPolicy(GFX.vistaTier, GFX).vista.enabled;
+  return {
+    cellSize: renderLayerDisabled('fencells') || vista ? 0 : ZONE_FEATURE_CELL_SIZE_CLASSIC,
+  };
 }
 
 const FEN_ZMIN = 180;
@@ -126,6 +135,12 @@ function extractParts(scene: THREE.Group): { geo: THREE.BufferGeometry; mat: THR
 // attribute setup on every consecutive draw. Distinct objects over the same
 // attribute objects give each cell its own binding at zero vertex memory
 // (the GPU buffers are cached per attribute, not per geometry).
+//
+// Dispose contract: a wrapper is never disposed on its own. three answers a
+// dispose on any one of them by deleting the SHARED attribute buffers, and
+// every sibling cell would silently re-upload on its next draw. The fen has
+// no teardown today (built once, never evicted); a future release path
+// disposes the family's source geometry once, not the cells.
 function cellGeometry(source: THREE.BufferGeometry): THREE.BufferGeometry {
   const geo = new THREE.BufferGeometry();
   if (source.index) geo.setIndex(source.index);

@@ -61,13 +61,18 @@ export const GFX_TIER_RANK: Record<GfxTier, number> = {
   insane: 4,
 };
 
-/** Zone-feature dressing cell size on the classic (fogged) arm; see
- *  GfxSettings.zoneFeatureCellSize and zone_feature_cells_core.ts. 180 yd on
- *  the Willowfen: 6 cells and 26 meshes, one cell inside the 340 yd low fog
- *  from Eastbrook (34 of 324 placements). 130 yd isolated fewer placements
- *  (13) but cost 46 meshes, measured at up to 27 fen draws at the Bridgemere
- *  hub against 5 whole; 180 halves that growth for a town gain still above
- *  90 percent. */
+/** XZ cell size (yd) the zone-feature dressing is split into for the
+ *  per-group distance cull (zone_feature_cells_core.ts) on the classic
+ *  (fogged) arm. Which arm a session runs is farFieldPolicy's decision
+ *  (far_terrain_core.ts), read by the consumer, never restated here: the
+ *  far-vista arm culls zone features at the detail horizon (700 to 850 yd)
+ *  and no cell of the fen lies beyond it from Eastbrook, so a split there
+ *  adds draws in the idle town view for no triangle. 180 yd on the
+ *  Willowfen: 6 cells and 26 meshes, one cell inside
+ *  the 340 yd low fog from Eastbrook (34 of 324 placements). 130 yd isolated
+ *  fewer placements (13) but cost 46 meshes, measured at up to 27 fen draws
+ *  at the Bridgemere hub against 5 whole; 180 halves that growth for a town
+ *  gain still above 90 percent. */
 export const ZONE_FEATURE_CELL_SIZE_CLASSIC = 180;
 
 /** True when `tier` sits at or above `floor` on the quality ladder. */
@@ -255,17 +260,6 @@ export interface GfxSettings {
   readonly lowPlus: boolean;
   /** Use the cheaper low-foliage density/LOD policy while keeping the rest of the tier. */
   readonly leanFoliage: boolean;
-  /**
-   * XZ cell size (yd) the zone-feature dressing is split into for the
-   * per-group distance cull (zone_feature_cells_core.ts), 0 to keep each
-   * family as one whole mesh. Cells only pay where the cull distance is the
-   * scene fog (the classic arm: low and constrained memory, the same
-   * predicate as farVistaPlan's "vista off", far_terrain_core.ts); on the
-   * vista arm zone features cull at the 700 yd detail horizon and no cell of
-   * the fen lies beyond it from town, so a split there adds draws for no
-   * triangle. Keep this in step with farVistaPlan (tests/gfx.test.ts pins it).
-   */
-  readonly zoneFeatureCellSize: number;
   /**
    * Ground-dressing density compensation (foliage.ts: the denser dress step,
    * the 1.24 density scale, the 1.08 spot boost). The lowPlus weak-GPU art
@@ -1283,7 +1277,6 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     // occlude world sightlines. Keep the constrained profile on the full placement
     // set and reduce only non-occluding grass below.
     leanFoliage,
-    zoneFeatureCellSize: constrainedMemory || tier === 'low' ? ZONE_FEATURE_CELL_SIZE_CLASSIC : 0,
     // The dressing compensation cohort (interface comment carries the why):
     // lowPlus plus the leanFoliage medium session, which the lowPlus re-key
     // had silently stripped of its denser-dressing compensation.

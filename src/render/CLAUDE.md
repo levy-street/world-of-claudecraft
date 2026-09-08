@@ -224,7 +224,12 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
 - `prewarm_pass.ts` sequences the BACKGROUND zone prewarm (live frames keep
   rendering, so its groups MUST stay invisible; hidden objects still link
   their programs because compile traverses via `scene.traverse`, not
-  `traverseVisible`).
+  `traverseVisible`). One documented exception in `withHiddenPrewarmGroups`:
+  a reveal that lands INSIDE its window is kept, because the only other
+  writer of a feature group's visibility there is its own gated attach, whose
+  reveal follows the gate's colour, shadow, settle, upload and touch arms, so
+  it draws linked programs only; restoring the captured "hidden" over it left
+  a lazily built feature invisible for good (the Willowfen dressing).
 - Shared machinery: `compile_gate.ts` (fail-soft async shader-compile gating
   that also BOUNDS in-flight driver links during snapshot bursts, plus the
   `SerialGateLane` for gates that arrive in a burst), `linked_program_touch.ts`
