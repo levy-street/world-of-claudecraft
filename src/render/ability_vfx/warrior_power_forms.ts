@@ -12,6 +12,8 @@ import type { CrestPrewarmHost } from './crest_prewarm';
 import { GuardPrewarm } from './guard_prewarm';
 import { warriorBloodTexture, warriorSteelTexture } from './production_assets';
 import type { AbilityVfxRibbons, RibbonAnchor } from './ribbons';
+import { warriorAvatarBracerShape } from './warrior_avatar_bracer';
+import { warriorAvatarChestShape } from './warrior_avatar_shape';
 import { warriorPowerGeometry } from './warrior_power_geometry';
 import { animateWarriorRage } from './warrior_rage_material';
 
@@ -28,10 +30,11 @@ interface Wearer {
   states: [State, State];
 }
 const WEARERS = 64,
-  SOLIDS = 16,
-  PIECES = 6;
+  SOLIDS = 16;
+const PIECE_MESH = [0, 2, 2, 3, 3] as const;
+const CAPACITY = [SOLIDS, SOLIDS * 6, SOLIDS * 2, SOLIDS * 2] as const;
 
-/** Offensive forms own their own two instanced draws, never attack or guard
+/** Offensive forms own four instanced draws, never attack or guard
  * slots. A cold/full pool retains one full shoulder/crown outline per wearer.
  * Actual aura elapsed time prevents camera reentry from replaying assembly. */
 export class WarriorPowerForms {
@@ -40,7 +43,7 @@ export class WarriorPowerForms {
   private readonly wearers = new Map<number, Wearer>();
   private readonly matrix = new THREE.Matrix4();
   private readonly frameMatrix = new THREE.Matrix4();
-  private readonly boneMatrix = new THREE.Matrix4();
+  private readonly boneMatrices = Array.from({ length: 5 }, () => new THREE.Matrix4());
   private readonly position = new THREE.Vector3();
   private readonly at = new THREE.Vector3();
   private readonly scale = new THREE.Vector3();
@@ -59,14 +62,14 @@ export class WarriorPowerForms {
     sz: 1,
     color: 0,
   };
-  private readonly used = [0, 0];
+  private readonly used = [0, 0, 0, 0];
   private disposed = false;
   private readonly rageTime = { value: 0 };
   private readonly rageMotion = { value: 1 };
   private elapsed = 0;
 
   constructor(scene: THREE.Scene) {
-    for (let kind = 0; kind < 2; kind++) {
+    for (let kind = 0; kind < 4; kind++) {
       const blood = kind === 1;
       const material = modulateEmissiveByVertexColor(
         new THREE.MeshStandardMaterial({
@@ -80,12 +83,23 @@ export class WarriorPowerForms {
         }),
       );
       if (blood) animateWarriorRage(material, this.rageTime, this.rageMotion);
-      const mesh = new THREE.InstancedMesh(warriorPowerGeometry(blood), material, SOLIDS * PIECES);
-      mesh.name = blood ? 'warrior-reckless-crown' : 'warrior-avatar-buttresses';
+      const geometry =
+        kind === 0
+          ? warriorAvatarChestShape()
+          : kind === 2
+            ? warriorAvatarBracerShape()
+            : warriorPowerGeometry(blood);
+      const mesh = new THREE.InstancedMesh(geometry, material, CAPACITY[kind]);
+      mesh.name = [
+        'warrior-avatar-chest',
+        'warrior-reckless-crown',
+        'warrior-avatar-bracers',
+        'warrior-avatar-shins',
+      ][kind];
       mesh.userData.renderCategory = 'vfx';
       mesh.frustumCulled = false;
       mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-      for (let i = 0; i < SOLIDS * PIECES; i++) {
+      for (let i = 0; i < CAPACITY[kind]; i++) {
         mesh.setMatrixAt(i, this.matrix);
         mesh.setColorAt(i, this.color.setHex(0xffffff));
       }
@@ -108,7 +122,7 @@ export class WarriorPowerForms {
               id: `power-${kind}:bind`,
               run: () => {
                 if (this.disposed) return;
-                const texture = kind === 0 ? warriorSteelTexture() : warriorBloodTexture();
+                const texture = kind === 1 ? warriorBloodTexture() : warriorSteelTexture();
                 if (!texture) throw Error('Warrior power texture is not prepared');
                 const material = this.meshes[kind].material;
                 if (material.map !== texture) {
@@ -182,7 +196,7 @@ export class WarriorPowerForms {
     this.elapsed += Number.isFinite(dt) ? Math.max(0, dt) : 0;
     this.rageTime.value = reduced ? 0 : this.elapsed;
     this.rageMotion.value = reduced ? 0 : 1;
-    this.used[0] = this.used[1] = 0;
+    this.used.fill(0);
     for (const [id, wearer] of this.wearers) {
       let live = false;
       for (const state of wearer.states)
@@ -201,10 +215,17 @@ export class WarriorPowerForms {
         for (let kind = 0; kind < 2; kind++) {
           const state = wearer.states[kind];
           if (state.stamp !== frame) continue;
-          const solid =
-            solidRank &&
-            this.preparation[kind].ready() &&
-            (kind !== 0 || !bodyAnchor || bodyAnchor(wearer.id, 0, this.boneMatrix));
+          let solid = solidRank && this.preparation[kind].ready();
+          if (solid && kind === 0) {
+            solid = !!bodyAnchor && this.preparation[2].ready() && this.preparation[3].ready();
+            // A missing joint keeps the complete outline, never partial armor.
+            if (solid)
+              for (let i = 0; i < 5; i++)
+                if (!bodyAnchor!(wearer.id, i, this.boneMatrices[i])) {
+                  solid = false;
+                  break;
+                }
+          }
           if (solid && !reduced && detail && state.age >= state.nextDetail) {
             // One bounded breath, no catch-up burst after a slow frame or
             // camera reentry. Borrow the particle pool; allocate nothing here.
@@ -217,8 +238,7 @@ export class WarriorPowerForms {
           }
           if (solid)
             for (let i = 0; i < WARRIOR_POWER_COUNTS[kind]; i++) {
-              const nativeBone = kind === 0 && !!bodyAnchor;
-              if (nativeBone && !bodyAnchor!(wearer.id, i, this.boneMatrix)) continue;
+              const nativeBone = kind === 0;
               const p = warriorPowerPiece(
                 this.piece,
                 kind as WarriorPowerKind,
@@ -233,10 +253,11 @@ export class WarriorPowerForms {
               this.rotation.setFromEuler(this.euler.set(0, p.yaw, p.roll));
               this.matrix
                 .compose(this.position, this.rotation, this.scale)
-                .premultiply(nativeBone ? this.boneMatrix : this.frameMatrix);
-              const mesh = this.meshes[kind];
-              mesh.setMatrixAt(this.used[kind], this.matrix);
-              mesh.setColorAt(this.used[kind]++, this.color.setHex(p.color));
+                .premultiply(nativeBone ? this.boneMatrices[i] : this.frameMatrix);
+              const meshIndex = nativeBone ? PIECE_MESH[i] : 1;
+              const mesh = this.meshes[meshIndex];
+              mesh.setMatrixAt(this.used[meshIndex], this.matrix);
+              mesh.setColorAt(this.used[meshIndex]++, this.color.setHex(p.color));
             }
           else {
             // Both states retain their complete silhouette: six vertices each.
@@ -258,7 +279,7 @@ export class WarriorPowerForms {
           }
         }
       }
-    for (let kind = 0; kind < 2; kind++) {
+    for (let kind = 0; kind < 4; kind++) {
       const mesh = this.meshes[kind],
         used = this.used[kind];
       mesh.count = used;

@@ -7,7 +7,7 @@ it does not declare the kit finished or AAA accepted.
 
 | Ability | Intended experience | Implementation |
 | --- | --- | --- |
-| Avatar | The Warrior becomes an ancient stone champion. | A planted rising performance, ground dust and mineral fragments introduce five weathered stone pieces attached to the animated chest, shoulders and shins. The real Avatar aura owns the duration and the game's existing size increase. |
+| Avatar | The Warrior becomes an ancient stone champion. | An open, planted rising performance raises seven fractured slabs and broad animated dust. A shaped breastplate, articulated forearm ridges and shin guards follow the character for the real aura duration and the game's existing size increase. See [the Avatar rework and matching views](warrior-avatar-v25.md). |
 | Recklessness | Deliberate restraint tears open into dangerous aggression. | A short opening performance and rising crimson pressure introduce six flowing blood flames. Broken edges, moving tendrils and embers replace the earlier solid red attachment. Battlecraft, Bloodrush and Ironguard retain different arrangements and color accents. |
 | Blood Toll | A painful, deliberate payment is drawn inward and clenched into power. | Two inward sprite strands finish with the .15-second clench, followed by contracting vein strokes. The real health cost remains visible in health and combat text, without a second self-hit animation or flinch. |
 | Seething Fury | The Warrior expels pressure and releases pent-up rage. | An outward arm performance, broad separated red strands and short tearing strokes give the release an outward direction, distinct from Blood Toll's inward payment. |
@@ -47,7 +47,8 @@ retains the normal fallback.
 
 ## Runtime limits
 
-The held forms use two instanced draws with at most 96 instances each. Sixteen
+The held forms now use four instanced draws: chest, blood crown, forearm ridges
+and shins, capped at 16, 96, 32 and 32 instances. Sixteen
 wearers receive solid forms; up to 64 retain their full primary outline, with
 the local player prioritized. Neither pool borrows attack or shield slots.
 Only live matrix and color prefixes upload. Ambient fragments are bounded and
@@ -71,14 +72,14 @@ bugs before their fixes.
 
 Matching real-cast captures have exposed and driven several reworks: flat stone
 strips, a bulky waist-mounted stone cluster, rigid red hooks and overly smooth
-smoke were rejected. The current attached stone still intersects the head in
-some raised-arm poses. An independent actual-mesh check confirmed this; simply
-moving those broad pieces also puts them into the hand and weapon sweep. Avatar
-needs shaped, articulated guards and a stronger monumental activation. This is
-an explicit open art problem, not a passed clearance result. Recklessness and
+smoke were rejected. The broad attached stone also intersected the head, hands
+and equipment; the [subsequent Avatar rework](warrior-avatar-v25.md) replaces
+those blocks with shaped, articulated armor and a larger activation. Its
+measured fitting evidence and remaining art concerns are recorded separately.
+Recklessness and
 the resource releases also remain subject to the full kit visual review.
 
-The checkpoint passed 253 focused tests in 22 suites, canonical `check:ts`,
+The initial four-power checkpoint passed 253 focused tests in 22 suites, canonical `check:ts`,
 Biome over 38 scoped source files, and `npm run sfx:check` (the library retains
 eight existing advisory loudness notices). Actual captures recorded:
 

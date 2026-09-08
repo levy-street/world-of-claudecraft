@@ -1,4 +1,5 @@
 import type { SeqSlot, SequencerHost } from './sequencer';
+import { drawWarriorAvatarRupture } from './warrior_avatar_rupture';
 
 const anchor = { x: 0, y: 0, z: 0 };
 
@@ -48,41 +49,8 @@ export function drawWarriorPowerCast(host: SequencerHost, slot: SeqSlot, beat: n
   const full = slot.tier === 0;
   const duration = stone ? 0.55 : toll ? 0.38 : 0.5;
   let primitives = 0;
-  if (stone) {
-    // Separate dust plumes at the rooted shoulders leave the feet and the
-    // centre silhouette clear. The aura, not this burst, owns the stone mass.
-    for (const side of [-1, 1]) {
-      const sx = x + dz * side * 0.9,
-        sz = z - dx * side * 0.9;
-      host.bakedAt?.(
-        'shout_dust',
-        sx,
-        host.groundYAt(sx, sz) + 0.06,
-        sz,
-        3.3,
-        0x8f897d,
-        0xd3c5a7,
-        duration,
-        side < 0 ? 0 : 0.045,
-        0,
-        facing + side * 0.35,
-      );
-      host.fragmentsAt?.(
-        'stone_chip',
-        sx,
-        y + 0.12,
-        sz,
-        0xa4a28c,
-        full ? 15 : 5,
-        1.6,
-        dz * side * 0.45,
-        -dx * side * 0.45,
-        0.5,
-      );
-      primitives += 2;
-    }
-  }
-  const strands = stone ? 3 : toll ? 3 : reckless ? 6 : 4;
+  if (stone) primitives += drawWarriorAvatarRupture(host, x, z, facing, full);
+  const strands = stone ? 0 : toll ? 3 : reckless ? 6 : 4;
   for (let strand = 0; strand < (full ? strands : Math.min(2, strands)); strand++) {
     const side = strand % 2 ? 1 : -1,
       band = Math.floor(strand / 2);

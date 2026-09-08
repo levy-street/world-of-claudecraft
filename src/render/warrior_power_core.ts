@@ -113,18 +113,12 @@ export function warriorPowerPiece(
     // with shin fronts facing local -Z; no inferred model scale here.
     out.x = out.y = out.z = out.yaw = out.roll = 0;
     if (piece === 0) {
-      out.y = -0.23;
-      out.z = 0.12;
-      out.sx = 1.2;
-      out.sy = 0.23;
-      out.sz = 0.55;
+      // Sculpted in the native chest frame, with an actual neckline opening.
+      out.sx = out.sy = out.sz = 1;
     } else if (piece < 3) {
-      out.y = -0.14;
-      out.z = 0.085;
-      out.sx = 2;
-      out.sy = 0.18;
-      out.sz = 1.1;
-      out.roll = piece === 1 ? 0.14 : -0.14;
+      out.sx = out.sy = out.sz = 1;
+      // One shaped sector serves both forearms without negative scaling.
+      out.yaw = piece === 2 ? (Math.PI * 13) / 18 : 0;
     } else {
       out.y = -0.15;
       out.z = -0.085;
@@ -134,7 +128,7 @@ export function warriorPowerPiece(
       out.sz = 0.65;
     }
   }
-  out.y -= (1 - assembly) * (nativeBone ? 0.3 : kind === 0 ? 1.15 : 0.5);
+  out.y -= (1 - assembly) * (nativeBone ? (piece < 3 ? 0 : 0.3) : kind === 0 ? 1.15 : 0.5);
   out.x *= 1 + (1 - assembly) * 0.35;
   out.sy *= Math.max(0.02, assembly);
   return out;

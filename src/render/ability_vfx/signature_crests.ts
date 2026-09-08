@@ -49,7 +49,7 @@ export class SignatureCrests {
       },
       vertexShader: `uniform float uAge,uKind,uMotion,uPressureGround[25]; varying vec2 vUv,vSurface; varying vec3 vNormal,vView,vLocal,vLocalNormal;
         float pressureGround(vec2 p){
-          vec2 uv=uKind>16.5?p/16.0+0.5:vec2(p.x/12.0+0.5,p.y/10.0);
+          vec2 uv=uKind>20.5?p/8.0+0.5:uKind>16.5?p/16.0+0.5:vec2(p.x/12.0+0.5,p.y/10.0);
           vec2 grid=clamp(uv*4.0,vec2(0.0),vec2(3.9999));
           ivec2 cell=ivec2(floor(grid));vec2 f=fract(grid);int i=cell.y*5+cell.x;
           return mix(mix(uPressureGround[i],uPressureGround[i+1],f.x),
@@ -86,6 +86,12 @@ export class SignatureCrests {
             if(uKind>17.5)p.y*=mix(1.0,(0.45+0.55*smoothstep(0.0,0.12,uAge))*(1.0-0.7*smoothstep(0.45,1.0,uAge)),uMotion);
             p.y+=pressureGround(p.xz);
           }
+          if(uKind>20.5){
+            float lift=smoothstep(0.0,0.16,uAge);
+            float settle=1.0-smoothstep(0.3,1.0,uAge);
+            p.y*=mix(1.0,0.12+0.88*lift*settle,uMotion);
+            p.y+=pressureGround(p.xz);
+          }
           vec4 view=modelViewMatrix*vec4(p,1.0); vView=-view.xyz; vNormal=normalize(normalMatrix*normal);
           gl_Position=projectionMatrix*view;
         }`,
@@ -95,7 +101,7 @@ export class SignatureCrests {
         varying vec2 vUv,vSurface; varying vec3 vNormal,vView,vLocal,vLocalNormal;
         vec2 groundSteelUv(vec2 p){return 1.0-abs(mod(p*0.24+0.37,2.0)-1.0);}
         void main(){
-          if(uKind>17.5 && uKind<19.5 && !gl_FrontFacing)discard;
+          if(((uKind>17.5 && uKind<19.5)||uKind>20.5) && !gl_FrontFacing)discard;
           float fresnel=pow(max(0.0,1.0-abs(dot(normalize(cross(dFdx(vView),dFdy(vView))),normalize(vView)))),3.0);
           float thread=sin(vUv.x*150.0+sin(vUv.y*22.0)*2.0-uAge*8.0*uMotion);
           float ribs=pow(max(0.0,thread),16.0);
@@ -156,7 +162,7 @@ export class SignatureCrests {
               float score=dot(steel,vec3(0.333333));
               colour=uTint*(0.34+score*0.5)*light+uAccent*(bevel*0.6+fresnel*0.12);
             }
-            if(uKind>17.5 && uKind<19.5){
+            if((uKind>17.5 && uKind<19.5)||uKind>20.5){
               // Sidewalls need their own vertical grain. XZ-only projection
               // stretches one texel column down the entire raised fracture.
               vec3 weights=pow(abs(normalize(vLocalNormal)),vec3(4.0));
@@ -247,6 +253,7 @@ export class SignatureCrests {
       contactSurface ||
       kind === 'steel_storm' ||
       kind === 'steel_reap' ||
+      kind === 'avatar_rupture' ||
       kind.startsWith('iron_') ||
       kind.endsWith('_pressure');
     if (authoredSurface && !this.preparation.ready(kind)) return false;
@@ -275,15 +282,16 @@ export class SignatureCrests {
     const u = s.mesh.material.uniforms;
     const ground = u.uPressureGround.value as Float32Array;
     ground.fill(0);
-    const ironGround = kind.startsWith('iron_');
+    const ironGround = kind.startsWith('iron_') || kind === 'avatar_rupture';
+    const groundSpan = kind === 'avatar_rupture' ? 8 : 16;
     if ((s.pressure || ironGround) && this.groundY) {
       const cosine = Math.cos(angle),
         sine = Math.sin(angle),
         sourceFloor = this.groundY(x, z);
       for (let row = 0; row < 5; row++)
         for (let column = 0; column < 5; column++) {
-          const lx = (column / 4 - 0.5) * (ironGround ? 16 : 12) * s.mesh.scale.x;
-          const lz = (ironGround ? (row / 4 - 0.5) * 16 : (row / 4) * 10) * s.mesh.scale.z;
+          const lx = (column / 4 - 0.5) * (ironGround ? groundSpan : 12) * s.mesh.scale.x;
+          const lz = (ironGround ? (row / 4 - 0.5) * groundSpan : (row / 4) * 10) * s.mesh.scale.z;
           const heightAt = this.groundY(x + lx * cosine + lz * sine, z + lz * cosine - lx * sine);
           ground[row * 5 + column] =
             Number.isFinite(sourceFloor) && Number.isFinite(heightAt)
@@ -294,11 +302,13 @@ export class SignatureCrests {
     u.uTint.value.setHex(tint);
     u.uAccent.value.setHex(accent);
     u.uKind.value = ironGround
-      ? kind === 'iron_counter'
-        ? 17
-        : kind === 'iron_quake'
-          ? 18
-          : 19
+      ? kind === 'avatar_rupture'
+        ? 21
+        : kind === 'iron_counter'
+          ? 17
+          : kind === 'iron_quake'
+            ? 18
+            : 19
       : kind === 'steel_storm' || kind === 'steel_reap'
         ? 16
         : kind === 'breach_wedge'

@@ -309,9 +309,48 @@ function gripBlade(pose, weight) {
     pose.set(`${bone.name}|rotation`, bone.quaternion.toArray());
   return pose;
 }
+function openAvatarArms(pose, weight) {
+  applyPose(idle);
+  const wrists = ['l', 'r'].map((side) => orientation(bones.get(`wrist.${side}`)));
+  applyPose(pose);
+  const chest = position(bones.get('chest'));
+  for (const [index, side] of ['l', 'r'].entries()) {
+    const sign = side === 'l' ? 1 : -1;
+    const upper = bones.get(`upperarm.${side}`),
+      lower = bones.get(`lowerarm.${side}`),
+      wrist = bones.get(`wrist.${side}`);
+    const shoulder = position(upper),
+      a = shoulder.distanceTo(position(lower)),
+      b = position(lower).distanceTo(position(wrist));
+    const target = position(wrist).lerp(
+      chest.clone().add(new Vector3(sign * 0.62, 0.06, 0.1)),
+      weight,
+    );
+    const aim = target.clone().sub(shoulder),
+      distance = aim.length();
+    if (distance >= a + b || distance <= Math.abs(a - b))
+      throw Error(`Avatar hand out of reach ${side}: ${distance}, ${a + b}`);
+    aim.normalize();
+    const along = (a * a - b * b + distance * distance) / (2 * distance),
+      height = Math.sqrt(Math.max(0, a * a - along * along));
+    const bend = new Vector3(sign, -0.65, -0.2);
+    bend.addScaledVector(aim, -bend.dot(aim)).normalize();
+    pointJoint(
+      upper,
+      lower,
+      shoulder.clone().addScaledVector(aim, along).addScaledVector(bend, height),
+    );
+    pointJoint(lower, wrist, target);
+    setWorldRotation(wrist, orientation(wrist).slerp(wrists[index], weight));
+    for (const bone of [upper, lower, wrist])
+      pose.set(`${bone.name}|rotation`, bone.quaternion.toArray());
+  }
+  return pose;
+}
+
 // Candidate offensive-state poses: no gameplay or runtime body scaling.
-const avatarLoad = bladePose(7, 0.35, [0, -0.065, 0], -6, 9);
-const avatarRise = bladePose(7, 1.8, [0, -0.005, 0], 0, -8);
+const avatarLoad = openAvatarArms(bladePose(7, 0.35, [0, -0.065, 0], -6, 9), 0.3);
+const avatarRise = openAvatarArms(bladePose(7, 1.8, [0, -0.005, 0], 0, -8), 1);
 const recklessLoad = bladePose(8, 0.18, [0, -0.04, 0], -12, 8);
 const recklessTear = bladePose(8, 0.76, [0, -0.008, 0], 12, -9);
 const tollLoad = bladePose(6, 0.14, [0, -0.018, 0], -8, 3);

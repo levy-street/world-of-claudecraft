@@ -23,15 +23,41 @@ function fixture(ready = true) {
     appendHeld: (p: THREE.Vector3[], n: number) => lines.push(p.slice(0, n).map((v) => v.clone())),
   } as unknown as AbilityVfxRibbons;
   let x = 0,
-    yaw = 0;
+    yaw = 0,
+    missingBone: number | null = null;
   const anchor: RibbonAnchor = (_id, _frac, out = new THREE.Vector3()) => out.set(x, 1, 0);
+  const bonePosition = new THREE.Vector3();
+  const bodyAnchor = (_id: number, piece: number, out: THREE.Matrix4) => {
+    if (piece === missingBone) return false;
+    const local =
+      piece === 0
+        ? [0, 0.97, 0]
+        : piece < 3
+          ? [piece === 1 ? 0.25 : -0.25, 0.8, 0.1]
+          : [piece === 3 ? 0.17 : -0.17, 0.29, 0];
+    bonePosition.fromArray(local).applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
+    out.makeRotationY(yaw).setPosition(bonePosition.x + x, bonePosition.y + 1, bonePosition.z);
+    return true;
+  };
   const draw = (frame: number, dt = 0, reduced = false, detail = vi.fn()) =>
-    pool.draw(frame, dt, reduced, anchor, () => yaw, ribbons, detail);
+    pool.draw(
+      frame,
+      dt,
+      reduced,
+      anchor,
+      () => yaw,
+      ribbons,
+      detail,
+      missingBone === 5 ? undefined : bodyAnchor,
+    );
   return {
     scene,
     pool,
     lines,
     draw,
+    missing: (piece: number | null) => {
+      missingBone = piece;
+    },
     move: (nextX: number, nextYaw: number) => {
       x = nextX;
       yaw = nextYaw;
@@ -90,20 +116,22 @@ it('keeps the local wearer and both complete fallback outlines within bounded so
   h.pool.hold(999, 0, aura, 0, 0, true);
   h.pool.hold(999, 1, aura, 1, 0, true);
   h.draw(0);
-  expect(h.pool.meshes.map((m) => m.count)).toEqual([80, 96]);
+  expect(h.pool.meshes.map((m) => m.count)).toEqual([16, 96, 32, 32]);
+  expect(h.pool.meshes.map((m) => m.instanceMatrix.count)).toEqual([16, 96, 32, 32]);
   expect(h.lines).toHaveLength(48 * 2);
   expect(h.lines.every((line) => line.length === 3)).toBe(true);
-  expect(h.pool.meshes[0].instanceMatrix.updateRanges).toEqual([{ start: 0, count: 80 * 16 }]);
+  for (const [i, count] of [16, 96, 32, 32].entries())
+    expect(h.pool.meshes[i].instanceMatrix.updateRanges).toEqual([{ start: 0, count: count * 16 }]);
   h.pool.clear();
   h.lines.length = 0;
   h.pool.hold(999, 0, aura, 0, 1, true);
   h.draw(1);
-  expect(h.pool.meshes.map((m) => m.count)).toEqual([5, 0]);
+  expect(h.pool.meshes.map((m) => m.count)).toEqual([1, 0, 2, 2]);
   expect(h.lines).toHaveLength(0);
   h.pool.dispose();
 });
 
-it('prepares the exact two instance buffers independently before their first visible use', async () => {
+it('prepares all four exact buffers and admits only a complete Avatar while blood remains independent', async () => {
   const h = fixture(false),
     program = { isReady: () => true, getUniforms: vi.fn(), getAttributes: vi.fn() };
   const host = {
@@ -112,18 +140,33 @@ it('prepares the exact two instance buffers independently before their first vis
     draw: vi.fn(),
   };
   const units = h.pool.units(host);
-  expect(units).toHaveLength(8);
-  expect(new Set(units.map((u) => u.id)).size).toBe(8);
+  expect(units).toHaveLength(16);
+  expect(new Set(units.map((u) => u.id)).size).toBe(16);
   for (const unit of units.slice(0, 4)) await unit.run();
-  expect(h.pool.preparation.map((p) => p.ready())).toEqual([true, false]);
+  expect(h.pool.preparation.map((p) => p.ready())).toEqual([true, false, false, false]);
   h.pool.hold(1, 0, aura, 0, 0, true);
   h.pool.hold(1, 1, aura, 1, 0, true);
   h.draw(0);
-  expect(h.pool.meshes.map((m) => m.count)).toEqual([5, 0]);
-  expect(h.lines[0]).toHaveLength(3);
-  for (const unit of units.slice(4)) await unit.run();
-  expect(h.pool.preparation.map((p) => p.ready())).toEqual([true, true]);
-  for (let kind = 0; kind < 2; kind++) {
+  expect(h.pool.meshes.map((m) => m.count)).toEqual([0, 0, 0, 0]);
+  expect(h.lines).toHaveLength(2);
+  expect(h.lines.every((line) => line.length === 3)).toBe(true);
+  for (const unit of units.slice(4, 8)) await unit.run();
+  h.lines.length = 0;
+  h.draw(0);
+  expect(h.pool.meshes.map((m) => m.count)).toEqual([0, 6, 0, 0]);
+  expect(h.lines).toHaveLength(1);
+  for (const unit of units.slice(8, 12)) await unit.run();
+  h.lines.length = 0;
+  h.draw(0);
+  expect(h.pool.meshes.map((m) => m.count)).toEqual([0, 6, 0, 0]);
+  expect(h.lines).toHaveLength(1);
+  for (const unit of units.slice(12)) await unit.run();
+  h.lines.length = 0;
+  h.draw(0);
+  expect(h.pool.meshes.map((m) => m.count)).toEqual([1, 6, 2, 2]);
+  expect(h.lines).toHaveLength(0);
+  expect(h.pool.preparation.map((p) => p.ready())).toEqual([true, true, true, true]);
+  for (let kind = 0; kind < 4; kind++) {
     const carrier = h.pool.preparation[kind].group.children[0] as THREE.InstancedMesh;
     expect(carrier.material).toBe(h.pool.meshes[kind].material);
     expect(carrier.instanceMatrix).toBe(h.pool.meshes[kind].instanceMatrix);
@@ -132,6 +175,29 @@ it('prepares the exact two instance buffers independently before their first vis
   expect(h.pool.units(host)).toEqual([]);
   h.pool.dispose();
 });
+
+it.each([0, 1, 2, 3, 4, 5])(
+  'keeps a complete outline when native bone %s is missing (5=no callback)',
+  (missing) => {
+    const h = fixture();
+    h.pool.hold(1, 0, aura, 0, 0, true);
+    h.pool.hold(1, 1, aura, 1, 0, true);
+    h.draw(0);
+    expect(h.pool.meshes.map((m) => m.count)).toEqual([1, 6, 2, 2]);
+    h.missing(missing);
+    h.lines.length = 0;
+    h.draw(0);
+    expect(h.pool.meshes.map((m) => m.count)).toEqual([0, 6, 0, 0]);
+    expect(h.lines).toHaveLength(1);
+    expect(h.lines[0]).toHaveLength(3);
+    h.missing(null);
+    h.lines.length = 0;
+    h.draw(0);
+    expect(h.pool.meshes.map((m) => m.count)).toEqual([1, 6, 2, 2]);
+    expect(h.lines).toHaveLength(0);
+    h.pool.dispose();
+  },
+);
 
 it('caps ambient particles to one pulse after a stalled frame and disables them for reduced motion', () => {
   const h = fixture(),

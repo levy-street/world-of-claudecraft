@@ -1,7 +1,7 @@
 import type * as THREE from 'three';
 
 export type WarriorPowerAnchor = (id: number, piece: number, out: THREE.Matrix4) => boolean;
-const names = ['chest', 'upperarm.l', 'upperarm.r', 'lowerleg.l', 'lowerleg.r'] as const;
+const names = ['chest', 'lowerarm.l', 'lowerarm.r', 'lowerleg.l', 'lowerleg.r'] as const;
 const cache = new WeakMap<THREE.Object3D, (THREE.Object3D | null)[]>();
 
 /** Native bone units, including the model's measured normalization and the

@@ -9,6 +9,7 @@ import {
   WarriorGuardPlates,
   warriorGuardKind,
 } from '../src/render/ability_vfx/warrior_guard_plates';
+import { drawWarriorPowerCast } from '../src/render/ability_vfx/warrior_power_cast';
 import { WarriorPowerForms } from '../src/render/ability_vfx/warrior_power_forms';
 import { WARRIOR_VFX_FULL_SPECS } from '../src/render/warrior_vfx_specs';
 
@@ -43,9 +44,14 @@ const raised = {
 };
 const sword = { id: 'die_by_sword', kind: 'die_by_sword', remaining: 8, duration: 8, value: 0.3 };
 
-it.each(['raging_gale', 'red_harvest'])(
-  'retains every authored %s ribbon with eight cold storms and every guard and power fallback',
-  (id) => {
+it.each([
+  ['raging_gale', false],
+  ['red_harvest', false],
+  ['raging_gale', true],
+  ['red_harvest', true],
+] as const)(
+  'retains every authored %s ribbon with eight cold storms and every guard and power fallback (Avatar=%s)',
+  (id, avatar) => {
     function draw(crowded: boolean) {
       const h = fixture(false),
         texture = new THREE.Texture();
@@ -99,6 +105,10 @@ it.each(['raging_gale', 'red_harvest'])(
         color: 0xb82235,
         physicalSecondary: false,
       } as SeqSlot;
+      if (avatar)
+        expect(drawWarriorPowerCast(host, { ...slot, abilityId: 'avatar', targetId: 1 }, 0)).toBe(
+          true,
+        );
       expect(furyBeat(host, slot, id === 'red_harvest' ? 2 : 1)).toBe(true);
       if (crowded)
         for (let entity = 1; entity <= 64; entity++) {
@@ -121,7 +131,7 @@ it.each(['raging_gale', 'red_harvest'])(
       });
       const geo = (ribbons as unknown as { geo: THREE.BufferGeometry }).geo;
       const used = Math.max(...Array.from(geo.getIndex()!.array).slice(0, geo.drawRange.count)) + 1;
-      const prefix = 1056 + (crowded ? 1920 + 768 : 0);
+      const prefix = 1056 + (crowded ? 1920 + 768 : 0) + (avatar ? 272 : 0);
       const result = {
         vertices: used - prefix,
         positions: Array.from(geo.getAttribute('position').array).slice(prefix * 3, used * 3),
