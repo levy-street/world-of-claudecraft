@@ -10455,9 +10455,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.attunedBanner': '調律完了：{title}',
   'hudChrome.crafting.tierTutorial.title': '最初のティア',
   'hudChrome.crafting.tierTutorial.tierCap':
-    '技は技能 {skill} で最初のティアに達し、ティアが上がるごとに作れる物が向上します。ただし技がレアを超える作品を作れるのは、それがあなたの二つの主専攻の一つである場合だけです。',
+    '専門技能は技能 {skill} で最初のティアに達し、ティアが上がるごとに産出物や作れる物が向上します。ただし製作系の専門技能に限っては、レアを超える作品を作れるのは、それがあなたの二つの主専攻の一つである場合だけです。',
   'hudChrome.crafting.tierTutorial.radar':
-    'あなたの専門は輪を成します。隣り合う一対に調律すると、その二つの技は上限のない主専攻になり、輪の反対側の一つの技はレア上限の趣味になり、残りは休眠します。その知識は保持されますが、再び手に取るまではコモン上限です。',
+    'あなたの製作系専門技能は輪を成します。隣り合う一対に調律すると、その二つの技は上限のない主専攻になり、輪の反対側の一つの技はレア上限の趣味になり、残りは休眠します。その知識は保持されますが、再び手に取るまではコモン上限です。',
   'hudChrome.crafting.tierTutorial.masters':
     '町の工芸の師匠が調律の依頼を出しています。準備ができたら訪ねて、あなたの組み合わせを選びましょう。学んだことが失われることは決してありません。',
   'hudChrome.crafting.tierTutorial.dismiss': '了解',

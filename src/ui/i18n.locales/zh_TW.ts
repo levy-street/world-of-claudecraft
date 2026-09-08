@@ -9983,9 +9983,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.attunedBanner': '已調諧：{title}',
   'hudChrome.crafting.tierTutorial.title': '你的第一個階級',
   'hudChrome.crafting.tierTutorial.tierCap':
-    '一門技藝在技能 {skill} 時達到第一個階級，每提升一個階級都會改善其製作能力。但只有當某門技藝成為你兩門主修之一時，才能製作超越稀有品質的作品。',
+    '一項專業在技能 {skill} 時達到第一個階級，每提升一個階級都會改善其產出或製作能力。不過，具體到你的技藝類專業，只有當某門技藝成為你兩門主修之一時，才能製作超越稀有品質的作品。',
   'hudChrome.crafting.tierTutorial.radar':
-    '你的專業構成一個環輪。調諧到相鄰的一對，這兩門技藝便成為無上限的主修；環輪對面的一門技藝成為上限為稀有的嗜好；其餘技藝則進入休眠：知識仍會保留，但在你重新拾起之前上限為普通。',
+    '你的技藝類專業構成一個環輪。調諧到相鄰的一對，這兩門技藝便成為無上限的主修；環輪對面的一門技藝成為上限為稀有的嗜好；其餘技藝則進入休眠：知識仍會保留，但在你重新拾起之前上限為普通。',
   'hudChrome.crafting.tierTutorial.masters':
     '各城鎮的工藝大師提供調諧任務。準備好後去拜訪他們，選擇你的組合。你所學到的一切都不會失去。',
   'hudChrome.crafting.tierTutorial.dismiss': '明白了',

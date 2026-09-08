@@ -375,8 +375,8 @@
       "tick": 104,
       "time": 5.2,
       "nextId": 1004,
-      "state": "dfa9fe06",
-      "events": "ad9dd4f8",
+      "state": "aeee44c1",
+      "events": "19496225",
       "rng": {
         "draws": 4,
         "digest": "49d036fe"
@@ -513,6 +513,7 @@
             "ore_eastbrook_1": 242.5,
             "wood_eastbrook_1": 245
           },
+          "profTierTutorialSent": true,
           "recipesGrandfathered": true,
           "reliquary": {
             "counts": {},
@@ -602,7 +603,7 @@
       "tick": 500,
       "time": 25,
       "nextId": 1004,
-      "state": "35b10ce5",
+      "state": "2e2a4918",
       "events": "b9cf84dd",
       "rng": {
         "draws": 18,
@@ -613,7 +614,7 @@
       "tick": 1000,
       "time": 50,
       "nextId": 1004,
-      "state": "bdfa4ef9",
+      "state": "ad9b4f8c",
       "events": "dbb6bb5d",
       "rng": {
         "draws": 38,
@@ -624,7 +625,7 @@
       "tick": 1500,
       "time": 75,
       "nextId": 1004,
-      "state": "8a01f6c9",
+      "state": "666842f4",
       "events": "ec3dedea",
       "rng": {
         "draws": 58,
@@ -635,7 +636,7 @@
       "tick": 2000,
       "time": 100,
       "nextId": 1004,
-      "state": "3b7be8ae",
+      "state": "09202867",
       "events": "dbac5a79",
       "rng": {
         "draws": 78,
@@ -646,7 +647,7 @@
       "tick": 2500,
       "time": 125,
       "nextId": 1004,
-      "state": "95c4148f",
+      "state": "c16d40b6",
       "events": "61ccf226",
       "rng": {
         "draws": 96,
@@ -657,7 +658,7 @@
       "tick": 3000,
       "time": 150,
       "nextId": 1004,
-      "state": "92d2b785",
+      "state": "4beee30c",
       "events": "dbac5a79",
       "rng": {
         "draws": 116,
@@ -668,7 +669,7 @@
       "tick": 3500,
       "time": 175,
       "nextId": 1004,
-      "state": "195e41e6",
+      "state": "8814ea15",
       "events": "ce46b5e3",
       "rng": {
         "draws": 136,
@@ -679,7 +680,7 @@
       "tick": 4000,
       "time": 200,
       "nextId": 1004,
-      "state": "05c99f9d",
+      "state": "96885d4c",
       "events": "0b58c0d9",
       "rng": {
         "draws": 156,
@@ -690,7 +691,7 @@
       "tick": 4500,
       "time": 225,
       "nextId": 1004,
-      "state": "3d460ecc",
+      "state": "a84f4613",
       "events": "e5b2f378",
       "rng": {
         "draws": 176,
@@ -701,7 +702,7 @@
       "tick": 5000,
       "time": 250,
       "nextId": 1004,
-      "state": "d86d2c39",
+      "state": "98837b76",
       "events": "77f72562",
       "rng": {
         "draws": 194,
@@ -712,7 +713,7 @@
       "tick": 5206,
       "time": 260.3,
       "nextId": 1004,
-      "state": "30da0182",
+      "state": "de636689",
       "events": "e84426f5",
       "rng": {
         "draws": 204,
@@ -884,6 +885,7 @@
             "ore_eastbrook_1": 242.5,
             "wood_eastbrook_1": 245
           },
+          "profTierTutorialSent": true,
           "recipesGrandfathered": true,
           "reliquary": {
             "counts": {},
@@ -979,7 +981,7 @@
       "tick": 5208,
       "time": 260.4,
       "nextId": 1004,
-      "state": "3127e881",
+      "state": "32bd6116",
       "events": "741638a5",
       "rng": {
         "draws": 204,
@@ -1151,6 +1153,7 @@
             "ore_eastbrook_1": 242.5,
             "wood_eastbrook_1": 245
           },
+          "profTierTutorialSent": true,
           "recipesGrandfathered": true,
           "reliquary": {
             "counts": {},

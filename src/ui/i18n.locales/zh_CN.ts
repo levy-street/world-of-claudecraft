@@ -9982,9 +9982,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.attunedBanner': '已调谐：{title}',
   'hudChrome.crafting.tierTutorial.title': '你的第一个阶级',
   'hudChrome.crafting.tierTutorial.tierCap':
-    '一门技艺在技能 {skill} 时达到第一个阶级，每提升一个阶级都会改善其制作能力。但只有当某门技艺成为你两门主修之一时，才能制作超越稀有品质的作品。',
+    '一项专业在技能 {skill} 时达到第一个阶级，每提升一个阶级都会改善其产出或制作能力。不过，具体到你的技艺类专业，只有当某门技艺成为你两门主修之一时，才能制作超越稀有品质的作品。',
   'hudChrome.crafting.tierTutorial.radar':
-    '你的专业构成一个环轮。调谐到相邻的一对，这两门技艺便成为无上限的主修；环轮对面的一门技艺成为上限为稀有的爱好；其余技艺则进入休眠：知识仍会保留，但在你重新拾起之前上限为普通。',
+    '你的技艺类专业构成一个环轮。调谐到相邻的一对，这两门技艺便成为无上限的主修；环轮对面的一门技艺成为上限为稀有的爱好；其余技艺则进入休眠：知识仍会保留，但在你重新拾起之前上限为普通。',
   'hudChrome.crafting.tierTutorial.masters':
     '各城镇的工艺大师提供调谐任务。准备好后去拜访他们，选择你的组合。你所学到的一切都不会失去。',
   'hudChrome.crafting.tierTutorial.dismiss': '明白了',

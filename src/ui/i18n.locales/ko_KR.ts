@@ -10435,9 +10435,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.attunedBanner': '조율 완료: {title}',
   'hudChrome.crafting.tierTutorial.title': '첫 티어',
   'hudChrome.crafting.tierTutorial.tierCap':
-    '기술은 숙련도 {skill}에서 첫 티어에 도달하며, 티어가 오를수록 만들 수 있는 것이 좋아집니다. 하지만 기술이 희귀 이상의 작품을 만들 수 있는 것은 그것이 당신의 두 주 전공 중 하나일 때뿐입니다.',
+    '전문 기술은 숙련도 {skill}에서 첫 티어에 도달하며, 티어가 오를수록 산출물이나 만들 수 있는 것이 좋아집니다. 다만 제작 계열 전문 기술에 한해, 기술이 희귀 이상의 작품을 만들 수 있는 것은 그것이 당신의 두 주 전공 중 하나일 때뿐입니다.',
   'hudChrome.crafting.tierTutorial.radar':
-    '당신의 전문 기술은 바퀴를 이룹니다. 인접한 한 쌍에 조율하면 그 두 기술은 상한 없는 주 전공이 되고, 바퀴 반대편의 한 기술은 희귀 상한의 취미가 되며, 나머지는 비활성 상태가 됩니다. 그 지식은 유지되지만 다시 택하기 전까지는 일반 상한이 적용됩니다.',
+    '당신의 제작 계열 전문 기술은 바퀴를 이룹니다. 인접한 한 쌍에 조율하면 그 두 기술은 상한 없는 주 전공이 되고, 바퀴 반대편의 한 기술은 희귀 상한의 취미가 되며, 나머지는 비활성 상태가 됩니다. 그 지식은 유지되지만 다시 택하기 전까지는 일반 상한이 적용됩니다.',
   'hudChrome.crafting.tierTutorial.masters':
     '마을의 공예 명인들이 조율 임무를 제공합니다. 준비가 되면 찾아가 당신의 조합을 선택하세요. 배운 것은 결코 사라지지 않습니다.',
   'hudChrome.crafting.tierTutorial.dismiss': '알겠습니다',

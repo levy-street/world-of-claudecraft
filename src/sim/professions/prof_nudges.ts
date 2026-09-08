@@ -13,11 +13,15 @@
 //     threshold) keeps its own one-shot semantics unchanged; nudges can fire
 //     BELOW that threshold because classifyCraftTrend returns leaning trends that
 //     have not yet crossed.
-//  2. First-tier tutorial: the first time ANY craft skill crosses tier 1 (skill
-//     >= TIER_SKILL_STEP), attuned or not, the character gets a `profTierTutorial`
-//     exactly once ever. A persisted one-shot flag (PlayerMeta.profTierTutorialSent,
-//     the guildLetterSent idiom) flipped BEFORE the emit guarantees it never
-//     re-fires across load, relog, or restart.
+//  2. First-tier tutorial: the first time ANY profession (a craft skill OR a
+//     gathering proficiency) crosses tier 1 (skill >= TIER_SKILL_STEP), attuned or
+//     not, the character gets a `profTierTutorial` exactly once ever. Gathering
+//     proficiency shares craft skill's 0-100 scale (see gathering.ts), so
+//     tierForSkill applies unchanged; before this, a character who only gathered
+//     (mining/logging/herbalism/fishing/farming) and never touched a craft skill
+//     never received this explainer at all. A persisted one-shot flag
+//     (PlayerMeta.profTierTutorialSent, the guildLetterSent idiom) flipped BEFORE
+//     the emit guarantees it never re-fires across load, relog, or restart.
 //
 // This module is `src/sim`-pure (see src/sim/CLAUDE.md): no DOM/render/ui/game/net
 // imports, no Math.random/Date.now, host-agnostic.
@@ -32,20 +36,24 @@ import { tierForSkill } from './wheel';
 // one keyed window in the per-character profNudgeCadence map).
 const TREND_NUDGE_KEY = 'trend';
 
-/** Whether any of the character's craft skills has reached tier 1 or higher. */
-function hasCraftAtTierOne(meta: PlayerMeta): boolean {
+/** Whether any of the character's craft skills OR gathering proficiencies has
+ *  reached tier 1 or higher (both share the same 0-100 scale). */
+function hasAnyProfessionAtTierOne(meta: PlayerMeta): boolean {
   for (const skill of Object.values(meta.craftSkills)) {
     if (tierForSkill(skill) >= 1) return true;
+  }
+  for (const proficiency of Object.values(meta.gatheringProficiency)) {
+    if (tierForSkill(proficiency) >= 1) return true;
   }
   return false;
 }
 
-/** The first-tier tutorial one-shot: emit once ever the first time any craft
- *  reaches tier 1. Flips the persisted flag BEFORE the emit so a re-entrant load
- *  can never double-fire. Returns whether it emitted. */
+/** The first-tier tutorial one-shot: emit once ever the first time any profession
+ *  (craft or gathering) reaches tier 1. Flips the persisted flag BEFORE the emit
+ *  so a re-entrant load can never double-fire. Returns whether it emitted. */
 export function maybeEmitTierTutorial(meta: PlayerMeta, ctx: SimContext): boolean {
   if (meta.profTierTutorialSent) return false;
-  if (!hasCraftAtTierOne(meta)) return false;
+  if (!hasAnyProfessionAtTierOne(meta)) return false;
   meta.profTierTutorialSent = true;
   ctx.emit({ type: 'profTierTutorial', pid: meta.entityId });
   return true;

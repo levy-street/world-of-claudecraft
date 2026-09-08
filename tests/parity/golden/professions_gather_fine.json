@@ -170,8 +170,8 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 1004,
-      "state": "294cc626",
-      "events": "24dfb052",
+      "state": "299420f9",
+      "events": "81ecb529",
       "rng": {
         "draws": 2,
         "digest": "00a2a78c"
@@ -282,6 +282,7 @@
           "nodeHarvestReadyAt": {
             "ore_mirefen_t2": 242.1
           },
+          "profTierTutorialSent": true,
           "recipesGrandfathered": true,
           "reliquary": {
             "counts": {},
@@ -371,7 +372,7 @@
       "tick": 104,
       "time": 5.2,
       "nextId": 1004,
-      "state": "c2c34913",
+      "state": "d14f687c",
       "events": "d213ac5c",
       "rng": {
         "draws": 4,
@@ -497,6 +498,7 @@
             "ore_mirefen_1": 244.35,
             "ore_mirefen_t2": 242.1
           },
+          "profTierTutorialSent": true,
           "recipesGrandfathered": true,
           "reliquary": {
             "counts": {},
@@ -586,7 +588,7 @@
       "tick": 157,
       "time": 7.85,
       "nextId": 1004,
-      "state": "dd457fc8",
+      "state": "4d6aca79",
       "events": "6deec87c",
       "rng": {
         "draws": 6,
@@ -727,6 +729,7 @@
             "ore_mirefen_1": 244.35,
             "ore_mirefen_t2": 242.1
           },
+          "profTierTutorialSent": true,
           "recipesGrandfathered": true,
           "reliquary": {
             "counts": {},
@@ -816,7 +819,7 @@
       "tick": 159,
       "time": 7.95,
       "nextId": 1004,
-      "state": "0d1e0997",
+      "state": "c7ed0c8a",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -957,6 +960,7 @@
             "ore_mirefen_1": 244.35,
             "ore_mirefen_t2": 242.1
           },
+          "profTierTutorialSent": true,
           "recipesGrandfathered": true,
           "reliquary": {
             "counts": {},
