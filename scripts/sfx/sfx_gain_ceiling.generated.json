@@ -978,6 +978,91 @@
       }
     ]
   },
+  "impact_warrior_red_harvest_finish": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "impact_warrior_red_harvest_finish_1.mp3",
+        "sha256": "1a1750d968ec8f1b028053883c16ff6abaa1d82d2ea55d31bf815f046eeec936",
+        "size": 6940,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "impact_warrior_red_harvest_finish_2.mp3",
+        "sha256": "61b084ea2b39eef18785db0daf466ff1f797bc882c2914c0e837eb589b013664",
+        "size": 6940,
+        "peakDb": -6.4
+      }
+    ]
+  },
+  "impact_warrior_red_harvest_first": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "impact_warrior_red_harvest_first_1.mp3",
+        "sha256": "031b0bac669cc08836614acc2aeca4a4066c52b98cba373c837466963ca90afe",
+        "size": 5686,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "impact_warrior_red_harvest_first_2.mp3",
+        "sha256": "c396f9fe38597dc372e0871af8506a1812e1983587bc85f062bfcd0e901304fc",
+        "size": 5686,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "impact_warrior_red_harvest_second": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "impact_warrior_red_harvest_second_1.mp3",
+        "sha256": "9f073bd683fcc1fff7b9325a27b1fb3544936fe07ee3ceac77e966f6bb25aedf",
+        "size": 5686,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "impact_warrior_red_harvest_second_2.mp3",
+        "sha256": "f29be1aab1d722781784645c25f4aebcc469814d977e252368753366adfcfcab",
+        "size": 5686,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "impact_warrior_twinstrike_first": {
+    "ceilingDb": 4.9,
+    "tracks": [
+      {
+        "filename": "impact_warrior_twinstrike_first_1.mp3",
+        "sha256": "93304be6c99896d6d587f35ddc5265fa47cc40ecc82d98fa1e5f9ff86c1aeb98",
+        "size": 5686,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "impact_warrior_twinstrike_first_2.mp3",
+        "sha256": "4d0926556feeb067c352200bc4c9d128b142a4a101b36d4f4e33a5bb54e9f97c",
+        "size": 5686,
+        "peakDb": -5.9
+      }
+    ]
+  },
+  "impact_warrior_twinstrike_second": {
+    "ceilingDb": 5.1,
+    "tracks": [
+      {
+        "filename": "impact_warrior_twinstrike_second_1.mp3",
+        "sha256": "67d67f1a444724867fa1db29cd9c063a2ebfc81f6a4a1e5f8a577a2af1d7aafd",
+        "size": 6940,
+        "peakDb": -6.1
+      },
+      {
+        "filename": "impact_warrior_twinstrike_second_2.mp3",
+        "sha256": "82c15d0074c00b77f057f775b814946cdfc2acb971029395656e044753a269f6",
+        "size": 6940,
+        "peakDb": -6.3
+      }
+    ]
+  },
   "intimidating_shout": {
     "ceilingDb": 6.2,
     "tracks": [
@@ -1363,6 +1448,40 @@
         "sha256": "093248a09f9dbb06b8fa0aa7d94901bb598166bb0b488a172ca3cb5b2bf794fc",
         "size": 11328,
         "peakDb": -6.2
+      }
+    ]
+  },
+  "melee_warrior_red_harvest_release": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "melee_warrior_red_harvest_release_1.mp3",
+        "sha256": "1742e90c41dc18196869a69aa27163dce0fe77ad1937d0d525cfc5dda7a7e736",
+        "size": 5059,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "melee_warrior_red_harvest_release_2.mp3",
+        "sha256": "b97e8b402e6516d57a6937bd8ddb9fc395e90f5387e6fb3b701cd9e21aa51ae4",
+        "size": 5059,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "melee_warrior_twinstrike_release": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "melee_warrior_twinstrike_release_1.mp3",
+        "sha256": "4356b09cea1eaff78e8d0fa6605c7091c23a5ae731543710dc48ebb29eacac7e",
+        "size": 5059,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "melee_warrior_twinstrike_release_2.mp3",
+        "sha256": "5730ac489a65060d9fa04bf9fc08da117c13b482b67716c79867dbc9334f7b46",
+        "size": 5059,
+        "peakDb": -6.3
       }
     ]
   },

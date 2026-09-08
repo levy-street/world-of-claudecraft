@@ -1,3 +1,4 @@
+import { furyAudioClaimed } from '../fury_audio_core';
 import type { SfxId } from '../game/sfx_manifest.generated';
 import { ABILITIES, MOBS } from '../sim/data';
 import type { Aura, Entity, SimEvent } from '../sim/types';
@@ -375,6 +376,7 @@ export function materialImpactCue(target: Entity): SfxId {
 const RIFT_HAZARD_ABILITY_IDS = new Set(['rift_hazard_molten', 'rift_hazard_boulder']);
 
 export function impactCueForDamage(event: DamageEvent, target: Entity): SfxId | null {
+  if (furyAudioClaimed(event)) return null;
   if (event.abilityId && RIFT_HAZARD_ABILITY_IDS.has(event.abilityId)) return null;
   // Keyed off the stable abilityId, not the display-label `ability` field:
   // a display rename (Scald/Pyrelance/Aether Surge/Dirt Nap/Wicked Slash/
@@ -511,6 +513,7 @@ export function weaponSwingCue(entity: Entity): SfxId {
 }
 
 export function playerSwingCueForDamage(event: DamageEvent, source: Entity | null): SfxId | null {
+  if (furyAudioClaimed(event)) return null;
   if (
     source?.kind !== 'player' ||
     (event.school && event.school !== 'physical') ||

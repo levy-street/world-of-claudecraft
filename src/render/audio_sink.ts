@@ -43,8 +43,7 @@ export interface AbilityAudioOpts {
    *  buff landing is carried by the recorded buff_apply cue; kept so a future
    *  conformed sample pack can style it again without re-plumbing the seam. */
   buffStyle?: string;
-  /** Spec-authored bespoke sample id (impact.sample). Inert for the same
-   *  reason as buffStyle: no sampled ability pack ships today. */
+  /** Authored recording key for a retained, prepared contact or release. */
   sample?: string;
   /** The spirit creature model ('spirit') or motif name ('motif'). */
   name?: string;
@@ -55,6 +54,9 @@ export interface AbilityAudioOpts {
 }
 
 export interface SpatialAudioSink {
+  /** Every variant is decoded before a timed event claims audio ownership. */
+  isBuffered?(key: string): boolean;
+  preload?(key: string): void;
   /** Listener pose each frame: position + forward unit vector (camera). */
   setListener(x: number, y: number, z: number, fx: number, fy: number, fz: number): void;
   /** One footfall for an entity (self or other) at a world position. */
@@ -168,4 +170,12 @@ export interface SpatialAudioSink {
    *  a fresh call with the same id restarts the timer at the new position,
    *  matching a zone that just landed again. No-op for a key with no clip. */
   timedGroundLoop(id: string, key: string, x: number, y: number, z: number, duration: number): void;
+}
+
+/** Start missing loads without claiming this event before decoding completes. */
+export function preparedAbilityAudio(sink: SpatialAudioSink | null, key: string): boolean {
+  if (!sink?.abilityAudio) return false;
+  if (sink.isBuffered?.(key)) return true;
+  sink.preload?.(key);
+  return false;
 }

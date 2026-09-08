@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import type { FuryAudioId } from '../../fury_audio_core';
 import {
   type AbilityVfxBuffSpec,
   type AbilityVfxFullSpec,
@@ -22,6 +23,7 @@ import { type DecalStyle, GroundDecals } from './decals';
 import { ElementalForms } from './elemental_forms';
 import { ElementalContactMemory, elementalPerformance } from './elemental_performance_core';
 import { asFlipbookStyle, ImpactFlipbooks } from './flipbooks';
+import { FuryAudioQueue } from './fury_audio';
 import { abilityVfxTextures, OVERLAY_CELL } from './fx_textures';
 import { GroundAuras } from './ground_auras';
 import { HeldConduction } from './held_conduction';
@@ -493,6 +495,7 @@ export class AbilityVfxFx implements SequencerHost {
   >();
   // Stable sink for the styled bolt heads (ribbons.drawHeads pushes through
   // it into the frame's overlay batch); one closure for the object's lifetime.
+  private readonly furyAudio = new FuryAudioQueue();
   private disposed = false;
   private heldConduction = new HeldConduction();
   private drawHeldConduction = (): void => {
@@ -732,6 +735,19 @@ export class AbilityVfxFx implements SequencerHost {
   // Dev probe: the entity's held ground-aura band count.
   groundAuraCountOf(entityId: number): number {
     return this.groundAuras.countOf(entityId);
+  }
+
+  reserveFuryAudio(
+    event: object,
+    id: FuryAudioId,
+    caster: number,
+    target: number,
+    outcome: 0 | 1 | 2,
+    ready: (key: string) => boolean,
+  ): boolean {
+    return (
+      !this.disposed && this.furyAudio.reserve(this, event, id, caster, target, outcome, ready)
+    );
   }
 
   // ---- archetype sequences (the gallery phase anatomy; see sequencer.ts) --
@@ -2143,6 +2159,7 @@ export class AbilityVfxFx implements SequencerHost {
     // the archetype sequences advance here so their transient draws (release
     // flash, gavel descent, stun stars) land inside this frame's overlay batch
     this.sequencer.update(this, dt);
+    this.furyAudio.update(this, dt);
     // Pack after the sequence emits this frame's contacts, so the visible
     // wound and native weapon contact share one frame. Advance each pool once.
     this.ribbons.update(dt, camPosScratch, reducedMotion, this.drawHeldConduction);
@@ -2191,6 +2208,7 @@ export class AbilityVfxFx implements SequencerHost {
   }
 
   clear(): void {
+    this.furyAudio.clear();
     this.ribbons.clear();
     this.water.clear();
     this.baked.clear();

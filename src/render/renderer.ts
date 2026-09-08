@@ -72,6 +72,7 @@ import { arrivalCoverActive, noteArrivalIfTeleported } from './arrival_cover';
 import { ktx2RetainedSourceBytes } from './assets/ktx2_mip_release';
 import { formatResidencyBudget, residencyBudget } from './assets/residency_budget';
 import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink';
+import { preparedAbilityAudio } from './audio_sink';
 import { createBackgroundGpuQueue, GPU_WORK_PRIORITY } from './background_gpu_queue';
 import { attachBankerChestToNpcView } from './banker_chest';
 import { type BattlegroundView, buildBattleground } from './battleground';
@@ -3064,9 +3065,8 @@ export class Renderer {
         if (this.post && !this.reducedMotion()) this.post.screenFlash(strength);
       },
       screenImpact: (x, y, z, strength) => this.screenImpactAt(x, y, z, strength),
-      // per-ability procedural audio (release whooshes, palette impact
-      // identities, zone pulses, crit stings) rides the injected spatial
-      // audio sink; offline/headless hosts without one stay silent
+      // Prepared recordings and procedural accents share the spatial sink.
+      audioReady: (key) => preparedAbilityAudio(this.audioSink, key),
       abilityAudio: (kind, palette, power, x, y, z, opts) =>
         this.audioSink?.abilityAudio?.(kind, palette, power, x, y, z, opts),
     }, () => this.time);

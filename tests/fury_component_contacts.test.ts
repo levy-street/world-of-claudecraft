@@ -1,4 +1,5 @@
 import { expect, it, vi } from 'vitest';
+import { FuryAudioQueue } from '../src/render/ability_vfx/fury_audio';
 import { AbilityVfx, type AbilityVfxDeps } from '../src/render/ability_vfx/painter';
 import { ArchetypeSequencer, type SequencerHost } from '../src/render/ability_vfx/sequencer';
 import type { AbilityVfxFullSpec } from '../src/render/ability_vfx_core';
@@ -223,3 +224,44 @@ it('overflow cannot wrap a later hit into an earlier missed component', () => {
     expect(vi.mocked(host.burstAt!).mock.calls.filter((c) => c[6] === 'blood')).toHaveLength(1);
   }
 });
+
+it.each([1 / 60, 0.05, 0.1, 0.25, 0.6])(
+  'keeps every recorded cut on its visual frame at dt %s',
+  (dt) => {
+    for (const [id, count] of [
+      ['raging_gale', 2],
+      ['red_harvest', 3],
+    ] as const) {
+      const { host, sequencer, painter } = performance();
+      const queue = new FuryAudioQueue();
+      for (let cut = 0; cut < count; cut++) {
+        const event = {
+          abilityId: id,
+          ability: ABILITIES[id].name,
+          sourceId: 1,
+          targetId: 2,
+          school: 'physical' as const,
+          amount: 150,
+          kind: 'hit' as const,
+          crit: false,
+        };
+        painter.onDamage(event);
+        expect(queue.reserve(host, event, id, 1, 2, 1, () => true)).toBe(true);
+      }
+      let contacts = 0,
+        recordings = 0;
+      for (let age = 0; age < 0.8; age += dt) {
+        sequencer.update(host, dt);
+        queue.update(host, dt);
+        const nextContacts = vi.mocked(host.contact!).mock.calls.length;
+        const nextRecordings = vi
+          .mocked(host.abilityAudio!)
+          .mock.calls.filter((call) => call[0] === 'impact' && call[6]?.sample).length;
+        expect(nextRecordings - recordings, `${id} at ${age + dt}`).toBe(nextContacts - contacts);
+        contacts = nextContacts;
+        recordings = nextRecordings;
+      }
+      expect(contacts).toBe(count);
+    }
+  },
+);

@@ -134,6 +134,9 @@ export function physicalImpact(host: SequencerHost, slot: SeqSlot): void {
   slot.motifLoops = 1;
   slot.motifTimer = slot.t;
   if (slot.abilityId === 'raging_gale' || slot.abilityId === 'red_harvest') {
+    // Keep later contacts on their authored clock even if a frame crosses
+    // the first contact late. The native clip and retained audio share it.
+    slot.motifTimer = slot.impactAt;
     furyBeat(host, slot, 0);
     return;
   }
@@ -152,7 +155,7 @@ export function physicalFollowThrough(host: SequencerHost, slot: SeqSlot): void 
   const p = slot.spec.physical!;
   while (
     slot.motifLoops < p.beats.length &&
-    slot.t - slot.motifTimer >= physicalBeatTime(p, slot.motifLoops)
+    slot.t >= slot.motifTimer + physicalBeatTime(p, slot.motifLoops)
   ) {
     physicalBeat(host, slot, slot.motifLoops++);
   }

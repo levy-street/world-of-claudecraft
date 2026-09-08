@@ -1,3 +1,4 @@
+import { clearFuryAudioClaim } from '../../fury_audio_core';
 import { DAMAGE_CAST_RELEASES } from '../characters/cast_performance';
 import { isBleedContinuation, meleeImpactProfile } from '../melee_impact_core';
 import { SIGNATURE_ABILITIES } from './signature_core';
@@ -139,6 +140,7 @@ export interface AbilityVfxDeps {
   // the renderer's spatial audio sink): release/impact/spirit/motif ride the
   // sequencer's exact moments, this painter fires zone pulses and crit stings
   // directly. Optional for tests and hosts without an audio engine.
+  audioReady?: (key: string) => boolean;
   abilityAudio?: (
     kind: AbilityAudioKind,
     palette: string,
@@ -1165,12 +1167,22 @@ export class AbilityVfx {
       (compoundId === 'raging_gale' || compoundId === 'red_harvest') &&
       (this.deps.visualVariantOf?.(compoundId, ev.sourceId) ?? compoundId) === compoundId
     ) {
+      clearFuryAudioClaim(ev);
       const spec = abilityVfxSpecFor(compoundId);
       const full = abilityVfxFullSpecFor(compoundId);
       const tier = this.castTier(ev.sourceId, compoundId);
       if (spec && full && tier < 2) {
         const outcome =
           ev.kind === 'hit' ? (ev.amount > 0 ? 1 : (ev.absorbed ?? 0) > 0 ? 2 : 0) : 0;
+        if (this.deps.audioReady)
+          this.deps.fx.reserveFuryAudio(
+            ev,
+            compoundId,
+            ev.sourceId,
+            ev.targetId,
+            outcome,
+            this.deps.audioReady,
+          );
         const plan = planImpact(spec, ev.crit, this.quality, tier);
         this.deps.fx.sequenceInstant(
           compoundId,

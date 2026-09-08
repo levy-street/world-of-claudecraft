@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "dc56ed86aa8a45941a245e1d408d9aa04f73521d4da2b71e88294d52598119b3",
-  "catalogHash": "6017ab550cc3688d0482b5b98e9f68d3c21b0b13f63282a533075ac7393e27d2",
+  "bundleId": "fccbf0d1ecc32f8c43f33df6fc9e1d9c9a5cf0be28248a4d6c49ff07618430b9",
+  "catalogHash": "0b7584088e08898dc5742766eb2577c865bad5868d8b34c38ad328cfaa63776a",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -1228,6 +1228,96 @@
       "gain": 1.678804,
       "playbackRate": 1
     },
+    "impact_warrior_red_harvest_finish": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_red_harvest_finish_1.mp3?v=1a1750d968ec",
+          "bytes": 6940,
+          "sha256": "1a1750d968ec8f1b028053883c16ff6abaa1d82d2ea55d31bf815f046eeec936"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_red_harvest_finish_2.mp3?v=61b084ea2b39",
+          "bytes": 6940,
+          "sha256": "61b084ea2b39eef18785db0daf466ff1f797bc882c2914c0e837eb589b013664"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "impact_warrior_red_harvest_first": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_red_harvest_first_1.mp3?v=031b0bac669c",
+          "bytes": 5686,
+          "sha256": "031b0bac669cc08836614acc2aeca4a4066c52b98cba373c837466963ca90afe"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_red_harvest_first_2.mp3?v=c396f9fe3859",
+          "bytes": 5686,
+          "sha256": "c396f9fe38597dc372e0871af8506a1812e1983587bc85f062bfcd0e901304fc"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "impact_warrior_red_harvest_second": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_red_harvest_second_1.mp3?v=9f073bd683fc",
+          "bytes": 5686,
+          "sha256": "9f073bd683fcc1fff7b9325a27b1fb3544936fe07ee3ceac77e966f6bb25aedf"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_red_harvest_second_2.mp3?v=f29be1aab1d7",
+          "bytes": 5686,
+          "sha256": "f29be1aab1d722781784645c25f4aebcc469814d977e252368753366adfcfcab"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "impact_warrior_twinstrike_first": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_twinstrike_first_1.mp3?v=93304be6c998",
+          "bytes": 5686,
+          "sha256": "93304be6c99896d6d587f35ddc5265fa47cc40ecc82d98fa1e5f9ff86c1aeb98"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_twinstrike_first_2.mp3?v=4d0926556fee",
+          "bytes": 5686,
+          "sha256": "4d0926556feeb067c352200bc4c9d128b142a4a101b36d4f4e33a5bb54e9f97c"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "impact_warrior_twinstrike_second": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_twinstrike_second_1.mp3?v=67d67f1a4447",
+          "bytes": 6940,
+          "sha256": "67d67f1a444724867fa1db29cd9c063a2ebfc81f6a4a1e5f8a577a2af1d7aafd"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_twinstrike_second_2.mp3?v=82c15d0074c0",
+          "bytes": 6940,
+          "sha256": "82c15d0074c00b77f057f775b814946cdfc2acb971029395656e044753a269f6"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
     "intimidating_shout": {
       "variants": [
         {
@@ -1634,6 +1724,42 @@
         }
       ],
       "gain": 1.819701,
+      "playbackRate": 1
+    },
+    "melee_warrior_red_harvest_release": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/melee_warrior_red_harvest_release_1.mp3?v=1742e90c41dc",
+          "bytes": 5059,
+          "sha256": "1742e90c41dc18196869a69aa27163dce0fe77ad1937d0d525cfc5dda7a7e736"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/melee_warrior_red_harvest_release_2.mp3?v=b97e8b402e65",
+          "bytes": 5059,
+          "sha256": "b97e8b402e6516d57a6937bd8ddb9fc395e90f5387e6fb3b701cd9e21aa51ae4"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "melee_warrior_twinstrike_release": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/melee_warrior_twinstrike_release_1.mp3?v=4356b09cea1e",
+          "bytes": 5059,
+          "sha256": "4356b09cea1eaff78e8d0fa6605c7091c23a5ae731543710dc48ebb29eacac7e"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/melee_warrior_twinstrike_release_2.mp3?v=5730ac489a65",
+          "bytes": 5059,
+          "sha256": "5730ac489a65060d9fa04bf9fc08da117c13b482b67716c79867dbc9334f7b46"
+        }
+      ],
+      "gain": 1,
       "playbackRate": 1
     },
     "meteor": {
