@@ -276,3 +276,9 @@ parity/determinism and reward-coverage checks:
 UPDATE_PARITY=1 npx vitest run tests/parity/parity_g.test.ts -t 'rift_clear_rewards' --maxWorkers=1
 npx vitest run tests/parity/parity_g.test.ts tests/parity/coverage_c.test.ts -t 'rift_clear_rewards|four rift reward scenarios' --maxWorkers=1
 ```
+
+The other inherited local fixture, `desktop_publish_guard`, reproduced its
+`EPIPE` when `grep -qF` exited successfully before Node finished sending the
+Vite config through stdin. The fixture now supplies a temporary filename,
+matching the real build workflow, and always removes it afterward. Patterns,
+positive/negative cases, and production build guards remain unchanged.
