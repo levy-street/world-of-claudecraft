@@ -71,6 +71,7 @@ import {
   IGNIVAR_FORGE_CHAINS_DURATION_SECONDS,
   IGNIVAR_FORGE_CHAINS_EVERY,
   IGNIVAR_FORGE_CHAINS_FIRST_SECONDS,
+  IGNIVAR_FORGE_CHAINS_NAME,
   IGNIVAR_FORGE_CHAINS_PAIR_COUNT,
   IGNIVAR_FORGE_CHAINS_STRAIN_SECONDS,
   updateIgnivarForgeChains,
@@ -633,6 +634,47 @@ describe('Ignivar encounter', () => {
     expect(second.hp).toBe(second.maxHp);
     expect(first.auras.some((aura) => aura.id === IGNIVAR_FORGE_CHAINS_AURA_ID)).toBe(false);
     expect(second.auras.some((aura) => aura.id === IGNIVAR_FORGE_CHAINS_AURA_ID)).toBe(false);
+  });
+
+  it('names the tether partner on the chain aura and announces the fade when a pair is released', () => {
+    // The parse recorder snapshots the aura's scalar state on the gained
+    // event (linkedEntityId is its reserved partner key) and only learns of a
+    // removal from the fade event, which the direct aura strip used to skip.
+    const { sim, boss } = claimedHeroicEncounter();
+    const first = addEncounterPlayer(sim, boss, 'Recorded Chain One');
+    const second = addEncounterPlayer(sim, boss, 'Recorded Chain Two');
+    updateIgnivarEncounter(sim.ctx, boss);
+    isolateForgeChains(boss);
+    updateIgnivarEncounter(sim.ctx, boss);
+
+    const firstChain = first.auras.find((aura) => aura.id === IGNIVAR_FORGE_CHAINS_AURA_ID);
+    const secondChain = second.auras.find((aura) => aura.id === IGNIVAR_FORGE_CHAINS_AURA_ID);
+    expect(firstChain?.linkedEntityId).toBe(second.id);
+    expect(secondChain?.linkedEntityId).toBe(first.id);
+    sim.drainEvents();
+
+    // A crossing releases the pair through the direct strip, not aura expiry.
+    const intruder = addEncounterPlayer(sim, boss, 'Recorded Chain Intruder');
+    first.pos = { x: boss.pos.x - 4, y: boss.pos.y, z: boss.pos.z + 2 };
+    second.pos = { x: boss.pos.x + 4, y: boss.pos.y, z: boss.pos.z + 2 };
+    intruder.pos = { x: boss.pos.x, y: boss.pos.y, z: boss.pos.z - 2 };
+    intruder.prevPos = { ...intruder.pos };
+    updateIgnivarEncounter(sim.ctx, boss);
+    intruder.pos = { x: boss.pos.x, y: boss.pos.y, z: boss.pos.z + 6 };
+    updateIgnivarEncounter(sim.ctx, boss);
+
+    expect(intruder.dead).toBe(true);
+    expect(first.auras.some((aura) => aura.id === IGNIVAR_FORGE_CHAINS_AURA_ID)).toBe(false);
+    expect(second.auras.some((aura) => aura.id === IGNIVAR_FORGE_CHAINS_AURA_ID)).toBe(false);
+    const fades = sim
+      .drainEvents()
+      .filter(
+        (ev): ev is SimEvent & { type: 'aura' } =>
+          ev.type === 'aura' && ev.gained === false && ev.name === IGNIVAR_FORGE_CHAINS_NAME,
+      )
+      .map((ev) => ev.targetId)
+      .sort((a, b) => a - b);
+    expect(fades).toEqual([first.id, second.id].sort((a, b) => a - b));
   });
 
   it('clears an active Heroic chain when the encounter resets', () => {

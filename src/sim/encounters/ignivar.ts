@@ -1510,7 +1510,7 @@ export function resetIgnivarEncounter(ctx: SimContext, boss: Entity): void {
   for (const meta of ctx.players.values()) {
     const player = ctx.entities.get(meta.entityId);
     if (player?.kind !== 'player') continue;
-    clearIgnivarEncounterAuras(player, boss.id);
+    clearIgnivarEncounterAuras(ctx, player, boss.id);
   }
   for (const conduit of conduitEntities(ctx, boss).values()) {
     conduit.templateId = IGNIVAR_WATER_CONDUIT_TEMPLATES.ready;
@@ -1536,8 +1536,12 @@ export function clearIgnivarBrand(player: Entity, sourceId?: number): void {
   );
 }
 
-export function clearIgnivarEncounterAuras(player: Entity, sourceId?: number): void {
-  clearIgnivarForgeChainAura(player, sourceId);
+export function clearIgnivarEncounterAuras(
+  ctx: SimContext,
+  player: Entity,
+  sourceId?: number,
+): void {
+  clearIgnivarForgeChainAura(ctx, player, sourceId);
   player.auras = player.auras.filter(
     (aura) =>
       (aura.id !== IGNIVAR_BRAND_AURA_ID &&
