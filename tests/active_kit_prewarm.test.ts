@@ -75,18 +75,18 @@ function fixture(cls = 'warrior') {
   };
 }
 
-it('registers without GPU work and resumes only the fifteen selected Warrior shapes', async () => {
+it('registers without GPU work and resumes only the twenty-two selected Warrior shapes', async () => {
   const f = fixture();
   try {
     expect(f.entry.required).toBe(false);
     expect(f.entry).not.toHaveProperty('resumeUnits');
     expect(f.entry).not.toHaveProperty('deadlineExempt');
     expect(f.queue.run).not.toHaveBeenCalled();
-    expect(f.entry.progress()).toEqual({ done: 0, planned: 64, trimmed: true });
+    expect(f.entry.progress()).toEqual({ done: 0, planned: 92, trimmed: true });
     // A dropped/skipped manifest never ran entry.run(), but kept registration.
     resumeActiveAbilityKit(f.scene);
     await ensureActiveAbilityKit(f.scene);
-    expect(f.queue.run).toHaveBeenCalledTimes(64);
+    expect(f.queue.run).toHaveBeenCalledTimes(92);
     for (const call of f.queue.run.mock.calls as unknown[][]) {
       expect(call[1]).toBe(GPU_WORK_PRIORITY.ACTIONABLE_VIEW);
       expect(call[3]).toEqual({ releaseTail: true });
@@ -96,7 +96,10 @@ it('registers without GPU work and resumes only the fifteen selected Warrior sha
     expect(f.upload).toHaveBeenNthCalledWith(2, f.steel);
     expect(f.upload).toHaveBeenNthCalledWith(3, f.texture);
     expect(f.upload).toHaveBeenNthCalledWith(4, f.power);
-    expect(f.host.draw).toHaveBeenCalledTimes(15);
+    expect(f.host.draw).toHaveBeenCalledTimes(22);
+    expect(ACTIVE_WARRIOR_CRESTS).toContain('steel_chop');
+    expect(ACTIVE_WARRIOR_CRESTS).toContain('steel_counter');
+    expect(ACTIVE_WARRIOR_CRESTS).toContain('steel_execution');
     expect(ACTIVE_WARRIOR_CRESTS).toContain('leap_rupture');
     expect(ACTIVE_WARRIOR_CRESTS).toContain('steel_storm');
     expect(ACTIVE_WARRIOR_CRESTS).toContain('steel_reap');
@@ -107,7 +110,7 @@ it('registers without GPU work and resumes only the fifteen selected Warrior sha
     for (const kind of ACTIVE_WARRIOR_CRESTS) expect(f.prep.ready(kind)).toBe(true);
     expect(f.prep.ready('fire')).toBe(false);
     await ensureActiveAbilityKit(f.scene);
-    expect(f.queue.run).toHaveBeenCalledTimes(64);
+    expect(f.queue.run).toHaveBeenCalledTimes(92);
     expect(f.entry.progress().trimmed).toBe(false);
   } finally {
     f.close();

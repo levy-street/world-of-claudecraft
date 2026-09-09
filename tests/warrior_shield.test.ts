@@ -13,6 +13,9 @@ it('builds bounded solid plates with depth and finite unit normals', () => {
   expect(size.y).toBeGreaterThan(2);
   expect(size.z).toBeGreaterThan(0.25);
   const positions = geometry.getAttribute('position');
+  // The central opening exposes the real shield; outer impact bounds stay large.
+  for (let i = 0; i < positions.count; i++)
+    expect(Math.abs(positions.getX(i))).toBeGreaterThanOrEqual(0.339);
   expect(positions.count / 3).toBeLessThan(200);
   for (const attribute of Object.values(geometry.attributes))
     expect(Array.from(attribute.array).every(Number.isFinite)).toBe(true);
@@ -79,4 +82,19 @@ it('keeps the complete shield and target imprint at reduced detail and during co
   expect(vi.mocked(host.flipbookAt).mock.calls[1][0]).toBe(7);
   drawWarriorShield(host, slot, 1);
   expect(contact).toHaveBeenCalledTimes(2);
+  host.weaponFace = vi.fn((_id, _hand, out, normal) => {
+    Object.assign(out, { x: 0.25, y: 1.4, z: 1.6 });
+    Object.assign(normal, { x: 0, y: 0, z: 1 });
+    return true;
+  });
+  drawWarriorShield(host, slot, 0);
+  expect(host.weaponFace).toHaveBeenCalledWith(1, 1, expect.any(Object), expect.any(Object));
+  expect(crest.mock.calls[2].slice(0, 5)).toEqual([0.25, 1.4, 1.6, 1.4, 1.4]);
+  // The physical imprint continues to follow the target, independent of the carrier.
+  expect(vi.mocked(host.flipbookAt).mock.calls[2][0]).toBe(7);
+  const link = ribbon.mock.calls.find((args) => args[1] === 0.14 && args[2] === 0.18)!;
+  link[3](points);
+  expect(points[0].toArray()).toEqual([0.25, 1.4, 1.6]);
+  expect(points.at(-1)!.x).toBeCloseTo(7);
+  expect(points.at(-1)!.z).toBeCloseTo(3);
 });

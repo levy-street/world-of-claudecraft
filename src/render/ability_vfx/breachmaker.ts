@@ -46,6 +46,7 @@ export function drawBreachmaker(host: SequencerHost, slot: SeqSlot, beat: number
       null,
       false,
       1,
+      { from: 0, to: 1 },
     );
   }
   host.crestAt?.(at.x, at.y, at.z, 1, 1, 0x728797, 0xe1b180, 'breach_wedge', angle, 0.27);

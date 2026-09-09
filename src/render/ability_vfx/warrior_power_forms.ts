@@ -79,7 +79,7 @@ export class WarriorPowerForms {
           roughness: blood ? 0.42 : 0.82,
           metalness: blood ? 0.08 : 0.18,
           emissive: 0xffffff,
-          emissiveIntensity: blood ? 0.85 : 0.42,
+          emissiveIntensity: blood ? 0.85 : 0.78,
         }),
       );
       if (blood) animateWarriorRage(material, this.rageTime, this.rageMotion);

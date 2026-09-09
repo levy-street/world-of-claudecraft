@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-/** Six thick beveled steel plates, with open seams and a pointed lower crest.
+/** Six thick beveled steel plates frame an open buckler-sized contact window.
  * This is an instantaneous shield contact sculpture, not a persistent barrier. */
 export function buildWarriorShield(): THREE.BufferGeometry {
   const positions: number[] = [],
@@ -21,10 +21,10 @@ export function buildWarriorShield(): THREE.BufferGeometry {
       const top = 1.18 - row * 0.63;
       const outer = [1.03, 0.91, 0.65][row];
       const polygon = [
-        [0.045, top - 0.23],
+        [0.34, top - 0.23],
         [outer, top],
         [outer * 0.78, top - 0.49],
-        [0.045, top - 0.84],
+        [0.34, top - 0.84],
       ];
       const center = polygon.reduce((sum, p) => [sum[0] + p[0] / 4, sum[1] + p[1] / 4], [0, 0]);
       const rim = polygon.map(([x, y]) => [x * side, y, 0.45 - x * 0.62]);

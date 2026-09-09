@@ -3,6 +3,7 @@ import { furyCutSurfacePoint } from './fury_shapes';
 import { physicalContact } from './physical_contact';
 import type { SeqSlot, SequencerHost } from './sequencer';
 import { warriorBladePoint } from './warrior_blade_shape';
+import { WARRIOR_HEAVY_POINTS, type WarriorHeavyShape } from './warrior_heavy_shapes';
 
 interface BladeStyle {
   span: number;
@@ -12,20 +13,22 @@ interface BladeStyle {
   heavy?: boolean;
   groundChop?: boolean;
   rising?: boolean;
+  shape?: WarriorHeavyShape;
 }
 export const WARRIOR_BLADE_STYLES: Readonly<Record<string, BladeStyle | undefined>> = {
   heroic_strike: { span: 4.2, height: 0.95, roll: -0.95 },
   hamstring: { span: 3.5, height: 0.35, roll: 0.015, blood: true },
-  slam: { span: 4.8, height: 1.4, roll: -1.35, groundChop: true },
-  overpower: { span: 5.1, height: 1.25, roll: 1.05, rising: true },
+  slam: { span: 4.8, height: 1.4, roll: -1.35, groundChop: true, shape: 'steel_chop' },
+  overpower: { span: 5.1, height: 1.25, roll: 1.05, rising: true, shape: 'steel_counter' },
   mortal_strike: { span: 5.2, height: 1.4, roll: -0.65 },
-  execute: { span: 6.4, height: 1.65, roll: -1.25, heavy: true },
+  execute: { span: 6.4, height: 1.65, roll: -1.25, heavy: true, shape: 'steel_execution' },
   bloodthirst: { span: 4.6, height: 1.45, roll: -0.8, blood: true },
   victory_rush: { span: 4.8, height: 1.3, roll: 0.35 },
 };
 const source = { x: 0, y: 0, z: 0 },
   target = { x: 0, y: 0, z: 0 },
   point = { x: 0, y: 0, z: 0 };
+const CONTACT_SWEEP = { from: 0, to: 1 };
 
 /** A single owned blade contact. Native animations provide distinct loading,
  * strike and recovery poses; these surfaces follow their authored cut direction. */
@@ -52,7 +55,11 @@ export function drawWarriorBlade(host: SequencerHost, slot: SeqSlot, beat: numbe
   const scale = style.span / (style.blood ? 3.7 : 4.4);
   const sine = Math.sin(style.roll),
     cosine = Math.cos(style.roll);
-  const sample = style.blood ? furyCutSurfacePoint : warriorBladePoint;
+  const sample = style.blood
+    ? furyCutSurfacePoint
+    : style.shape
+      ? WARRIOR_HEAVY_POINTS[style.shape]
+      : warriorBladePoint;
   const duration = style.heavy ? 0.28 : 0.24;
   const count = slot.tier > 0 ? 1 : 3;
   for (let strand = 0; strand < count; strand++) {
@@ -77,6 +84,7 @@ export function drawWarriorBlade(host: SequencerHost, slot: SeqSlot, beat: numbe
       null,
       false,
       strand === 0 ? 1 : 0,
+      style.blood ? null : CONTACT_SWEEP,
     );
   }
   host.crestAt?.(
@@ -87,7 +95,7 @@ export function drawWarriorBlade(host: SequencerHost, slot: SeqSlot, beat: numbe
     style.height,
     style.blood ? 0x8f1028 : 0x8296a6,
     style.blood ? 0xf24e59 : 0xd6b19a,
-    style.blood ? 'blood_cut' : 'steel_cut',
+    style.blood ? 'blood_cut' : (style.shape ?? 'steel_cut'),
     facing,
     duration,
     style.roll,

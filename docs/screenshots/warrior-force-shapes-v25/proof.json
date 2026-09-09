@@ -1,0 +1,20 @@
+{
+  "scope": "Selected source-stamped visual review candidates; final whole-kit acceptance remains open. World frames are alternate-angle evidence, not matched before/after pairs.",
+  "captures": {
+    "world-arms-avatar-t1.50.png": "5fba689d9e902d973550aa37e83772fc9eaaf624028b82796241781988e26024",
+    "world-fury-avatar-t1.50.png": "9d99eadf0194aedb0a8e2e6a494e16e63793db68f2aecca3fa3fdd1e8e81e617",
+    "world-prot-avatar-t1.50.png": "40aeecc7784747cc04f6b8f900488f93d81406c3e90453c7500bfd373f1e40ea",
+    "world-prot-revenge-t0.15.png": "8fe0d56327472686711f78860ba599ac450caea60c21c46c3ab8774ac7189a99",
+    "world-prot-revenge-t0.30.png": "9d7e9146fa3c68dffcfb9278242521690b1d209661813a7e78de454f6ccb9172",
+    "world-arms-breachmaker-t0.15.png": "41803e1b1f00793571ae0527ad3f0d7ada8ab3beac25052940fc6fc03c7152b3",
+    "studio-prot-shield_slam-t0.15.png": "00cdb772863a19b6d3ae077be730d72d7ff2b066159295a40394dad488f418f8",
+    "studio-prot-shield_slam-t0.30.png": "c0367dfe48e438afc55666774a9e226de611c9dd8a0f26b351f47741945cfc19",
+    "studio-arms-battle_stance-t1.50.png": "f9716ef22972f229dd2cf7b44b688f1a8dd10bceaef1e37b64f29dc138c5a736",
+    "studio-fury-berserker_stance-t1.50.png": "195194dcabb6fcdc0e13cec4d80c1264c02814bdfb1a652766e1c7c753e745e1",
+    "studio-prot-defensive_stance-t1.50.png": "ee3fcf4541ccbdfd17595556485a72423f6b23b058b561b1fcb3f779341887ae"
+  },
+  "reports": {
+    "world": "warrior-final-upper-counter-4",
+    "studio": "warrior-final-shield-stance-5"
+  }
+}

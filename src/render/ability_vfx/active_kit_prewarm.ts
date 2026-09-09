@@ -9,11 +9,15 @@ import {
   warriorSteelTexture,
 } from './production_assets';
 import type { CrestKind } from './signature_shapes';
+import { WARRIOR_PRESSURE_KINDS } from './warrior_shout_shapes';
 
 export const ACTIVE_WARRIOR_CRESTS: readonly CrestKind[] = [
   'blood_cut',
   'shield_contact',
   'steel_cut',
+  'steel_chop',
+  'steel_counter',
+  'steel_execution',
   'steel_storm',
   'steel_reap',
   'iron_counter',
@@ -23,9 +27,7 @@ export const ACTIVE_WARRIOR_CRESTS: readonly CrestKind[] = [
   'avatar_rupture',
   'blood_gyre',
   'leap_rupture',
-  'rally_pressure',
-  'dread_pressure',
-  'challenge_pressure',
+  ...WARRIOR_PRESSURE_KINDS,
 ];
 interface ActiveKitHost {
   queue: Pick<BackgroundGpuQueue, 'run'>;

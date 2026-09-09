@@ -1,9 +1,10 @@
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
 /** Native chest-local V-neck, reserving the helmet and crossed grip sweep.
  * Facet rings remain a closed volume rather than a translucent body repaint. */
 export function warriorAvatarChestShape(): THREE.BufferGeometry {
-  return avatarBeveledShell(
+  const chest = avatarBeveledShell(
     [
       [-0.34, 0.03],
       [-0.13, 0.045],
@@ -20,6 +21,19 @@ export function warriorAvatarChestShape(): THREE.BufferGeometry {
     0.08,
     0.2,
   );
+  // Mineral masses use broad facets on every side, rather than flat caps
+  // whose sidewalls become rectangular panels from the gameplay camera.
+  const shoulders = [-1, 1].map((side) =>
+    warriorAvatarShape()
+      .scale(0.55, 0.6, 0.7)
+      .rotateY(side * 0.45)
+      .translate(side * 0.9, 0.17, -0.38),
+  );
+  const geometry = mergeGeometries([chest, ...shoulders]);
+  chest.dispose();
+  for (const shoulder of shoulders) shoulder.dispose();
+  geometry.computeBoundingSphere();
+  return geometry;
 }
 
 function avatarBeveledShell(
@@ -69,7 +83,7 @@ function avatarBeveledShell(
         b = vertices[ring * count + ((i + 1) % count)];
       const c = vertices[(ring + 1) * count + ((i + 1) % count)],
         d = vertices[(ring + 1) * count + i];
-      const tint = ring === 1 ? 0x727e76 : ring === 2 ? 0xd5cdb7 : 0x969d8e;
+      const tint = ring === 1 ? 0x647887 : ring === 2 ? 0xffe9bc : 0xb6c8cd;
       face(a, b, c, tint);
       face(a, c, d, tint);
     }
@@ -78,8 +92,8 @@ function avatarBeveledShell(
     for (let i = 0; i < count; i++) {
       const a = vertices[ring * count + i],
         b = vertices[ring * count + ((i + 1) % count)];
-      if (ring === 0) face(point, b, a, 0x76817a);
-      else face(point, a, b, i % 3 === 0 ? 0xadb49f : 0xa0a796);
+      if (ring === 0) face(point, b, a, 0x6a7a84);
+      else face(point, a, b, i % 3 === 0 ? 0xe3e4d7 : 0xa4b6bc);
     }
   }
   const geometry = new THREE.BufferGeometry();

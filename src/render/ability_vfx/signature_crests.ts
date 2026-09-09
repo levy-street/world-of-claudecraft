@@ -150,13 +150,21 @@ export class SignatureCrests {
             // actual painted strip, flipped from image rows into the mesh UVs.
             vec3 enamel=texture2D(uBloodMap,vec2(vUv.x,0.70-vUv.y*0.47)).rgb;
             float coverage=smoothstep(0.004,0.055,max(enamel.r,max(enamel.g,enamel.b)));
-            colour=enamel*(1.1+fresnel*0.28)+uAccent*edge*0.34;
+            // The geometry owns the cut silhouette. A black paint matte must
+            // not punch the entire blood mass into isolated bright speckles.
+            float core=smoothstep(0.02,0.12,vUv.x)*(1.0-smoothstep(0.88,0.98,vUv.x))*(1.0-smoothstep(0.72,1.0,vUv.y));
+            coverage=max(coverage,core*0.92);
+            vec3 bloodBody=mix(uTint*0.58,enamel,smoothstep(0.015,0.14,enamel.r));
+            colour=bloodBody*(1.1+fresnel*0.28)+uAccent*edge*0.34;
             alpha=0.97*coverage*dissolve*smoothstep(0.0,0.1,taper)*(1.0-smoothstep(0.68,1.0,uAge));
           }
           if(uKind>12.5 && uKind<13.5){
             vec2 flowUv=vUv;
+            // Each authored sheet owns one plume; sampling all three painted
+            // branches on every sheet duplicates them into fine spoke bundles.
+            flowUv.y=0.5+(flowUv.y-0.5)*0.28;
             flowUv.y+=sin(vUv.x*13.0-uAge*4.0)*0.012*uMotion*uAge;
-            float density=texture2D(uPressureMap,clamp(flowUv,vec2(0.0),vec2(1.0))).r;
+            float density=pow(texture2D(uPressureMap,clamp(flowUv,vec2(0.0),vec2(1.0))).r,0.65);
             float dissolution=smoothstep(uAge*0.9-0.35,uAge*0.9+0.1,density);
             colour=mix(uTint*(0.8+density*0.6),uAccent*1.3,pow(max(0.0,density),2.5));
             alpha=density*0.72*dissolution*(1.0-smoothstep(0.55,1.0,uAge));
@@ -200,11 +208,31 @@ export class SignatureCrests {
             }
             alpha=1.0-smoothstep(0.48,1.0,uAge);
           }
+          if(uKind>14.5 && uKind<15.5){
+            // A fast cutting head draws the broad steel wake through contact.
+            // A fixed full-opacity wall would freeze the motion into a panel.
+            float gain=steelSweepGain(vUv.x,uAge);
+            alpha*=mix(1.0,min(1.0,gain),uMotion);
+            colour+=uAccent*max(0.0,gain-0.8)*0.24*uMotion;
+          }
+          if(uKind>13.5 && uKind<14.5){
+            float bevel=1.0-smoothstep(0.18,0.3,vUv.y);
+            colour=mix(uTint*0.55,colour,0.6)+uAccent*bevel*0.08;
+          }
           if(uKind>16.5 && uKind<17.5){
             float sweepU=clamp((atan(vSurface.x-0.5,vSurface.y-0.5)+2.2)/4.4,0.0,1.0);
             float gain=steelSweepGain(sweepU,uAge);
             alpha*=mix(1.0,min(1.0,gain),uMotion);
             colour+=uAccent*max(0.0,gain-0.75)*0.55*uMotion;
+          }
+          if(uKind>19.5 && uKind<20.5){
+            // The compression travels down the thrust, with its hot head
+            // crossing the victim before the scored pressure wake dissolves.
+            float thrustU=clamp((vLocal.z+3.3)/5.6,0.0,1.0);
+            float gain=steelSweepGain(thrustU,uAge);
+            float grain=dot(colour,vec3(0.333333));
+            colour=uTint*(0.45+grain*0.6)+uAccent*max(0.0,gain-0.65)*0.9;
+            alpha*=mix(1.0,min(1.0,gain),uMotion);
           }
           if(uKind>21.5 && uKind<22.5){
             vec3 blood=texture2D(uBloodMap,clamp(vec2(vUv.x,vUv.y),vec2(.01),vec2(.99))).rgb;
@@ -272,11 +300,13 @@ export class SignatureCrests {
       height <= 0
     )
       return false;
-    const contactSurface =
-      kind === 'blood_cut' ||
-      kind === 'shield_contact' ||
+    const steelBlade =
       kind === 'steel_cut' ||
-      kind === 'breach_wedge';
+      kind === 'steel_chop' ||
+      kind === 'steel_counter' ||
+      kind === 'steel_execution';
+    const contactSurface =
+      kind === 'blood_cut' || kind === 'shield_contact' || steelBlade || kind === 'breach_wedge';
     const authoredSurface =
       contactSurface ||
       kind === 'steel_storm' ||
@@ -305,7 +335,7 @@ export class SignatureCrests {
     const geometry = this.shapes.get(kind) ?? this.shapes.get('shadow');
     if (geometry) s.mesh.geometry = geometry;
     s.mesh.rotation.set(pitch, angle, 0, 'YXZ');
-    if (kind === 'blood_cut' || kind === 'steel_cut') s.mesh.rotation.set(0, angle, pitch, 'YXZ');
+    if (kind === 'blood_cut' || steelBlade) s.mesh.rotation.set(0, angle, pitch, 'YXZ');
     s.mesh.position.set(x, y, z);
     s.mesh.scale.set(Math.min(3, radius), Math.min(3, height), Math.min(3, radius));
     if (kind === 'chain') s.mesh.scale.set(height, height, radius);
@@ -349,7 +379,7 @@ export class SignatureCrests {
               ? 16
               : kind === 'breach_wedge'
                 ? 20
-                : kind === 'steel_cut'
+                : steelBlade
                   ? 15
                   : kind === 'shield_contact'
                     ? 14

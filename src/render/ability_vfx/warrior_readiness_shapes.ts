@@ -50,7 +50,7 @@ export class WarriorReadinessShapes {
     this.across.crossVectors(this.along, this.normal).normalize();
     const pulse = reducedMotion ? 1 : 0.9 + 0.1 * Math.sin(time * 5);
     if (hand === 0) {
-      if (bits & R.battle) this.line(ribbons, STEEL_EDGE, 0xaebac4, 0.035, 0.7);
+      if (bits & R.battle) this.line(ribbons, STEEL_EDGE, 0xdcb66d, 0.072, 1.25);
       if (bits & R.wideningArc) {
         this.line(ribbons, WIDE_EDGE, 0x9c7652, 0.095, 0.7);
         this.line(ribbons, WIDE_EDGE, 0xe8d6af, 0.035, 1.25);
@@ -66,13 +66,13 @@ export class WarriorReadinessShapes {
         this.line(ribbons, TRANCE_B, 0xfcdf9e, 0.035, 1.2);
       }
     }
-    if (bits & R.berserker) this.line(ribbons, RED_EDGE, 0xc8493c, 0.047, 0.85);
+    if (bits & R.berserker) this.line(ribbons, RED_EDGE, 0xeb3244, 0.078, 1.25);
     if ((hand === 1 || !offhandReady) && bits & (R.guarded | R.revenge)) {
       // Use the real equipment face even when the permitted loadout has no shield.
       this.along.setFromMatrixColumn(frame, 1).normalize();
       this.across.setFromMatrixColumn(frame, 0).normalize();
       this.length = Math.max(0.35, this.length);
-      if (bits & R.guarded) this.line(ribbons, GUARD, 0x93b6c6, 0.045, 0.85);
+      if (bits & R.guarded) this.line(ribbons, GUARD, 0x79cce8, 0.08, 1.2);
       if (bits & R.revenge) {
         this.line(ribbons, COUNTER, 0x6399b6, 0.1, 0.85);
         this.line(ribbons, COUNTER_CUT, 0xe1f1ef, 0.045, 1.3 * pulse);

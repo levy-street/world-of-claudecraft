@@ -6,10 +6,15 @@ import type { Substance } from './signature_core';
 import { buildWarriorArea, type WarriorAreaShape } from './warrior_area_shapes';
 import { warriorAvatarRuptureShape } from './warrior_avatar_rupture';
 import { buildWarriorBlade } from './warrior_blade_shape';
+import { buildWarriorHeavyShape, type WarriorHeavyShape } from './warrior_heavy_shapes';
 import { warriorGyreShape } from './warrior_gyre_shape';
 import { warriorLeapShape } from './warrior_leap_shape';
 import { buildWarriorShield } from './warrior_shield_shape';
-import { buildWarriorPressure, type WarriorPressureKind } from './warrior_shout_shapes';
+import {
+  buildWarriorPressure,
+  WARRIOR_PRESSURE_KINDS,
+  type WarriorPressureKind,
+} from './warrior_shout_shapes';
 export type CrestKind =
   | Substance
   | 'bone'
@@ -20,6 +25,7 @@ export type CrestKind =
   | 'blood_cut'
   | 'shield_contact'
   | 'steel_cut'
+  | WarriorHeavyShape
   | 'avatar_rupture'
   | 'blood_gyre'
   | 'leap_rupture'
@@ -34,6 +40,8 @@ export function buildSignatureShapes(): Map<CrestKind, THREE.BufferGeometry> {
   shapes.set('blood_cut', buildFuryCutShape());
   shapes.set('shield_contact', buildWarriorShield());
   shapes.set('steel_cut', buildWarriorBlade());
+  for (const kind of ['steel_chop', 'steel_counter', 'steel_execution'] as const)
+    shapes.set(kind, buildWarriorHeavyShape(kind));
   shapes.set('avatar_rupture', warriorAvatarRuptureShape());
   shapes.set('blood_gyre', warriorGyreShape());
   shapes.set('leap_rupture', warriorLeapShape());
@@ -41,8 +49,7 @@ export function buildSignatureShapes(): Map<CrestKind, THREE.BufferGeometry> {
   shapes.set('steel_reap', buildWarriorArea('steel_reap'));
   for (const kind of ['iron_counter', 'iron_quake', 'iron_fault', 'breach_wedge'] as const)
     shapes.set(kind, buildIronguardShape(kind));
-  for (const kind of ['rally_pressure', 'dread_pressure', 'challenge_pressure'] as const)
-    shapes.set(kind, buildWarriorPressure(kind));
+  for (const kind of WARRIOR_PRESSURE_KINDS) shapes.set(kind, buildWarriorPressure(kind));
   for (const kind of ['ice', 'water', 'fire', 'shadow', 'light', 'nature', 'arcane'] as const) {
     const positions: number[] = [],
       uvs: number[] = [],

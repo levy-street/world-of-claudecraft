@@ -67,7 +67,9 @@ export function warriorPowerGeometry(blood: boolean): THREE.BufferGeometry {
     for (const [a, b, c] of faces) {
       const verts = [a, b, c].map((i) => [...inset[i], side * depth]);
       if (side > 0) tri(verts[0], verts[1], verts[2], face);
-      else tri(verts[2], verts[1], verts[0], dark);
+      // Blood flame emits from both faces. A metal-dark back leaves only the
+      // bright bevel visible when the crown is viewed from behind or the side.
+      else tri(verts[2], verts[1], verts[0], face);
     }
   }
   for (let i = 0; i < outline.length; i++) {

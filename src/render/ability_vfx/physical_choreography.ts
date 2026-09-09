@@ -4,6 +4,7 @@ import { drawDirtToss } from './action_contact';
 import { drawBloodhook } from './bloodhook';
 import { drawBreachmaker } from './breachmaker';
 import { furyBeat } from './fury_choreography';
+import { drawHarvestRelease } from './fury_release';
 import { drawIronguard } from './ironguard';
 import {
   physicalBeatTime,
@@ -110,6 +111,7 @@ export function physicalRelease(host: SequencerHost, slot: SeqSlot): void {
   const at = host.anchorOf(slot.casterId, 0.6, origin);
   if (!at) return;
   warriorPowerRelease(host, slot);
+  drawHarvestRelease(host, slot);
   if (p.weapon !== undefined) {
     const duration = physicalBeatTime(p, p.beats.length - 1) + 0.3;
     if (p.weapon === 'both' || p.weapon === 0)

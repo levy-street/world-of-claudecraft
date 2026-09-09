@@ -17,7 +17,10 @@ export function warriorBladePoint(
   out.z = arch * 0.75 - v * taper * 0.8;
 }
 
-export function buildWarriorBlade(): THREE.BufferGeometry {
+export function buildWarriorBlade(
+  sample = warriorBladePoint,
+  breaks: readonly number[] = [],
+): THREE.BufferGeometry {
   const positions: number[] = [],
     uvs: number[] = [],
     indices: number[] = [];
@@ -30,7 +33,7 @@ export function buildWarriorBlade(): THREE.BufferGeometry {
       for (let col = 0; col <= columns; col++) {
         const u = col / columns,
           v = bands[row];
-        warriorBladePoint(u, v, point);
+        sample(u, v, point);
         const bevel = row === 0 || row === bands.length - 1;
         positions.push(
           point.x,
@@ -38,7 +41,7 @@ export function buildWarriorBlade(): THREE.BufferGeometry {
           point.z + side * (bevel ? 0.012 : 0.09) * Math.sin(u * Math.PI),
         );
         uvs.push(u, bevel ? 0 : row === 1 ? 0.18 : 0.7);
-        if (row < bands.length - 1 && col < columns) {
+        if (row < bands.length - 1 && col < columns && !breaks.includes(col)) {
           const a = start + row * (columns + 1) + col,
             b = a + 1,
             c = a + columns + 1,
@@ -51,10 +54,19 @@ export function buildWarriorBlade(): THREE.BufferGeometry {
   const faceCount = bands.length * (columns + 1);
   for (const row of [0, bands.length - 1])
     for (let col = 0; col < columns; col++) {
+      if (breaks.includes(col)) continue;
       const a = row * (columns + 1) + col,
         b = a + 1;
       indices.push(a, b, a + faceCount, b, b + faceCount, a + faceCount);
     }
+  // Fractured cleavers retain real thickness at each exposed break.
+  for (const split of breaks)
+    for (const col of [split, split + 1])
+      for (let row = 0; row < bands.length - 1; row++) {
+        const a = row * (columns + 1) + col,
+          b = a + columns + 1;
+        indices.push(a, b, a + faceCount, b, b + faceCount, a + faceCount);
+      }
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
   geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));

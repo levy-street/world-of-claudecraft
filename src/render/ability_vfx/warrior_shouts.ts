@@ -1,5 +1,9 @@
 import type { SeqSlot, SequencerHost } from './sequencer';
-import type { WarriorPressureKind } from './warrior_shout_shapes';
+import {
+  warriorPressureLayers,
+  warriorPressurePoint,
+  type WarriorPressureKind,
+} from './warrior_shout_shapes';
 
 interface ShoutDesign {
   shape: WarriorPressureKind;
@@ -12,7 +16,7 @@ interface ShoutDesign {
 // range claim. Iron Bellow has unlimited party range; recipient state owns it.
 const SHOUTS: Readonly<Record<string, ShoutDesign>> = {
   battle_shout: {
-    shape: 'rally_pressure',
+    shape: 'battle_pressure',
     tint: 0x8f7660,
     edge: 0xe8c58a,
     presence: 8,
@@ -26,7 +30,7 @@ const SHOUTS: Readonly<Record<string, ShoutDesign>> = {
     lift: 1.2,
   },
   emboldening_roar: {
-    shape: 'rally_pressure',
+    shape: 'embolden_pressure',
     tint: 0x9f3944,
     edge: 0xffb17d,
     presence: 9,
@@ -47,14 +51,14 @@ const SHOUTS: Readonly<Record<string, ShoutDesign>> = {
     lift: 0.85,
   },
   intimidating_shout: {
-    shape: 'dread_pressure',
+    shape: 'fear_pressure',
     tint: 0x4a4052,
     edge: 0xc0b2cb,
     presence: 8,
     lift: 1.35,
   },
   piercing_howl: {
-    shape: 'challenge_pressure',
+    shape: 'piercing_pressure',
     tint: 0x5d7580,
     edge: 0xc2d6da,
     presence: 12,
@@ -63,6 +67,7 @@ const SHOUTS: Readonly<Record<string, ShoutDesign>> = {
 };
 const source = { x: 0, y: 0, z: 0 };
 const mouthPoint = { x: 0, y: 0, z: 0 };
+const pressurePoint = { x: 0, y: 0, z: 0 };
 
 /** A surrounding physical pressure front, with grit and torn voiced accents.
  * These casts never authorize damage, target hitstop or a target body repaint. */
@@ -79,9 +84,11 @@ export function drawWarriorShout(host: SequencerHost, slot: SeqSlot, beat: numbe
   let count = 0;
   if (beat === 0) {
     const mouth = host.anchorOf(slot.casterId, 0.56, mouthPoint);
+    const voiceY =
+      design.shape === 'piercing_pressure' ? host.groundYAt(x, z) + 0.08 : (mouth?.y ?? y + 1.8);
     const pressure = host.crestAt?.(
       x,
-      mouth?.y ?? y + 1.8,
+      voiceY,
       z,
       design.presence / 5,
       design.lift,
@@ -96,10 +103,9 @@ export function drawWarriorShout(host: SequencerHost, slot: SeqSlot, beat: numbe
     // preparation is never submitted from a cast.
     if (pressure === false) {
       const floor = host.groundYAt(x, z);
-      const voiceY = mouth?.y ?? y + 1.8;
       const dx = Math.sin(facing),
         dz = Math.cos(facing);
-      for (let spoke = -1; spoke <= 1; spoke++) {
+      for (let spoke = 0; spoke < warriorPressureLayers(design.shape); spoke++) {
         host.pathRibbon(
           design.edge,
           0.32 + design.lift * 0.1,
@@ -107,16 +113,14 @@ export function drawWarriorShout(host: SequencerHost, slot: SeqSlot, beat: numbe
           (points) => {
             for (let i = 0; i < points.length; i++) {
               const u = i / (points.length - 1);
-              const forward = design.presence * 1.8 * u;
-              const side = spoke * design.presence * u * (0.2 + 0.8 * u);
+              warriorPressurePoint(design.shape, spoke, u, 0.5, pressurePoint);
+              const forward = (pressurePoint.z * design.presence) / 5;
+              const side = (pressurePoint.x * design.presence) / 5;
               const px = x + dx * forward + dz * side;
               const pz = z + dz * forward - dx * side;
               points[i].set(
                 px,
-                voiceY +
-                  host.groundYAt(px, pz) -
-                  floor +
-                  Math.sin(u * Math.PI) * design.lift * (2.8 - Math.abs(spoke)),
+                voiceY + host.groundYAt(px, pz) - floor + pressurePoint.y * design.lift,
                 pz,
               );
             }
@@ -128,7 +132,7 @@ export function drawWarriorShout(host: SequencerHost, slot: SeqSlot, beat: numbe
           1,
         );
       }
-      count += 3;
+      count += warriorPressureLayers(design.shape);
     }
     host.pulseLight(slot.casterId, 'physical', 0.85, 0.08, 4);
     count += 2;

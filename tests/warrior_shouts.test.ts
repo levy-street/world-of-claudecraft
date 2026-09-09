@@ -3,28 +3,28 @@ import { describe, expect, it, vi } from 'vitest';
 import { physicalImpact } from '../src/render/ability_vfx/physical_choreography';
 import type { SeqSlot, SequencerHost } from '../src/render/ability_vfx/sequencer';
 import { SignatureCrests } from '../src/render/ability_vfx/signature_crests';
-import { buildWarriorPressure } from '../src/render/ability_vfx/warrior_shout_shapes';
+import {
+  buildWarriorPressure,
+  WARRIOR_PRESSURE_KINDS,
+} from '../src/render/ability_vfx/warrior_shout_shapes';
 import { drawWarriorShout } from '../src/render/ability_vfx/warrior_shouts';
 import { WARRIOR_VFX_FULL_SPECS } from '../src/render/warrior_vfx_specs';
 
 describe('Warrior surrounding voice sculptures', () => {
-  it.each(['rally_pressure', 'dread_pressure', 'challenge_pressure'] as const)(
-    'builds finite open %s geometry at preparation time',
-    (kind) => {
-      const geometry = buildWarriorPressure(kind);
-      const positions = geometry.getAttribute('position');
-      expect(Array.from(positions.array).every(Number.isFinite)).toBe(true);
-      expect(Array.from(geometry.getAttribute('normal').array).every(Number.isFinite)).toBe(true);
-      expect(Math.max(...Array.from(geometry.index!.array))).toBeLessThan(positions.count);
-      geometry.computeBoundingBox();
-      const size = geometry.boundingBox!.getSize(new THREE.Vector3());
-      expect(size.x).toBeGreaterThan(8);
-      expect(size.z).toBeGreaterThan(8);
-      expect(size.y).toBeGreaterThan(0.8);
-      expect(geometry.index!.count / 3).toBeLessThanOrEqual(2304);
-      geometry.dispose();
-    },
-  );
+  it.each(WARRIOR_PRESSURE_KINDS)('builds finite open %s geometry at preparation time', (kind) => {
+    const geometry = buildWarriorPressure(kind);
+    const positions = geometry.getAttribute('position');
+    expect(Array.from(positions.array).every(Number.isFinite)).toBe(true);
+    expect(Array.from(geometry.getAttribute('normal').array).every(Number.isFinite)).toBe(true);
+    expect(Math.max(...Array.from(geometry.index!.array))).toBeLessThan(positions.count);
+    geometry.computeBoundingBox();
+    const size = geometry.boundingBox!.getSize(new THREE.Vector3());
+    expect(size.x).toBeGreaterThan(8);
+    expect(size.z).toBeGreaterThan(8);
+    expect(size.y).toBeGreaterThan(0.8);
+    expect(geometry.index!.count / 3).toBeLessThanOrEqual(2304);
+    geometry.dispose();
+  });
 
   it.each([
     'battle_shout',
@@ -184,7 +184,7 @@ it('keeps the pressure height grid finite when the caster floor sample is unavai
 
 it('keeps a full-size directed primary silhouette when its sculpture is cold', () => {
   const crests = new SignatureCrests(new THREE.Scene());
-  expect(crests.preparation.ready('challenge_pressure')).toBe(false);
+  expect(crests.preparation.ready('piercing_pressure')).toBe(false);
   const host = {
     anchorOf: (_id: number, fraction: number, out: THREE.Vector3) =>
       Object.assign(out, { x: 0, y: fraction * 3, z: 0 }),
@@ -211,11 +211,12 @@ it('keeps a full-size directed primary silhouette when its sculpture is cold', (
     const points = Array.from({ length: 24 }, () => new THREE.Vector3());
     call[3](points);
     expect(points[0].x).toBe(0);
-    expect(points[0].y).toBeCloseTo(1.68, 12);
+    // The slowing rake originates at the ankles and follows sloping terrain.
+    expect(points[0].y).toBeCloseTo(0.146, 12);
     expect(points[0].z).toBe(0);
-    expect(points.at(-1)!.z).toBeCloseTo(21.6);
+    expect(points.at(-1)!.z).toBeCloseTo(22.08);
     expect(points.every((p) => p.y >= host.groundYAt(p.x, p.z))).toBe(true);
   }
-  expect(crests.preparation.ready('challenge_pressure')).toBe(false);
+  expect(crests.preparation.ready('piercing_pressure')).toBe(false);
   crests.dispose();
 });

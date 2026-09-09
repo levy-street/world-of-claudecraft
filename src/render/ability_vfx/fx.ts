@@ -102,6 +102,7 @@ const camFwdScratch = new THREE.Vector3();
 // caller is still holding.
 const anchorScratchA = new THREE.Vector3();
 const anchorScratchB = new THREE.Vector3();
+const weaponFaceScratch = new THREE.Matrix4();
 const hostAnchorScratch = new THREE.Vector3();
 
 // The Three-side engine of the per-ability VFX system: owns the pooled
@@ -815,6 +816,17 @@ export class AbilityVfxFx implements SequencerHost {
     | null = null;
   handPoint(id: number, hand: 0 | 1, out: { x: number; y: number; z: number }): typeof out | null {
     return this.handSample?.(id, hand, out) ? out : null;
+  }
+  weaponFace(id: number, hand: 0 | 1, out: SeqPoint, normal: SeqPoint): boolean {
+    if (!this.weaponAnchor?.(id, hand)?.frame?.(weaponFaceScratch)) return false;
+    const e = weaponFaceScratch.elements;
+    out.x = e[12];
+    out.y = e[13];
+    out.z = e[14];
+    normal.x = e[8];
+    normal.y = e[9];
+    normal.z = e[10];
+    return true;
   }
   contact(
     sourceId: number,

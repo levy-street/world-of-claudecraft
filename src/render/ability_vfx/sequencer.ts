@@ -67,6 +67,7 @@ export interface SeqPoint {
 // The host surface fx.ts implements: every primitive the sequences drive.
 export interface SequencerHost {
   handPoint?(id: number, hand: 0 | 1, out: SeqPoint): SeqPoint | null;
+  weaponFace?(id: number, hand: 0 | 1, out: SeqPoint, normal: SeqPoint): boolean;
   contact?(
     sourceId: number,
     targetId: number,

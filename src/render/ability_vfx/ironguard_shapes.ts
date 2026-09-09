@@ -101,25 +101,25 @@ export function buildIronguardShape(kind: IronguardShape): THREE.BufferGeometry 
     }
   } else if (kind === 'iron_counter') {
     const p = { x: 0, y: 0, z: 0 };
-    // Nine separated broken shield blades form a counter-sweep, each with
-    // its own sharp head and cooling inner face; no closed circular outline.
-    for (let segment = 0; segment < 9; segment++) {
-      const angle = -2.2 + ((segment + 0.5) * 4.4) / 9;
+    // Three broad returning steel wakes read as one driven counter-sweep.
+    // Narrow air breaks retain distinct heads without a fan of loose panels.
+    for (let segment = 0; segment < 3; segment++) {
+      const angle = -2.2 + ((segment + 0.5) * 4.4) / 3;
       const left: number[][] = [],
         right: number[][] = [];
-      for (let i = 0; i < 5; i++) {
-        const u = i / 4,
-          a = angle + (u - 0.5) * (4.4 / 9) * 0.94;
+      for (let i = 0; i < 13; i++) {
+        const u = i / 12,
+          a = angle + (u - 0.5) * (4.4 / 3) * 0.98;
         const taper = Math.sin(u * Math.PI);
         ironguardPath(kind, (a + 2.2) / 1.1, 0, p);
         left.push([Math.sin(a) * 8, p.y + taper * 0.12, Math.cos(a) * 8]);
         right.push([
-          Math.sin(a) * (8 - 1.6 * taper),
+          Math.sin(a) * (8 - 2.2 * taper),
           p.y - taper * 0.4,
-          Math.cos(a) * (8 - 1.6 * taper),
+          Math.cos(a) * (8 - 2.2 * taper),
         ]);
       }
-      for (let i = 0; i < 4; i++) {
+      for (let i = 0; i < 12; i++) {
         const bevelA = left[i].map((v, axis) => v + (right[i][axis] - v) * 0.12);
         const bevelB = left[i + 1].map((v, axis) => v + (right[i + 1][axis] - v) * 0.12);
         face(left[i], left[i + 1], bevelA, true);

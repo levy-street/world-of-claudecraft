@@ -41,10 +41,10 @@ export function animateWarriorRage(
       .replace(
         '#include <alphatest_fragment>',
         `
-        vec2 rageUv=vec2(vRagePosition.x*9.,vRagePosition.y*4.-uWarriorRageTime*3.2);
+        vec2 rageUv=vec2(vRagePosition.x*6.+sin(vRagePosition.y*3.-uWarriorRageTime*4.)*.7,vRagePosition.y*1.8-uWarriorRageTime*3.2);
         float rageField=rageNoise(rageUv)*.72+rageNoise(rageUv*2.3)*.28;
         float rageTip=clamp(vRagePosition.y/1.9,0.,1.);
-        float rageDensity=smoothstep(.22+rageTip*.14,.6,rageField);
+        float rageDensity=smoothstep(.12+rageTip*.2,.68,rageField)*.78+pow(1.-rageTip,2.)*.22;
         diffuseColor.a*=rageDensity*.87;
         if(diffuseColor.a<.025)discard;
         diffuseColor.rgb*=vec3(1.7,.72,.6);
@@ -56,6 +56,6 @@ export function animateWarriorRage(
         totalEmissiveRadiance+=vec3(1.,.055,.018)*rageDensity*.55;`,
       );
   };
-  material.customProgramCacheKey = () => `${cacheKey()}|warrior-rage-flame-v1`;
+  material.customProgramCacheKey = () => `${cacheKey()}|warrior-rage-flame-v2`;
   material.needsUpdate = true;
 }
