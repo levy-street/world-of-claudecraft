@@ -3051,10 +3051,10 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // Jewelcrafting and Inscription titles + the farming Harvestmaster + the
   // Crucible raid's flawless title.
   horizons_titles: 44,
-  // 29 = 27 distinct rift mobs across the ten rare multi-hints (eight theme
-  // bosses + both citadel bosses + 17 trash carriers), plus the B and S rank
-  // doors. The rift_first_clear activity left with the bands.
-  conquerors_the_rift: 29,
+  // The Roach King replaces the old theme/citadel boss sources: one boss,
+  // 17 trash carriers, and the B/S rank doors. The first-clear activity
+  // belongs to the bands page.
+  conquerors_the_rift: 20,
   // The one first-clear activity door, on all three bands (Phase 21).
   horizons_riftbound: 1,
   // 24 = the 19 rares plus the 5 zones they camp across (vale, marsh, peaks,
@@ -3267,7 +3267,8 @@ describe('Reliquary source hints resolve against live content', () => {
     // the ten themed rares, then +19 slain-mark claims and +33 Spoils claims,
     // 29 single-rare drops plus the two shared drops' two rares each); update
     // deliberately with the authoring, same regime as the totals pins above.
-    expect(checked).toBeGreaterThanOrEqual(239);
+    // The two citadel boss claims for vestments now share one Roach King door.
+    expect(checked).toBeGreaterThanOrEqual(238);
     // The mark arm specifically (the slain family), so the kill-credit
     // derivation cannot rot into a skip that leaves every mark boss hint
     // unpinned while the total above still clears on item slots alone.
@@ -4274,8 +4275,9 @@ describe('Reliquary source hint coverage', () => {
     // The release/v0.41.0 bank-storage merge adds 5 mob routes
     // (wayfarers_backpack's Brutok door plus its three acknowledged
     // ordinary-mob farms on Spoils; the satchel's Velkhar door on Gravewyrm),
-    // re-measured exact at 216 on the merged tree (211 + 5).
-    expect(routesByFamily.mob).toBeGreaterThanOrEqual(216);
+    // re-measured exact at 216.
+    // The paired citadel vestment route is one canonical boss route now.
+    expect(routesByFamily.mob).toBeGreaterThanOrEqual(215);
     expect(routesByFamily.heroic).toBeGreaterThanOrEqual(47);
     expect(routesByFamily.vendor).toBeGreaterThanOrEqual(101);
     expect(routesByFamily.quest).toBeGreaterThanOrEqual(8);
@@ -4288,10 +4290,11 @@ describe('Reliquary source hint coverage', () => {
     // Measured at Phase 11l's third fix round: mob 211, heroic 47, vendor
     // 101, quest 8, recipe 6, delveChest 8, riftReins 6, store 29, activity
     // 10, then the release/v0.41.0 merge's 5 bank-storage mob routes lift the
-    // mob term to 216. This total equals the sum of the nine family floors
+    // mob term to 216. The paired citadel vestment route then merges into
+    // one Roach King door, leaving 215 mob routes. This total equals the sum of the nine family floors
     // above, so it is documentation of the whole rather than an independent
     // tripwire: the per-family floors are what red on a lost route.
-    expect(checkedRoutes).toBeGreaterThanOrEqual(431);
+    expect(checkedRoutes).toBeGreaterThanOrEqual(430);
   });
 
   it('every acknowledgment family can actually fail (one doctored miss per family)', () => {

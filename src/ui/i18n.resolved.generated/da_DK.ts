@@ -6828,7 +6828,7 @@ export const da_DK: EnTranslations = {
     },
     "riftsPage": {
       "heading": "Rifter",
-      "intro": "En rift er en revne i selve verden, ikke en dør, du vandrer hen til. Træd gennem én, og du får en nedstigning, ingen har løbet før: etagerne, uhyrerne og det, der venter på bunden, er alle sammen bygget helt fra bunden til netop den rift, så den samme rang aldrig udspiller sig ens to gange.",
+      "intro": "En rift er en revne i selve verden, ikke en dør, du vandrer hen til. Træd gennem én, og du får en nedstigning, ingen har løbet før: etagerne og deres beboere skifter fra rift til rift, mens den samme hersker gør krav på hvert sidste opgør. Den samme rang kan derfor stadig føre dig gennem en ny nedstigning hver gang.",
       "whatHeading": "Hvad en rift er",
       "whatBody": "Fangehuller er steder. De ligger, hvor de altid har ligget, og du lærer dem, indtil du kender hvert hjørne. En delve er en kort, privat nedstigning, du starter fra en tavle, skåret til en eller to. En rift er ingen af delene: den åbner af sig selv, ude i verden, uden varsel, og alt indeni den bliver genereret i samme øjeblik. Ingen kan give dig en rute, for ingen har været nede i denne. Den er instanseret som de to andre, så det, du finder indeni, tilhører kun dig og din gruppe, men det er det eneste instanserede indhold i spillet, der kommer og leder efter dig i stedet for at vente på at blive fundet.",
       "openHeading": "Hvor rifter åbner, og hvor ofte",
@@ -6840,7 +6840,7 @@ export const da_DK: EnTranslations = {
       "groupBody": "Tag en gruppe med. En rift bliver ikke lettere, fordi færre af jer trådte igennem den: intet indeni tæller, hvor mange der står der, så rangen på portalen er rangen, I kæmper mod, uanset om det er fem af jer eller kun én. Døren lader dig komme ind alene, og folk prøver det faktisk, men en rift er gruppeindhold på enhver rang, og den er ærlig om det fra det første rum. Din gruppe får sin egen kopi af riften, så ingen anden gruppe kan vælte ind i jeres tur. Falder du, kan du gå ind igen som et genfærd og samle dig selv op, når kampen indeni er stoppet.",
       "levelNote": "Rifter er slutspilsindhold. Du skal være på niveauloftet, niveau {n}, for at træde gennem en, uanset rang.",
       "floorsHeading": "Ned gennem etagerne",
-      "floorsBody": "En rift løber gennem en håndfuld etager, hver bygget fra bunden, og vejen ned åbner sig ikke, før etagen er færdig med dig: ryd det, der lever på den, løs hvad end den har låst på tværs af din sti, og nedstigningen river sig åben. Den sidste etage ender ved en boss. Hver etage har sin egen karakter, så en enkelt tur kan føre dig ud af frosten og ind i gløderne, og din chat navngiver hver etage, i det øjeblik du ankommer til den. Sporingen på din skærm er der, hvor du finder ud af, hvor mange etager denne har. Nogle få rifter åbner ind til et håndbygget forløb i stedet for en genereret nedstigning, som følger sin egen faste længde.",
+      "floorsBody": "En rift løber gennem en håndfuld etager, hver bygget fra bunden, og vejen ned åbner sig ikke, før etagen er færdig med dig: ryd det, der lever på den, løs hvad end den har låst på tværs af din sti, og nedstigningen river sig åben. Den sidste etage ender ved den samme hersker, hvis styrke vokser med riften. Hans utøj følger ham mellem omgivelserne, så forvent selskab i den sidste kamp. Hver etage har sin egen karakter, så en enkelt tur kan føre dig ud af frosten og ind i gløderne, og din chat navngiver hver etage, i det øjeblik du ankommer til den. Sporingen på din skærm er der, hvor du finder ud af, hvor mange etager denne har. Nogle få rifter åbner ind til et håndbygget forløb i stedet for en genereret nedstigning, som følger sin egen faste længde.",
       "boundHeading": "Når du trækker blod",
       "boundBody": "Det første drab, din gruppe tager inde i en rift, afgør turen, og det samme gør den første kiste uden for stien, I bryder op. Fra det øjeblik er I bundet til den kopi af den: går I ud af en hvilken som helst grund, sender vejen jer tilbage til den tur, I forlod, aldrig en anden gruppes og aldrig en frisk en, så længe indgangen ude i verden stadig står. Før det første drab, og før den første kiste, er intet afgjort, så en gruppe, der stadig samles, kan gå sammen igen og træde ind samlet uden at efterlade halvbegyndte kopier bag sig.",
       "raceHeading": "Løbet om den første oprydning",
@@ -8813,6 +8813,20 @@ export const da_DK: EnTranslations = {
   },
   "sim": {
     "rift": {
+      "roachKing": {
+        "coronation": "Coronation of Filth",
+        "tributeFeast": "Tribute Feast",
+        "crown": "Roach King's Crown",
+        "crownWarning": "The hermit rises. The Roach King claims his crown!",
+        "filthWarning": "Mountain of Filth: leave the marked ground!",
+        "tributeWarning": "Tribute Feast: interrupt the channel or kill the tribute beetles!",
+        "ringWarning": "The Roach King winds up: get outside the ring!",
+        "filthDetonate": "The mountain of filth erupts!",
+        "swarmDetonate": "The royal swarm erupts!",
+        "deskSlam": "Desk Slam",
+        "mountainOfFilth": "Mountain of Filth",
+        "royalSwarm": "Royal Swarm"
+      },
       "allUnstable": "Alle rifter er ustabile lige nu. Prøv igen senere.",
       "enterFloor": "Du træder gennem riften ind i {name}.",
       "descendFloor": "Du stiger dybere ned i {name}.",
@@ -16623,6 +16637,15 @@ export const da_DK: EnTranslations = {
       },
       "stable_horse": {
         "name": "Staldhest"
+      },
+      "rift_boss_asmon": {
+        "name": "Asmon, the Roach King"
+      },
+      "rift_roachling": {
+        "name": "Royal Roachling"
+      },
+      "rift_garbage_beetle": {
+        "name": "Tribute Beetle"
       },
       "rift_spawnling": {
         "name": "Riftyngel"

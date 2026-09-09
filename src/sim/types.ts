@@ -15,6 +15,7 @@ import type {
   PerfectingSwapRequest,
 } from './professions/perfecting_swap';
 import type { RespawnWindow } from './respawn_policy';
+import type { RoachKingState } from './rift/types';
 import type {
   VarkhulAssemblyDifficulty,
   VarkhulAssemblyPhase,
@@ -5206,6 +5207,7 @@ export interface Entity extends ClientMirroredEntityFields {
   petOwnerHpBonus: number;
   pulseTimer: number; // boss aoe pulse countdown
   stompTimer: number; // boss War Stomp stun-pulse countdown
+  roachKing?: RoachKingState;
   bigCastTimer: number; // boss telegraphed-hardcast (bigCast) cadence countdown
   deathZoneCastTimer: number; // lethal zone cast (deathZoneCast) cadence countdown
   deathZoneStrikeTimer: number; // lethal zone cast (deathZoneStrike) cadence countdown
@@ -7716,6 +7718,8 @@ export type SimEvent = { pid?: number } & (
       z: number;
       radius: number;
       durationSecs: number;
+      /** Original fuse on a replay; omitted on fresh placement/older servers. */
+      totalSecs?: number;
     }
   // The sim cancelled every pending death zone before its fuse ran out (boss
   // death, boss evade, or floor teardown). Online mirrors count zones down

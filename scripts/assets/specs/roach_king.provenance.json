@@ -1,0 +1,428 @@
+{
+  "schema": 1,
+  "releaseBase": "v0.41.4",
+  "conceptOrigin": "User-supplied fantasy Asmon / Roach King concept, followed by four single-subject generated references",
+  "conceptImagePricing": "Built-in image generation usage was not returned; excluded from Tripo totals",
+  "animationSource": "scripts/assets/animate_roach_king.py",
+  "buildSpec": "scripts/assets/specs/roach_king.json",
+  "assets": [
+    {
+      "name": "asmon_hermit",
+      "path": "public/models/creatures/asmon_hermit.glb",
+      "model": "P2-20260801",
+      "tasks": {
+        "generate": "9a57b7d8-1874-4239-97b8-3f010d9c6c38",
+        "rig": "aef0f066-ef39-4895-a073-b090d228f6cc"
+      },
+      "sourceHashes": {
+        "concept.png": "87f16f8946fa3630a75187f8b6a465b846dacca49fe056ff818ab0d77849356a",
+        "raw.glb": "d2830af918901de8f308662c1a95ed4e3b951b6a2409b201b8bb409ed7c097c7",
+        "rigged.glb": "e7154cd1ca1b056e348f1af01fa92ecb273d80bfcc5600b6b545003d7073ca56"
+      },
+      "sha256": "0c02d784255a857a5c2acd6077d7fb0158d0b66300591abbc33894d6d98032de",
+      "bytes": 1455604,
+      "authoring": {
+        "blender": "5.2.0 LTS",
+        "asset": "asmon_hermit",
+        "clips": {
+          "Idle": 3.2,
+          "Walk": 1.4,
+          "Run": 0.8,
+          "Attack": 1.25,
+          "Hit": 0.55,
+          "Death": 2.4,
+          "Cast": 2.4,
+          "Jump": 1.1,
+          "Transform": 2.8,
+          "Decree": 2.8,
+          "Spit": 1.8,
+          "Stomp": 1.7
+        },
+        "revision": 2,
+        "repairedWeightVertices": 0,
+        "bones": 41,
+        "legChains": [],
+        "normalizedIdleSampleSeconds": 0.5,
+        "idleFloor": 0.0
+      },
+      "qa": {
+        "job": "roach_asmon_hermit_p2",
+        "kind": "creature",
+        "name": "asmon_hermit",
+        "verdict": "WARN",
+        "checks": [
+          {
+            "name": "rig + clips",
+            "status": "warn",
+            "detail": "texture NormalGL_9a57b7d8-1874-4239-97b8-3f010d9c6c38 is 1024x1024, category norm is 512"
+          },
+          {
+            "name": "rig + clips",
+            "status": "warn",
+            "detail": "texture Color_9a57b7d8-1874-4239-97b8-3f010d9c6c38 is 1024x1024, category norm is 512"
+          },
+          {
+            "name": "rig + clips",
+            "status": "warn",
+            "detail": "texture ORM_9a57b7d8-1874-4239-97b8-3f010d9c6c38 is 1024x1024, category norm is 512"
+          },
+          {
+            "name": "rigged",
+            "status": "pass",
+            "detail": "41 joints, 12 clips"
+          },
+          {
+            "name": "previews",
+            "status": "pass",
+            "detail": "hero + 12/12 clip frames"
+          }
+        ],
+        "cost": {
+          "items": [
+            {
+              "kind": "tripo",
+              "label": "generate",
+              "taskId": "9a57b7d8-1874-4239-97b8-3f010d9c6c38",
+              "credits": 110,
+              "usd": 1.1,
+              "status": "success"
+            },
+            {
+              "kind": "tripo",
+              "label": "rig",
+              "taskId": "aef0f066-ef39-4895-a073-b090d228f6cc",
+              "credits": 25,
+              "usd": 0.25,
+              "status": "success"
+            }
+          ],
+          "totalCredits": 135,
+          "totalUsd": 1.35,
+          "unpriced": 0
+        }
+      }
+    },
+    {
+      "name": "roach_king",
+      "path": "public/models/creatures/roach_king.glb",
+      "model": "P2-20260801",
+      "tasks": {
+        "generate": "e1dcd2a7-cbe4-497f-8ad1-aac9604acf0b",
+        "rig": "21e6e722-3b1b-4c76-96db-92abde329a09"
+      },
+      "sourceHashes": {
+        "concept.png": "ad33e45991b8b9269379f468a365932a186bd727b5581984453b49ecf9dab099",
+        "raw.glb": "15152b69260998a4f0e2a623a4d4e62eae04cb2a1fca807bd5fc00edcec85e04",
+        "rigged.glb": "8d6de5bb8926f3bb2a6c7f3732eecf7513edbabb86ea9dfcb328f793b9ec85ee"
+      },
+      "sha256": "f3e7409c685716e950306d436399a8a242b0496bb24ec4f1ab53573098206ea9",
+      "bytes": 1845128,
+      "authoring": {
+        "blender": "5.2.0 LTS",
+        "asset": "roach_king",
+        "clips": {
+          "Idle": 3.2,
+          "Walk": 1.4,
+          "Run": 0.8,
+          "Attack": 1.25,
+          "Hit": 0.55,
+          "Death": 2.4,
+          "Cast": 2.4,
+          "Jump": 1.1,
+          "Transform": 2.8,
+          "Decree": 2.8,
+          "Spit": 1.8,
+          "Stomp": 1.7
+        },
+        "revision": 2,
+        "repairedWeightVertices": 9018,
+        "bones": 69,
+        "legChains": [
+          ["bone_12", "bone_13", "bone_14", "bone_15", "bone_16"],
+          ["bone_17", "bone_18", "bone_19", "bone_20"],
+          ["bone_21", "bone_22", "bone_23", "bone_24", "bone_25"],
+          ["bone_7", "bone_8", "bone_9", "bone_10", "bone_11"],
+          ["bone_3", "bone_4", "bone_5", "bone_6"],
+          [
+            "tripo::0_Left_Limb_1",
+            "tripo::0_Left_Limb_2",
+            "tripo::0_Left_Limb_3",
+            "tripo::0_Left_Limb_4",
+            "tripo::0_Left_Limb_5"
+          ]
+        ],
+        "normalizedIdleSampleSeconds": 0.5,
+        "idleFloor": 0.00448647141456604
+      },
+      "qa": {
+        "job": "roach_roach_king_p2",
+        "kind": "creature",
+        "name": "roach_king",
+        "verdict": "WARN",
+        "checks": [
+          {
+            "name": "rig + clips",
+            "status": "warn",
+            "detail": "file is 1802KB, above the 1536KB category norm"
+          },
+          {
+            "name": "rig + clips",
+            "status": "warn",
+            "detail": "texture NormalGL_e1dcd2a7-cbe4-497f-8ad1-aac9604acf0b is 1024x1024, category norm is 512"
+          },
+          {
+            "name": "rig + clips",
+            "status": "warn",
+            "detail": "texture Color_e1dcd2a7-cbe4-497f-8ad1-aac9604acf0b is 1024x1024, category norm is 512"
+          },
+          {
+            "name": "rig + clips",
+            "status": "warn",
+            "detail": "texture ORM_e1dcd2a7-cbe4-497f-8ad1-aac9604acf0b is 1024x1024, category norm is 512"
+          },
+          {
+            "name": "rigged",
+            "status": "pass",
+            "detail": "69 joints, 12 clips"
+          },
+          {
+            "name": "previews",
+            "status": "pass",
+            "detail": "hero + 12/12 clip frames"
+          }
+        ],
+        "cost": {
+          "items": [
+            {
+              "kind": "tripo",
+              "label": "generate",
+              "taskId": "e1dcd2a7-cbe4-497f-8ad1-aac9604acf0b",
+              "credits": 110,
+              "usd": 1.1,
+              "status": "success"
+            },
+            {
+              "kind": "tripo",
+              "label": "rig",
+              "taskId": "21e6e722-3b1b-4c76-96db-92abde329a09",
+              "credits": 25,
+              "usd": 0.25,
+              "status": "success"
+            }
+          ],
+          "totalCredits": 135,
+          "totalUsd": 1.35,
+          "unpriced": 0
+        }
+      }
+    },
+    {
+      "name": "roachling",
+      "path": "public/models/creatures/roachling.glb",
+      "model": "P2-20260801",
+      "tasks": {
+        "generate": "a52d4470-6baf-414a-9424-28d194251eaf",
+        "rig": "a9b9253e-0515-4c75-a213-480187ba6095"
+      },
+      "sourceHashes": {
+        "concept.png": "eea55570c813e7ddca7e4ae802371ee2b60cc412a63587a02e109eaec72a291c",
+        "raw.glb": "aa18821d116599bb8ae9248979c2c3dc5a13fe166aa37880e5c6c8a8c6eb3718",
+        "rigged.glb": "97e0e75e1c8927723a258bfdd43c9fc41b61b4eeb72dc3714ab56fcb02ce0ca8"
+      },
+      "sha256": "38ffd1c4f288c074cac9ae5bc62b1ed9041ed9964d476d8fbd419f03757a2f1a",
+      "bytes": 584544,
+      "authoring": {
+        "blender": "5.2.0 LTS",
+        "asset": "roachling",
+        "clips": {
+          "Idle": 3.2,
+          "Walk": 1.4,
+          "Run": 0.8,
+          "Attack": 1.25,
+          "Hit": 0.55,
+          "Death": 2.4,
+          "Cast": 2.4,
+          "Jump": 1.1
+        },
+        "revision": 2,
+        "repairedWeightVertices": 0,
+        "bones": 34,
+        "legChains": [
+          ["tripo::2_Right_Limb_0", "tripo::2_Right_Limb_1"],
+          [
+            "tripo::1_Right_Limb_0",
+            "tripo::1_Right_Limb_1",
+            "tripo::1_Right_Limb_2",
+            "tripo::1_Right_Limb_3"
+          ],
+          [
+            "tripo::0_Right_Limb_0",
+            "tripo::0_Right_Limb_1",
+            "tripo::0_Right_Limb_2",
+            "tripo::0_Right_Limb_3"
+          ],
+          [
+            "tripo::2_Left_Limb_0",
+            "tripo::2_Left_Limb_1",
+            "tripo::2_Left_Limb_2",
+            "tripo::2_Left_Limb_3"
+          ],
+          [
+            "tripo::1_Left_Limb_0",
+            "tripo::1_Left_Limb_1",
+            "tripo::1_Left_Limb_2",
+            "tripo::1_Left_Limb_3"
+          ],
+          ["tripo::0_Left_Limb_0", "tripo::0_Left_Limb_1"]
+        ],
+        "normalizedIdleSampleSeconds": 0.5,
+        "idleFloor": 0.0005795955657958984
+      },
+      "qa": {
+        "job": "roach_roachling_p2",
+        "kind": "creature",
+        "name": "roachling",
+        "verdict": "PASS",
+        "checks": [
+          {
+            "name": "rig + clips",
+            "status": "pass",
+            "detail": "all structural checks green"
+          },
+          {
+            "name": "rigged",
+            "status": "pass",
+            "detail": "34 joints, 8 clips"
+          },
+          {
+            "name": "previews",
+            "status": "pass",
+            "detail": "hero + 8/8 clip frames"
+          }
+        ],
+        "cost": {
+          "items": [
+            {
+              "kind": "tripo",
+              "label": "generate",
+              "taskId": "a52d4470-6baf-414a-9424-28d194251eaf",
+              "credits": 110,
+              "usd": 1.1,
+              "status": "success"
+            },
+            {
+              "kind": "tripo",
+              "label": "rig",
+              "taskId": "a9b9253e-0515-4c75-a213-480187ba6095",
+              "credits": 25,
+              "usd": 0.25,
+              "status": "success"
+            }
+          ],
+          "totalCredits": 135,
+          "totalUsd": 1.35,
+          "unpriced": 0
+        }
+      }
+    },
+    {
+      "name": "garbage_beetle",
+      "path": "public/models/creatures/garbage_beetle.glb",
+      "model": "P2-20260801",
+      "tasks": {
+        "generate": "4bfcd9de-6f80-4476-94a7-2240b7902073",
+        "rig": "4caa1022-144f-4d02-93c5-486bff876adf"
+      },
+      "sourceHashes": {
+        "concept.png": "f6099c9977cb1560119e7375ff87c72320640c43905f06c29a9671705910f0d4",
+        "raw.glb": "fdfa6c59733127835d8a980b5ac1e56e13468f9e4fbf600c915fa5c8a81d87a4",
+        "rigged.glb": "bfe9249e1c3e556d6b6746cbffb473c70bd9808f26ed3fc44b19832d505a758d"
+      },
+      "sha256": "848c36b7c3a56b750567e52e10e270894fd5ff4aed0835e1b1eb83bc2a52f583",
+      "bytes": 594980,
+      "authoring": {
+        "blender": "5.2.0 LTS",
+        "asset": "garbage_beetle",
+        "clips": {
+          "Idle": 3.2,
+          "Walk": 1.4,
+          "Run": 0.8,
+          "Attack": 1.25,
+          "Hit": 0.55,
+          "Death": 2.4,
+          "Cast": 2.4,
+          "Jump": 1.1
+        },
+        "revision": 2,
+        "repairedWeightVertices": 0,
+        "bones": 25,
+        "legChains": [
+          [
+            "tripo::2_Right_Limb_0",
+            "tripo::2_Right_Limb_1",
+            "tripo::2_Right_Limb_2",
+            "tripo::2_Right_Limb_3"
+          ],
+          ["Beetle_MiddleRight_0", "Beetle_MiddleRight_1", "Beetle_MiddleRight_2"],
+          ["tripo::1_Right_Limb_0", "tripo::1_Right_Limb_1", "tripo::1_Right_Limb_2"],
+          ["bone_5", "tripo::2_Left_Limb_0", "tripo::2_Left_Limb_1", "tripo::2_Left_Limb_2"],
+          ["bone_16", "tripo::1_Left_Limb_0", "tripo::1_Left_Limb_1"],
+          [
+            "tripo::0_Left_Limb_0",
+            "tripo::0_Left_Limb_1",
+            "tripo::0_Left_Limb_2",
+            "tripo::0_Left_Limb_3"
+          ]
+        ],
+        "normalizedIdleSampleSeconds": 0.5,
+        "idleFloor": -0.0031905174255371094
+      },
+      "qa": {
+        "job": "roach_garbage_beetle_p2",
+        "kind": "creature",
+        "name": "garbage_beetle",
+        "verdict": "PASS",
+        "checks": [
+          {
+            "name": "rig + clips",
+            "status": "pass",
+            "detail": "all structural checks green"
+          },
+          {
+            "name": "rigged",
+            "status": "pass",
+            "detail": "25 joints, 8 clips"
+          },
+          {
+            "name": "previews",
+            "status": "pass",
+            "detail": "hero + 8/8 clip frames"
+          }
+        ],
+        "cost": {
+          "items": [
+            {
+              "kind": "tripo",
+              "label": "generate",
+              "taskId": "4bfcd9de-6f80-4476-94a7-2240b7902073",
+              "credits": 110,
+              "usd": 1.1,
+              "status": "success"
+            },
+            {
+              "kind": "tripo",
+              "label": "rig",
+              "taskId": "4caa1022-144f-4d02-93c5-486bff876adf",
+              "credits": 25,
+              "usd": 0.25,
+              "status": "success"
+            }
+          ],
+          "totalCredits": 135,
+          "totalUsd": 1.35,
+          "unpriced": 0
+        }
+      }
+    }
+  ]
+}

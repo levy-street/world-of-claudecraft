@@ -223,7 +223,6 @@ import {
   movingHoldoutActive,
   showsStaticFarMesh,
 } from './crowd_lod';
-import { daisVisualLift } from './dais_lift';
 import { buildDawnholdFeatures, type DawnholdFeaturesView } from './dawnhold_features';
 import { currentDayNightPhase, currentLunarPhase, dayNightPhaseOverride } from './day_night_clock';
 import {
@@ -258,7 +257,7 @@ import { buildDoorBody, buildRiftGateBody, buildRiftPuzzleProp } from './door_po
 import { watchDevicePixelRatio } from './dpr_watch';
 import { DrainChannelStopLatch, drainChannelVisualPlan } from './drain_channel_visual_core';
 import { createLogicalFrameDrawStats, type LogicalFrameDrawStats } from './draw_stats_core';
-import { DungeonInteriors, dungeonDaisHasRaisedPlatform, ensureDungeonAssets } from './dungeon';
+import { DungeonInteriors, ensureDungeonAssets } from './dungeon';
 import {
   dynamicResolutionAllocationScale,
   dynamicResolutionGovernorRange,
@@ -662,6 +661,7 @@ import type { RevealGateCore } from './reveal_gate_core';
 import { type RickshawMountViewState, updateRollingMountLoop } from './rickshaw_mount';
 import { FOOT_RUN_SPEED, updateRiddenMountAudio } from './ridden_mount_audio';
 import { collectRiftAmbientSources } from './rift_ambience';
+import { riftGroundHeight } from './rift_ground_height';
 import { buildRiftRankBadge } from './rift_rank';
 import { syncRigMatrixFreeze, unfreezeRigMatrices } from './rig_visibility_freeze';
 import { RingOfFrostVisuals } from './ring_of_frost_visual';
@@ -2883,7 +2883,7 @@ export class Renderer {
     // (meteor_landing_burst.ts: the spec painter in the cue's school, else fire).
     this.mageGroundFx = new MageGroundFx(
       this.scene,
-      (x, z) => groundHeight(x, z, this.sim.cfg.seed),
+      (x, z) => riftGroundHeight(groundHeight(x, z, this.sim.cfg.seed), this.sim.riftFloor, x, z),
       (x, z, meteor) =>
         meteorLandingBurst(this.abilityVfx, this.vfx, this.sim.cfg.seed, x, z, meteor),
     );
@@ -2933,27 +2933,9 @@ export class Renderer {
         riftDeathZoneGeneration !== this.lifecycleGeneration
       )
         return;
-      this.riftDeathZoneVisuals = new RiftDeathZoneVisuals(this.scene, (x, z) => {
-        const base = groundHeight(x, z, this.sim.cfg.seed);
-        // Add the rift platform lift so rings on elevated sanctum boss arenas
-        // sit on the arena floor, not under it (same pattern as entity ground
-        // and the camera clamp), PLUS the raised boss dais: the dais is a
-        // render-only platform the sim keeps flat, so without daisVisualLift a
-        // ring under the tanked boss hides beneath the foundation blocks (the
-        // playtest's invisible aoe circles). Mirrors placeDais's raised
-        // decision exactly (style.daisRaised override, else the kit default).
-        const rf = this.sim.riftFloor;
-        if (rf) {
-          const floor = generateRiftFloor(rf.seed, rf.baseLevel, rf.floorIndex, rf.upgrade);
-          const lx = x - rf.origin.x;
-          const lz = z - rf.origin.z;
-          const raised = floor.style.daisRaised ?? dungeonDaisHasRaisedPlatform(floor.style.kit);
-          return (
-            base + riftLiftAt(floor, lx, lz) + daisVisualLift(floor.layout.dais, raised, lx, lz)
-          );
-        }
-        return base;
-      });
+      this.riftDeathZoneVisuals = new RiftDeathZoneVisuals(this.scene, (x, z) =>
+        riftGroundHeight(groundHeight(x, z, this.sim.cfg.seed), this.sim.riftFloor, x, z),
+      );
     });
     this.temporalHourglassGroundVisuals = new TemporalHourglassGroundVisuals(this.scene, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
@@ -2996,7 +2978,7 @@ export class Renderer {
       this.scene,
       this.camera,
       vfxAnchor,
-      (x, z) => groundHeight(x, z, this.sim.cfg.seed),
+      (x, z) => riftGroundHeight(groundHeight(x, z, this.sim.cfg.seed), this.sim.riftFloor, x, z),
       // the DISPLAYED facing, not e.facing: the view group carries the smoothed
       // yaw actually on screen, so a stationary spirit lines up with the body it
       // is rising out of instead of with a pose one frame ahead of the draw

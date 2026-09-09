@@ -6828,7 +6828,7 @@ export const nl_NL: EnTranslations = {
     },
     "riftsPage": {
       "heading": "Rifts",
-      "intro": "Een rift is een scheur in de wereld zelf, geen deur waar je naartoe loopt. Stap erdoorheen en je krijgt een afdaling die niemand ooit eerder heeft gelopen: de verdiepingen, de monsters en wat er onderaan wacht worden allemaal vers gebouwd voor die ene rift, dus dezelfde rang verloopt nooit twee keer hetzelfde.",
+      "intro": "Een rift is een scheur in de wereld zelf, geen deur waar je naartoe loopt. Stap erdoorheen en je krijgt een afdaling die niemand ooit eerder heeft gelopen: de verdiepingen en hun bewoners veranderen met elke rift, terwijl dezelfde heerser elk eindgevecht opeist. Dezelfde rang kan je dus nog steeds elke keer door een andere afdaling voeren.",
       "whatHeading": "Wat een rift is",
       "whatBody": "Kerkers zijn plekken. Ze liggen waar ze altijd al lagen, en je leert ze kennen tot je elke hoek uit je hoofd kent. Een delve is een korte, privéafdaling die je start vanaf een bord, gemaakt voor één of twee spelers. Een rift is geen van beide: hij gaat vanzelf open, buiten in de wereld, zonder waarschuwing, en alles erbinnen wordt gegenereerd op het moment dat dat gebeurt. Niemand kan je een route aanreiken, want niemand is deze al eerder afgedaald. Hij is geïnstantieerd zoals de andere twee, dus wat je erbinnen vindt, is alleen van jou en je groep, maar het is de enige geïnstantieerde inhoud in het spel die naar jou op zoek komt in plaats van te wachten om gevonden te worden.",
       "openHeading": "Waar rifts opengaan, en hoe vaak",
@@ -6840,7 +6840,7 @@ export const nl_NL: EnTranslations = {
       "groupBody": "Breng een groep mee. Een rift wordt niet zachter omdat er minder van jullie doorheen liepen: niets daarbinnen telt hoeveel mensen er staan, dus de rang op de poort is de rang waartegen je vecht, of dat nu met vijf is of in je eentje. De doorgang laat je ook alleen naar binnen, en mensen proberen het, maar een rift is groepsinhoud op elke rang en is daar vanaf de eerste kamer eerlijk over. Je groep krijgt een eigen kopie van de rift, zodat geen andere groep in jouw run kan vloeien. Val je, dan kun je als geest weer naar binnen lopen en jezelf oprapen zodra het gevecht binnen is gestopt.",
       "levelNote": "Rifts zijn eindspelinhoud. Je moet de niveaulimiet hebben bereikt, niveau {n}, om er doorheen te stappen, op elke rang.",
       "floorsHeading": "Omlaag door de verdiepingen",
-      "floorsBody": "Een rift telt een handvol verdiepingen, elk vers gebouwd, en de weg naar beneden gaat pas open als de verdieping klaar is met jou: ruim op wat er leeft, los op wat er over je pad is vergrendeld, en de afdaling scheurt open. De laatste verdieping eindigt bij een baas. Elke verdieping heeft zijn eigen karakter, zodat één enkele run je uit de vorst en de gloeiende as in kan voeren, en je chat noemt elke verdieping zodra je erop aankomt. De tracker op je scherm is waar je leert hoeveel verdiepingen deze telt. Een handvol rifts opent op een handgemaakt decorstuk in plaats van een gegenereerde afdaling, dat zijn eigen vaste lengte aanhoudt.",
+      "floorsBody": "Een rift telt een handvol verdiepingen, elk vers gebouwd, en de weg naar beneden gaat pas open als de verdieping klaar is met jou: ruim op wat er leeft, los op wat er over je pad is vergrendeld, en de afdaling scheurt open. De laatste verdieping eindigt bij dezelfde heerser, wiens kracht met de rift toeneemt. Zijn ongedierte volgt hem door alle omgevingen, dus verwacht gezelschap in het eindgevecht. Elke verdieping heeft zijn eigen karakter, zodat één enkele run je uit de vorst en de gloeiende as in kan voeren, en je chat noemt elke verdieping zodra je erop aankomt. De tracker op je scherm is waar je leert hoeveel verdiepingen deze telt. Een handvol rifts opent op een handgemaakt decorstuk in plaats van een gegenereerde afdaling, dat zijn eigen vaste lengte aanhoudt.",
       "boundHeading": "Zodra je bloed vergiet",
       "boundBody": "De eerste kill die je groep binnen een rift maakt, legt de run vast, en hetzelfde geldt voor de eerste bergplaats buiten het pad die je openbreekt. Vanaf dat moment ben je gebonden aan die kopie ervan: stap om welke reden dan ook naar buiten, en terugkomen zet je weer in de run die je verliet, nooit in die van een andere groep en nooit in een nieuwe, zolang de ingang in de wereld nog overeind staat. Voor die eerste kill, en voor die eerste bergplaats, ligt niets vast, zodat een groep die nog aan het verzamelen is, zich kan hergroeperen en samen naar binnen kan lopen zonder halfbegonnen kopieën achter te laten.",
       "raceHeading": "De race om de eerste clear",
@@ -8813,6 +8813,20 @@ export const nl_NL: EnTranslations = {
   },
   "sim": {
     "rift": {
+      "roachKing": {
+        "coronation": "Coronation of Filth",
+        "tributeFeast": "Tribute Feast",
+        "crown": "Roach King's Crown",
+        "crownWarning": "The hermit rises. The Roach King claims his crown!",
+        "filthWarning": "Mountain of Filth: leave the marked ground!",
+        "tributeWarning": "Tribute Feast: interrupt the channel or kill the tribute beetles!",
+        "ringWarning": "The Roach King winds up: get outside the ring!",
+        "filthDetonate": "The mountain of filth erupts!",
+        "swarmDetonate": "The royal swarm erupts!",
+        "deskSlam": "Desk Slam",
+        "mountainOfFilth": "Mountain of Filth",
+        "royalSwarm": "Royal Swarm"
+      },
       "allUnstable": "Alle rifts zijn op dit moment onstabiel. Probeer het straks opnieuw.",
       "enterFloor": "Je stapt door de rift naar {name}.",
       "descendFloor": "Je daalt dieper af in {name}.",
@@ -16623,6 +16637,15 @@ export const nl_NL: EnTranslations = {
       },
       "stable_horse": {
         "name": "Stalpaard"
+      },
+      "rift_boss_asmon": {
+        "name": "Asmon, the Roach King"
+      },
+      "rift_roachling": {
+        "name": "Royal Roachling"
+      },
+      "rift_garbage_beetle": {
+        "name": "Tribute Beetle"
       },
       "rift_spawnling": {
         "name": "Riftbroedsel"

@@ -1,5 +1,5 @@
-// Pure per-frame visual plan for the rift boss death-zone telegraph (the red
-// danger circle). Three-free and deterministic so the readability contract is
+// Pure per-frame visual plan for the rift boss death-zone telegraph (the amber-rimmed
+// violet danger circle). Three-free and deterministic so the readability contract is
 // Node-testable: the ring never fades below RING_MIN_OPACITY (the v0.36.0
 // playtest complaint was a hairline ring pulsing to near-invisible), the timer
 // sweep grows monotonically from the center to the rim as the fuse elapses,
@@ -19,6 +19,12 @@ export interface DeathZonePlan {
   /** 0..1 radial fraction of the zone the timer sweep covers (elapsed / total). */
   sweepFraction: number;
 }
+
+// All rift bosses share the Roach King palette. A bright amber border and
+// dark violet interior keep overlapping filth pools legible without bloom.
+export const DEATH_ZONE_RIM_COLOR = 0xffb52e;
+export const DEATH_ZONE_FILL_COLOR = 0x6520a4;
+export const DEATH_ZONE_SWEEP_COLOR = 0xea8731;
 
 export const RING_MAX_OPACITY = 0.95;
 /** The pulse floor. The pre-v0.36.0 ring dipped to 0.34 opacity twice a second,

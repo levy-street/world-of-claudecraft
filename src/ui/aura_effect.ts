@@ -40,6 +40,7 @@ import {
   GALEHEART_ECHO_DAMAGE,
   WARSPIRIT_CADENCE_STEPS,
 } from '../sim/combat/shaman_warspirit';
+import { ROACH_CROWN_AURA } from '../sim/content/rift/roach_king';
 import {
   IGNIVAR_SOAK_REQUIRED_PLAYERS,
   IGNIVAR_SOAK_SHARED_MAX_HP,
@@ -158,6 +159,8 @@ const flatStat = (statKey: string, value: number): AuraEffectDescriptor => ({
  * adding an AuraKind without player-facing explanation is a compile-time error.
  */
 export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor | null {
+  // Coronation is an encounter form marker; it grants no Attack Power.
+  if (a.id === ROACH_CROWN_AURA) return null;
   // This is a four-second placement marker, not a damage-taken modifier. Its
   // countdown and localized name are the complete tooltip; the generic
   // vulnerability copy would misleadingly claim that it adds 0% damage taken.

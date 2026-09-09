@@ -15032,7 +15032,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.riftsPage.groupHeading': '누가 들어가나',
   'guide.riftsPage.heading': '균열',
   'guide.riftsPage.intro':
-    '균열은 걸어서 찾아가는 문이 아니라, 세계 그 자체에 난 찢김입니다. 하나를 지나면 아무도 밟아 본 적 없는 하강로가 펼쳐집니다. 층도, 괴물도, 맨 아래에서 기다리는 것도 모두 그 균열만을 위해 새로 지어지므로, 같은 등급이라도 두 번 다시 같은 방식으로 흘러가지 않습니다.',
+    '균열은 걸어서 찾아가는 문이 아니라, 세계 그 자체에 난 찢김입니다. 하나를 지나면 아무도 밟아 본 적 없는 하강로가 펼쳐집니다. 층과 그곳의 주민은 균열마다 달라지지만, 마지막 전투에는 언제나 같은 군주가 기다립니다. 같은 등급이라도 매번 다른 하강로를 지나갈 수 있습니다.',
   'guide.riftsPage.levelNote':
     '균열은 최종 단계 콘텐츠입니다. 어느 등급이든 균열에 들어서려면 최고 레벨인 {n} 레벨에 도달해야 합니다.',
   'guide.riftsPage.openBody':
@@ -15423,7 +15423,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.formLine.form_bear':
     '방어를 맡는 형태입니다. 두꺼운 가죽을 두르고, 마나 대신 분노를 쓰며, 위협 수준을 더 쌓아 적이 계속 당신을 때리게 합니다.',
   'guide.riftsPage.floorsBody':
-    '균열은 몇 개 층으로 이어지며 각 층은 새로 지어집니다. 그리고 그 층이 당신을 놓아줄 때까지 아래로 향하는 길은 열리지 않습니다. 층에 살아 있는 것을 정리하고, 길을 가로막아 잠가 둔 것을 풀어내면 비로소 하강로가 찢겨 열립니다. 마지막 층은 우두머리로 끝납니다. 층마다 저마다의 성격이 있어 한 번의 공략이 당신을 서리 속에서 잉걸불 속으로 데려가기도 하며, 새 층에 들어설 때마다 채팅에 그 이름이 뜹니다. 이번 균열이 몇 층짜리인지는 화면의 추적기에서 알 수 있습니다. 어떤 균열은 생성된 하강로 대신 손으로 빚은 특별한 무대를 열며, 그런 곳은 정해진 자기 길이대로 진행됩니다.',
+    '균열은 몇 개 층으로 이어지며 각 층은 새로 지어집니다. 그리고 그 층이 당신을 놓아줄 때까지 아래로 향하는 길은 열리지 않습니다. 층에 살아 있는 것을 정리하고, 길을 가로막아 잠가 둔 것을 풀어내면 비로소 하강로가 찢겨 열립니다. 마지막 층에는 언제나 같은 군주가 기다리며, 그의 힘은 균열과 함께 강해집니다. 그의 벌레 떼는 환경이 달라져도 따라오므로 마지막 전투에서는 부하들도 상대할 준비를 하세요. 층마다 저마다의 성격이 있어 한 번의 공략이 당신을 서리 속에서 잉걸불 속으로 데려가기도 하며, 새 층에 들어설 때마다 채팅에 그 이름이 뜹니다. 이번 균열이 몇 층짜리인지는 화면의 추적기에서 알 수 있습니다. 어떤 균열은 생성된 하강로 대신 손으로 빚은 특별한 무대를 열며, 그런 곳은 정해진 자기 길이대로 진행됩니다.',
   // Performance diagnostics panel chrome. Technical report prose remains English.
   'hudChrome.perf.diagnostics.panelAria': 'World of ClaudeCraft 성능 진단',
   'hudChrome.perf.diagnostics.title': 'ClaudeCraft 성능 진단',
@@ -16751,4 +16751,19 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.farmgrow.label': '작물 익히기',
   'devCommand.fields.bed': '경작지 ID (선택 사항)',
   'guide.profPages.oncePerDay': '하루 한 번',
+  'sim.rift.roachKing.coronation': '오물의 대관식',
+  'sim.rift.roachKing.tributeFeast': '공물의 향연',
+  'sim.rift.roachKing.crown': '바퀴벌레 왕의 왕관',
+  'sim.rift.roachKing.crownWarning': '은둔자가 일어납니다. 바퀴벌레 왕이 왕관을 씁니다!',
+  'sim.rift.roachKing.filthWarning': '오물의 산: 표시된 바닥에서 벗어나세요!',
+  'sim.rift.roachKing.tributeWarning':
+    '공물의 향연: 정신 집중을 차단하거나 공물 딱정벌레를 처치하세요!',
+  'sim.rift.roachKing.ringWarning': '바퀴벌레 왕이 힘을 모읍니다. 원 밖으로 나가세요!',
+  'sim.rift.roachKing.filthDetonate': '오물의 산이 폭발합니다!',
+  'sim.rift.roachKing.swarmDetonate': '왕실 벌레 떼가 터져 나옵니다!',
+  'sim.rift.roachKing.mountainOfFilth': '오물의 산',
+  'sim.rift.roachKing.royalSwarm': '왕실 벌레 떼',
+  'entities.mobs.rift_boss_asmon.name': '바퀴벌레 왕 Asmon',
+  'entities.mobs.rift_roachling.name': '왕실 새끼 바퀴벌레',
+  'entities.mobs.rift_garbage_beetle.name': '공물 딱정벌레',
 };

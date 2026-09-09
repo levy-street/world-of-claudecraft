@@ -1,0 +1,32 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_pipeline/roach_asmon_hermit_p2/asmon_hermit_blender.glb",
+      "out": "models/creatures/asmon_hermit.glb",
+      "type": "character",
+      "maxTex": 1024,
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_pipeline/roach_roach_king_p2/roach_king_blender.glb",
+      "out": "models/creatures/roach_king.glb",
+      "type": "character",
+      "maxTex": 1024,
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_pipeline/roach_roachling_p2/roachling_blender.glb",
+      "out": "models/creatures/roachling.glb",
+      "type": "character",
+      "maxTex": 512,
+      "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_pipeline/roach_garbage_beetle_p2/garbage_beetle_blender.glb",
+      "out": "models/creatures/garbage_beetle.glb",
+      "type": "character",
+      "maxTex": 512,
+      "keepExtras": true
+    }
+  ]
+}

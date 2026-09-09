@@ -32,6 +32,7 @@
 // touches not-yet-extracted Sim state routes through the seam.
 
 import { hasUnbreakableMovementLock } from '../combat/cc';
+import { ROACH_KING_ID } from '../content/rift/roach_king';
 import { YUMI_TEMPLATE_ID } from '../content/yumi';
 import { DUNGEON_X_THRESHOLD, MOBS } from '../data';
 import * as deedsMod from '../deeds';
@@ -70,6 +71,7 @@ import {
   riftMechanicSuppressed,
   riftRankForBaseLevel,
 } from '../rift/ranks';
+import { resetRoachKing, updateRoachKing } from '../rift/roach_king';
 import { clearRiftBossDeathZones, instancePlayerIds } from '../rift/runs';
 // Type only: the idle sub-stream is threaded through the wander step as a local.
 // The helper that CONSTRUCTS one lives in mob/idle_rng.ts.
@@ -202,6 +204,7 @@ export function isInertInstanceCorpse(mob: Entity): boolean {
 }
 
 export function updateMob(ctx: SimContext, mob: Entity): void {
+  if (mob.templateId === ROACH_KING_ID && updateRoachKing(ctx, mob)) return;
   // Summoned quest add (widow hatchling): cancel its out-of-combat despawn while it
   // is fighting; resetEvadingMob (re)starts the countdown when it leashes home.
   if (mob.leashDespawnSecs !== undefined && !mob.dead && mob.inCombat) {
@@ -481,7 +484,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     } else if (isVarkhul) {
       updateVarkhulEncounter(ctx, mob, true);
       return;
-    } else if (mob.aiState !== 'evade') {
+    } else if (mob.aiState !== 'evade' && mob.templateId !== ROACH_KING_ID) {
       // Scoped to the generic boss kit on purpose: the scripted raid encounters
       // above own their own state and returned already. inCombat deliberately
       // survives startEvadeHome (other systems key on it), so the kit is gated
@@ -996,6 +999,7 @@ function tickRiftMechanicWindups(ctx: SimContext, mob: Entity): void {
 }
 
 function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
+  if (mob.templateId === ROACH_KING_ID) return;
   // Every driver below consults riftMechanicSuppressed: a rift boss spawned at
   // a low rank runs only the head of its template's rankMechanics list (C=1 ..
   // S=4, rift/ranks.ts). Inert for every non-rift mob.
@@ -1492,6 +1496,7 @@ function pulseLoudYell(ctx: SimContext, mob: Entity): void {
 // An evading mob has reached its spawn (walking or phasing): drop the pull
 // entirely and return to idle at full health, ready to be pulled again.
 export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
+  resetRoachKing(ctx, mob);
   mob.aiState = 'idle';
   mob.hp = mob.maxHp;
   mob.auras = [];
@@ -1601,7 +1606,7 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   // A boss evade ends the pull: clear any pending lethal death zones so stale
   // zones from the previous pull do not linger into the next (and notify
   // online mirrors, which otherwise run the phantom fuse to detonation).
-  if (deathZoneCastDef || deathZoneStrikeDef) {
+  if (mob.templateId !== ROACH_KING_ID && (deathZoneCastDef || deathZoneStrikeDef)) {
     for (const inst of ctx.riftInstances) {
       if (inst.partyKey !== null && inst.bossId === mob.id) {
         clearRiftBossDeathZones(ctx, inst);

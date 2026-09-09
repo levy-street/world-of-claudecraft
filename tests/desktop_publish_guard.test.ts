@@ -1,5 +1,7 @@
 import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 // The desktop-publish workflow's "Verify version lockstep" step is the ONLY
@@ -58,13 +60,22 @@ const grepAvailable = (() => {
 function grepQF(pattern: string, input: string): boolean {
   expect(pattern).not.toContain('\n');
   if (!grepAvailable) return input.includes(pattern);
+  // Match the workflow's file input: -q can exit as soon as it matches,
+  // leaving Node's queued stdin writes with EPIPE despite grep exiting 0.
+  const dir = mkdtempSync(join(tmpdir(), 'desktop-publish-guard-'));
   try {
-    execFileSync('grep', ['-qF', pattern], { input });
-    return true;
-  } catch (err) {
-    // status 1 is grep's clean no-match; anything else is a real error.
-    expect((err as { status?: number }).status).toBe(1);
-    return false;
+    const file = join(dir, 'input.txt');
+    writeFileSync(file, input);
+    try {
+      execFileSync('grep', ['-qF', pattern, file]);
+      return true;
+    } catch (err) {
+      // status 1 is grep's clean no-match; anything else is a real error.
+      expect((err as { status?: number }).status).toBe(1);
+      return false;
+    }
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
   }
 }
 

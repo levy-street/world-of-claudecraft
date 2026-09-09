@@ -6828,7 +6828,7 @@ export const fr_FR: EnTranslations = {
     },
     "riftsPage": {
       "heading": "Failles",
-      "intro": "Une faille est une déchirure dans le monde lui-même, pas une porte vers laquelle on marche. Franchissez-en une et vous obtenez une descente que personne n'a jamais parcourue : les étages, les monstres et ce qui attend au fond sont tous conçus à neuf rien que pour cette faille, si bien que le même rang ne se joue jamais deux fois de la même façon.",
+      "intro": "Une faille est une déchirure dans le monde lui-même, pas une porte vers laquelle on marche. Franchissez-en une et vous obtenez une descente que personne n'a jamais parcourue : les étages et leurs habitants changent à chaque faille, tandis qu’un même souverain revendique chaque affrontement final. Un même rang peut donc encore vous mener dans une descente différente à chaque fois.",
       "whatHeading": "Ce qu'est une faille",
       "whatBody": "Les donjons sont des lieux. Ils se tiennent là où ils se sont toujours tenus, et vous les apprenez jusqu'à en connaître chaque recoin. Une plongée est une courte descente privée que vous lancez depuis un tableau, taillée pour un ou deux joueurs. Une faille n'est ni l'un ni l'autre : elle s'ouvre d'elle-même, dans le monde, sans avertissement, et tout ce qu'elle contient est généré à l'instant même où elle s'ouvre. Personne ne peut vous donner d'itinéraire, parce que personne n'a encore parcouru celle-ci. Elle est instanciée comme les deux autres, si bien que ce que vous trouvez à l'intérieur n'appartient qu'à vous et votre groupe, mais c'est le seul contenu instancié du jeu qui vienne vous chercher plutôt que d'attendre qu'on le trouve.",
       "openHeading": "Où les failles s'ouvrent, et à quelle fréquence",
@@ -6840,7 +6840,7 @@ export const fr_FR: EnTranslations = {
       "groupBody": "Venez en groupe. Une faille ne s'adoucit pas parce que vous êtes moins nombreux à y être entrés : rien à l'intérieur ne compte combien de joueurs s'y trouvent, si bien que le rang inscrit sur le portail est le rang que vous affrontez, que vous soyez cinq ou un seul. La porte vous laissera entrer seul, et certains l'essaient, mais une faille est un contenu de groupe à tous les rangs, et elle l'annonce honnêtement dès la première salle. Votre groupe reçoit sa propre copie de la faille, si bien qu'aucun autre groupe ne peut se mêler à votre parcours. Si vous tombez, vous pouvez revenir sous forme d'esprit et vous relever une fois les combats terminés à l'intérieur.",
       "levelNote": "Les failles sont un contenu de fin de jeu. Vous devez être au plafond de niveau, niveau {n}, pour en franchir une, quel que soit le rang.",
       "floorsHeading": "À travers les étages",
-      "floorsBody": "Une faille traverse une poignée d'étages, chacun conçu à neuf, et le chemin vers le bas ne s'ouvre pas tant que l'étage n'en a pas fini avec vous : éliminez ce qui y vit, résolvez ce qu'il a verrouillé sur votre chemin, et la descente se déchire. Le dernier étage s'achève sur un boss. Chaque étage a son propre caractère, si bien qu'un seul parcours peut vous mener du givre jusqu'aux braises, et votre discussion nomme chaque étage à votre arrivée. Le suivi à l'écran est l'endroit où vous apprenez combien d'étages compte celui-ci. Quelques failles s'ouvrent sur un décor conçu à la main plutôt que sur une descente générée, et suivent alors leur propre longueur fixe.",
+      "floorsBody": "Une faille traverse une poignée d'étages, chacun conçu à neuf, et le chemin vers le bas ne s'ouvre pas tant que l'étage n'en a pas fini avec vous : éliminez ce qui y vit, résolvez ce qu'il a verrouillé sur votre chemin, et la descente se déchire. Le dernier étage s’achève face au même souverain, dont la puissance augmente avec celle de la faille. Son infestation le suit à travers les différents décors : attendez-vous à de la compagnie lors du combat final. Chaque étage a son propre caractère, si bien qu'un seul parcours peut vous mener du givre jusqu'aux braises, et votre discussion nomme chaque étage à votre arrivée. Le suivi à l'écran est l'endroit où vous apprenez combien d'étages compte celui-ci. Quelques failles s'ouvrent sur un décor conçu à la main plutôt que sur une descente générée, et suivent alors leur propre longueur fixe.",
       "boundHeading": "Dès le premier sang versé",
       "boundBody": "Le premier ennemi que votre groupe abat à l'intérieur d'une faille fixe votre parcours, tout comme la première cachette hors chemin que vous ouvrez. À partir de cet instant, vous êtes lié à cette copie : en sortir pour quelque raison que ce soit et y revenir vous replace dans le parcours que vous avez quitté, jamais dans celui d'un autre groupe, jamais dans un nouveau, et ce tant que l'entrée reste ouverte dans le monde. Avant ce premier ennemi abattu, et avant cette première cachette, rien n'est fixé, si bien qu'un groupe encore en train de se rassembler peut se regrouper et entrer ensemble sans laisser derrière lui des copies à moitié entamées.",
       "raceHeading": "La course au premier scellement",
@@ -8813,6 +8813,20 @@ export const fr_FR: EnTranslations = {
   },
   "sim": {
     "rift": {
+      "roachKing": {
+        "coronation": "Coronation of Filth",
+        "tributeFeast": "Tribute Feast",
+        "crown": "Roach King's Crown",
+        "crownWarning": "The hermit rises. The Roach King claims his crown!",
+        "filthWarning": "Mountain of Filth: leave the marked ground!",
+        "tributeWarning": "Tribute Feast: interrupt the channel or kill the tribute beetles!",
+        "ringWarning": "The Roach King winds up: get outside the ring!",
+        "filthDetonate": "The mountain of filth erupts!",
+        "swarmDetonate": "The royal swarm erupts!",
+        "deskSlam": "Desk Slam",
+        "mountainOfFilth": "Mountain of Filth",
+        "royalSwarm": "Royal Swarm"
+      },
       "allUnstable": "Toutes les failles sont instables pour le moment. Réessayez bientôt.",
       "enterFloor": "Vous franchissez la faille et pénétrez dans {name}.",
       "descendFloor": "Vous descendez plus profondément dans {name}.",
@@ -16623,6 +16637,15 @@ export const fr_FR: EnTranslations = {
       },
       "stable_horse": {
         "name": "Cheval d'écurie"
+      },
+      "rift_boss_asmon": {
+        "name": "Asmon, the Roach King"
+      },
+      "rift_roachling": {
+        "name": "Royal Roachling"
+      },
+      "rift_garbage_beetle": {
+        "name": "Tribute Beetle"
       },
       "rift_spawnling": {
         "name": "Rejeton de faille"

@@ -6828,7 +6828,7 @@ export const it_IT: EnTranslations = {
     },
     "riftsPage": {
       "heading": "Squarci",
-      "intro": "Uno squarcio è una lacerazione nel mondo stesso, non una porta verso cui camminare. Attraversane uno e ottieni una discesa che nessuno ha mai percorso prima: i piani, i mostri e la cosa che attende in fondo sono costruiti da zero solo per quello squarcio, così lo stesso rango non si gioca mai due volte allo stesso modo.",
+      "intro": "Uno squarcio è una lacerazione nel mondo stesso, non una porta verso cui camminare. Attraversane uno e ottieni una discesa che nessuno ha mai percorso prima: i piani e i loro abitanti cambiano a ogni squarcio, mentre lo stesso sovrano rivendica ogni scontro finale. Anche lo stesso rango può condurti lungo una discesa diversa ogni volta.",
       "whatHeading": "Cos'è uno squarcio",
       "whatBody": "I dungeon sono luoghi. Stanno dove sono sempre stati, e li impari finché non ne conosci ogni angolo. Un'incursione è una breve discesa privata che avvii da un tabellone, pensata per uno o due giocatori. Uno squarcio non è né l'una né l'altra cosa: si apre da solo, nel mondo, senza preavviso, e tutto ciò che contiene viene generato nell'istante in cui si apre. Nessuno può darti un percorso da seguire, perché nessuno ha mai affrontato questo in particolare. È istanziato come gli altri due, quindi ciò che trovi al suo interno appartiene solo a te e al tuo gruppo, ma è l'unico contenuto istanziato del gioco che viene a cercarti invece di aspettare di essere trovato.",
       "openHeading": "Dove si aprono gli squarci, e con che frequenza",
@@ -6840,7 +6840,7 @@ export const it_IT: EnTranslations = {
       "groupBody": "Porta un gruppo. Uno squarcio non si ammorbidisce perché siete entrati in meno: nulla al suo interno conta quanti siete, quindi il rango sul portale è il rango che affronti, che siate in cinque o da soli. Il varco ti lascia entrare anche da solo, e c'è chi ci prova, ma uno squarcio è contenuto di gruppo a ogni rango, e lo dichiara onestamente fin dalla prima stanza. Il tuo gruppo ottiene una copia tutta sua dello squarcio, così nessun altro gruppo può riversarsi nella tua run. Se cadi, puoi rientrare come spettro e recuperare il tuo corpo una volta che i combattimenti al suo interno si sono fermati.",
       "levelNote": "Gli squarci sono contenuto di fine gioco. Devi essere al livello massimo, livello {n}, per attraversarne uno, a qualsiasi rango.",
       "floorsHeading": "Giù attraverso i piani",
-      "floorsBody": "Uno squarcio si snoda per una manciata di piani, ognuno costruito da zero, e la via verso il basso non si apre finché il piano non ha finito con te: ripulisci ciò che ci vive, risolvi qualsiasi cosa abbia sbarrato il tuo cammino, e la discesa si squarcia. L'ultimo piano si conclude con un boss. Ogni piano ha un proprio carattere, così una singola run può portarti fuori dal gelo e dentro le braci, e la tua chat nomina ogni piano non appena vi arrivi. Il tracciatore sul tuo schermo è dove scopri quanti piani ha questo in particolare. Alcuni squarci si aprono su uno scenario costruito a mano invece che su una discesa generata, che ha una lunghezza fissa tutta sua.",
+      "floorsBody": "Uno squarcio si snoda per una manciata di piani, ognuno costruito da zero, e la via verso il basso non si apre finché il piano non ha finito con te: ripulisci ciò che ci vive, risolvi qualsiasi cosa abbia sbarrato il tuo cammino, e la discesa si squarcia. L’ultimo piano si conclude con lo stesso sovrano, la cui forza cresce insieme allo squarcio. La sua infestazione lo segue nei diversi ambienti, quindi aspettati compagnia nello scontro finale. Ogni piano ha un proprio carattere, così una singola run può portarti fuori dal gelo e dentro le braci, e la tua chat nomina ogni piano non appena vi arrivi. Il tracciatore sul tuo schermo è dove scopri quanti piani ha questo in particolare. Alcuni squarci si aprono su uno scenario costruito a mano invece che su una discesa generata, che ha una lunghezza fissa tutta sua.",
       "boundHeading": "Una volta versato il primo sangue",
       "boundBody": "La prima uccisione del tuo gruppo dentro uno squarcio fissa la run, e lo stesso vale per il primo scrigno fuori percorso che scassini. Da quel momento sei vincolato a quella copia: se esci per qualsiasi motivo, il ritorno ti riporta nella run che hai lasciato, mai in quella di un altro gruppo e mai in una nuova, finché l'ingresso nel mondo resta ancora aperto. Prima di quella prima uccisione, e prima di quel primo scrigno, nulla è fissato, quindi un gruppo che si sta ancora radunando può ricompattarsi ed entrare insieme senza lasciarsi dietro copie iniziate a metà.",
       "raceHeading": "La corsa per il primo completamento",
@@ -8813,6 +8813,20 @@ export const it_IT: EnTranslations = {
   },
   "sim": {
     "rift": {
+      "roachKing": {
+        "coronation": "Coronation of Filth",
+        "tributeFeast": "Tribute Feast",
+        "crown": "Roach King's Crown",
+        "crownWarning": "The hermit rises. The Roach King claims his crown!",
+        "filthWarning": "Mountain of Filth: leave the marked ground!",
+        "tributeWarning": "Tribute Feast: interrupt the channel or kill the tribute beetles!",
+        "ringWarning": "The Roach King winds up: get outside the ring!",
+        "filthDetonate": "The mountain of filth erupts!",
+        "swarmDetonate": "The royal swarm erupts!",
+        "deskSlam": "Desk Slam",
+        "mountainOfFilth": "Mountain of Filth",
+        "royalSwarm": "Royal Swarm"
+      },
       "allUnstable": "Tutti gli squarci sono instabili in questo momento. Riprova a breve.",
       "enterFloor": "Attraversi lo squarcio ed entri in {name}.",
       "descendFloor": "Scendi più in profondità in {name}.",
@@ -16623,6 +16637,15 @@ export const it_IT: EnTranslations = {
       },
       "stable_horse": {
         "name": "Cavallo da stalla"
+      },
+      "rift_boss_asmon": {
+        "name": "Asmon, the Roach King"
+      },
+      "rift_roachling": {
+        "name": "Royal Roachling"
+      },
+      "rift_garbage_beetle": {
+        "name": "Tribute Beetle"
       },
       "rift_spawnling": {
         "name": "Progenie dello Squarcio"

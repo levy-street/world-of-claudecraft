@@ -1,0 +1,3025 @@
+{
+  "accepted": true,
+  "profiles": [
+    {
+      "profile": "desktop-low",
+      "report": "desktop-low.json",
+      "passed": true,
+      "hardware": true,
+      "headed": false,
+      "viewport": {
+        "width": 1600,
+        "height": 900,
+        "deviceScaleFactor": 1
+      },
+      "adapter": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4 Pro, Unspecified Version)",
+      "pageErrors": [],
+      "consoleErrors": [
+        {
+          "text": "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+          "location": {
+            "url": "http://127.0.0.1:5185/api/site-presence"
+          }
+        },
+        {
+          "text": "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+          "location": {
+            "url": "http://127.0.0.1:5185/api/project-stats"
+          }
+        },
+        {
+          "text": "character visual unavailable, skipping view (npc_modular_walking_staff): Error: character asset not preloaded: models/weapons/brasscrown_walking_staff.glb",
+          "location": {
+            "url": "http://127.0.0.1:5185/@vite/client",
+            "lineNumber": 524,
+            "columnNumber": 3
+          }
+        },
+        {
+          "text": "character visual unavailable, skipping view (mob_training_dummy): Error: character asset not preloaded: models/creatures/training_dummy.glb",
+          "location": {
+            "url": "http://127.0.0.1:5185/@vite/client",
+            "lineNumber": 524,
+            "columnNumber": 3
+          }
+        },
+        {
+          "text": "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+          "location": {
+            "url": "http://127.0.0.1:5185/api/site-presence"
+          }
+        }
+      ],
+      "failedRequests": [
+        {
+          "url": "http://127.0.0.1:5185/api/site-presence",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/home-bg.mp4",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/audio/sfx/runtime-pack.json",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/weapons/shield_square.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/players/ranger.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/players/bow_hold_anim.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/players/hunter_ability_anims.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/players/ranger_hit_variety_anims.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/players/rogue_ability_anims.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/mounts/valorsteed.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/stag.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/yumi_cat.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/aurelhorn.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/grix.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/orc.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/wildheart_ravager.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/wildheart_high_priest.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/wildheart_beastmaster.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/ignivar_ashcaller.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/water_elemental.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/varkhul_forgefather.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/gravewing.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/dragonkin_ability_anims.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/dragonkin_elite.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/demonalt.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/nightkin_ability_anims.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/ghost_ability_anims.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/glimmerwisp.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/duskwisp.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/crabenemy.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/crabenemy_hit_variety_anims.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/crab_ability_anims.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/enemies/skeleton_minion_free.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/enemies/necromancer.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/stone_cantor.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/players/mage_classic.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/modular/warrior_modular.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/weapons/notched_woodaxe.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/weapons/adv_druid_staff.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/weapons/adv_staff.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/weapons/staff_d.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/weapons/staff_c.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/weapons/hammer_c.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/weapons/axe_a.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/weapons/hammer_d.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/weapons/hammer_varkhul.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_lava_face.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_lift_vertical_beam.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hexb_home_b.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hexb_home_a.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/house_2.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/kmed_home_A_hollow.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/kmed_market_hollow.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/blacksmith.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/kmed_blacksmith_hollow.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/cart.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/tent_open.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/tent_small.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/rock_large_d.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/rock_large_f.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/mushroom_red.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/statue_block.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/gravestone_bevel.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/delve_entrance_2.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/jump_vertical.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/crystal_mound_cave.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/star_heart_crystal.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hex_wall.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hex_watchtower.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hex_market.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hex_tower_cannon.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hex_lumber.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hex_weaponrack.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hexb_tower_base.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hexb_tower_a.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hexb_stables.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hexb_tower_b.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hex_ship_blue.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hex_ship_red.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hex_boat.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hex_sack.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hexn_fence_stone.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hexn_palisade.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hex_barrel.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/sea_buoy.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/golden_horse_statue.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/garden_arch.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/shrub_flowering.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/kcas_floor_large.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/banner_green.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/kcas_torch_mounted.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/kcas_rocks.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/kcas_rubble_large.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/kcas_rubble_half.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/shelf_small_books.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hexr_townhall.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hexr_castle.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hexr_home_b.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hexr_blacksmith.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hexr_market.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hexr_tower_base.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hexr_archeryrange.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/dungeon_door_arch.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/foliage/pine_1.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/foliage/pine_2.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/foliage/pine_4.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/foliage/oak_1.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/foliage/dead_1.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/foliage/dead_2.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/foliage/twisted_3.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/marsh_dead_tree.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/wildheart_beast_den.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/wildheart_jungle_canopy_tree.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/wildheart_giant_fern.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/floor_dirt_large.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/banner_blue.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/banner_red.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/rubble_half.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/shrine.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/bucket.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/keyring_hanging.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/post_lantern.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/mailbox_pillar.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/eastbrook_noticeboard.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/quest/crypt_ritual_circle.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/quest/rusted_censer.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/alchemy_cauldron.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/leatherworking_rack.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/maledict_eye.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/delve_rite_shrine_reed.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/lava_pool.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/lava_river_end.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/fen_lilies.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/fallen_coconuts.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/willow_tree.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/fen_mushrooms.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/fen_log.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/streetlamp_eastbrook_civic.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/weapons/brasscrown_walking_staff.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/api/site-presence",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/audio/music/proving_shore.mp3?v=51e9b5a6c01f",
+          "error": "net::ERR_ABORTED"
+        }
+      ],
+      "corpse": {
+        "bounds": {
+          "minY": 2.961210040450958,
+          "maxY": 9.827038147163444,
+          "simY": 2.9578609554097053,
+          "viewY": 2.9578609554097053
+        },
+        "heightRatio": 1.0291136177062552,
+        "farMeshVisible": false,
+        "modelVisible": true,
+        "actions": [
+          {
+            "name": "Death",
+            "weight": 1,
+            "time": 2.433333396911621,
+            "duration": 2.433333396911621,
+            "paused": true
+          }
+        ]
+      },
+      "stages": [
+        {
+          "stage": "hermit",
+          "screenshot": "desktop-low-hermit.png",
+          "livePrograms": 0,
+          "tier": "low"
+        },
+        {
+          "stage": "desk-slam",
+          "screenshot": "desktop-low-desk-slam.png",
+          "livePrograms": 0,
+          "tier": "low"
+        },
+        {
+          "stage": "tribute",
+          "screenshot": "desktop-low-tribute.png",
+          "livePrograms": 0,
+          "tier": "low"
+        },
+        {
+          "stage": "coronation",
+          "screenshot": "desktop-low-coronation.png",
+          "livePrograms": 0,
+          "tier": "low"
+        },
+        {
+          "stage": "coronation-end",
+          "screenshot": "desktop-low-coronation-end.png",
+          "livePrograms": 0,
+          "tier": "low"
+        },
+        {
+          "stage": "crowned",
+          "screenshot": "desktop-low-crowned.png",
+          "livePrograms": 0,
+          "tier": "low"
+        },
+        {
+          "stage": "swarm",
+          "screenshot": "desktop-low-swarm.png",
+          "livePrograms": 0,
+          "tier": "low"
+        },
+        {
+          "stage": "filth",
+          "screenshot": "desktop-low-filth.png",
+          "livePrograms": 0,
+          "tier": "low"
+        },
+        {
+          "stage": "death-end",
+          "screenshot": "desktop-low-death-end.png",
+          "livePrograms": 0,
+          "tier": "low"
+        }
+      ]
+    },
+    {
+      "profile": "desktop-high",
+      "report": "desktop-high.json",
+      "passed": true,
+      "hardware": true,
+      "headed": false,
+      "viewport": {
+        "width": 1600,
+        "height": 900,
+        "deviceScaleFactor": 1
+      },
+      "adapter": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4 Pro, Unspecified Version)",
+      "pageErrors": [],
+      "consoleErrors": [
+        {
+          "text": "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+          "location": {
+            "url": "http://127.0.0.1:5185/api/site-presence"
+          }
+        },
+        {
+          "text": "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+          "location": {
+            "url": "http://127.0.0.1:5185/api/project-stats"
+          }
+        },
+        {
+          "text": "character visual unavailable, skipping view (npc_modular_walking_staff): Error: character asset not preloaded: models/weapons/brasscrown_walking_staff.glb",
+          "location": {
+            "url": "http://127.0.0.1:5185/@vite/client",
+            "lineNumber": 524,
+            "columnNumber": 3
+          }
+        },
+        {
+          "text": "character visual unavailable, skipping view (mob_training_dummy): Error: character asset not preloaded: models/creatures/training_dummy.glb",
+          "location": {
+            "url": "http://127.0.0.1:5185/@vite/client",
+            "lineNumber": 524,
+            "columnNumber": 3
+          }
+        },
+        {
+          "text": "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+          "location": {
+            "url": "http://127.0.0.1:5185/api/site-presence"
+          }
+        }
+      ],
+      "failedRequests": [
+        {
+          "url": "http://127.0.0.1:5185/api/site-presence",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/players/knight.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/players/ranger.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/players/hunter_ability_anims.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/home-bg.mp4",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/audio/sfx/runtime-pack.json",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/textures/structures/Fabric030_Roughness.ktx2",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/greyjaw.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/textures/structures/Metal013_Displacement.ktx2",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/textures/structures/Metal013_NormalGL.ktx2",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/textures/structures/Fabric030_Displacement.ktx2",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/mushroom_pixie.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/stag.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/gleamstag.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/aurelhorn.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/veiled_doe.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/textures/terrain/Ground080_NormalGL.ktx2",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/goblin_hit_variety_anims.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/grubjaw.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/kobold.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/grix.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/dragonkin_ability_anims.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/dragonkin_elite.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/dragonkin_mob.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/tolling_bell.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/ghost.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/mech.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/emberkin.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/pyre_colossus.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/ghost_ability_anims.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/glimmerwisp.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/duskwisp.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/crabenemy_hit_variety_anims.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/crabenemy.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/bull.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/enemies/skeleton_minion_hit_variety_anims.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/enemies/skeleton_rogue_hit_variety_anims.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/players/rogue_hooded.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/weapons/knotted_oak_stave.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/weapons/sword_e.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/weapons/sword_g.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/weapons/adv_sword_2handed.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/weapons/redskull_dagger.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/weapons/axe_a.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/weapons/axe_c.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_lava_face.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_fortress_wall.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_lift_arch_beam.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_lift_handle.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_lift_vertical_beam.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_lift_spool.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_stone_floor.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_tower_top.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/eastbrook_market_stall.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/eastbrook_wall_wing.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/bench.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/fenbridge_warden_gatehouse.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/fenbridge_crooked_reed_inn.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/house_1.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/house_2.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/kmed_home_A_hollow.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/kmed_blacksmith_hollow.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/blacksmith.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/inn.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/bell_tower.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/tent_open.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/tent_small.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/rock_tall_a.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/rock_tall_h.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/rock_large_d.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/mushroom_red.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/rock_large_f.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/course_arch.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/jump_vertical.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/star_heart_crystal.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/crystal_mound_cave.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hex_windmill.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hex_tower.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hex_castle.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hex_tower_cannon.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hex_barracks.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hex_ship_blue.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hex_boat.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hex_ship_green.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hex_ship_red.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/foliage/oak_4.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/golden_horse_statue.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/flower_bed_round.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/flower_bed_square_b.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/mushroom_giant_purple.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/mushroom_glow_cluster.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/flower_glow.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/kcas_wall_window.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/kcas_wall_doorway.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/kcas_wall_broken.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/kcas_wall_cracked.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/rift_portal.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/foliage/twisted_1.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/foliage/twisted_2.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/foliage/dead_2.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/foliage/dead_3.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/marsh_corpse_candle.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/marsh_bell_gallows.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/banner_triple_blue.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/sword_shield_broken.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/candle_lit.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/trunk_large_A.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/shrine.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/skull_candle.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/bone_B.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/skull.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/post_lantern.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/quest/gravewyrm_sigil.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/quest/weathered_ledger_page.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/quest/bastion_ward_stone.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/quest/sanctum_key_shard.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/leatherworking_rack.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/delve_rite_shrine_bell.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/delve_pressure_plate.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/lava_river_mid.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/fen_mushrooms.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/maze_hedge_wall.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/streetlamp_eastbrook_civic.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/hollow_gate_crystal.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/hollow_gate_tree.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/streetlamp_thornpeak_beacon.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/streetlamp_mirefen_witchflame.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/env/vale_day_2k.ktx2",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/api/site-presence",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/audio/music/proving_shore.mp3?v=51e9b5a6c01f",
+          "error": "net::ERR_ABORTED"
+        }
+      ],
+      "corpse": {
+        "bounds": {
+          "minY": 2.961210040450958,
+          "maxY": 9.827038147163444,
+          "simY": 2.9578609554097053,
+          "viewY": 2.9578609554097053
+        },
+        "heightRatio": 1.0291136177062552,
+        "farMeshVisible": false,
+        "modelVisible": true,
+        "actions": [
+          {
+            "name": "Death",
+            "weight": 1,
+            "time": 2.433333396911621,
+            "duration": 2.433333396911621,
+            "paused": true
+          }
+        ]
+      },
+      "stages": [
+        {
+          "stage": "hermit",
+          "screenshot": "desktop-high-hermit.png",
+          "livePrograms": 0,
+          "tier": "high"
+        },
+        {
+          "stage": "desk-slam",
+          "screenshot": "desktop-high-desk-slam.png",
+          "livePrograms": 0,
+          "tier": "high"
+        },
+        {
+          "stage": "tribute",
+          "screenshot": "desktop-high-tribute.png",
+          "livePrograms": 0,
+          "tier": "high"
+        },
+        {
+          "stage": "coronation",
+          "screenshot": "desktop-high-coronation.png",
+          "livePrograms": 0,
+          "tier": "high"
+        },
+        {
+          "stage": "coronation-end",
+          "screenshot": "desktop-high-coronation-end.png",
+          "livePrograms": 0,
+          "tier": "high"
+        },
+        {
+          "stage": "crowned",
+          "screenshot": "desktop-high-crowned.png",
+          "livePrograms": 0,
+          "tier": "high"
+        },
+        {
+          "stage": "swarm",
+          "screenshot": "desktop-high-swarm.png",
+          "livePrograms": 0,
+          "tier": "high"
+        },
+        {
+          "stage": "filth",
+          "screenshot": "desktop-high-filth.png",
+          "livePrograms": 0,
+          "tier": "high"
+        },
+        {
+          "stage": "death-end",
+          "screenshot": "desktop-high-death-end.png",
+          "livePrograms": 0,
+          "tier": "high"
+        }
+      ]
+    },
+    {
+      "profile": "mobile-low",
+      "report": "mobile-low.json",
+      "passed": true,
+      "hardware": true,
+      "headed": false,
+      "viewport": {
+        "width": 844,
+        "height": 390,
+        "deviceScaleFactor": 1,
+        "isMobile": true,
+        "hasTouch": true
+      },
+      "adapter": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4 Pro, Unspecified Version)",
+      "pageErrors": [],
+      "consoleErrors": [
+        {
+          "text": "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+          "location": {
+            "url": "http://127.0.0.1:5185/api/site-presence"
+          }
+        },
+        {
+          "text": "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+          "location": {
+            "url": "http://127.0.0.1:5185/api/project-stats"
+          }
+        },
+        {
+          "text": "character visual unavailable, skipping view (npc_modular_walking_staff): Error: character asset not preloaded: models/weapons/brasscrown_walking_staff.glb",
+          "location": {
+            "url": "http://127.0.0.1:5185/@vite/client",
+            "lineNumber": 524,
+            "columnNumber": 3
+          }
+        },
+        {
+          "text": "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+          "location": {
+            "url": "http://127.0.0.1:5185/api/site-presence"
+          }
+        }
+      ],
+      "failedRequests": [
+        {
+          "url": "http://127.0.0.1:5185/api/site-presence",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/basis/basis_transcoder.wasm",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/garbage_beetle.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/players/paladin.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/players/paladin_ability_anims.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/players/ranger.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/players/hunter_ability_anims.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/players/ranger_hit_variety_anims.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/weapons/crossbow_1handed.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/players/mage.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/players/barbarian.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/players/shaman_ability_anims.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/players/mage_ability_anims.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/players/druid.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/alpaca.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/bear_form.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/forms/metamorphosis.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/wolf_basic.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/mushroom_pixie.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/greyjaw.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/veiled_stag.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/veiled_doe.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/aurelhorn.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/velociraptor.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/frog.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/grubjaw.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/wildheart_hexcaller.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/crucible_warden.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/water_elemental.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/gravewing.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/dragonkin_elite.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/dragonkin_baby.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/dragon_egg.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/tolling_bell.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/mech.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/emberkin.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/gloomshade_abyssal_guardian.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/demonalt.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/tribal.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/glimmerwisp.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/duskwisp.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/glubevolved.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/enemies/skeleton_minion.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/enemies/skeleton_mage.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/enemies/skelboss_ability_anims.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/enemies/skeleton_minion_free.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/enemies/skeleton_golem.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/players/rogue_hooded.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/stone_cantor.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/spider_egg_sac.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/weapons/knotted_oak_stave.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/modular/warrior_modular.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/weapons/notched_woodaxe.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/weapons/scythe.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/weapons/whittler_s_knife.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/weapons/spear_a.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/weapons/dagger_b.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/weapons/adv_dagger.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/weapons/wand_b.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/weapons/adv_wand.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/weapons/hammer_varkhul.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/weapons/varkhul_emberward.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_beam.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_vault_door.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_reactor.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_anvil.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_forge.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_chain_link.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_square_wall.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_industrial_pipe.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_lava_channel_curved.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_water_pump.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_bridge_rail.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_cannon.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_dragon_head.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_dragon_pillar.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_fortress_wall.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_fountain_base.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_lava_pillar.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/streetlamp_drakelands_brazier.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_lift_arch_beam.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_lift_beam.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_lift_handle.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_lift_vertical_beam.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_lift_mount.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_lift_spool.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_stone_floor.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_tower_base.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_tower_pillar.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hexb_market.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/fenbridge_crooked_reed_inn.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/fenbridge_moonwort_apothecary.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/house_1.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/house_2.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/kmed_home_B_hollow.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/kmed_tavern_hollow.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/kmed_church_hollow.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/kmed_market_hollow.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/inn.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/bell_tower.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/gravestone_cross.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/barrel.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/anvil.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/lantern_wall.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/weapon_stand.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/delve_entrance_2.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/jump_vertical.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/pixie_mushroom_house.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/crystal_mound_cave.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hexb_shipyard.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/foliage/oak_4.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/golden_horse_statue.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/mushroom_giant_purple.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/kcas_wall.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/kcas_banner_red_triple.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/kcas_keg.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/bar_straight_a.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/candle_triple.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hexr_castle.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hexr_townhall.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hexr_barracks.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hexr_stables.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hexr_market.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hexr_windmill.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/dungeon_door_arch.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/wildheart_jaguar_gate.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/rift_flame.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/rift_portal.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/foliage/pine_1.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/foliage/pine_2.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/foliage/pine_5.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/foliage/oak_1.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/foliage/oak_2.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/foliage/oak_3.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/foliage/oak_5.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/foliage/twisted_2.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/foliage/bush_flowers.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/marsh_plank_bridge.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/marsh_shrine_fragment.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/wildheart_ritual_pyramid.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/wildheart_beast_den.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/wildheart_jungle_canopy_tree.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/wildheart_ancestor_ruin.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/floor_tile_small_decorated.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ribcage.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/shrine.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/quest/lost_caravan_goods.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/quest/gravecaller_sigil.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/quest/gravewyrm_sigil.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/quest/rusted_censer.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/quest/bastion_ward_stone.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/quest/ogre_war_totem.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/quest/sanctum_key_shard.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/alchemy_cauldron.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/leatherworking_rack.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/engineering_workbench.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/tailoring_loom.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/battleground/rune_sprint.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/fallback_crate.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/delve_module_exit.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/delve_surface_exit.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/delve_pressure_plate.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/delve_rite_shrine_bell.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/delve_rite_shrine_candle.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/delve_rite_shrine_reed.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/delve_rite_shrine_skull.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/lava_pool.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/dragon_hoard.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/dragon_eggs.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/fallen_coconuts.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/fen_lilies.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/fen_reeds.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/willow_tree.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/fen_log.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/frostveil_ice_spire.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/maze_hedge_arch.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/resources/gather_wood_pile.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/resources/gather_herb_cluster.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/streetlamp_mirefen_witchflame.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/streetlamp_thornpeak_beacon.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/streetlamp_frostveil_icicle.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/streetlamp_willowfen_reed.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/streetlamp_palmreach_totem.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/streetlamp_galecrest_mast.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/yumi_brazier_stand.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/api/site-presence",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/audio/music/proving_shore.mp3?v=51e9b5a6c01f",
+          "error": "net::ERR_ABORTED"
+        }
+      ],
+      "corpse": {
+        "bounds": {
+          "minY": 2.9612100404509594,
+          "maxY": 9.827038147163442,
+          "simY": 2.9578609554097053,
+          "viewY": 2.9578609554097053
+        },
+        "heightRatio": 1.0291136177062545,
+        "farMeshVisible": false,
+        "modelVisible": true,
+        "actions": [
+          {
+            "name": "Death",
+            "weight": 1,
+            "time": 2.433333396911621,
+            "duration": 2.433333396911621,
+            "paused": true
+          }
+        ]
+      },
+      "stages": [
+        {
+          "stage": "hermit",
+          "screenshot": "mobile-low-hermit.png",
+          "livePrograms": 0,
+          "tier": "low"
+        },
+        {
+          "stage": "desk-slam",
+          "screenshot": "mobile-low-desk-slam.png",
+          "livePrograms": 0,
+          "tier": "low"
+        },
+        {
+          "stage": "tribute",
+          "screenshot": "mobile-low-tribute.png",
+          "livePrograms": 0,
+          "tier": "low"
+        },
+        {
+          "stage": "coronation",
+          "screenshot": "mobile-low-coronation.png",
+          "livePrograms": 0,
+          "tier": "low"
+        },
+        {
+          "stage": "coronation-end",
+          "screenshot": "mobile-low-coronation-end.png",
+          "livePrograms": 0,
+          "tier": "low"
+        },
+        {
+          "stage": "crowned",
+          "screenshot": "mobile-low-crowned.png",
+          "livePrograms": 0,
+          "tier": "low"
+        },
+        {
+          "stage": "swarm",
+          "screenshot": "mobile-low-swarm.png",
+          "livePrograms": 0,
+          "tier": "low"
+        },
+        {
+          "stage": "filth",
+          "screenshot": "mobile-low-filth.png",
+          "livePrograms": 0,
+          "tier": "low"
+        },
+        {
+          "stage": "death-end",
+          "screenshot": "mobile-low-death-end.png",
+          "livePrograms": 0,
+          "tier": "low"
+        }
+      ]
+    },
+    {
+      "profile": "mobile-high",
+      "report": "mobile-high.json",
+      "passed": true,
+      "hardware": true,
+      "headed": false,
+      "viewport": {
+        "width": 844,
+        "height": 390,
+        "deviceScaleFactor": 1,
+        "isMobile": true,
+        "hasTouch": true
+      },
+      "adapter": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4 Pro, Unspecified Version)",
+      "pageErrors": [],
+      "consoleErrors": [
+        {
+          "text": "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+          "location": {
+            "url": "http://127.0.0.1:5185/api/site-presence"
+          }
+        },
+        {
+          "text": "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+          "location": {
+            "url": "http://127.0.0.1:5185/api/project-stats"
+          }
+        },
+        {
+          "text": "character visual unavailable, skipping view (npc_modular_walking_staff): Error: character asset not preloaded: models/weapons/brasscrown_walking_staff.glb",
+          "location": {
+            "url": "http://127.0.0.1:5185/@vite/client",
+            "lineNumber": 524,
+            "columnNumber": 3
+          }
+        },
+        {
+          "text": "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+          "location": {
+            "url": "http://127.0.0.1:5185/api/site-presence"
+          }
+        }
+      ],
+      "failedRequests": [
+        {
+          "url": "http://127.0.0.1:5185/api/site-presence",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/weapons/shield_round.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/players/paladin_hit_variety_anims.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/textures/structures/Bricks076A_Roughness.ktx2",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/textures/structures/Bricks076A_Displacement.ktx2",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/players/bow_anims.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/players/ranger.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/textures/terrain/Rock026_NormalGL.ktx2",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/textures/terrain/Rock026_Roughness.ktx2",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/players/hunter_ability_anims.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/textures/terrain/Rock026_Displacement.ktx2",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/textures/structures/MedievalWood_AmbientOcclusion.ktx2",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/players/mage.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/textures/structures/Plaster007_NormalGL.ktx2",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/textures/structures/Plaster007_Roughness.ktx2",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/players/barbarian.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/players/druid.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/textures/structures/Fabric030_AmbientOcclusion.ktx2",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/textures/structures/Fabric030_Displacement.ktx2",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/alpaca.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/bear_form.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/textures/structures/Metal013_NormalGL.ktx2",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/forms/metamorphosis.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/chicken_cow.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/mounts/valorsteed.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/mushroom_pixie.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/textures/terrain/Grass001_NormalGL.ktx2",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/wild_boar.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/textures/terrain/Ground080_NormalGL.ktx2",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/veiled_stag.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/gleamstag.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/velociraptor.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/grubjaw.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/kobold.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/orc.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/ogre.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/wildheart_stalker.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/wildheart_hexcaller.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/wildheart_beastmaster_hit_variety_anims.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/golelingevolved.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/ignivar_herald.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/ignivar_ashcaller.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/gravewing.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/dragonkin_baby.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/tolling_bell.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/emberkin.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/gloomshade_abyssal_guardian.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/pyre_colossus.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/enemies/skeleton_minion.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/enemies/skeleton_minion_free.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/enemies/necromancer.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/chars/players/rogue_hooded.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/creatures/stone_cantor.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/weapons/knotted_oak_stave.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/weapons/whittler_s_knife.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/weapons/adv_wand.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/weapons/hammer_varkhul.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/weapons/axe_d.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_lava_face.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_gear_machine.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_anvil.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_forge.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_chain.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_lava_outlet.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_lava_port.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_steam_pipes.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_bridge_pillar.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_dragon_head.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_dragon_pillar.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_gate.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_gate_gear.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_staircase.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_dungeon_entrance.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_lift_beam.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_lift_frame.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_tower_base.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/ignivar_prop_tower_pillar.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/fence.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/fenbridge_scout_lodge.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/kmed_blacksmith_hollow.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/inn.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/bell_tower.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/barrel.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/anvil.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/lantern_wall.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/weapon_stand.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/course_arch.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/delve_entrance_2.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/pixie_mushroom_house.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/star_heart_crystal.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hex_castle.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hex_tower_catapult.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hex_barracks.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hex_wheelbarrow.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hexb_stables.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hex_crate_big.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hexr_watchtower.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hex_target.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hex_flag_red.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hex_cannon.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/ship_monument.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/foliage/oak_4.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/flower_bed_square_a.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/flower_bed_square_b.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/flower_bed_round.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/mushroom_giant_purple.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/mushroom_glow_cluster.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/flower_glow.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/shrub_flowering.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/kcas_foundation.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/kcas_banner_red_a.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/kcas_bench.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/chair.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/stool.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/bar_straight_b.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hexr_castle.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hexr_church.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hexr_windmill.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/biome/hexr_tower_catapult.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/foliage/pine_2.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/foliage/pine_4.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/foliage/twisted_2.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/foliage/twisted_3.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/marsh_shrine_fragment.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/marsh_root_wall.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/wildheart_canopy_platform.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/wildheart_ritual_pyramid.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/wildheart_rope_bridge.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/wildheart_jungle_canopy_tree.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/wildheart_mask_totem.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/wildheart_giant_fern.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/floor_tile_small_weeds_B.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/floor_tile_small_decorated.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/banner_thin_white.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/dungeon/bone_B.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/quest/lost_caravan_goods.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/quest/gravecaller_sigil.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/quest/weathered_ledger_page.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/quest/ogre_war_totem.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/quest/sanctum_key_shard.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/leatherworking_rack.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/engineering_workbench.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/battleground/rune_damage.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/cracked_grave.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/fallback_crate.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/destructible_wall.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/delve_rite_shrine_bell.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/delve_rite_shrine_skull.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/lava_pool.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/lava_river_mid.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/dragon_hoard.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/ember_lily.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/fallen_coconuts.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/fen_lilies.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/fen_mushrooms.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/maze_hedge_wall.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/maze_hedge_arch.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/hollow_gate_crystal.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/hollow_gate_tree.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/streetlamp_mirefen_witchflame.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/streetlamp_veiled_crystal.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/streetlamp_amberfall_crystal.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/streetlamp_nightbloom_moonflower.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/streetlamp_wraithwood_ghost.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/streetlamp_palmreach_totem.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/models/props/yumi_torch_handle.glb",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/env/vale_day_2k.ktx2",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/api/site-presence",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:5185/audio/music/proving_shore.mp3?v=51e9b5a6c01f",
+          "error": "net::ERR_ABORTED"
+        }
+      ],
+      "corpse": {
+        "bounds": {
+          "minY": 2.961210040450959,
+          "maxY": 9.827038147163446,
+          "simY": 2.9578609554097053,
+          "viewY": 2.9578609554097053
+        },
+        "heightRatio": 1.0291136177062552,
+        "farMeshVisible": false,
+        "modelVisible": true,
+        "actions": [
+          {
+            "name": "Death",
+            "weight": 1,
+            "time": 2.433333396911621,
+            "duration": 2.433333396911621,
+            "paused": true
+          }
+        ]
+      },
+      "stages": [
+        {
+          "stage": "hermit",
+          "screenshot": "mobile-high-hermit.png",
+          "livePrograms": 0,
+          "tier": "high"
+        },
+        {
+          "stage": "desk-slam",
+          "screenshot": "mobile-high-desk-slam.png",
+          "livePrograms": 0,
+          "tier": "high"
+        },
+        {
+          "stage": "tribute",
+          "screenshot": "mobile-high-tribute.png",
+          "livePrograms": 0,
+          "tier": "high"
+        },
+        {
+          "stage": "coronation",
+          "screenshot": "mobile-high-coronation.png",
+          "livePrograms": 0,
+          "tier": "high"
+        },
+        {
+          "stage": "coronation-end",
+          "screenshot": "mobile-high-coronation-end.png",
+          "livePrograms": 0,
+          "tier": "high"
+        },
+        {
+          "stage": "crowned",
+          "screenshot": "mobile-high-crowned.png",
+          "livePrograms": 0,
+          "tier": "high"
+        },
+        {
+          "stage": "swarm",
+          "screenshot": "mobile-high-swarm.png",
+          "livePrograms": 0,
+          "tier": "high"
+        },
+        {
+          "stage": "filth",
+          "screenshot": "mobile-high-filth.png",
+          "livePrograms": 0,
+          "tier": "high"
+        },
+        {
+          "stage": "death-end",
+          "screenshot": "mobile-high-death-end.png",
+          "livePrograms": 0,
+          "tier": "high"
+        }
+      ]
+    }
+  ],
+  "models": {
+    "public/models/creatures/asmon_hermit.glb": "46eed28fdde9f1de99857eccaa1438a66940d08643dc455ce23a5055cc9752ab",
+    "public/models/creatures/roach_king.glb": "754c0bc4c85a92cb9863527f1bc91788d3f752267575b0043b1348fc4b1ebdd8",
+    "public/models/creatures/roachling.glb": "468fd1b2306bc55d6bd9beed8f8f5eb7741c8cac2be9f3215662665e09a96cf7",
+    "public/models/creatures/garbage_beetle.glb": "dd4541c099409ef1c1f0676aa9a5f22d23f4fb453e67486675cdb31fdc2a8c8e"
+  },
+  "limits": [
+    "Headless hardware functional validation; no FPS or smoothness claim.",
+    "Mobile profiles emulate responsive touch viewports on desktop hardware; not physical-phone testing.",
+    "Console/network entries are preserved in each report. Offline site-presence/project-stats proxy errors and unrelated initial-world preload skips remain.",
+    "Only screenshots named in these four accepted reports belong to this receipt; previous failure artifacts are not acceptance evidence."
+  ]
+}

@@ -6828,7 +6828,7 @@ export const pl_PL: EnTranslations = {
     },
     "riftsPage": {
       "heading": "Szczeliny",
-      "intro": "Szczelina to rozdarcie samego świata, a nie drzwi, do których podchodzisz. Wejdź w nią, a czeka cię zejście, którego nikt wcześniej nie przeszedł: piętra, potwory i to, co czeka na dole, są budowane od nowa wyłącznie dla tej jednej Szczeliny, więc ta sama ranga nigdy nie wygląda tak samo dwa razy.",
+      "intro": "Szczelina to rozdarcie samego świata, a nie drzwi, do których podchodzisz. Wejdź w nią, a czeka cię zejście, którego nikt wcześniej nie przeszedł: piętra i ich mieszkańcy zmieniają się z każdą Szczeliną, lecz ten sam władca czeka w każdym finałowym starciu. Ta sama ranga nadal może więc za każdym razem prowadzić przez inne zejście.",
       "whatHeading": "Czym jest Szczelina",
       "whatBody": "Lochy to miejsca. Stoją tam, gdzie zawsze stały, a ty poznajesz je, aż znasz każdy kąt. Wyprawa to krótkie, prywatne zejście, które zaczynasz przy tablicy, skrojone na jedną lub dwie osoby. Szczelina nie jest ani jednym, ani drugim: otwiera się sama, gdzieś w świecie, bez ostrzeżenia, a wszystko w jej wnętrzu generowane jest w chwili, gdy to się dzieje. Nikt nie poda ci trasy, bo nikt jeszcze nie przeszedł tej konkretnej. Jest instancjowana jak te dwa pozostałe rodzaje treści, więc to, co znajdziesz w środku, należy wyłącznie do ciebie i twojej drużyny, ale to jedyna instancjowana treść w grze, która sama cię szuka, zamiast czekać, aż ją znajdziesz.",
       "openHeading": "Gdzie otwierają się Szczeliny i jak często",
@@ -6840,7 +6840,7 @@ export const pl_PL: EnTranslations = {
       "groupBody": "Zabierz ze sobą drużynę. Szczelina nie robi się łagodniejsza dlatego, że weszło w nią mniej osób: nic w środku nie liczy, ilu was tam stoi, więc ranga na portalu to ranga, z którą walczysz, czy jest was pięciu, czy jeden. Wejście wpuści cię nawet samego, i ludzie naprawdę tego próbują, ale Szczelina jest treścią grupową na każdej randze i jest z tym szczera już od pierwszego pomieszczenia. Twoja drużyna dostaje własną kopię Szczeliny, więc żadna inna grupa nie może wtargnąć do twojego przebiegu. Jeśli polegniesz, możesz wrócić do środka jako zjawa i odzyskać swoje ciało, gdy walka w środku ucichnie.",
       "levelNote": "Szczeliny to zawartość endgame. Musisz osiągnąć pułap poziomów, poziom {n}, by wejść do którejkolwiek z nich, niezależnie od rangi.",
       "floorsHeading": "W dół przez piętra",
-      "floorsBody": "Szczelina prowadzi przez garść pięter, z których każde zbudowano od nowa, a droga w dół nie otwiera się, dopóki piętro nie skończy z tobą: oczyść to, co na nim żyje, rozwiąż to, co zamknęło ci drogę, a zejście rozdziera się przed tobą. Ostatnie piętro kończy się bossem. Każde piętro ma swój własny charakter, więc jeden przebieg może przeprowadzić cię z mrozu prosto w żar, a twój czat nazywa każde piętro w chwili, gdy na nie wchodzisz. To, ile pięter ma dana Szczelina, poznasz z podglądu na ekranie. Kilka Szczelin, zamiast generowanego zejścia, prowadzi do ręcznie zaprojektowanej areny o swojej własnej, stałej długości.",
+      "floorsBody": "Szczelina prowadzi przez garść pięter, z których każde zbudowano od nowa, a droga w dół nie otwiera się, dopóki piętro nie skończy z tobą: oczyść to, co na nim żyje, rozwiąż to, co zamknęło ci drogę, a zejście rozdziera się przed tobą. Ostatnie piętro kończy się starciem z tym samym władcą, którego siła rośnie wraz ze Szczeliną. Jego robactwo podąża za nim przez różne scenerie, więc w finałowej walce spodziewaj się towarzystwa. Każde piętro ma swój własny charakter, więc jeden przebieg może przeprowadzić cię z mrozu prosto w żar, a twój czat nazywa każde piętro w chwili, gdy na nie wchodzisz. To, ile pięter ma dana Szczelina, poznasz z podglądu na ekranie. Kilka Szczelin, zamiast generowanego zejścia, prowadzi do ręcznie zaprojektowanej areny o swojej własnej, stałej długości.",
       "boundHeading": "Gdy przelejesz krew",
       "boundBody": "Pierwsze zabójstwo, jakiego dokona twoja drużyna wewnątrz Szczeliny, przesądza sprawę przebiegu, tak samo jak pierwsza boczna skrytka, którą otworzysz. Od tej chwili jesteś związany z tą konkretną kopią: wyjdź z dowolnego powodu, a powrót wrzuci cię z powrotem w przebieg, który zostawiłeś, nigdy w cudzy i nigdy w świeży, dopóki wejście w świecie wciąż stoi otworem. Przed tym pierwszym zabójstwem i przed tą pierwszą skrytką nic nie jest jeszcze przesądzone, więc grupa, która wciąż się zbiera, może się przegrupować i wejść razem, nie zostawiając za sobą porzuconych w połowie kopii.",
       "raceHeading": "Wyścig o pierwsze oczyszczenie",
@@ -8813,6 +8813,20 @@ export const pl_PL: EnTranslations = {
   },
   "sim": {
     "rift": {
+      "roachKing": {
+        "coronation": "Coronation of Filth",
+        "tributeFeast": "Tribute Feast",
+        "crown": "Roach King's Crown",
+        "crownWarning": "The hermit rises. The Roach King claims his crown!",
+        "filthWarning": "Mountain of Filth: leave the marked ground!",
+        "tributeWarning": "Tribute Feast: interrupt the channel or kill the tribute beetles!",
+        "ringWarning": "The Roach King winds up: get outside the ring!",
+        "filthDetonate": "The mountain of filth erupts!",
+        "swarmDetonate": "The royal swarm erupts!",
+        "deskSlam": "Desk Slam",
+        "mountainOfFilth": "Mountain of Filth",
+        "royalSwarm": "Royal Swarm"
+      },
       "allUnstable": "Wszystkie Szczeliny są obecnie niestabilne. Spróbuj ponownie wkrótce.",
       "enterFloor": "Przechodzisz przez Szczelinę do {name}.",
       "descendFloor": "Schodzisz głębiej w {name}.",
@@ -16623,6 +16637,15 @@ export const pl_PL: EnTranslations = {
       },
       "stable_horse": {
         "name": "Koń stajenny"
+      },
+      "rift_boss_asmon": {
+        "name": "Asmon, the Roach King"
+      },
+      "rift_roachling": {
+        "name": "Royal Roachling"
+      },
+      "rift_garbage_beetle": {
+        "name": "Tribute Beetle"
       },
       "rift_spawnling": {
         "name": "Pomiot Szczeliny"

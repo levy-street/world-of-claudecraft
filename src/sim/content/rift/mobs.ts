@@ -6,14 +6,13 @@
 // re-scaling (entity.scale) and level-scaling these building blocks, not from
 // spawning ad-hoc templates.
 //
-// Stat lines mirror the hand-authored dungeon elites in ../dungeons.ts so a rift
-// stays inside the same balance envelope. Every boss carries a DISTINCT mechanic
-// signature so "noticeably different bosses each run" holds, and lists its
-// headline mechanics in `rankMechanics` unlock order so the portal rank sets how
-// many are live (C=1 .. S=4, src/sim/rift/ranks.ts). Loot: coin plus each
-// environment's signature rare (./items.ts) at a slim rate on trash and a fat
-// one on its boss, and a Rift Essence trickle, so every run (ranked or dev) has
-// real itemisation; the ranked first-clear rings ride rift/progression.ts on top.
+// Stat lines mirror the hand-authored dungeon elites in ../dungeons.ts and
+// receive the shared rank transform at spawn. Every generated boss placement
+// now uses ROACH_KING_MOBS; historical guardian kits remain addressable for
+// compatibility and generic-mechanic regression tests, with acquisition routes
+// retired. Asmon inherits their signature rare pool, while themed trash
+// retains its slim rare chance and Rift Essence trickle. Ranked clear rewards
+// still ride rift/progression.ts on top.
 //
 // Level band note: rift spawn levels are chosen by the generator
 // (rift/ranks.ts riftFloorLevel, 18..RIFT_MAX_MOB_LEVEL), so the bands here are
@@ -23,6 +22,7 @@
 
 import type { LootEntry, MobTemplate } from '../../types';
 import { RIFT_ESSENCE_ITEM_ID } from './items';
+import { ROACH_KING_MOBS } from './roach_king';
 
 /** Trash loot: coin, a slim shot at the environment's signature rare, and a
  * trickle of Rift Essence so clearing packs pays even outside a ranked race. */
@@ -1138,10 +1138,15 @@ const BOSSES: Record<string, MobTemplate> = {
 export const RIFT_MOBS: Record<string, MobTemplate> = {
   ...ADDS,
   ...TRASH,
-  ...BOSSES,
+  // Retired guardian templates remain resolvable for historical identifiers and
+  // generic-mechanic regression fixtures. Their loot now belongs to Asmon.
+  ...Object.fromEntries(
+    Object.entries(BOSSES).map(([id, template]) => [id, { ...template, loot: [] }]),
+  ),
+  ...ROACH_KING_MOBS,
 };
 
 /** Every rift boss template id (the generator's boss pool). */
-export const RIFT_BOSS_IDS: readonly string[] = Object.keys(BOSSES);
+export const RIFT_BOSS_IDS: readonly string[] = ['rift_boss_asmon'];
 /** Every rift trash template id. */
 export const RIFT_TRASH_IDS: readonly string[] = Object.keys(TRASH);

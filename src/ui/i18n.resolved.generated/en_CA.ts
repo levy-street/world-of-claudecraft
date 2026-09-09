@@ -6828,7 +6828,7 @@ export const en_CA: EnTranslations = {
     },
     "riftsPage": {
       "heading": "Rifts",
-      "intro": "A rift is a tear in the world itself, not a door you walk to. Step through one and you get a descent nobody has run before: the floors, the monsters, and the thing waiting at the bottom are all built fresh for that rift alone, so the same rank never plays out the same way twice.",
+      "intro": "A rift is a tear in the world itself, not a door you walk to. Step through one and you get a descent nobody has run before: the floors and their inhabitants change with each rift, while one recurring sovereign claims every final encounter. The same rank can still take you through a different descent each time.",
       "whatHeading": "What a rift is",
       "whatBody": "Dungeons are places. They sit where they have always sat, and you learn them until you know every corner. A delve is a short private descent you start from a board, cut for one or two. A rift is neither: it opens on its own, out in the world, with no warning, and everything inside it is generated the moment it does. Nobody has a route to hand you, because nobody has been down this one. It is instanced like the other two, so what you find inside belongs to you and your group alone, but it is the only instanced content in the game that comes looking for you rather than waiting to be found.",
       "openHeading": "Where rifts open, and how often",
@@ -6840,7 +6840,7 @@ export const en_CA: EnTranslations = {
       "groupBody": "Bring a group. A rift does not soften because fewer of you walked through it: nothing inside counts how many are standing there, so the rank on the portal is the rank you fight, whether that is five of you or one. The doorway will let you in alone, and people do try it, but a rift is group content at every rank and it is honest about that from the first room. Your party gets its own copy of the rift, so no other group can spill into your run. If you fall, you can walk back in as a ghost and collect yourself once the fighting inside has stopped.",
       "levelNote": "Rifts are endgame content. You have to be at the level cap, level {n}, to step through one, at any rank.",
       "floorsHeading": "Down through the floors",
-      "floorsBody": "A rift runs a handful of floors, each one built fresh, and the way down does not open until the floor is finished with you: clear what is living on it, solve whatever it has locked across your path, and the descent tears open. The last floor ends on a boss. Every floor takes a character of its own, so a single run can carry you out of the frost and into the embers, and your chat names each floor as you arrive on it. The tracker on your screen is where you learn how many floors this one has. A few rifts open onto a hand-built set piece instead of a generated descent, which runs to its own fixed length.",
+      "floorsBody": "A rift runs a handful of floors, each one built fresh, and the way down does not open until the floor is finished with you: clear what is living on it, solve whatever it has locked across your path, and the descent tears open. The last floor ends on the same sovereign, whose strength rises with the rift. His infestation follows him between themes, so expect company in the final fight. Every floor takes a character of its own, so a single run can carry you out of the frost and into the embers, and your chat names each floor as you arrive on it. The tracker on your screen is where you learn how many floors this one has. A few rifts open onto a hand-built set piece instead of a generated descent, which runs to its own fixed length.",
       "boundHeading": "Once you draw blood",
       "boundBody": "The first kill your group takes inside a rift settles the run, and so does the first off-path cache you crack open. From that moment you are bound to that copy of it: step out for any reason and coming back puts you in the run you left, never in another group's and never in a fresh one, for as long as the entrance out in the world is still standing. Before that first kill, and before that first cache, nothing is settled, so a group that is still gathering can regroup and walk in together without stranding half-started copies behind them.",
       "raceHeading": "The race for the first clear",
@@ -8813,6 +8813,20 @@ export const en_CA: EnTranslations = {
   },
   "sim": {
     "rift": {
+      "roachKing": {
+        "coronation": "Coronation of Filth",
+        "tributeFeast": "Tribute Feast",
+        "crown": "Roach King's Crown",
+        "crownWarning": "The hermit rises. The Roach King claims his crown!",
+        "filthWarning": "Mountain of Filth: leave the marked ground!",
+        "tributeWarning": "Tribute Feast: interrupt the channel or kill the tribute beetles!",
+        "ringWarning": "The Roach King winds up: get outside the ring!",
+        "filthDetonate": "The mountain of filth erupts!",
+        "swarmDetonate": "The royal swarm erupts!",
+        "deskSlam": "Desk Slam",
+        "mountainOfFilth": "Mountain of Filth",
+        "royalSwarm": "Royal Swarm"
+      },
       "allUnstable": "All rifts are unstable right now. Try again soon.",
       "enterFloor": "You step through the rift into {name}.",
       "descendFloor": "You descend deeper into {name}.",
@@ -16623,6 +16637,15 @@ export const en_CA: EnTranslations = {
       },
       "stable_horse": {
         "name": "Stable Horse"
+      },
+      "rift_boss_asmon": {
+        "name": "Asmon, the Roach King"
+      },
+      "rift_roachling": {
+        "name": "Royal Roachling"
+      },
+      "rift_garbage_beetle": {
+        "name": "Tribute Beetle"
       },
       "rift_spawnling": {
         "name": "Rift Spawnling"

@@ -6828,7 +6828,7 @@ export const es: EnTranslations = {
     },
     "riftsPage": {
       "heading": "Brechas",
-      "intro": "Una brecha es un desgarro en el mundo mismo, no una puerta a la que caminas. Atraviesa una y consigues un descenso que nadie ha recorrido antes: los pisos, los monstruos y lo que espera al fondo se construyen de cero solo para esa brecha, así que el mismo rango nunca se desarrolla igual dos veces.",
+      "intro": "Una brecha es un desgarro en el mundo mismo, no una puerta a la que caminas. Atraviesa una y consigues un descenso que nadie ha recorrido antes: los pisos y sus habitantes cambian con cada brecha, mientras un mismo soberano reclama todos los encuentros finales. Incluso el mismo rango puede llevarte por un descenso diferente cada vez.",
       "whatHeading": "Qué es una brecha",
       "whatBody": "Las mazmorras son lugares. Están donde siempre han estado, y las aprendes hasta conocer cada rincón. Una expedición es un breve descenso privado que empiezas desde un tablón, pensado para uno o dos. Una brecha no es ninguna de las dos cosas: se abre por su cuenta, ahí fuera en el mundo, sin previo aviso, y cuanto hay dentro se genera en el momento en que lo hace. Nadie tiene una ruta que darte, porque nadie ha bajado por esta. Está instanciada como las otras dos, así que lo que encuentras dentro te pertenece solo a ti y a tu grupo, pero es el único contenido instanciado del juego que viene a buscarte a ti, en lugar de esperar a que lo encuentres.",
       "openHeading": "Dónde se abren las brechas, y con qué frecuencia",
@@ -6840,7 +6840,7 @@ export const es: EnTranslations = {
       "groupBody": "Trae un grupo. Una brecha no se ablanda porque hayáis entrado menos personas: nada en su interior cuenta cuántos hay allí de pie, así que el rango del portal es el rango contra el que luchas, sean cinco de vosotros o uno solo. La entrada te dejará pasar en solitario, y hay quien lo intenta, pero una brecha es contenido de grupo en todos los rangos, y es honesta al respecto desde la primera sala. Tu grupo recibe su propia copia de la brecha, así que ningún otro grupo puede colarse en tu partida. Si caes, puedes volver a entrar como espíritu y reunirte con tu cuerpo en cuanto el combate en el interior se haya detenido.",
       "levelNote": "Las brechas son contenido de final de juego. Tienes que estar en el límite de nivel, nivel {n}, para atravesar una, en cualquier rango.",
       "floorsHeading": "Descendiendo por los pisos",
-      "floorsBody": "Una brecha recorre un puñado de pisos, cada uno construido de cero, y el camino hacia abajo no se abre hasta que el piso termina contigo: despeja lo que vive en él, resuelve lo que te haya cerrado el paso, y el camino hacia abajo se abre. El último piso termina en un jefe. Cada piso tiene un carácter propio, así que una sola partida puede llevarte de la escarcha a las ascuas, y tu chat nombra cada piso en cuanto llegas a él. El rastreador en tu pantalla es donde averiguas cuántos pisos tiene esta. Unas pocas brechas se abren a un escenario construido a mano en lugar de un descenso generado, que recorre su propia longitud fija.",
+      "floorsBody": "Una brecha recorre un puñado de pisos, cada uno construido de cero, y el camino hacia abajo no se abre hasta que el piso termina contigo: despeja lo que vive en él, resuelve lo que te haya cerrado el paso, y el camino hacia abajo se abre. El último piso termina ante el mismo soberano, cuya fuerza aumenta con la brecha. Su infestación lo acompaña entre los distintos entornos, así que espera compañía en el combate final. Cada piso tiene un carácter propio, así que una sola partida puede llevarte de la escarcha a las ascuas, y tu chat nombra cada piso en cuanto llegas a él. El rastreador en tu pantalla es donde averiguas cuántos pisos tiene esta. Unas pocas brechas se abren a un escenario construido a mano en lugar de un descenso generado, que recorre su propia longitud fija.",
       "boundHeading": "En cuanto derramas sangre",
       "boundBody": "El primer derribo que consigue tu grupo dentro de una brecha fija la partida, y lo mismo ocurre con el primer alijo apartado del camino que abres. A partir de ese momento quedas ligado a esa copia de la brecha: si sales por cualquier motivo, al volver caerás en la partida que dejaste, nunca en la de otro grupo ni en una nueva, mientras la entrada siga en pie en el mundo. Antes de ese primer derribo, y antes de ese primer alijo, nada está decidido, así que un grupo que todavía se está reuniendo puede rehacerse y entrar juntos, sin dejar copias a medio empezar abandonadas atrás.",
       "raceHeading": "La carrera por el primer despeje",
@@ -8813,6 +8813,20 @@ export const es: EnTranslations = {
   },
   "sim": {
     "rift": {
+      "roachKing": {
+        "coronation": "Coronation of Filth",
+        "tributeFeast": "Tribute Feast",
+        "crown": "Roach King's Crown",
+        "crownWarning": "The hermit rises. The Roach King claims his crown!",
+        "filthWarning": "Mountain of Filth: leave the marked ground!",
+        "tributeWarning": "Tribute Feast: interrupt the channel or kill the tribute beetles!",
+        "ringWarning": "The Roach King winds up: get outside the ring!",
+        "filthDetonate": "The mountain of filth erupts!",
+        "swarmDetonate": "The royal swarm erupts!",
+        "deskSlam": "Desk Slam",
+        "mountainOfFilth": "Mountain of Filth",
+        "royalSwarm": "Royal Swarm"
+      },
       "allUnstable": "Todas las brechas están inestables en este momento. Vuelve a intentarlo pronto.",
       "enterFloor": "Cruzas la brecha hacia {name}.",
       "descendFloor": "Desciendes más profundo en {name}.",
@@ -16623,6 +16637,15 @@ export const es: EnTranslations = {
       },
       "stable_horse": {
         "name": "Caballo de establo"
+      },
+      "rift_boss_asmon": {
+        "name": "Asmon, the Roach King"
+      },
+      "rift_roachling": {
+        "name": "Royal Roachling"
+      },
+      "rift_garbage_beetle": {
+        "name": "Tribute Beetle"
       },
       "rift_spawnling": {
         "name": "Cría de la Brecha"

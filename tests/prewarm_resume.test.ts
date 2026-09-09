@@ -527,7 +527,13 @@ describe('resumeDroppedPrewarmEntries', () => {
     );
     expect(unitsStart).toBeGreaterThan(-1);
     expect(unitsEnd).toBeGreaterThan(unitsStart);
-    expect(compileUnitsSource).toContain('if (visibleOnly) root.traverseVisible(collect)');
+    // Only explicitly marked eager VFX pools bypass visibility: their first
+    // cast must not link live. Optional hidden catalogs stay excluded (actual
+    // scene and pool behavior is covered by initial_scene_compile_units and
+    // ability_vfx_prewarm tests). Keep the exception narrow in this wiring pin.
+    expect(compileUnitsSource).toContain(
+      'if (visibleOnly && !isAbilityVfxPrimitive(root)) root.traverseVisible(collect)',
+    );
     expect(compileUnitsSource).toContain('else root.traverse(collect)');
     expect(compileUnitsSource).toContain('roots: compileRoots(group.children, false)');
     // The mass-submission callback compiles against the lights-only proxy

@@ -675,9 +675,9 @@ describe('every lethal death zone leaves real time to react', () => {
   it('covers the whole roster (the list is not silently empty)', () => {
     // A budget guard that enumerates nothing passes vacuously. Every rift boss
     // authors both zones, and both sit at rankMechanics indices 2 and 3 across
-    // the procedural roster, so the live set is substantial at A and S.
-    expect(zones.length).toBeGreaterThan(15);
-    expect(new Set(zones.map((z) => z.id)).size).toBeGreaterThan(5);
+    // the procedural roster, giving one A-zone and two S-zone entries per boss.
+    expect(zones.length).toBe(RIFT_BOSS_IDS.length * 3);
+    expect([...new Set(zones.map((z) => z.id))]).toEqual(RIFT_BOSS_IDS);
   });
 
   it.each(zones)(

@@ -15058,7 +15058,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.riftsPage.groupHeading': '誰が入るのか',
   'guide.riftsPage.heading': 'リフト',
   'guide.riftsPage.intro':
-    'リフトは世界そのものに走った裂け目であり、歩いて訪れる扉ではありません。くぐった先には、誰ひとり踏破したことのない下降が待っています。フロアも、そこに巣くうものも、底で待ち構えるものも、すべてそのリフトのためだけに新しく組み上げられるので、同じランクでも二度と同じ展開にはなりません。',
+    'リフトは世界そのものに走った裂け目であり、歩いて訪れる扉ではありません。くぐった先には、誰ひとり踏破したことのない下降が待っています。フロアとその住人はリフトごとに変わりますが、最後の戦いにはいつも同じ君主が待ち構えています。同じランクでも、毎回異なる下降をたどることがあります。',
   'guide.riftsPage.levelNote':
     'リフトはエンドゲームの内容です。どのランクであっても、くぐるにはレベル上限、すなわちレベル{n}に達している必要があります。',
   'guide.riftsPage.openBody':
@@ -15451,7 +15451,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.formLine.form_bear':
     'タンクの姿です。分厚い毛皮をまとい、マナの代わりにレイジを使い、追加の脅威で敵の矛先を自分に引きつけ続けます。',
   'guide.riftsPage.floorsBody':
-    'リフトはいくつかのフロアで構成され、そのどれもがその場で新しく組み上げられます。下への道は、そのフロアがあなたを解放するまで開きません。フロアに居座るものを片づけ、行く手をふさぐ仕掛けを解いてはじめて、下りの道が裂け開きます。最後のフロアはボスで終わります。フロアごとに固有の性格があるので、ひとつの挑戦の中で霜の世界から燃え殻の世界へ移ることもあり、到着するたびにチャットがそのフロアの名を告げます。今回のリフトが何フロアあるのかは、画面のトラッカーでわかります。なお、一部のリフトは生成された下降のかわりに、手作りの舞台を開きます。こちらは決まった長さで進みます。',
+    'リフトはいくつかのフロアで構成され、そのどれもがその場で新しく組み上げられます。下への道は、そのフロアがあなたを解放するまで開きません。フロアに居座るものを片づけ、行く手をふさぐ仕掛けを解いてはじめて、下りの道が裂け開きます。最後のフロアにはいつも同じ君主が待ち構え、その力はリフトとともに増していきます。彼の蟲の群れはさまざまな環境へついてくるので、最後の戦いでは取り巻きにも備えましょう。フロアごとに固有の性格があるので、ひとつの挑戦の中で霜の世界から燃え殻の世界へ移ることもあり、到着するたびにチャットがそのフロアの名を告げます。今回のリフトが何フロアあるのかは、画面のトラッカーでわかります。なお、一部のリフトは生成された下降のかわりに、手作りの舞台を開きます。こちらは決まった長さで進みます。',
   // Performance diagnostics panel chrome. Technical report prose remains English.
   'hudChrome.perf.diagnostics.panelAria': 'World of ClaudeCraft パフォーマンス診断',
   'hudChrome.perf.diagnostics.title': 'ClaudeCraft パフォーマンス診断',
@@ -16785,4 +16785,18 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.farmgrow.label': '作物を成熟させる',
   'devCommand.fields.bed': '畝のID（任意）',
   'guide.profPages.oncePerDay': '1日1回',
+  'sim.rift.roachKing.coronation': '汚穢の戴冠',
+  'sim.rift.roachKing.tributeFeast': '貢物の饗宴',
+  'sim.rift.roachKing.crown': 'ゴキブリ王の王冠',
+  'sim.rift.roachKing.crownWarning': '隠者が立ち上がる。ゴキブリ王が王冠を戴く！',
+  'sim.rift.roachKing.filthWarning': '汚穢の山：地面の印から離れろ！',
+  'sim.rift.roachKing.tributeWarning': '貢物の饗宴：チャネリングを中断するか、貢物の甲虫を倒せ！',
+  'sim.rift.roachKing.ringWarning': 'ゴキブリ王が力を溜めている。円の外へ逃げろ！',
+  'sim.rift.roachKing.filthDetonate': '汚穢の山が噴き出す！',
+  'sim.rift.roachKing.swarmDetonate': '王家の蟲群が噴き出す！',
+  'sim.rift.roachKing.mountainOfFilth': '汚穢の山',
+  'sim.rift.roachKing.royalSwarm': '王家の蟲群',
+  'entities.mobs.rift_boss_asmon.name': 'ゴキブリ王Asmon',
+  'entities.mobs.rift_roachling.name': '王家の幼ゴキブリ',
+  'entities.mobs.rift_garbage_beetle.name': '貢物の甲虫',
 };

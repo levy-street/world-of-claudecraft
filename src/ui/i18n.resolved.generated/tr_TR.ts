@@ -6828,7 +6828,7 @@ export const tr_TR: EnTranslations = {
     },
     "riftsPage": {
       "heading": "Yarıklar",
-      "intro": "Bir Yarık, yürüyerek gidebileceğin bir kapı değil, dünyanın kendisindeki bir yırtıktır. Birinden geçtiğinde daha önce kimsenin koşmadığı bir iniş elde edersin: katlar, canavarlar ve dipte bekleyen şey, yalnızca o Yarık için sıfırdan inşa edilmiştir, bu yüzden aynı derece hiçbir zaman iki kez aynı şekilde geçmez.",
+      "intro": "Bir Yarık, yürüyerek gidebileceğin bir kapı değil, dünyanın kendisindeki bir yırtıktır. Birinden geçtiğinde daha önce kimsenin koşmadığı bir iniş elde edersin: katlar ve sakinleri her Yarıkta değişirken, her son karşılaşmada aynı hükümdar hak iddia eder. Aynı derece bile seni her seferinde farklı bir inişten geçirebilir.",
       "whatHeading": "Bir Yarık nedir",
       "whatBody": "Zindanlar birer yerdir. Hep durdukları yerde dururlar ve sen onları her köşesini tanıyana dek öğrenirsin. Bir mağara seferi, bir panodan başlattığın, bir ya da iki kişi için kısa ve özel bir iniştir. Bir Yarık ise ikisi de değildir: kendiliğinden, dünyanın içinde, hiçbir uyarı olmadan açılır ve içindeki her şey açıldığı anda oluşturulur. Kimsenin sana verecek bir rotası yoktur, çünkü kimse bu Yarıktan aşağı inmemiştir. Diğer ikisi gibi kopya alanlıdır, bu yüzden içinde bulduğun şey yalnızca sana ve grubuna aittir, ama oyundaki bulunmayı bekleyen değil seni arayıp bulan tek kopya alanlı içeriktir.",
       "openHeading": "Yarıklar nerede açılır, ne sıklıkla",
@@ -6840,7 +6840,7 @@ export const tr_TR: EnTranslations = {
       "groupBody": "Bir grup getir. Bir Yarık, içinden daha az kişi geçti diye yumuşamaz: içerideki hiçbir şey orada kaç kişi durduğunu saymaz, bu yüzden portaldaki derece, ister beş kişi ister tek başına ol, karşına çıkan derecedir. Kapı seni tek başına da içeri alır, ve bunu deneyen insanlar gerçekten var, ama bir Yarık her derecede grup içeriğidir ve bunu ilk odadan itibaren dürüstçe belli eder. Grubun, Yarığın kendi kopyasını alır, bu yüzden başka hiçbir grup senin koşuna sızamaz. Düşersen, içerideki dövüş durduktan sonra bir hayalet olarak geri yürüyüp kendini toparlayabilirsin.",
       "levelNote": "Yarıklar son oyun içeriğidir. Herhangi bir derecede birinden geçebilmek için seviye tavanında, yani {n}. seviyede olman gerekir.",
       "floorsHeading": "Katlar boyunca aşağı",
-      "floorsBody": "Bir Yarık, her biri sıfırdan inşa edilmiş bir avuç kattan oluşur ve aşağı inen yol, kat seninle işini bitirmeden açılmaz: üzerinde yaşayanları temizle, yoluna kilitlediği her şeyi çöz, ardından iniş yırtılarak açılır. Son kat bir patronla biter. Her kat kendi karakterini taşır, bu yüzden tek bir koşu seni dondan çıkarıp korlara sokabilir, ve sohbetin her katı vardığın anda adlandırır. Ekranındaki takipçi, bu Yarığın kaç katı olduğunu öğrendiğin yerdir. Birkaç Yarık, oluşturulmuş bir inişin yerine, kendi sabit uzunluğunda çalışan elle inşa edilmiş bir sahneye açılır.",
+      "floorsBody": "Bir Yarık, her biri sıfırdan inşa edilmiş bir avuç kattan oluşur ve aşağı inen yol, kat seninle işini bitirmeden açılmaz: üzerinde yaşayanları temizle, yoluna kilitlediği her şeyi çöz, ardından iniş yırtılarak açılır. Son kat, gücü Yarıkla birlikte artan aynı hükümdarla biter. Haşereleri farklı ortamlarda da onu takip eder, bu yüzden son savaşta yalnız olmayacağını hesaba kat. Her kat kendi karakterini taşır, bu yüzden tek bir koşu seni dondan çıkarıp korlara sokabilir, ve sohbetin her katı vardığın anda adlandırır. Ekranındaki takipçi, bu Yarığın kaç katı olduğunu öğrendiğin yerdir. Birkaç Yarık, oluşturulmuş bir inişin yerine, kendi sabit uzunluğunda çalışan elle inşa edilmiş bir sahneye açılır.",
       "boundHeading": "Kan döktüğün an",
       "boundBody": "Grubunun bir Yarığın içinde aldığı ilk öldürme, koşuyu kesinleştirir; açtığın ilk yoldan sapan zula da öyle. O andan itibaren o kopyasına bağlanırsın: herhangi bir nedenle dışarı çıkıp geri döndüğünde, dışarıdaki giriş hâlâ ayaktaysa, seni her zaman bıraktığın koşuya koyar, asla başka bir grubun koşusuna ya da yepyeni bir koşuya değil. O ilk öldürmeden ve o ilk zuladan önce hiçbir şey kesinleşmemiştir, bu yüzden hâlâ toplanmakta olan bir grup yeniden bir araya gelip yarım kalmış kopyalar bırakmadan birlikte içeri girebilir.",
       "raceHeading": "İlk temizlik için yarış",
@@ -8813,6 +8813,20 @@ export const tr_TR: EnTranslations = {
   },
   "sim": {
     "rift": {
+      "roachKing": {
+        "coronation": "Coronation of Filth",
+        "tributeFeast": "Tribute Feast",
+        "crown": "Roach King's Crown",
+        "crownWarning": "The hermit rises. The Roach King claims his crown!",
+        "filthWarning": "Mountain of Filth: leave the marked ground!",
+        "tributeWarning": "Tribute Feast: interrupt the channel or kill the tribute beetles!",
+        "ringWarning": "The Roach King winds up: get outside the ring!",
+        "filthDetonate": "The mountain of filth erupts!",
+        "swarmDetonate": "The royal swarm erupts!",
+        "deskSlam": "Desk Slam",
+        "mountainOfFilth": "Mountain of Filth",
+        "royalSwarm": "Royal Swarm"
+      },
       "allUnstable": "Şu anda tüm Yarıklar kararsız. Yakında tekrar dene.",
       "enterFloor": "Yarıktan geçip {name} içine giriyorsun.",
       "descendFloor": "{name} içinde daha derine iniyorsun.",
@@ -16623,6 +16637,15 @@ export const tr_TR: EnTranslations = {
       },
       "stable_horse": {
         "name": "Ahır Atı"
+      },
+      "rift_boss_asmon": {
+        "name": "Asmon, the Roach King"
+      },
+      "rift_roachling": {
+        "name": "Royal Roachling"
+      },
+      "rift_garbage_beetle": {
+        "name": "Tribute Beetle"
       },
       "rift_spawnling": {
         "name": "Yarık Yavrusu"

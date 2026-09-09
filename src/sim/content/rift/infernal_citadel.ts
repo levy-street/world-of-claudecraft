@@ -338,7 +338,7 @@ export function buildInfernalCitadelFloor(
   if (pit) {
     // The giga-boss waits at the bottom of the pit: his death opens the way home.
     spawns.push({
-      templateId: 'rift_boss_pitlord',
+      templateId: 'rift_boss_asmon',
       x: DAIS.x,
       z: DAIS.z,
       level: floorLevel,
@@ -347,7 +347,7 @@ export function buildInfernalCitadelFloor(
   } else {
     // Miniboss on the pentagram: his death arms the Blood Orb.
     spawns.push({
-      templateId: 'rift_boss_ritualist',
+      templateId: 'rift_boss_asmon',
       x: ROTUNDA.x,
       z: ROTUNDA.z,
       level: floorLevel,

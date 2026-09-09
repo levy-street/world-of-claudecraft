@@ -1,4 +1,4 @@
-// Rift boss lethal death zone visual: the red danger circle drawn on the
+// Rift boss lethal death zone visual: the amber-rimmed violet danger circle drawn on the
 // terrain at the zone's (x, z) position while the boss casts. The cast bar is
 // the primary telegraph; this decal makes the exact danger radius visible so
 // players can step out before the detonation.
@@ -18,6 +18,9 @@
 import * as THREE from 'three';
 import type { RiftBossDeathZoneView } from '../world_api/dungeons';
 import {
+  DEATH_ZONE_FILL_COLOR,
+  DEATH_ZONE_RIM_COLOR,
+  DEATH_ZONE_SWEEP_COLOR,
   deathZonePlan,
   deathZonePulseSpeed,
   deathZoneSweepScale,
@@ -27,8 +30,6 @@ import {
 } from './rift_death_zone_core';
 
 const SEGMENTS = 64;
-const BASE_COLOR = 0xff2200;
-const SWEEP_COLOR = 0xff5500;
 /** Rim band inner edge as a fraction of the zone radius (mage_ground_fx's
  * terrain-ring proportions, which read clearly at gameplay camera range). */
 const RIM_INNER_FRACTION = 0.85;
@@ -118,7 +119,7 @@ export class RiftDeathZoneVisuals {
     const ownedGeometries: THREE.BufferGeometry[] = [];
 
     const rimMat = new THREE.MeshBasicMaterial({
-      color: new THREE.Color(BASE_COLOR).multiplyScalar(1.6),
+      color: new THREE.Color(DEATH_ZONE_RIM_COLOR).multiplyScalar(1.6),
       transparent: true,
       opacity: RING_MAX_OPACITY,
       blending: THREE.AdditiveBlending,
@@ -139,7 +140,7 @@ export class RiftDeathZoneVisuals {
     // any number of overlaps stays readable; the thin rim band keeps its
     // additive glow (overlap area is small and a brighter crossing helps).
     const fillMat = new THREE.MeshBasicMaterial({
-      color: new THREE.Color(BASE_COLOR).multiplyScalar(1.3),
+      color: new THREE.Color(DEATH_ZONE_FILL_COLOR).multiplyScalar(1.3),
       transparent: true,
       opacity: FILL_OPACITY,
       depthWrite: false,
@@ -156,7 +157,7 @@ export class RiftDeathZoneVisuals {
     // rescales every frame; rift boss floors are flat apart from the dais
     // step, and the center height is the right one where the sweep starts.
     const sweepMat = new THREE.MeshBasicMaterial({
-      color: new THREE.Color(SWEEP_COLOR).multiplyScalar(1.4),
+      color: new THREE.Color(DEATH_ZONE_SWEEP_COLOR).multiplyScalar(1.4),
       transparent: true,
       opacity: SWEEP_BASE_OPACITY,
       depthWrite: false,

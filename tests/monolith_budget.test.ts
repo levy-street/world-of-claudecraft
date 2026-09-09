@@ -840,7 +840,7 @@ const MONOLITHS: MonolithRow[] = [
     // Measured after formatting; lower the ratchet with the extraction.
     // Mount skins: bank the coordinator extraction at its measured size.
     // Restored per-ability resurrection school lookup removes one line.
-    ceiling: 12851,
+    ceiling: 12833,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1566,7 +1566,8 @@ const MONOLITHS: MonolithRow[] = [
     // OSSBrain integration: entity flair decoding moved to net/entity_flair_wire.ts.
     // Measured after formatting; lower the ratchet with the extraction.
     // Main hotfix integration: combined extractions, exact merged count.
-    ceiling: 5540,
+    // Rift death-zone decode/pruning lives in rift_death_zone_wire.ts.
+    ceiling: 5527,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

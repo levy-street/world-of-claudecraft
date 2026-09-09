@@ -8,11 +8,13 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { AbilityVfxFx } from '../src/render/ability_vfx/fx';
 import { FLIPBOOK_STYLES } from '../src/render/ability_vfx/fx_textures';
 import {
   abilityVfxTexturePrewarmSteps,
   collectAbilityVfxCompileTargets,
 } from '../src/render/ability_vfx/prewarm';
+import { buildInitialSceneCompileUnits } from '../src/render/initial_scene_compile_units';
 
 // The canvas textures are procedurally drawn, so a plain Node run needs a 2D
 // context stub (same shape as the ability-VFX and vfx suites use).
@@ -91,6 +93,69 @@ describe('abilityVfxTexturePrewarmSteps', () => {
 });
 
 describe('collectAbilityVfxCompileTargets', () => {
+  it.each(['toneMapped', 'forceSinglePass'] as const)(
+    'prepares all eight eager primitive programs without merging the pillar %s variant',
+    async (dimension) => {
+      installCanvasStub();
+      const scene = new THREE.Scene();
+      const unrelated = vfxMesh('unrelated-hidden-vfx', new THREE.MeshStandardMaterial());
+      scene.add(unrelated);
+      const fx = new AbilityVfxFx(
+        scene,
+        new THREE.PerspectiveCamera(),
+        () => null,
+        () => 0,
+      );
+      const pillar = scene.children.find(
+        (root) => (root as THREE.Mesh).geometry?.type === 'CylinderGeometry',
+      ) as THREE.InstancedMesh<THREE.BufferGeometry, THREE.ShaderMaterial>;
+      // Release pillars use one instanced ShaderMaterial. A second mesh with
+      // exactly one differing flag must still get its own preparation unit.
+      const priorVariant = new THREE.InstancedMesh(pillar.geometry, pillar.material.clone(), 1);
+      priorVariant.material[dimension] = !pillar.material[dimension];
+      scene.add(priorVariant);
+      const visibility = new Map(scene.children.map((root) => [root, root.visible]));
+      const compiled: THREE.Object3D[] = [];
+      const options = {
+        scene,
+        stagedGroups: [],
+        includeGroup: (id: string) => id === 'scene',
+        playerX: 0,
+        playerZ: 0,
+        batchSize: 1,
+        sharedDedupe: { seen: new Set<THREE.Object3D>(), seenKeys: new Set<unknown>() },
+        compileColor: async (root: THREE.Object3D) => {
+          compiled.push(root);
+        },
+        compileShadow: async () => undefined,
+        onCompiledRoot: () => undefined,
+      };
+      try {
+        for (const unit of buildInitialSceneCompileUnits(options)) await unit.run();
+        expect(compiled).toHaveLength(9); // eight pools plus the distinct material variant
+        expect(scene.children).toContain(unrelated);
+        expect(compiled).not.toContain(unrelated);
+        expect(compiled.every((root) => root.visible === visibility.get(root))).toBe(true);
+        const meshes = compiled as THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial>[];
+        expect(meshes.find((mesh) => mesh.material.uniforms?.uFrame)?.material.side).toBe(0);
+        expect(meshes.find((mesh) => mesh.material.uniforms?.uDissolve)?.material.side).toBe(0);
+        const ring = meshes.find((mesh) => mesh.material.uniforms?.uProgress)!;
+        expect(ring.material.side).toBe(2);
+        expect(ring.material.forceSinglePass).toBe(true);
+        expect(compiled).toContain(pillar);
+        expect(pillar.isInstancedMesh).toBe(true);
+        expect(pillar.material.type).toBe('ShaderMaterial');
+        expect(pillar.material.side).toBe(2);
+        expect(pillar.material.forceSinglePass).toBe(true);
+        expect(pillar.geometry.getAttribute('normal').itemSize).toBe(3);
+        expect(buildInitialSceneCompileUnits(options)).toEqual([]);
+      } finally {
+        priorVariant.material.dispose();
+        fx.dispose();
+      }
+    },
+  );
+
   it('returns one target per distinct pooled material', () => {
     const scene = new THREE.Scene();
     const shared = new THREE.MeshBasicMaterial();

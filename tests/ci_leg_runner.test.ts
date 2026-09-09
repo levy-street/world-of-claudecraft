@@ -302,47 +302,54 @@ describe('exported constants and header shape', () => {
 });
 
 describe('runLeg (real subprocess)', () => {
-  it('streams output through, captures a bounded tail, and reports the exit code', async () => {
-    const out = new PassThrough();
-    const err = new PassThrough();
-    const outChunks: Buffer[] = [];
-    const errChunks: Buffer[] = [];
-    out.on('data', (c) => outChunks.push(c));
-    err.on('data', (c) => errChunks.push(c));
-    const script =
-      // Enough stdout to overflow the small tail budget below, then the
-      // signature artifacts at the very end, split across the two streams
-      // like a real vitest run (summary on stdout, rejection on stderr).
-      // exitCode, never process.exit(): on a loaded machine the 64 KB burst
-      // is still queued on the child's async stdout pipe, and a forced exit
-      // drops the summary write behind it, exactly the truncation defect the
-      // entry itself was fixed for (this fixture flaked that way once under
-      // a full gate before the change).
-      "process.stdout.write('x'.repeat(64 * 1024));" +
-      "process.stdout.write('\\n Test Files  2 passed (2)\\n      Tests  5 passed (5)\\n');" +
-      "process.stderr.write('EnvironmentTeardownError: [vitest-worker]: " +
-      'Closing rpc while "onUserConsoleLog" was pending' +
-      "\\n');" +
-      'process.exitCode = 1;';
-    const result = await runLeg({
-      cmd: process.execPath,
-      args: ['-e', script],
-      cwd: process.cwd(),
-      out,
-      err,
-      tailBytes: 8 * 1024,
-    });
-    expect(result.status).toBe(1);
-    expect(result.spawnError).toBeUndefined();
-    // The tail is bounded and keeps the END of the combined output.
-    expect(result.tail.length).toBeLessThanOrEqual(8 * 1024);
-    expect(result.tail).toContain('Test Files  2 passed (2)');
-    expect(result.tail).toContain(TEARDOWN_RPC_MESSAGE);
-    // The full output still reached the passthrough sinks uncut: the CI log
-    // must never lose bytes to the tail bookkeeping.
-    expect(Buffer.concat(outChunks).length).toBeGreaterThan(64 * 1024);
-    expect(Buffer.concat(errChunks).toString('utf8')).toContain(TEARDOWN_RPC_MESSAGE);
-  });
+  it.each(['stdout', 'stderr'] as const)(
+    'streams output through, captures a bounded %s tail, and reports the exit code',
+    async (overflowStream) => {
+      const out = new PassThrough();
+      const err = new PassThrough();
+      const outChunks: Buffer[] = [];
+      const errChunks: Buffer[] = [];
+      out.on('data', (c) => outChunks.push(c));
+      err.on('data', (c) => errChunks.push(c));
+      // Separate pipes have no shared delivery order: an early stderr marker
+      // can legitimately leave the rolling tail while queued stdout drains.
+      // Exercise each pipe with its burst and tail markers in that pipe's
+      // guaranteed order, and independently require both full sinks below.
+      const otherStream = overflowStream === 'stdout' ? 'stderr' : 'stdout';
+      const summary = '\n Test Files  2 passed (2)\n      Tests  5 passed (5)\n';
+      const teardown = `EnvironmentTeardownError: [vitest-worker]: ${TEARDOWN_RPC_MESSAGE}\n`;
+      const payload = 'x'.repeat(64 * 1024) + summary + teardown;
+      const sideOutput = 'other pipe output\n';
+      // exitCode allows queued pipe writes to drain; process.exit() can
+      // truncate the burst and its terminal markers on a loaded machine.
+      const script =
+        `process.${otherStream}.write(${JSON.stringify(sideOutput)});` +
+        `process.${overflowStream}.write('x'.repeat(64 * 1024) + ${JSON.stringify(summary + teardown)});` +
+        'process.exitCode = 1;';
+      const result = await runLeg({
+        cmd: process.execPath,
+        args: ['-e', script],
+        cwd: process.cwd(),
+        out,
+        err,
+        tailBytes: 8 * 1024,
+      });
+      expect(result.status).toBe(1);
+      expect(result.spawnError).toBeUndefined();
+      // The tail is bounded and keeps the END of the combined output.
+      expect(result.tail.length).toBeLessThanOrEqual(8 * 1024);
+      expect(result.tail).toContain('Test Files  2 passed (2)');
+      expect(result.tail).toContain(TEARDOWN_RPC_MESSAGE);
+      // The full output still reached the passthrough sinks uncut: the CI log
+      // must never lose bytes to the tail bookkeeping.
+      expect(Buffer.concat(outChunks).toString('utf8')).toBe(
+        overflowStream === 'stdout' ? payload : sideOutput,
+      );
+      expect(Buffer.concat(errChunks).toString('utf8')).toBe(
+        overflowStream === 'stderr' ? payload : sideOutput,
+      );
+    },
+  );
 
   it('reports exit 0 for a green child', async () => {
     const result = await runLeg({

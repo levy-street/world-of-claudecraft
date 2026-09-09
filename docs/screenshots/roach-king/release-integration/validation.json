@@ -1,0 +1,187 @@
+{
+  "sourceCommit": "a03bde5c07b5ed384d78f3ed3c1fe9db780724df",
+  "url": "http://127.0.0.1:5186",
+  "commands": [
+    "GAME_URL=http://127.0.0.1:5186 SHOT_OUT=tmp/roach-king-release-merge node scripts/roach_king_smoke.mjs --low --hardware --pose-probe",
+    "GAME_URL=http://127.0.0.1:5186 SHOT_OUT=tmp/roach-king-release-merge node scripts/roach_king_smoke.mjs --mobile --hardware --death-only --pose-probe"
+  ],
+  "notes": [
+    "Merged source was frozen for both accepted runs; Vite build label retained its launch-time pre-commit hash.",
+    "Desktop captures were inspected for clear Slam boundary, coherent front paws, and side-view shell support; mobile corpse capture was inspected with its exact rendered-floor probe.",
+    "Hardware headless Chrome on Apple M4 Pro; mobile viewport emulation is not a physical-phone performance test. No FPS or smoothness claim.",
+    "Console was not empty: offline local API502s and fail-soft startup missing-preload diagnostics for unrelated walking staff and training dummy are preserved in raw reports. No page or shader errors.",
+    "First fresh-Vite run was interrupted by dependency optimization reloads before entering the world. Its failed receipt is retained in tmp/roach-king-release-merge/optimizer-reload and is excluded from acceptance."
+  ],
+  "profiles": {
+    "desktop-low": {
+      "report": "desktop-low.json",
+      "passed": true,
+      "scope": "full encounter (9 stages)",
+      "viewport": {
+        "width": 1600,
+        "height": 900,
+        "deviceScaleFactor": 1
+      },
+      "hardware": true,
+      "headed": false,
+      "pageErrors": [],
+      "consoleErrors": [
+        {
+          "text": "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+          "location": {
+            "url": "http://127.0.0.1:5186/api/site-presence"
+          }
+        },
+        {
+          "text": "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+          "location": {
+            "url": "http://127.0.0.1:5186/api/project-stats"
+          }
+        },
+        {
+          "text": "character visual unavailable, skipping view (npc_modular_walking_staff): Error: character asset not preloaded: models/weapons/brasscrown_walking_staff.glb",
+          "location": {
+            "url": "http://127.0.0.1:5186/@vite/client",
+            "lineNumber": 524,
+            "columnNumber": 3
+          }
+        },
+        {
+          "text": "character visual unavailable, skipping view (mob_training_dummy): Error: character asset not preloaded: models/creatures/training_dummy.glb",
+          "location": {
+            "url": "http://127.0.0.1:5186/@vite/client",
+            "lineNumber": 524,
+            "columnNumber": 3
+          }
+        }
+      ],
+      "liveProgramsByStage": {
+        "hermit": 0,
+        "desk-slam": 0,
+        "tribute": 0,
+        "coronation": 0,
+        "coronation-end": 0,
+        "crowned": 0,
+        "swarm": 0,
+        "filth": 0,
+        "death-end": 0
+      },
+      "shellVertices": 2094,
+      "renderedFloorClearances": [
+        0.004824855735507061,
+        0.004824855735507061,
+        0.009925706425045977,
+        0.009925706425045977,
+        0.026374872389510085,
+        0.026374872389510085,
+        0.036203752937080225,
+        0.03772226611245477,
+        0.03772226611245477,
+        0.044203427924186744,
+        0.044203427924186744,
+        0.046038351079662476,
+        0.05789909909355684,
+        0.06463813364755122,
+        0.06463813364755122,
+        0.06941335197292275
+      ],
+      "corpseHeightRatio": 1.0594401760344248,
+      "maximumEdgeStretch": 2.36897763938471,
+      "adapter": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4 Pro, Unspecified Version)"
+    },
+    "mobile-high": {
+      "report": "mobile-high.json",
+      "passed": true,
+      "scope": "coronation and corpse (5 stages)",
+      "viewport": {
+        "width": 844,
+        "height": 390,
+        "deviceScaleFactor": 1,
+        "isMobile": true,
+        "hasTouch": true
+      },
+      "hardware": true,
+      "headed": false,
+      "pageErrors": [],
+      "consoleErrors": [
+        {
+          "text": "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+          "location": {
+            "url": "http://127.0.0.1:5186/api/site-presence"
+          }
+        },
+        {
+          "text": "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+          "location": {
+            "url": "http://127.0.0.1:5186/api/project-stats"
+          }
+        },
+        {
+          "text": "character visual unavailable, skipping view (mob_training_dummy): Error: character asset not preloaded: models/creatures/training_dummy.glb",
+          "location": {
+            "url": "http://127.0.0.1:5186/@vite/client",
+            "lineNumber": 524,
+            "columnNumber": 3
+          }
+        },
+        {
+          "text": "character visual unavailable, skipping view (npc_modular_walking_staff): Error: character asset not preloaded: models/weapons/brasscrown_walking_staff.glb",
+          "location": {
+            "url": "http://127.0.0.1:5186/@vite/client",
+            "lineNumber": 524,
+            "columnNumber": 3
+          }
+        }
+      ],
+      "liveProgramsByStage": {
+        "hermit": 0,
+        "coronation": 0,
+        "coronation-end": 0,
+        "crowned": 0,
+        "death-end": 0
+      },
+      "shellVertices": 2094,
+      "renderedFloorClearances": [
+        0.004824855735507061,
+        0.004824855735507061,
+        0.009925706425045977,
+        0.009925706425045977,
+        0.026374872389510085,
+        0.026374872389510085,
+        0.036203752937080225,
+        0.03772226611245477,
+        0.03772226611245477,
+        0.044203427924186744,
+        0.044203427924186744,
+        0.046038351079662476,
+        0.05789909909355684,
+        0.06463813364755122,
+        0.06463813364755122,
+        0.06941335197292275
+      ],
+      "corpseHeightRatio": 1.0594401760344248,
+      "maximumEdgeStretch": 2.368977639435966,
+      "adapter": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4 Pro, Unspecified Version)"
+    }
+  },
+  "artifacts": {
+    "desktop-low-crowned.png": {
+      "sha256": "5eed9ddde66296185abf58e498940bb0d91c45caf46e70af8befede4b587dafc"
+    },
+    "desktop-low-desk-slam.png": {
+      "sha256": "454673dde0a334a2b4bbd589e10bd56a230dece64ca8ee98eef8378cba5b4b6b"
+    },
+    "desktop-low-death-right.png": {
+      "sha256": "ce61389a19bf80531c7943de307645c5d836a53bc24c9917b881a9c3edba787e"
+    },
+    "mobile-high-death-end.png": {
+      "sha256": "9d9631d63436072fb1a0d3484b6a3ba10af5f860444b885b25f11f5d889b874b"
+    },
+    "desktop-low.json": {
+      "sha256": "8dcd4d23433777a39bff28090f70936f52da5f65c3434e31c3ae47f0922bf810"
+    },
+    "mobile-high.json": {
+      "sha256": "4070810f2f150e695218413b72f367f80aee4abce4356808a49893b0894f243d"
+    }
+  }
+}

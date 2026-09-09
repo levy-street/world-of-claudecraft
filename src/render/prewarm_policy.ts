@@ -500,6 +500,8 @@ export function materialProgramSignature(material: {
   flatShading?: boolean;
   fog?: boolean;
   side?: number;
+  toneMapped?: boolean;
+  forceSinglePass?: boolean;
 }): string {
   const bit = (value: unknown): string => (value ? '1' : '0');
   const source = (value: string | undefined): string =>
@@ -546,6 +548,11 @@ export function materialProgramSignature(material: {
     bit(material.flatShading),
     bit(material.fog !== false),
     String(material.side ?? 0),
+    // Direct output applies the renderer's tone mapping only for opted-in
+    // materials. Transparent DoubleSide two-pass materials additionally need
+    // BackSide and FrontSide programs, unlike their forceSinglePass twins.
+    bit(material.toneMapped !== false),
+    bit(material.forceSinglePass === true),
   ].join('|');
 }
 

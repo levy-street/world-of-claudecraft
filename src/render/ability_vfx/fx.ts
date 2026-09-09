@@ -18,6 +18,7 @@ import { abilityVfxTextures, OVERLAY_CELL } from './fx_textures';
 import { GroundAuras } from './ground_auras';
 import { OverlaySprites } from './overlay_sprites';
 import { LightPillars } from './pillars';
+import { markAbilityVfxPrimitives } from './prewarm';
 import { AbilityVfxRibbons, type BoltTrailStyle, type RibbonAnchor } from './ribbons';
 import { ShockRings } from './rings';
 import { ArchetypeSequencer, type SeqPoint, type SequencerHost } from './sequencer';
@@ -441,6 +442,7 @@ export class AbilityVfxFx implements SequencerHost {
      *  camera-relative behaviour. */
     private facingOf?: (id: number) => number | null,
   ) {
+    const firstPrimitive = scene.children.length;
     const tex = abilityVfxTextures();
     this.ribbons = new AbilityVfxRibbons(scene, anchor, tex);
     this.rings = new ShockRings(scene, tex, groundY);
@@ -451,6 +453,7 @@ export class AbilityVfxFx implements SequencerHost {
     this.groundAuras = new GroundAuras(scene, tex);
     this.flipbooks = new ImpactFlipbooks(scene);
     this.spirits = new SpiritApparitions(scene, groundY);
+    markAbilityVfxPrimitives(scene, firstPrimitive);
   }
 
   // Kick the async GLB loads for every spirit model a sighted player's class

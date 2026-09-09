@@ -6828,7 +6828,7 @@ export const pt_BR: EnTranslations = {
     },
     "riftsPage": {
       "heading": "Fendas",
-      "intro": "Uma fenda é um rasgo no próprio mundo, não uma porta até a qual você caminha. Atravesse uma e você ganha uma descida que ninguém percorreu antes: os andares, os monstros e a coisa que espera lá no fundo são todos construídos do zero só para aquela fenda, então o mesmo nível nunca se desenrola da mesma forma duas vezes.",
+      "intro": "Uma fenda é um rasgo no próprio mundo, não uma porta até a qual você caminha. Atravesse uma e você ganha uma descida que ninguém percorreu antes: os andares e seus habitantes mudam a cada fenda, enquanto um mesmo soberano toma para si todos os encontros finais. Mesmo no mesmo nível, cada descida pode seguir um caminho diferente.",
       "whatHeading": "O que é uma fenda",
       "whatBody": "Masmorras são lugares. Elas ficam onde sempre ficaram, e você as aprende até conhecer cada canto. Uma incursão é uma descida curta e privada que você inicia a partir de um quadro, feita para um ou dois jogadores. Uma fenda não é nada disso: ela se abre por conta própria, lá fora no mundo, sem aviso, e tudo dentro dela é gerado no instante em que isso acontece. Ninguém tem uma rota para te passar, porque ninguém já percorreu esta. Ela é instanciada como as outras duas, então o que você encontra lá dentro pertence só a você e ao seu grupo, mas é o único conteúdo instanciado do jogo que vem atrás de você em vez de esperar para ser encontrado.",
       "openHeading": "Onde as fendas se abrem, e com que frequência",
@@ -6840,7 +6840,7 @@ export const pt_BR: EnTranslations = {
       "groupBody": "Leve um grupo. Uma fenda não fica mais fácil porque menos gente atravessou por ela: nada lá dentro conta quantos estão presentes, então o nível do portal é o nível que você enfrenta, seja com cinco pessoas ou sozinho. A entrada deixa você passar sozinho, e tem gente que tenta, mas uma fenda é conteúdo em grupo em todos os níveis, e ela é sincera sobre isso desde a primeira sala. Seu grupo recebe sua própria cópia da fenda, então nenhum outro grupo pode invadir sua corrida. Se você cair, pode voltar como fantasma e se recompor assim que a luta lá dentro tiver parado.",
       "levelNote": "Fendas são conteúdo de final de jogo. Você precisa estar no nível máximo, nível {n}, para atravessar uma, seja qual for o nível dela.",
       "floorsHeading": "Descendo pelos andares",
-      "floorsBody": "Uma fenda percorre um punhado de andares, cada um construído do zero, e o caminho para baixo só se abre quando o andar termina com você: limpe o que vive nele, resolva o que ele tiver trancado pelo seu caminho, e a descida se rasga aberta. O último andar termina num chefe. Cada andar tem um caráter próprio, então uma única corrida pode te levar do gelo direto para as brasas, e seu chat nomeia cada andar assim que você chega nele. O rastreador na sua tela é onde você descobre quantos andares esta fenda tem. Algumas fendas abrem para um cenário construído à mão em vez de uma descida gerada, e esse segue por um comprimento fixo próprio.",
+      "floorsBody": "Uma fenda percorre um punhado de andares, cada um construído do zero, e o caminho para baixo só se abre quando o andar termina com você: limpe o que vive nele, resolva o que ele tiver trancado pelo seu caminho, e a descida se rasga aberta. O último andar termina no mesmo soberano, cuja força cresce com a fenda. Sua infestação o acompanha entre os diferentes ambientes, então espere companhia na luta final. Cada andar tem um caráter próprio, então uma única corrida pode te levar do gelo direto para as brasas, e seu chat nomeia cada andar assim que você chega nele. O rastreador na sua tela é onde você descobre quantos andares esta fenda tem. Algumas fendas abrem para um cenário construído à mão em vez de uma descida gerada, e esse segue por um comprimento fixo próprio.",
       "boundHeading": "Depois do primeiro sangue",
       "boundBody": "O primeiro abate que seu grupo faz dentro de uma fenda decide a corrida, assim como a primeira reserva fora do caminho que você arromba. A partir desse momento você fica vinculado àquela cópia da fenda: saia por qualquer motivo e, ao voltar, você cai na mesma corrida que deixou, nunca na de outro grupo e nunca em uma nova, enquanto a entrada lá fora no mundo ainda estiver de pé. Antes desse primeiro abate, e antes dessa primeira reserva, nada está decidido, então um grupo que ainda está se reunindo pode se recompor e entrar junto sem deixar cópias pela metade para trás.",
       "raceHeading": "A corrida pela primeira conclusão",
@@ -8813,6 +8813,20 @@ export const pt_BR: EnTranslations = {
   },
   "sim": {
     "rift": {
+      "roachKing": {
+        "coronation": "Coronation of Filth",
+        "tributeFeast": "Tribute Feast",
+        "crown": "Roach King's Crown",
+        "crownWarning": "The hermit rises. The Roach King claims his crown!",
+        "filthWarning": "Mountain of Filth: leave the marked ground!",
+        "tributeWarning": "Tribute Feast: interrupt the channel or kill the tribute beetles!",
+        "ringWarning": "The Roach King winds up: get outside the ring!",
+        "filthDetonate": "The mountain of filth erupts!",
+        "swarmDetonate": "The royal swarm erupts!",
+        "deskSlam": "Desk Slam",
+        "mountainOfFilth": "Mountain of Filth",
+        "royalSwarm": "Royal Swarm"
+      },
       "allUnstable": "Todas as fendas estão instáveis no momento. Tente novamente em breve.",
       "enterFloor": "Você atravessa a fenda e entra em {name}.",
       "descendFloor": "Você desce mais fundo em {name}.",
@@ -16623,6 +16637,15 @@ export const pt_BR: EnTranslations = {
       },
       "stable_horse": {
         "name": "Cavalo de estábulo"
+      },
+      "rift_boss_asmon": {
+        "name": "Asmon, the Roach King"
+      },
+      "rift_roachling": {
+        "name": "Royal Roachling"
+      },
+      "rift_garbage_beetle": {
+        "name": "Tribute Beetle"
       },
       "rift_spawnling": {
         "name": "Prole da Fenda"

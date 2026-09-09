@@ -4,6 +4,7 @@
 // scene + staged groups.
 
 import type * as THREE from 'three';
+import { isAbilityVfxPrimitive } from './ability_vfx/prewarm';
 import { GPU_WORK_PRIORITY } from './background_gpu_queue';
 import type { CompileGateResult, CompileGateScheduler, PieceDeadline } from './compile_gate';
 import type { PieceSettle } from './compile_gate_pieces';
@@ -158,7 +159,10 @@ function compileRoots(roots: readonly THREE.Object3D[], visibleOnly: boolean): T
     if ((child as THREE.Mesh).material) materialRoots.push(child);
   };
   for (const root of roots) {
-    if (visibleOnly) root.traverseVisible(collect);
+    // Eager pooled impact programs are a small, already-resident set. Their
+    // slots stay hidden until cast, but must link before that first live draw.
+    // The ordinary optional catalogs retain the visible-only rule.
+    if (visibleOnly && !isAbilityVfxPrimitive(root)) root.traverseVisible(collect);
     else root.traverse(collect);
   }
   return materialRoots;

@@ -39,6 +39,7 @@ import {
   SOUL_LANCE_VFX_FULL_SPEC,
   SOUL_LANCE_VFX_SPEC,
 } from './necromancy_vfx_specs';
+import { ROACH_KING_VFX_FULL_SPECS, ROACH_KING_VFX_SPECS } from './roach_king_vfx_specs';
 import {
   EMBERKIN_FELBOLT_VFX_FULL_SPEC,
   EMBERKIN_FELBOLT_VFX_SPEC,
@@ -70,7 +71,7 @@ export function abilityVfxSpec(abilityId: string): AbilityVfxSpec | undefined {
   if (abilityId === 'reaping_command') return REAPING_COMMAND_VFX_SPEC;
   if (abilityId === 'army_of_the_dead') return ARMY_OF_THE_DEAD_VFX_SPEC;
   if (abilityId === 'abyssal_rift') return ABYSSAL_RIFT_VFX_SPEC;
-  return ABILITY_VFX_SPECS[abilityId];
+  return ROACH_KING_VFX_SPECS[abilityId] ?? ABILITY_VFX_SPECS[abilityId];
 }
 
 export function abilityVfxFullSpec(abilityId: string): AbilityVfxFullSpec | undefined {
@@ -94,7 +95,7 @@ export function abilityVfxFullSpec(abilityId: string): AbilityVfxFullSpec | unde
   if (abilityId === 'reaping_command') return REAPING_COMMAND_VFX_FULL_SPEC;
   if (abilityId === 'army_of_the_dead') return ARMY_OF_THE_DEAD_VFX_FULL_SPEC;
   if (abilityId === 'abyssal_rift') return ABYSSAL_RIFT_VFX_FULL_SPEC;
-  return ABILITY_VFX_FULL_SPECS[abilityId];
+  return ROACH_KING_VFX_FULL_SPECS[abilityId] ?? ABILITY_VFX_FULL_SPECS[abilityId];
 }
 
 interface CastVfxSyncPort<T> {

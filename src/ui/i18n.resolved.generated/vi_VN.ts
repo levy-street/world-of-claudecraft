@@ -6828,7 +6828,7 @@ export const vi_VN: EnTranslations = {
     },
     "riftsPage": {
       "heading": "Rạn Nứt",
-      "intro": "Một Rạn Nứt là một vết xé ngay trên chính thế giới, không phải một cánh cửa bạn đi tới. Bước qua nó, bạn sẽ có một cuộc xuống hầm chưa ai từng chạy qua: các tầng, lũ quái vật, và thứ đang chờ dưới đáy đều được dựng mới hoàn toàn riêng cho Rạn Nứt đó, nên cùng một hạng sẽ không bao giờ diễn ra giống nhau hai lần.",
+      "intro": "Một Rạn Nứt là một vết xé ngay trên chính thế giới, không phải một cánh cửa bạn đi tới. Bước qua nó, bạn sẽ có một cuộc xuống hầm chưa ai từng chạy qua: các tầng và cư dân thay đổi theo từng Rạn Nứt, còn cùng một vị chúa tể luôn chiếm giữ cuộc chạm trán cuối cùng. Cùng một hạng vẫn có thể đưa bạn qua một hành trình đi xuống khác nhau mỗi lần.",
       "whatHeading": "Rạn Nứt là gì",
       "whatBody": "Hầm ngục là những địa điểm. Chúng luôn nằm ở nơi chúng vẫn luôn nằm, và bạn học thuộc chúng đến khi biết rõ từng góc. Hang sâu là một cuộc xuống hầm riêng tư ngắn bạn bắt đầu từ một bảng, dành cho một hoặc hai người. Rạn Nứt thì không giống cả hai: nó tự mở ra, ngoài thế giới, không hề báo trước, và mọi thứ bên trong được tạo ra ngay khoảnh khắc nó xuất hiện. Không ai có lộ trình để chỉ cho bạn, bởi chưa ai từng xuống cái này. Nó cũng là instance như hai loại kia, nên những gì bạn tìm thấy bên trong chỉ thuộc về bạn và nhóm của bạn, nhưng nó là nội dung instance duy nhất trong trò chơi tự đi tìm bạn thay vì chờ được tìm thấy.",
       "openHeading": "Rạn Nứt mở ra ở đâu, và thường xuyên đến mức nào",
@@ -6840,7 +6840,7 @@ export const vi_VN: EnTranslations = {
       "groupBody": "Hãy mang theo một nhóm. Một Rạn Nứt không nương tay chỉ vì có ít người bước vào hơn: không có gì bên trong đếm xem có bao nhiêu người đang đứng đó, nên hạng ghi trên cổng chính là hạng bạn phải chiến đấu, dù đó là năm người hay chỉ một mình. Cánh cổng vẫn để bạn vào một mình, và cũng có người thử làm vậy, nhưng Rạn Nứt là nội dung dành cho nhóm ở mọi hạng, và nó thẳng thắn về điều đó ngay từ căn phòng đầu tiên. Tổ đội của bạn nhận bản sao Rạn Nứt của riêng mình, nên không nhóm nào khác có thể tràn vào lượt chạy của bạn. Nếu bạn gục ngã, bạn có thể trở vào trong dưới dạng hồn ma và tự hồi sinh một khi giao tranh bên trong đã kết thúc.",
       "levelNote": "Rạn Nứt là nội dung cuối game. Bạn phải đạt cấp độ tối đa, cấp {n}, mới có thể bước qua một Rạn Nứt, ở bất kỳ hạng nào.",
       "floorsHeading": "Xuống qua từng tầng",
-      "floorsBody": "Một Rạn Nứt chạy qua một số tầng, mỗi tầng được dựng mới hoàn toàn, và lối xuống không mở ra cho đến khi tầng đó xong việc với bạn: dọn sạch những gì đang sống trên đó, giải quyết bất cứ thứ gì nó khóa chặn trên đường đi, rồi lối xuống mới xé toạc mở ra. Tầng cuối cùng kết thúc bằng một trùm. Mỗi tầng mang một tính cách riêng, nên chỉ một lượt chạy cũng có thể đưa bạn từ băng giá sang than hồng, và khung chat của bạn xướng tên từng tầng khi bạn vừa đặt chân tới. Bảng theo dõi trên màn hình là nơi bạn biết được lượt chạy này có bao nhiêu tầng. Một số ít Rạn Nứt mở ra một cảnh dựng sẵn thay vì một lối xuống được tạo ngẫu nhiên, và cảnh đó chạy theo độ dài cố định của riêng nó.",
+      "floorsBody": "Một Rạn Nứt chạy qua một số tầng, mỗi tầng được dựng mới hoàn toàn, và lối xuống không mở ra cho đến khi tầng đó xong việc với bạn: dọn sạch những gì đang sống trên đó, giải quyết bất cứ thứ gì nó khóa chặn trên đường đi, rồi lối xuống mới xé toạc mở ra. Tầng cuối cùng kết thúc với cùng một vị chúa tể, có sức mạnh tăng theo Rạn Nứt. Lũ côn trùng của hắn theo hắn qua mọi khung cảnh, nên hãy chuẩn bị đối phó với chúng trong trận chiến cuối cùng. Mỗi tầng mang một tính cách riêng, nên chỉ một lượt chạy cũng có thể đưa bạn từ băng giá sang than hồng, và khung chat của bạn xướng tên từng tầng khi bạn vừa đặt chân tới. Bảng theo dõi trên màn hình là nơi bạn biết được lượt chạy này có bao nhiêu tầng. Một số ít Rạn Nứt mở ra một cảnh dựng sẵn thay vì một lối xuống được tạo ngẫu nhiên, và cảnh đó chạy theo độ dài cố định của riêng nó.",
       "boundHeading": "Một khi máu đã đổ",
       "boundBody": "Đòn hạ gục đầu tiên mà nhóm bạn thực hiện bên trong một Rạn Nứt sẽ chốt lại lượt chạy, và việc phá mở chiếc rương đầu tiên nằm ngoài lối chính cũng vậy. Từ khoảnh khắc đó bạn bị ràng buộc với bản sao ấy: rời đi vì bất kỳ lý do gì rồi quay lại, bạn sẽ luôn trở về đúng lượt chạy mình đã rời, không bao giờ là lượt chạy của một nhóm khác và cũng không phải một lượt chạy mới, miễn là lối vào ngoài thế giới vẫn còn đứng vững. Trước đòn hạ gục đầu tiên đó, và trước chiếc rương đầu tiên đó, chưa có gì được chốt, nên một nhóm vẫn đang tập hợp có thể gom quân và cùng nhau bước vào mà không để lại những bản sao dở dang phía sau.",
       "raceHeading": "Cuộc đua giành lượt dọn sạch đầu tiên",
@@ -8813,6 +8813,20 @@ export const vi_VN: EnTranslations = {
   },
   "sim": {
     "rift": {
+      "roachKing": {
+        "coronation": "Coronation of Filth",
+        "tributeFeast": "Tribute Feast",
+        "crown": "Roach King's Crown",
+        "crownWarning": "The hermit rises. The Roach King claims his crown!",
+        "filthWarning": "Mountain of Filth: leave the marked ground!",
+        "tributeWarning": "Tribute Feast: interrupt the channel or kill the tribute beetles!",
+        "ringWarning": "The Roach King winds up: get outside the ring!",
+        "filthDetonate": "The mountain of filth erupts!",
+        "swarmDetonate": "The royal swarm erupts!",
+        "deskSlam": "Desk Slam",
+        "mountainOfFilth": "Mountain of Filth",
+        "royalSwarm": "Royal Swarm"
+      },
       "allUnstable": "Tất cả Rạn Nứt hiện đang không ổn định. Hãy thử lại sau.",
       "enterFloor": "Bạn bước qua Rạn Nứt vào {name}.",
       "descendFloor": "Bạn đi sâu hơn vào {name}.",
@@ -16623,6 +16637,15 @@ export const vi_VN: EnTranslations = {
       },
       "stable_horse": {
         "name": "Ngựa chuồng"
+      },
+      "rift_boss_asmon": {
+        "name": "Asmon, the Roach King"
+      },
+      "rift_roachling": {
+        "name": "Royal Roachling"
+      },
+      "rift_garbage_beetle": {
+        "name": "Tribute Beetle"
       },
       "rift_spawnling": {
         "name": "Ấu Trùng Rạn Nứt"

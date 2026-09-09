@@ -3621,6 +3621,8 @@ export class CharacterVisual {
    *  as long as the body is off the ground. Rigs without a `land` clip keep
    *  looping `jump` unchanged. */
   private isOnce(a: THREE.AnimationAction): boolean {
+    if (this.baseState === 'cast')
+      return this.def.clips.castOnce?.includes(a.getClip().name) ?? false;
     if (this.baseState === 'sit') return a === this.action(this.def.clips.sitDown);
     // 'fall' counts as well as 'jump'. A rig with no authored flail resolves
     // `fall` back to its jump clip (baseAction), so keying this on 'jump' alone

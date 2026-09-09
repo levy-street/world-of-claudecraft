@@ -665,8 +665,9 @@ interface AttributionTargetFixture {
 // with Drakelands/hotkey renderer work. No capture was retaken.
 // PR3946: remint the renderer leaf after restoring school-aware resurrection VFX.
 // Existing captures, performance measurements and capture identity are unchanged.
+// Roach King release integration: runtime-input reseal only, no capture retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '5a8a04a27406a5ade4b29472c74b6d2c10764286c86d05cae5eae2fc45b89ae1';
+  '33be38579283942b39a0a0074bf01ce693856b60f8ea28f4e53f89f5b50dfa2a';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

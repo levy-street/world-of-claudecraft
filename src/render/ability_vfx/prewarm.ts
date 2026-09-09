@@ -33,6 +33,21 @@ export interface AbilityVfxCompileTarget {
   object: THREE.Object3D;
 }
 
+/** The engine adds its eager, bounded pools directly to the scene. Mark only
+ * those newly constructed material roots, so the required scene compile can
+ * include their programs without promoting unrelated hidden VFX or textures. */
+export function markAbilityVfxPrimitives(scene: THREE.Scene, firstChild: number): void {
+  for (let index = firstChild; index < scene.children.length; index++) {
+    const root = scene.children[index] as THREE.Mesh;
+    if (root.material && root.userData.renderCategory === 'vfx')
+      root.userData.abilityVfxPrimitive = true;
+  }
+}
+
+export function isAbilityVfxPrimitive(root: THREE.Object3D): boolean {
+  return root.userData.abilityVfxPrimitive === true;
+}
+
 /**
  * One unit per procedurally drawn impact sheet, plus one for the shared canvas
  * set. The sheets are deliberately separate: each is an independent 64-frame

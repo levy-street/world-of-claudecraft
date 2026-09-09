@@ -454,11 +454,30 @@ function dropObjects(ctx: SimContext, ids: number[]): void {
  * from riftDeathZoneSpawn and would keep strobing a phantom "about to
  * detonate" telegraph for the rest of the fuse. Personal events per instance
  * member so delivery never depends on interest radius; draws no rng. */
-export function clearRiftBossDeathZones(ctx: SimContext, inst: RiftInstance): void {
+export function clearRiftBossDeathZones(
+  ctx: SimContext,
+  inst: RiftInstance,
+  sourceId?: number,
+): void {
   if (inst.bossDeathZones.length === 0) return;
-  inst.bossDeathZones = [];
+  const retained =
+    sourceId === undefined ? [] : inst.bossDeathZones.filter((zone) => zone.sourceId !== sourceId);
+  if (retained.length === inst.bossDeathZones.length) return;
+  inst.bossDeathZones = retained;
   for (const pid of instancePlayerIds(ctx, inst)) {
     ctx.emit({ type: 'riftDeathZoneClear', pid });
+    // The existing wire clears the whole instance. Reconstruct other casters'
+    // still-live warnings with their remaining fuse after a source-only reset.
+    for (const zone of retained)
+      ctx.emit({
+        type: 'riftDeathZoneSpawn',
+        x: zone.x,
+        z: zone.z,
+        radius: zone.radius,
+        durationSecs: zone.remaining,
+        totalSecs: zone.total,
+        pid,
+      });
   }
 }
 
@@ -1688,11 +1707,29 @@ export function tickRiftBossDeathZones(ctx: SimContext): void {
     if (inst.partyKey === null || inst.bossDeathZones.length === 0) continue;
     const live: typeof inst.bossDeathZones = [];
     for (const zone of inst.bossDeathZones) {
+      if (zone.sourceId !== undefined) {
+        const source = ctx.entities.get(zone.sourceId);
+        if (!source || source.dead || source.aiState === 'evade') {
+          clearRiftBossDeathZones(ctx, inst, zone.sourceId);
+          continue;
+        }
+      }
       zone.remaining -= DT;
       if (zone.remaining > 0) {
         live.push(zone);
         continue;
       }
+      if (zone.ability)
+        ctx.emit({
+          type: 'spellfxAt',
+          x: zone.x,
+          z: zone.z,
+          sourceId: zone.sourceId,
+          school: 'nature',
+          fx: 'nova',
+          ability: zone.ability,
+          radius: zone.radius,
+        });
       // Detonation: lethal to any player still inside the radius.
       const pids = instancePlayerIds(ctx, inst);
       for (const pid of pids) {

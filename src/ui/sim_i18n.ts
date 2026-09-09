@@ -14352,7 +14352,18 @@ const WARLOCK_TALENT_AURA_NAMES: ReadonlySet<string> = new Set([
   'Forbidden Reflection',
 ]);
 
+const ROACH_KING_NAME_KEYS: Readonly<Record<string, TranslationKey>> = {
+  'Coronation of Filth': 'sim.rift.roachKing.coronation',
+  'Desk Slam': 'sim.rift.roachKing.deskSlam',
+  'Tribute Feast': 'sim.rift.roachKing.tributeFeast',
+  'Mountain of Filth': 'sim.rift.roachKing.mountainOfFilth',
+  'Royal Swarm': 'sim.rift.roachKing.royalSwarm',
+  "Roach King's Crown": 'sim.rift.roachKing.crown',
+};
+
 export function localizeSimAuraName(name: string): string | null {
+  const roachKey = ROACH_KING_NAME_KEYS[name];
+  if (roachKey) return t(roachKey);
   const key = AURA_NAME_KEY[name];
   if (key) return tSim(key);
   if (name === 'Condemnation') return t('hudChrome.warlock.doomLabel');
@@ -17212,6 +17223,24 @@ const RULES: Rule[] = [
     re: /^You descend deeper into (.+)\.$/,
     build: (m) => t('sim.rift.descendFloor', { name: m[1] }),
   },
+  {
+    re: /^The hermit rises\. The Roach King claims his crown!$/,
+    build: () => t('sim.rift.roachKing.crownWarning'),
+  },
+  {
+    re: /^Mountain of Filth: leave the marked ground!$/,
+    build: () => t('sim.rift.roachKing.filthWarning'),
+  },
+  {
+    re: /^Tribute Feast: interrupt the channel or kill the tribute beetles!$/,
+    build: () => t('sim.rift.roachKing.tributeWarning'),
+  },
+  {
+    re: /^The Roach King winds up: get outside the ring!$/,
+    build: () => t('sim.rift.roachKing.ringWarning'),
+  },
+  { re: /^The mountain of filth erupts!$/, build: () => t('sim.rift.roachKing.filthDetonate') },
+  { re: /^The royal swarm erupts!$/, build: () => t('sim.rift.roachKing.swarmDetonate') },
   { re: /^You step back through the rift\.$/, build: () => t('sim.rift.stepBack') },
   {
     re: /^A rune pylon flares to life \(([^/)]+)\/([^)]+)\)\.$/,

@@ -1,0 +1,97 @@
+{
+  "accepted": true,
+  "scope": "Roach animation revision: repaired paws, authored motion and shell-supported Death.",
+  "profiles": [
+    {
+      "profile": "desktop-low",
+      "report": "tmp/roach-king-shell-final/desktop-low.json",
+      "passed": true,
+      "visualReview": "Both side views inspected; thorax and abdomen contact accepted.",
+      "viewport": {
+        "width": 1600,
+        "height": 900,
+        "deviceScaleFactor": 1
+      },
+      "adapter": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4 Pro, Unspecified Version)",
+      "bodyVertices": 2094,
+      "shellFloorGapYards": [
+        0.004824855735507949,
+        0.0694133519729232
+      ],
+      "corpseToLivingHeightRatio": 1.0594401760344252,
+      "maximumNormalizedEdgeStretch": 2.3689776399977145,
+      "livePrograms": {
+        "hermit": 0,
+        "coronation": 0,
+        "coronation-end": 0,
+        "crowned": 0,
+        "death-end": 0
+      },
+      "pageErrors": []
+    },
+    {
+      "profile": "mobile-high",
+      "report": "tmp/roach-king-shell-final/mobile-high.json",
+      "passed": true,
+      "visualReview": "Both side views inspected; thorax and abdomen contact accepted.",
+      "viewport": {
+        "width": 844,
+        "height": 390,
+        "deviceScaleFactor": 1,
+        "isMobile": true,
+        "hasTouch": true
+      },
+      "adapter": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4 Pro, Unspecified Version)",
+      "bodyVertices": 2094,
+      "shellFloorGapYards": [
+        0.004824855735507949,
+        0.0694133519729232
+      ],
+      "corpseToLivingHeightRatio": 1.0594401760344252,
+      "maximumNormalizedEdgeStretch": 2.3689776387733317,
+      "livePrograms": {
+        "hermit": 0,
+        "coronation": 0,
+        "coronation-end": 0,
+        "crowned": 0,
+        "death-end": 0
+      },
+      "pageErrors": []
+    }
+  ],
+  "naturalMotion": {
+    "report": "tmp/roach-king-followup-verified/desktop-low.json",
+    "hermit": "tmp/roach-king-followup-verified/desktop-low-hermit-motion.webm",
+    "king": "tmp/roach-king-followup-verified/desktop-low-crowned-motion.webm",
+    "coverage": "Normal locomotion, melee and complete unskipped Slam/Swarm casts. These living clips were unchanged by the final Death-only adjustment. The Death pose in that earlier report is explicitly rejected and superseded by shell-final."
+  },
+  "screenshots": [
+    "animation-revision-before-paws.png",
+    "animation-revision-after-paws.png",
+    "animation-revision-before-shell-contact.png",
+    "animation-revision-after-shell-contact.png",
+    "animation-revision-after-shell-left.png",
+    "animation-revision-mobile-shell-contact.png"
+  ],
+  "checks": [
+    "tests/roach_king_pose_probe.test.mjs: 4 passed",
+    "Biome: four touched harness/test files passed",
+    "node --check: three harness modules passed",
+    "git diff --check: passed"
+  ],
+  "limitations": [
+    "Headless hardware functional evidence only; no FPS, frame-pacing or perceptual-stutter claim.",
+    "Mobile is responsive touch viewport emulation on desktop hardware, not a physical phone.",
+    "Raw console/network records preserve offline proxy failures and unrelated initial-world preload messages.",
+    "An earlier startup browser crash is preserved under tmp/roach-king-followup-final/failed-start."
+  ],
+  "sha256": {
+    "public/models/creatures/asmon_hermit.glb": "0c02d784255a857a5c2acd6077d7fb0158d0b66300591abbc33894d6d98032de",
+    "public/models/creatures/roach_king.glb": "f3e7409c685716e950306d436399a8a242b0496bb24ec4f1ab53573098206ea9",
+    "public/models/creatures/roachling.glb": "38ffd1c4f288c074cac9ae5bc62b1ed9041ed9964d476d8fbd419f03757a2f1a",
+    "public/models/creatures/garbage_beetle.glb": "848c36b7c3a56b750567e52e10e270894fd5ff4aed0835e1b1eb83bc2a52f583",
+    "scripts/roach_king_smoke.mjs": "af9ab8ed4e24a52fb1938ce93768556c9dd62af2c0ad8a20a9d9f0ad784865e7",
+    "scripts/lib/roach_king_scenario.mjs": "ff01a607c6e81ef6d1be13506a7080bdfa9e0e8d2fa1e3003d9d807707e175d7",
+    "scripts/lib/roach_king_pose_probe.mjs": "28de1412144059191613c6a48b42758a039333df789ba0a93b3601049d40402f"
+  }
+}
