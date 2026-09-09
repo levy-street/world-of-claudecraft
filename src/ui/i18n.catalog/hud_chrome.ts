@@ -5725,12 +5725,13 @@ export const hudChromeStrings = {
     // count against the guild's cap, the Guild Master's buy button and its
     // confirm prompt, the guild-wide success line, and the refusal codes the
     // server answers with (hud.ts renders them from result_code_keys.ts).
-    // {seats} is the page size, {price} the formatted page price, {cap} the
-    // seat cap, {name} the buyer's character name spliced verbatim.
+    // {seats} is the page size, {price} the page price (the confirm prompt
+    // splices coin-icon markup into it, so the button itself carries neither),
+    // {cap} the seat cap, {name} the buyer's character name spliced verbatim.
     // Wordy, M16: the five non-Latin fills land in this same change.
     roster: {
       seats: '{count} of {cap} seats',
-      expand: 'Expand roster (+{seats} seats for {price})',
+      expand: 'Expand roster',
       maxed: 'The roster is at its largest size',
       confirm:
         'Expand the guild roster by {seats} seats for {price}? The gold comes from your own purse and is not refunded.',

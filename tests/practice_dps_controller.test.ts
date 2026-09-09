@@ -105,8 +105,8 @@ describe('PracticeDpsController', () => {
   });
 
   it('re-localizes on the next paint without a fan-out arm (resolved-string elision)', async () => {
-    // A live run carries numbers, which is what a locale flip moves for
-    // English-only chrome keys (the decimal separator here: 12.3k vs 12,3k).
+    // A locale flip changes both number formatting and translated chrome.
+    // Pin the German output so a stale English frame cannot pass.
     const { controller, element } = make(() => ({
       targetDummyId: 'training_dummy',
       live: run(12_345, 10),
@@ -119,7 +119,9 @@ describe('PracticeDpsController', () => {
     setLanguage('de_DE');
     try {
       controller.update(PRACTICE_PAINT_INTERVAL_MS);
-      expect(element.innerHTML).toContain('12,3k');
+      expect(element.innerHTML).toContain('12,3Tsd. in 10 Sek.');
+      expect(element.innerHTML).toContain('Dieser Lauf');
+      expect(element.innerHTML).not.toContain('This run');
       expect(element.innerHTML).not.toContain('12.3k');
     } finally {
       setLanguage('en');

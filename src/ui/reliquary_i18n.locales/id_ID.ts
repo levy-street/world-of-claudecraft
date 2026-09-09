@@ -151,23 +151,33 @@ export const table: ReliquaryLocaleTable = {
     desc: 'Cincin Rift pribadi, ditempa untuk setiap jawara dalam kelompok yang meraih penyelesaian pertama sebuah Rift berperingkat. Setiap karakter hanya bisa memiliki miliknya sendiri.',
   },
   conquerors_ignivar: {
-    name: 'Crucible of the Last Spring',
-    desc: 'Rampasan epik dari Ignivar, Herald of the Last Flame.',
+    name: 'Tungku Mata Air Terakhir',
+    desc: 'Rampasan epik dari Ignivar, Utusan Api Terakhir.',
   },
   conquerors_ignivar_heroic: {
-    name: 'Heroik: Crucible of the Last Spring',
-    desc: 'Senjata khusus mode heroik dari Ignivar, Herald of the Last Flame.',
+    name: 'Heroik: Tungku Mata Air Terakhir',
+    desc: 'Senjata khusus mode heroik dari Ignivar, Utusan Api Terakhir.',
   },
   conquerors_varkhul: {
-    name: 'The Inner Crucible',
-    desc: 'Rampasan epik dari Varkhul, Forgefather of the Last Flame.',
+    name: 'Tungku Dalam',
+    desc: 'Rampasan epik dari Varkhul, Bapak Penempa Api Terakhir.',
   },
   conquerors_varkhul_heroic: {
-    name: 'Heroik: The Inner Crucible',
-    desc: 'Perisai dan senjata khusus mode heroik dari Varkhul, Forgefather of the Last Flame.',
+    name: 'Heroik: Tungku Dalam',
+    desc: 'Perisai dan senjata khusus mode heroik dari Varkhul, Bapak Penempa Api Terakhir.',
   },
   conquerors_set_bramblehide: {
-    name: 'Kulit Semak Duri Roots',
-    desc: 'Keluarga kulit Bramblehide yang lengkap.',
+    name: 'Kulit Semak Duri',
+    desc: 'Keluarga lengkap kulit semak berduri.',
+  },
+  professions_crucible: {
+    desc: 'Sebelas koleksi buatan raid, masing-masing menawarkan bagian dada, pinggang, dan kaki. Manual dan formula adalah pengetahuan, bukan relik.',
+
+    name: 'Kerajinan Tungku',
+  },
+
+  professions_forgebreaker: {
+    name: 'Pemecah Tempa',
+    desc: 'Suara Mata Air Terakhir, dibebaskan dari tempa dan dibawa dalam palu buatanmu sendiri.',
   },
 };

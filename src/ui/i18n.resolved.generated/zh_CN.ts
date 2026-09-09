@@ -65,7 +65,7 @@ export const zh_CN: EnTranslations = {
       "difficulty": "难度",
       "name": "名称",
       "spec": "专精",
-      "bed": "Bed id (optional)"
+      "bed": "田畦ID（可选）"
     },
     "difficulty": {
       "normal": "普通",
@@ -153,8 +153,8 @@ export const zh_CN: EnTranslations = {
         "description": "提高一项采集专业技能。"
       },
       "farmgrow": {
-        "label": "Ripen crops",
-        "description": "Bring your planted crop beds to their ready time, or one bed by id. Nothing else changes: the outcome was rolled when you planted."
+        "label": "催熟作物",
+        "description": "将所有已种植的田畦推进至成熟时间，也可按ID指定一处田畦。其他内容保持不变：收获结果在种植时就已随机确定。"
       },
       "teleport": {
         "label": "传送",
@@ -1261,11 +1261,11 @@ export const zh_CN: EnTranslations = {
     "practiceDps": {
       "title": "训练假人",
       "liveDps": "{value} DPS",
-      "liveLabel": "This run",
+      "liveLabel": "本次练习",
       "prompt": "攻击假人以开始一轮测试",
       "previous": "之前的测试",
-      "runLabel": "Run {index}",
-      "runSummary": "{total} in {time}"
+      "runLabel": "第 {index} 次练习",
+      "runSummary": "{time} 内 {total}"
     },
     "hubLesson": {
       "target": "先将假人设为目标。",
@@ -1357,9 +1357,9 @@ export const zh_CN: EnTranslations = {
       "utility": "移动与潜行",
       "friendly": "我给队友的增益",
       "shields": "我的护盾",
-      "row": "{aura} on {unit}",
+      "row": "{aura} 对 {unit} 生效",
       "selfRow": "{aura}",
-      "mode": "on",
+      "mode": "开启",
       "overflow": "还有{count}项未显示"
     },
     "targetDots": {
@@ -3037,7 +3037,7 @@ export const zh_CN: EnTranslations = {
       "suddenDeath": "下一次斩杀不消耗怒气并无视生命值要求",
       "aoeEcho": "剩余 {charges} 次回响：单体技能对附近最多 {targets} 个敌人造成 {pct}% 伤害",
       "sureCrit": "接下来 {charges} 个伤害技能必定暴击",
-      "temporalEcho": "施法者的奥术伤害会治疗你，单体伤害转化 {singlePct}%，范围伤害转化 {areaPct}%",
+      "temporalEcho": "施法者的奥术伤害会治疗你，单体伤害转化 {singlePct}%，范围伤害转化 {areaPct}%。以太涌动和以太飞镖在单独的时光回响上按4倍加成计算。群体回响会产生等量的治疗储备，按照缺失生命值在生命低于60%的被标记盟友之间分配",
       "arcaneCharge": "{stacks} 层奥术充能：以太涌动伤害提高 {damagePct}%，施法加快 {castPct}%，法力消耗变为 {costMult} 倍",
       "physicalReduction": "受到的物理伤害降低 {pct}%",
       "temporalHourglass": "免疫伤害且无法行动；恢复生命并加速冷却。右键点击可取消。",
@@ -3156,7 +3156,7 @@ export const zh_CN: EnTranslations = {
       "fingersOfFrost": "剩余 {charges} 层：冰枪术视目标为冻结状态，并造成 {pct}% 的冻结伤害",
       "brainFreeze": "下一次冰风暴瞬发且无视冷却时间",
       "wintersChill": "剩余 {charges} 层：符合条件的法术视此目标为冻结状态",
-      "icicles": "{value}/{max} 根冰刺；达到 {max} 根时可施放冰川尖刺",
+      "icicles": "{value}/{max} 根冰刺；达到 {max} 根时可施放凝霜冰针",
       "desolation": "剩余 {charges} 层：下一次混乱箭施法加快 {castPct}%，或下一次火焰之雨立即落下",
       "ruinousBrand": "剩余 {charges} 次复制：直接法术在此复制 {otherPct}% 伤害；若此目标也是主目标则复制 {selfPct}%",
       "duskfireClaim": "目标死亡时获得 {value} 点毁灭",
@@ -4004,7 +4004,7 @@ export const zh_CN: EnTranslations = {
       },
       "roster": {
         "seats": "{count} / {cap} 席位",
-        "expand": "扩充名册（+{seats} 席位，{price}）",
+        "expand": "扩充名册",
         "maxed": "名册已达最大规模",
         "confirm": "花费 {price} 为公会名册扩充 {seats} 个席位？金币从你自己的钱包扣除，不予退还。",
         "confirmAction": "扩充",
@@ -4470,7 +4470,7 @@ export const zh_CN: EnTranslations = {
       "noBagSpace": "背包空间不足，无法存放制作的物品。",
       "dailyLimit": "该物品每天只能制作一次。",
       "dailyLimitRetry": "该物品每天只能制作一次。{duration}后可再次制作。",
-      "oncePerDay": "Once per day",
+      "oncePerDay": "每天一次",
       "skillReqLine": "需要{craft} {skill}",
       "difficultyFull": "完整技能成长",
       "difficultyReduced": "技能成长减少",
@@ -5124,7 +5124,7 @@ export const zh_CN: EnTranslations = {
       "toWorld": "世界地图",
       "toZone": "地区地图",
       "toInstance": "副本地图",
-      "toggleAria": "在世界地图和地区地图之间切换",
+      "toggleAria": "在世界地图、地区地图和副本地图之间切换",
       "levels": "等级 {min} 到 {max}"
     },
     "arenaGate": {
@@ -7210,7 +7210,7 @@ export const zh_CN: EnTranslations = {
       "matFmt": "{name}×{count}",
       "outputFmt": "{name}×{count}",
       "comboReq": "需要{a}与{b}",
-      "oncePerDay": "Once per day",
+      "oncePerDay": "每日一次",
       "effectFood": "食用后在{seconds}秒内恢复{amount}点生命值。",
       "effectWellFed": "吃完后进入精神饱满状态：{stat}+{value}，持续{minutes}分钟。",
       "effectWellFedAura": "吃完后获得{aura}，持续{minutes}分钟。",

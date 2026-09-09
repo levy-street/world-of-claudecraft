@@ -287,7 +287,8 @@ describe('harvest preference controller: relocalize', () => {
     setLanguage('es');
     try {
       ctl.relocalize();
-      expect(document.activeElement).toBe(buttonByText(root, /apply/i));
+      expect(t('hudChrome.harvestPreference.applyButton')).toBe('Aplicar');
+      expect(document.activeElement).toBe(buttonByText(root, /^Aplicar$/));
     } finally {
       setLanguage('en');
     }

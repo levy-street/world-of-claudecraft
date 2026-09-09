@@ -151,23 +151,33 @@ export const table: ReliquaryLocaleTable = {
     desc: 'Osobní prsteny trhliny, ražené pro každého šampiona v družině, která zvládne první průchod hodnocenou trhlinou. Každá postava může vlastnit jen ten svůj.',
   },
   conquerors_ignivar: {
-    name: 'Crucible of the Last Spring',
-    desc: 'Epická kořist získaná od Ignivar, Herald of the Last Flame.',
+    name: 'Tavicí kelímek Posledního pramene',
+    desc: 'Epická kořist získaná od Ignivara, hlasatele Posledního plamene.',
   },
   conquerors_ignivar_heroic: {
-    name: 'Hrdinský: Crucible of the Last Spring',
-    desc: 'Zbraně dostupné jen hrdinsky od Ignivar, Herald of the Last Flame.',
+    name: 'Hrdinská: Tavicí kelímek Posledního pramene',
+    desc: 'Zbraně dostupné pouze v hrdinské verzi od Ignivara, hlasatele Posledního plamene.',
   },
   conquerors_varkhul: {
-    name: 'The Inner Crucible',
-    desc: 'Epická kořist získaná od Varkhul, Forgefather of the Last Flame.',
+    name: 'Vnitřní tavicí kelímek',
+    desc: 'Epická kořist získaná od Varkhula, otce kovárny Posledního plamene.',
   },
   conquerors_varkhul_heroic: {
-    name: 'Hrdinský: The Inner Crucible',
-    desc: 'Štíty a zbraně dostupné jen hrdinsky od Varkhul, Forgefather of the Last Flame.',
+    name: 'Hrdinská: Vnitřní tavicí kelímek',
+    desc: 'Štíty a zbraně dostupné pouze v hrdinské verzi od Varkhula, otce kovárny Posledního plamene.',
   },
   conquerors_set_bramblehide: {
     name: 'Rootsova ostružinová kůže',
-    desc: 'Úplná kožená rodina Bramblehide.',
+    desc: 'Úplná kožená sada Rootsova ostružinová kůže.',
+  },
+  professions_crucible: {
+    desc: 'Jedenáct kolekcí vytvořených pro raid, z nichž každá nabízí kus na hruď, pas a chodidla. Manuály a vzorce jsou znalosti, ne relikvie.',
+
+    name: 'Řemeslo Tavicího kelímku',
+  },
+
+  professions_forgebreaker: {
+    name: 'Kovářský drtič',
+    desc: 'Hlas Posledního pramene, osvobozený z kovárny a nesený ve vlastnoručně vyrobeném kladivu.',
   },
 };

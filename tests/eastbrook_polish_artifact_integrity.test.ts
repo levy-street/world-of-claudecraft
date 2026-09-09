@@ -1359,13 +1359,16 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Historical images, performance scores and capture identity are unchanged.
 // PR3946: remint the renderer leaf after restoring school-aware resurrection VFX.
 // Existing captures, performance measurements and capture identity are unchanged.
-// PR fen-features-subcull: remint after merging release/v0.42.0 into the branch,
-// the renderer leaf having moved with the zone-feature sweep extraction.
-// Existing captures, performance measurements and capture identity are unchanged.
+// v0.42.0 dependency-floor bump (sharp, js-yaml, vitest): the lockfile is a
+// fingerprint input, so every shipping GLB was size-preserving re-minted and this
+// seal follows the swept evidence. No capture was retaken.
+// PR fen-features-subcull: remint after merging release/v0.43.0 into the branch.
+// The renderer leaf differs from the release tree by the zone-feature sweep
+// extraction; captures, performance measurements and capture identity are unchanged.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '2b262a46faa3326d2039f29cbea04b8d52844d89788865ef84f1446f5040ddea';
+  'cb0863418b6c6a73e3b2cc9dac3dc4370602d412548ec1fd757efefeaff37764';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '52d7ac5ce06a62ae5c88de3c45f993957c33f4ac15de5a5601be8958bbcb908c';
+  'faf74aded65e0c50da1dd4f352d76e24d564270eb4d5074a756b0d6bab34be42';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2722,7 +2725,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       //
       // OSSBrain integration: this digest was recomputed LAST from the
       // canonical re-sealed evidence files. Capture pixels and scores did not change.
-    ).toBe('d21378452e0e216cbdbcfcaaabb1f8fcf26543a35028ffc0ffe5840af2820572');
+      // v0.42.0 dependency-floor bump: recomputed LAST over the swept evidence
+      // after the lockfile-driven GLB re-mint. No capture was retaken.
+    ).toBe('9e5b8ec54a5f1fe83fb9a3129dfd09420738fc228541814ee6f4f464421d5719');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

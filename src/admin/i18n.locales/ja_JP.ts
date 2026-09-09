@@ -1236,4 +1236,39 @@ export const ja_JP: Record<string, string> = {
   'realmBuilders.saveNew': '発行する',
   'realmBuilders.useNextMonth': '来月',
   'realmBuilders.yearLabel': '年',
+  'error.clearItemNameBagRange': 'bag は {min} から {max} までの整数で指定してください',
+  'error.clearItemNameWentOffline':
+    '名前の削除が反映される前にキャラクターがオフラインになりました。もう一度お試しください',
+  'error.itemNameClearFailed': 'アイテム名の削除に失敗しました',
+  'loadFailure.forbiddenDetail':
+    'このビューが読み取る権限をスタッフロールが持っていません。スーパ管理者に権限を付与してもらい、再読み込みしてください。',
+  'loadFailure.forbiddenTitle': '権限がありません',
+  'marketMetrics.autoRefresh': '自動更新（{seconds}秒）',
+  'marketMetrics.bucketCompost': '堆肥',
+  'marketMetrics.bucketCores': 'コア',
+  'marketMetrics.bucketEmpty': '出品中の商品なし',
+  'marketMetrics.bucketEssence': 'エッセンス',
+  'marketMetrics.bucketPatterns': 'パターン',
+  'marketMetrics.bucketProduce': '生産物',
+  'marketMetrics.bucketSeeds': '種',
+  'marketMetrics.bucketSold': '過去 {days} 日間の売上: {sales}件、{quantity}個、{copper}',
+  'marketMetrics.bucketSummary':
+    '{listings}件出品、{quantity}個、{tracked}種類中{listed}種類を出品',
+  'marketMetrics.colItem': 'アイテム',
+  'marketMetrics.colListings': '出品数',
+  'marketMetrics.colLowest': '最低価格（1個）',
+  'marketMetrics.colMedian': '中央価格（1個）',
+  'marketMetrics.colQuantity': '数量',
+  'marketMetrics.empty': '追跡中のどの分類にも出品中の商品はありません',
+  'marketMetrics.essenceNote':
+    'これらの素材はソウルバウンドで、出品できません。ここに行が表示される場合は、市場エスクローの不変条件が壊れており、エンジニアリング対応が必要です。',
+  'marketMetrics.hint':
+    '追跡対象の供給分類におけるワールドマーケットの出品状況です。売却量ではなく、現在の出品を表示します。サーバーはこの表示を約15秒間キャッシュします。',
+  'marketMetrics.loadFailed': '市場指標の読み込みに失敗しました',
+  'marketMetrics.loading': '読み込み中…',
+  'marketMetrics.realm': 'レルム: {realm}',
+  'marketMetrics.soldNone': '過去 {days} 日間の売上: なし',
+  'marketMetrics.soldUnavailable':
+    '現在、売却量を取得できないため、下には出品中の商品だけが表示されます。',
+  'nav.marketMetrics': '市場指標',
 };

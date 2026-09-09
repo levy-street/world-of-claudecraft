@@ -195,6 +195,7 @@ export const table: DeedLocaleTable = {
   prog_herbalism_100: { name: '초원의 달인', desc: '약초 채집 숙련도 100을 달성하십시오.' },
   prog_master_gatherer: {
     name: '채집의 대가',
+    desc: '채집 직업 세 가지의 숙련도를 100까지 올리십시오.',
   },
   prog_first_craft: { name: '손수 만든 물건', desc: '첫 제작을 성공적으로 완료하십시오.' },
   prog_craft_specialist: {
@@ -397,6 +398,7 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_packbreaker: { name: '무리를 흩는 자', desc: '10초 안에 숲늑대 3마리를 처치하십시오.' },
   chr_vale_cup_debut: {
+    desc: '소필드에서 열리는 베일 컵 경기에 출전해 공을 터치하십시오. 베일 컵 경기는 더 이상 플레이할 수 없으므로 새로 획득할 수 없습니다.',
     name: '구리 양동이 도전자',
   },
   chr_vale_rares: {
@@ -581,49 +583,72 @@ export const table: DeedLocaleTable = {
   pvp_duel_first_win: { name: '결판은 밖에서', desc: '결투에서 승리하십시오.' },
   pvp_duel_grace: { name: '겸손의 가르침', desc: '결투에서 지되, 체면은 그럭저럭 지켜 내십시오.' },
   pvp_vcup_first_match: {
+    desc: '소필드에서 베일 컵 경기를 승패와 관계없이 끝까지 마치십시오. 베일 컵 경기는 더 이상 플레이할 수 없으므로 새로 획득할 수 없습니다.',
     name: '그라운드에 선 첫발',
   },
-  pvp_vcup_first_win: { name: '첫 우승컵' },
+  pvp_vcup_first_win: {
+    name: '첫 우승컵',
+    desc: '평점제 베일 컵 경기에서 승리하십시오. 베일 컵 경기는 더 이상 플레이할 수 없으므로 새로 획득할 수 없습니다.',
+  },
   pvp_vcup_wins_10: {
+    desc: '평점제 베일 컵 경기에서 10회 승리하십시오. 베일 컵 경기는 더 이상 플레이할 수 없으므로 새로 획득할 수 없습니다.',
     name: '노련한 멧돼지공 선수',
   },
   pvp_vcup_wins_25: {
+    desc: '평점제 베일 컵 경기에서 25회 승리하십시오. 베일 컵 경기는 더 이상 플레이할 수 없으므로 새로 획득할 수 없습니다.',
     name: '멧돼지공의 전설',
     title: '멧돼지공의 전설',
   },
-  pvp_vcup_first_goal: { name: '마수걸이 골' },
+  pvp_vcup_first_goal: {
+    name: '마수걸이 골',
+    desc: '평점제 베일 컵 경기에서 골을 넣으십시오. 베일 컵 경기는 더 이상 플레이할 수 없으므로 새로 획득할 수 없습니다.',
+  },
   pvp_vcup_hat_trick: {
+    desc: '3대3 이상 부문의 평점제 베일 컵 경기에서 한 경기 세 골을 넣으십시오. 베일 컵 경기는 더 이상 플레이할 수 없으므로 새로 획득할 수 없습니다.',
     name: '해트트릭의 주인공',
   },
   pvp_vcup_golden_goal: {
+    desc: '평점제 베일 컵 경기의 승패를 가르는 골든 골을 넣으십시오. 베일 컵 경기는 더 이상 플레이할 수 없으므로 새로 획득할 수 없습니다.',
     name: '황금의 순간',
   },
   pvp_vcup_first_save: {
+    desc: '3대3 이상 부문의 평점제 베일 컵 경기에서 골키퍼로 선방하십시오. 손아귀를 시험할 만큼 빠른 슛만 인정되며, 살짝 잡은 공은 인정되지 않습니다. 베일 컵 경기는 더 이상 플레이할 수 없으므로 새로 획득할 수 없습니다.',
     name: '든든한 두 손',
   },
   pvp_vcup_clean_sheet: {
+    desc: '3대3 이상 부문의 평점제 베일 컵 경기에서 골키퍼로 무실점 승리하십시오. 베일 컵 경기는 더 이상 플레이할 수 없으므로 새로 획득할 수 없습니다.',
     name: '철벽 수문장',
   },
   pvp_vcup_guild_win: {
+    desc: '길드의 깃발을 걸고 참가한 평점제 베일 컵 경기에서 승리하십시오. 베일 컵 경기는 더 이상 플레이할 수 없으므로 새로 획득할 수 없습니다.',
     name: '깃발을 위하여',
   },
   pvp_fiesta_first_bout: {
+    desc: '승패와 관계없이 Fiesta 2대2 경기를 끝까지 치르십시오. Fiesta 경기는 더 이상 투기장 대기열에 나오지 않으므로 새로 획득할 수 없습니다.',
     name: '잔치의 불청객',
   },
   pvp_fiesta_first_win: {
+    desc: 'Fiesta 2대2 경기에서 승리하십시오. Fiesta 경기는 더 이상 투기장 대기열에 나오지 않으므로 새로 획득할 수 없습니다.',
     name: '피에스타의 주인공',
   },
-  pvp_fiesta_double: { name: '연달아 둘' },
+  pvp_fiesta_double: {
+    name: '연달아 둘',
+    desc: '4초 안에 Fiesta 적을 두 번 쓰러뜨리십시오. Fiesta 경기는 더 이상 투기장 대기열에 나오지 않으므로 새로 획득할 수 없습니다.',
+  },
   pvp_fiesta_shutdown: {
+    desc: '3연승 이상의 기록을 가진 Fiesta 적을 쓰러뜨리십시오. Fiesta 경기는 더 이상 투기장 대기열에 나오지 않으므로 새로 획득할 수 없습니다.',
     name: '흥을 깨는 자',
   },
   pvp_fiesta_full_build: {
+    desc: '세 웨이브 모두에서 강화 하나를 고정한 채 Fiesta 경기에서 승리하십시오. Fiesta 경기는 더 이상 투기장 대기열에 나오지 않으므로 새로 획득할 수 없습니다.',
     name: '완벽한 채비',
   },
   pvp_fiesta_powerups: {
+    desc: '네 가지 링 강화, 속도의 악마, 거상, 달빛 장화, 광전사를 각각 한 번 이상 획득하십시오. Fiesta 경기는 더 이상 투기장 대기열에 나오지 않으므로 새로 획득할 수 없습니다.',
     name: '하나씩 전부',
   },
   pvp_fiesta_five_kills: {
+    desc: '한 번의 Fiesta 경기에서 적을 다섯 번 쓰러뜨리십시오. Fiesta 경기는 더 이상 투기장 대기열에 나오지 않으므로 새로 획득할 수 없습니다.',
     name: '잔치를 짊어지다',
   },
   soc_first_party: { name: '함께라면 더 멀리', desc: '다른 플레이어와 함께 파티에 들어가십시오.' },
@@ -1005,5 +1030,52 @@ export const table: DeedLocaleTable = {
   col_set_bramblehide: {
     name: '루츠의 가시덤불가죽',
     desc: '루츠의 가시덤불가죽의 모든 부위를 발견하십시오.',
+  },
+  col_deepest_cast: {
+    desc: 'Clockreel 낚싯대를 획득하십시오. 가장 깊은 어획물까지 닿는 유일한 낚싯대입니다.',
+
+    name: '가장 깊은 투척',
+  },
+  prog_first_planting: { desc: '텃밭에 첫 작물을 심으십시오.', name: '씨앗으로 시작하다' },
+  chr_vale_first_harvest: {
+    desc: '이스트브룩 골짜기의 밭에서 처음으로 잘 자란 작물을 수확하십시오.',
+
+    name: '골짜기의 첫 열매',
+  },
+  chr_marsh_first_harvest: {
+    desc: '마이어펜 습지의 밭에서 처음으로 잘 자란 작물을 수확하십시오.',
+    name: '이탄 속 새싹',
+  },
+  chr_peaks_first_harvest: {
+    desc: '쏜피크 고지의 밭에서 처음으로 잘 자란 작물을 수확하십시오.',
+    name: '바위산의 수확',
+  },
+  chr_evergarden_first_harvest: {
+    desc: 'Evergarden의 밭에서 처음으로 잘 자란 작물을 수확하십시오.',
+
+    name: '낙원의 텃밭',
+  },
+  col_golden_harvest: {
+    desc: '황금 수확을 거두고 그 소식이 온 구역에 퍼지게 하십시오.',
+    name: '황금빛 수확',
+  },
+  prog_farming_100: {
+    desc: '농사 숙련도 100을 달성하십시오.',
+    name: '수확의 달인',
+    title: '수확의 달인',
+  },
+  col_farm_roster: {
+    desc: '네 정원에서 자라는 모든 작물을 수확하십시오.',
+    name: '모든 고랑을 채우다',
+  },
+  prog_field_to_feast: {
+    desc: '정점의 잔치를 요리하여 공격대 전체가 함께 먹을 수 있는 상을 차리십시오.',
+
+    name: '밭에서 잔치까지',
+  },
+  prog_legendmaker: {
+    desc: '창조의 증서로 완전해진 작품을 전설로 승격시키고, 그 작품만의 이름을 지어 주십시오.',
+
+    name: '전설을 빚는 자',
   },
 };

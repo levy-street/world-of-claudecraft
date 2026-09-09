@@ -1252,4 +1252,55 @@ export const fr_FR: Record<string, string> = {
   'realmBuilders.saveNew': 'Publier',
   'realmBuilders.useNextMonth': 'Le mois prochain',
   'realmBuilders.yearLabel': 'Année',
+  'error.clearItemNameAllLiteral': 'all doit être littéralement true',
+  'error.clearItemNameBagIndex': 'bag doit être un nombre entier positif ou nul',
+  'error.clearItemNameBagPair':
+    'une cible de sac nécessite à la fois l’index de cellule et son identifiant d’objet',
+  'error.clearItemNameBagRange': 'bag doit être un nombre entier compris entre {min} et {max}',
+  'error.clearItemNameCameOnline':
+    'le personnage s’est connecté avant la suppression du nom ; déconnectez-le puis réessayez',
+  'error.clearItemNameLeased':
+    'le personnage détient un bail de session actif ; déconnectez-le (ou attendez l’expiration du bail), puis réessayez',
+  'error.clearItemNameNoMatch': 'aucune copie nommée ne correspond à cette cible',
+  'error.clearItemNameOnline': 'le personnage est en ligne sur ce royaume ; déconnectez-le d’abord',
+  'error.clearItemNameTargetForms':
+    'nommez exactement une cible : un emplacement porté, une cellule de sac ou all: true',
+  'error.clearItemNameUnknownSlot': 'emplacement d’équipement inconnu',
+  'error.clearItemNameWentOffline':
+    'le personnage s’est déconnecté avant la suppression du nom ; réessayez',
+  'error.itemNameClearFailed': 'échec de la suppression du nom de l’objet',
+  'loadFailure.forbiddenDetail':
+    'Les rôles de votre équipe ne possèdent pas l’autorisation requise par cette vue. Demandez à un superadministrateur de l’accorder, puis rechargez la page.',
+  'loadFailure.forbiddenTitle': 'Accès refusé',
+  'marketMetrics.autoRefresh': 'Actualisation automatique ({seconds}s)',
+  'marketMetrics.bucketCompost': 'Compost',
+  'marketMetrics.bucketCores': 'Cœurs',
+  'marketMetrics.bucketEmpty': 'aucune annonce active',
+  'marketMetrics.bucketEssence': 'Essence',
+  'marketMetrics.bucketPatterns': 'Patrons',
+  'marketMetrics.bucketProduce': 'Récoltes',
+  'marketMetrics.bucketSeeds': 'Graines',
+  'marketMetrics.bucketSold':
+    'Vendus ces {days} derniers jours : {sales} ventes, {quantity} objets, {copper}',
+  'marketMetrics.bucketSummary':
+    '{listings} annonces, {quantity} unités, {listed} objets sur {tracked} proposés',
+  'marketMetrics.colItem': 'Objet',
+  'marketMetrics.colListings': 'Annonces',
+  'marketMetrics.colLowest': 'Prix le plus bas (par unité)',
+  'marketMetrics.colMedian': 'Prix médian (par unité)',
+  'marketMetrics.colQuantity': 'Quantité',
+  'marketMetrics.empty': 'aucune annonce active dans les catégories suivies',
+  'marketMetrics.essenceNote':
+    'Ces matériaux sont liés à l’âme et ne peuvent jamais être proposés. Toute ligne ici signifie que l’invariant du séquestre du marché est rompu et nécessite l’attention de l’équipe technique.',
+  'marketMetrics.hint':
+    'Annonces actives du Marché mondial pour les catégories d’approvisionnement suivies : ce qui est proposé maintenant, et non le volume vendu. Le serveur met cette vue en cache environ 15 secondes.',
+  'marketMetrics.loadFailed': 'échec du chargement des statistiques du marché',
+  'marketMetrics.loading': 'chargement…',
+  'marketMetrics.realm': 'Royaume : {realm}',
+  'marketMetrics.soldNone': 'Vendus ces {days} derniers jours : aucun',
+  'marketMetrics.soldUnavailable':
+    'Le volume vendu est indisponible pour le moment ; seules les annonces actives sont donc affichées ci-dessous.',
+  'moderationHistory.actionClearItemName': 'Nom de l’objet supprimé',
+  'nav.marketMetrics': 'Statistiques du marché',
+  'poi.thornpeak_heights.7': 'Tentes assermentées de la Couvée',
 };

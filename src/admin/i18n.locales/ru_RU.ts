@@ -1237,4 +1237,40 @@ export const ru_RU: Record<string, string> = {
   'realmBuilders.saveNew': 'Опубликовать',
   'realmBuilders.useNextMonth': 'В следующем месяце',
   'realmBuilders.yearLabel': 'Год',
+  'error.clearItemNameBagRange': 'bag должно быть целым числом от {min} до {max}',
+  'error.clearItemNameWentOffline':
+    'персонаж вышел из сети до применения удаления; кикните его и повторите',
+  'error.itemNameClearFailed': 'не удалось удалить имя предмета',
+  'loadFailure.forbiddenDetail':
+    'У ваших ролей сотрудника нет разрешения на просмотр этих данных. Попросите суперадмина выдать его и перезагрузите страницу.',
+  'loadFailure.forbiddenTitle': 'Доступ запрещен',
+  'marketMetrics.autoRefresh': 'Автообновление ({seconds} с)',
+  'marketMetrics.bucketCompost': 'Компост',
+  'marketMetrics.bucketCores': 'Ядра',
+  'marketMetrics.bucketEmpty': 'нет активных объявлений',
+  'marketMetrics.bucketEssence': 'Эссенция',
+  'marketMetrics.bucketPatterns': 'Схемы',
+  'marketMetrics.bucketProduce': 'Продукты',
+  'marketMetrics.bucketSeeds': 'Семена',
+  'marketMetrics.bucketSold':
+    'Продано за последние {days} дн.: {sales} продаж, {quantity} предметов, {copper}',
+  'marketMetrics.bucketSummary':
+    '{listings} объявлений, {quantity} единиц, выставлено {listed} из {tracked} предметов',
+  'marketMetrics.colItem': 'Предмет',
+  'marketMetrics.colListings': 'Объявления',
+  'marketMetrics.colLowest': 'Минимум (за единицу)',
+  'marketMetrics.colMedian': 'Медиана (за единицу)',
+  'marketMetrics.colQuantity': 'Количество',
+  'marketMetrics.empty': 'нет активных объявлений ни в одной отслеживаемой категории',
+  'marketMetrics.essenceNote':
+    'Эти материалы привязаны к душе и никогда не могут быть выставлены. Любая строка здесь означает нарушение инварианта биржевого хранилища и требует внимания инженеров.',
+  'marketMetrics.hint':
+    'Активные объявления Мирового рынка по отслеживаемым категориям запасов: что выставлено сейчас, а не объем продаж. Сервер кэширует эти данные примерно на 15 секунд.',
+  'marketMetrics.loadFailed': 'Не удалось загрузить показатели рынка',
+  'marketMetrics.loading': 'Загрузка…',
+  'marketMetrics.realm': 'Мир: {realm}',
+  'marketMetrics.soldNone': 'Продано за последние {days} дн.: ничего',
+  'marketMetrics.soldUnavailable':
+    'Объем продаж сейчас недоступен, поэтому ниже показаны только активные объявления.',
+  'nav.marketMetrics': 'Показатели рынка',
 };

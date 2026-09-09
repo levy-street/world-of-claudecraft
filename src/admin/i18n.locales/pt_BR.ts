@@ -1225,4 +1225,53 @@ export const pt_BR: Record<string, string> = {
   'realmBuilders.saveNew': 'Publicar',
   'realmBuilders.useNextMonth': 'No próximo mês',
   'realmBuilders.yearLabel': 'Ano',
+  'error.clearItemNameAllLiteral': 'all deve ser o literal true',
+  'error.clearItemNameBagIndex': 'bag deve ser um número inteiro não negativo',
+  'error.clearItemNameBagPair': 'um alvo de bolsa precisa do índice da célula e do id do item',
+  'error.clearItemNameBagRange': 'bag deve ser um número inteiro de {min} a {max}',
+  'error.clearItemNameCameOnline':
+    'o personagem ficou online antes da remoção; expulse-o e tente novamente',
+  'error.clearItemNameLeased':
+    'o personagem mantém uma concessão de sessão ativa; expulse-o (ou espere a concessão terminar) e tente novamente',
+  'error.clearItemNameNoMatch': 'nenhuma cópia nomeada correspondeu a esse alvo',
+  'error.clearItemNameOnline': 'o personagem está online neste reino; desconecte-o primeiro',
+  'error.clearItemNameTargetForms':
+    'nome exatamente um alvo: um espaço equipado, uma célula de bolsa ou all: true',
+  'error.clearItemNameUnknownSlot': 'espaço de equipamento desconhecido',
+  'error.clearItemNameWentOffline': 'o personagem ficou offline antes da remoção; tente novamente',
+  'error.itemNameClearFailed': 'falha ao limpar o nome do item',
+  'loadFailure.forbiddenDetail':
+    'Suas funções de equipe não têm a permissão lida por esta tela. Peça a um superadministrador para concedê-la e recarregue.',
+  'loadFailure.forbiddenTitle': 'Permissão negada',
+  'marketMetrics.autoRefresh': 'Atualização automática ({seconds}s)',
+  'marketMetrics.bucketCompost': 'Composto',
+  'marketMetrics.bucketCores': 'Núcleos',
+  'marketMetrics.bucketEmpty': 'nenhum anúncio ativo',
+  'marketMetrics.bucketEssence': 'Essência',
+  'marketMetrics.bucketPatterns': 'Padrões',
+  'marketMetrics.bucketProduce': 'Produção',
+  'marketMetrics.bucketSeeds': 'Sementes',
+  'marketMetrics.bucketSold':
+    'Vendidos nos últimos {days} dias: {sales} vendas, {quantity} itens, {copper}',
+  'marketMetrics.bucketSummary':
+    '{listings} anúncios, {quantity} unidades, {listed} de {tracked} itens anunciados',
+  'marketMetrics.colItem': 'Objeto',
+  'marketMetrics.colListings': 'Anúncios',
+  'marketMetrics.colLowest': 'Menor (por unidade)',
+  'marketMetrics.colMedian': 'Mediana (por unidade)',
+  'marketMetrics.colQuantity': 'Quantidade',
+  'marketMetrics.empty': 'nenhum anúncio ativo em qualquer lote acompanhado',
+  'marketMetrics.essenceNote':
+    'Esses materiais são vinculados à alma e nunca podem ser anunciados. Qualquer linha aqui indica que a invariante do depósito de mercado foi quebrada e precisa de atenção da engenharia.',
+  'marketMetrics.hint':
+    'Anúncios ativos do Mercado Mundial para os lotes de suprimento acompanhados: o que está no livro agora, não o volume vendido. O servidor armazena esta leitura em cache por cerca de 15 segundos.',
+  'marketMetrics.loadFailed': 'falha ao carregar as métricas do mercado',
+  'marketMetrics.loading': 'carregando…',
+  'marketMetrics.realm': 'Reino: {realm}',
+  'marketMetrics.soldNone': 'Vendidos nos últimos {days} dias: nada',
+  'marketMetrics.soldUnavailable':
+    'O volume vendido está indisponível agora, então somente os anúncios ativos aparecem abaixo.',
+  'moderationHistory.actionClearItemName': 'Nome do item limpo',
+  'nav.marketMetrics': 'Métricas do mercado',
+  'poi.thornpeak_heights.7': 'Tendas Juramentadas da Ninhada',
 };

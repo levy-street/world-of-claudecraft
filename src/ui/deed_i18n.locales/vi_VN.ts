@@ -89,6 +89,8 @@ export const table: DeedLocaleTable = {
   },
   chr_nightbloom_first_cast: {
     desc: 'Cau mot con ca trong vung nuoc Nightbloom.',
+
+    name: 'Gợn Sóng Trên Suối Trăng',
   },
   chr_wraithwood_gatherer: {
     name: 'Thu hoach duoi tan cay',
@@ -186,6 +188,7 @@ export const table: DeedLocaleTable = {
   prog_herbalism_100: { name: 'Bậc Thầy Đồng Cỏ', desc: 'Đạt 100 điểm thành thạo Thảo Dược Học.' },
   prog_master_gatherer: {
     name: 'Bậc Thầy Thu Thập',
+    desc: 'Đạt 100 điểm thành thạo trong bất kỳ ba nghề thu thập nào.',
   },
   prog_first_craft: {
     name: 'Làm Bằng Đôi Tay',
@@ -300,6 +303,8 @@ export const table: DeedLocaleTable = {
   },
   dgn_sanctum_speed: {
     desc: 'Đánh bại Korzul Mộ Long trong vòng 15 phút kể từ khi tổ đội của bạn tiến chiếm Thánh Đường Mộ Long.',
+
+    name: 'Cuộc Đua Thánh Điện',
   },
   dgn_nythraxis_gravebreaker: {
     name: 'Không Quỳ Trước Vua Nào',
@@ -387,6 +392,7 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_packbreaker: { name: 'Kẻ Phá Bầy', desc: 'Hạ 3 Sói Rừng trong vòng 10 giây.' },
   chr_vale_cup_debut: {
+    desc: 'Ra sân và chạm bóng trong một trận Cúp Vale tại Sân Heo Nái. Các trận Cúp Vale không còn chơi được, nên thành tích này không thể kiếm mới.',
     name: 'Kẻ Tranh Xô Đồng',
   },
   chr_vale_rares: {
@@ -433,6 +439,8 @@ export const table: DeedLocaleTable = {
   chr_peaks_chapter_iii: {
     name: 'Trọn Bộ Biên Niên Sử Đỉnh Gai',
     title: 'Xứ Đỉnh Gai',
+
+    desc: 'Theo trọn câu chuyện của ngọn núi: đánh tan Giáo Phái Thệ Long, làm Thánh Điện im tiếng, hạ Đỉnh Núi Thức Giấc và tiêu diệt mọi nỗi kinh hoàng có tên giữa các vách đá.',
   },
   chr_peaks_sparring: {
     name: 'Luyện Đòn Trên Tường',
@@ -582,51 +590,72 @@ export const table: DeedLocaleTable = {
     desc: 'Thua một trận đấu tay đôi mà thể diện vẫn gần như nguyên vẹn.',
   },
   pvp_vcup_first_match: {
+    desc: 'Chơi trọn một trận Cúp Vale tại Sân Heo Nái, thắng hay thua đều được. Các trận Cúp Vale không còn chơi được, nên thành tích này không thể kiếm mới.',
     name: 'Đôi Giày Chạm Cỏ',
   },
   pvp_vcup_first_win: {
+    desc: 'Thắng một trận Cúp Vale xếp hạng. Các trận Cúp Vale không còn chơi được, nên thành tích này không thể kiếm mới.',
     name: 'Chiếc Cúp Đầu Tay',
   },
-  pvp_vcup_wins_10: { name: 'Cầu Thủ Dạn Dày' },
+  pvp_vcup_wins_10: {
+    name: 'Cầu Thủ Dạn Dày',
+    desc: 'Thắng 10 trận Cúp Vale xếp hạng. Các trận Cúp Vale không còn chơi được, nên thành tích này không thể kiếm mới.',
+  },
   pvp_vcup_wins_25: {
+    desc: 'Thắng 25 trận Cúp Vale xếp hạng. Các trận Cúp Vale không còn chơi được, nên thành tích này không thể kiếm mới.',
     name: 'Huyền Thoại Bóng Heo Rừng',
     title: 'Huyền Thoại Bóng Heo Rừng',
   },
   pvp_vcup_first_goal: {
+    desc: 'Ghi bàn trong một trận Cúp Vale xếp hạng. Các trận Cúp Vale không còn chơi được, nên thành tích này không thể kiếm mới.',
     name: 'Khai Nòng',
   },
   pvp_vcup_hat_trick: {
+    desc: 'Ghi ba bàn trong cùng một trận Cúp Vale xếp hạng, ở hạng 3v3 trở lên. Các trận Cúp Vale không còn chơi được, nên thành tích này không thể kiếm mới.',
     name: 'Người Hùng Hat-trick',
   },
   pvp_vcup_golden_goal: {
+    desc: 'Ghi bàn thắng vàng quyết định một trận Cúp Vale xếp hạng. Các trận Cúp Vale không còn chơi được, nên thành tích này không thể kiếm mới.',
     name: 'Khoảnh Khắc Vàng',
   },
   pvp_vcup_first_save: {
+    desc: 'Thực hiện một pha cản phá với vai trò thủ môn trong trận Cúp Vale xếp hạng ở hạng 3v3 trở lên. Chỉ cú sút đủ nhanh để thử thách khả năng bắt bóng mới được tính; bắt bóng nhẹ không được tính. Các trận Cúp Vale không còn chơi được, nên thành tích này không thể kiếm mới.',
     name: 'Đôi Tay Vững Vàng',
   },
   pvp_vcup_clean_sheet: {
+    desc: 'Thắng một trận Cúp Vale xếp hạng với vai trò thủ môn mà không để thủng lưới, ở hạng 3v3 trở lên. Các trận Cúp Vale không còn chơi được, nên thành tích này không thể kiếm mới.',
     name: 'Đừng Hòng Qua Được Ta',
   },
   pvp_vcup_guild_win: {
+    desc: 'Thắng một trận Cúp Vale xếp hạng dưới lá cờ bang hội của bạn. Các trận Cúp Vale không còn chơi được, nên thành tích này không thể kiếm mới.',
     name: 'Vì Màu Cờ Sắc Áo',
   },
   pvp_fiesta_first_bout: {
+    desc: 'Đấu trọn một trận Fiesta 2v2, thắng hay thua đều được. Các trận Fiesta không còn xuất hiện trong hàng chờ Đấu Trường, nên thành tích này không thể kiếm mới.',
     name: 'Khách Không Mời',
   },
-  pvp_fiesta_first_win: { name: 'Linh Hồn Của Bữa Tiệc' },
+  pvp_fiesta_first_win: {
+    name: 'Linh Hồn Của Bữa Tiệc',
+    desc: 'Thắng một trận Fiesta 2v2. Các trận Fiesta không còn xuất hiện trong hàng chờ Đấu Trường, nên thành tích này không thể kiếm mới.',
+  },
   pvp_fiesta_double: {
+    desc: 'Hạ hai đối thủ trong Fiesta trong vòng bốn giây. Các trận Fiesta không còn xuất hiện trong hàng chờ Đấu Trường, nên thành tích này không thể kiếm mới.',
     name: 'Họa Vô Đơn Chí',
   },
   pvp_fiesta_shutdown: {
+    desc: 'Hạ một đối thủ Fiesta đang có chuỗi từ ba mạng trở lên. Các trận Fiesta không còn xuất hiện trong hàng chờ Đấu Trường, nên thành tích này không thể kiếm mới.',
     name: 'Kẻ Phá Đám',
   },
   pvp_fiesta_full_build: {
+    desc: 'Thắng một trận Fiesta với một cường hóa được khóa từ cả ba đợt. Các trận Fiesta không còn xuất hiện trong hàng chờ Đấu Trường, nên thành tích này không thể kiếm mới.',
     name: 'Chỉnh Tề Dự Tiệc',
   },
   pvp_fiesta_powerups: {
+    desc: 'Nhặt mỗi cường hóa vòng đấu trong bốn loại ít nhất một lần: Quỷ Tốc Độ, Người Khổng Lồ, Giày Mặt Trăng và Cuồng Sĩ. Các trận Fiesta không còn xuất hiện trong hàng chờ Đấu Trường, nên thành tích này không thể kiếm mới.',
     name: 'Mỗi Thứ Một Chút',
   },
   pvp_fiesta_five_kills: {
+    desc: 'Hạ năm đối thủ trong một trận Fiesta. Các trận Fiesta không còn xuất hiện trong hàng chờ Đấu Trường, nên thành tích này không thể kiếm mới.',
     name: 'Gánh Cả Bữa Tiệc',
   },
   soc_first_party: { name: 'Có Nhau Vẫn Hơn', desc: 'Gia nhập một tổ đội cùng người chơi khác.' },
@@ -1035,27 +1064,111 @@ export const table: DeedLocaleTable = {
   },
   dgn_ignivar: {
     name: 'Sứ Giả Ngã Xuống',
-    desc: 'Đánh bại Ignivar, Herald of the Last Flame, tại Crucible of the Last Spring.',
+    desc: 'Đánh bại Ignivar, Sứ Giả Ngọn Lửa Cuối Cùng, tại Lò Luyện Suối Nguồn Cuối Cùng.',
   },
   dgn_ignivar_heroic: {
     name: 'Anh Hùng: Sứ Giả Ngã Xuống',
-    desc: 'Đánh bại Ignivar, Herald of the Last Flame, ở độ khó Anh Hùng.',
+    desc: 'Đánh bại Ignivar, Sứ Giả Ngọn Lửa Cuối Cùng, ở độ khó Anh Hùng.',
   },
   dgn_varkhul: {
     name: 'Lò Rèn Nguội Lạnh',
-    desc: 'Đánh bại Varkhul, Forgefather of the Last Flame, tại The Inner Crucible.',
+    desc: 'Đánh bại Varkhul, Tổ Phụ Lò Rèn của Ngọn Lửa Cuối Cùng, tại Lò Luyện Bên Trong.',
   },
   dgn_varkhul_heroic: {
     name: 'Anh Hùng: Lò Rèn Nguội Lạnh',
-    desc: 'Đánh bại Varkhul, Forgefather of the Last Flame, ở độ khó Anh Hùng.',
+    desc: 'Đánh bại Varkhul, Tổ Phụ Lò Rèn của Ngọn Lửa Cuối Cùng, ở độ khó Anh Hùng.',
   },
   dgn_varkhul_flawless: {
     name: 'Không Một Tia Lửa Nào Tắt',
-    desc: 'Đánh bại Varkhul, Forgefather of the Last Flame, ở độ khó Anh Hùng mà không một thành viên raid nào tử trận.',
+    desc: 'Đánh bại Varkhul, Tổ Phụ Lò Rèn của Ngọn Lửa Cuối Cùng, ở độ khó Anh Hùng mà không một thành viên raid nào tử trận.',
     title: 'Kẻ Bất Thiêu',
   },
   col_set_bramblehide: {
     name: 'Da Gai Của Roots',
     desc: 'Khám phá đủ mọi món của bộ Da Gai Của Roots.',
+  },
+  prog_jewelcrafting_rare: {
+    desc: 'Chế tạo vật phẩm bậc hiếm đầu tiên trong nghề Kim Hoàn.',
+    name: 'Đánh Bóng Đến Rực Rỡ',
+  },
+  prog_jewelcrafting_50: {
+    desc: 'Đạt 50 điểm kỹ năng trong nghề Kim Hoàn.',
+    name: 'Mặt Cắt Và Hoa Văn',
+  },
+  prog_grandmaster_jewelcrafting: {
+    desc: 'Đạt 125 điểm kỹ năng trong nghề Kim Hoàn, đỉnh cao của nghề.',
+
+    name: 'Đại Sư Chế Tác Trang Sức',
+    title: 'Đại Sư Chế Tác Trang Sức',
+  },
+  prog_inscription_rare: {
+    desc: 'Chế tạo vật phẩm bậc hiếm đầu tiên trong nghề Khắc Chữ.',
+    name: 'Viết Bằng Mực Tinh Xảo',
+  },
+  prog_inscription_50: {
+    desc: 'Đạt 50 điểm kỹ năng trong nghề Khắc Chữ.',
+    name: 'Bút Lông Và Sắc Tố',
+  },
+  prog_grandmaster_inscription: {
+    desc: 'Đạt 125 điểm kỹ năng trong nghề Khắc Chữ, đỉnh cao của nghề.',
+
+    name: 'Đại Sư Minh Văn',
+    title: 'Đại Sư Minh Văn',
+  },
+  col_deepest_cast: {
+    desc: 'Có được Cần Câu Clockreel, cây cần duy nhất có thể câu được những mẻ cá sâu nhất.',
+
+    name: 'Cú Quăng Câu Sâu Nhất',
+  },
+  prog_first_planting: {
+    desc: 'Trồng vụ mùa đầu tiên của bạn trong một luống vườn.',
+    name: 'Khởi Đầu Từ Hạt Giống',
+  },
+  chr_vale_first_harvest: {
+    desc: 'Thu hoạch vụ mùa tươi tốt đầu tiên từ luống vườn ở Thung Lũng Eastbrook.',
+
+    name: 'Trái Đầu Mùa Của Thung Lũng',
+  },
+  chr_marsh_first_harvest: {
+    desc: 'Thu hoạch vụ mùa tươi tốt đầu tiên từ luống vườn ở Đầm Lầy Mirefen.',
+
+    name: 'Mầm Non Trong Than Bùn',
+  },
+  chr_peaks_first_harvest: {
+    desc: 'Thu hoạch vụ mùa tươi tốt đầu tiên từ luống vườn ở Cao Nguyên Thornpeak.',
+
+    name: 'Vụ Mùa Giữa Vách Đá',
+  },
+  chr_evergarden_first_harvest: {
+    desc: 'Thu hoạch vụ mùa tươi tốt đầu tiên từ luống vườn ở Vườn Vĩnh Hằng.',
+
+    name: 'Mảnh Vườn Chốn Thiên Đường',
+  },
+  col_golden_harvest: {
+    desc: 'Gặt một vụ mùa vàng và để cả khu vực nghe thấy tin này.',
+    name: 'Mùa Gặt Vàng',
+  },
+  prog_farming_100: {
+    desc: 'Đạt 100 điểm thành thạo nghề Nông.',
+    name: 'Bậc Thầy Thu Hoạch',
+    title: 'Bậc Thầy Thu Hoạch',
+  },
+  col_farm_roster: {
+    desc: 'Thu hoạch mọi vụ mùa mà bốn khu vườn trồng được.',
+    name: 'Mọi Luống Đều Đầy',
+  },
+  prog_field_to_feast: {
+    desc: 'Nấu một bữa tiệc đỉnh cao mà cả raid có thể cùng ăn.',
+    name: 'Từ Đồng Ruộng Đến Yến Tiệc',
+  },
+  prog_legendmaker: {
+    desc: 'Dùng Giấy Chế Tác để nâng một tác phẩm Đã Hoàn Thiện thành huyền thoại và đặt cho nó một cái tên riêng.',
+
+    name: 'Người Tạo Huyền Thoại',
+  },
+  hid_forgebreaker: {
+    desc: 'Tự tay tạo hình Kẻ Phá Lò rồi trở về gặp Maelin với chiếc búa đã hoàn thành.',
+
+    name: 'Suối Nguồn Thoát Xiềng',
   },
 };

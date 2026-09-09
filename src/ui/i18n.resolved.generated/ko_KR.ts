@@ -65,7 +65,7 @@ export const ko_KR: EnTranslations = {
       "difficulty": "난이도",
       "name": "이름",
       "spec": "전문화",
-      "bed": "Bed id (optional)"
+      "bed": "경작지 ID (선택 사항)"
     },
     "difficulty": {
       "normal": "일반",
@@ -153,8 +153,8 @@ export const ko_KR: EnTranslations = {
         "description": "채집 전문 기술을 올립니다."
       },
       "farmgrow": {
-        "label": "Ripen crops",
-        "description": "Bring your planted crop beds to their ready time, or one bed by id. Nothing else changes: the outcome was rolled when you planted."
+        "label": "작물 익히기",
+        "description": "심어 둔 모든 경작지 또는 ID로 지정한 경작지 하나를 수확 가능한 시점까지 진행시킵니다. 그 외에는 바뀌지 않습니다. 수확 결과는 심을 때 이미 무작위로 결정되었습니다."
       },
       "teleport": {
         "label": "순간이동",
@@ -1261,11 +1261,11 @@ export const ko_KR: EnTranslations = {
     "practiceDps": {
       "title": "훈련용 허수아비",
       "liveDps": "{value} DPS",
-      "liveLabel": "This run",
+      "liveLabel": "이번 연습",
       "prompt": "허수아비를 공격하여 측정을 시작하세요",
       "previous": "이전 측정",
-      "runLabel": "Run {index}",
-      "runSummary": "{total} in {time}"
+      "runLabel": "{index}번째 연습",
+      "runSummary": "{time} 동안 {total}"
     },
     "hubLesson": {
       "target": "먼저 허수아비를 대상으로 삼으세요.",
@@ -1357,9 +1357,9 @@ export const ko_KR: EnTranslations = {
       "utility": "이동 및 은신",
       "friendly": "아군에게 건 내 버프",
       "shields": "내 보호막",
-      "row": "{aura} on {unit}",
+      "row": "{unit}에게 {aura} 적용",
       "selfRow": "{aura}",
-      "mode": "on",
+      "mode": "켜짐",
       "overflow": "{count}개 더 표시되지 않음"
     },
     "targetDots": {
@@ -3037,7 +3037,7 @@ export const ko_KR: EnTranslations = {
       "suddenDeath": "다음 마무리 일격은 분노를 소모하지 않고 생명력 조건을 무시합니다",
       "aoeEcho": "메아리 {charges}회 남음: 단일 대상 기술이 주변 최대 {targets}명에게 {pct}% 피해를 줍니다",
       "sureCrit": "다음 공격 기술 {charges}회가 반드시 치명타로 적중합니다",
-      "temporalEcho": "시전자의 비전 피해가 단일 대상 피해의 {singlePct}%, 광역 피해의 {areaPct}%만큼 당신을 치유합니다",
+      "temporalEcho": "시전자의 비전 피해가 단일 대상 피해의 {singlePct}%, 광역 피해의 {areaPct}%만큼 당신을 치유합니다. 에테르 쇄도와 에테르 화살은 개별 시간의 메아리에 4배 보너스를 적용합니다. 집단 메아리는 같은 양의 치유 예비량을 만들고, 체력이 60% 미만인 표식이 있는 아군에게 잃은 생명력에 따라 나눠 줍니다",
       "arcaneCharge": "비전 충전 {stacks}중첩: 에테르 쇄도의 피해가 {damagePct}% 증가하고 시전이 {castPct}% 빨라지며 마나가 {costMult}배 듭니다",
       "physicalReduction": "받는 물리 피해가 {pct}% 감소합니다",
       "temporalHourglass": "피해에 면역이고 행동할 수 없습니다. 생명력을 회복하고 재사용 대기시간을 가속합니다. 우클릭으로 취소할 수 있습니다.",
@@ -3156,7 +3156,7 @@ export const ko_KR: EnTranslations = {
       "fingersOfFrost": "충전 {charges}회 남음: 얼음창이 대상을 빙결 상태로 간주하고 빙결 피해 {pct}%를 줍니다",
       "brainFreeze": "다음 눈보라가 즉시 시전되고 재사용 대기시간을 무시합니다",
       "wintersChill": "충전 {charges}회 남음: 적용 가능한 주문이 이 대상을 빙결 상태로 간주합니다",
-      "icicles": "고드름 {value}/{max}개. {max}개면 빙하 쐐기를 사용할 수 있습니다",
+      "icicles": "고드름 {value}/{max}개. {max}개면 서리 바늘을 사용할 수 있습니다",
       "desolation": "충전 {charges}회 남음: 다음 혼돈의 화살 시전이 {castPct}% 빨라지거나 불의 비가 즉시 떨어집니다",
       "ruinousBrand": "복제 {charges}회 남음: 직접 주문 피해의 {otherPct}%를 이곳에 복제하며, 이곳이 주 대상이면 {selfPct}%를 복제합니다",
       "duskfireClaim": "대상이 죽으면 파멸을 {value} 얻습니다",
@@ -4004,7 +4004,7 @@ export const ko_KR: EnTranslations = {
       },
       "roster": {
         "seats": "{count} / {cap} 자리",
-        "expand": "명단 확장 (+{seats}자리, {price})",
+        "expand": "명단 확장",
         "maxed": "명단이 이미 최대 규모입니다",
         "confirm": "{price}(으)로 길드 명단을 {seats}자리 확장하시겠습니까? 골드는 본인의 소지금에서 차감되며 환불되지 않습니다.",
         "confirmAction": "확장",
@@ -4470,7 +4470,7 @@ export const ko_KR: EnTranslations = {
       "noBagSpace": "가방에 제작한 아이템을 넣을 공간이 없습니다.",
       "dailyLimit": "하루에 한 번만 제작할 수 있습니다.",
       "dailyLimitRetry": "하루에 한 번만 제작할 수 있습니다. {duration} 후에 다시 제작할 수 있습니다.",
-      "oncePerDay": "Once per day",
+      "oncePerDay": "하루 한 번",
       "skillReqLine": "{craft} {skill} 필요",
       "difficultyFull": "숙련도 전량 상승",
       "difficultyReduced": "숙련도 상승 감소",
@@ -5124,7 +5124,7 @@ export const ko_KR: EnTranslations = {
       "toWorld": "세계 지도",
       "toZone": "지역 지도",
       "toInstance": "인스턴스 지도",
-      "toggleAria": "세계 지도와 지역 지도 전환",
+      "toggleAria": "세계 지도, 지역 지도, 인스턴스 지도 전환",
       "levels": "레벨 {min}부터 {max}까지"
     },
     "arenaGate": {
@@ -7210,7 +7210,7 @@ export const ko_KR: EnTranslations = {
       "matFmt": "{name} x{count}",
       "outputFmt": "{name} x{count}",
       "comboReq": "{a}와 {b} 필요",
-      "oncePerDay": "Once per day",
+      "oncePerDay": "하루 한 번",
       "effectFood": "먹으면 {seconds}초에 걸쳐 생명력을 {amount} 회복합니다.",
       "effectWellFed": "식사를 마치면 잘 먹음: {minutes}분간 {stat} +{value}.",
       "effectWellFedAura": "식사를 마치면 {minutes}분간 {aura} 효과를 얻습니다.",

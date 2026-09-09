@@ -665,11 +665,14 @@ interface AttributionTargetFixture {
 // with Drakelands/hotkey renderer work. No capture was retaken.
 // PR3946: remint the renderer leaf after restoring school-aware resurrection VFX.
 // Existing captures, performance measurements and capture identity are unchanged.
-// PR fen-features-subcull: remint after merging release/v0.42.0 into the branch,
-// the renderer leaf having moved with the zone-feature sweep extraction.
-// Existing captures, performance measurements and capture identity are unchanged.
+// v0.42.0 dependency-floor bump (sharp, js-yaml, vitest): the lockfile is a
+// fingerprint input, so every shipping GLB was size-preserving re-minted and this
+// seal follows the swept evidence. No capture was retaken.
+// PR fen-features-subcull: remint after merging release/v0.43.0 into the branch.
+// The renderer leaf differs from the release tree by the zone-feature sweep
+// extraction; captures, performance measurements and capture identity are unchanged.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '52d7ac5ce06a62ae5c88de3c45f993957c33f4ac15de5a5601be8958bbcb908c';
+  'faf74aded65e0c50da1dd4f352d76e24d564270eb4d5074a756b0d6bab34be42';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

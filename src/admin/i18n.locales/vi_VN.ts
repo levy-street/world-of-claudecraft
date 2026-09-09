@@ -1227,4 +1227,54 @@ export const vi_VN: Record<string, string> = {
   'realmBuilders.saveNew': 'Xuất bản',
   'realmBuilders.useNextMonth': 'Tháng tiếp theo',
   'realmBuilders.yearLabel': 'Năm',
+  'error.clearItemNameAllLiteral': 'all phải là giá trị true nguyên văn',
+  'error.clearItemNameBagIndex': 'bag phải là số nguyên không âm',
+  'error.clearItemNameBagPair': 'mục tiêu trong túi cần cả chỉ số ô và ID vật phẩm',
+  'error.clearItemNameBagRange': 'bag phải là số nguyên từ {min} đến {max}',
+  'error.clearItemNameCameOnline':
+    'nhân vật đã trực tuyến trước khi thao tác xóa hoàn tất; hãy đá họ rồi thử lại',
+  'error.clearItemNameLeased':
+    'nhân vật đang giữ một phiên thuê còn hiệu lực; hãy đá họ (hoặc chờ phiên hết hạn) rồi thử lại',
+  'error.clearItemNameNoMatch': 'không có bản sao có tên nào khớp với mục tiêu đó',
+  'error.clearItemNameOnline':
+    'nhân vật đang trực tuyến trong vương quốc này; hãy ngắt kết nối trước',
+  'error.clearItemNameTargetForms':
+    'chỉ định chính xác một mục tiêu: ô đang mặc, ô trong túi hoặc all: true',
+  'error.clearItemNameUnknownSlot': 'ô trang bị không xác định',
+  'error.clearItemNameWentOffline':
+    'nhân vật đã ngoại tuyến trước khi thao tác xóa hoàn tất; hãy thử lại',
+  'error.itemNameClearFailed': 'không thể xóa tên vật phẩm',
+  'loadFailure.forbiddenDetail':
+    'Vai trò nhân viên của bạn không có quyền mà chế độ xem này đọc. Hãy nhờ siêu quản trị viên cấp quyền, rồi tải lại.',
+  'loadFailure.forbiddenTitle': 'Bị từ chối quyền',
+  'marketMetrics.autoRefresh': 'Tự động làm mới ({seconds} giây)',
+  'marketMetrics.bucketCompost': 'Phân ủ',
+  'marketMetrics.bucketCores': 'Lõi',
+  'marketMetrics.bucketEmpty': 'không có tin đăng trực tiếp',
+  'marketMetrics.bucketEssence': 'Tinh chất',
+  'marketMetrics.bucketPatterns': 'Công thức',
+  'marketMetrics.bucketProduce': 'Nông sản',
+  'marketMetrics.bucketSeeds': 'Hạt giống',
+  'marketMetrics.bucketSold':
+    'Đã bán trong {days} ngày qua: {sales} lượt bán, {quantity} vật phẩm, {copper}',
+  'marketMetrics.bucketSummary':
+    '{listings} tin đăng, {quantity} đơn vị, đã đăng {listed}/{tracked} vật phẩm',
+  'marketMetrics.colItem': 'Vật phẩm',
+  'marketMetrics.colListings': 'Tin đăng',
+  'marketMetrics.colLowest': 'Thấp nhất (mỗi đơn vị)',
+  'marketMetrics.colMedian': 'Trung vị (mỗi đơn vị)',
+  'marketMetrics.colQuantity': 'Số lượng',
+  'marketMetrics.empty': 'không có tin đăng trực tiếp trong bất kỳ nhóm nào đang theo dõi',
+  'marketMetrics.essenceNote':
+    'Những vật liệu này bị khóa linh hồn và không bao giờ có thể đăng bán. Mỗi dòng ở đây cho thấy bất biến ký quỹ thị trường đã hỏng và cần kỹ sư xử lý.',
+  'marketMetrics.hint':
+    'Tin đăng trực tiếp trên Chợ Thế giới trong các nhóm nguồn cung được theo dõi: những gì đang có trên sổ lệnh, không phải khối lượng đã bán. Máy chủ lưu bộ nhớ đệm dữ liệu này khoảng 15 giây.',
+  'marketMetrics.loadFailed': 'không thể tải chỉ số thị trường',
+  'marketMetrics.loading': 'đang tải…',
+  'marketMetrics.realm': 'Vương quốc: {realm}',
+  'marketMetrics.soldNone': 'Đã bán trong {days} ngày qua: không có',
+  'marketMetrics.soldUnavailable':
+    'Khối lượng bán hiện không khả dụng, nên bên dưới chỉ hiển thị tin đăng trực tiếp.',
+  'moderationHistory.actionClearItemName': 'Đã xóa tên vật phẩm',
+  'nav.marketMetrics': 'Chỉ số thị trường',
 };

@@ -1211,4 +1211,54 @@ export const cs_CZ: Record<string, string> = {
   'realmBuilders.saveNew': 'Publikovat',
   'realmBuilders.useNextMonth': 'Příští měsíc',
   'realmBuilders.yearLabel': 'rok',
+  'error.clearItemNameAllLiteral': 'all musí být doslovná hodnota true',
+  'error.clearItemNameBagIndex': 'bag musí být nezáporné celé číslo',
+  'error.clearItemNameBagPair': 'cíl brašny potřebuje index políčka i id předmětu',
+  'error.clearItemNameBagRange': 'bag musí být celé číslo od {min} do {max}',
+  'error.clearItemNameCameOnline':
+    'postava se připojila dříve, než proběhlo odstranění; odpojte ji a zkuste to znovu',
+  'error.clearItemNameLeased':
+    'postava drží aktivní nájem relace; odpojte ji (nebo vyčkejte na jeho vypršení) a zkuste to znovu',
+  'error.clearItemNameNoMatch': 'tomuto cíli neodpovídá žádná pojmenovaná kopie',
+  'error.clearItemNameOnline': 'postava je v tomto světě online; nejprve ji odpojte',
+  'error.clearItemNameTargetForms':
+    'zadejte právě jeden cíl: vybavený slot, políčko brašny nebo all: true',
+  'error.clearItemNameUnknownSlot': 'neznámý slot výbavy',
+  'error.clearItemNameWentOffline':
+    'postava se odpojila dříve, než proběhlo odstranění; zkuste to znovu',
+  'error.itemNameClearFailed': 'nepodařilo se vymazat jméno předmětu',
+  'loadFailure.forbiddenDetail':
+    'Vaše zaměstnanecké role nemají oprávnění, které toto zobrazení čte. Požádejte superadministrátora o jeho udělení a pak stránku načtěte znovu.',
+  'loadFailure.forbiddenTitle': 'Přístup odepřen',
+  'marketMetrics.autoRefresh': 'Automatické obnovení ({seconds} s)',
+  'marketMetrics.bucketCompost': 'Kompost',
+  'marketMetrics.bucketCores': 'Jádra',
+  'marketMetrics.bucketEmpty': 'žádné aktivní nabídky',
+  'marketMetrics.bucketEssence': 'Esence',
+  'marketMetrics.bucketPatterns': 'Vzory',
+  'marketMetrics.bucketProduce': 'Úroda',
+  'marketMetrics.bucketSeeds': 'Semena',
+  'marketMetrics.bucketSold':
+    'Prodáno za posledních {days} dní: {sales} prodejů, {quantity} předmětů, {copper}',
+  'marketMetrics.bucketSummary':
+    '{listings} nabídek, {quantity} kusů, nabízeno {listed} z {tracked} předmětů',
+  'marketMetrics.colItem': 'Předmět',
+  'marketMetrics.colListings': 'Nabídky',
+  'marketMetrics.colLowest': 'Nejnižší (za kus)',
+  'marketMetrics.colMedian': 'Medián (za kus)',
+  'marketMetrics.colQuantity': 'Množství',
+  'marketMetrics.empty': 'v žádné sledované kategorii nejsou aktivní nabídky',
+  'marketMetrics.essenceNote':
+    'Tyto materiály jsou vázané na duši a nikdy nemohou být nabízeny. Jakýkoli řádek zde znamená porušení invariantu úschovy trhu a vyžaduje zásah vývojářů.',
+  'marketMetrics.hint':
+    'Aktivní nabídky Světového trhu pro sledované kategorie zásob: co je právě v nabídce, nikoli objem prodeje. Server tento přehled ukládá do mezipaměti asi na 15 sekund.',
+  'marketMetrics.loadFailed': 'nepodařilo se načíst metriky trhu',
+  'marketMetrics.loading': 'načítání…',
+  'marketMetrics.realm': 'Svět: {realm}',
+  'marketMetrics.soldNone': 'Prodáno za posledních {days} dní: nic',
+  'marketMetrics.soldUnavailable':
+    'Objem prodeje nyní není k dispozici, proto jsou níže zobrazeny jen aktivní nabídky.',
+  'moderationHistory.actionClearItemName': 'Jméno předmětu vymazáno',
+  'nav.marketMetrics': 'Metriky trhu',
+  'poi.thornpeak_heights.7': 'Stany Broodsworn',
 };

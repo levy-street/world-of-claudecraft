@@ -65,7 +65,7 @@ export const ja_JP: EnTranslations = {
       "difficulty": "難易度",
       "name": "名前",
       "spec": "スペック",
-      "bed": "Bed id (optional)"
+      "bed": "畝のID（任意）"
     },
     "difficulty": {
       "normal": "ノーマル",
@@ -153,8 +153,8 @@ export const ja_JP: EnTranslations = {
         "description": "採集専門職のスキルを上げます。"
       },
       "farmgrow": {
-        "label": "Ripen crops",
-        "description": "Bring your planted crop beds to their ready time, or one bed by id. Nothing else changes: the outcome was rolled when you planted."
+        "label": "作物を成熟させる",
+        "description": "作物を植えたすべての畝、またはIDで指定した畝一つを収穫可能な時刻まで進めます。それ以外は変わりません。収穫の結果は植えた時点で抽選済みです。"
       },
       "teleport": {
         "label": "テレポート",
@@ -1261,11 +1261,11 @@ export const ja_JP: EnTranslations = {
     "practiceDps": {
       "title": "練習用ダミー",
       "liveDps": "{value} DPS",
-      "liveLabel": "This run",
+      "liveLabel": "今回の練習",
       "prompt": "ダミーを攻撃して計測を開始",
       "previous": "これまでの計測",
-      "runLabel": "Run {index}",
-      "runSummary": "{total} in {time}"
+      "runLabel": "{index}回目の練習",
+      "runSummary": "{time} で {total}"
     },
     "hubLesson": {
       "target": "まずダミーを標的にしよう。",
@@ -1357,9 +1357,9 @@ export const ja_JP: EnTranslations = {
       "utility": "移動とステルス",
       "friendly": "味方へのバフ",
       "shields": "自分のシールド",
-      "row": "{aura} on {unit}",
+      "row": "{unit} に {aura}",
       "selfRow": "{aura}",
-      "mode": "on",
+      "mode": "オン",
       "overflow": "他{count}件は非表示"
     },
     "targetDots": {
@@ -3037,7 +3037,7 @@ export const ja_JP: EnTranslations = {
       "suddenDeath": "次のエグゼキュートは怒気を消費せず、体力条件を無視する",
       "aoeEcho": "残り{charges}回：単体アビリティが近くの最大{targets}体にも{pct}%のダメージを与える",
       "sureCrit": "次のダメージアビリティ{charges}回が必ずクリティカルになる",
-      "temporalEcho": "術者の秘術ダメージのうち、単体なら{singlePct}%、範囲なら{areaPct}%があなたへの回復になる",
+      "temporalEcho": "術者の秘術ダメージのうち、単体なら{singlePct}%、範囲なら{areaPct}%があなたへの回復になる。エーテルサージとエーテルダートは個別の時の残響に4倍のボーナスを使う。グループの残響は同量の回復予備を作り、体力が60%未満の標識付き味方へ失った体力に応じて分配する",
       "arcaneCharge": "秘術チャージ{stacks}：エーテル・サージのダメージが{damagePct}%増加、詠唱が{castPct}%短縮、マナ消費が{costMult}倍になる",
       "physicalReduction": "受ける物理ダメージが{pct}%減少する",
       "temporalHourglass": "ダメージを受けず行動不能になります。体力を回復し、クールダウンを加速します。右クリックで解除できます。",
@@ -3156,7 +3156,7 @@ export const ja_JP: EnTranslations = {
       "fingersOfFrost": "残り{charges}チャージ：アイス・ランスは対象を凍結扱いにし、凍結時ダメージ{pct}%を与える",
       "brainFreeze": "次のフラーリィが即時発動し、クールダウンを無視する",
       "wintersChill": "残り{charges}チャージ：対象となる呪文はこの敵を凍結扱いにする",
-      "icicles": "アイシクル{value}/{max}。{max}でグレイシャル・スパイクを使用できる",
+      "icicles": "アイシクル{value}/{max}。{max}でリムニードルを使用できる",
       "desolation": "残り{charges}チャージ：次のカオス・ボルトの詠唱が{castPct}%短縮、または次のレイン・オブ・ファイアが即着弾する",
       "ruinousBrand": "残り{charges}回：直接呪文がここへ{otherPct}%のダメージを複製し、ここが主対象なら{selfPct}%を複製する",
       "duskfireClaim": "対象の死亡時にルインを{value}得る",
@@ -4004,7 +4004,7 @@ export const ja_JP: EnTranslations = {
       },
       "roster": {
         "seats": "{count} / {cap} 席",
-        "expand": "名簿を拡張（+{seats}席、{price}）",
+        "expand": "名簿を拡張",
         "maxed": "名簿はすでに最大です",
         "confirm": "{price}でギルド名簿を{seats}席拡張しますか？ゴールドはあなた自身の所持金から支払われ、返金されません。",
         "confirmAction": "拡張",
@@ -4470,7 +4470,7 @@ export const ja_JP: EnTranslations = {
       "noBagSpace": "バッグに製作したアイテムを入れる空きがありません。",
       "dailyLimit": "それは1日に1回しか製作できません。",
       "dailyLimitRetry": "それは1日に1回しか製作できません。{duration}後に再び製作できます。",
-      "oncePerDay": "Once per day",
+      "oncePerDay": "1日1回",
       "skillReqLine": "{craft} {skill} が必要",
       "difficultyFull": "技能上昇（全量）",
       "difficultyReduced": "技能上昇（減少）",
@@ -5124,7 +5124,7 @@ export const ja_JP: EnTranslations = {
       "toWorld": "ワールドマップ",
       "toZone": "ゾーンマップ",
       "toInstance": "インスタンスマップ",
-      "toggleAria": "ワールドマップとゾーンマップを切り替える",
+      "toggleAria": "ワールドマップ、ゾーンマップ、インスタンスマップを切り替える",
       "levels": "レベル {min} から {max}"
     },
     "arenaGate": {
@@ -7210,7 +7210,7 @@ export const ja_JP: EnTranslations = {
       "matFmt": "{name}×{count}",
       "outputFmt": "{name}×{count}",
       "comboReq": "{a}と{b}が必要",
-      "oncePerDay": "Once per day",
+      "oncePerDay": "1日1回",
       "effectFood": "食べると{seconds}秒かけて体力を{amount}回復する。",
       "effectWellFed": "食べ終えると満腹: {stat}+{value}({minutes}分)。",
       "effectWellFedAura": "食べ終えると{minutes}分間{aura}を得る。",

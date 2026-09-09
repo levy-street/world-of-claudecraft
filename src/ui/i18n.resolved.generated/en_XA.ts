@@ -4004,7 +4004,7 @@ export const en_XA: EnTranslations = {
       },
       "roster": {
         "seats": "[{count} óƒ {cap} šéáţš]",
-        "expand": "[Éẋþáñð ŕóšţéŕ (+{seats} šéáţš ƒóŕ {price})]",
+        "expand": "[Éẋþáñð ŕóšţéŕ]",
         "maxed": "[Ţĥé ŕóšţéŕ íš áţ íţš ļáŕĝéšţ šížé]",
         "confirm": "[Éẋþáñð ţĥé ĝúíļð ŕóšţéŕ ƀý {seats} šéáţš ƒóŕ {price}? Ţĥé ĝóļð çóɱéš ƒŕóɱ ýóúŕ óŵñ þúŕšé áñð íš ñóţ ŕéƒúñðéð.]",
         "confirmAction": "[Éẋþáñð]",

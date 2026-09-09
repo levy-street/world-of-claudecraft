@@ -65,7 +65,7 @@ export const sv_SE: EnTranslations = {
       "difficulty": "Svårighetsgrad",
       "name": "Namn",
       "spec": "Specialisering",
-      "bed": "Bed id (optional)"
+      "bed": "Bädd-id (valfritt)"
     },
     "difficulty": {
       "normal": "Normal",
@@ -153,8 +153,8 @@ export const sv_SE: EnTranslations = {
         "description": "Höj färdigheten i ett insamlingsyrke."
       },
       "farmgrow": {
-        "label": "Ripen crops",
-        "description": "Bring your planted crop beds to their ready time, or one bed by id. Nothing else changes: the outcome was rolled when you planted."
+        "label": "Ripen grödor",
+        "description": "För dina planterade odlingsbäddar till skördetid, eller en enskild bädd efter id. Inget annat ändras: resultatet avgjordes när du planterade."
       },
       "teleport": {
         "label": "Teleportera",
@@ -227,7 +227,7 @@ export const sv_SE: EnTranslations = {
     },
     "milestone": {
       "unlocked": "Milstolpe upplåst",
-      "veteran": "Veteran",
+      "veteran": "Veteranen",
       "champion": "Mästare",
       "paragon": "Förebild",
       "mythic": "Mytisk",
@@ -326,7 +326,7 @@ export const sv_SE: EnTranslations = {
     }
   },
   "hudChrome": {
-    "materialStackSelectionUnavailable": "That material selection is no longer available.",
+    "materialStackSelectionUnavailable": "Det materialvalet är inte längre tillgängligt.",
     "warlock": {
       "doomLabel": "Fördömelse",
       "fateThreadsLabel": "Ödestrådar",
@@ -577,7 +577,7 @@ export const sv_SE: EnTranslations = {
       "mountsEyebrow": "Kontomontering",
       "mountsTitle": "Maskinstabil",
       "mountBuyAria": "Köp {item}",
-      "mountSkinType": "Mount skin",
+      "mountSkinType": "Riddjursskinn",
       "loading": "Laddar WOC-butiken...",
       "error": "WOC-butiken är inte tillgänglig just nu. Försök igen om en stund.",
       "balance": "Claudium-saldo",
@@ -714,7 +714,7 @@ export const sv_SE: EnTranslations = {
           "lore": "En spik av glödande glaciäris, som sägs vara bruten från den djupa tjärnen nedanför Sanctum, där bergets kyla har tänder. Rimfrost blommar oändligt från sin silverkrage och smälter aldrig, varken av eld eller vid sommar. Magikers håller det nära för kylan det lånar deras arbete, och håller det långt på nätterna som det verkar luta sig mot Nythraxis krypta, och lyssna."
         },
         "winterbite": {
-          "name": "Wintergnaw",
+          "name": "Vinterbett",
           "look": "Försilvrat stål och blå-is båge, en glödande cyan frusen kärna i stigaren, en nockad pil av solid is, kall ånga.",
           "lore": "En båge av försilvrat stål och Thornpeak-is, dess stigare upplyst av en kall cyan kärna som fryser pilen till snöret. Det knackar ett schakt av fast glaciär-is som reformerar varje dragning; bågskytten bär inget koger på väggen, bara kylan. Highwatch höll Smygjagaer Ridge genom en belägring med en liknande: en enda bågeskytt, säger de, och en vinter med pilar som alltid redan fanns där."
         },
@@ -1042,7 +1042,7 @@ export const sv_SE: EnTranslations = {
     },
     "tutorialGreeting": {
       "bellHomeNote": "Redan tillbaka från stranden? Det var färjeklockan du ringde i. Dess tvilling hänger där borta vid Korppostens brevlåda: ring i den när som helst, så bär överfarten dig tillbaka till Prövostranden. Ingen skada skedd, hur du än väljer.",
-      "islandArrivalNote": "Välkommen till Prövostranden. Väktaren Tam väntar strax uppe på stranden: gå och hälsa på honom.",
+      "islandArrivalNote": "Välkommen till Prövostranden. Väktaren Tam väntar strax uppe på stranden: gå och hälsa på honom. Om du hellre vill ge dig av kan du när som helst ringa i klockan vid min brygga, så tar den dig över till dalen.",
       "noteClose": "Förstått"
     },
     "tutorial": {
@@ -1259,41 +1259,41 @@ export const sv_SE: EnTranslations = {
       "heroicLocked": "Du är låst till Heroisk {name}."
     },
     "practiceDps": {
-      "title": "Practice Dummy",
+      "title": "Träningsdocka",
       "liveDps": "{value} DPS",
-      "liveLabel": "This run",
-      "prompt": "Attack the dummy to start a run",
-      "previous": "Previous runs",
-      "runLabel": "Run {index}",
-      "runSummary": "{total} in {time}"
+      "liveLabel": "Den här körningen",
+      "prompt": "Attackera träningsdockan för att starta en körning",
+      "previous": "Tidigare körningar",
+      "runLabel": "Körning {index}",
+      "runSummary": "{total} på {time}"
     },
     "hubLesson": {
-      "target": "Target the dummy to begin.",
-      "openWindow": "Open {meters}.",
-      "openWindowTouch": "Open {menu} → {more} → {meters}.",
-      "openTab": "Switch to the right tab.",
-      "openTabDamage": "Switch to the Damage tab.",
-      "openTabHealing": "Switch to the Healing tab.",
-      "act": "Land a hit to start the measurement.",
-      "actDamage": "Attack the dummy to start the measurement.",
-      "actHealing": "Cast a heal on the dummy to start the measurement.",
-      "addToBar": "Add your heal to your action bar from your Spellbook, then cast it on the dummy.",
-      "readRow": "Read your row, then press Continue.",
-      "readRowDamage": "Total is all your damage this run. DPS is damage per second over the run. Watch your row, then Continue.",
-      "readRowHealing": "Total counts health restored; healing past full health adds zero. HPS is health restored per second over the run. Read your row, then Continue.",
-      "findRun": "Use the meter arrows to return to your practice run.",
-      "addAttackToBar": "Add your attack from your Spellbook to the action bar, then use it on the dummy.",
-      "ackContinue": "Continue",
-      "viewBreakdown": "Hover, focus, or hold your row for the per-ability split.",
-      "endRun": "Turn off Attack and stop casting. After 5 seconds without a hit, this run ends.",
-      "endHealingRun": "Stop healing for 5 seconds to finish this run, then you can replay the lesson.",
-      "inspectHistory": "Use the history arrow to look back at that finished run.",
-      "compareAgain": "Return to Current with the right arrow, then attack the same dummy for about the same time.",
-      "reviewComparison": "Use the arrows to compare Total, DPS, and duration with your first run. Return to this run, then Done.",
-      "ackDone": "Done",
-      "replay": "Lesson complete. Practice freely, or replay these instructions.",
-      "replayAction": "Practice again",
-      "replayTarget": "Target it again"
+      "target": "Välj träningsdockan som mål för att börja.",
+      "openWindow": "Öppna {meters}.",
+      "openWindowTouch": "Öppna {menu}, sedan {more}, sedan {meters}.",
+      "openTab": "Byt till rätt flik.",
+      "openTabDamage": "Byt till fliken Skada.",
+      "openTabHealing": "Byt till fliken Läkning.",
+      "act": "Träffa målet för att starta mätningen.",
+      "actDamage": "Attackera träningsdockan för att starta mätningen.",
+      "actHealing": "Kasta en läkning på träningsdockan för att starta mätningen.",
+      "addToBar": "Lägg till din läkning från Spellboken på åtgärdsfältet och kasta den sedan på dockan.",
+      "readRow": "Läs din rad och tryck sedan på Fortsätt.",
+      "readRowDamage": "Totalt är all din skada under körningen. DPS är skada per sekund under körningen. Titta på din rad och fortsätt sedan.",
+      "readRowHealing": "Totalt räknar återställd hälsa, läkning över full hälsa ger noll. HPS är återställd hälsa per sekund. Läs din rad och fortsätt sedan.",
+      "findRun": "Använd mätarpilarna för att återvända till din övningskörning.",
+      "addAttackToBar": "Lägg till din attack från Spellboken på åtgärdsfältet och använd den sedan på dockan.",
+      "ackContinue": "Fortsätt",
+      "viewBreakdown": "Hovra, fokusera eller håll din rad för uppdelning per förmåga.",
+      "endRun": "Stäng av Attack och sluta kasta. Efter 5 sekunder utan träff avslutas körningen.",
+      "endHealingRun": "Sluta läka i 5 sekunder för att avsluta körningen, sedan kan du spela om lektionen.",
+      "inspectHistory": "Använd historikpilen för att se tillbaka på den avslutade körningen.",
+      "compareAgain": "Gå tillbaka till Nuvarande med högerpilen och attackera sedan samma docka ungefär lika länge.",
+      "reviewComparison": "Använd pilarna för att jämföra Totalt, DPS och tid med din första körning. Återvänd till denna körning och välj sedan Klar.",
+      "ackDone": "Klar",
+      "replay": "Lektionen är klar. Öva fritt eller spela upp instruktionerna igen.",
+      "replayAction": "Öva igen",
+      "replayTarget": "Välj den som mål igen"
     },
     "riftTracker": {
       "title": "Reva",
@@ -1330,8 +1330,8 @@ export const sv_SE: EnTranslations = {
     },
     "meters": {
       "perSecond": "{value}/s",
-      "thousands": "{value}k",
-      "millions": "{value}m",
+      "thousands": "{value} k",
+      "millions": "{value} mn",
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m} m {s} s",
       "seconds": "{s} s",
@@ -1351,16 +1351,16 @@ export const sv_SE: EnTranslations = {
       "regroup": "Gruppera {meter} igen"
     },
     "auraTracks": {
-      "defensives": "Defensive Cooldowns",
-      "self": "My Buffs",
-      "power": "Offensive Cooldowns",
-      "utility": "Movement and Stealth",
-      "friendly": "My Buffs on Allies",
-      "shields": "My Shields",
-      "row": "{aura} on {unit}",
+      "defensives": "Defensiva nedkylningar",
+      "self": "Mina förstärkningar",
+      "power": "Offensiva nedkylningar",
+      "utility": "Rörelse och smygande",
+      "friendly": "Mina förstärkningar på allierade",
+      "shields": "Mina sköldar",
+      "row": "{aura} på {unit}",
       "selfRow": "{aura}",
-      "mode": "on",
-      "overflow": "{count} more not shown"
+      "mode": "på",
+      "overflow": "{count} till visas inte"
     },
     "targetDots": {
       "title": "Målprickar",
@@ -1450,7 +1450,7 @@ export const sv_SE: EnTranslations = {
       "name_thunderstrut_gobbler": "Åskstoltsern, Den stora kalkonen",
       "name_goblin_rocket_sled": "Goblinraketsläde",
       "name_rallycart_rxt": "Rallycart RXT",
-      "name_terrorspark_groundshaker": "Dreadspark Groundshaker",
+      "name_terrorspark_groundshaker": "Dreadsparks markskakare",
       "name_drakemaw_raptor": "Drakgapsraptor",
       "name_mech_bird": "Cluckwork-mekafågel",
       "name_lanternback_troll": "Lanternbacken Grumbol",
@@ -1465,7 +1465,7 @@ export const sv_SE: EnTranslations = {
       "desc_thunderstrut_gobbler": "En kolossal stormkläckt kalkon som stoltserar ner från Den vaknande toppen, med stjärten spretande som ett åskmoln.",
       "desc_goblin_rocket_sled": "En farligt överbyggd goblinsläde, driven av två raketer och utsökt dåligt omdöme.",
       "desc_rallycart_rxt": "En liten rallymaskin som ökar färdhastigheten.",
-      "desc_rallycart_skin": "A tiny rally car with a mighty roar.",
+      "desc_rallycart_skin": "En liten rallybil med mäktigt vrål.",
       "desc_terrorspark_groundshaker": "En kompakt bepansrad maskin med tunga larvband, en grovkalibrig kanon och en sadel byggd för orädda förare.",
       "desc_drakemaw_raptor": "En sadeltämjd kullraptor från Drakgapets kaldera, ren sena och sprint, som fortfarande doftar svagt av aska.",
       "desc_mech_bird": "En handbyggd urverkshöna som sprintar på knäppande servon medan upprullningsnyckeln fortfarande vrider sig.",
@@ -1689,13 +1689,13 @@ export const sv_SE: EnTranslations = {
       "showNameplateDots": "Visa mina prickar på namnskyltar",
       "nameplateDotScale": "Namnskylt Punktstorlek",
       "showTargetDots": "Visa målprickar",
-      "showDefensivesTrack": "Show Defensive Cooldowns",
-      "showSelfBuffTrack": "Show My Buffs",
-      "showOffensiveTrack": "Show Offensive Cooldowns",
-      "showUtilityTrack": "Show Movement and Stealth",
-      "showUtilityModes": "Include Stealth and Travel Modes",
-      "showFriendlyTrack": "Show My Buffs on Allies",
-      "showShieldTrack": "Show My Shields",
+      "showDefensivesTrack": "Visa defensiva nedkylningar",
+      "showSelfBuffTrack": "Visa mina förstärkningar",
+      "showOffensiveTrack": "Visa offensiva nedkylningar",
+      "showUtilityTrack": "Visa rörelse och smygande",
+      "showUtilityModes": "Inkludera smygande och reseformer",
+      "showFriendlyTrack": "Visa mina förstärkningar på allierade",
+      "showShieldTrack": "Visa mina sköldar",
       "waterRipples": "Vattenkrusningar (kölvatten)",
       "showAttackButton": "Visa attackknapp",
       "showDailyRewardsChest": "Visa kistan för dagliga belöningar",
@@ -2048,7 +2048,7 @@ export const sv_SE: EnTranslations = {
         "battleTrance": "Stridstrans",
         "overpowerCharge": "Rödhandsförstärkning",
         "suddenDeath": "Plötslig död",
-        "victoryRush": "Victor's Surge",
+        "victoryRush": "Segerfart",
         "enrage": "Kalabalik: Rasande",
         "heatingUp": "Uppvärmning",
         "arcaneCharge": "Arkana laddningar",
@@ -2190,14 +2190,14 @@ export const sv_SE: EnTranslations = {
     "itemHeroicLabel": "Heroisk",
     "itemSoulbound": "Själabunden",
     "itemUniqueEquipped": "Unikt utrustad",
-    "itemMasterwrought": "Unique-Equipped: Masterwrought ({count})",
+    "itemMasterwrought": "Unikt utrustad: mästersmitt ({count})",
     "masterwrought": {
-      "slotsLabel": "Masterwrought slots:",
+      "slotsLabel": "Mästersmidesslottar:",
       "slotsValue": "{used} / {cap}",
-      "pieceMark": "Masterwrought",
-      "tooltipWorn": "Occupies a Masterwrought slot ({used} of {cap} in use).",
-      "tooltipLegendaryLimit": "Only {cap} legendary Masterwrought piece can be worn.",
-      "tooltipAtCap": "All {cap} of your Masterwrought slots are in use."
+      "pieceMark": "Mästersmitt",
+      "tooltipWorn": "Upptar en mästersmidesslott ({used} av {cap} används).",
+      "tooltipLegendaryLimit": "Endast {cap} legendarisk mästersmidd del kan bäras.",
+      "tooltipAtCap": "Alla dina {cap} mästersmidesslottar används."
     },
     "itemSet": {
       "header": "{name} ({have}/{total})",
@@ -2229,16 +2229,16 @@ export const sv_SE: EnTranslations = {
     },
     "plurals": {
       "commissionMasterworks": {
-        "one": "{count} masterwork",
-        "few": "{count} masterworks",
-        "many": "{count} masterworks",
-        "other": "{count} masterworks"
+        "one": "{count} mästerverk",
+        "few": "{count} mästerverk",
+        "many": "{count} mästerverk",
+        "other": "{count} mästerverk"
       },
       "commissionLegendaries": {
-        "one": "{count} legendary",
-        "few": "{count} legendaries",
-        "many": "{count} legendaries",
-        "other": "{count} legendaries"
+        "one": "{count} legendarisk",
+        "few": "{count} legendariska",
+        "many": "{count} legendariska",
+        "other": "{count} legendariska"
       },
       "guildMembers": {
         "one": "du är {rank}, {count} medlem",
@@ -2510,34 +2510,34 @@ export const sv_SE: EnTranslations = {
         "meat": "Kött",
         "cloth": "Tyg"
       },
-      "preferenceLabel": "Harvest preference: {preference}",
-      "changeButton": "Change",
-      "harvestActionTooltip": "Harvests with your current preference over {seconds} seconds. Requires a Field Kit. Each body can be harvested once. The killer and their party have priority for {prioritySeconds} seconds. Dropped loot stays available.",
-      "checkingStatus": "Checking harvest status...",
-      "statusUnavailable": "Harvest status is not available right now.",
-      "harvestStarting": "Starting harvest...",
-      "allBenefit": "Gathers every available material from this body.",
-      "focusBenefit": "Focuses the harvest on {material}.",
-      "tierBonusHint": "Focuses the harvest on {material}: +{tierBonus} tier over All materials.",
+      "preferenceLabel": "Skördepreferens: {preference}",
+      "changeButton": "Ändra",
+      "harvestActionTooltip": "Skördar enligt din nuvarande preferens under {seconds} sekunder. Kräver ett fältkit. Varje kropp kan skördas en gång. Dödaren och hens grupp har förtur i {prioritySeconds} sekunder. Släppt byte är tillgängligt.",
+      "checkingStatus": "Kontrollerar skördestatus...",
+      "statusUnavailable": "Skördestatus är inte tillgänglig just nu.",
+      "harvestStarting": "Börjar skörda...",
+      "allBenefit": "Samlar allt tillgängligt material från den här kroppen.",
+      "focusBenefit": "Fokuserar skörden på {material}.",
+      "tierBonusHint": "Fokuserar skörden på {material}: +{tierBonus} nivå över alla material.",
       "denial": {
-        "actorDead": "You must be alive to harvest.",
-        "actorInCombat": "You cannot harvest while in combat.",
-        "actorBusy": "You are already busy.",
-        "corpseInvalid": "This corpse can no longer be harvested.",
-        "wrongWorld": "This corpse is not in your world.",
-        "outOfRange": "Move closer to harvest this body.",
-        "noFieldKit": "You need a Field Kit to harvest.",
-        "reservedSelf": "You are already harvesting this body.",
-        "reservedOther": "{name} is harvesting this body.",
-        "reservedOtherUnknown": "Another player is harvesting this body.",
-        "priorityProtected": "Another player has priority on this body right now.",
-        "corpseExpiring": "This body will not last long enough to harvest.",
-        "preferenceMalformed": "Your harvest preference is invalid. Choose one to continue.",
-        "nothingToHarvest": "This body has nothing your Field Kit can harvest.",
-        "materialUnavailable": "{material} is not on this body.",
-        "materialUnavailableWithList": "{material} is not on this body. Available: {materials}.",
-        "bagsFull": "Your bags are too full to harvest.",
-        "malformedInput": "Something went wrong. Try again."
+        "actorDead": "Du måste vara vid liv för att skörda.",
+        "actorInCombat": "Du kan inte skörda i strid.",
+        "actorBusy": "Du är redan upptagen.",
+        "corpseInvalid": "Den här kroppen kan inte längre skördas.",
+        "wrongWorld": "Den här kroppen finns inte i din värld.",
+        "outOfRange": "Gå närmare för att skörda den här kroppen.",
+        "noFieldKit": "Du behöver ett fältkit för att skörda.",
+        "reservedSelf": "Du skördar redan den här kroppen.",
+        "reservedOther": "{name} skördar den här kroppen.",
+        "reservedOtherUnknown": "En annan spelare skördar den här kroppen.",
+        "priorityProtected": "En annan spelare har förtur till den här kroppen just nu.",
+        "corpseExpiring": "Kroppen varar inte länge nog för att skörda.",
+        "preferenceMalformed": "Din skördepreferens är ogiltig. Välj en för att fortsätta.",
+        "nothingToHarvest": "Den här kroppen har inget som ditt fältkit kan skörda.",
+        "materialUnavailable": "{material} finns inte på den här kroppen.",
+        "materialUnavailableWithList": "{material} finns inte på den här kroppen. Tillgängligt: {materials}.",
+        "bagsFull": "Dina väskor är för fulla för att skörda.",
+        "malformedInput": "Något gick fel. Försök igen."
       }
     },
     "townFocus": {
@@ -2558,68 +2558,68 @@ export const sv_SE: EnTranslations = {
       "respecCostLine": "Kostar {coin} och {materials}"
     },
     "harvestPreference": {
-      "title": "Harvest Preference",
-      "allLabel": "All materials",
-      "applyButton": "Apply",
-      "cancelButton": "Cancel",
-      "pickHint": "Choose what to harvest before applying.",
-      "currentUnavailable": "Your current choice, {material}, is not offered here.",
-      "unknownMaterial": "Unavailable material",
-      "currentChoiceLabel": "Current: {choice}"
+      "title": "Skördepreferens",
+      "allLabel": "Alla material",
+      "applyButton": "Använd",
+      "cancelButton": "Avbryt",
+      "pickHint": "Välj vad som ska skördas före användning.",
+      "currentUnavailable": "Ditt nuvarande val, {material}, erbjuds inte här.",
+      "unknownMaterial": "Otillgängligt material",
+      "currentChoiceLabel": "Nuvarande: {choice}"
     },
     "gatheringSource": {
-      "title": "Where to find {material}",
+      "title": "Var hittar man {material}",
       "corpseExample": "{creature} ({zone})",
       "corpseExampleTagged": "{creature} ({zone}, {tag})",
-      "rareTag": "rare",
-      "eliteTag": "elite",
-      "gatedTag": "quest-gated",
-      "moreSources": "and {count} more",
-      "moreZones": "and {count} more zones",
-      "premiumChance": "Rare or better {material} harvests also yield {specimen} when there is room in your bags.",
-      "specimenOfBase": "{material} is a rare or better harvest bonus from {base}, from the same creatures shown above, never a separate guaranteed find.",
-      "nodeZone": "{zone} (tier {tier}+ tool)",
-      "nodeFineNote": "A gathering tool of tier {tier}+ upgrades this to its fine grade at a matching vein.",
-      "farmNote": "Grown from a planted seed, ready after about {duration}. Needs farming skill {skill}+ and a tier {tier}+ hoe.",
-      "fishingZoneProven": "{zone} waters (proficiency {skill}+, rod tier {tier}+)",
-      "fishingZoneUnproven": "Some waters need proficiency {skill}+ and rod tier {tier}+; no specific spot is confirmed yet."
+      "rareTag": "sällsynt",
+      "eliteTag": "elit",
+      "gatedTag": "uppdragslåst",
+      "moreSources": "och {count} till",
+      "moreZones": "och {count} zoner till",
+      "premiumChance": "Sällsynta eller bättre skördar av {material} ger också {specimen} när det finns plats i väskorna.",
+      "specimenOfBase": "{material} är en sällsynt eller bättre skördebonus från {base}, från samma varelser som visas ovan, aldrig ett separat garanterat fynd.",
+      "nodeZone": "{zone} (verktyg av nivå {tier}+)",
+      "nodeFineNote": "Ett samlarverktyg av nivå {tier}+ höjer detta till fin kvalitet vid en motsvarande åder.",
+      "farmNote": "Odlas från ett planterat frö och blir klar efter ungefär {duration}. Kräver odlingsfärdighet {skill}+ och en hacka av nivå {tier}+.",
+      "fishingZoneProven": "{zone}s vatten (färdighet {skill}+, spönivå {tier}+)",
+      "fishingZoneUnproven": "Vissa vatten kräver färdighet {skill}+ och spönivå {tier}+; ingen särskild plats är bekräftad än."
     },
     "gatheringGoal": {
-      "title": "Gathering Goal",
-      "close": "Clear gathering goal",
-      "clearButton": "Clear",
-      "empty": "No gathering goal set.",
+      "title": "Samlarmål",
+      "close": "Rensa samlarmål",
+      "clearButton": "Rensa",
+      "empty": "Inget samlarmål är satt.",
       "recipeGoalLabel": "{name} x{count}",
-      "commissionGoalLabel": "Commission: {name} x{count}",
-      "craftCountLine": "{count} crafts tracked",
-      "unknownRecipeLabel": "Unknown recipe",
-      "invalidGoalLabel": "No longer tracked",
-      "statusCollecting": "Collecting",
-      "statusReady": "Ready",
-      "statusUnavailable": "Unavailable",
-      "statusDelivered": "Delivered",
-      "statusCancelled": "Cancelled",
-      "statusExpired": "Expired",
-      "readyHint": "Materials on hand. Crafting still needs gold, a station, and bag space.",
-      "reasonInvalidGoal": "This goal is no longer valid.",
-      "reasonUnknownRecipe": "That recipe no longer exists.",
-      "reasonRecipeUnavailable": "That recipe is no longer available to you.",
-      "reasonCommissionUnavailable": "That commission is no longer tracked. Track it again from the board if it is still listed.",
-      "reasonDailyLimit": "That recipe has already been crafted today.",
-      "reasonBatchLimit": "That batch size is no longer valid.",
-      "materialLine": "{name}: {reachable} of {required}",
-      "materialCarried": "{count} carried",
-      "materialStored": "{count} in storage",
-      "materialMissing": "{count} missing",
-      "materialInaccessible": "{count} unavailable for crafting",
-      "storageRestrictedNote": "Some materials are in storage you cannot reach from here.",
-      "payableCraftsLine": "Enough on hand for {count} more.",
-      "setPreferenceButton": "Set as harvest preference",
-      "setPreferenceButtonAria": "Set {name} as your harvest preference",
-      "currentPreferenceLabel": "Current harvest preference",
-      "currentPreferenceAria": "{name} is your current harvest preference",
-      "sourcesToggle": "Sources",
-      "sourcesToggleAria": "Sources for {name}"
+      "commissionGoalLabel": "Beställning: {name} x{count}",
+      "craftCountLine": "{count} tillverkningar spåras",
+      "unknownRecipeLabel": "Okänt recept",
+      "invalidGoalLabel": "Spåras inte längre",
+      "statusCollecting": "Samlar",
+      "statusReady": "Redo",
+      "statusUnavailable": "Otillgänglig",
+      "statusDelivered": "Levererad",
+      "statusCancelled": "Avbruten",
+      "statusExpired": "Utgången",
+      "readyHint": "Material finns till hands. Tillverkning behöver fortfarande guld, en station och väskutrymme.",
+      "reasonInvalidGoal": "Det här målet är inte längre giltigt.",
+      "reasonUnknownRecipe": "Det receptet finns inte längre.",
+      "reasonRecipeUnavailable": "Det receptet är inte längre tillgängligt för dig.",
+      "reasonCommissionUnavailable": "Den beställningen spåras inte längre. Spåra den igen från tavlan om den fortfarande finns där.",
+      "reasonDailyLimit": "Det receptet har redan tillverkats idag.",
+      "reasonBatchLimit": "Den batchstorleken är inte längre giltig.",
+      "materialLine": "{name}: {reachable} av {required}",
+      "materialCarried": "{count} bärs",
+      "materialStored": "{count} i lagring",
+      "materialMissing": "{count} saknas",
+      "materialInaccessible": "{count} otillgängliga för tillverkning",
+      "storageRestrictedNote": "En del material finns i lagring som du inte kan nå härifrån.",
+      "payableCraftsLine": "Du har tillräckligt för ytterligare {count}.",
+      "setPreferenceButton": "Ange som skördepreferens",
+      "setPreferenceButtonAria": "Ange {name} som skördepreferens",
+      "currentPreferenceLabel": "Nuvarande skördepreferens",
+      "currentPreferenceAria": "{name} är din nuvarande skördepreferens",
+      "sourcesToggle": "Källor",
+      "sourcesToggleAria": "Källor för {name}"
     },
     "party": {
       "promoteLeader": "Befordra till ledare",
@@ -3031,13 +3031,13 @@ export const sv_SE: EnTranslations = {
       "sanguine": "Ökar attackhastigheten med {hastePct}% och vållad skada med {dmgPct}%",
       "battleTrance": "Ditt nästa Plundrarhugg eller Stympande hugg kostar inget raseri",
       "revengeFree": "Din nästa Hämnd kostar inget raseri",
-      "victoryRush": "Victor's Surge is ready",
+      "victoryRush": "Segerfart är redo",
       "maxHpPct": "Ökar maximal hälsa med {pct}%",
       "enrage": "Vållad skada ökad med {damagePct}%, attackhastighet med {hastePct}% och förflyttningshastighet med {movePct}%",
       "suddenDeath": "Din nästa Tidig grav kostar inget raseri och ignorerar sitt hälsokrav",
       "aoeEcho": "{charges} ekon återstår: förmågor mot ett enda mål vållar {pct}% skada till upp till {targets} närliggande fiender",
       "sureCrit": "{charges} kastningar av skadeförmågor är garanterat kritiska träffar",
-      "temporalEcho": "Kastarens arkanskada läker dig för {singlePct}% av enmålsskada eller {areaPct}% av områdesskada. Etervåg och Eterpilar får en x4-bonus på ett individuellt Tidsmässigt eko. Gruppekona skapar en lika stor läkningsreserv, fördelad efter saknad hälsa bland märkta allierade under 60% hälsa",
+      "temporalEcho": "Kastarens arkanskada läker dig för {singlePct}% av enmålsskada eller {areaPct}% av områdesskada. Etersvall och Eterpilar får en x4-bonus på ett individuellt Tidsmässigt eko. Gruppekona skapar en lika stor läkningsreserv, fördelad efter saknad hälsa bland märkta allierade under 60% hälsa",
       "arcaneCharge": "{stacks} Arkanladdningar: Etersvall gör {damagePct}% mer skada, kastas {castPct}% snabbare och kostar {costMult}x mana",
       "physicalReduction": "Minskar mottagen fysisk skada med {pct}%",
       "temporalHourglass": "Immun och oförmögen att handla; återställer hälsa och accelererar nedkylningsåterhämtning. Högerklicka för att avbryta.",
@@ -3062,14 +3062,14 @@ export const sv_SE: EnTranslations = {
       "duskEconomy": "Förmågor kostar {pct}% mindre energi",
       "moontide": "Månflod: steg {stacks} av {max}. Vildbult-, Himlafall- och Månfrö-besvärjelser fyller den i Månugglaform; vid {max} blir Månfrö Månsvall och Himlafall Solspår, och båda tär på den",
       "oldBlood": "Gammalt Blod: steg {stacks} av {max}. Träffande Varg- och Bruin-slag delar detta förråd; vid {max} förvandlas Blodsbett eller Benkross",
-      "verdance": "Grönska: steg {stacks} av {max}. Fullbordade besvärjelser av Vildblomning och Andra blomningen fyller den; vid {max} blir Snabb läkning Överblomning",
+      "verdance": "Grönska {stacks}/{max}. Varje NY Vildblomning eller Andra blomningen du planterar ger 1. Vid {max} blir Snabb läkning Överblomning",
       "freeExecute": "Din nästa kvalificerade avrättningsförmåga kostar ingenting",
       "resourceSap": "Återställer {value} av din nuvarande resurs var {interval}:e sek",
       "nextAttackCrit": "Din nästa attack blir garanterat en kritisk träff",
       "healEcho": "Att falla under {threshold}% hälsa återställer {value} hälsa",
       "increase": {
         "ap": "Erhöht Angriffskraft um {value}",
-        "str": "Increases Strength by {value}",
+        "str": "Ökar Styrka med {value}",
         "sp": "Ökar besvärjelsekraft med {value}",
         "armor": "Erhöht Rüstung um {value}",
         "int": "Erhöht Intelligenz um {value}",
@@ -3080,7 +3080,7 @@ export const sv_SE: EnTranslations = {
       },
       "reduce": {
         "ap": "Verringert Angriffskraft um {value}",
-        "str": "Reduces Strength by {value}",
+        "str": "Minskar Styrka med {value}",
         "armor": "Verringert Rüstung um {value}",
         "int": "Verringert Intelligenz um {value}",
         "agi": "Verringert Beweglichkeit um {value}",
@@ -3156,7 +3156,7 @@ export const sv_SE: EnTranslations = {
       "fingersOfFrost": "{charges} laddningar: Islans behandlar sitt mål som fryst och vållar {pct}% frusen skada",
       "brainFreeze": "Din nästa Vinterpiska är omedelbar och ignorerar sin nedkylning",
       "wintersChill": "{charges} laddningar: kompatibla besvärjelser behandlar detta mål som fryst",
-      "icicles": "{value} av {max} Istappar; vid {max} kan Glaciärtagg kastas",
+      "icicles": "{value} av {max} Istappar; vid {max} kan Rimeneedle kastas",
       "desolation": "{charges} laddningar: din nästa Fördärvsbult kastas {castPct}% snabbare, eller din nästa Eldregn landar omedelbart",
       "ruinousBrand": "{charges} kopior återstår: direkta besvärjelser kopierar {otherPct}% skada hit, eller {selfPct}% när detta är deras mål",
       "duskfireClaim": "Döden ger {value} Wrack",
@@ -3417,59 +3417,59 @@ export const sv_SE: EnTranslations = {
       "statEnchanted": "+{value} {stat} (Förtrollad)",
       "enchantedFallback": "Förtrollad",
       "partyTradeWindow": "Du kan överlåta det här föremålet till spelare som delade bytet i {time} till. Att ta på det avslutar handelsfönstret.",
-      "perfectedBadge": "Perfected",
-      "perfectingRank": "Perfecting: rank {rank} of {ranks}",
-      "materialSourceGatherer": "{count} × Collected by {name}",
-      "materialSourceGathererSigned": "{count} × Collected by {name}, signed by {signer}",
-      "materialSourceUnrecorded": "{count} × No gatherer recorded",
-      "materialSourceUnrecordedSigned": "{count} × No gatherer recorded, signed by {name}",
-      "materialSourceMore": "+{sources} more sources, {units} units"
+      "perfectedBadge": "Förfinad",
+      "perfectingRank": "Förfining: rang {rank} av {ranks}",
+      "materialSourceGatherer": "{count} × samlad av {name}",
+      "materialSourceGathererSigned": "{count} × samlad av {name}, signerad av {signer}",
+      "materialSourceUnrecorded": "{count} × ingen samlare registrerad",
+      "materialSourceUnrecordedSigned": "{count} × ingen samlare registrerad, signerad av {name}",
+      "materialSourceMore": "+{sources} fler källor, {units} enheter"
     },
     "materialSources": {
-      "detailsTitle": "Sources for {item}",
-      "pickerTitle": "Choose sources from {item}",
-      "close": "Close material sources",
-      "view": "Sources",
-      "choose": "Sources",
-      "viewAria": "View all material sources for {item}",
-      "chooseAria": "Choose material sources to move for {item}",
-      "cancel": "Cancel",
-      "confirm": "Move selected units",
-      "listAria": "Material source list",
-      "total": "{units} units in this stack",
-      "row": "{count} units: {source}",
-      "gatherer": "Collected by {name}",
-      "gathererSigned": "Collected by {name}, signed by {signer}",
-      "unrecorded": "No gatherer recorded",
-      "unrecordedSigned": "No gatherer recorded, signed by {name}",
-      "quantityAria": "Units from {source}, up to {count}",
-      "decreaseAria": "Decrease units from {source}",
-      "increaseAria": "Increase units from {source}"
+      "detailsTitle": "Källor för {item}",
+      "pickerTitle": "Välj källor från {item}",
+      "close": "Stäng materialkällor",
+      "view": "Källor",
+      "choose": "Källor",
+      "viewAria": "Visa alla materialkällor för {item}",
+      "chooseAria": "Välj materialkällor att flytta för {item}",
+      "cancel": "Avbryt",
+      "confirm": "Flytta valda enheter",
+      "listAria": "Lista över materialkällor",
+      "total": "{units} enheter i den här bunten",
+      "row": "{count} enheter: {source}",
+      "gatherer": "Samlad av {name}",
+      "gathererSigned": "Samlad av {name}, signerad av {signer}",
+      "unrecorded": "Ingen samlare registrerad",
+      "unrecordedSigned": "Ingen samlare registrerad, signerad av {name}",
+      "quantityAria": "Enheter från {source}, upp till {count}",
+      "decreaseAria": "Minska enheter från {source}",
+      "increaseAria": "Öka enheter från {source}"
     },
     "materialHint": {
       "fineGrade": "Fin kvalitet. Bruten ur en åder av full nivå med ett verktyg som rankar över materialet, och räknas som den vanliga versionen varhelst en sådan krävs.",
       "cookingCatch": "Ingrediens för matlagning. Måste tillagas innan den kan ätas.",
       "usedBy": "Används av {crafts}.",
-      "arcaneDust": "Crafting reagent. Disenchanted from common and uncommon gear.",
-      "arcaneEssence": "Crafting reagent. Disenchanted from rare gear.",
+      "arcaneDust": "Hantverksreagens. Förtrollas fram från vanlig och ovanlig utrustning.",
+      "arcaneEssence": "Hantverksreagens. Förtrollas fram från sällsynt utrustning.",
       "arcaneShard": "Förtrollningsreagens. Fås genom avförtrollning av episk och legendarisk utrustning.",
       "resonantThread": "Förtrollningsreagens. Fås genom avförtrollning av sällsynt eller bättre tygrustning.",
       "resonantHide": "Förtrollningsreagens. Fås genom avförtrollning av sällsynt eller bättre läderrustning.",
       "resonantLinks": "Förtrollningsreagens. Fås genom avförtrollning av sällsynt eller bättre ringbrynja.",
       "resonantSteel": "Förtrollningsreagens. Fås genom avförtrollning av sällsynta eller bättre närstridsvapen.",
       "resonantTimber": "Förtrollningsreagens. Fås genom avförtrollning av sällsynta eller bättre stavar, trollstavar, bågar och armborst.",
-      "masterwroughtIntermediate": "Masterwrought crafting component.",
-      "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day.",
-      "growthTonic": "Farming supply. Spent when you plant a crop for a chance of a slightly larger harvest. If the crop withers, the tonic is lost with it.",
-      "deedOfMaking": "Inscription writ. Consumed to raise a Perfected Masterwrought work to legendary and give it a name.",
-      "wyrmfallCore": "Masterwrought crafting catalyst. The raid final boss drops 1 to 3 to each player once per day on each difficulty. Heroic dungeon final bosses each drop 1 to 3 to each player once per day. Your first A or S rank Rift race win of the day grants 1 at A rank or 2 at S rank. The Heroic Quartermaster sells one for Heroic Marks.",
-      "mudfinScale": "Crafting reagent. Mudfin Skulkers drop it about half the time, the deeper marsh fish a little less often, and the named terrors of those waters always.",
-      "crackedWyrmScale": "Crafting reagent. Sanctum Scaleguards drop it about half the time, and nothing else in the world carries one.",
-      "crackedOgreTusk": "Crafting reagent. Brutok Skullsmasher carries one every time he falls, and he is its only source.",
-      "tallowCandle": "Crafting reagent. Deeprock diggers drop it more often than not and Gravecaller cultists now and then, while the named leaders of both always carry one.",
-      "banditBandana": "Crafting reagent. Bandits drop it about half the time, and their named leaders always carry one.",
-      "oldCragmawsPelt": "Crafting reagent. Old Cragmaw yields one every time he falls, and no other beast carries it.",
-      "emberwingCinderscale": "Crafting reagent. Voskar the Emberwing yields one every time he falls, and no other beast carries it."
+      "masterwroughtIntermediate": "Mästersmidd hantverkskomponent.",
+      "quickeningCatalyst": "Hantverkskatalysator. En alkemist kan bara tillverka en per dag.",
+      "growthTonic": "Odlingstillbehör. Förbrukas när du planterar en gröda för en chans till något större skörd. Om grödan vissnar förloras tonicen med den.",
+      "deedOfMaking": "Inskriptionsbrev. Förbrukas för att höja ett förfinat mästersmitt verk till legendariskt och ge det ett namn.",
+      "wyrmfallCore": "Mästersmidd hantverkskatalysator. Raidens sista boss släpper 1 till 3 till varje spelare en gång per dag på varje svårighetsgrad. Sista bossar i heroiska fängelsehålor släpper vardera 1 till 3 till varje spelare per dag. Ditt första A- eller S-rankade Riftlopp för dagen ger 1 på A-rang eller 2 på S-rang. Den heroiska kvartermästaren säljer en för heroiska märken.",
+      "mudfinScale": "Hantverksreagens. Slamfenesmygare släpper den ungefär hälften av gångerna, de djupare träskfiskarna lite mer sällan och vattnens namngivna fasor alltid.",
+      "crackedWyrmScale": "Hantverksreagens. Sanctums skalvakter släpper den ungefär hälften av gångerna, och inget annat i världen bär en.",
+      "crackedOgreTusk": "Hantverksreagens. Brutok Skallekrossaren har en varje gång han faller, och han är dess enda källa.",
+      "tallowCandle": "Hantverksreagens. Deeprockgrävare släpper den oftare än inte och Gravkallarens kultister då och då, medan bådas namngivna ledare alltid har en.",
+      "banditBandana": "Hantverksreagens. Banditer släpper den ungefär hälften av gångerna, och deras namngivna ledare bär alltid en.",
+      "oldCragmawsPelt": "Hantverksreagens. Gamle Cragmaw ger en varje gång han faller, och inget annat odjur bär en.",
+      "emberwingCinderscale": "Hantverksreagens. Voskar Glödvingen ger en varje gång han faller, och inget annat odjur bär en."
     },
     "discord": {
       "title": "Discord",
@@ -4004,7 +4004,7 @@ export const sv_SE: EnTranslations = {
       },
       "roster": {
         "seats": "{count} av {cap} säten",
-        "expand": "Utöka förteckningen (+{seats} platser för {price})",
+        "expand": "Utöka förteckningen",
         "maxed": "Listan är i sin största storlek",
         "confirm": "Utöka guildlistan med {seats}-platser för {price}? Guldet kommer från din egen handväska och återbetalas inte.",
         "confirmAction": "Expandera",
@@ -4023,8 +4023,8 @@ export const sv_SE: EnTranslations = {
       "logging": "Skogsavverkning",
       "herbalism": "Örtkunskap",
       "fishing": "Fiske",
-      "farming": "Farming",
-      "corpseHarvesting": "Corpse Harvesting",
+      "farming": "Odling",
+      "corpseHarvesting": "Kroppsskörd",
       "notReady": "Den här resursnoden har inte återspawnats för dig ännu.",
       "gatherLine": "Du samlar: {name}.",
       "gatherLineQty": "Du samlar in: {name} x{qty}.",
@@ -4044,7 +4044,7 @@ export const sv_SE: EnTranslations = {
         "mining": "Kräver en tier {tier} gruvhacka",
         "logging": "Kräver en tier {tier} skogsavverkningsyxa",
         "herbalism": "Kräver en tier {tier} örtinsamlingsskära",
-        "farming": "Requires a tier {tier} farming hoe"
+        "farming": "Kräver en odlingshacka av nivå {tier}"
       },
       "requiresTool": {
         "mining": "Kräver en gruvhacka",
@@ -4056,26 +4056,26 @@ export const sv_SE: EnTranslations = {
         "logging": "Du behöver en tier {tier} skogsavverkningsyxa för att fälla det här beståndet.",
         "herbalism": "Du behöver en tier {tier} örtinsamlingsskära för att samla den här fläcken.",
         "fishing": "Du behöver ett tier {tier} fiskespö för att fiska i de här vattnen.",
-        "farming": "You need a tier {tier} farming hoe to work this bed."
+        "farming": "Du behöver en odlingshacka av nivå {tier} för att arbeta med den här bädden."
       },
       "toolRequired": {
         "mining": "Du behöver en gruvhacka för att bryta den här ådern.",
         "logging": "Du behöver en skogsavverkningsyxa för att fälla det här beståndet.",
         "herbalism": "Du behöver en örtinsamlingsskära för att samla den här fläcken.",
         "fishing": "Du behöver ett metspö för att kasta ut linan.",
-        "farming": "You need a farming hoe to work this bed."
+        "farming": "Du behöver en odlingshacka för att arbeta med den här bädden."
       },
       "noNodeNearby": {
         "mining": "Det finns ingen malmåder inom räckhåll.",
         "logging": "Det finns inget timmerbestånd inom räckhåll.",
         "herbalism": "Det finns ingen örtfläck inom räckhåll.",
-        "farming": "There is no crop bed within reach."
+        "farming": "Det finns ingen odlingsbädd inom räckhåll."
       },
       "wieldUnmet": {
         "mining": "Du behöver Gruvdrift {skill} för att svinga hackan du redan har i väskorna.",
         "logging": "Du behöver Skogsavverkning {skill} för att svinga yxan du redan har i väskorna.",
         "herbalism": "Du behöver Örtkunskap {skill} för att använda skäran du redan har i väskorna.",
-        "farming": "You need Farming {skill} to swing the hoe already in your bags."
+        "farming": "Du behöver odlingsfärdighet {skill} för att använda hackan som redan finns i dina väskor."
       },
       "wieldUnmetCorpse": "Du behöver insamlingsskicklighet {skill} för att sätta ditt finaste verktyg i arbete.",
       "toolTierUnmetCorpse": "Du behöver ett tier {tier} insamlingsverktyg för att återvinna de bästa materialen.",
@@ -4085,30 +4085,30 @@ export const sv_SE: EnTranslations = {
           "logging": "Skogsavverkningsverktyg (tier {tier})",
           "herbalism": "Örtinsamlingsverktyg (tier {tier})",
           "fishing": "Fiskespö (tier {tier})",
-          "farming": "Farming tool (tier {tier})"
+          "farming": "Odlingsverktyg (nivå {tier})"
         },
         "unlocks": {
           "mining": "Krävs för att bryta malmådror upp till tier {tier}.",
           "logging": "Krävs för att fälla timmerbestånd upp till tier {tier}.",
           "herbalism": "Krävs för att samla örtfläckar upp till tier {tier}.",
           "fishing": "Krävs för att fiska vatten upp till tier {tier}.",
-          "farming": "Required to plant crops up to tier {tier}."
+          "farming": "Krävs för att plantera grödor upp till nivå {tier}."
         },
         "use": {
           "mining": "Använd: Bryt en malmåder i närheten.",
           "logging": "Använd: Fäll ett timmerbestånd i närheten.",
           "herbalism": "Använd: Samla från en örtfläck i närheten.",
-          "farming": "Works from your bags when you plant a crop bed."
+          "farming": "Fungerar från dina väskor när du planterar i en odlingsbädd."
         },
         "speed": "Samlar snabbare vid noder under tier {tier}.",
         "rodRequired": "Krävs för att fiska.",
         "rodBite": "Fisken nappar upp till {seconds}s tidigare.",
         "rodReel": "Förlänger indragningsfönstret med {seconds}s.",
         "rodBand": "Låser upp rikare fångster vid fiskeskicklighet {skill} och uppåt.",
-        "rodBandCatch": "Unlocks {fish} at fishing skill {skill} and above."
+        "rodBandCatch": "Låser upp {fish} vid fiskefärdighet {skill} och högre."
       },
       "downgradeMark": "Väskorna fulla: fyndet förvarades utan samlarmärke.",
-      "downgradeMarkCrop": "Bags full: the harvest was stored without its grower's mark.",
+      "downgradeMarkCrop": "Väskorna är fulla: skörden lagrades utan odlarens märke.",
       "downgradeFind": "Väskorna fulla: ett orört fynd gled undan.",
       "emptyHookNote": "Inget på kroken",
       "stateReady": "Redo",
@@ -4118,88 +4118,88 @@ export const sv_SE: EnTranslations = {
       "fineGradePreview": "Ditt verktyg förädlar det här utbytet till fin kvalitet."
     },
     "farming": {
-      "plantLine": "You plant: {name}.",
-      "harvestLine": "You bring in: {name}.",
-      "harvestLineQty": "You bring in: {name} x{qty}.",
-      "harvestFineLine": "You also bring in: {name}.",
-      "harvestFineLineQty": "You also bring in: {name} x{qty}.",
-      "witheredLine": "The crop withered. You clear the bed: {name}.",
-      "witheredLineQty": "The crop withered. You clear the bed: {name} x{qty}.",
+      "plantLine": "Du planterar: {name}.",
+      "harvestLine": "Du bär hem: {name}.",
+      "harvestLineQty": "Du bär hem: {name} x{qty}.",
+      "harvestFineLine": "Du bär också hem: {name}.",
+      "harvestFineLineQty": "Du bär också hem: {name} x{qty}.",
+      "witheredLine": "Grödan vissnade. Du rensar bädden: {name}.",
+      "witheredLineQty": "Grödan vissnade. Du rensar bädden: {name} x{qty}.",
       "pressTarget": {
-        "feastOverHarvest": "A feast and your crop are both in reach. Interact takes the feast before the bed; step away from the feast to open your crop's bed window.",
-        "feastOverPlant": "A feast and an empty bed are both in reach. Interact takes the feast before the bed; step away from the feast to plant."
+        "feastOverHarvest": "En festmåltid och din gröda är båda inom räckhåll. Interagera tar festmåltiden före bädden, gå från festmåltiden för att öppna grödans bäddfönster.",
+        "feastOverPlant": "En festmåltid och en tom bädd är båda inom räckhåll. Interagera tar festmåltiden före bädden, gå från festmåltiden för att plantera."
       },
-      "seedBackLine": "You recover seed: {name}.",
-      "seedBackLineQty": "You recover seed: {name} x{qty}.",
-      "goldenBonusLine": "The golden harvest yields: {name}.",
+      "seedBackLine": "Du återfår frö: {name}.",
+      "seedBackLineQty": "Du återfår frö: {name} x{qty}.",
+      "goldenBonusLine": "Den gyllene skörden ger: {name}.",
       "denied": {
-        "bad_bed": "There is no crop bed there.",
-        "bad_crop": "You cannot plant that here.",
-        "range": "You are too far from that crop bed.",
-        "bed_taken": "You already have a crop growing there.",
-        "skill": "Your Farming skill is too low for that crop.",
-        "no_seed": "You have no seed for that crop.",
-        "not_ready": "That crop is still growing.",
-        "no_plot": "Nothing is planted in that bed.",
-        "no_husks": "You do not have enough withered husks.",
-        "no_compost": "You have no compost.",
-        "no_fee_produce": "You have no produce to pay the watch fee.",
-        "no_tonic": "You have no growth tonic.",
-        "tool": "You have no farming hoe fit for that crop.",
-        "locked": "An item that would pay for that is locked.",
-        "no_farmer": "You must be near a farmer to trade husks for compost.",
-        "no_feast": "You have no feast to set out.",
-        "feast_active": "Your feast is already set out.",
-        "feast_expired": "That feast is gone.",
-        "feast_finished": "That feast has been picked clean.",
-        "feast_eaten": "You have already eaten from that feast."
+        "bad_bed": "Det finns ingen odlingsbädd där.",
+        "bad_crop": "Du kan inte plantera det här.",
+        "range": "Du är för långt från den odlingsbädden.",
+        "bed_taken": "Du har redan en gröda som växer där.",
+        "skill": "Din odlingsfärdighet är för låg för den grödan.",
+        "no_seed": "Du har inget frö för den grödan.",
+        "not_ready": "Den grödan växer fortfarande.",
+        "no_plot": "Inget är planterat i den bädden.",
+        "no_husks": "Du har inte tillräckligt med vissna skal.",
+        "no_compost": "Du har ingen kompost.",
+        "no_fee_produce": "Du har inga skördar att betala vaktavgiften med.",
+        "no_tonic": "Du har ingen växttonic.",
+        "tool": "Du har ingen odlingshacka som passar den grödan.",
+        "locked": "Ett föremål som skulle betala för det är låst.",
+        "no_farmer": "Du måste vara nära en bonde för att byta skal mot kompost.",
+        "no_feast": "Du har ingen festmåltid att duka fram.",
+        "feast_active": "Din festmåltid är redan framdukad.",
+        "feast_expired": "Den festmåltiden är borta.",
+        "feast_finished": "Den festmåltiden är uppäten.",
+        "feast_eaten": "Du har redan ätit från den festmåltiden."
       },
-      "feastTitle": "{name}'s Harvest Feast",
-      "stonepotFeastTitle": "{name}'s Stonepot Feast",
-      "warspiceFeastTitle": "{name}'s Warspice Feast",
-      "sageleafFeastTitle": "{name}'s Sageleaf Feast",
-      "feastPlacedLine": "You set out your harvest feast.",
-      "huskTrade": "Trade husks for compost",
-      "huskTradeAria": "Trade husks for compost with {name}",
+      "feastTitle": "{name}s skördefest",
+      "stonepotFeastTitle": "{name}s stengrytefest",
+      "warspiceFeastTitle": "{name}s krigskryddade fest",
+      "sageleafFeastTitle": "{name}s salviabladfest",
+      "feastPlacedLine": "Du dukar fram din skördefest.",
+      "huskTrade": "Byt skal mot kompost",
+      "huskTradeAria": "Byt skal mot kompost med {name}",
       "plantSheet": {
-        "title": "Plant a Crop",
-        "plant": "Plant",
-        "sowAria": "Sow {name}",
-        "empty": "You have no seed you can sow at this bed.",
-        "close": "Close the bed window"
+        "title": "Plantera en gröda",
+        "plant": "Plantera",
+        "sowAria": "Så {name}",
+        "empty": "Du har inget frö som du kan så i den här bädden.",
+        "close": "Stäng bäddfönstret"
       },
-      "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
-      "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}.",
-      "readyLine": "A crop is ready to harvest.",
-      "readyLineQty": "{count} crops are ready to harvest.",
-      "readyWitheredLine": "A crop withered in its bed.",
-      "readyWitheredLineQty": "{count} crops withered in their beds."
+      "husksConvertedLine": "Du byter {husksName} x{husks} mot {name}.",
+      "husksConvertedLineQty": "Du byter {husksName} x{husks} mot {name} x{qty}.",
+      "readyLine": "En gröda är redo att skördas.",
+      "readyLineQty": "{count} grödor är redo att skördas.",
+      "readyWitheredLine": "En gröda vissnade i sin bädd.",
+      "readyWitheredLineQty": "{count} grödor vissnade i sina bäddar."
     },
     "harvestJournal": {
-      "title": "Harvest Journal",
-      "close": "Close",
-      "listLabel": "Planted crop beds",
-      "growing": "Ready in {time}",
-      "ready": "Ready to harvest",
-      "finishing": "Finishing up",
-      "withered": "Withered",
-      "readyAnnounce": "Ready to harvest: {name}",
-      "remainingDaysHours": "{days}d {hours}h",
-      "remainingHoursMinutes": "{hours}h {minutes}m",
-      "remainingMinutesSeconds": "{minutes}m {seconds}s",
-      "remainingSeconds": "{seconds}s",
-      "bedLine": "{zone}, bed {index}",
-      "bedLineUnknown": "Unknown bed",
-      "careWatch": "Farmer's Watch",
-      "careNone": "No extras",
-      "stageSprout": "Sprout",
-      "stageSeedling": "Seedling",
-      "stageMaturing": "Maturing",
-      "stageRipe": "Ripe",
-      "emptyTitle": "No crops planted",
-      "emptyBody": "Sow a seed in any garden bed and the plot appears here with its timer.",
-      "noviceTitle": "You have not worked a garden bed yet",
-      "noviceBody": "Farming skill grows every time you bring in a crop. Sow a seed in any garden bed to begin."
+      "title": "Skördedagbok",
+      "close": "Stäng",
+      "listLabel": "Planterade odlingsbäddar",
+      "growing": "Redo om {time}",
+      "ready": "Redo att skördas",
+      "finishing": "Avslutar",
+      "withered": "Vissnad",
+      "readyAnnounce": "Redo att skördas: {name}",
+      "remainingDaysHours": "{days} d {hours} h",
+      "remainingHoursMinutes": "{hours} h {minutes} min",
+      "remainingMinutesSeconds": "{minutes} min {seconds} s",
+      "remainingSeconds": "{seconds} s",
+      "bedLine": "{zone}, bädd {index}",
+      "bedLineUnknown": "Okänd bädd",
+      "careWatch": "Bondens vakthållning",
+      "careNone": "Inga tillägg",
+      "stageSprout": "Grodd",
+      "stageSeedling": "Planta",
+      "stageMaturing": "Mognar",
+      "stageRipe": "Mogen",
+      "emptyTitle": "Inga planterade grödor",
+      "emptyBody": "Så ett frö i en valfri odlingsbädd så visas lotten här med sin timer.",
+      "noviceTitle": "Du har inte arbetat en odlingsbädd än",
+      "noviceBody": "Odlingsfärdigheten ökar varje gång du skördar en gröda. Så ett frö i en valfri odlingsbädd för att börja."
     },
     "archetypeTitle": {
       "label": "Titel",
@@ -4231,63 +4231,63 @@ export const sv_SE: EnTranslations = {
       "leatherworking": "Läderhantverkeri"
     },
     "enchantName": {
-      "enchant_weapon_lastflame_zeal": "Last Flame's Zeal",
-      "enchant_weapon_might": "Weapon Etching: Might",
-      "enchant_weapon_intellect": "Weapon Etching: Spellpower",
-      "enchant_offhand_stamina": "Offhand Etching: Stamina",
-      "enchant_helmet_fortitude": "Helmet Etching: Fortitude",
-      "enchant_neck_spirit": "Necklace Etching: Spirit",
-      "enchant_shoulder_agility": "Shoulder Etching: Agility",
-      "enchant_chest_stamina": "Chest Etching: Stamina",
-      "enchant_waist_stamina": "Belt Etching: Stamina",
-      "enchant_legs_stamina": "Leg Etching: Stamina",
-      "enchant_gloves_agility": "Glove Etching: Agility",
-      "enchant_gloves_intellect": "Glove Etching: Spellpower",
-      "enchant_feet_agility": "Boot Etching: Agility",
-      "enchant_ring_spirit": "Ring Etching: Spirit",
-      "enchant_weapon_agility": "Weapon Etching: Agility",
-      "enchant_helmet_intellect": "Helmet Etching: Intellect",
-      "enchant_helmet_armor": "Helmet Etching: Reinforcement",
-      "enchant_neck_intellect": "Necklace Etching: Intellect",
-      "enchant_neck_agility": "Necklace Etching: Agility",
-      "enchant_shoulder_strength": "Shoulder Etching: Strength",
-      "enchant_shoulder_intellect": "Shoulder Etching: Intellect",
-      "enchant_chest_spirit": "Chest Etching: Spirit",
-      "enchant_chest_armor": "Chest Etching: Reinforcement",
-      "enchant_waist_strength": "Belt Etching: Strength",
-      "enchant_waist_agility": "Belt Etching: Agility",
-      "enchant_legs_intellect": "Leg Etching: Intellect",
-      "enchant_gloves_strength": "Glove Etching: Strength",
-      "enchant_feet_strength": "Boot Etching: Strength",
-      "enchant_feet_stamina": "Boot Etching: Stamina",
-      "enchant_ring_strength": "Ring Etching: Strength",
-      "enchant_ring_agility": "Ring Etching: Agility",
-      "enchant_ring_intellect": "Ring Etching: Intellect",
-      "enchant_weapon_greater_might": "Weapon Etching: Greater Might",
-      "enchant_weapon_greater_spellpower": "Weapon Etching: Greater Spellpower",
-      "enchant_helmet_greater_fortitude": "Helmet Etching: Greater Fortitude",
-      "enchant_chest_greater_stamina": "Chest Etching: Greater Stamina",
-      "enchant_legs_greater_stamina": "Leg Etching: Greater Stamina",
-      "enchant_gloves_greater_agility": "Glove Etching: Greater Agility",
-      "enchant_weapon_runed_edge": "Weapon Etching: Runed Edge",
-      "enchant_weapon_runed_focus": "Weapon Etching: Runed Sigil",
-      "enchant_chest_runeweave": "Chest Etching: Runed Weave",
-      "enchant_legs_runed_hide": "Leg Etching: Runed Hide",
-      "enchant_helmet_runed_links": "Helmet Etching: Runed Links",
-      "enchant_weapon_lucent_might": "Weapon Etching: Lucent Might",
-      "enchant_weapon_lucent_spellpower": "Weapon Etching: Lucent Spellpower",
-      "enchant_chest_lucent_stamina": "Chest Etching: Lucent Stamina",
-      "enchant_feet_lucent_agility": "Boot Etching: Lucent Agility",
-      "enchant_lucent_infusion": "Lucent Infusion"
+      "enchant_weapon_lastflame_zeal": "Sista lågans iver",
+      "enchant_weapon_might": "Vapenetsning: Kraft",
+      "enchant_weapon_intellect": "Vapenetsning: Magikraft",
+      "enchant_offhand_stamina": "Bihandsetsning: Uthållighet",
+      "enchant_helmet_fortitude": "Hjälmetsning: Härdighet",
+      "enchant_neck_spirit": "Halsbandsetsning: Ande",
+      "enchant_shoulder_agility": "Axelsetsning: Smidighet",
+      "enchant_chest_stamina": "Bröstetsning: Uthållighet",
+      "enchant_waist_stamina": "Bältesetsning: Uthållighet",
+      "enchant_legs_stamina": "Benetsning: Uthållighet",
+      "enchant_gloves_agility": "Handsketsning: Smidighet",
+      "enchant_gloves_intellect": "Handsketsning: Magikraft",
+      "enchant_feet_agility": "Stövletsning: Smidighet",
+      "enchant_ring_spirit": "Ringetsning: Ande",
+      "enchant_weapon_agility": "Vapenetsning: Smidighet",
+      "enchant_helmet_intellect": "Hjälmetsning: Intellekt",
+      "enchant_helmet_armor": "Hjälmetsning: Förstärkning",
+      "enchant_neck_intellect": "Halsbandsetsning: Intellekt",
+      "enchant_neck_agility": "Halsbandsetsning: Smidighet",
+      "enchant_shoulder_strength": "Axelsetsning: Styrka",
+      "enchant_shoulder_intellect": "Axelsetsning: Intellekt",
+      "enchant_chest_spirit": "Bröstetsning: Ande",
+      "enchant_chest_armor": "Bröstetsning: Förstärkning",
+      "enchant_waist_strength": "Bältesetsning: Styrka",
+      "enchant_waist_agility": "Bältesetsning: Smidighet",
+      "enchant_legs_intellect": "Benetsning: Intellekt",
+      "enchant_gloves_strength": "Handsketsning: Styrka",
+      "enchant_feet_strength": "Stövletsning: Styrka",
+      "enchant_feet_stamina": "Stövletsning: Uthållighet",
+      "enchant_ring_strength": "Ringetsning: Styrka",
+      "enchant_ring_agility": "Ringetsning: Smidighet",
+      "enchant_ring_intellect": "Ringetsning: Intellekt",
+      "enchant_weapon_greater_might": "Vapenetsning: Större kraft",
+      "enchant_weapon_greater_spellpower": "Vapenetsning: Större magikraft",
+      "enchant_helmet_greater_fortitude": "Hjälmetsning: Större härdighet",
+      "enchant_chest_greater_stamina": "Bröstetsning: Större uthållighet",
+      "enchant_legs_greater_stamina": "Benetsning: Större uthållighet",
+      "enchant_gloves_greater_agility": "Handsketsning: Större smidighet",
+      "enchant_weapon_runed_edge": "Vapenetsning: Runegg",
+      "enchant_weapon_runed_focus": "Vapenetsning: Runsigill",
+      "enchant_chest_runeweave": "Bröstetsning: Runväv",
+      "enchant_legs_runed_hide": "Benetsning: Runhud",
+      "enchant_helmet_runed_links": "Hjälmetsning: Runlänkar",
+      "enchant_weapon_lucent_might": "Vapenetsning: Lysande kraft",
+      "enchant_weapon_lucent_spellpower": "Vapenetsning: Lysande magikraft",
+      "enchant_chest_lucent_stamina": "Bröstetsning: Lysande uthållighet",
+      "enchant_feet_lucent_agility": "Stövletsning: Lysande smidighet",
+      "enchant_lucent_infusion": "Lysande infusion"
     },
     "enchantDescription": {
-      "enchant_weapon_lastflame_zeal": "Your landed melee attacks can grant 50 Strength for 15 sec and heal you for 200 health. Healing modifiers apply. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Each hand has its own buff; repeated triggers refresh that hand. Ranged attacks do not trigger this effect. Wolf Form uses its 1 sec base swing speed instead."
+      "enchant_weapon_lastflame_zeal": "Dina träffande närstridsattacker kan ge 50 Styrka i 15 sekunder och hela dig för 200 hälsa. Läkningsmodifierare gäller. Varje träff har 1 % chans per 0,6 sekunder av den anfallande vapnets bashastighet. Ingen intern nedkylning. Varje hand har sin egen förstärkning, upprepade utlösningar förnyar den handen. Distansattacker utlöser inte effekten. Vargform använder sin bashastighet på 1 sekund."
     },
     "professions": {
       "title": "Yrken",
       "close": "Stäng yrken",
-      "harvestBodyButton": "Harvest a body",
-      "harvestBodyHint": "Opens the choice for a body in reach that can still be harvested. Nothing is gathered until you choose.",
+      "harvestBodyButton": "Skörda en kropp",
+      "harvestBodyHint": "Öppnar valet för en kropp inom räckhåll som fortfarande kan skördas. Inget samlas förrän du väljer.",
       "ringAria": "Hantverkshjul",
       "skillsHeader": "Hantverksfärdigheter",
       "gatheringHeader": "Insamling",
@@ -4315,7 +4315,7 @@ export const sv_SE: EnTranslations = {
         "gatherersCache": "Samlarens gömma",
         "artisansEye": "Hantverkarens öga",
         "quickeningCharm": "Spänstamulett",
-        "makersCharm": "Maker's Charm"
+        "makersCharm": "Tillverkarens charm"
       },
       "toolEffectTooltip": {
         "kind": "Verktygsamulett",
@@ -4323,7 +4323,7 @@ export const sv_SE: EnTranslations = {
           "gatherersCache": "+1 utbyte per skörd medan den är laddad.",
           "artisansEye": "Höjer skördegraden med en verktygsnivå medan den är laddad.",
           "quickeningCharm": "Förkortar återspawningstiden för noden den utlöses på.",
-          "makersCharm": "+2 yield per harvest while charged, or +1 on a farming tool."
+          "makersCharm": "+2 utbyte per skörd när den är laddad, eller +1 på ett odlingsverktyg."
         },
         "howToSlot": "Montera på ett gruv-, skogsavverknings-, örtinsamlings- eller jordbruksverktyg från Yrkesfönstret. Förbrukas när den monteras.",
         "charges": "Börjar med {base} laddningar på ett vanligt verktyg (+{bonus} per sällsynthetssteg).",
@@ -4331,12 +4331,12 @@ export const sv_SE: EnTranslations = {
         "openProfessions": "Öppna Yrken för att montera detta på ett insamlingsverktyg."
       },
       "mobileStationTooltip": {
-        "kind": "Field station",
-        "use": "Places a party-shared {station} at your feet.",
-        "radius": "You can craft at it from anywhere; party members must be within {radius} yards.",
-        "duration": "Lasts {minutes} minutes.",
-        "notConsumed": "Never consumed.",
-        "replace": "Placing replaces your active field station, including a specialty-placed one."
+        "kind": "Fältstation",
+        "use": "Placerar en gruppdelad {station} vid dina fötter.",
+        "radius": "Du kan tillverka vid den var som helst ifrån, gruppmedlemmar måste vara inom {radius} yard.",
+        "duration": "Varar i {minutes} minuter.",
+        "notConsumed": "Förbrukas aldrig.",
+        "replace": "Placering ersätter din aktiva fältstation, även en som placerats av specialitet."
       },
       "toolEffectSlotButton": "Montera {effect}",
       "toolEffectRechargeButton": "Ladda om",
@@ -4389,11 +4389,11 @@ export const sv_SE: EnTranslations = {
       "qtyDecreaseAria": "Minska tillverkningsantalet, för närvarande {count}",
       "qtyIncreaseAria": "Öka tillverkningsantalet, för närvarande {count}",
       "qtyValueAria": "Tillverkningsantal, {count}",
-      "goalQtyRowAria": "Goal quantity",
-      "goalQtyDecreaseAria": "Decrease goal quantity, currently {count}",
-      "goalQtyIncreaseAria": "Increase goal quantity, currently {count}",
-      "trackGoalButton": "Track",
-      "trackGoalButtonAria": "Track {count} crafts of {name} as your gathering goal",
+      "goalQtyRowAria": "Målantal",
+      "goalQtyDecreaseAria": "Minska målantalet, nu {count}",
+      "goalQtyIncreaseAria": "Öka målantalet, nu {count}",
+      "trackGoalButton": "Spåra",
+      "trackGoalButtonAria": "Spåra {count} tillverkningar av {name} som ditt samlarmål",
       "batchRemaining": "{remaining} av {total} kvar",
       "batchRemainingAria": "{remaining} av {total} tillverkningar kvar",
       "durationChip": "{seconds} s",
@@ -4468,9 +4468,9 @@ export const sv_SE: EnTranslations = {
       "busy": "Du är upptagen.",
       "recipeNotLearned": "Du har inte lärt dig det receptet än.",
       "noBagSpace": "Du har inte plats för det tillverkade föremålet.",
-      "dailyLimit": "You can only craft that once per day.",
-      "dailyLimitRetry": "You can only craft that once per day. Available again in {duration}.",
-      "oncePerDay": "Once per day",
+      "dailyLimit": "Du kan bara tillverka den en gång per dag.",
+      "dailyLimitRetry": "Du kan bara tillverka den en gång per dag. Tillgänglig igen om {duration}.",
+      "oncePerDay": "En gång per dag",
       "skillReqLine": "Kräver {craft} {skill}",
       "difficultyFull": "Full skicklighetsvinst",
       "difficultyReduced": "Minskad färdighetsvinst",
@@ -4479,16 +4479,16 @@ export const sv_SE: EnTranslations = {
       "stationBadge": "Station",
       "stationOutOfRangeNamed": "Flytta till {station} för att skapa detta.",
       "learnMoreAtStation": "{master} vid {station} kan lära dig fler {craft}-recept.",
-      "apexChip": "Apex",
-      "apexPatternRaid": "Its pattern is a rare raid trophy.",
-      "apexPatternRift": "Its pattern is won on victorious high-rank Rift clears.",
-      "apexPatternVendor": "The Heroic Quartermaster sells its pattern for Heroic Marks.",
-      "apexPatternDrop": "Its pattern is found in the world.",
-      "perfectingLink": "Perfecting",
+      "apexChip": "Topp",
+      "apexPatternRaid": "Mönstret är en sällsynt raidtrofé.",
+      "apexPatternRift": "Mönstret vinns vid framgångsrika rensningar av Högrankade Riftar.",
+      "apexPatternVendor": "Den heroiska kvartermästaren säljer mönstret för heroiska märken.",
+      "apexPatternDrop": "Mönstret finns i världen.",
+      "perfectingLink": "Förfining",
       "masterworkToast": "Mästerverk! {name}",
       "masterworkZoneLine": "{crafter} skapade ett mästerverk {name}!",
-      "legendaryLine": "{item} is reborn as {name}, a legend!",
-      "legendaryZoneLine": "{player} forged {item} into the legend {name}!",
+      "legendaryLine": "{item} föds på nytt som {name}, en legend!",
+      "legendaryZoneLine": "{player} smidde {item} till legenden {name}!",
       "tierUpToast": "{craft} avancerat till nivå {tier}!",
       "skillUpToast": "{skill}-skicklighet höjd till {level}!",
       "skillUpSubtext": "Skicklighet höjd till {level}!",
@@ -4517,16 +4517,16 @@ export const sv_SE: EnTranslations = {
       "disenchant": "Avförtrylla",
       "salvage": "Bärga",
       "applyEnchant": "Applicera förtrollning",
-      "sunder": "Sunder",
+      "sunder": "Söndra",
       "sell": "Sälj",
       "sellAll": "Sälj alla ({count})",
-      "viewSources": "View sources",
-      "separateByGatherer": "Separate by gatherer",
-      "takeChosenQuantity": "Take out chosen quantity",
-      "combine": "Combine material stacks"
+      "viewSources": "Visa källor",
+      "separateByGatherer": "Dela upp efter samlare",
+      "takeChosenQuantity": "Ta ut valt antal",
+      "combine": "Slå ihop materialbuntar"
     },
     "enchanting": {
-      "recipeNotLearned": "Learn the formula before applying this enchant.",
+      "recipeNotLearned": "Lär dig formeln innan du använder förtrollningen.",
       "disenchantedLine": "Du avförtrollar {item}.",
       "disenchantedYield": "Du avförtrollar {item} till {material}.",
       "disenchantedYieldQty": "Du avförtrollar {item} till {material} x{qty}.",
@@ -4555,9 +4555,9 @@ export const sv_SE: EnTranslations = {
       "salvageConfirmTitle": "Bärga {item}?",
       "salvageConfirmBody": "Detta förstör {item} och ger hantverksmaterial. Det kan inte ångras.",
       "salvageConfirmBodySpecial": "Detta förstör en särskild kopia av {item} (signerad, mästerverk eller förtrollad) och ger hantverksmaterial. Det kan inte ångras.",
-      "sunderConfirmTitle": "Sunder {item}?",
-      "sunderConfirmBody": "This destroys {item} and yields Sundered Essence. This cannot be undone.",
-      "sunderConfirmBodySpecial": "This destroys a special copy of {item} (signed, masterwork, or enchanted) and yields Sundered Essence. This cannot be undone.",
+      "sunderConfirmTitle": "Söndra {item}?",
+      "sunderConfirmBody": "Det här förstör {item} och ger söndrad essens. Det kan inte ångras.",
+      "sunderConfirmBodySpecial": "Det här förstör en särskild kopia av {item} (signerad, mästerverk eller förtrollad) och ger söndrad essens. Det kan inte ångras.",
       "pickerTitle": "Applicera förtrollning",
       "targetTitle": "Välj ett föremål att förtrylla",
       "noEnchants": "Inget förtrollning använder det reagnset.",
@@ -4568,15 +4568,15 @@ export const sv_SE: EnTranslations = {
         "base": "Basförtrollningar",
         "runed": "Runristade förtrollningar",
         "greater": "Högre förtrollningar",
-        "lucent": "Lucent Enchants"
+        "lucent": "Lysande förtrollningar"
       },
       "yieldHeader": "Förväntade material:",
       "yieldLineExact": "{count} {item}",
       "yieldLineRange": "{min} till {max} {item}",
       "alreadyEnchanted": "Det föremålet är redan förtrollat.",
       "sameEnchant": "Det föremålet har redan den förtrollningen.",
-      "notPerfected": "Only a Perfected item can bear that enchant.",
-      "enchantSkillTooLow": "Your Enchanting skill is too low for that enchant.",
+      "notPerfected": "Bara ett förfinat föremål kan bära den förtrollningen.",
+      "enchantSkillTooLow": "Din förtrollningsfärdighet är för låg för den förtrollningen.",
       "riftGear": "Riftbundna band tar Rift-ädelstenar, inte förtrollningar.",
       "replaceTag": "Ersätter {enchant}",
       "sameEnchantTag": "Redan applicerad",
@@ -4588,7 +4588,7 @@ export const sv_SE: EnTranslations = {
       "replaceConfirmKeepsSigner": "Tillverkarens märke",
       "replaceConfirmKeepsMasterwork": "Mästerverksbonus",
       "replaceConfirmKeepsBond": "Uppdragsbindning",
-      "replaceConfirmKeepsPerfecting": "Perfecting",
+      "replaceConfirmKeepsPerfecting": "Förfining",
       "replaceConfirmCost": "Kostnad: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Ersätt"
@@ -4615,8 +4615,8 @@ export const sv_SE: EnTranslations = {
       "outOfRange": "Du måste vara på stationen för att träna."
     },
     "pattern": {
-      "teaches": "Use: Teaches you how to craft {item}.",
-      "teachesEnchant": "Use: Teaches you how to apply {enchant}."
+      "teaches": "Användning: Lär dig tillverka {item}.",
+      "teachesEnchant": "Användning: Lär dig använda {enchant}."
     },
     "unbind": {
       "title": "Upplösning: {name}",
@@ -4637,71 +4637,71 @@ export const sv_SE: EnTranslations = {
       "cannotAfford": "Du har inte råd med upplösningsavgiften.",
       "outOfRange": "Du måste vara vid en hantverksstation för att lösa upp.",
       "noSpace": "Du har inte plats för den obundna kopian.",
-      "perfecting": "A piece on the Perfecting track, or already Perfected, stays bound."
+      "perfecting": "En del på förfiningsspåret, eller redan förfinad, förblir bunden."
     },
     "perfecting": {
-      "swapTitle": "Exchange Perfecting ranks",
-      "swapIntro": "Choose another owned piece from this collection. Exchange ranks at the matching crafting station, out of combat, with craft skill {skill}. No materials or failure roll.",
-      "swapChoose": "Choose a second piece to preview the exchange.",
-      "swapRank": "{name}: rank {before} to {after}",
-      "swapAction": "Review rank exchange",
-      "swapPending": "Exchanging ranks",
-      "swapConfirm": "Both pieces become permanently bound to you. Exchange their Perfecting ranks?",
-      "swapConfirmAccept": "Bind and exchange ranks",
-      "swapPreserve": "Neither item is consumed. Names, cosmetic legendary promotion, and enchants stay on their original pieces. Equipment limits still apply.",
-      "swapEnchantInactive": "Its Perfected-only enchant becomes inactive until this piece is Perfected again.",
-      "swapEnchantActive": "Its Perfected-only enchant becomes active again.",
-      "swapSuccess": "Perfecting ranks exchanged. Both pieces are permanently bound.",
-      "swapInterrupted": "We could not confirm the exchange after reconnecting. Check both pieces' ranks before choosing another exchange.",
-      "swapChanged": "The selected pieces changed. Choose them again and review the new ranks.",
-      "swapDead": "You must be alive to exchange ranks.",
-      "swapBusy": "Leave combat and finish your current action before exchanging ranks.",
-      "swapInvalid": "These pieces have unsupported Perfecting progress and cannot exchange ranks.",
-      "swapSameRank": "These pieces already have the same Perfecting rank.",
-      "swapSkill": "You need skill {skill} in this collection's craft.",
-      "swapStation": "Move to the matching crafting station to exchange ranks.",
-      "swapLocked": "Unlock both pieces before exchanging ranks.",
-      "enchantInactive": "Enchantment inactive: this piece must be Perfected. The enchantment is preserved.",
-      "title": "Perfecting",
-      "close": "Close the Perfecting window",
-      "openButton": "Perfecting",
-      "openButtonAria": "Open the Perfecting window",
-      "empty": "You hold no Masterwrought piece. The apex recipes forge one.",
-      "wornChip": "Worn",
-      "bagCopy": "Bag copy {index} of {count}",
-      "rowRank": "Rank {rank} of {ranks}",
-      "rowPerfected": "Perfected",
-      "rankAnnounce": "{name} reaches Perfecting rank {rank} of {ranks}.",
-      "perfectedAnnounce": "{name} is now Perfected.",
-      "promotedAnnounce": "{name} is forged as {chosen}.",
-      "unknownItem": "Unknown item",
-      "namingSelectionUnconfirmed": "Your bags shifted: the piece being named could not be confirmed. Check the selection before you forge.",
-      "rowPromoted": "Legendary",
-      "attemptCost": "Attempt cost",
-      "promoteCost": "Promotion cost",
-      "matCount": "{have} of {required}",
-      "skillNeed": "Needs {craft} skill {skill}.",
-      "skillMet": "Met.",
-      "skillUnmet": "Not met.",
-      "skillSyncing": "Checking your craft skill.",
-      "bindWarn": "Your first perfecting attempt binds {name} to you.",
-      "bindWarnDetail": "Perfecting never lowers a rank: a failed attempt only spends its materials. A piece with Perfecting progress or a Perfected piece cannot be unbound, and a promotion is permanent.",
-      "bindConfirmText": "Your first attempt binds {name} to you. Attempt anyway?",
-      "bindConfirmAccept": "Bind and Attempt",
-      "bindConfirmCancel": "Cancel",
-      "attempt": "Attempt Perfecting",
-      "promote": "Name and Promote",
-      "perfectedLead": "Perfected. Give it a name to forge a legend.",
-      "promotedLine": "A finished legend: nothing left to perfect.",
-      "equipBlocked": "You could not equip it once promoted. Unequip the conflicting piece first.",
-      "nameTitle": "Name the Legend",
-      "nameLabel": "Inscribe a name for {name}. The name is permanent.",
-      "nameInputAria": "Legendary name",
-      "nameHint": "Two to 32 characters: letters, spaces, apostrophes, and hyphens, starting with a letter.",
-      "nameCount": "{count} of {max}",
-      "nameSubmit": "Forge the Legend",
-      "nameSubmitBusy": "Forging",
-      "nameCancel": "Cancel"
+      "swapTitle": "Byt förfiningsranger",
+      "swapIntro": "Välj en annan ägd del från samlingen. Byt ranger vid den motsvarande hantverksstationen, utanför strid, med hantverksfärdighet {skill}. Inga material och inget misslyckandeslag.",
+      "swapChoose": "Välj en andra del för att förhandsvisa bytet.",
+      "swapRank": "{name}: rang {before} till {after}",
+      "swapAction": "Granska rangbyte",
+      "swapPending": "Byter ranger",
+      "swapConfirm": "Båda delarna blir permanent bundna till dig. Byta deras förfiningsranger?",
+      "swapConfirmAccept": "Bind och byt ranger",
+      "swapPreserve": "Inget föremål förbrukas. Namn, kosmetisk legendarisk uppflyttning och förtrollningar stannar på sina ursprungliga delar. Utrustningsgränser gäller fortfarande.",
+      "swapEnchantInactive": "Dess förfiningskrävande förtrollning blir inaktiv tills delen är förfinad igen.",
+      "swapEnchantActive": "Dess förfiningskrävande förtrollning blir aktiv igen.",
+      "swapSuccess": "Förfiningsrangerna har bytts. Båda delarna är permanent bundna.",
+      "swapInterrupted": "Vi kunde inte bekräfta bytet efter återanslutning. Kontrollera båda delarnas ranger innan du väljer ett nytt byte.",
+      "swapChanged": "De valda delarna ändrades. Välj dem igen och granska de nya rangerna.",
+      "swapDead": "Du måste vara vid liv för att byta ranger.",
+      "swapBusy": "Lämna strid och avsluta din nuvarande handling innan du byter rang.",
+      "swapInvalid": "De här delarna har förfiningsframsteg som inte stöds och kan inte byta rang.",
+      "swapSameRank": "De här delarna har redan samma förfiningsrang.",
+      "swapSkill": "Du behöver färdighet {skill} i samlingens hantverk.",
+      "swapStation": "Gå till den motsvarande hantverksstationen för att byta ranger.",
+      "swapLocked": "Lås upp båda delarna innan du byter rang.",
+      "enchantInactive": "Förtrollning inaktiv: den här delen måste vara förfinad. Förtrollningen bevaras.",
+      "title": "Förfining",
+      "close": "Stäng förfiningsfönstret",
+      "openButton": "Förfining",
+      "openButtonAria": "Öppna förfiningsfönstret",
+      "empty": "Du har ingen mästersmidd del. Topp-recepten smider en.",
+      "wornChip": "Bärs",
+      "bagCopy": "Väskkopia {index} av {count}",
+      "rowRank": "Rang {rank} av {ranks}",
+      "rowPerfected": "Förfinad",
+      "rankAnnounce": "{name} når förfiningsrang {rank} av {ranks}.",
+      "perfectedAnnounce": "{name} är nu förfinad.",
+      "promotedAnnounce": "{name} är smidd som {chosen}.",
+      "unknownItem": "Okänt föremål",
+      "namingSelectionUnconfirmed": "Dina väskor ändrades: delen som ska namnges kunde inte bekräftas. Kontrollera valet före smidet.",
+      "rowPromoted": "Legendarisk",
+      "attemptCost": "Försökskostnad",
+      "promoteCost": "Uppgraderingskostnad",
+      "matCount": "{have} av {required}",
+      "skillNeed": "Kräver {craft}-färdighet {skill}.",
+      "skillMet": "Uppfyllt.",
+      "skillUnmet": "Inte uppfyllt.",
+      "skillSyncing": "Kontrollerar din hantverksfärdighet.",
+      "bindWarn": "Ditt första förfiningsförsök binder {name} till dig.",
+      "bindWarnDetail": "Förfining sänker aldrig en rang: ett misslyckat försök förbrukar bara material. En del med förfiningsframsteg eller en förfinad del kan inte frigöras, och en uppflyttning är permanent.",
+      "bindConfirmText": "Ditt första försök binder {name} till dig. Försöka ändå?",
+      "bindConfirmAccept": "Bind och försök",
+      "bindConfirmCancel": "Avbryt",
+      "attempt": "Försök förfina",
+      "promote": "Namnge och uppgradera",
+      "perfectedLead": "Förfinad. Ge den ett namn för att smida en legend.",
+      "promotedLine": "En färdig legend: inget återstår att förfina.",
+      "equipBlocked": "Du kunde inte utrusta den efter uppflyttningen. Ta av den motstridiga delen först.",
+      "nameTitle": "Namnge legenden",
+      "nameLabel": "Skriv in ett namn för {name}. Namnet är permanent.",
+      "nameInputAria": "Legendariskt namn",
+      "nameHint": "Två till 32 tecken: bokstäver, mellanslag, apostrofer och bindestreck, med början på en bokstav.",
+      "nameCount": "{count} av {max}",
+      "nameSubmit": "Smid legenden",
+      "nameSubmitBusy": "Smider",
+      "nameCancel": "Avbryt"
     },
     "commissionBoard": {
       "title": "Beställningsordrar",
@@ -4727,7 +4727,7 @@ export const sv_SE: EnTranslations = {
       "rowFor": "{item} åt {requester}",
       "rowTargeted": "{item} åt {requester} (för {crafter})",
       "acceptedBy": "Accepterad av {name}",
-      "crafterRecordLabel": "Crafter's record:",
+      "crafterRecordLabel": "Hantverkarens meritlista:",
       "statusOpen": "Öppen",
       "statusAccepted": "Accepterad",
       "statusDelivered": "Levererad",
@@ -4737,7 +4737,7 @@ export const sv_SE: EnTranslations = {
       "acceptButton": "Acceptera",
       "deliverButton": "Leverera",
       "deliverHint": "Tillverka den beställda pjäsen (med beställningsväxeln på), kom sedan tillbaka hit för att leverera den.",
-      "trackButton": "Track",
+      "trackButton": "Spåra",
       "opened": "Du lägger upp en beställningsorder för {item}.",
       "cancelled": "Du avbryter beställningsordern för {item}.",
       "accepted": "Du accepterar beställningsordern för {item}.",
@@ -4864,10 +4864,10 @@ export const sv_SE: EnTranslations = {
         "sealbreak_shockwave": "Sigelsbrytande chockvåg (områdesburst)",
         "gravebreaker": "Gravkrossare (frontal kon, rikta den bort från raiden)",
         "raise_fallen": "Res de fallna (periodiska vågor av tillskott)",
-        "soul_rend": "Själsrift (märkta spelare måste sprida sig och bli helade)",
+        "soul_rend": "Själsrift (märkta spelare samlas, sedan lämnar de elden)",
         "deathless_rage": "Dödsfri vrede (avbryts vid väktarstenarna)",
         "wardstones": "Väktarstenarnas kanaler (fasövergång)",
-        "dread_curse": "Skräckförbannelse (endast heroisk, staplande försvagning för tankbyte)",
+        "dread_curse": "Skräckförbannelse (staplande försvagning för tankbyte, byt vid 2 staplar)",
         "bone_spike": "Benspett (spetsade raiddeltagare dräneras tills spettet förstörs)",
         "grave_eruption": "Gravutbrott (varningscirklar som lämnar brinnande mark)",
         "binding_sigil": "Bindningssigill (dra bossen till sigillet, annars får raiden betala)",
@@ -4880,30 +4880,30 @@ export const sv_SE: EnTranslations = {
       }
     },
     "cosmetics": {
-      "title": "Cosmetics",
-      "close": "Close Cosmetics",
-      "tabsLabel": "Cosmetics sections",
-      "tabMounts": "Mounts",
-      "tabSkins": "Skins",
+      "title": "Kosmetik",
+      "close": "Stäng kosmetik",
+      "tabsLabel": "Kosmetikavdelningar",
+      "tabMounts": "Riddjur",
+      "tabSkins": "Skinn",
       "tabMech": "Mech",
-      "legend": "Account: shared by every character. Character: this character only.",
-      "scopeAccount": "Account",
-      "scopeCharacter": "Character",
-      "wear": "Wear",
-      "takeOff": "Take off",
-      "worn": "Worn",
-      "apply": "Apply",
-      "detach": "Detach",
-      "applied": "Applied",
-      "owned": "Owned",
-      "storeOnly": "Available in the WOC Store",
+      "legend": "Konto: delas av alla karaktärer. Karaktär: bara den här karaktären.",
+      "scopeAccount": "Konto",
+      "scopeCharacter": "Karaktär",
+      "wear": "Bär",
+      "takeOff": "Ta av",
+      "worn": "Bärs",
+      "apply": "Tillämpa",
+      "detach": "Ta loss",
+      "applied": "Tillämpad",
+      "owned": "Ägs",
+      "storeOnly": "Tillgängligt i WOC-butiken",
       "cardAria": "{name}, {rarity}",
-      "mountsIntro": "A mount skin is drawn over whichever mount this character rides. It never changes speed.",
-      "mountsNoMount": "Own a mount first: a skin needs something to ride.",
-      "skinsEmpty": "No weapon skins owned yet. Visit the WOC Store.",
-      "skinsApplyHint": "Equip a {type} to apply this skin.",
-      "mechIntro": "The Combat Mech replaces this character's body. One chroma is worn at a time.",
-      "mechEmpty": "No Combat Mech chromas owned yet."
+      "mountsIntro": "Ett riddjursskinn ritas över det riddjur som karaktären rider. Det ändrar aldrig farten.",
+      "mountsNoMount": "Skaffa först ett riddjur: ett skinn behöver något att rida på.",
+      "skinsEmpty": "Du äger ännu inga vapenskinn. Besök WOC-butiken.",
+      "skinsApplyHint": "Utrusta en {type} för att använda skinnet.",
+      "mechIntro": "Stridsmechen ersätter den här karaktärens kropp. En färgvariant bärs åt gången.",
+      "mechEmpty": "Du äger ännu inga färgvarianter för stridsmechen."
     },
     "reliquary": {
       "title": "Relikvariet",
@@ -4955,13 +4955,13 @@ export const sv_SE: EnTranslations = {
         "masterwork_armorcrafting": "Mästerverk i rustningssmide",
         "masterwork_tailoring": "Mästerverk i skrädderi",
         "masterwork_leatherworking": "Mästerverk i läderhantverkeri",
-        "masterwork_jewelcrafting": "Jewelcrafting Masterwork",
-        "masterwork_inscription": "Inscription Masterwork",
+        "masterwork_jewelcrafting": "Juvelhantverksmästerverk",
+        "masterwork_inscription": "Inskriptionsmästerverk",
         "masterwork_engineering": "Mästerverk i ingenjörskonst",
         "gather_event_pristine_vein": "Orörd åder",
         "gather_event_ancient_heartwood": "Uråldrig kärnved",
         "gather_event_moonlit_bloom": "Månbelyst blomma",
-        "gather_event_golden_harvest": "Golden Harvest",
+        "gather_event_golden_harvest": "Gyllene skörd",
         "gather_event_perfect_specimen": "Perfekt exemplar",
         "slain_old_greyjaw": "Fälld: Gamle Gråkäft",
         "slain_mogger": "Fälld: Mogger",
@@ -5124,7 +5124,7 @@ export const sv_SE: EnTranslations = {
       "toWorld": "Världskarta",
       "toZone": "Zonkarta",
       "toInstance": "Instanskarta",
-      "toggleAria": "Växla mellan världskartan och zonkartan",
+      "toggleAria": "Växla mellan världskartan, zonkartan och instanskartan",
       "levels": "Nivåer {min} till {max}"
     },
     "arenaGate": {
@@ -5393,7 +5393,7 @@ export const sv_SE: EnTranslations = {
     "pristineVein": "{finder} träffade en orörd ådra!",
     "ancientHeartwood": "{finder} fällde en gammal kärnved!",
     "moonlitBloom": "{finder} upptäckte en månbelyst blomning!",
-    "goldenHarvest": "{finder} reaped a golden harvest!"
+    "goldenHarvest": "{finder} skördade en gyllene skörd!"
   },
   "apiError": {
     "validation": {
@@ -5835,7 +5835,7 @@ export const sv_SE: EnTranslations = {
       "groupCamera": "Kamera",
       "talents": "Talanger",
       "professions": "Yrken",
-      "harvestJournal": "Harvest Journal",
+      "harvestJournal": "Skördedagbok",
       "arena": "PvP-fönstret (arenorna och Törnhålefälten)",
       "leaderboard": "Topplista",
       "deeds": "Bedrifternas bok",
@@ -6058,9 +6058,9 @@ export const sv_SE: EnTranslations = {
       "framePetTitle": "Ditt djur",
       "framePetBody": "Jägare, häxmästare och alla andra som har ett djur framme får en liten ram för det bredvid sin egen, med dess namn, nivå och hälsa. Att klicka på den ramen markerar ditt djur, och Ctrl+6 gör detsamma från tangentbordet.",
       "framesMoveBody": "Din ram, din målram och dina gruppramar kan alla flyttas. Var och en bär en liten flyttknapp i sitt hörn: lås upp den, dra ramen dit du vill ha den, och lås den igen så att ett felklick inte kan flytta den. Om de hamnar någonstans du ångrar finns Återställ ramarnas positioner i inställningarna, som slänger tillbaka dem alla dit de började.",
-      "framesMoveBodyEditFrames": "Your frame, your target frame, and your party frames can all be moved. Each carries a small move button in its corner: unlock it, drag the frame where you want it, and lock it again so a stray click cannot shift it. Edit Frames, at the top of the Frames tab in the Interface options, loosens the rest of the interface at once, those three frames with it: the action bars, the cast bar, the swing bar, the experience bar, the minimap, the button rail, the pet frame, the stance bar, the buff and debuff rows, and the Wishlist Reminder chip, each wearing a name chip while it is loose. If they end up somewhere you regret, Reset to Defaults at the foot of that same Frames tab snaps them all back to where they started.",
-      "framesGovernedExtra": "Edit Frames also loosens the tracker stack below (your tracked quests and their objectives, your deed progress, your Reliquary pages, the delve you are in, any rift you are taking part in, and the recipe or commission you are tracking), the pet action bar beside your pet frame, the Target dots frame for your debuffs across nearby enemies, the paladin's Devotion medallion, the warlock's Affliction Bar, the spell-proc overlay, the off-hand swing timer for dual-wielders, and the tabbed damage meter window, each wearing its own name chip while it is loose.",
-      "framesGovernedAuraTracks": "Edit Frames also loosens the six opt-in aura tracks once you have switched them on from the Combat tab of the same Interface options: the My Buffs track, the Defensive Cooldowns track, the My Shields track, the Offensive Cooldowns track, the Movement and Stealth track, and the My Buffs on Allies track. Every track is off by default, and each wears its own name chip while it is loose.",
+      "framesMoveBodyEditFrames": "Din ram, din målram och dina gruppmedlemsramar kan alla flyttas. Varje ram har en liten flyttknapp i hörnet: lås upp den, dra ramen dit du vill och lås den igen så att ett felklick inte kan flytta den. Redigera ramar, högst upp på ramfliken i gränssnittsalternativen, frigör resten av gränssnittet på en gång, tillsammans med dessa tre ramar: åtgärdsraderna, kastningsraden, svängraden, erfarenhetsraden, minimap, knappraden, husdjursramen, stansraden, raderna för förstärkningar och försvagningar samt namnmarkeringen för önskelistepåminnelsen. Var och en får en namnmarkering när den är frigjord. Om de hamnar någonstans du ångrar återställer Återställ standardvärden längst ned på samma ramflik dem alla till där de började.",
+      "framesGovernedExtra": "Redigera ramar frigör också spårarstacken nedanför (dina följda uppdrag och deras mål, dina bedriftframsteg, dina reliksamlingssidor, djupet du befinner dig i, varje spricka du deltar i samt receptet eller beställningen du följer), husdjurets åtgärdsrad bredvid dess ram, Målprickar-ramen för dina försvagningar på fiender i närheten, paladinens Andaktsmedaljong, häxmästarens Lidelsefält, överlägget för besvärjelseprocs, timern för vapenhandens svingar för den som använder två vapen och fönstret med flikar för skademätaren. Var och en får sin egen namnmarkering när den är frigjord.",
+      "framesGovernedAuraTracks": "Redigera ramar frigör också de sex frivilliga auraraderna när du har slagit på dem på stridsfliken i samma gränssnittsalternativ: raden Mina förstärkningar, raden Defensiva nedkylningar, raden Mina sköldar, raden Offensiva nedkylningar, raden Rörelse och Smygande samt raden Mina förstärkningar på allierade. Varje rad är avstängd från början och får sin egen namnmarkering när den är frigjord.",
       "barsTitle": "Mätare, timer och stridstext",
       "barsBody": "Din besvärjelsemätare visas mitt på skärmen, precis ovanför dina handlingsfält, närhelst du kastar eller kanaliserar, och bär besvärjelsens namn och tiden som återstår. Ditt mål får en egen besvärjelsemätare på sin ram, så du kan se vad som kommer och svara på det.\n\nEn tunn svingmätare sitter under din besvärjelsemätare och fylls mellan dina vapensvingar, så en närstrids- eller distansanfallare kan se när nästa automatiska träff landar.\n\nDin erfarenhetsmätare löper i full bredd under dina handlingsfält, uppdelad i segment, med en ljusare sträcka som visar den vilade erfarenhet du har sparat.\n\nSimma under vatten så visas en blå andningsmätare högst upp på skärmen. Den tappas medan huvudet är under ytan, blinkar rött när den tar slut och du börjar drunkna, och fylls snabbt på igen så fort du dyker upp. Blanksteg simmar dig upp, och tangenten Simma ner, Ctrl som standard, tar dig djupare.\n\nSkada och läkning flyter upp över det de landade på som små siffror, så du kan läsa en strid utan att läsa text. Fliken Stridslogg i din chattruta håller den fullständiga skriftliga redogörelsen.",
       "aurasTitle": "Buffar och debuffar",
@@ -6071,9 +6071,9 @@ export const sv_SE: EnTranslations = {
       "minimapBody": "Uppe till höger: en rund minikarta med zonens namn ovanför och dina koordinater under, omringad av en urtavla som målar dygnets timme.\n\nSkivan bär mer än terräng. Din egen pil sitter i mitten och pekar dit du är vänd, med din grupp runt omkring dig som klassfärgade prickar och en kantpil för den som har vandrat utanför den. Uppdragsgivare bär samma märken där som de gör ute i världen, och du kommer också att upptäcka insamlingsnoder och hantverksstationer, reseportaler, plundringsbara kroppar och behållare, alla fientliga som fattat intresse för dig, vänner och gillesmedlemmar i närheten, och din egen kropp medan du springer tillbaka som en gengångare.\n\nSmå indikatorer dyker upp på den när de har något att säga: ett kuvert medan olästa brev väntar på dig, ett mynt medan försäljningsintäkter eller returnerade varor väntar hos Köpmannen, och en knapp med lista över dina Raidlåsningar.",
       "mapTitle": "Världskartan och dina spårare",
       "mapBody": "M öppnar världskartan: kontinenten uppritad, med din egen pil på den, zonerna och deras namn, intressepunkterna runt dig, reseportalerna och de insamlingsnoder du har hittat. Din grupp visas också på den. Inne i en delve växlar kartan till en skiss över de rum du har utforskat hittills.\n\nNer längs högerkanten, under minikartan, håller en stapel spårare din pågående verksamhet i sikte utan att du behöver öppna något: dina spårade uppdrag och deras mål, dina bedriftsframsteg, den delve du befinner dig i, och den reva du deltar i. Uppdragsspåraren fälls ihop när du vill ha skärmen tillbaka.",
-      "mapBodyZoneFirst": "M opens the world map on the zone you are standing in, with your own arrow on it, the points of interest around you, the quest givers with their marks and the areas your objectives sit in, the crafting stations, mailboxes, noticeboards and garden beds, the dungeon entrances, and every gathering node in the zone, grayed out while it regrows and marked when your tools are not up to it. Your party shows on it too. Right-click the map, or press its World map button, and it pulls back to the continent, every zone drawn with its name, where a click on a zone opens that zone's map. Step into a delve, a dungeon, a rift or a castle keep and the map switches to a floor plan of where you stand; the Thornhollow Fields battleground gets a field map of its own.\n\nDown the right side, under the minimap, a stack of trackers keeps your current business in view without opening anything: your tracked quests and their objectives, your deed progress, your Reliquary pages, the delve you are in, and any rift you are taking part in. The quest tracker collapses when you want the screen back.",
-      "gatheringGoalTrackerBody": "A gathering goal tracker joins the stack once you Track a recipe in the crafting window or a commission on the board: it names the recipe or commission you are tracking, how many you are collecting for, and how far your held and stored materials get you there. Track replaces your current goal, and Clear drops it explicitly; neither one ever changes your harvest preference.",
-      "hubPracticeTrackerBody": "Near the Eastbrook hub, a practice tracker joins the stack once you take the guided practice lessons there: it keeps your best runs against the practice dummies in view. While a lesson is active, a coaching strip beside it walks you through the current step of the lesson, from opening the Damage Meters to comparing a second run.",
+      "mapBodyZoneFirst": "M öppnar världskartan över zonen där du står, med din egen pil, sevärdheterna omkring dig, uppdragsgivarna med sina markeringar och områdena där dina mål finns, tillverkningsstationerna, brevlådorna, anslagstavlorna och odlingsbäddarna, ingångarna till fängelsehålorna och varje insamlingsnod i zonen. Noder är gråtonade medan de växer tillbaka och markerade när dina verktyg inte räcker till. Din grupp visas också på kartan. Högerklicka på kartan eller tryck på dess knapp Världskarta så zoomar den ut till kontinenten, där varje zon ritas med sitt namn och ett klick på en zon öppnar dess karta. Kliv in i ett djup, en fängelsehåla, en spricka eller ett slottsfäste så växlar kartan till en planritning över platsen där du står; slagfältet Törnhålefälten har en egen fältkarta.\n\nLängs höger sida, under minimappen, håller en stack av spårare din aktuella verksamhet synlig utan att något behöver öppnas: dina följda uppdrag och deras mål, dina bedriftframsteg, dina reliksamlingssidor, djupet du befinner dig i och varje spricka du deltar i. Uppdragsspåraren kan fällas ihop när du vill ha tillbaka skärmen.",
+      "gatheringGoalTrackerBody": "En spårare för insamlingsmål läggs till i stacken när du väljer Följ för ett recept i tillverkningsfönstret eller en beställning på anslagstavlan: den visar receptet eller beställningen du följer, hur mycket du samlar till och hur långt dina burna och lagrade material räcker. Följ ersätter ditt nuvarande mål och Rensa tar bort det uttryckligen; inget av dem ändrar någonsin din skördeinställning.",
+      "hubPracticeTrackerBody": "Nära navet i Östbäck läggs en övningsspårare till i stacken när du tar de vägledda övningslektionerna där: den håller dina bästa försök mot övningsdockorna synliga. Medan en lektion är aktiv visar en coachningsrad bredvid den det aktuella steget i lektionen, från att öppna Skademätare till att jämföra ett andra försök.",
       "chatTitle": "Chattrutan",
       "chatBody": "Nere till vänster. Tryck på Enter för att börja skriva och Enter igen för att skicka.\n\nTvå flikar finns alltid: Chatt, den samlade loggen över allt som sägs runt omkring dig, och Stridslogg, den skriftliga redogörelsen för din strid. Plus-knappen lägger till fler, en per kanal: Säg, Ropa, Grupp, Allmänt, Världen, LFG, Gille och Officer, samt en Viska-flik som samlar varenda viskning du skickar och tar emot på ett ställe. Att skriva i en kanalflik skickar till den kanalen utan att du behöver skriva om kommandot.\n\nHela rutan kan dras till en annan plats och ändra storlek, och den kommer ihåg var du lämnade den.",
       "keyWindowsTitle": "Fönster du öppnar med en tangent",
@@ -6102,10 +6102,10 @@ export const sv_SE: EnTranslations = {
       "winMetersBody": "Skada, läkning och hot för dig och alla med dig, sparade i segment så att du kan titta tillbaka på striden före den senaste. Läknings- och hotpanelerna kan dras ut för att stå för sig själva.",
       "winMoreTitle": "Och några till",
       "winMoreBody": "Världskartan (M), PvP-fönstret (G), Dalcupen (Y), Topplistan (K), Händelsekalendern (I) och emotehjulet (X) fungerar alla på samma sätt. Topplistan är värd en stund vid ditt första besök: den har en flik för spelare, en för gillen, en som rankar hela konton efter Ryktbarhet från Bedrifternas bok, och en för de dagliga ställningarna.\n\nHögerklicka på en annan spelare, på deras namnskylt eller på deras namn i chatten, så öppnar Spelarinfo ett kort om dem: utrustningen de bär, med verktygstips, och de offentliga detaljerna om deras karaktär. Det är bara en titt, inget mer, och det kräver att de är tillräckligt nära för att synas.",
-      "winMoreBodyNoValeCup": "The world map (M), the PvP window (G), the leaderboard (K), and the event calendar (I) all work the same way. The emote wheel (X) is the exception: hold its key and the wheel appears, then let go over an emote to play it. The leaderboard is worth a moment on your first visit: it keeps a tab for players, one for guilds, one that ranks whole accounts by Renown from the Book of Deeds, one for the daily standings, and a Developers tab for the people who build the game, there unless you switch Show Developer Badges off.\n\nTarget another player and right-click the target frame (on touch, double-tap or long-press it), or right-click their name in chat, and Player Info opens a card on them: the gear they are wearing, with tooltips, and the public details of their character. It is a look, nothing more. The gear needs them close enough to see: look a name up from chat while they are far away and you get the public half of the card instead, their portrait, name, level, class, and guild.",
+      "winMoreBodyNoValeCup": "Världskartan (M), PvP-fönstret (G), topplistan (K) och händelsekalendern (I) fungerar alla på samma sätt. Emotehjulet (X) är undantaget: håll ned dess tangent så visas hjulet och släpp sedan över en emote för att använda den. Topplistan är värd en stund vid första besöket: den har en flik för spelare, en för gillen, en som rangordnar hela konton efter anseende från Bedrifternas bok, en för dagens ställning och fliken Utvecklare för människorna som bygger spelet. Den visas om du inte stänger av Visa utvecklarmärken.\n\nVälj en annan spelare som mål och högerklicka på målramen (med pekstyrning dubbeltrycker eller långtrycker du på den), eller högerklicka på spelarens namn i chatten, så öppnar Spelarinformation ett kort om spelaren: utrustningen den bär, med verktygstips, och karaktärens offentliga uppgifter. Det är bara en titt, inget mer. Utrustningen kräver att spelaren är nära nog för att synas: söker du på ett namn från chatten medan spelaren är långt borta får du i stället den offentliga halvan av kortet, porträtt, namn, nivå, klass och gille.",
       "worldWindowsTitle": "Fönster som världen öppnar åt dig",
       "worldWindowsBody": "Vissa fönster trycker du aldrig upp med en tangent: de öppnas när du pratar med rätt person eller klickar på rätt sak.\n\nEn handlare öppnar köpmansfönstret, med deras lager att köpa från och en flik för Återköp som håller det du senast sålde, ifall du sålde det av misstag. En rad antalsknappar sitter bredvid lagret, så en stapel reagenser blir ett enda tryck fem eller tio åt gången i stället för tio tryck, och ett eget antal finns där när ingetdera passar. En klasstränare öppnar listan över vad du kan lära dig nu och vad som fortfarande ligger framför dig.\n\nEn kamrer öppnar ditt valv, kassakistan med extra platser du kan köpa fler av. Om ditt gille har öppnat en bank visar en andra flik den: varje medlem kan titta i den även utan tillåtelse att ta ut något, så ingen behöver fråga vad gillet håller på, graderna avgör vem som får sätta in, ta ut och flytta gillets pengar, och en logg för in varje rörelse.\n\nEn brevlåda från Korpposten öppnar dina brev, med det som har kommit på en flik och ett formulär för att skicka på en annan, bilagor och allt. Världsmarknaden hos Köpmannen har sitt eget fönster: bläddra och köp på en flik, lista dina egna varor på en annan, och hämta ut det som sålts på en tredje. Att handla ansikte mot ansikte med en annan spelare öppnar ett handelsfönster med varsin sida.",
-      "worldWindowsBodyStationMaster": "Some windows you never press a key for: they open when you talk to the right person or click the right thing.\n\nA merchant opens the vendor window, with their stock to buy from and a buyback list at the foot of the same panel holding what you last sold, in case you sold it by mistake. A row of quantity buttons sits with the stock, so a stack of reagents is one press at five or ten at a time rather than ten presses, and a custom amount is there when neither suits. Your class abilities need no trainer, they come with your levels; the trainers here are the resident masters of the crafting stations, and Training on one of them opens the recipes they can teach you now, the ones you already know, and the ones still locked behind more skill.\n\nA banker opens your bank, with a Personal tab for the strongbox of extra slots you can buy more of and a Vault tab that stores your crafting materials by kind. If your guild has opened a bank, a Guild tab there shows it: every member can look inside even without permission to take anything out, so nobody has to ask what the guild is holding, ranks decide who may deposit, withdraw, and move the guild's coin, and a log records every movement.\n\nA Ravenpost mailbox opens your letters, with what has arrived on one tab and a form for sending on another, attachments and all. The World Market, at the Merchant in Eastbrook or Auctioneer Voss up in Highwatch, has its own window: browse and buy on one tab, list your own goods on another, and collect what has sold on a third. Trading face to face with another player opens a trade window with a side each.",
+      "worldWindowsBodyStationMaster": "Vissa fönster öppnar du aldrig med en tangent: de öppnas när du pratar med rätt person eller klickar på rätt sak.\n\nEn handlare öppnar köpmansfönstret, med varor att köpa och en återköpslista längst ned i samma panel med det du senast sålde, om du sålde det av misstag. En rad antalsknappar finns vid varorna, så en stapel reagenser blir ett tryck för fem eller tio åt gången i stället för tio tryck, och ett eget antal finns när ingetdera passar. Dina klassförmågor behöver ingen tränare, de kommer med dina nivåer; tränarna här är de fasta mästarna vid tillverkningsstationerna, och Träning hos en av dem öppnar recepten de kan lära dig nu, dem du redan kan och dem som fortfarande är låsta bakom mer skicklighet.\n\nEn bankir öppnar din bank, med fliken Personlig för kassakistan med extra platser som du kan köpa fler av och fliken Valv som lagrar dina tillverkningsmaterial efter sort. Om ditt gille har öppnat en bank visas dess gillesflik där: varje medlem kan titta in även utan tillstånd att ta ut något, så ingen behöver fråga vad gillet förvarar, grader avgör vem som får sätta in, ta ut och flytta gillets mynt och en logg registrerar varje rörelse.\n\nEn brevlåda från Korpposten öppnar dina brev, med det som kommit på en flik och ett formulär för att skicka på en annan, bilagor och allt. Världsmarknaden, hos Köpmannen i Östbäck eller Auktionsförrättare Voss uppe i Högvakt, har ett eget fönster: bläddra och köp på en flik, lista dina egna varor på en annan och hämta ut det som sålts på en tredje. Handel ansikte mot ansikte med en annan spelare öppnar ett handelsfönster med varsin sida.",
       "lootTitle": "Byte och tärningsslag",
       "lootBody": "Interagera med en kropp du har förtjänat, så öppnas bytesfönstret och listar vad som föll. Klicka på en rad för att ta det.\n\nI en grupp sätter ett bra byte, under gruppens byteinställningar, i stället upp en tärningsprompt på din skärm: Behov om du vill ha det själv, Girighet om du skulle ta det för att sälja, eller Avstå för att lämna det till någon annan. En liten panel visar sedan vem som har slagit och vad de valde medan tiden räknas ner.\n\nSjälva byteinställningarna bor i ett litet eget fönster. Gruppledaren kan ändra dem där, och alla andra ser samma fönster skrivskyddat, så reglerna är aldrig en hemlighet.\n\nVissa kroppar kan också skördas för sina delar. När de kan visas ett Skörda-avsnitt längst ner i bytesfönstret, med en ruta att kryssa i för varje komponent du vill ha.",
       "playerCardTitle": "Ditt spelarkort",
@@ -6114,7 +6114,7 @@ export const sv_SE: EnTranslations = {
       "wikiBody": "Den här wikin är ett klick bort i spelet. En knapp för den sitter tillsammans med de andra i raden nere i högra hörnet, det finns en rad för den i Esc-spelmenyn, och på en telefon bor den i Mer-brickan. Eftersom att öppna den lämnar över dig till din webbläsare ber knappen alltid om en bekräftelse först, så ett oavsiktligt tryck mitt i en strid aldrig kan dra dig ut ur den. Spelet fortsätter köra bakom den.",
       "mobileTitle": "På telefon eller surfplatta",
       "mobileBody": "Pekkontroller dyker upp av sig själva, och layouten anpassar sig efter din skärm: en kompakt uppställning på en liten telefon, en standarduppställning på en större telefon, och en rymligare på en surfplatta.\n\nDina förmågor sitter i en ring i stället för en sifferrad: anfallsknappen med fem handlingsknappar bredvid sig, och en sidväxlare som byter ringen genom resten av dina platser, upp till sju sidor när alla tre handlingsfält är påslagna. Runt omkring dem sitter de knappar en pekspelare når efter mest: byta mål, använda det som är framför dig, och hoppa, plus en utdragbar rad med dina förbrukningsvaror som fyller sig själv från det du bär.\n\nLängs nederkanten finns Chatt, Socialt, Uppdrag, Inställningar och Mer. Mer öppnar en bricka som rymmer resten av dina fönster, bland annat din karaktär, Fängelsehålsletaren, PvP, Dalcupen, emotes och wikin. Fönster fyller skärmen här snarare än flyter ovanpå den.\n\nAtt flytta dina enhetsramar är en skrivbordsgrej: på touch placerar layouten dem åt dig.",
-      "mobileBodyTwoPages": "Touch controls appear on their own, and the layout sizes itself to your screen: a compact arrangement on a small phone, a standard one on a larger phone, and a roomier one on a tablet.\n\nYour abilities sit in a ring rather than a number row: the attack button with four action buttons beside it, and a page toggle that swaps the ring between its {pages} pages, which together reach all {slots} of your ability slots whether or not the extra desktop bars are switched on. The fifth arc position of that ring is your consumables seat: tap it to use what is seated there, or hold it, or swipe it inward, to open a row that fills itself from what you are carrying. Around the ring sit the buttons a touch player reaches for most, swapping target, using what is in front of you, and jumping.\n\nOne Quick Actions control sits at the bottom edge in place of a row of buttons. It opens onto everything else: mount, chat, map, bags, social, quests, character, spellbook, game menu, and a More entry holding the rest of your windows, the Dungeon Finder, PvP, emotes and the wiki among them. Windows fill the screen here rather than floating over it.\n\nMoving your unit frames is a desktop thing: on touch the layout places them for you.",
+      "mobileBodyTwoPages": "Pekkontroller visas av sig själva och layouten anpassar sin storlek efter din skärm: kompakt på en liten telefon, normal på en större telefon och rymligare på en surfplatta.\n\nDina förmågor ligger i en ring i stället för på en sifferrad: attackknappen med fyra åtgärdsknappar intill sig och en sidväxlare som byter ringen mellan dess {pages} sidor. Tillsammans når de alla {slots} av dina förmågeplatser, oavsett om de extra skrivbordsraderna är påslagna eller inte. Ringens femte bågposition är platsen för dina förbrukningsvaror: tryck på den för att använda det som ligger där, eller håll kvar fingret eller svep inåt för att öppna en rad som fylls av det du bär med dig. Runt ringen finns knapparna en pekspelare oftast behöver: byt mål, använd det som står framför dig och hoppa.\n\nEn kontroll för Snabbåtgärder sitter vid nederkanten i stället för en knapprad. Den öppnar allt annat: riddjur, chatt, karta, väskor, socialt, uppdrag, karaktär, besvärjelsebok, spelmeny och posten Mer, som bland annat rymmer resten av dina fönster, fängelsehålesökaren, PvP, emoter och wikin. Fönster fyller skärmen här i stället för att sväva ovanpå den.\n\nAtt flytta dina enhetsramar hör till skrivbordet: med pekstyrning placerar layouten dem åt dig.",
       "railTitle": "Knappraden",
       "railBody": "Nere i skärmens nedre högra hörn, långt från minikartan, sitter en rad av små fyrkantiga knappar, en per fönster, ordnade i två korta kolumner sida vid sida. De flesta av dem är märkta med sin standardtangent.\n\nDen första kolumnen täcker din karaktär, trollformelsbok, talanger, uppdragslogg, Bedrifternas bok, yrken, världskarta, väskor och hantverk. Den andra öppnar med WOC-butiken och fortsätter genom PvP, Fängelsehålsletaren, Dalcupen, Kortduell, topplistan, emotes, musik, vänner och gille, den här wikin och spelmenyn. Några till ansluter bara när de gäller."
     },
@@ -6660,13 +6660,13 @@ export const sv_SE: EnTranslations = {
       "valeBlurb": "Den gröna startdalen, där nya hjältar prövar sina krafter på vargar och banditer kring staden Eastbrook.",
       "marshBlurb": "Ett dränkt land av dimma och ruiner. Mudfiner svärmar i grundvattnet och något äldre rör sig under ytan, bevakat från bro-staden Fenbridge.",
       "peaksBlurb": "Vindpiskade åsar och gamla gruvverk som klättrar mot de hårdaste farorna på startvägen, hållna av utposten Highwatch.",
-      "duskBlurb": "A valley of permanent dusk beneath the great tree of Eldershine, where crystal ruins glow and the air hums with old magic.",
+      "duskBlurb": "En dal i evig skymning under Eldershines stora träd, där kristallruiner glöder och luften surrar av gammal magi.",
       "emberBlurb": "Stormbelysta ödemarker av aska och blodglas där drakar kretsar över kaldera, och trollens eldar brinner bland dynerna, vaktade från porten Drakvakten.",
       "frostBlurb": "En tystnad av snö och mörka granar under norrskenet, där kylan själv känns vaken och Ismanteln håller sina eldar brinnande.",
       "amberBlurb": "En evig höst av guld och röda löv som aldrig faller, samlad kring den lyktupplysta staden Lyktsjön.",
       "fenBlurb": "En ljus, surrande våtmark av liljor och lugnt vatten, korsad på gamla spångar från brostaden Brosjön.",
       "nightBlurb": "Ett rike av stjärnklar midnatt där blommor lyser upp stigarna och Månvila håller en tyst vaka under en drömmande himmel.",
-      "hauntBlurb": "A haunted forest under giant canopies, where the lanterns of Gibbetmere are the only honest light on the road.",
+      "hauntBlurb": "En hemsökt skog under väldiga trädkronor, där Gibbetmeres lyktor är det enda ärliga ljuset på vägen.",
       "galeBlurb": "Havsklippor och tjutande kullar där vinden aldrig vilar, Den gamla vårdkasen aldrig slocknar, och Vikhamn stänger sina dörrar hårt.",
       "jungleBlurb": "Ett tropiskt snår av palmer, vit sand och högljudda fåglar, med strandstaden Drivhamn som håller en eld tänd på stranden.",
       "gardenBlurb": "Ett labyrintträdgårdsrike som fortfarande klipps av ingen trädgårdsmästare någon har sett, du kommer in förbi Häckby och dess fontängårdar.",
@@ -6677,7 +6677,7 @@ export const sv_SE: EnTranslations = {
       "peaksGreeting": "Tvåhundra år har denna mur hållit. Den ska inte brista på min vakt, men den stönar.",
       "peaksGreeter": "Kapten Thessaly, Highwatch",
       "duskGreeting": "Få av ditt slag har stått under dessa grenar. Gå varsamt, och var välkommen.",
-      "duskGreeter": "Keeper Saelwyn, Eldershine",
+      "duskGreeter": "Väktare Saelwyn, Eldershine",
       "emberGreeting": "Het vind från ödemarken, drakar över Drakgapet, och trollens eldar i dynerna. Drick något innan du vandrar ut dit.",
       "emberGreeter": "Portväktaren, Drakvakten",
       "frostGreeting": "Snön sväljer varje ljud bortom muren. Om skenen börjar dansa, håll rösten låg och elden tänd.",
@@ -6689,7 +6689,7 @@ export const sv_SE: EnTranslations = {
       "nightGreeting": "Bortom Nattporten drömmer själva luften. Följ blomljuset, och se upp för den sovande världen som hänger i skyn.",
       "nightGreeter": "Vakväktaren, Månvila",
       "hauntGreeting": "Håll dig till lyktorna, resenär. Och om skogen ropar ditt namn från sidan av vägen, svara inte.",
-      "hauntGreeter": "The lamplighter, Gibbetmere",
+      "hauntGreeter": "Lyktändaren, Gibbetmere",
       "galeGreeting": "Vinden har aldrig en enda gång slutat blåsa här, och Den gamla vårdkasen har aldrig en enda gång slocknat. Stäng värdshusdörren efter dig.",
       "galeGreeter": "Vårdkasväktaren, Vikhamn",
       "jungleGreeting": "Varm sand, högljudda fåglar och en djungel som äter upp horisonten. Vi håller en eld tänd på stranden; försök komma tillbaka till den.",
@@ -6699,13 +6699,13 @@ export const sv_SE: EnTranslations = {
       "valePlaceNotes": "Östbäck är din första hembas. Vargstråket och Vildsvinsängen är milda jaktmarker; Spegelsjön är gott fiskevatten, fast gyttjefenor svärmar i grunden; Sableweb och Kopparbrottet döljer spindlar och malmgiriga grävare; ett Banditläger och Det fallna kapellet rymmer hårdare arbete; Relikkullen leder ner i Det rasade relikvariet, rikets första delve; Ljusskogsgläntan är en lugn, solbelyst lund i norr; och Suggfältet är Östbäcks muromgärdade vildsvinsbollsplan, där Dalcupen spelas under ett skördestillestånd.",
       "marshPlaceNotes": "Kärrbron vaktar den enda torra vägen. Smygjägarvassen och Djupkärrsgrunden kryllar av träskbestar och Mudfiner; Änkesnåret är tjockt spunnet med väv; Det dränkta kapellet och Trollhögarna rymmer äldre faror, medan Den dränkta litanian, kärrets egen delve, öppnar strax norr om högarna; Gravkallarlägret är kulten nedgrävd, och Den sjunkna bastionen är kärrets instansierade hjärta.",
       "peaksPlaceNotes": "Highwatch håller muren. Stalker Ridge och Deeprock Burrows tillhör åskatter och grävare; Ogre Foothills och Drogmar's War-Camp åt brutaler till salu; Stormcrag sprakar av elementarer, och nedanför den lyser Skimmertjärnen, tjärnen vars strand vaktar porten av blekt ljus ner till Det dränkta templet; Broodsworn Tents och Revenant Fields omger kultens höglänta mark, med Gravlindormens helgedom på dess topp.",
-      "duskPlaceNotes": "Eldershine gathers beneath the great tree. The Duskfall Cave and its overlook are the way in and the first sight of the valley; Elder Grove and Starfall Basin keep the quiet south; the Sunken Court holds overgrown ruins in the east; and the Gleaming Deep and Crystalline Shallows glow across the north.",
+      "duskPlaceNotes": "Eldershine samlas under det stora trädet. Skymningsfallsgrottan och dess utsikt är vägen in och dalens första vy; Äldrelunden och Stjärnfallsbäckenet bevarar den stilla södern; Den sjunkna gården håller övervuxna ruiner i öster; och Det glimmande djupet samt Kristallgrundet lyser över norr.",
       "emberPlaceNotes": "Drakvakten håller porten. Portskogen är det sista gröna innan ödemarken; Sotdynerna drivs av aska och värre saker; Trollmötet är där dyntrollen samlar sina eldar; Blodglasfälten glittrar av rakvassa skärvor; och Drakgapets kaldera är den rykande krona som drakarna kretsar kring.",
       "frostPlaceNotes": "Ismanteln håller den sista varma härden. Snölinjen markerar var drivorna tar över; Glaciärtjärnen är svart, stilla vatten under isen; Norrskenstrapporna klättrar under de dansande skenen; Skälvkärret är en frusen myr som aldrig riktigt sover; och De tjutande terrasserna förtjänar sitt namn varje natt.",
       "amberPlaceNotes": "Lyktsjön glöder i skördens hjärta. Guldsmältan är det bärnstenshala passet in; Den förgyllda fruktlunden och Skördehålan gömmer de sötaste fynden och de djärvaste tjuvarna; Den stora sjön speglar de brinnande löven; Sotlönnshöjden står högst och rödast; och Den lutande monoliten minns något äldre än hösten.",
       "fenPlaceNotes": "Brosjön ligger tvärs över det lugna vattnet. Bärnstenskärrets trappor kommer ner från skördelandet; Liljemyrarna och Myrglansdammarna glittrar av irrbloss och trollsländor; Pilgråten släpar sina grenar ner i sjön; och De sömniga slätterna är så milda som detta land någonsin blir.",
       "nightPlaceNotes": "Månvila håller vakan. Nattporten är vägen in i midnattslandet; Månbrunnen rymmer stjärnljus du kan stå bredvid; Skymningsfältet blommar i mörkret; Den stående vakan vakar utan att någonsin röra sig; och Den sömnlösa gravhögen är den enda platsen här som aldrig drömmer.",
-      "hauntPlaceNotes": "Gibbetmere huddles inside its lanterns. The Crowgate is the wood's grim front door; Widow's Thicket is spun thick with web; the Hanging Glade and the Mournstone Chapel keep the forest's oldest griefs; and the Huntsman's Clearing belongs to whatever still hunts there.",
+      "hauntPlaceNotes": "Gibbetmere hukar innanför sina lyktor. Kråkporten är skogens bistra ytterdörr; Änkans snår är tätt spundet av nät; Den hängande gläntan och Sorgstenskapellet bevarar skogens äldsta sorger; och Jägarens röjning tillhör vad det än är som fortfarande jagar där.",
       "galePlaceNotes": "Vikhamn lutar sig mot vinden. Vindleden är klippvägen in; De tjutande kullarna rullar trädlösa under stormen; Den gamla vårdkasen har brunnit så länge någon kan minnas; Branten faller brant ner mot vattnet; Vrakfälten håller kusten ärlig; och Spegeltjärnen är det enda stillsamma i hela riket.",
       "junglePlaceNotes": "Drivhamn håller sin eld på stranden. Snårmynningen är där floden möter den gröna muren; Palmstranden löper vit och varm längs bränningen; Smaragdsnåret och Rankfallet sväljer inlandet; Safirlagunen glöder klar och djup; och Den sjunkna avguden vakar från vattnets djup.",
       "gardenPlaceNotes": "Häckby väntar vid Trädgårdsporten. Parterrpromenaden blommar i klippt färgprakt; Gryningsborgen drillar sina riddare bakom nya murar; Kronbladsdammen driver rosa året runt; Den gamla kvarnen vänder sina egna rabatter; Den stora labyrinten omarrangerar sina vägar för varje gäst, dess valv vaktade av lövklädda rävar; Nordvakten håller utfartsvägen; Liljebassängen vilar bortom allt detta; och Fontängården rinner fortfarande klar vid trädgårdens hjärta.",
@@ -6910,17 +6910,17 @@ export const sv_SE: EnTranslations = {
       "ladderBody": "Rankat spel följer din ställning över tid. Kolla topplistan för att se var du befinner dig och vem som håller rikets topp.",
       "rewardsHeading": "Vad rankat spel betalar",
       "rewardsBody": "En rankad vinst betalar Heder, valutan för spelare mot spelare, och en förlust kostar dig ingenting annat än ställning. Heder är tänkt att belöna riktiga matcher: att besegra samma motståndare eller samma lag igen samma dag betalar inget mer, en lång vinstdag ger lite mindre Heder per vinst ju längre den pågår, och en match din motståndare ger förlorad flyttar ändå din ställning men betalar ingen Heder alls. Den dagen är Hederns egen, och den rullar över på sin egen klocka snarare än med rikets instansåterställning.",
-      "rewardsBodyLossShare": "A ranked win pays Honor, the player versus player currency, and a loss you play to the end still pays a smaller share of it, as does a draw, so rating is the only thing a loss really costs you. Honor is meant to reward real matches: beating the same opponent or the same team again on the same day pays nothing further (nor does losing to them again), a long winning day pays in full for its first stretch of wins and then halves what a win pays, halving it again deeper in and staying there, and a match your opponent forfeits still moves your rating but pays no Honor at all. That day is the realm's own: it rolls over at the realm's nightly reset hour, the same boundary every daily lockout clears on.",
+      "rewardsBodyLossShare": "En rankad vinst ger Heder, valutan för spelare mot spelare, och en förlust som du spelar till slutet ger fortfarande en mindre andel, liksom oavgjort, så rankning är det enda en förlust egentligen kostar dig. Heder ska belöna riktiga matcher: att besegra samma motståndare eller samma lag igen samma dag ger inget mer, och det gör inte heller att förlora mot dem igen. En lång vinstdag betalar fullt för sin första följd av segrar, halverar sedan vad en vinst ger, halverar det igen längre in och stannar där. En match som din motståndare lämnar påverkar fortfarande din rankning men ger ingen Heder alls. Dagen tillhör riket: den rullar över vid rikets nattliga återställningstid, samma gräns där alla dagliga låsningar nollställs.",
       "honorHeading": "Heder",
       "honorBody": "Heder är valutan för att slåss mot andra spelare. Du tjänar den i Coliseum och ute på Törnhålefälten, den hålls skild från ditt mynt och blandas aldrig med det, och ditt karaktärsblad visar hur mycket du har. Det finns precis en enda sak att spendera den på: Krigföringsutrustning.",
       "quartermastersBody": "Två kvartersmästare håller samma hyllor, så handla med den som är närmast. RASERI, Hederskvartermästaren, står i Östbäcksdalen, och Krigsmarskalk Draven Kole, Mästare av Krigföringsförråden, sköter disken i Highwatch. Deras lager är Krigföringsnivån: fem rustningsfamiljer, plus halsband, ringar och vapen som delas mellan dem alla.",
       "honorFinalNote": "Hederköp är slutgiltiga. Ett myntköp kan ångras från en handlares återköpslista, men ett Hederköp hamnar aldrig där, och Krigföringsutrustning blir själsbunden i samma stund du köper den, så den kan aldrig bytas, skickas med post eller säljas tillbaka för något. Butiken ber dig bekräfta av just den anledningen: läs plagget innan du trycker på det.",
-      "honorFinalNoteSoldBack": "Honor purchases are final. The buyback list only ever holds what you sold: a coin purchase can usually be sold back for its sell price and reclaimed from that list if you change your mind again, but Warfare gear is soulbound the moment you buy it, so it can never be traded, mailed, or sold back for anything, and it never reaches that list. The shop asks you to confirm for that reason: read the piece before you press it.",
+      "honorFinalNoteSoldBack": "Hedersköp är slutgiltiga. Återköpslistan innehåller bara det du har sålt: ett köp för mynt kan vanligen säljas tillbaka för sitt försäljningspris och hämtas tillbaka från listan om du ändrar dig igen, men krigföringsutrustning binds till själen i samma ögonblick som du köper den. Den kan därför aldrig handlas, skickas med post eller säljas tillbaka för något, och den hamnar aldrig på listan. Butiken ber dig bekräfta av den anledningen: läs föremålet innan du trycker.",
       "warfareHeading": "Krigföringsutrustning",
       "warfareBody": "Varje Krigföringsplagg bär Krigföringsanfallsvärdering och Krigföringsförsvarsvärdering, och dessa två värden gör ingenting alls mot monster. De gäller bara när du slåss mot en annan spelare: i en duell, i arenan eller på slagfältet, där Anfallsvärdering lägger till skadan du vållar och Försvarsvärdering minskar skadan du tar, vardera upp till sitt eget tak. Varje rustningsfamilj är också ett set, och dess setbonusar är likaså Krigföringsvärdering eller effekter som bara fungerar mot spelare, så en full uppsättning krigföringsutrustning är värdelös mot en fängelsehåleboss.",
-      "warfareBodyStatsStay": "Every Warfare piece carries Warfare Offense and Warfare Defense Rating, and those two ratings do nothing at all against monsters. They apply only when you fight another player, in a duel, in the arena, or on the battleground, where Offense adds to the damage you deal and Defense cuts the damage you take, each up to its own ceiling. Each armor family is also a set, and its set bonuses are likewise Warfare rating or effects that only work against players, so a full honor kit's set bonuses count for nothing on a dungeon boss. The pieces themselves still carry their ordinary stats, armor, and weapon damage, and those work everywhere; it is the Warfare ratings and the set bonuses that go quiet against a monster.",
+      "warfareBodyStatsStay": "Varje krigföringsföremål har Krigföringsanfall och Krigföringsförsvar, och dessa två värden gör ingenting alls mot monster. De gäller bara när du slåss mot en annan spelare, i en duell, på arenan eller slagfältet. Där ökar Anfall skadan du orsakar och Försvar minskar skadan du tar, vart och ett upp till sitt eget tak. Varje rustningsfamilj är också ett set, och dess setbonusar är likaså krigföringsvärden eller effekter som endast fungerar mot spelare, så setbonusarna från en full hedersuppsättning betyder ingenting mot en fängelsehålechef. Föremålen har fortfarande sina vanliga egenskaper, rustning och vapenskada, och dessa fungerar överallt. Det är krigföringsvärdena och setbonusarna som tystnar mot ett monster.",
       "warfareTradeBody": "Det är den medvetna avvägningen. Krigföringsutrustning är byggd för att slåss mot spelare, inte som en genväg förbi fängelsehålenivåerna: ett Krigföringsplagg bär aldrig de stridsvärden en episk fängelsehålepjäs i samma plats gör, och allt det faktiskt ger spenderas på andra spelare. Vill du hålla din egen i arenan, köp den. Vill du klara heroiska snabbare, förtjäna din utrustning i fängelsehålorna.",
-      "warfareTradeBodyRatingSpent": "That is the deliberate trade. Warfare gear is built for fighting players, not as a shortcut past the dungeon tiers: a Warfare piece never carries the combat ratings a dungeon epic in the same slot does, and the Warfare rating and set bonuses it carries instead are spent entirely on other players. If you want to hold your own in the arena, buy it. If you want to clear heroics faster, earn your gear in the dungeons."
+      "warfareTradeBodyRatingSpent": "Det är den avsiktliga avvägningen. Krigföringsutrustning är byggd för att slåss mot spelare, inte som en genväg förbi fängelsehålornas nivåer: ett krigföringsföremål har aldrig de stridsvärden som en episk fängelsehåleutrustning på samma plats har, och krigföringsvärdet och setbonusarna det får i stället används helt mot andra spelare. Vill du hävda dig på arenan, köp den. Vill du klara hjältemodiga fängelsehålor snabbare, förtjäna din utrustning där."
     },
     "thornhollowPage": {
       "heading": "Törnhålefälten",
@@ -7113,9 +7113,9 @@ export const sv_SE: EnTranslations = {
       "soulboundBody": "Ett fåtal särskilda belöningar är själsbundna, bundna till din karaktär från det ögonblick du förtjänar dem. Ett själsbundet föremål kan inte bytas, skickas med post, säljas till en handlare eller läggas upp på marknaden; det är ditt och endast ditt. I dag skyddar det värnet prispolletter som Heroiska märken, medan utrustningen du vinner är din att byta, sälja eller dela fritt.",
       "uniqueTitle": "Unikt utrustad: ett legendariskt föremål av varje slag",
       "uniqueBody": "Legendariska föremål är unikt utrustade: din karaktär kan bara bära en kopia av ett givet legendariskt föremål åt gången, och dess heroiska version räknas som samma föremål. En andra kopia kan ligga i dina väskor, i banken eller på marknaden, men att försöka bära båda samtidigt nekas, och verktygstipset bär en gyllene Unikt utrustad-tagg så att du ser regeln innan du planerar ett bygge kring två av dem.",
-      "masterwroughtTitle": "Masterwrought: the crafted summit",
+      "masterwroughtTitle": "Mästersmidd: hantverkets höjdpunkt",
       "masterwroughtBody": "The finest crafted gear carries a gold Unique-Equipped: Masterwrought tag on its tooltip. These pieces are the summit of the crafting professions, made by master crafters from rare materials and traded freely on the open market, and they stand beside the treasures of the deepest dungeons. The tag is one shared family rule: a character can wear at most two Masterwrought pieces at once, whichever crafts they come from, so pick the two slots where they serve your build best.",
-      "masterwroughtBodyLegendary": "The finest crafted gear carries a gold Unique-Equipped: Masterwrought tag on its tooltip. These pieces are the summit of the crafting professions, made by master crafters from rare materials and traded freely on the open market, and they stand beside the treasures of the deepest dungeons. The tag is one shared family rule: a character can wear at most two Masterwrought pieces at once, whichever crafts they come from, so pick the two slots where they serve your build best. The rule keeps one further line for the very top of the family: a wearer who has Perfected a Masterwrought piece can promote it into a legendary of their own naming, a chain the Professions page tells in full, and a character can wear at most one legendary Masterwrought piece among the two.",
+      "masterwroughtBodyLegendary": "Den finaste tillverkade utrustningen har en gyllene etikett, Unique-Equipped: Mästersmidd, i sin verktygstipsruta. Dessa föremål är hantverksyrkenas höjdpunkt, tillverkade av mästerhantverkare av sällsynta material och fritt handlade på den öppna marknaden, och de står sida vid sida med skatterna från de djupaste fängelsehålorna. Etiketten är en gemensam familjeregel: en karaktär kan bära högst två Mästersmidda föremål samtidigt, oavsett vilket hantverk de kommer från, så välj de två platser där de tjänar din uppsättning bäst. Regeln har ytterligare en rad för familjens högsta nivå: den som har fulländat ett Mästersmitt föremål kan befordra det till en legendar med ett eget namn, en kedja som yrkessidan beskriver i sin helhet, och en karaktär kan bland de två bära högst ett legendariskt Mästersmitt föremål.",
       "setsTitle": "Set och setbonusar",
       "setsBody": "En del rustning kommer i matchande familjer, flera stycken skurna för att se ut och strida som ett. Bär tillräckligt många stycken ur en familj samtidigt så vaknar setet och ger bonusar ovanpå varje styckes egna värden, och ju fler stycken du bär desto starkare blir det. Ett fåtal sådana familjer dyker upp som eftertraktat byte medan du stiger i nivå, och de största kommer från det hårdaste gruppinnehållet nära nivåtaket, så att jaga ett fullständigt set är ett klassiskt slutspelsmål. Striden mot andra spelare har egna matchande familjer, köpta ett stycke i taget med Heder; de vaknar vid andra styckeantal än bytesfamiljerna, och deras bonusar svarar bara när fienden är en annan spelare.",
       "consumablesTitle": "Förbrukningsvaror",
@@ -7156,10 +7156,10 @@ export const sv_SE: EnTranslations = {
       "archetypeChooseBody": "Du behöver inte leta upp något av detta. Arbeta med dina hantverk, och när dina hantverksfärdigheter för första gången visar en tydlig lutning mot ett par lägger Hantverksgillet märke till det och skickar ett Korppostbrev som namnger vilken mästare du ska söka upp och vilket uppdrag du ska ta. Det anländer en gång per karaktär, och bara om du inte redan svurit dig till ett par.",
       "archetypeSwitchBody": "En deklaration är heller inget livstidsstraff. Ett par du aldrig hållit är helt enkelt ett nytt inriktningsuppdrag, medan en återkomst till ett par du vandrat ifrån kräver att du gör bot först: fem uppgifter första gången, och tre till för varje återkomst du redan gjort (att ta upp ett helt nytt par höjer aldrig antalet). Valet förblir betydelsefullt utan att någonsin låsa en dörr för gott.",
       "whatHeading": "En handel vid sidan om svärdet",
-      "whatBody": "Professions are the working life of the world: the gathering trades that pull raw material straight out of the land, and a ring of ten crafts that turn it into gear, meals, potions, and tools. Everything feeds something else here. The ore you mine becomes a blade, the blade takes an enchant, and the enchant needs dust broken out of old gear, so a gatherer, a crafter, and a tinkerer are all links in one chain.\n\nThere is no profession limit to agonize over. Every character can raise nine of the ten crafts and every gathering profession side by side (Engineering is the one holdout: its recipes all start above the free ceiling, so its ladder waits for the Bombardier's oath); the only exclusive choice is your archetype, the identity you eventually swear to, though once you attune the crafts that fall dormant behind it climb only on their common recipes, and past skill 75 not at all. Skill never goes down, and nothing you learn is ever taken away.",
+      "whatBody": "Yrken är världens arbetsliv: insamlingsyrkena som drar råmaterial direkt ur marken och en ring av tio hantverk som gör det till utrustning, måltider, drycker och verktyg. Allt föder något annat. Malmen du bryter blir en klinga, klingan får en förtrollning och förtrollningen behöver damm från gammal utrustning, så samlare, hantverkare och fixare är länkar i samma kedja.\n\nDet finns ingen yrkesgräns att grubbla över. Varje karaktär kan höja nio av de tio hantverken och varje insamlingsyrke sida vid sida (Ingenjörskonst är undantaget: alla dess recept börjar över det fria taket, så stegen väntar på Bombbärarens ed). Det enda uteslutande valet är din arketyp, identiteten du till slut svär dig till; efter inriktning klättrar hantverk som blir vilande bakom den bara på sina vanliga recept, och inte alls efter 75. Skicklighet går aldrig ned och inget du lär dig tas ifrån dig.",
       "ringHeading": "Hantverksringen",
-      "ringBody": "Every craft on the ring caps at 125 skill: Weaponcrafting, Armorcrafting, Jewelcrafting, Inscription, Tailoring, Leatherworking, Cooking, Alchemy, Engineering, and Enchanting. At a cap the trade keeps working, harvests still yield, crafts still resolve, and masterworks can still happen; only the number stops climbing. Pick a card below for a craft's full recipe tables and numbers.",
-      "ringWaveNote": "With Inscription taking up its quills, every seat on the wheel now ships real recipes. The ring is complete rather than finished: the caps rise with future zones, so a capped craft today is a head start on that expansion, not a finish line.",
+      "ringBody": "Varje hantverk på ringen har taket 125 i skicklighet: Vapensmide, Rustningssmide, Juveleringskonst, Inskription, Skrädderi, Läderhantverkeri, Matlagning, Alkemi, Ingenjörskonst och Förtrollning. Vid taket fortsätter yrket att fungera, skördar ger fortfarande utbyte, hantverk avslutas och mästerverk kan fortfarande inträffa; bara siffran slutar stiga. Välj ett kort nedan för ett hantverks fullständiga recepttabeller och siffror.",
+      "ringWaveNote": "När Inskription tar upp sina fjäderpennor har varje plats på hjulet riktiga recept. Ringen är komplett, inte avslutad: taken stiger med framtida zoner, så ett hantverk vid taket i dag är ett försprång inför den utvidgningen, inte en målgång.",
       "capFmt": "Tak {cap}",
       "comingSoon": "Inga recept ännu",
       "gatherHubHeading": "Insamling",
@@ -7168,24 +7168,24 @@ export const sv_SE: EnTranslations = {
       "archetypesBody": "De tio hantverken sitter på ett fast hjul, och geografin på det hjulet spelar roll. Varje två grannar bildar ett namngivet par: Smed för Vapensmide och Rustningssmide, Utrustare för Läderhantverkeri och Skrädderi, Apotekare för Alkemi och Matlagning, Bombbärare för Ingenjörskonst och Alkemi, och sex till runt ringen.\n\nAtt inrikta sig mot ett par är ett uppdrag, inte ett menyklick. Fyra par går att ansluta sig till idag (Smed, Utrustare, Apotekare och Bombbärare), vart och ett förankrat hos en stationerad mästare i Östbäck vars antagningsuppdrag lägger fram hela överenskommelsen innan du tar den. Tills du deklarerar avancerar varje hantverk fritt på recept upp genom den sällsynta nivån (varje recept som ber om skicklighet 74 eller mindre), så du kan pröva allt innan du väljer.\n\nNär du väl inriktat dig blir parets två hantverk dina ämnen, utan något tak under själva skicklighetstaket. Resten av hjulet slocknar inte: ett hantverk mitt emot dina ämnen lever vidare som en hobby som fortsätter klättra genom den sällsynta nivån (ett repeterbart uppdrag vid Smed Haldrens smedja låter dig byta vilket), och varje annat hantverk går i vila. Ett vilande hantverk behåller sin skicklighet och sina vanliga recept, som fortsätter lära ut det på den normala kurvan tills de grånar vid 75; allt ovanför vanligt slutar betala med en gång, och ett vilande hantverk levererar aldrig ett mästerverk medan det vilar.",
       "pairFmt": "{a} och {b}",
       "curveHeading": "Masterkurvan",
-      "curveBodyRetunedFishing": "Skill gain follows one rule everywhere, the four-state Mastery Curve. Every {step} points of skill is a tier, and each recipe is scored by where it sits against yours: at or above your tier it grants full gain, one tier below grants half, two below a quarter, and three or more below nothing at all.\n\nThe crafting window paints this straight onto the recipe list in the classic colors: orange for full gain, yellow for reduced, green for a trickle, gray for none. Gains are deterministic, never a skill-up roll, so the same craft at the same tier always moves your skill by exactly the same amount, and a recipe turning yellow is your cue to train the next rung.\n\nGathering runs on the same curve with the same tier step, scored against the node instead of a recipe: easy nodes gray out as you pass them, and the richer nodes of the later zones are what finish a climb. Fishing keeps its own schedule: 0.08 of a point per catch below 50 proficiency, 0.05 to 100, 0.04 to 150, and 0.03 to 200, with junk catches teaching nothing from 100 on.",
+      "curveBodyRetunedFishing": "Färdighetsökning följer samma regel överallt: mästerskapskurvans fyra lägen. Varje {step} färdighetspoäng utgör ett steg, och varje recept bedöms i förhållande till ditt steg. Ett recept på eller över ditt steg ger full ökning, ett steg under ger hälften, två steg under en fjärdedel och tre eller fler steg under ingenting.\n\nTillverkningsfönstret visar detta direkt i receptlistan med de klassiska färgerna: orange för full ökning, gult för minskad, grönt för en liten ökning och grått för ingen. Ökningen är deterministisk och avgörs aldrig av ett färdighetsslag. Samma tillverkning på samma steg ökar därför alltid färdigheten med exakt lika mycket, och när ett recept blir gult är det dags att lära sig nästa steg.\n\nInsamling följer samma kurva med samma steglängd, men bedömer resursplatsen i stället för ett recept. Enkla resursplatser blir grå när du växer ifrån dem, och de rikare resursplatserna i senare zoner avslutar klättringen. Fiske har sin egen takt: 0,08 poäng per fångst under färdighet 50, 0,05 upp till 100, 0,04 upp till 150 och 0,03 upp till 200. Skräpfångster ger ingen färdighet från 100 och uppåt.",
       "provenanceHeading": "Ursprungsbevis",
       "provenanceBody": "Fint arbete i den här världen minns sin tillverkare: sällsynta eller bättre skördar och hantverk anländer signerade (Samlat av, Tillverkad av), ett mästerverk färdigställs en kvalitetsnivå högre med tillverkarens namn alltid på det, och ett beställt föremål binder sig till sin mottagare via Tillverkarens band. Sidan Hantverksekonomi bär de fullständiga reglerna, från signaturer och staplar till upplösningsavgifter.",
-      "endgameHeading": "The Masterwrought endgame",
+      "endgameHeading": "Mästersmidds slutspel",
       "endgameBody": "Above every craft's trainer ladder sits one shared summit: the Masterwrought family, the crafted pieces wearing the gold Unique-Equipped: Masterwrought tag the Gear page describes. The chain has the same shape whichever craft climbs it: apex patterns found rather than taught, daily-gated intermediate crafts that pace the work, and three shared materials every ladder drinks from. The finished pieces trade freely like any other crafted work (the Crafting Economy page carries the trading rules), and the two-piece wearing cap keeps them an accent on a build rather than a whole kit, so a crafter who never sets foot in the deepest endgame still sells to the people who live there.",
-      "endgameBodyRaidCollections": "Masterwrought is the shared family marked Unique-Equipped: Masterwrought. The older apex ladder still uses its found patterns, daily intermediate crafts, and shared endgame materials. The Crucible collections are a separate raid-funded route, not another set of costs added to that ladder. Both families share the same two-piece wearing cap, so they compete for the same two places in your build. Finished pieces trade freely until Perfecting or a commission binds the individual copy.",
+      "endgameBodyRaidCollections": "Mästersmidd är den gemensamma familjen med märkningen Unique-Equipped: Mästersmidd. Den äldre toppstegen använder fortfarande sina upphittade mönster, dagliga mellanliggande tillverkningar och gemensamma slutspelsmaterial. Degel-samlingarna är en separat rädfinansierad väg, inte ännu en uppsättning kostnader som läggs till den stegen. Båda familjerna delar samma gräns på två burna föremål, så de konkurrerar om samma två platser i din uppsättning. Färdiga föremål kan handlas fritt tills fulländning eller ett uppdrag binder det enskilda exemplaret.",
       "endgamePatternsBody": "The patterns arrive through three channels, and the recipe tables on every craft page label each row's own: found in the deepest endgame victories, sold by the Heroic Quartermaster for Heroic Marks, or both at once. The split is deliberate. The gear patterns are found and never sold, the consumable patterns sit on the quartermaster's counter from day one, and the farming patterns ride both roads. Patterns are ordinary tradable goods besides, so a find you cannot use is a find you can sell.",
-      "endgamePatternsBodyCollections": "The older gear patterns are found rather than sold; the older consumable patterns are sold by the Heroic Quartermaster for Heroic Marks, and farming patterns use both routes. Crucible collection manuals and the Last Flame's Zeal formula instead drop from either Crucible boss on either difficulty. Their shared drop group has a 30% chance per boss, choosing one of twelve equally likely scrolls. The Crucible quartermaster also sells any of these scrolls for one core, a deterministic alternative to a lucky drop. Each collection manual teaches all three of its recipes at skill 100. A partly learned manual fills the missing lessons and consumes only one scroll. Manuals and formulas can be traded.",
+      "endgamePatternsBodyCollections": "De äldre utrustningsmönstren hittas i stället för att säljas. De äldre mönstren för förbrukningsvaror säljs av den heroiska kvartermästaren för heroiska märken, och odlingsmönster använder båda vägarna. Manualer för Smältdegelns samlingar och formeln för Sista lågans iver kan i stället falla från båda Smältdegelns bossar på båda svårighetsgraderna. Deras gemensamma bytesgrupp har 30% chans per boss och väljer en av tolv lika sannolika skriftrullar. Smältdegelns kvartermästare säljer också valfri sådan rulle för en kärna, ett deterministiskt alternativ till ett lyckosamt fynd. Varje samlingsmanual lär ut alla sina tre recept vid färdighet 100. En delvis inlärd manual fyller i de saknade recepten och förbrukar bara en rulle. Manualer och formler kan handlas.",
       "endgameMaterialsBody": "Three shared materials feed the chain. The Wyrmfall Core is the tradable catalyst: each of the deepest endgame's final victories pays a credited character 1 to 3 cores, once per source per day, the highest rift clears pay a fixed count of their own on the same daily clock, and the Heroic Quartermaster sells one for 12 Heroic Marks as the bad-luck backstop; cores trade freely. The Sundered Essence is soulbound, and sundering is its only source: any character can sunder, no profession asked, and the cast breaks a raid-won piece of epic gear of the tier into exactly one essence, the gear itself being the price. The Maker's Ember is soulbound too, and it is the chain's clock: one per week per character, granted on your first eligible endgame completion of the week, and a missed week is never lost, since the embers accrue and pay out on your next completion.",
-      "endgameMaterialsBodyAnyRaid": "Three shared materials feed the chain. The Wyrmfall Core is the tradable catalyst: each of the deepest endgame's final victories pays a credited character 1 to 3 cores, once per source per day, the highest rift clears pay a fixed count of their own on the same daily clock, and the Heroic Quartermaster sells one for 12 Heroic Marks as the bad-luck backstop; cores trade freely. The Sundered Essence is soulbound, and sundering is its only source: any character can sunder, no profession asked, and the cast breaks a raid-won piece of epic gear, from any raid and either difficulty, into exactly one essence, the gear itself being the price. The Maker's Ember is soulbound too, and it is the chain's clock: one per week per character, granted on your first eligible endgame completion of the week, and a missed week is never lost, since the embers accrue and pay out on your next completion.",
-      "perfectingHeading": "Perfecting, and the orange promotion",
-      "crucibleCollectionsBody": "Each of the eleven Crucible collections offers chest, waist, and feet pieces in its own native armor and role profile. Any two pieces activate its only set bonus, even before Perfecting; there is no three-piece bonus. Each item starts at item level 35 and costs 3 Cores of the Last Flame plus ordinary high-grade gathering materials, so a pair costs six cores before the optional manual purchase. No Wyrmfall Core, daily intermediate, or Maker's Ember is required for the base craft. At rank four, Perfecting raises the primary-stat budget to item level 38. Perfecting still follows its own weekly Ember progression, independent of obtaining and wearing the base gear.\n\nYou can exchange Perfecting ranks between two copies from the same collection at the appropriate crafting station, with skill 125, while alive, idle, and out of combat. The ranks are swapped, never duplicated, and each slot applies its own Perfected stat bonus. The exchange has no material cost and no cooldown. Both copies bind to you; their individual names, enchants, and maker marks stay with their original items.",
-      "perfectingBody": "A finished apex piece is not the end of its story. Its owner, with 125 skill in the craft that made it, can walk the piece up four ranks of Perfecting. Each attempt spends one Maker's Ember, one Sundered Essence, and one Prismglass Setting, and succeeds four times in five; a miss costs the materials and nothing else, the piece is never harmed or set back. The first attempt binds the piece to the one perfecting it, so a copy meant for sale is sold before the work begins. A Perfected piece carries a stat bonus over its base, and Perfected is exactly what the Lucent Infusion waits for: the one enchant the Enchanting page marks Perfected only lands on nothing less.\n\nThe walk can begin one rank in. A masterwork proc on an apex craft cannot finish the piece a tier finer, since apex is already the top of the ladder, so it grants the head start instead: the piece comes off the bench at the first rank of Perfecting, with three ranks left to walk rather than four. It is the same roll and the same odds the Masterworks section on every craft page publishes, spent on a rank instead of a quality.",
-      "promotionBody": "The last step is the orange promotion, and it is the Deed of Making's whole purpose. Bring a Perfected piece and one Deed of Making, an inscriptionist's skill-125 writ, and the copy is promoted into a legendary carrying a name of your own choosing. No roll rides it: the promotion is deterministic, the stats do not change at all, and what changes is the name and the color. The deed is tradable, so the scribe and the wearer need never be the same person, and the family cap keeps its one extra line: a character wears at most one legendary Masterwrought piece among their two.",
+      "endgameMaterialsBodyAnyRaid": "Tre gemensamma material driver kedjan. Wyrmfall-kärnan är den handelsbara katalysatorn: varje avslutande seger i det djupaste slutspelet ger en berättigad karaktär 1 till 3 kärnor, en gång per källa och dag. De högsta revorna ger sina egna fasta antal med samma dagliga återställning, och den heroiska kvartermästaren säljer en för 12 heroiska märken som skydd mot otur. Kärnor kan handlas fritt. Söndrad essens är själsbunden, och söndring är dess enda källa: alla karaktärer kan söndra utan krav på yrke. Förmågan förstör ett episkt föremål som vunnits i en raid, från vilken raid som helst och på endera svårighetsgraden, och ger exakt en essens. Själva utrustningen är priset. Skaparens glöd är också själsbunden och styr kedjans takt: en per vecka och karaktär, utdelad vid veckans första berättigande slutspelsavslutning. En missad vecka går aldrig förlorad, eftersom glöden sparas och betalas ut vid nästa avslutning.",
+      "perfectingHeading": "Fulländning och den orange befordran",
+      "crucibleCollectionsBody": "Var och en av de elva Degel-samlingarna erbjuder bröst-, midje- och fotföremål med sin egen rustningstyp och rollprofil. Vilka två föremål som helst aktiverar dess enda setbonus, även före fulländning, och det finns ingen bonus för tre föremål. Varje föremål börjar på föremålsnivå 35 och kostar 3 Kärnor från den sista lågan plus vanliga insamlingsmaterial av hög kvalitet, så ett par kostar sex kärnor före det valfria köpet av manualen. Ingen Wyrmfall-kärna, daglig mellanliggande tillverkning eller Skaparens glöd krävs för grundhantverket. På rang fyra höjer fulländning budgeten för huvudsakliga egenskaper till föremålsnivå 38. Fulländning följer fortfarande sin egen veckovisa Glöd-progression, oberoende av att skaffa och bära grundutrustningen.\n\nDu kan byta fulländningsranger mellan två exemplar från samma samling vid rätt hantverksstation, med färdighet 125, medan du lever, står stilla och är utanför strid. Rangerna byts, de dupliceras aldrig, och varje plats använder sin egen bonus från fulländning. Bytet kostar inga material och har ingen nedkylning. Båda exemplaren binds till dig, medan deras enskilda namn, förtrollningar och skaparmärken stannar på sina ursprungliga föremål.",
+      "perfectingBody": "Ett färdigt toppföremål är inte slutet på dess historia. Dess ägare, med färdighet 125 i hantverket som skapade det, kan föra föremålet genom fyra ranger av fulländning. Varje försök förbrukar en Skaparens glöd, en Söndrad essens och en Prismglasinfattning och lyckas fyra gånger av fem. Ett misslyckande kostar materialen och inget annat, föremålet skadas aldrig och går aldrig tillbaka i rang. Det första försöket binder föremålet till den som fulländar det, så ett exemplar avsett för försäljning ska säljas innan arbetet börjar. Ett fulländat föremål har en egenskapsbonus utöver grundvärdet, och fulländad är precis vad den Lysande infusionen väntar på: den enda förtrollning som förtrollningssidan markerar som endast fulländad kan inte fästas på något sämre.\n\nArbetet kan börja en rang in. En mästerverksproc på ett topphantverk kan inte göra föremålet en kvalitet finare, eftersom toppen redan är stegens högsta nivå, utan ger försprånget i stället: föremålet lämnar bänken på den första rangen av fulländning, med tre i stället för fyra ranger kvar att arbeta igenom. Det är samma slagning och samma sannolikhet som avsnittet Mästerverk på varje hantverkssida anger, men den används på en rang i stället för en kvalitet.",
+      "promotionBody": "Det sista steget är den orange befordran, och det är Skapandets bedrifts hela syfte. Ta med ett fulländat föremål och en Skapandets bedrift, en skrivelse på färdighet 125 från en inskriptionist, så befordras exemplaret till en legendar med ett namn som du själv väljer. Ingen slagning avgör det: befordran är deterministisk, egenskaperna ändras inte alls och det som ändras är namnet och färgen. Bedriften kan handlas, så skrivaren och bäraren behöver aldrig vara samma person, och familjegränsen har sin extra rad: en karaktär kan bland sina två bära högst ett legendariskt Mästersmitt föremål.",
       "stationsHeading": "Stationer och de tre orterna",
-      "stationsBody": "Six typed stations serve the nine station-bound crafts, spread across the three town hubs. Eastbrook holds the forge (Weaponcrafting, Armorcrafting, and Jewelcrafting all share it), the kitchens, the loom, and the toolworks; Fenbridge keeps the tannery, and Highwatch the apothecary (Alchemy and Inscription share that bench). Each station has a resident master beside it who trains recipes, posts work orders, and offers the unbind service.\n\nThe working radius is 20 yards, roughly the station's own yard, so you craft standing at the anvil rather than from across town. Enchanting alone has no station: it works anywhere by design.",
+      "stationsBody": "Sex olika stationstyper, utspridda över de tre stadsnaven, betjänar de nio hantverk som kräver en station. Östbäck har smedjan (Vapensmide, Rustningssmide och Juveleringskonst delar alla på den), köken, vävstolen och verktygsverkstaden; Kärrbron har garveriet och Högvakten apoteket (Alkemi och Inskription delar på den bänken). Vid varje station finns en bofast mästare som lär ut recept, lägger ut arbetsorder och erbjuder tjänsten att lösa upp bindningar.\n\nArbetsradien är 20 yard, ungefär stationens egen gårdsplan, så du står vid städet när du tillverkar i stället för att göra det från andra sidan staden. Förtrollning är det enda hantverket utan station: det går avsiktligt att utöva var som helst.",
       "deedsHeading": "Bedrifter som minns resan",
-      "deedsBody": "The Book of Deeds walks beside every step of this. Your first attunement earns Craftsworn and your first masterwork earns Masterwright, both wearable as titles. All ten earnable crafts mark a milestone deed at 50 skill and crown their caps with a Grandmaster title, while Fishing gets Old Salt at 100 proficiency and the Master Angler title at 200.\n\nThere are quieter pages too: deeds for your first harvest and first craft, for the rare finds luck turns up in the field, and for taking up salvage. All of it is cosmetic, titles and Renown only. A deed never grants power; it only proves you were there.",
+      "deedsBody": "Bedrifternas bok följer varje steg. Din första inriktning ger Hantverkssvuren och ditt första mästerverk ger Mästerhantverkaren, båda bärbara som titlar. Alla tio möjliga hantverk markerar en milstolpebedrift vid 50 i skicklighet och kröner sina tak med en Stormästare-titel, medan Fiske får Gamla saltet vid 100 i färdighet och titeln Mästarfiskare vid 200.\n\nDet finns också tystare sidor: bedrifter för din första skörd och ditt första hantverk, för de sällsynta fynd turen ger i fält och för att börja bärga. Allt är kosmetiskt, bara titlar och Anseende. En bedrift ger aldrig kraft; den bevisar bara att du var där.",
       "startHeading": "Var börjar man",
       "startBody": "Nyss anländ till Östbäck? Leta upp Förman Odell och ta Ett yrke för varje hand: han pekar ut malmådrorna runt Kopparbrottet nordost om staden och ger dig dina första valkar. Akta dig för själva brottet: Djupbergsgrävarna som slagit läger på det står några nivåer över en färsk ankomst, så bearbeta de yttre ådrorna först och spara lägrets hjärta till dess att du levlat lite. Från och med då: skörda varje åder, varje timmerbestånd och varje örtfläck du passerar medan du gör uppdrag; skicklighet kommer naturligt för den som reser.\n\nTillbaka i staden trycker du T för att öppna hantverksfönstret och arbetar med de vanliga recepten som varje karaktär kan från start. Besök mästarna vid smedjan, köket, vävstolen och verktygsverkstaden för att se vad de lär ut, och ta deras arbetsordrar för stadiga mynt. När Gillets brev når dig vet du redan vilket par som känns som hemma.",
       "colStation": "Station",
@@ -7195,7 +7195,7 @@ export const sv_SE: EnTranslations = {
       "harvestBodyFamilies": "Insamling stannar inte vid fyndplatser. Många slagna bestar kan skördas en gång var, först till kvarn, för hudar, huggtänder, klor, betar, horn, gälar, silke, gift, tyg och kött, direkt från kroppen vid sidan av det vanliga bytet. Interagera-tangenten tar bara bytet; skörden är ett eget val, som du gör i avsnittet Skörda i bytesfönstret. När en best bär mer än en användbar komponent är valet ditt: ta allt den kan ge, eller koncentrera dig på färre komponenter och ta en mätbart finare kvalitet av det du tar.\n\nEtt sällsynt eller bättre skördeslag på en exemplarbärande familj ger också ett signerat perfekt exemplar (ett Orört skinn, Orörd siden, Orörd giftkörtel, Orörd klo eller Förstklassig styckdetalj) utöver det vanliga utbytet, och registrerar Ett perfekt exemplar i din Bedrifternas bok. Vilken karaktär som helst kan skörda, ingen träning krävs, och vilket insamlingsverktyg du äger räknas mot premiumarmen, oavsett vilket yrke det tillhör.",
       "focusBodyTiers": "Varje huvudort har en Stadsfokus-panel för besökande skördare: stå i staden, öppna den bredvid minikartan, och sprid en budget på 10 fokuspoäng över de komponenttyper du bryr dig om. Var femte poäng på en komponent höjer dess skördegrad ett steg (högst två steg), och varje poäng lägger till 10 procent till dess utbyte; ofokuserade komponenter blir aldrig sämre.\n\nDin fördelning följer din karaktär vart den än vandrar och kan riktas om vid vilket senare besök i staden som helst, i den takt du väljer. Att ta din tid är gratis: omriktningen tar 1 minut per poäng du flyttar. Att betala lite snabbar på det, 15 sekunder per poäng plus 5 koppar och 1 Klingdamm per poäng, och att betala fullt ut gör det omedelbart för 25 koppar och 5 Klingdamm per poäng. Bara de poäng du faktiskt flyttar räknas, så att knuffa en enda poäng är billigt, och en panel du öppnar och stänger oförändrad kostar ingenting på någon nivå.",
       "toolEffectsHeading": "Verktygseffekter",
-      "toolEffectsBody": "A gathering tool has a slot in it, and a crafted charm is what goes in. A Gatherer's Cache adds a unit to what a harvest yields; an Artisan's Eye raises the grade of what it pulls up; a Maker's Charm adds two units the same way. The first two are enchanting work: Tinker Gizzel, Master of the Toolworks in Eastbrook, teaches them to enchanters who have reached 25 skill in the craft. The Maker's Charm is engineering work instead, a dropped pattern crafted at 100 skill; all three are made at his toolworks.\n\nA freshly slotted charm carries 20 charges on a common tool and 10 more for every rarity rung above common, so the same charm slotted on an epic pick starts at 50. A charge is spent only when the charm actually changed the outcome, never on a harvest it did not improve, and a slot can be set to ask each use, so the charm waits until you say Use a Charge. Slotting a fresh charm re-mints the slot around the tool you are carrying at that moment, so it fills to what that tool can hold rather than back to some earlier high mark, and a re-slot that would change nothing at all is turned away instead of eating the charm.\n\nRunning out of charges does not destroy the charm: the tool's owner refills the slot, 10 charges for each arcane material spent, and which material it asks for follows the better of the tool you are carrying and the best tool that slot has ever been filled by, Chime Dust for a common or uncommon tool, Chime Essence for a rare one, and a Chime Shard for an epic. Leaving the good tool in the bank does not buy a cheaper refill, only a smaller one at the same price; the honest way down to a cheaper rung is to slot a fresh charm while carrying the lesser tool, which re-mints the slot there. If the slot's ceiling sits above what your current tool can fill, the refill stops where that tool stops and tells you to carry the better one. The refill costs half the materials when you are the crafter who signed the charm, and less again if you are specialized in the charm's own craft, Enchanting for a Cache or an Eye, Engineering for a Maker's Charm; anyone else pays the full rate. A refill is a short cast, like the rest of the craft family."
+      "toolEffectsBody": "Ett insamlingsverktyg har en plats, och där sätter du en tillverkad talisman. Samlarens gömma lägger till en enhet till det en skörd ger; Hantverkarens öga höjer graden på det som skördas; Skaparens talisman lägger till två enheter på samma sätt. De två första är arbeten inom Förtrollning: Fixare Gizzel, Verktygsverkets mästare i Östbäck, lär ut dem till förtrollare som har nått 25 i Förtrollning. Skaparens talisman är i stället ett arbete inom Ingenjörskonst. Mönstret fås som byte, och talismanen tillverkas vid 100 i skicklighet; alla tre tillverkas vid hans verktygsverkstad.\n\nEn nyinsatt talisman har 20 laddningar på ett vanligt verktyg och 10 fler för varje sällsynthetssteg över vanlig, så samma talisman börjar med 50 laddningar om den sätts i en episk hacka. En laddning förbrukas bara när talismanen faktiskt ändrar resultatet, aldrig för en skörd som den inte förbättrar. Platsen kan också ställas in på att fråga vid varje användning, så talismanen väntar tills du väljer Använd en laddning. När du sätter i en ny talisman formas platsen om efter det verktyg du bär just då. Den fylls därför till vad det verktyget kan rymma i stället för att återgå till ett tidigare högre maxvärde. Om ett nytt insättande inte skulle ändra någonting alls avvisas det utan att talismanen förbrukas.\n\nAtt laddningarna tar slut förstör inte talismanen. Verktygets ägare fyller på platsen med 10 laddningar för varje arkant material som förbrukas. Vilket material som krävs avgörs av den högre av två verktygsnivåer: verktyget du bär och det bästa verktyg som platsen någonsin har fyllts för. Det är Arkandamm för ett vanligt eller ovanligt verktyg, Arkanessens för ett sällsynt verktyg och en Arkanskärva för ett episkt. Att lämna det bättre verktyget i banken ger ingen billigare påfyllning, bara en mindre påfyllning till samma pris. Den ärliga vägen ned till ett billigare steg är att sätta i en ny talisman medan du bär det enklare verktyget; då formas platsen om på den nivån. Om platsens laddningstak är högre än vad ditt nuvarande verktyg medger, stannar påfyllningen vid verktygets gräns och talar om för dig att bära det bättre verktyget. Påfyllningen kostar hälften så mycket material när du är den hantverkare som signerade talismanen, och ännu mindre om du är specialiserad på talismanens eget hantverk: Förtrollning för Samlarens gömma eller Hantverkarens öga och Ingenjörskonst för Skaparens talisman. Alla andra betalar full kostnad. En påfyllning har en kort kasttid, precis som resten av hantverksfamiljen."
     },
     "profPages": {
       "back": "Tillbaka till yrken",
@@ -7210,21 +7210,21 @@ export const sv_SE: EnTranslations = {
       "matFmt": "{name} x{count}",
       "outputFmt": "{name} x{count}",
       "comboReq": "Kräver {a} och {b}",
-      "oncePerDay": "Once per day",
-      "effectFood": "Restores {amount} health over {seconds} sec when eaten.",
-      "effectWellFed": "Well Fed when you finish eating: +{value} {stat} for {minutes} min.",
-      "effectWellFedAura": "Grants {aura} for {minutes} min when you finish eating.",
-      "effectFeast": "Sets out a feast others eat from, one serving each: {servings} servings, lasting {minutes} min.",
-      "effectFeastServing": "Each serving restores {amount} health over {seconds} sec.",
-      "effectFeastWellFed": "Well Fed when a serving is finished: +{value} {stat} for {minutes} min.",
+      "oncePerDay": "En gång per dag",
+      "effectFood": "Återställer {amount} hälsa under {seconds} sek. när den äts.",
+      "effectWellFed": "Mätt när du har ätit färdigt: +{value} {stat} i {minutes} min.",
+      "effectWellFedAura": "Ger {aura} i {minutes} min. när du har ätit färdigt.",
+      "effectFeast": "Dukar upp en festmåltid som andra kan äta av, en portion var: {servings} portioner, varar i {minutes} min.",
+      "effectFeastServing": "Varje portion återställer {amount} hälsa under {seconds} sek.",
+      "effectFeastWellFed": "Mätt när en portion har ätits upp: +{value} {stat} i {minutes} min.",
       "sourceTrainerFee": "Tränare, {fee}",
       "sourceTrainerFree": "Tränare, gratis",
       "sourceKnown": "Känd från start",
-      "sourceDrop": "From a found pattern",
-      "sourceVendor": "Sold by the Heroic Quartermaster",
-      "sourceDropAndVendor": "From a found pattern, or the Heroic Quartermaster",
+      "sourceDrop": "Från ett upphittat mönster",
+      "sourceVendor": "Säljs av den heroiska kvartermästaren",
+      "sourceDropAndVendor": "Från ett upphittat mönster eller den heroiska kvartermästaren",
       "gainFmt": "{reduced} / {minimal} / {zero}",
-      "gainNever": "never",
+      "gainNever": "aldrig",
       "colRecipe": "Recept",
       "colSkill": "Skicklighet",
       "colSource": "Källa",
@@ -7245,23 +7245,23 @@ export const sv_SE: EnTranslations = {
         "armorcrafting": "Rustningssmide hamrar ringbrynja, den tyngsta rustning en hantverkare kan tillverka, från nitade koppargrunder till det sällsynta osmiumfjällsetet, med ett par kastetableringsstycken på sidan. Kunderna är de som står där slagen landar.",
         "tailoring": "Skrädderi väver den Intelligens- och Andeduk trollkarlarna lever i, från hemspunnet bastyg genom gildenvävnadssetet till sällsynt solvävarbete, och syr Silkessömmarens säck, en tioplatspåse som ingen någonsin tackar nej till.",
         "leatherworking": "Läderhantverkeri garvar Rörlighets- och Uthållighetsutrustning för de klasser som undviker slag i stället för att blockera dem, från Fenbros hudbaser till det sällsynta myrväktarsetet, och det är det enda djupa hantverket som lärs ut ute i träsket.",
-        "cooking": "Cooking turns the day's catch and the season's harvest into sit-down meals that heal over 18 seconds of rest, the cheapest healing in the game, from Salted Jerky through Marlow's Grand Roast to the three apex role dishes, which heal more than any other food and leave a Well Fed buff on whoever finishes the plate. Everyone eats, so no craft is more universally welcome in a group.",
-        "alchemy": "Alchemy turns herbs, glands, and glass into bottles that win fights: healing and mana draughts for the moment things go wrong, stamina elixirs that sit on your buff bar through a whole dungeon, and at the top the flasks, one per role, that stay with you through your own death.",
-        "engineering": "Engineering builds the tools every serious gatherer ends up wanting: the tier 4 and tier 5 picks, axes and sickles, and the three fishing rods that climb from tier 4 to tier 6, none of which any counter will ever sell for coin, each one consuming the tool below it.",
-        "enchanting": "Enchanting takes gear apart and puts the power back in: break unwanted pieces into arcane materials, then spend them on a permanent stat bonus for a piece you mean to keep. Breaking and enchanting need no station and no trainer, and anyone can start on day one; only its three trainer recipes ask more, the two charms and the Lucent Reagent, taught and worked at the toolworks.",
-        "jewelcrafting": "Jewelcrafting is the finer bench of the Eastbrook forge: rings and necklaces in copper, iron, and rare osmium, with a Strength ring, an Intellect ring, and an Agility necklace on every rung. Jewelry has no armor and no class lock, so its customers are simply everyone with fingers and a neck.",
-        "inscription": "Inscription is the writing desk of the Highwatch apothecary: caster tomes for the offhand and stamina scrolls for everyone, milled from the same herbs the draughts beside them use. Its scrolls are the second door into the battle-elixir buffs, so even a fighter who never holds a book has reason to knock."
+        "cooking": "Matlagning förvandlar dagens fångst och säsongens skörd till sittande måltider som läker under 18 sekunders vila, den billigaste läkningen i spelet, från Saltat torkat kött via Marlows Storläckra stek till de tre toppmåltiderna för roller. De läker mer än någon annan mat och lämnar en Mätt-förstärkning på den som avslutar tallriken. Alla äter, så inget hantverk är mer allmänt välkommet i en grupp.",
+        "alchemy": "Alkemi förvandlar örter, körtlar och glas till flaskor som vinner strider: läkande drycker och manadrycker när något går fel, uthållighetselixir som ligger kvar på din förstärkningsrad genom en hel fängelsehåla och, på toppen, flaskor – en för varje roll – som stannar kvar genom din egen död.",
+        "engineering": "Ingenjörskonst bygger verktygen som varje seriös insamlare till slut vill ha: hackor, yxor och skäror på nivå 4 och 5 samt de tre fiskespön som går från nivå 4 till 6. Ingen disk säljer någonsin något av dem för mynt, och vart och ett förbrukar verktyget under sig.",
+        "enchanting": "Förtrollning tar isär utrustning och lägger tillbaka kraften: bryt ner oönskade delar till arkana material och använd dem sedan till en permanent egenskapsbonus på en del du vill behålla. Nedbrytning och förtrollning behöver varken station eller tränare, och vem som helst kan börja första dagen; bara dess tre tränarrecept kräver mer, de två berlockerna och det lysande reagenset, som lärs ut och tillverkas vid verktygsverkstaden.",
+        "jewelcrafting": "Juveleringskonst är den finare bänken vid smedjan i Östbäck: ringar och halsband i koppar, järn och sällsynt osmium, med en Styrkaring, en Intelligensring och ett Smidighetshalsband på varje steg. Smycken har varken rustning eller klasslås, så kunderna är helt enkelt alla med fingrar och en hals.",
+        "inscription": "Inskription är skrivbordet på apoteket i Högvakt: kastartomer för andra handen och uthållighetsrullar för alla, malda av samma örter som dryckerna bredvid använder. Rullarna är den andra vägen till förstärkningarna från stridselixir, så även en kämpe som aldrig håller en bok har skäl att knacka på."
       },
       "craftProse": {
         "weaponcrafting": {
           "identityHeading": "Eggen varje stridande handlar",
-          "identityBody": "Someone in every group wants this craft's work, because the rare rung alone covers all three appetites: the Osmium Warblade for Strength melee, the Glyphsteel War Axe for Agility fighters, and the Highpine Battle Staff, an Intellect and Spirit stave for the robe crowd.\n\nOn the craft ring it stands between Armorcrafting and Jewelcrafting. Its living identity is the Smith, the Weaponcrafting and Armorcrafting pair, sworn before Forgemistress Darva at the forge by working three ore veins with your own hands; the Bladewright pair with Jewelcrafting is named on the ring too, and though Jewelcrafting now works its own 0-to-50 jewelry ladder at this same forge, the pair still waits for its oath quest before it can be sworn.",
+          "identityBody": "I varje grupp finns någon som vill ha det här hantverkets arbete, eftersom redan den sällsynta nivån tillgodoser alla tre behoven: Osmiumkrigsklinga för närstridskämpar med Styrka, Glyfstålskrigsyxa för kämpar med Smidighet och Högtallsstridsstav, en stav med Intelligens och Ande för tygbärare.\n\nPå hantverksringen ligger Vapensmide mellan Rustningssmide och Juveleringskonst. Dess aktiva identitet är Smeden, paret av Vapensmide och Rustningssmide som svärs in inför Smedmästarinnan Darva vid smedjan genom att du bearbetar tre malmådror med egna händer; Klingasmedsparet med Juveleringskonst finns också namngivet på ringen, och även om Juveleringskonst nu har sin egen smyckesstege från 0 till 50 vid samma smedja väntar paret fortfarande på sitt edsuppdrag innan det kan sväras in.",
           "materialsHeading": "Vad smedjan dricks av",
           "materialsBody": "Gruvdrift är ryggraden. Kopparmalm kommer från nivå 1-ådrorna i Östbäcksdalen, järnmalm från Dykärrsträsket och osmiummalm från Törntoppshöjderna, och varje steg i stegen trappar upp på samma sätt. Skogsavverkning betyder mer än du kanske tror: järnbark skaftar vildsvinsspjutet, askved axlar stridshammaren, och en enda högtallsstock formar stridsstaven.\n\nResten kommer från jakten och disken. Grovt skinn till greppen skördas rakt av varg- och vildsvinskroppar, benfragment kommer från de rastlösa döda eller ur bärgad vanlig utrustning, och smedjans stege bränner Smidesfluss, 20 koppar burken från Darva själv. Om din egen gruvdrift släpar efter räddar ingen disk dig på själva malmen: osmium kommer från Törntoppens ådror, från startådrorna i varje yngre zon utom Fjärrkusten (vars ådror gräver järn), eller ur en annan spelares stapel, genom handel eller Världsmarknaden. Bara Glyfstålstackan köps för mynt, från Fixare Gizzel vid verktygsverkstaden eller Kvartersmästare Bree i Högvakt.",
           "ladderHeading": "Stegen, steg för steg",
           "ladderBody": "Ett fältrecept, Östbäcks armérsvärd, är känt för alla från start och tillverkas var som helst från jaktbyten (ett par varghuggare och benfragment) plus sex Smidesfluss från smedjadisken. Den riktiga stegen är nio tränarrecept i tre steg, alla smedjebundna: kopparsteget (skäggig yxa, flänsad klubba, vildsvinsspjut) är gratis att lära vid skicklighet 0, järnsteget (långsvärd, stridshammare, dolk) öppnar vid skicklighet 25 för 25 silver per recept och osmiumsteget (krigsklinga, krigsyxa, stridsklubba) öppnar vid skicklighet 50 för 1 guld var. Darva lär ut ett recept i det ögonblick din nivå i hantverket når det egna, så varje steg låses upp exakt när dess skicklighetsband börjar.\n\nYtterligare ett recept rider på paret: Gravmaskvantskar, ett tränarlärt kombinationsstycke som bara en anpassad Smed med både Vapensmide och Rustningssmide på skicklighet 25 kan tillverka, och det kräver ingen station alls.",
           "routeHeading": "Mästerverk, och en fungerande väg till 125",
-          "routeBody": "Any piece with a real stat line, which on this ladder means the iron rung and up, can come off the anvil as a masterwork so long as the finer quality fits inside your tier ceiling; the statless copper commons never proc, because there is nothing in them to improve. Iron and osmium count as tier 1 materials for the masterwork bonus, highpine and glyphsteel as tier 2, and skill sitting above a recipe's own tier adds its own point per tier, so among the osmium three it is the war axe and the battle staff that carry the material edge, and a rung keeps proccing better after you have outgrown it.\n\nRide the copper rung to 25, train the iron rung the day it opens and ride it to 50, then the osmium rung to 75. Above the osmium three sits an apex rung Darva does not teach: its patterns are found, not bought. For a smith whose majors include Weaponcrafting, which today means the sworn Smith, an apex craft pays full gain right to the 125 cap; below a major's ceiling it teaches nothing at all, so an undeclared or hobby smith works one for the weapon, not the points. Either way the osmium recipes carry the climb, fading to half and then quarter gain: budget roughly 150 more crafts to reach the 125 cap, and each craft takes real cast time, so a long batch is paced by duration rather than a quota.\n\nFund the climb as you go: Darva's forge work order takes eight copper ore off your hands every 30 minutes for a little coin and XP, and the iron and osmium rungs sell honestly to leveling melee. The Book of Deeds marks Edge and Temper at skill 50 and crowns Grandmaster Weaponcrafting at 125."
+          "routeBody": "Varje föremål med en riktig egenskapsrad, vilket på den här stegen innebär järnnivån och uppåt, kan lämna städet som ett mästerverk så länge den högre kvalitetsgraden ryms inom ditt nivåtak; de vanliga kopparföremålen utan egenskaper utlöser aldrig en mästerverkproc, eftersom det inte finns något hos dem att förbättra. Järn och osmium räknas som material på nivå 1 för mästerverksbonusen, högtall och glyfstål som nivå 2. Färdighet över receptets egen nivå lägger dessutom till en egen poäng per nivå, så bland de tre osmiumföremålen är det krigsyxan och stridsstaven som har materialfördelen, och chansen för en mästerverkproc på en nivå fortsätter att förbättras efter att du har vuxit ifrån den.\n\nTillverka på kopparnivån till 25, lär dig järnnivån samma dag den öppnas och använd den till 50, och fortsätt sedan med osmiumnivån till 75. Ovanför de tre osmiumrecepten finns en toppnivå som Darva inte lär ut: dess mönster hittas, de köps inte. För en smed vars huvudyrken omfattar Vapensmide, vilket i dag innebär en edsvuren Smed, ger en tillverkning på toppnivån full färdighetsökning ända till taket på 125; med ett lägre tak än huvudyrkets ger den inga poäng alls, så en smed utan inriktning eller en hobbysmed tillverkar den för vapnet, inte för poängen. Oavsett vilket bär osmiumrecepten klättringen medan färdighetsökningen sjunker till hälften och sedan en fjärdedel: räkna med ungefär 150 ytterligare tillverkningar för att nå taket på 125. Varje tillverkning tar verklig kanaliseringstid, så en lång omgång styrs av tidsåtgången snarare än av en kvot.\n\nFinansiera klättringen under tiden: Darvas arbetsorder vid smedjan tar åtta kopparmalm av dig var 30:e minut i utbyte mot lite mynt och XP, och föremålen på järn- och osmiumnivåerna går bra att sälja till närstridskämpar som levlar. Bedrifternas bok markerar Egg och härdning vid 50 i färdighet och kröner Stormästare i Vapensmide vid 125."
         },
         "armorcrafting": {
           "identityHeading": "Ringbrynja för frontlinjen",
@@ -7275,7 +7275,7 @@ export const sv_SE: EnTranslations = {
         },
         "tailoring": {
           "identityHeading": "Tyg för trollkarlarna, väskor för alla",
-          "identityBody": "The ladder climbs from homespun basics through the gildenweave set to the rare rung: the Silkbinder's Raiment and the sunweave pieces. Its second trade is universal: the Silkspun Satchel is a ten-slot bag, and there is no class, spec, or level that does not want more bag space.\n\nOn the ring Tailoring sits between Leatherworking and Inscription. Its living pair is the Outfitter, Leatherworking and Tailoring together, sworn before Weaver Ottilie at the Eastbrook loom after culling four webwood spiders for their silk; the Inkweaver pair with Inscription is named on the ring, and with Inscription's base catalog now inked it waits only on an oath quest of its own.",
+          "identityBody": "Stegen går från enkla hemspunna plagg via gildenvävssetet till den sällsynta nivån: Silkbinders klädsel och de solvävda delarna. Dess andra produkt har en universell marknad: Silkespunna väska är en väska med tio platser, och det finns ingen klass, specialisering eller nivå som inte vill ha mer väskutrymme.\n\nPå hantverksringen ligger Skrädderi mellan Läderhantverkeri och Inskription. Dess aktiva par är Utrustaren, som förenar Läderhantverkeri och Skrädderi och svärs in inför Väver Ottilie vid vävstolen i Östbäck efter att du har gallrat fyra Sableweb-lurkare för deras silke; Bläckvävarparet med Inskription finns också namngivet på ringen, och nu när Inskriptions baskatalog har fyllts med bläck väntar det bara på ett eget edsuppdrag.",
           "materialsHeading": "Tråd, silke och ja, örter",
           "materialsBody": "Vävstolen drivs av vad jakten ger och vad fälten odlar. Lintrsor och hemspunnet tyg faller från humanoider, spindelsilke skördas från spindelkroppar och den sällsynta rungens mittpunkt, Silkesvalkets Dräkt, vill ha ett Fint silke, det signerade exemplaret som en lyckad kroppsskörd kan ge.\n\nÖrtkunskap matar skrädderiet mer än något annat rustningshantverk: skimmerblad kanter tofflorna, guldblad färgar gildenvävnadssetet och solkronblad syr hela den sällsynta rungan, så en skräddare som plockar sina egna örter sparar stadigt. En Trådrull kostar 12 koppar hos Ottilie och vävstolen kräver inget metall alls: till och med Varpmässkekhuvan toppstycke är vävt av premiumörter, Fint silke, spindelsilke och tråd.",
           "ladderHeading": "Att lära sig vid Ottilies vävstol",
@@ -7296,79 +7296,79 @@ export const sv_SE: EnTranslations = {
         "cooking": {
           "identityHeading": "Grytan som mättar sällskapet",
           "identityBody": "Eat a cooked meal and it heals you over 18 seconds of rest, which between pulls is the cheapest healing in the game. The ladder runs from a 90-health Pan-Seared River Perch up through Marlow's Grand Roast at 980, and above even the roast sit the three apex role dishes at 1,392, the largest sit-heal in the game and the strongest Well Fed buff a finished plate can leave behind (the farm kitchen's buff dishes fill the rungs below it).\n\nOn the ring Cooking sits between Alchemy and Leatherworking. Its living pair is the Apothecary, Alchemy and Cooking, sworn before Cook Marlow at the Eastbrook kitchens after hunting four wild boars for the pot; the Trapper pair with Leatherworking is named on the ring but has no oath quest yet.",
-          "identityBodyOneMeal": "Eat a cooked meal and it heals you over 18 seconds of rest, which between pulls is the cheapest healing in the game. The ladder runs from a 90-health Pan-Seared River Perch up through Marlow's Grand Roast at 980, and above even the roast sit the three apex role dishes at 1,392, the largest sit-heal in the game and the strongest Well Fed buff a finished plate can leave behind (the farm kitchen's buff dishes fill the rungs below it; the Farming page tells that side of the story). Only one Well Fed effect at a time: a newer meal replaces it.\n\nOn the ring Cooking sits between Alchemy and Leatherworking. Its living pair is the Apothecary, Alchemy and Cooking, sworn before Cook Marlow at the Eastbrook kitchens after hunting four wild boars for the pot; the Trapper pair with Leatherworking is named on the ring but has no oath quest yet.",
+          "identityBodyOneMeal": "Ät en lagad måltid så läker den dig under 18 sekunders vila, vilket mellan strider är den billigaste läkningen i spelet. Stegen går från en stekt flodabborre med 90 hälsa upp till Marlows Storläckra stek på 980, och ovanför till och med steken finns de tre toppmåltiderna för roller på 1,392, spelets största viloläkning och den starkaste Mätt-förstärkning som en färdig tallrik kan ge (gårdskökets förstärkningsrätter fyller stegen under dem; sidan om Jordbruk berättar den delen). Endast en Mätt-effekt kan vara aktiv åt gången: en nyare måltid ersätter den.\n\nPå ringen ligger Matlagning mellan Alkemi och Läderhantverkeri. Dess levande par är Apotekaren, Alkemi och Matlagning, som svärs inför Kock Marlow vid köken i Östbäck efter att du jagat fyra vildsvin till grytan; Jägarparet med Läderhantverkeri är namngivet på ringen men har ännu inget edsuppdrag.",
           "materialsHeading": "Ett skafferi fött av spö och kniv",
           "materialsBody": "Fisket fyller skafferiet med signaturingredienserna, zon för zon: spegelforell och flodabborre ur Östbäcksdalens vatten, träskgädda och kärrål från Dykärrsträsket, frostgälsforell och skifferfenskarp från Törntoppshöjderna. Stegen blandar zonerna fritt (det gratis steget vill redan ha träskgädda, mellansteget Törntoppens frostgäl, och den sällsynta supén viker in Dalens spegelforell igen), så en kock som fiskar överallt där vägen bär sinar aldrig.\n\nSlaktarsidan kommer från skördade kroppar: viltkött från vildsvin och deras släkt, och, vid en skörderullning på sällsynt eller bättre, en signerad Förstklassig styckdetalj, mittpunkten i den storläckra steken. Örter kryddar de bättre rätterna, en askvedstock röker ålen, och Matlagningssalt går på 8 koppar påsen från Marlows eget stånd.",
           "ladderHeading": "Från rimkött till den storläckra steken",
           "ladderBody": "Saltat rimkött är fältreceptet: känt från start, ett spindelben, tillverkbart var som helst, stigensmaten för varje ny äventyrare. Tränarstegen lagar mat vid Östbäcks kök på östra sidan av torget: det gratis steget vid skicklighet 0 (abborre, Jägarspett, Örtkryddad träskgädda), mellansteget vid skicklighet 25 för 25 silver per recept (Askträrökt ål, Guldbladsviltgryta, Frostgälschowder) och det sällsynta steget vid skicklighet 50 för 1 guld var (Silverkarpmiddag, Fiskarens festfat, Marlows Storläckra stek).\n\nBatchrätterna stretchar ingredienserna: den rökta ålen och viltsoppan ger två portioner per hantverk och festfatet ger tre. Marlow lär ut varje steg i det ögonblick din nivå i Matlagning når det.",
           "routeHeading": "Specialisering, inte mästerverk, och vägen till 125",
-          "routeBody": "Cooking is the honest exception to the masterwork story: a meal has no stat line to improve, so dishes never proc one, and no cook should chase it. The craft's mastery is specialization at 75: a fifth less of every ingredient, which compounds fast on batch dishes, and a mobile field kitchen so dinner gets cooked at the dungeon door.\n\nCook what you catch: pair the climb with a fishing session and the two skills feed each other all the way up. Jerky and the free rung carry you to 25 at a point per craft, the mid rung to 50, and the rare rung to 75. Above the rare rung sits the apex kitchen, the three role dishes and The Laden Hearth: no trainer teaches them, they come off found patterns. For a cook whose majors include Cooking, which today means the sworn Apothecary, an apex craft pays full gain right to the 125 cap; below a major's ceiling it teaches nothing at all, so an undeclared or hobby cook works one for the plate, not the points. Either way the rare dishes carry the last stretch, fading to half and then quarter gain, roughly 150 more crafts. Treat it as stocking, not grinding: a guild eats every serving.\n\nMarlow's kitchens work order buys eight game meat every 30 minutes for coin and XP, and the Book of Deeds marks Seasoned Chef at skill 50 on the way to the Grandmaster Cooking title at 125."
+          "routeBody": "Matlagning är det ärliga undantaget från mästerverksberättelsen: en måltid har ingen egenskapsrad att förbättra, så rätter proccar aldrig och ingen kock bör jaga det. Hantverkets mästerskap är specialisering vid 75: en femtedel färre av varje ingrediens, vilket växer snabbt på batchrätter, och ett mobilt fältkök så att middag kan lagas vid fängelsehåledörren.\n\nLaga det du fångar: para klättringen med ett fiskepass så matar de två färdigheterna varandra hela vägen upp. Rimkött och gratissteget bär dig till 25 med en poäng per tillverkning, mellansteget till 50 och det sällsynta steget till 75. Ovanför det sällsynta steget ligger toppköket, de tre rollrätterna och Den lastade härden: ingen tränare lär ut dem, de kommer från hittade mönster. För en kock vars huvudyrken innehåller Matlagning, vilket i dag betyder den svurna Apotekaren, ger ett topphantverk full vinst hela vägen till 125; under huvudyrkets tak lär det ingenting, så en odeklarerad kock eller hobbykock arbetar för tallriken, inte poängen. De sällsynta rätterna bär sista sträckan med halv och sedan fjärdedelad vinst, ungefär 150 tillverkningar. Se det som lagerhållning, inte grind: ett gille äter varje portion.\n\nMarlows köksarbetsorder köper åtta viltkött var 30:e minut för mynt och XP, och Bedrifternas bok markerar Kryddad kock vid 50 på vägen till Stormästare i Matlagning vid 125."
         },
         "alchemy": {
           "identityHeading": "Flaskor som avgör strider",
-          "identityBody": "The craft is worked at the apothecary in Highwatch, home of Alchemist Verane, Master of the Apothecary, who teaches the recipe ladder, sells Glass Vials at 12 copper, and pays coin for herbs through her work order.\n\nOn the craft ring, Alchemy sits with the trial-and-error trades, next to Engineering on one side and Cooking on the other. That gives it two pair identities: the Bombardier (Engineering and Alchemy, taken up before Tinker Gizzel in Eastbrook) and the Apothecary (Alchemy and Cooking, sworn before Cook Marlow). Attune to either pair to make Alchemy a major and let your own signed work teach you back; the Bombardier pair also opens its combination brew, the Elixir of the Bear, while the Apothecary pair ships no combination recipe yet. The 0-to-50 ladder itself never waits, though: every one of those rungs sits inside the rare tier that undeclared crafts work under, so the climb to the cap is open before any oath. Two things sit above that ceiling and pay their skill to a major alone: the Quickening Catalyst, the 75-rung intermediate Verane also teaches, and the found-pattern rungs above the ladder; an undeclared or hobby alchemist brews them for the goods, not the points.",
+          "identityBody": "Hantverket utövas vid apoteket i Högvakt, hem för Alkemisten Verane, Apotekets mästare, som lär ut receptstegen, säljer glasflaskor för 12 koppar och betalar mynt för örter genom sin arbetsorder.\n\nPå hantverksringen ligger Alkemi bland försöks-och-misstagsyrkena, med Ingenjörskonst på ena sidan och Matlagning på den andra. Det ger två paridentiteter: Bombbäraren (Ingenjörskonst och Alkemi, som tas upp inför Fixare Gizzel i Östbäck) och Apotekaren (Alkemi och Matlagning, som svärs inför Kock Marlow). Inrikta dig mot något av paren för att göra Alkemi till ett huvudyrke och låta ditt eget signerade arbete lära dig tillbaka; Bombbärarparet öppnar också sin kombinationsbrygd, Björnens elixir, medan Apotekarparet ännu saknar kombinationsrecept. Stegen från 0 till 50 väntar dock aldrig: varje steg ligger inom den sällsynta nivå som odeklarerade hantverk arbetar under, så klättringen till taket är öppen före varje ed. Två saker ligger över det taket och ger skicklighet bara till ett huvudyrke: Snabbhetskatalysatorn, mellanprodukten på steg 75 som Verane också lär ut, och stegen ovanför från hittade mönster; en odeklarerad alkemist eller hobbyalkemist brygger dem för varornas skull, inte för poängen.",
           "materialsHeading": "Örter, körtlar och glas",
           "materialsBody": "Varje dryck kräver en Glasflaska plus örter matchade till sitt steg: skimmerblad växer i Östbäcksdalen, guldblad i Mirefensumparna och solkronblad i Törntoppshöjderna, en ört per zon, så dina flaskor klättrar med världen vid din sida. Örtkunskap är den naturliga partnerfärdigheten, men att köpa från insamlare eller på marknaden fungerar lika bra; djupare zoner innehåller högre nivåfläckar som kräver en bättre skära, så håll verktyget aktuellt om du plockar själv.\n\nElixirlinjen lägger till en jägaringrediens: Giftkörtlar skördade från giftiga kroppar, och topperxiret kräver en Ren giftkortel, det signerade sällsynta exemplaret som en lyckad kroppsskörd kan ge. Har du inte egna skördar är det precis de varor det är värt att be en jägarvän ta med sig tillbaka.",
           "ladderHeading": "Receptstegen",
-          "ladderBody": "Everyone knows the Minor Healing Potion from the start and can mix it anywhere, no station needed. The real ladder is taught by Verane at the apothecary, rung by rung: the skill 0 recipes are free, the skill 25 rung costs 25 silver per recipe, and the skill 50 rung costs 1 gold per recipe. Each rung carries a healing draught, a mana draught, and a stamina elixir, stepping from common sheenleaf bottles (120 health, 160 mana) through uncommon goldleaf (200 health, 260 mana) to rare sunpetal (335 health, 425 mana); since the trophy economy the skill 25 rung also teaches a Lesser Healing Potion brewed from tallow, a cheaper bottle a hair weaker than the goldleaf draught.\n\nThe elixirs climb the same way: the Elixir of the Boar grants 6 Stamina for 10 minutes, the Vipersear Elixir 9 for 15 minutes, and the Elixir of the Serpent 12 for 15 minutes, the Serpent alone brewing two bottles per craft. One more recipe sits off to the side: the Elixir of the Bear, a combination brew Verane teaches for 25 silver once your Alchemy reaches 25, mixable anywhere, but only by an attuned Bombardier with both Alchemy and Engineering at 25.\n\nAbove the whole elixir line sits the flask rung, which no trainer teaches and which comes off found patterns instead. A flask grants 13 for 20 minutes, and it opens two axes the elixirs never had: Attack Power and Intellect beside the familiar Stamina, one flask per role. It also keeps its own rules. Only one flask rides at a time whatever its stat, a weaker elixir or scroll of that stat cannot replace it, no dispel, steal, or hand cancel takes it off, and it stays with you through your own death, though it ends when you log out.",
+          "ladderBody": "Alla känner Liten läkedryck från start och kan blanda den var som helst, utan station. Den riktiga stegen lärs ut av Verane vid apoteket: recepten vid skicklighet 0 är gratis, steget vid 25 kostar 25 silver per recept och steget vid 50 kostar 1 guld per recept. Varje steg har en läkedryck, en manadryck och ett uthållighetselixir: vanliga glansbladsflaskor (120 hälsa, 160 mana), ovanliga guldbladsflaskor (200 hälsa, 260 mana) och sällsynta solbladsflaskor (335 hälsa, 425 mana). Sedan troféekonomin lär steget vid 25 också ut Mindre läkedryck av talg, en billigare flaska strax svagare än guldbladsdrycken.\n\nElixiren klättrar på samma sätt: Vildsvinets elixir ger 6 Uthållighet i 10 minuter, Vipersears elixir 9 i 15 minuter och Ormens elixir 12 i 15 minuter; bara Ormen brygger två flaskor per tillverkning. Ett recept står vid sidan: Björnens elixir, en kombinationsbrygd som Verane lär ut för 25 silver när din Alkemi når 25, blandbar var som helst men bara av en inriktad Bombbärare med både Alkemi och Ingenjörskonst på 25.\n\nOvanför hela elixirlinjen ligger flasksteget, som ingen tränare lär ut utan som kommer från hittade mönster. En flaska ger 13 i 20 minuter och öppnar två axlar som elixiren saknar: Attackkraft och Intelligens vid sidan av Uthållighet, en flaska per roll. Bara en flaska kan vara aktiv åt gången oavsett egenskap; ett svagare elixir eller en skrift med samma egenskap kan inte ersätta den, och den kan varken skingras, stjälas eller avbrytas för hand. Den stannar genom din död men upphör när du loggar ut.",
           "routeHeading": "En bryggares väg till 125",
-          "routeBody": "Draughts and elixirs never roll masterworks; that proc belongs to stat-bearing gear. Your name still travels, though: the rare sunpetal draughts arrive signed with a maker's mark, and so does every bottle of the double-batch Elixir of the Serpent, so nothing rare in this craft leaves the bench unsigned. At skill 75 you specialize, and every Alchemy recipe costs 20 percent fewer materials from then on.\n\nTake Herbalism early and pick as you level: sheenleaf is everywhere in the Vale, and once you reach Verane's bench the free rung will carry you cleanly to skill 25 on herbs you would have picked anyway. Learn the 25 rung the moment it turns on, move your picking to the marsh for goldleaf, and let Verane's work order (six Goldleaf Herbs for 45 copper, repeatable every 30 minutes) hand a little coin back as you go.\n\nFrom 50 on, brew sunpetal draughts and Serpent batches out of Thornpeak sunpetal, with a little Vale and marsh greenery still in the mix. Above the Serpent sits the apex bench, the three flasks and, at the very top, the Grand Cauldron, the skill-125 capstone: no trainer teaches them, they come off found patterns, and they pay their skill to a sworn major alone (below a major's ceiling they teach nothing at all). The last stretch from 100 to 125 is a deliberate trickle, so brew what actually sells rather than burning herbs for the number, and remember that consumables are the one crafted good everyone re-buys forever. The Book of Deeds marks Strange Brews at skill 50 and Grandmaster Alchemy at the cap."
+          "routeBody": "Drycker och elixir rullar aldrig mästerverk; den procen tillhör utrustning med egenskaper. Ditt namn följer ändå med: de sällsynta solbladsdryckerna kommer signerade med tillverkarens märke, liksom varje flaska i dubbelsatsen Ormens elixir, så inget sällsynt från hantverket lämnar bänken osignerat. Vid skicklighet 75 specialiserar du dig och varje alkemirecept kostar därefter 20 procent färre material.\n\nTa Örtkunskap tidigt och plocka medan du nivåhöjer: glansblad finns överallt i Dalen, och när du når Veranes bänk bär gratissteget dig till skicklighet 25 på örter du ändå skulle ha plockat. Lär dig 25-steget när det öppnar, flytta plockandet till kärret för guldblad och låt Veranes arbetsorder – sex Guldbladsörter för 45 koppar, upprepningsbar var 30:e minut – ge lite mynt tillbaka.\n\nFrån 50 brygger du solbladsdrycker och Ormsatser av solblad från Törntoppen, med lite grönska från Dalen och kärret kvar i blandningen. Ovanför Ormen ligger toppbänken, de tre flaskorna och längst upp Stora kitteln, höjdpunkten vid skicklighet 125: ingen tränare lär ut dem, de kommer från hittade mönster och ger skicklighet bara till ett svuret huvudyrke. Under ett huvudyrkes tak lär de ingenting. Den sista sträckan från 100 till 125 är avsiktligt långsam, så brygg det som säljer i stället för att bränna örter för siffrans skull. Bedrifternas bok markerar Sällsamma brygder vid 50 och Stormästare i Alkemi vid taket."
         },
         "engineering": {
           "identityHeading": "Verktygsmakarens monopol",
-          "identityBody": "The craft is worked at the toolworks in the southwest corner of Eastbrook Square, home of Tinker Gizzel, Master of the Toolworks. Tiers 1 through 3 of every tool line are ordinary vendor stock; every rung above that comes off an engineer's bench, or out of the Drowned Litany's delve counter for Delve Marks behind its clears gates, and never out of any till for coin. The land lines stop at tier 5; the rod line climbs one further, to the tier 6 Clockreel.\n\nOn the ring it sits with the trial-and-error trades, next to Alchemy and Armorcrafting, giving it two pair identities: the Bombardier (Engineering and Alchemy, taken up before Gizzel himself) and the Gearwright (Armorcrafting and Engineering, named but not yet swearable). One warning still matters here: every rung of the tool ladder itself sits above the rare-tier ceiling that hobbies and undeclared crafters work under, so ladder work only moves the skill for a crafter whose majors include Engineering, which today means the Bombardier. The bench is no longer closed to everyone else, though: Gizzel now starts anyone at skill 0 with the Cogwheel Blank and the Bronze Hoe, both free of any fee, and teaches the Copperlens Ocular at 25 for the ordinary tier fee, so an unattuned or hobby engineer can raise the skill through its early rungs; a craft left dormant behind another identity still gains only from the two skill-0 lessons. Anyone can still build the land tools; an unattuned crafter just learns nothing from doing those, and two of the three rod recipes ask for Gizzel's teaching besides, the tier 6 rung coming off a schematic instead.",
+          "identityBody": "Hantverket utövas vid Verktygsverkstaden i sydvästra hörnet av Östbäcks torg, där Fixare Gizzel, Verktygsverkstadens mästare, håller till. Nivå 1 till 3 i varje verktygsserie ingår i handlarnas vanliga sortiment; varje steg däröver kommer från en ingenjörs arbetsbänk eller från delvedisken i Den dränkta litanian mot Delve-märken efter att dess krav på avklarningar uppfyllts, aldrig från en handlarkassa mot mynt. Landverktygens serier slutar på nivå 5; spöserien går ett steg längre, till Urverksspö på nivå 6.\n\nPå yrkesringen hör Ingenjörskonst till yrkena som bygger på försök och misstag, intill Alkemi och Rustningssmide, vilket ger två paridentiteter: Bombbäraren (Ingenjörskonst och Alkemi, som väljs inför Gizzel själv) och Kugghjulsbyggaren (Rustningssmide och Ingenjörskonst, namngiven men ännu inte möjlig att svära sig till). En varning är fortfarande viktig här: varje steg i själva verktygsstegen ligger över det sällsynta tak som hobbyhantverkare och odeklarerade hantverkare arbetar under, så arbete på stegen höjer bara färdigheten för en hantverkare vars huvudyrken omfattar Ingenjörskonst, vilket i dag betyder Bombbäraren. Arbetsbänken är dock inte längre stängd för alla andra: Gizzel börjar nu med vem som helst på färdighet 0 genom att lära ut Kugghjulsämne och Bronshacka, båda utan avgift, och lär ut Kopparlinsokular vid 25 för den ordinarie nivåavgiften. Därmed kan en oinriktad ingenjör eller hobbyingenjör höja färdigheten genom de tidiga stegen; ett yrke som lämnas vilande bakom en annan identitet får dock bara färdighet av de två lektionerna på 0. Vem som helst kan fortfarande tillverka landverktygen, men en oinriktad hantverkare lär sig ingenting av det. Två av de tre spörecepten kräver dessutom undervisning av Gizzel, medan steget på nivå 6 kommer från en ritning.",
           "materialsHeading": "Reagenser och tidigare verktyg",
           "materialsBody": "Varje landverktygsrecept förbrukar verktyget en nivå under sig plus ett FINT material, och den parningen är hela landstegen: fyra Fin järnmalm och en Himmelsilverhacka blir Osmiumhackan, och därefter blir två Glyfstålstackor, två Fin osmiummalm och den osmiumhackan en Glyfstålshacka. Yx- och skärlinjerna speglar samma form av fint material plus föregående verktyg med Fin askvedstock och Fin högtallsstock, Fin guldbladsört och Fin solkronbladsört, även om deras nivå 5-steg inte begär några Glyfstålstackor: hackan är den enda linjen som blir dyrare i toppen. De två spörecepten bryter mönstret med flit: Stormrullespö tar fyra Solglintens koi och ett Silverbäcksspö, Tidvattensmitt spö två koi, åtta Rå skifferfenskarp och just det Stormrullespöet, så toppen av metarens stege betalas ute på vattnet snarare än vid en åder.\n\nEtt fint material säljs ingenstans och faller inte ur en vanlig skörd: du får det genom att arbeta en av zonens fullgradiga ådror med ett verktyg som rankas över materialet självt, vilket i praktiken betyder verktyget ett steg under det du försöker bygga (de lättare ådror en zon håller åt resenärer ger det enkla materialet vad du än svingar). Det är avsiktligt. På hantverksvägen kommer ett nivå 5-verktyg av att man faktiskt svingar nivå 4-verktyget, inte av en shoppingtur; disken för Delve-märken är den enda vägen runt det. Det enda undantaget är Glyfstålstackan, raffinerad och enbart såld av handlare, 1 silver 60 koppar per tacka från Kvartersmästare Bree i Högvakt eller från Gizzels egen disk, så bara Glyfstålshackan bär ett fast myntgolv inbyggt i sin kostnad.",
-          "materialsBodyThreeRods": "Every land tool recipe consumes the tool one tier below it plus a FINE material, and that pairing is the whole land ladder: four Fine Iron Ore and a Skysilver Mining Pick become the Osmium Mining Pick, then two Glyphsteel Bars, two Fine Osmium Ore and that osmium pick become the Glyphsteel Mining Pick. The axe and sickle lines mirror the fine-plus-prior-tool shape with Fine Ashwood and Fine Highpine Logs, Fine Goldleaf and Fine Sunpetal Herbs, though their tier 5 rungs ask no Glyphsteel Bars: the pick is the one line that gets dearer at the top. The three rod recipes break the pattern on purpose: the Stormreel takes four Sunglint Koi and a Silverstream rod, the Tidewrought two Koi, eight Raw Slatefin Carp and that Stormreel, and the Clockreel two Koi, ten Raw Hollowgill Sturgeon and that Tidewrought, so the top of the angler's ladder is paid for on the water rather than at a vein.\n\nA fine material is not sold anywhere and does not drop from an ordinary harvest: you get it by working one of a zone's full-grade veins with a tool ranked above the material itself, which in practice means the tool one rung below the one you are trying to build (the easier veins a zone keeps for travellers yield the plain material whatever you swing). That is deliberate. On the craft route, a tier 5 tool comes from actually swinging the tier 4 one, not from a shopping trip; the Delve Marks counter is the one way around it. The single exception is the Glyphsteel Bar, refined and vendor-only, 1 silver 60 copper a bar from Quartermaster Bree in Highwatch or from Gizzel's own counter, so the Glyphsteel Mining Pick alone carries a fixed coin floor built into its cost.",
+          "materialsBodyThreeRods": "Varje recept på landverktyg förbrukar verktyget en nivå under sig plus ett FINT material, och den parningen är hela landstegen: fyra Fin järnmalm och en Himmelsilverhacka blir en Osmiumhacka, sedan blir två Glyfstålstackor, två Fin osmiummalm och den osmiumhackan en Glyfstålshacka. Yx- och skärlinjerna följer samma form med fint material plus föregående verktyg, med Fin askvedstock och Fin högtallsstock, Fin guldbladsört och Fin solkronbladsört, även om deras steg på nivå 5 inte kräver några Glyfstålstackor: hackan är den enda linjen som blir dyrare på toppen. De tre spörecepten bryter mönstret med flit: Stormrullespöet kräver fyra Solglintens koi och ett Silverbäcksspö, Tidvattensmitt spö två koi, åtta Rå skifferfenskarpar och just det Stormrullespöet, och Klockrullespöet två koi, tio Rå ihålgälstörar och det Tidvattensmidda spöet. Därför betalas toppen av metarens stege på vattnet snarare än vid en åder.\n\nEtt fint material säljs ingenstans och faller inte ur en vanlig skörd: du får det genom att arbeta en av zonens fullgradiga ådror med ett verktyg som rankas över själva materialet, vilket i praktiken är verktyget ett steg under det du försöker bygga (de lättare ådror som en zon behåller åt resenärer ger det enkla materialet oavsett vad du svingar). Det är avsiktligt. På hantverksvägen kommer ett verktyg på nivå 5 av att du faktiskt svingar verktyget på nivå 4, inte av en shoppingtur; disken för Djupmärken är den enda vägen runt det. Det enda undantaget är Glyfstålstackan, raffinerad och enbart såld av handlare, för 1 silver 60 koppar per tacka hos Kvartersmästare Bree i Högvakt eller vid Gizzels egen disk, så just Glyfstålshackan har ett fast myntgolv inbyggt i sin kostnad.",
           "ladderHeading": "Verktygssteget",
-          "ladderBody": "Every rung of the tool ladder is bound to the toolworks station (the crafted hoes the toolmaker also teaches have their own note on the gathering page, and his two starter lessons are the pair named above). The six land-tool recipes are known automatically, no trainer fee ever: the tier 4 pick, axe, and sickle at skill 75, and the tier 5 versions at skill 125, the cap tier itself. Skill requirements never gate a craft here, they only shape skill gain, so you can build a tier 5 tool the day you hold its reagents and its tier 4 predecessor. Two of the three crafted rods are the taught exception: Gizzel teaches the Stormreel at skill 75 for 4 gold and the Tidewrought at skill 125 for 16 gold, each the moment your tier in the craft reaches its own. The tier 6 Clockreel is the third, and no trainer quotes it a fee at all: its schematic sits on the Heroic Quartermaster's counter and teaches the recipe outright.\n\nEvery finished tool is rare or epic quality and comes out signed, so your name rides the zones on other players' toolbelts. Engineering also holds up half of one combination recipe: the Elixir of the Bear, brewed by an attuned Bombardier with both Engineering and Alchemy at 25.",
+          "ladderBody": "Varje steg i verktygsstegen är bundet till Verktygsverkstadens station (de tillverkade hackor som verktygsmakaren också lär ut har en egen kommentar på insamlingssidan, och hans två startlektioner är paret ovan). De sex recepten för landverktyg är kända automatiskt och har aldrig någon tränaravgift: hackan, yxan och skäran på nivå 4 vid färdighet 75, och deras versioner på nivå 5 vid färdighet 125, som också är taknivån. Färdighetskrav spärrar aldrig tillverkning här, utan formar bara färdighetsvinsten, så du kan tillverka ett verktyg på nivå 5 samma dag som du har dess reagenser och föregångaren på nivå 4. Två av de tre tillverkade spöna är undantag som måste läras ut: Gizzel lär ut Stormrullespö vid färdighet 75 för 4 guld och Tidvattensmitt spö vid färdighet 125 för 16 guld, vart och ett så snart din nivå i yrket når receptets nivå. Urverksspö på nivå 6 är det tredje, och ingen tränare anger någon avgift alls för det: ritningen finns på den heroiska kvartermästarens disk och lär ut receptet direkt.\n\nVarje färdigt verktyg är av sällsynt eller episk kvalitet och blir signerat, så ditt namn följer med genom zonerna på andra spelares verktygsbälten. Ingenjörskonst står också för ena halvan av ett kombinationsrecept: Björnens elixir, som bryggs av en inriktad Bombbärare med både Ingenjörskonst och Alkemi på 25.",
           "routeHeading": "En ingenjörs väg till 125",
           "routeBody": "Verktyg bär inga stridegenskaper, så de ger aldrig mästerverk; den procen tillhör utrustning med egenskaper. Specialisering landar fortfarande vid skicklighet 75: 20 procent färre material per hantverk och ett tillfälligt fältverktygsverkstan som förvandlar varje insamlingstur till ett verkstad. Vinst-matematiken avtar knappt här: skicklighet 75-recepten ger full vinst till 100 och hälften därefter, och skicklighet 125-recepten ger full vinst hela vägen till taket, så den verkliga begränsningen är reagenser och mynt, aldrig grå recept.\n\nVälj ditt par tidigt, för verktygsstegen rör sig inte utan det: ta Bombardörsanpassningen från Mekaniker Gizzel. Mata sedan stegen: leva upp Gruvdrift, Skogsavverkning eller Örtkunskap själv eller befrienda insamlare, köp nivå 3-verktygen hos handlare och behandla Gizzels arbetsorder (åtta Järnbarkstockar för 16 koppar, upprepningsbar var 30:e minut) som fickpengar.\n\nIngenjörskonst är en lågvolym prestigehandel, ungefär en skicklighetspoäng per färdigt verktyg, så behandla varje hantverk som lager för försäljning. Pitchen till dina kunder skriver sig själv: varje verktygsivå ovanför en fyndplats egna nivå trimmar 0,4 sekunder av de 2,5 sekunder långa skördekanaliseringen (ner till ett 1,5 sekunders golv), så ett nivå 5-verktyg är en hastighetsuppgradering vid varje fyndplats i världen och bara du kan tillverka ett. Bedrifternas bok markerar Kugghjul och Fjädrar vid skicklighet 50 och Stormästare i Ingenjörskonst vid 125."
         },
         "enchanting": {
           "identityHeading": "Utrustning isär, kraften tillbaka",
-          "identityBody": "Every enchant is known from the start, anyone can disenchant from day one, and neither ever needs a station; the skill caps at 125 like every craft. The one taught corner of the trade is three recipes, all Tinker Gizzel's at the toolworks in the southwest corner of Eastbrook Square, and all worked at that station: the two charms, the Gatherer's Cache and the Artisan's Eye, for the ordinary tier fee once your Enchanting reaches 25, and above them the Lucent Reagent, the apex tier's own material, at 75.\n\nOn the ring it sits between Inscription and Jewelcrafting, so its two pair identities are the Arcanist (Inscription and Enchanting) and the Gembinder (Enchanting and Jewelcrafting). Neither can be sworn yet: both neighbor crafts now work their own ladders (Inscription at the apothecary, Jewelcrafting at the forge), but neither pair has an oath quest yet. So today Enchanting climbs as everyone's craft: free to the rare tier before any oath, and a natural hobby pick for a Bombardier or an Apothecary. Enchanters also keep the gathering world running: the two slottable tool effects are Enchanter work, and an original crafter recharges their own effects at a discount, deeper still once specialized.",
+          "identityBody": "Varje förtrollning är känd från början, vem som helst kan avförtrolla från första dagen och ingen av handlingarna kräver någonsin en station; färdighetstaket är 125, precis som för alla hantverksyrken. Den enda del av yrket som lärs ut omfattar tre recept, samtliga hos Fixare Gizzel i Verktygsverkstaden i sydvästra hörnet av Östbäcks torg och samtliga tillverkade vid den stationen: de två amuletterna, Samlarens gömma och Hantverkarens öga, för den ordinarie nivåavgiften när din Förtrollning når 25, och däröver Lysande reagens, toppnivåns eget material, vid 75.\n\nPå yrkesringen ligger Förtrollning mellan Inskription och Juveleringskonst, så dess två paridentiteter är Arkanisten (Inskription och Förtrollning) och Stenbindaren (Förtrollning och Juveleringskonst). Ingen av dem går ännu att svära sig till: båda grannyrkena har nu egna utvecklingsstegar (Inskription vid apoteket, Juveleringskonst vid smedjan), men inget av paren har ännu något edsuppdrag. I dag utvecklas därför Förtrollning som allas yrke: fritt upp till den sällsynta nivån före någon ed, och ett naturligt hobbyval för en Bombbärare eller Apotekare. Förtrollare håller också insamlingsvärlden i gång: de två verktygseffekter som kan sättas i en plats är förtrollares verk, och den ursprungliga tillverkaren laddar om sina egna effekter till rabatt, ännu billigare efter specialisering.",
           "levelingHeading": "Hur förtrollning levlar",
-          "levelingBody": "Three actions move the skill: disenchanting a piece, applying an enchant, and crafting the two charm recipes, which climb the ordinary crafting curve. The third taught recipe, the Lucent Reagent, is the exception: at skill 75 it sits above the rare ceiling every enchanter works under (Enchanting has no oath pair, so it is never a major), and a recipe above your ceiling teaches nothing, so craft it for the reagent, not the points. Each success is worth up to one point, scaled by how serious the work is: the rarity of the piece you break, or the reagent tier of the enchant you apply. Common disenchants and dust-only enchants score as common work; uncommon disenchants and essence enchants as uncommon; rare disenchants and every Runed or Greater enchant as rare; epic and legendary disenchants, and every Lucent enchant, rank higher still on the table, though no enchanting identity today reaches past the rare rung, so they pay the same as rare work in practice. One honesty rules the breaking bench: a piece that came off a player bench (crafted, signed, or masterworked) still mills into materials but teaches nothing, so a craft-and-break loop levels no one, and the lessons are in world-found gear.\n\nThe familiar mastery fade applies on 25-point tiers, so common-grade work goes gray at skill 75, uncommon work at 100, and rare-tier work exactly at the 125 cap. Enchanting also has one kindness of its own: input above your archetype ceiling is rounded down to that ceiling instead of zeroed, so before you attune, an epic disenchant simply scores as rare rather than teaching nothing. If Enchanting ends up dormant behind another identity, breaking and applying score as common work and the climb stalls at 75, while the two charms, riding the crafting curve above the common ceiling, teach a dormant enchanter nothing at all; keep it as your hobby and rare-tier work still pays, just slower past 75.",
+          "levelingBody": "Tre handlingar höjer färdigheten: att avförtrolla ett föremål, lägga på en förtrollning och tillverka de två amulettrecepten, som följer den vanliga tillverkningskurvan. Det tredje utlärda receptet, Lysande reagens, är undantaget: vid färdighet 75 ligger det över det sällsynta tak som alla förtrollare arbetar under (Förtrollning har inget edspar och kan därför aldrig vara ett huvudyrke), och ett recept över ditt tak ger ingen färdighet, så tillverka det för reagensets skull, inte för poängen. Varje framgång ger upp till en poäng, skalad efter hur krävande arbetet är: sällsyntheten hos föremålet du bryter ned eller nivån på reagenset i förtrollningen du lägger på. Avförtrollning av vanliga föremål och förtrollningar som bara kräver damm räknas som vanligt arbete; avförtrollning av ovanliga föremål och essensförtrollningar som ovanligt; avförtrollning av sällsynta föremål och alla runristade eller större förtrollningar som sällsynt; avförtrollning av episka och legendariska föremål samt varje lysande förtrollning ligger ännu högre i tabellen. Ingen identitet inom Förtrollning når dock i dag högre än det sällsynta steget, så i praktiken ger de lika mycket som sällsynt arbete. En regel håller nedbrytningen hederlig: ett föremål som kommer från en spelarverkstad (tillverkat, signerat eller mästersmitt) bryts fortfarande ned till material men ger ingen färdighet. En tillverka-och-bryt-ned-loop höjer alltså ingens färdighet; lärdomarna finns i utrustning som hittats ute i världen.\n\nDen vanliga avtrappningen av färdighetsvinsten gäller i steg om 25 poäng, så vanligt arbete blir grått vid färdighet 75, ovanligt vid 100 och sällsynt exakt vid taket 125. Förtrollning har dessutom en egen lättnad: arbete över din arketyps tak avrundas ned till taket i stället för att nollas, så före din inriktning räknas en episk avförtrollning helt enkelt som sällsynt i stället för att inte lära dig något. Om Förtrollning blir vilande bakom en annan identitet räknas avförtrollning och påläggning som vanligt arbete, och klättringen stannar vid 75, medan de två amuletterna, som följer tillverkningskurvan över det vanliga taket, inte lär en vilande förtrollare någonting alls. Behåll det som hobby, så ger sällsynt arbete fortfarande färdighet, bara långsammare efter 75.",
           "marketHeading": "Förtrollade kopior, ursprung och marknaden",
           "marketBody": "Att lägga på en förtrollning förbrukar reagenserna och märker en enda bestämd kopia av föremålet. Rikta den mot en kopia i väskan så får du tillbaka en särskild förtrollad kopia; rikta den mot en pjäs du redan bär så förtrollas den på plats, precis där den sitter, utan någon av-och-på-dans. Hur du än gör följer bonusen den pjäsen för alltid, genom avrustningar, bankbesök och handel. En förtrollning per pjäs: att lägga en annan förtrollning på en redan förtrollad kopia ber om bekräftelse och ersätter sedan den gamla rakt av, förstör den utan att ge tillbaka dess material. Att sälja, att kasta och att avförtrolla föredrar alla vanliga kopior först, så din färdiga pjäs blir inte uppäten av misstag.\n\nMästerverksutrustning och förtrollning är vänner: en mästerverkspjäs förblir fullt förtrollningsbar, och förtrollningen läggs ovanpå mästerverksbonusen utan att störa vare sig den eller tillverkarens signatur. Med alla källor staplade är ett signerat mästerverk med en Högre förtrollning det bästa en tillverkad pjäs blir, och den ligger fortfarande under raidbytet, precis som avsett.\n\nPå marknaden listas en förtrollad eller signerad pjäs som vad som helst annat: den går upp som sin egen listning på en enda kopia, verktygstipset visar förtrollningen och tillverkarmärket, och Korpposten bär den precis lika troget. Materialen förblir hantverkets stadiga hälft: Damm, Essens och Skärvor listas fritt, listning kostar ingenting, och Köpmannen tar 5 procent enbart av en genomförd försäljning. Det gör de två klassiska förtrollarinkomsterna till att sälja material och att sälja färdigt arbete: över marknaden, med korp, eller ansikte mot ansikte i ett handelsfönster."
         },
         "jewelcrafting": {
-          "identityHeading": "The finer work of the forge",
-          "identityBody": "The ladder is three rungs of three: a Strength ring, an Intellect ring, and an Agility necklace, first in copper, again in iron, and once more in rare osmium at the top. Jewelry carries no armor and no class lock, and even the copper pieces arrive with real stat lines, because a ring without stats would be nothing at all.\n\nOn the craft ring it sits between Enchanting and Weaponcrafting, giving it two pair identities: the Gembinder (Enchanting and Jewelcrafting) and the Bladewright (Jewelcrafting and Weaponcrafting). Neither has an oath quest yet, so today Jewelcrafting climbs as everyone's craft: the three rungs of the 0-to-50 ladder all sit inside the rare tier that undeclared crafts work under, so the ladder is open before any oath. Two things sit above that ceiling: the Prismglass Setting, the 75-rung intermediate Darva also teaches, and the found-pattern rung above it; since neither pair can be sworn yet, today they teach nothing to anyone, so cut them for the goods, not the points.",
-          "materialsHeading": "Ore, dust, and essence",
-          "materialsBody": "The bench runs on mining and breaking. Copper ore comes off the tier 1 veins of Eastbrook Vale, iron ore from Mirefen Marsh, and osmium ore from Thornpeak Heights, with a jar or two of Smithing Flux, 20 copper each from Forgemistress Darva, in every recipe. The other half of every piece comes off the breaking bench: Chime Dust settles the copper rung and Chime Essence the iron and osmium rungs, so a jewelcrafter is an enchanter's steadiest customer, or simply keeps a disenchanting habit of their own.\n\nThe osmium rung adds one refinement: every rare piece takes two iron ore besides its osmium, worked in as solder for the fine settings. No counter sells the ores or the dust: they come out of the world or off another player, by trade or the World Market; only the flux is bought for coin.",
-          "ladderHeading": "Taught beside the anvil",
-          "ladderBody": "Jewelcrafting has no station of its own: the whole catalog is worked at the Eastbrook forge, the same anvil Weaponcrafting and Armorcrafting share, and Forgemistress Darva teaches it there. The ladder is nine trainer recipes in three rungs: the copper rung (band, loop, torc) is free at skill 0, the iron rung (signet, loop, choker) costs 25 silver a recipe at skill 25, and the osmium rung (band, loop, amulet) costs 1 gold each at skill 50, each rung teachable the moment your tier in the craft reaches its own.\n\nThere are no field recipes and no combination piece yet: every taught rung is forge-bound trainer work, and the found-pattern rung above them is forge-bound too but bought nowhere, so this craft is learned, and practiced, standing where the smiths stand.",
-          "routeHeading": "Masterworks, and a working route to 125",
-          "routeBody": "There is no statless rung here: every piece on the ladder carries a real stat line, so every craft rolls the masterwork chance so long as the finer quality fits inside your tier ceiling, with iron and osmium counting as tier 1 materials for the proc. The copper and iron rungs, uncommon by make, can masterwork into rare for a hobby or undeclared jewelcrafter alike; the osmium three are rare already, so their epic masterworks wait on a ceiling above rare, which no jewelcrafter has until the craft's pairs open.\n\nThe climb is the standard ride: copper to 25, the iron rung the day it opens to 50, then osmium to 75. Above them sits an apex rung no trainer teaches: its patterns are found, not bought. Read that as an item you can make, not a shortcut up the ladder, because the same ceiling named above applies to skill gain as well as to masterworks: an apex pattern sits well over the rare ceiling every jewelcrafter works under today, so crafting one teaches nothing at all until this craft's pairs open and it can be a major. Whichever you hold, the osmium recipes carry the climb, fading to half and then quarter gain: budget roughly 150 more crafts to reach the 125 cap, and fund them honestly, since every class wears jewelry and most travelers level with their ring and neck slots empty.\n\nThe Book of Deeds marks Polished to Brilliance for your first rare-tier piece, Facet and Filigree at 50 skill, and Grandmaster Jewelcrafting at the 125 cap."
+          "identityHeading": "Smedjans finare arbete",
+          "identityBody": "Stegen har tre steg med tre recept: en Styrkaring, en Intelligensring och ett Smidighetshalsband, först i koppar, sedan i järn och en gång till i sällsynt osmium på toppen. Smycken har varken rustning eller klasslås, och även kopparpjäserna har riktiga egenskapsrader, eftersom en ring utan egenskaper inte vore någonting alls.\n\nPå hantverksringen ligger det mellan Förtrollning och Vapensmide, vilket ger det två paridentiteter: Ädelstensbindaren (Förtrollning och Juveleringskonst) och Bladsmidaren (Juveleringskonst och Vapensmide). Inget av paren har ännu ett edsuppdrag, så Juveleringskonst klättrar i dag som allas hantverk: stegens tre steg från 0 till 50 ligger alla inom den sällsynta nivå som odeklarerade hantverk arbetar under, så stegen är öppen före varje ed. Två saker ligger över det taket: Prismglasinfattningen, mellanprodukten på steg 75 som Darva också lär ut, och steget ovanför från ett hittat mönster. Eftersom inget par ännu kan sväras lär de i dag ingen någonting, så slipa dem för varornas skull, inte för poängen.",
+          "materialsHeading": "Malm, stoft och essens",
+          "materialsBody": "Bänken drivs av gruvdrift och nedbrytning. Kopparmalm kommer från ådrorna på nivå 1 i Östbäcksdalen, järnmalm från Dykärrsträsket och osmiummalm från Törntoppshöjderna, tillsammans med en eller två burkar Smidesfluss för 20 koppar styck hos Smidesmästarinnan Darva, i varje recept. Den andra hälften av varje pjäs kommer från nedbrytningsbänken: Klingdamm räcker till kopparsteget och Klingessens till järn- och osmiumstegen. Därför är en juvelerare en förtrollares stadigaste kund eller behåller själv vanan att avförtrolla.\n\nOsmiumsteget lägger till en förfining: varje sällsynt pjäs tar två järnmalm utöver sin osmium, arbetade som lod för de fina infattningarna. Ingen disk säljer malmen eller dammet: de kommer ur världen eller från en annan spelare genom handel eller Världsmarknaden; bara flusset köps för mynt.",
+          "ladderHeading": "Lärs ut vid städet",
+          "ladderBody": "Juveleringskonst har ingen egen station: hela katalogen tillverkas vid smedjan i Östbäck, samma städ som Vapensmide och Rustningssmide delar, och Smidesmästarinnan Darva lär ut den där. Stegen består av nio tränarrecept i tre steg: kopparsteget (band, ögla, torc) är gratis vid skicklighet 0, järnsteget (signetring, ögla, halskrage) kostar 25 silver per recept vid skicklighet 25 och osmiumsteget (band, ögla, amulett) kostar 1 guld per recept vid skicklighet 50. Varje steg kan läras så snart din nivå i hantverket når dess egen nivå.\n\nDet finns ännu inga fältrecept och ingen kombinationsdel: varje utlärt steg är tränararbete bundet till smedjan, och steget ovanför från ett hittat mönster är också bundet till smedjan men köps ingenstans. Därför lärs och övas hantverket medan du står där smederna står.",
+          "routeHeading": "Mästerverk och en väg till 125",
+          "routeBody": "Det finns inget steg utan egenskaper här: varje pjäs på stegen har en riktig egenskapsrad, så varje tillverkning slår för mästerverkschansen så länge den finare kvaliteten ryms inom ditt nivåtak, där järn och osmium räknas som material på nivå 1 för procen. Koppar- och järnstegen, ovanliga när de tillverkas, kan bli sällsynta mästerverk både för en hobbyjuvelerare och en odeklarerad juvelerare; de tre osmiumföremålen är redan sällsynta, så deras episka mästerverk väntar på ett tak över sällsynt, vilket ingen juvelerare har förrän hantverkets par öppnas.\n\nKlättringen är den vanliga: koppar till 25, järnsteget den dag det öppnar till 50 och sedan osmium till 75. Ovanför finns ett toppsteg som ingen tränare lär ut: dess mönster hittas, de köps inte. Se det som ett föremål du kan tillverka, inte som en genväg uppför stegen, eftersom samma tak ovan även gäller skicklighetsvinst och mästerverk: ett toppmönster ligger långt över det sällsynta tak som varje juvelerare arbetar under i dag, så att tillverka ett lär dig ingenting alls förrän hantverkets par öppnas och det kan bli ett huvudyrke. Oavsett vad du har bär osmiumrecepten klättringen, med halverad och sedan fjärdedelad vinst: räkna med ungefär 150 ytterligare tillverkningar för att nå taket på 125 och finansiera dem ärligt, eftersom varje klass bär smycken och de flesta resenärer nivåhöjer med tomma ring- och halsplatser.\n\nBedrifternas bok markerar Polerad till glans för din första del på sällsynt nivå, Facett och filigran vid 50 i skicklighet och Stormästare i juveleringskonst vid taket på 125."
         },
         "inscription": {
-          "identityHeading": "Ink for the mind, scrolls for the road",
-          "identityBody": "The ladder is three rungs of two: a caster tome for the offhand and a stamina scroll for anyone at all, first in sheenleaf, again in goldleaf, and once more in rare sunpetal at the top. The tomes are held stat sticks for the six mana classes, real Intellect and Spirit from the first rung; the scrolls are consumables with no class lock, so half of every rung sells to the whole realm.\n\nOn the craft ring it sits between Tailoring and Enchanting, giving it two pair identities: the Inkweaver (Tailoring and Inscription) and the Arcanist (Inscription and Enchanting). Neither has an oath quest yet, so today Inscription climbs as everyone's craft: the three rungs of the 0-to-50 ladder all sit inside the rare tier that undeclared crafts work under, so the ladder is open before any oath. Two things sit above that ceiling: the Sablewax Vellum, the 75-rung intermediate Verane also teaches, and the found-pattern rung above it; since neither pair can be sworn yet, today they teach nothing to anyone, so scribe them for the goods, not the points.",
-          "materialsHeading": "Herbs, ink, and a vial to hold it",
+          "identityHeading": "Bläck för sinnet, skriftrullar för vägen",
+          "identityBody": "Stegen har tre steg med två recept: en kastartom för andra handen och en uthållighetsskrift för vem som helst, först i glansblad, sedan i guldblad och en gång till i sällsynt solblad på toppen. Tomerna är burna egenskapsföremål för de sex manaklasserna, med verklig Intelligens och Ande från första steget; skrifterna är förbrukningsvaror utan klasslås, så hälften av varje steg säljs till hela riket.\n\nPå hantverksringen ligger det mellan Skrädderi och Förtrollning, vilket ger det två paridentiteter: Bläckvävaren (Skrädderi och Inskription) och Arkanisten (Inskription och Förtrollning). Inget av paren har ännu ett edsuppdrag, så Inskription klättrar i dag som allas hantverk: stegens tre steg från 0 till 50 ligger alla inom den sällsynta nivå som odeklarerade hantverk arbetar under, så stegen är öppen före varje ed. Två saker ligger över det taket: Sabelvaxpergamentet, mellanprodukten på steg 75 som Verane också lär ut, och steget ovanför från ett hittat mönster. Eftersom inget par ännu kan sväras lär de i dag ingen någonting, så skriv dem för varornas skull, inte för poängen.",
+          "materialsHeading": "Örter, bläck och en flaska att förvara det i",
           "materialsBody": "The desk runs on herbalism and the breaking bench. Sheenleaf comes off the tier 1 herb patches of Eastbrook Vale, goldleaf from Mirefen Marsh, and sunpetal from Thornpeak Heights, ground into pigment with a Glass Vial, 12 copper from the apothecary master, in every recipe. The magical half of the ink comes off the breaking bench: Chime Dust settles the sheenleaf rung, Chime Essence the goldleaf and sunpetal rungs, and the sunpetal scroll binds a pinch of dust back in, so a scribe is an enchanter's steady customer, or keeps a disenchanting habit of their own.\n\nThe sunpetal rung refines both of its recipes: the rare grimoire takes two goldleaf besides its sunpetal, worked in to size the illuminations, and the double scroll batch takes a second essence with that pinch of dust, priced even with the Elixir of the Serpent whose buff it mirrors. No counter sells the herbs or the dust: they come out of the world or off another player; only the vial is bought for coin.",
-          "materialsBodyFrostGourd": "The desk runs on herbalism and the breaking bench. Sheenleaf comes off the tier 1 herb patches of Eastbrook Vale, goldleaf from Mirefen Marsh, and sunpetal from Thornpeak Heights, ground into pigment with a Glass Vial, 12 copper from the apothecary master, in every recipe. The magical half of the ink comes off the breaking bench: Chime Dust settles the sheenleaf rung, Chime Essence the goldleaf and sunpetal rungs, and the sunpetal scroll binds a pinch of dust back in, so a scribe is an enchanter's steady customer, or keeps a disenchanting habit of their own.\n\nThe sunpetal rung refines both of its recipes: the rare grimoire takes two goldleaf besides its sunpetal, worked in to size the illuminations, and the double scroll batch takes a second essence with that pinch of dust and a Frost Gourd off the Highwatch terraces, which prices it even with the Elixir of the Serpent whose buff it mirrors. No counter sells the herbs, the dust or the gourd: they come out of the world, a garden bed or off another player; only the vial is bought for coin.",
-          "ladderHeading": "Taught beside the alembics",
-          "ladderBody": "Inscription has no station of its own: the whole catalog is worked at the Highwatch apothecary, the same bench Alchemy brews at, and Alchemist Verane teaches it there. The ladder is six trainer recipes in three rungs: the sheenleaf rung (primer and scroll) is free at skill 0, the goldleaf rung (folio and scroll) costs 25 silver a recipe at skill 25, and the sunpetal rung (grimoire and scroll) costs 1 gold each at skill 50, each rung teachable the moment your tier in the craft reaches its own. The rung-50 scroll comes off the desk two at a time.\n\nThere are no field recipes and no combination piece yet: every taught rung is apothecary-bound trainer work, and the found-pattern rung above them is apothecary-bound too but bought nowhere, so this craft is learned, and practiced, standing where the alchemists stand.",
-          "routeHeading": "Scrolls, elixirs, and a working route to 125",
-          "routeBody": "The scrolls are the craft's signature rule: each rung's scroll grants exactly the buff of its band's stamina elixir (the boar, vipersear, and serpent bands), and the two sources share one slot on the buff bar. Reading a scroll over an elixir replaces it, drinking an elixir over a scroll replaces that, and the newest application always wins, so a scroll is an alternative door into the same buff, never a second stack on top of it.\n\nThe tomes carry real stat lines, so every tome craft rolls the masterwork chance so long as the finer quality fits inside your tier ceiling; the scrolls, statless consumables, never proc. The climb is the standard ride: sheenleaf to 25, the goldleaf rung the day it opens to 50, then sunpetal to 75. Above them sits an apex rung Verane does not teach: its pattern is found, not bought. Read that as a tome you can make, not a shortcut up the ladder: an apex pattern sits well over the rare ceiling every scribe works under today, and a recipe above your ceiling teaches nothing at all, so the skill it grants waits on this craft's pairs opening and Inscription becoming a major. Whichever you hold, the sunpetal recipes carry the climb, fading to half and then quarter gain: budget roughly 150 more crafts to reach the 125 cap, and fund them honestly, since the scrolls sell to every class in the game.\n\nThe Book of Deeds marks Written in Fine Ink for your first rare-tier piece, Quill and Pigment at 50 skill, and Grandmaster Inscription at the 125 cap."
+          "materialsBodyFrostGourd": "Skrivbordet drivs av örtplockning och nedbrytningsbänken. Glansblad kommer från örtfälten på nivå 1 i Östbäcksdalen, guldblad från Dykärrsträsket och solblad från Törntoppshöjderna. I varje recept mals de till pigment med en glasflaska, som kostar 12 koppar hos apoteksmästaren. Bläckets magiska hälft kommer från nedbrytningsbänken: Klingdamm räcker till glansbladssteget, Klingessens till guldblads- och solbladsstegen, och solbladsskriften binder in en nypa damm igen. Därför är en skrivare en förtrollares stadiga kund eller behåller själv vanan att avförtrolla.\n\nSolbladssteget förfinar båda sina recept: den sällsynta grimoaren tar två guldblad utöver sitt solblad, arbetade för att måttsätta illuminationerna, och den dubbla satsen skrifter tar en andra essens tillsammans med den nypan damm och en Frostkalebass från terrasserna i Högvakt. Det prissätter den i nivå med Ormelixiret vars förstärkning den speglar. Ingen disk säljer örterna, dammet eller kalebassen: de kommer ur världen, en odlingsbädd eller från en annan spelare; bara flaskan köps för mynt.",
+          "ladderHeading": "Lärs ut vid alembikerna",
+          "ladderBody": "Inskription har ingen egen station: hela katalogen tillverkas vid apoteket i Högvakt, samma bänk som Alkemi brygger vid, och Alkemisten Verane lär ut den där. Stegen består av sex tränarrecept i tre steg: glansbladssteget (primer och skrift) är gratis vid skicklighet 0, guldbladssteget (folio och skrift) kostar 25 silver per recept vid skicklighet 25 och solbladssteget (grimoar och skrift) kostar 1 guld per recept vid skicklighet 50. Varje steg kan läras så snart din nivå i hantverket når dess egen nivå. Skriften på steg 50 kommer två åt gången från skrivbordet.\n\nDet finns ännu inga fältrecept och ingen kombinationsdel: varje utlärt steg är tränararbete bundet till apoteket, och steget ovanför från ett hittat mönster är också bundet till apoteket men köps ingenstans. Därför lärs och övas hantverket medan du står där alkemisterna står.",
+          "routeHeading": "Skriftrullar, elixir och en väg till 125",
+          "routeBody": "Skrifterna är hantverkets särregel: varje stegs skrift ger exakt förstärkningen från dess bands uthållighetselixir (vildsvins-, huggormsörts- och orm-banden), och de två källorna delar en plats på förstärkningsraden. Att läsa en skrift ovanpå ett elixir ersätter det, att dricka ett elixir ovanpå en skrift ersätter den, och den senaste appliceringen vinner alltid. En skrift är alltså en alternativ väg till samma förstärkning, aldrig en andra stapel ovanpå den.\n\nTomerna har riktiga egenskapsrader, så varje tomtillverkning slår för mästerverkschansen så länge den finare kvaliteten ryms inom ditt nivåtak; skrifterna, förbrukningsvaror utan egenskaper, proccar aldrig. Klättringen är den vanliga: glansblad till 25, guldbladssteget den dag det öppnar till 50 och sedan solblad till 75. Ovanför finns ett toppsteg som Verane inte lär ut: dess mönster hittas, det köps inte. Se det som en tom du kan tillverka, inte som en genväg uppför stegen: ett toppmönster ligger långt över det sällsynta tak som varje skrivare arbetar under i dag, och ett recept ovanför ditt tak lär dig ingenting alls. Skickligheten det skulle ge väntar därför på att hantverkets par öppnas och Inskription blir ett huvudyrke. Oavsett vad du har bär solbladsrecepten klättringen, med halverad och sedan fjärdedelad vinst: räkna med ungefär 150 ytterligare tillverkningar för att nå taket på 125 och finansiera dem ärligt, eftersom skrifterna säljs till varje klass i spelet.\n\nBedrifternas bok markerar Skrivet med fint bläck för din första del på sällsynt nivå, Fjäder och pigment vid 50 i skicklighet och Stormästare i inskription vid taket på 125."
         }
       },
       "howHeading": "Hur hantverkande fungerar",
-      "howBody": "Open the crafting window (default key T) and every recipe you know is listed with what it needs and what you have on hand. Station-bound recipes ask you to stand within 20 yards of the right station in town, field recipes craft anywhere, and Enchanting's breaking and enchanting need no station at all (only its three trainer recipes are station work, at the toolworks). There is no failure roll: a craft with the materials in hand always succeeds.\n\nTwo small frictions keep the economy honest. Every successful craft pays a fee of 2 copper per point of the item's stat budget, and every craft-family action takes real cast time (field crafts near two seconds, harder ladder crafts longer, and disenchant, enchant, salvage, and tool recharge each about a second and a half). Materials, the gold fee, stations, and skill ceilings do the rest; nothing scolds you for working too quickly.",
+      "howBody": "Öppna hantverksfönstret (standardtangent T), så visas varje recept du känner till tillsammans med vad det kräver och vad du har till hands. Stationsbundna recept kräver att du står inom 20 yard från rätt station i staden, fältrecept kan tillverkas var som helst, och att avförtrolla och förtrolla inom yrket Förtrollning kräver ingen station alls (endast yrkets tre tränarrecept är stationsarbete, i Verktygsverkstaden). Det finns inget slag för misslyckande: en tillverkning med materialen till hands lyckas alltid.\n\nTvå små bromsar håller ekonomin sund. Varje lyckad tillverkning kostar 2 koppar per poäng i föremålets egenskapsbudget, och varje handling i hantverksfamiljen tar verklig kanaliseringstid (fältarbete tar omkring två sekunder, svårare tillverkningar på stegen tar längre tid, och avförtrollning, förtrollning, bärgning och omladdning av verktyg tar omkring en och en halv sekund vardera). Materialen, guldavgiften, stationerna och färdighetstaken sköter resten; inget bestraffar dig för att arbeta för snabbt.",
       "recipesHeading": "Recept",
       "recipesNote": "Varje recept i hantverket: dess exakta skicklighetskrav och material, var det lärs ut och för vilken avgift, och de tre skicklighetsvärdena där dess vinst bleknar till hälften, en fjärdedel och ingenting.",
       "masteryHeading": "Skicklighetsvinst",
       "masteryBody": "Varje recept i fönstret bär sitt vinsttillstånd i de klassiska färgerna: orange betyder full vinst, gul hälften, grön en fjärdedel, grå ingenting. Gränserna är exakta, var {step}:e skicklighetspoäng är en nivå, och ett recept bleknar en färg för varje nivå det faller under din.\n\nEftersom vinster är deterministiska (ett fullvinsthantverk rör dig alltid exakt en poäng) kan du planera en hel klättring från listan: arbeta ett steg medan det är orange, träna nästa steg när det blir gult, och slösa aldrig material på ett grått hantverk i hopp om framsteg. Vid taket på {cap} stannar siffran, men recepten, mästerverksrisken och vinsterna fortsätter att fungera.",
       "masterworkHeading": "Mästerverk",
       "masterworkBody": "Varje lyckat hantverk är precis vad receptet lovar, och ibland lite mer: ett mästerverk färdigställer samma pjäs en kvalitetsnivå finare, med bonusegenskaperna inbakade redan vid tillverkningen. Det lägger bara till, det drar aldrig ifrån, och det stannar under raidgolvet, så tillverkad utrustning kan vara utmärkt utan att ersätta ett raidfynd.\n\nChansen är publicerad, inte mystisk: {base}% i grunden, plus {perTier}% per nivå din skicklighet ligger över receptet, plus {signed}% när ett signerat reagens går i, plus {spec}% när du väl är specialiserad, med material av högre nivå som lägger till 1 till 2% mer, allt med ett tak på {cap}%. Bara en pjäs med riktiga egenskaper kan förbättras, så egenskapslösa vanligheter, verktyg och förbrukningsvaror proccar aldrig; ett vilande hantverk producerar aldrig ett, och ett hobbyhantverk kan inte ge mästerverk förbi sitt sällsynta tak.\n\nFint arbete bär sin tillverkare. Sällsynta och bättre resultat är signerade, varje kopia (Skapad av; insamlade material bär Samlat av), och ett mästerverk är alltid signerat oavsett kvalitet. En signatur är ett ursprungsbevis, inte ett lås: signerade varor byts, skickas med post och listas fritt på Världsmarknaden.",
-      "masterworkBodyRaidCollections": "Every successful craft is exactly what the recipe promises, and sometimes a little more: a masterwork finishes the same piece one quality tier finer, with the bonus stats baked in at craft time. It is add-only, never a downgrade. Ordinary crafting follows its existing gear ladder; the raid-funded Crucible collections are a separate alternative at the current raid tier.\n\nThe apex Masterwrought crafts are the one exception, and they pay the same proc a different way. An apex piece already sits at the top of its ladder, so there is no finer tier to finish it in; a masterwork there hands the piece over one rank into Perfecting instead, a free first rank on the four-rank walk the Professions page describes. Nothing is baked into the stats, and the chance and its gates are the ones below.\n\nThe chance is published, not mystical: {base}% base, plus {perTier}% per tier your skill sits above the recipe, plus {signed}% when any signed reagent goes in, plus {spec}% once you are specialized, with higher-tier materials adding 1 to 2% more, all capped at {cap}%. Only a piece with real stats can improve, so statless commons, tools, and consumables never proc; a dormant craft never produces one, and a hobby craft cannot masterwork past its rare ceiling.\n\nFine work carries its maker. Rare and better outputs are signed, every copy (Crafted by; gathered materials carry Gathered by), a masterwork is always signed whatever its quality. A signature is provenance, not a lock: signed goods trade, mail, and list on the World Market freely.",
+      "masterworkBodyRaidCollections": "Varje lyckad tillverkning ger exakt vad receptet lovar, och ibland mer: ett mästerverk färdigställer samma del en kvalitetsnivå finare, med bonusegenskaperna inbakade när den tillverkas. Det lägger bara till och sänker aldrig kvaliteten. Vanlig tillverkning följer sin utrustningsstege, medan raidfinansierade Degelsamlingar är ett separat alternativ på den aktuella raidnivån.\n\nDe främsta Mästersmidda tillverkningarna är undantaget och betalar samma proc annorlunda. En del på toppnivå ligger redan högst på stegen och saknar finare nivå. Där flyttar ett mästerverk delen en rang in i fulländning, en gratis första rang på den fyrarangsresa yrkessidan beskriver. Inga egenskaper bakas in, och chansen samt kraven är de nedan.\n\nChansen är offentlig, inte mystisk: {base}% grundchans, plus {perTier}% per nivå färdigheten ligger över receptet, plus {signed}% för signerat reagens, plus {spec}% när du specialiserat dig, plus 1 till 2% för högre nivåmaterial, begränsat till {cap}%. Bara delar med riktiga egenskaper kan förbättras, så egenskapslösa vanliga föremål, verktyg och förbrukningsvaror proccar inte. Ett vilande yrke gör aldrig mästerverk, och ett hobbyyrke kan inte mästerverka över sitt sällsynthetstak.\n\nFint arbete bär sin skapare. Sällsynta och bättre resultat är signerade, varje kopia visar Tillverkad av och insamlade material Insamlad av. Ett mästerverk är alltid signerat oavsett kvalitet. En signatur visar ursprung, inte låsning: signerade varor kan handlas, postas och listas fritt på Världsmarknaden.",
       "trainingHeading": "Träning",
-      "trainingBody": "Trainer recipes come from the resident masters, taught at their stations. The rule is one line: a master teaches a recipe once your tier in the craft has reached the recipe's own tier, and nothing else gates it, not your level, not your archetype. The gear and consumable ladders run their rungs at skill 0, 25, and 50, and every craft adds one 75-rung intermediate above them, taught at its station (Enchanting's is the Lucent Reagent, beside its two charm recipes on the 25 rung); Engineering's two rod lessons continue its ladder at 75 and 125, so a fresh rung opens as your tiers climb.\n\nFees are one-time and flat by rung: the starting rung is free, the skill 25 rung costs {tier1} a recipe, the skill 50 rung {tier2}, and the 75 and 125 rungs above them carry their own fees, listed beside each recipe in the table. You must stand at the master's actual station to train, and a mobile station never counts. The common field recipes and the six crafted land-tool recipes need no training at all; every character knows them from the start.",
+      "trainingBody": "Tränarrecept kommer från de bofasta mästarna och lärs ut vid deras stationer. Regeln ryms på en rad: en mästare lär dig ett recept så snart din skicklighet i hantverket har nått receptets eget färdighetssteg, och inget annat spärrar det, varken din karaktärsnivå eller din arketyp. Stegarna för utrustnings- och förbrukningsrecept har steg vid skicklighet 0, 25 och 50. Varje hantverk lägger dessutom till en mellanprodukt på steg 75 som lärs ut vid dess station (för Förtrollning är det lysande reagens, bredvid hantverkets två talismanrecept på steg 25). Ingenjörskonstens två lektioner för fiskespön fortsätter stegen vid 75 och 125, så ett nytt steg öppnas i takt med att dina färdigheter stiger.\n\nAvgifterna betalas en gång och är fasta per steg: startsteget är gratis, steget vid skicklighet 25 kostar {tier1} per recept, steget vid skicklighet 50 kostar {tier2} per recept, och stegen vid 75 och 125 ovanför dem har egna avgifter som står bredvid varje recept i tabellen. För att lära dig recepten måste du stå vid mästarens riktiga station, och en mobil station räknas aldrig. De vanliga fältrecepten och de sex recepten för tillverkade landverktyg kräver ingen undervisning alls; varje karaktär kan dem från början.",
       "specializationHeading": "Specialisering",
       "specializationBody": "Vid skicklighet {at} specialiserar detta hantverk dig, inget uppdrag behövs: recept kostar {pct}% färre material från och med då, och specialiseringen lägger till en egen höjning av mästerverksrisken.\n\nSpecialister lär sig också att ta verkstaden med sig: en specialiserad hantverkare kan sätta upp en mobil station i fält i tio minuter åt gången, så att stationsbundna recept kan utföras vid gruventrén istället för tillbaka i staden. Dess gränser är avsiktliga: den räknas aldrig för träning hos en mästare eller för att lösa upp ett beställt föremål, och den löper ut vid sin timer oavsett om du använde den.",
-      "specializationBodyUndiscounted": "At skill {at} this craft specializes you, no quest needed: discountable recipe materials cost {pct}% less from then on, and specialization adds its own bump to the masterwork chance. Raid-core costs are never discounted.\n\nSpecialists also learn to take the workshop with them: a specialized crafter can set up a mobile station in the field for ten minutes at a time, so station-bound recipes can be worked at the mine mouth instead of back in town. Its limits are deliberate: it never counts for training with a master or for unbinding a commissioned piece, and it expires on its timer whether or not you used it.",
+      "specializationBodyUndiscounted": "Vid färdighet {at} blir du specialist i det här hantverket utan något uppdrag: receptmaterial som kan rabatteras kostar därefter {pct}% mindre, och specialiseringen ökar också chansen att skapa ett mästerverk. Kostnaden i raidkärnor rabatteras aldrig.\n\nSpecialister lär sig dessutom att ta verkstaden med sig: en specialiserad hantverkare kan ställa upp en mobil station ute i världen i tio minuter åt gången. Recept som kräver en station kan då tillverkas vid gruvmynningen i stället för inne i staden. Begränsningarna är avsiktliga: stationen fungerar aldrig för utbildning hos en mästare eller för att lösa bindningen på ett beställt föremål, och den försvinner när tiden går ut oavsett om du har använt den.",
       "ench": {
         "disenchantHeading": "Avförtrollning",
         "disenchantNote": "Avförtrollning tar ett vapen eller en rustningspjäs av vanlig kvalitet eller bättre och konsumerar en kopia, en vanlig kopia före en förtrollad; när bara förtrollade kopior återstår förstörs en av dem, förtrollning och allt. Vanliga och ovanliga pjäser mals ner till en rullad handfull Klingdamm, lite rikare för sällsyntare och högre-nivåartiklar; från sällsynt och uppåt ändrar avkastningen form, exakt en Klingessens från en sällsynt pjäs eller en Klingskarva från en episk eller legendarisk, plus en typad sekundär kopplad till vad pjäsen var tillverkad av.",
@@ -7387,17 +7387,17 @@ export const sv_SE: EnTranslations = {
           "base": "Bas",
           "runed": "Runristad",
           "greater": "Hogre",
-          "lucent": "Lucent"
+          "lucent": "Lysande"
         },
-        "perfectedOnly": "Perfected only",
+        "perfectedOnly": "Endast fulländad",
         "salvageHeading": "Bärgning",
         "salvageNote": "Bärgning är vanliga människans kusin till avförtrollning: samma vapen och rustning, ingen skicklighet krävs och ingen vinns, och returnerar vanligt hantverksskrot efter kvalitet i stället för något arkaniskt. Vem som helst kan göra det, förtrollare eller ej. När du håller en pjäs värd att bryta är valet enkelt: från sällsynt och uppåt är avförtrollning strikt det bättre alternativet, medan båda avkastningarna vid vanlig säljer för ungefär det samma till handlare, så bryt mot det material du faktiskt behöver.",
         "bonusFmt": "+{value} {stat}",
         "enchantsNoteOffhand": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove them all sits the Lucent tier, the capstone work of the craft and the only enchants that ask for any skill in it at all: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected, and no piece can be yet: it is authored ahead of the Perfecting work it waits on.",
         "enchantsNoteInfusionLive": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove them all sits the Lucent tier, the capstone work of the craft and the only enchants that ask for any skill in it at all: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected: Perfecting is the wearer's own work, not the enchanter's, and the Professions page tells how a piece earns it.",
-        "enchantsNoteRaidFormula": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove the ordinary lower tiers sits the Lucent tier, the capstone ordinary work of the craft: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected: Perfecting is the wearer's own work, not the enchanter's, and the Professions page tells how a piece earns it.\n\nLast Flame's Zeal is a separate raid formula, not a free ordinary enchant. Learn its tradable formula at Enchanting 100 before applying it. Each application uses 3 Cores of the Last Flame and 2 Chime Shards; the formula can drop in the Crucible or be bought from its quartermaster for one core. Its melee proc and weapon-speed rules are shown in full below.",
+        "enchantsNoteRaidFormula": "Förtrollningar finns i fyra nivåer. Basnivån använder Klingdamm (med lite Klingessens i den övre änden) och täcker vapenplatsen, andra handen och varje rustningsplats, med nog många egenskapsalternativ för att varje bygge ska hitta något till varje plats: sköldar och burna kastarföremål i andra handen får en egen Uthållighetsförtrollning, så ingen utrustad plats saknar förtrollning. Den Högre nivån kostar en Klingskarva plus Klingessens: starkare bonusar på platserna med störst genomslag. Skärvorna förser dessutom tre andra sänkor: de två berlockrecepten med fem vardera, det översta steget för omladdning av verktygseffekter och den Lysande nivån, där vapen- och bröstförtrollningarna tar en var och Infusionen två, så lägg undan några innan du förbrukar dem.\n\nMellan dem finns de fem Runristade förtrollningarna, en förbrukare för varje typad sekundär egenskap, så inget du maler blir en återvändsgränd: Runristad egg (vapen, Styrka, förbrukar Resonant stål), Runat sigill (vapen, Intelligens, Resonant timmer), Runvävnad (bröst, Ande, Resonant tråd), Runhud (ben, Smidighet, Resonant skinn) och Runlänkar (hjälm, Uthållighet, Resonanta länkar). Var och en tar dessutom två Klingessenser; där en plats och egenskap har både en bas- och en Högre-förtrollning hamnar den runristade bonusen mellan dem, medan Runvävnad är den starkaste Ande-förtrollningen för bröstet och Runhud är den enda Smidighetsförtrollningen för benen. De exakta bonusarna finns i tabellen nedan.\n\nOvanför de vanliga lägre nivåerna ligger den Lysande nivån, hantverkets höjdpunkt för vanlig tillverkning: Förtrollning 100 för de fyra och 125 för Infusionen, som visas i kolumnen Skicklighet nedan. Var och en använder ett lysande reagens och lägger till ett steg på sin plats: vapnet (ett alternativ för Styrka och ett för Besvärjelsekraft), bröstet och stövlarna. Den sista, Lysande infusion, fäster bara på en del som har fulländats: fulländning är bärarens eget arbete, inte förtrollarens, och sidan Yrken förklarar hur en del får det.\n\nSista lågans iver är en separat raidformel, inte en gratis vanlig förtrollning. Lär dig dess handelsbara formel vid Förtrollning 100 innan du använder den. Varje applicering använder 3 Kärnor från Sista lågan och 2 Klingskarvor; formeln kan falla i Smältdegeln eller köpas av dess kvartersmästare för en kärna. Dess närstridsproc och regler för vapenhastighet visas i sin helhet nedan.",
         "charmsHeading": "Amuletter för en samlares verktyg",
-        "formulaRequired": "Formula required",
+        "formulaRequired": "Formel krävs",
         "charmsBody": "Förtrollning är också där en samlares amuletter kommer ifrån. Fixare Gizzel lär ut båda vid verktygsverkstaden i Östbäck så snart din Förtrollning når 25: Samlarens gömma, som lägger till en enhet till en skörd, och Hantverkarens öga, som höjer graden på det som kommer upp. Var och en tillverkas en gång, monteras sedan på en hacka, yxa eller skära, där den förbrukar en laddning bara på de skördar den faktiskt förbättrar.\n\nOmladdningen är där hantverket fortsätter tjäna. Laddningar återställs av den som äger verktyget, inte av en besökande förtrollare, och omladdningen kostar hälften av materialen när den ägaren är förtrollaren som signerade amuletten, ännu mindre med en specialisering i Förtrollning. Så en amulett såld över disk är en enda försäljning, medan amuletterna som rider på dina egna verktyg är de billiga att hålla i gång. Den fullständiga laddnings- och materialstegen finns på varje insamlingsyrkes sida, under Verktygseffekter."
       },
       "gatherIntro": {
@@ -7405,7 +7405,7 @@ export const sv_SE: EnTranslations = {
         "logging": "Skogsavverkning fäller timmer från trädbestånd över hela världen: järnbark i Östbäcksdalen, askved i Dykärrsträsket, högtall i Törntoppshöjderna och nybörjarbestånd i varje yngre zon, råvaran till skaft, stavar och ingenjörens bänk. Öppen för alla från nivå 1 med en skogsavverkningsyxa i väskorna (20 koppar vid diskarna i Östbäck, Fenbron och Högvakt), spårad på en egen räknare till ett tak på 100.",
         "herbalism": "Örtkunskap samlar det som växer vilt: skimmerblad i Östbäcksdalen, guldblad i Dykärrsträsket, solkronblad i Törntoppshöjderna och nybörjarfläckar i varje yngre zon, bladet och stjälken som håller apotekaryrkena kokande. Öppen för alla från nivå 1 med en örtinsamlingsskära i väskorna (20 koppar vid diskarna i Östbäck, Fenbron och Högvakt), spårad på en egen räknare till ett tak på 100.",
         "fishing": "Fiske är det udda inslaget bland insamlingsyrkena, och det djupaste: ett riktigt napp-och-indragning-minispel, egna fångsttabeller i var och en av kärnlandets tre zoner (de unga vattnen bortom dem serverar tills vidare alla Dalens tabell), och ett skicklighetstak på 200, dubbelt mot de andra. Köp ett metspö, vänd dig mot öppet vatten och kasta.",
-        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked garden beds, growing on their own clock whether you stay or go, and pulled up ripe whenever you come back, because nothing in a bed ever spoils. A farmer stands beside every bed site, from the Eastbrook allotments through Fenbridge and Highwatch to the Evergarden parterre, and Farmer Jessica in Eastbrook is where the trade starts: she sells the garden hoe and the first seeds, and her errand walks a new farmer through a first crop. Each rung of the ladder grows its own crops, two on the lower rungs and four on the upper ones, each with a finer grade for a practiced hand to pull, and engineers craft the hoes for the tougher ground above the starter beds. Tracked on its own counter to a cap of 100."
+        "farming": "Jordbruk är det enda samlaryrke du sköter snarare än tar: grödor odlas från frön i bearbetade trädgårdsbäddar, växer enligt sin egen klocka vare sig du stannar eller går, och dras upp mogna när du återvänder, eftersom ingenting i en bädd förstörs. En bonde står vid varje bäddplats, från odlingslotterna i Östbäck genom Kärrbron och Högvakten till Evergardens parterr. Bonde Jessica i Östbäck är där yrket börjar: hon säljer trädgårdshackan och första fröna, och hennes ärende leder en ny bonde genom den första grödan. Varje steg odlar sina egna grödor, två på lägre steg och fyra på högre, var och en med en finare grad för en van hand att dra upp. Ingenjörer tillverkar hackorna för den hårdare jorden ovanför startbäddarna. Jordbruk har en egen räknare med taket 100."
       },
       "rhythmHeading": "Insamlingsrytmen",
       "rhythmBody": "En skörd är en kort synlig kanalisering, inte ett omedelbart grepp: {base} sekunder i grunden, aldrig under ett golv på {floor} sekunder. Att bära ett verktyg över nodens nivå, ett som din skicklighet låter dig hantera, snabbar upp dig med {tool} sekunder per nivå över den, och varje skicklighetsband du passerar skalar bort ytterligare {band} sekunder; att bara matcha nodens nivå släpper in dig genom dörren, det är nivåerna över den som gör dig snabb.\n\nEn full väska avböjer artigt kanaliseringen innan den börjar, så inget går till spillo mitt i svingen, och varje skörd ger en liten skiva karaktärserfarenhet, skalad efter nodens nivå mot din egen på samma sätt som erfarenhet för dödade fiender skalas: en trivial grå nod lär en karaktär vid taket ingenting.",
@@ -7413,7 +7413,7 @@ export const sv_SE: EnTranslations = {
       "nodesHeading": "Noder per zon",
       "nodesNote": "Var noderna finns, deras nivå, vilket verktyg de behöver och vad de ger. Varje nod återspawnar för dig {respawn} sekunder efter din egen skörd, och den timern är din ensam: en annan skördare som arbetar samma nod fördröjer aldrig din, så det finns ingen nodkapplöpning och ingen campning. Varje zon uppåt i stegen ger ett bättre material från tuffare mark.",
       "toolsHeading": "Verktyg",
-      "toolsNoteFishingPageMarks": "Every node needs its trade's tool in your bags, tier 1 included: no pick, no ore, and no pole, no fish. The vendor ladder covers tiers 1 to 3 across the three heartland hubs: the tier-1 tool is sold at all three, the rungs above it where the ground that uses them begins (Fenbridge adds tier 2, Highwatch tier 3), and the younger settlements beyond them stock no tools at all, so kit up before you travel. Farming buys elsewhere: its tier-1 hoe is stocked by the farmer who keeps the first allotment (she stands at the Eastbrook allotments, not at any tool counter), and no hoe rung above it is sold for coin anywhere. Every counter sells every rung it stocks freely, and any tool passes by direct trade; every rung also lists on the Market and travels by mail except the four 20-copper land starters (the Copper Mining Pick, the Handaxe, the Gathering Sickle and the Garden Hoe): those are bought at a counter or passed hand to hand, and never sold back, mailed, or listed. What is gated is the wielding. A land tool above tier 1 works only once your proficiency in its own trade has earned it, {tier2Prof} for tier 2, {tier3Prof} for tier 3, and 85 for tier 4 and 100 for tier 5, and the vendor row, the tooltip, and the table below all name the requirement up front. Until then a tool bought ahead simply waits in your bags, opening no ground, buying no speed, and minting no fine grades, then wields the moment your counter touches its number. Fishing rods are the one exception: no rod carries a wield requirement, and Trader Wilkes in Eastbrook deliberately stocks the tier 2 and tier 3 rods for anglers buying ahead. A tool never occupies an equip slot and never wears out, so each is a one-time purchase, and only the tier matters to the gate: a rarer tool of the same tier opens nothing extra. Rarity is not only colour, though. It makes a slotted tool effect last longer, and on a rod it widens the reel window.\n\nA better tool buys three things, not two. It opens higher-tier ground, it shortens the cast, and it improves what comes out: work a vein with a tool ranked ABOVE the zone's own material and the harvest yields the fine grade of it instead of the plain one. The vein has to be one of the zone's full-grade ones, so the easier veins a zone keeps for travellers still yield the ordinary material. Fine materials are what the crafted tool recipes consume, and a fine grade counts as its ordinary version anywhere a recipe or a work order asks for one, so upgrading never strands you: it just means your copper ore arrives as Fine Copper Ore.\n\nAbove the vendor ladder the three node trades each have two crafted tools, tier 4 and tier 5, made at the toolworks (every character knows those two recipes; the skill that climbs for the work is Engineering's), or bought with Delve Marks at the Drowned Litany counter once its clears gates are met: the table below carries the Marks price and the clears each rung asks. No merchant ever sells them for coin. Farming's ladder is the long one: every hoe above the 20-copper starter is crafted, tiers 2 through 5, all four taught by the toolmaker rather than known from the start, and the top two rungs are also stocked at that same Marks counter. Fishing has three of its own, and they are learned rather than known from the start too: the toolmaker teaches the tier 4 Stormreel and the tier 5 Tidewrought, and the tier 6 Clockreel is built from a schematic instead; the Stormreel and the Tidewrought are also stocked at that same Marks counter, behind the same clears gates as the node tools of their tier, and the fishing page's tool table carries their Marks prices. Rods are the one ladder whose top rungs buy ACCESS on the water: every one of the three opens a catch band that skill alone can never reach, so a better rod is not comfort. For the three node trades no node today needs more than tier 3, so their tier 4 and tier 5 tools still buy speed and grade rather than access, and they will be the entry ticket when higher-tier ground arrives. Farming sits between the two: planting is what needs the hoe, so a bed of tier N asks a hoe of tier N right up to the fourth and last crop tier, and only the fifth rung opens no new ground.",
+      "toolsNoteFishingPageMarks": "Varje resursplats kräver att du har yrkets verktyg i väskorna, även på nivå 1: ingen hacka, ingen malm; inget spö, ingen fisk. Handlarna säljer verktyg på nivå 1 till 3 i de tre centralorterna. Nivå 1 säljs på alla tre, och de högre nivåerna där marken som kräver dem börjar: Fenbridge lägger till nivå 2 och Highwatch nivå 3. De yngre bosättningarna längre bort säljer inga verktyg alls, så utrusta dig före resan. Odling handlar på annat håll: hackan på nivå 1 säljs av bonden som sköter den första odlingslotten. Hon står vid Eastbrooks odlingslotter, inte vid någon verktygsdisk. Ingen hacka på högre nivå säljs för mynt någonstans. Varje handlare säljer fritt alla nivåer i sitt sortiment, och alla verktyg kan byta ägare genom direkt handel. Alla nivåer kan också säljas på marknaden och skickas med post, utom de fyra startverktygen för landyrken som kostar 20 koppar: Kopparhacka, Handyxa, Skördeskära och Trädgårdshacka. De köps över disk eller lämnas direkt till en annan spelare och kan aldrig säljas tillbaka, postas eller läggas ut på marknaden. Begränsningen gäller användningen. Ett landverktyg över nivå 1 fungerar först när din färdighet i rätt yrke räcker: {tier2Prof} för nivå 2, {tier3Prof} för nivå 3, 85 för nivå 4 och 100 för nivå 5. Handlarraden, verktygstipset och tabellen nedan visar kravet i förväg. Tills dess ligger ett förköpt verktyg bara i väskan: det öppnar ingen mark, ger ingen hastighet och skapar inga fina kvaliteter. Det börjar fungera så snart din färdighet når kravet. Fiskespön är undantaget: inget spö har ett användningskrav, och Handlare Wilkes i Eastbrook säljer avsiktligt spön på nivå 2 och 3 åt fiskare som vill köpa i förväg. Verktyg tar aldrig en utrustningsplats och slits aldrig ut, så vart och ett är ett engångsköp. Bara nivån avgör vilken mark som öppnas; ett mer sällsynt verktyg på samma nivå öppnar inget extra. Sällsynthet är ändå mer än färg: en insatt verktygseffekt räcker längre, och på ett spö blir tidsfönstret för att veva in fisken större.\n\nEtt bättre verktyg ger tre saker, inte två. Det öppnar mark på högre nivå, förkortar insamlingstiden och förbättrar resultatet. Arbeta en malmåder med ett verktyg på HÖGRE nivå än zonens eget material, så ger skörden den fina kvaliteten i stället för den vanliga. Ådern måste vara en av zonens fullvärdiga ådror; de enklare ådror som finns för förbipasserande ger fortfarande vanligt material. De fina materialen används i recepten för tillverkade verktyg. Fina material räknas dessutom som sin vanliga motsvarighet när ett recept eller en arbetsorder kräver den, så en uppgradering låser dig aldrig ute: din kopparmalm kommer bara som Fin kopparmalm.\n\nOvanför handlarnas nivåer har vart och ett av de tre resursyrkena två tillverkade verktyg, på nivå 4 och 5. De görs i verktygsverkstaden; alla karaktärer kan de båda recepten från början, och tillverkningen ökar Ingenjörskonst. De kan också köpas för Delve-märken vid Den dränkta litanians disk när kraven på avklarningar är uppfyllda. Tabellen nedan visar priset i märken och antalet avklarningar för varje nivå. Ingen handlare säljer dem någonsin för mynt. Odling har den långa stegen: varje hacka över startverktyget för 20 koppar tillverkas, från nivå 2 till 5. Alla fyra lärs ut av verktygsmakaren i stället för att vara kända från början, och de två högsta nivåerna säljs också vid samma märkesdisk. Fiske har tre egna verktyg som också måste läras in: verktygsmakaren lär ut Stormrullespö på nivå 4 och Tidvattensmitt spö på nivå 5, medan Urverksspö på nivå 6 byggs efter en ritning. Stormrullespö och Tidvattensmitt spö säljs också vid samma märkesdisk, bakom samma krav på avklarningar som resursverktygen på deras nivå. Fiskesidans verktygstabell visar deras priser i märken. Spön är den enda verktygsstegen vars högsta nivåer öppnar TILLGÅNG till vattnet: vart och ett av de tre öppnar ett fångstintervall som enbart färdighet aldrig kan nå, så ett bättre spö ger mer än bekvämlighet. För de tre resursyrkena kräver ingen resursplats i dag mer än nivå 3. Deras verktyg på nivå 4 och 5 ger därför fortfarande hastighet och kvalitet snarare än tillgång, men blir inträdesbiljetten när mark på högre nivå tillkommer. Odling ligger mellan dessa två: det är planteringen som kräver hackan, så en bädd på nivå N kräver en hacka på nivå N ända upp till den fjärde och sista grödnivån. Bara det femte steget öppnar ingen ny mark.",
       "toolCrafted": "Tillverkad ({craft})",
       "toolCraftedOrMarks": "Tillverkad ({craft}) eller {marks} Delve-märken efter tre rensningar av Den dränkta litanian",
       "toolCraftedOrMarksHeroic": "Tillverkad ({craft}) eller {marks} Delve-märken efter en heroisk rensning av Den dränkta litanian",
@@ -7426,11 +7426,11 @@ export const sv_SE: EnTranslations = {
       "yieldsHeading": "Vad en skörd ger",
       "yieldsBody": "Varje skörd rullar en kvalitet för det den ger, och din skicklighet är hela historien bakom det rullet. En helt ny skördare drar alltid vanligt material; varje skicklighetspoäng förskjuter stadigt vikt från vanligt till de högre graderna och aldrig bakåt, tills graden vanlig vid 100-taket försvinner helt: 60 procent ovanligt, 30 procent sällsynt, 8 procent episkt och 2 procent legendariskt, varje gång.\n\nKvalitet innebär också kvantitet: ett vanligt resultat ger 1 enhet, ovanligt och sällsynt ger 2, episkt 3 och legendariskt 4. Varje sällsynt, episk eller legendarisk skörd anländer som en signerad kopia stämplad Samlat av dig: vid taket är det fyra av tio skördar som bär ditt namn, och provenansreglerna på sidan Hantverksekonomi förklarar varför hantverkare betalar extra för just de stackarna.",
       "bandsHeading": "Skicklighetsband",
-      "bandsBodySplitLadder": "Proficiency bands are the shared 0/100/200 ladder over a land trade's counter: the band crossed at 100 shaves the gather cast, and the land cap makes band 1 the ceiling. Fishing keeps a ladder of its own, six rungs at 0, 100, 150 and then three more at 200. Its bands shave nothing; they select the catch tables, each with a rod to match. After that third rung the gate moves once more, to the 200 cap, and then stops: from the cap on, the rod alone decides how far the table goes. The climb is what pulls an angler to deeper water, where the better tables and the further lessons both live.",
+      "bandsBodySplitLadder": "Färdighetsbanden är den gemensamma 0/100/200-stegen över ett landyrkes räknare: bandet du passerar vid 100 förkortar insamlingskastet och landtaket gör band 1 till taket. Fiske har en egen stege med sex steg vid 0, 100, 150 och därefter tre till vid 200. Dess band förkortar inget; de väljer fångsttabellerna, var och en med ett spö som passar. Efter det tredje steget flyttas spärren en gång till, till taket vid 200, och stannar sedan: från taket avgör enbart spöet hur långt tabellen sträcker sig. Det är klättringen som drar en metare till djupare vatten, där både de bättre tabellerna och de fortsatta lektionerna finns.",
       "bandFmt": "Band {band}: från {at} skicklighet",
       "rareHeading": "Sällsynta fynd",
       "rareBody": "Vid varje skörd, oavsett din skicklighet, finns en chans på 1 av {oneIn} att hitta ett sällsynt fynd: en oskadd åder i malm, urgammalt hjärtved i timmer, en månlyst blomma bland örterna. Fyndet multiplicerar den skördens utbyte {mult} gånger, varje enhet anländer signerad med ditt namn oavsett vilken kvalitet som rullas, och hela zonen hör om det vid namn. Varje smak skriver också in sin egen noll-Ryktbarhetsbedrift i din Bedriftbok, en samlarmarkering som enbart existerar för att bevisa att det hände dig.",
-      "rareBodyFourFlavors": "Every harvest, whatever your skill, carries a 1 in {oneIn} chance of a rare find: a pristine vein in ore, ancient heartwood in timber, a moonlit bloom among the herbs, a golden harvest from a garden bed. The find multiplies that harvest's yield {mult} times over, every unit arrives signed with your name regardless of the quality rolled, and the whole zone hears about it by name. Each flavor also inscribes its own zero-Renown deed in your Book of Deeds, a collector's mark that exists purely to prove it happened to you.",
+      "rareBodyFourFlavors": "Varje skörd har, oavsett din färdighet, 1 chans på {oneIn} att ge ett sällsynt fynd: en orörd malmåder, uråldrig kärnved, en månbelyst blomma bland örterna eller en gyllene skörd från en odlingsbädd. Fyndet multiplicerar skördens mängd med {mult}, varje enhet får din signatur oavsett vilken kvalitet som slås fram och hela zonen får höra ditt namn. Varje sorts fynd skriver också in en egen bedrift utan anseendepoäng i din Bedriftsbok, ett samlarmärke vars enda syfte är att visa att det hände dig.",
       "specimenBody": "Håll lite väskutrymme ledigt när du samlar: ett signerat vindfall behöver en egen plats eller en matchande signerad stapel att landa i, och om inget passar anländer utbytet ändå men signaturen går förlorad. Kroppsskörd har också sin egen jackpotarm: ungefär {pct}% av varje skördad komponent kommer upp sällsynt eller bättre. En familj som har ett perfekt exemplar att ge (skinn, siden, gift, kött) håller sitt vanliga utbyte enkelt och präglar det signerade exemplaret vid sidan av; varje annan familj signerar utbytet självt.",
       "gatherDeedsHeading": "Bedrifter längs vägen",
       "gatherDeeds": {
@@ -7439,42 +7439,42 @@ export const sv_SE: EnTranslations = {
         "herbalism": "Din första nod i vilket yrke som helst förtjänar Markens frukter, och 100-taket i Örtkunskap skriver in Ängens mästare. Att nå 100 i tre av Gruvdrift, Skogsavverkning, Örtkunskap och Fiske lägger till Mästarskördare med 25 Ryktbarhet, och en månlyst blomma registrerar sin egen samlarmarkering. Bedrifter är titlar och Ryktbarhet enbart, aldrig kraft.",
         "fishing": "Milstolpen vid 100 skriver in Gamla saltet och 200 skriver in Mästarfiskare med sin titel, själva toppen av fiskarens konst; Fiske räknas också mot Mästarskördare, som förtjänas vid 100 i tre valfria insamlingsyrken. En första fisk ur sex zoners vatten fyller var sin egen sida, kärnlandets tre zoner samt Pilkärret, Stormkammen och Fjärrkusten bortom dem, och Solglintens koi registrerar Glimmer av hopp, så resenärer med ett spö i packningen fyller sin bok snabbare än de väntar sig.",
         "farming": "Farming keeps no deeds of its own yet: now that its beds and crops are in the ground, the milestone and cap deeds that mark the other trades arrive in a later patch. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power.",
-        "farmingSown": "Farming keeps its own shelf in the Book of Deeds now. Sow It Begins marks your first planted crop, and four chronicle pages mark a first thriving harvest at each of the bed sites, from Eastbrook Vale to the Evergarden. A golden harvest records its own zero-Renown collector's mark, and proficiency in Farming counts toward Master Gatherer, earned at 100 in any three gathering trades. Every Furrow Filled gathers the whole roster onto one page: grow every crop the four gardens carry and the collection closes. The capstone above it is Harvestmaster, the trade's 100-proficiency title, and with the mountain and parterre seeds now on their farmers' counters it is a climb you can finish today. Deeds are titles and Renown only, never power."
+        "farmingSown": "Jordbruk har en egen hylla i Bedrifternas bok. Sådden börjar markerar din första planterade gröda, och fyra krönikesidor markerar den första frodiga skörden vid var och en av bäddplatserna, från Östbäcksdalen till Evergarden. En gyllene skörd skriver in sitt eget samlarmärke utan Rykte, och färdighet i Jordbruk räknas mot Mästersamlare, som fås vid 100 i vilka tre samlaryrken som helst. Varje fåra fylld samlar hela uppsättningen på en sida: odla varje gröda de fyra trädgårdarna har så är samlingen klar. Toppen är Skördemästaren, yrkets titel vid 100 i färdighet, och med bergs- och parterrfrön hos sina bönder är det en klättring du kan avsluta i dag. Bedrifter ger bara titlar och Rykte, aldrig kraft."
       },
       "fish": {
         "startHeading": "Kom igång",
-        "startBodyThreeRods": "A Simple Fishing Pole costs 20 copper from Fisherman Brandt in Eastbrook (look for the Old Salt at the town's east edge, by the road to Mirror Lake); Tinker Gizzel, Provisioner Hale in Fenbridge, and Quartermaster Bree in Highwatch stock poles too. Use the pole while facing water deep enough to hold fish, up to about 24 yards ahead of you, and your bobber sails out.\n\nYou cannot cast while in combat, while swimming, or while dead: casting from shore is the intended posture. Water gets harder as the land does, though: the marsh wants at least the tier 2 Ironreel and the peaks the tier 3 Silverstream, and a line cast without the rod that water takes never leaves your hand. Three rods sit above those, the Stormreel, the Tidewrought and the Clockreel: engineers craft all three at the toolworks out of what a line pulls up, and the Drowned Litany's delve counter sells the first two for Delve Marks behind its clears gates, though never for coin. No water asks for any of them, but they are not comfort alone: each one opens a catch band that skill by itself cannot reach, so once your counter is capped the rod is the only thing left that decides how deep your table goes. They shorten the wait and widen the reel window besides, which at the top rung means a bite in a flat three seconds.",
+        "startBodyThreeRods": "Ett enkelt fiskespö kostar 20 koppar hos Fiskare Brandt i Östbäck (leta efter den gamle sjömannen vid stadens östra kant, vid vägen till Spegelsjön). Fixare Gizzel, Provianterare Hale i Kärrbron och Kvartermästare Bree i Högvakten har också spön. Använd spöet vänd mot vatten som är tillräckligt djupt för fisk, upp till omkring 24 yard framför dig, så seglar flötet ut.\n\nDu kan inte kasta i strid, när du simmar eller när du är död: kast från stranden är avsett. Vattnet blir svårare som marken: träsket kräver minst Järnrullen på nivå 2 och topparna Silverströmmen på nivå 3, och en lina kastad utan spöet vattnet kräver lämnar aldrig din hand. Ovanför dem finns Stormrullen, Tidssmidda spöet och Klockrullen. Ingenjörer tillverkar alla tre vid verktygsverkstaden av sådant linan drar upp, och disken i Den dränkta litanian säljer de två första för Delve-märken efter sina rensningskrav, men aldrig för mynt. Inget vatten kräver dem, men de är inte bara bekvämlighet: vart och ett öppnar ett fångstband som färdigheten ensam inte når. När räknaren nått taket är spöet det enda som bestämmer hur djup din tabell blir. De kortar också väntan och vidgar invevningsfönstret, vilket på högsta steget ger napp på exakt tre sekunder.",
         "biteHeading": "Napp och indragning",
         "biteBody": "Efter kastet kommer ett napp i ett dolt ögonblick mellan {min} och {max} sekunder; fördröjningen avgörs när linan landar, så inga två kast känns riktigt lika. När flötet dyker har du ett fönster på {reel} sekunder att trycka på spöet igen och dra in: dra in inom det så landar fångsten, tveka förbi det och fisken kommer undan utan att lämna något efter sig. En hel session har ett tak på {cap} sekunder, så även ett stillsamt kast avgörs snabbt.\n\nBättre spön skärper båda ändarna av minispelet: varje spönivå över den första skalar bort {rod} sekunder från den längsta möjliga väntan, aldrig under golvet på tre sekunder som toppspöet redan tangerar, och lägger till {reelRod} sekunder på indragningsfönstret, så Järnrullespöet drar ner den värsta väntan till 6,5 sekunder med ett fönster på 3,25 sekunder, och Silverbäcksspöet till 5 med ett fönster förbi 4, där dess sällsynthet vidgar indragningen lite utöver vad nivån ensam betalar. De snabbaste nappen ändras aldrig oavsett vad du håller i, och ett spö behöver bara ligga i väskorna för att räknas.",
         "earlyReelNote": "En varning för ivriga tummar: tryck på spöet igen innan något nappar och du drar in en tom lina, vilket avslutar kastet. Den första sekunden efter att linan landat förlåts, så ett oavsiktligt dubbeltryck kostar dig ingenting; därefter är ett för tidigt tryck ett bortkastat kast. Tålamod är hela spelet: vänta på nappet, och hugg sedan.",
         "scheduleHeading": "Skicklighetsvinst",
-        "scheduleNoteRetuned": "Fishing gain follows a fixed schedule with no dice: 0.08 of a point per catch below 50 proficiency, 0.05 below 100, 0.04 below 150, and 0.03 from 150 to 200. The curve is deliberately shallow rather than back-loaded: the whole climb to 200 is about eleven hours of active fishing, and no quarter of it costs more than a third of the total, so the last fifty points are a long stretch rather than the whole journey.\n\nJunk stops teaching entirely at {cutoff}: from there on, weeds and boots are just weeds and boots. The water itself caps the lesson too: the Vale's tier 1 waters (and every young shore beyond the heartland) teach nothing past 100, the marsh's stop at 150, and only Thornpeak's school an angler the whole way to 200. Every landed catch otherwise gains at the scheduled rate, so when the counter stalls, the schedule is telling you to seek deeper water.",
+        "scheduleNoteRetuned": "Fiskets färdighetsvinst följer ett fast schema utan tärningar: 0,08 av en poäng per fångst under 50 i färdighet, 0,05 under 100, 0,04 under 150 och 0,03 från 150 till 200. Kurvan är medvetet jämn snarare än baktung: vägen till 200 tar omkring elva timmar av aktivt fiske, och ingen fjärdedel kostar mer än en tredjedel av totalen, så de sista femtio poängen är en lång sträcka snarare än hela resan.\n\nSkräp slutar lära ut helt vid {cutoff}: sedan är ogräs och stövlar bara ogräs och stövlar. Vattnet sätter också taket: Dalens vatten på nivå 1 (och alla unga stränder bortom kärnlandet) lär inget efter 100, träskets slutar vid 150, och bara Törntoppens vatten lär en fiskare hela vägen till 200. Varje annan landad fångst ger vinst enligt schemat, så när räknaren stannar säger schemat åt dig att söka djupare vatten.",
         "colProficiency": "Skicklighet",
         "colGain": "Vinst per fångst",
         "belowFmt": "Under {below}",
         "tablesHeading": "Fångsttabeller",
-        "tablesNoteSixBands": "Your proficiency selects one of six catch bands: band 0 from the start, band 1 at 100, band 2 at 150, and the top three all at 200, each shifting weight out of junk and empty hooks into real fish, zone by zone. Each band above the first also demands a rod, one tier higher every time: band 1 wants the tier 2 Ironreel, band 2 the tier 3 Silverstream, band 3 the tier 4 Stormreel, band 4 the tier 5 Tidewrought, and band 5 the tier 6 Clockreel. Band 2 opens at 150 and the last three all wait for the 200 cap, so the skill gate moves once more and then stops: from the cap on, the rod is the only thing that lifts your table, which is what the crafted rods are for and where the three deep-water catches live. Your effective band is the lower of what your skill has earned and what your rod supports, and the cap is silent: with a lesser rod you still catch, just off the lower band's table, so if your catches feel stuck while your skill climbs, check your rod first.\n\nEach zone's waters hold their own pair of cooking catches, higher-tier fish the deeper the zone, all of them kitchen reagents that must be cooked before they restore anything; from band 3 up, three more join every zone's table at the same weight, so a recipe naming one of those asks the same of an angler wherever they fish. The rest of the table is the angler's tax: weed, the occasional boot, and the empty hook, which never fully disappears. How much you pay depends on the water your bobber lands in, not where you stand: a cast reaches up to 24 yards, and the rod the water demands, the table it draws from, the deed it credits, and how far it teaches all answer to the zone that water belongs to, decided the moment the line lands. Each zone's water is written for a band of its own, the Vale for band 0, the marsh for band 1, the peaks for band 2, and fishing one band under that turns roughly a third of your casts into empty hooks, two bands under it more than half. The rod gets you to the water; the skill is what makes it pay, and the climb is what pulls an angler deeper, because better bands are not just better pay: past the Vale they are the only waters that keep teaching. The {rare} is the one row that answers to your catch band and nothing else: the same odds in every zone, and six times likelier at band 2 than at band 0, so the rarest thing on the dock is the one a Master Angler really is better at.",
+        "tablesNoteSixBands": "Din färdighet väljer ett av sex fångstband: band 0 från början, band 1 vid 100, band 2 vid 150 och de översta tre vid 200. Vart och ett flyttar vikt från skräp och tomma krokar till riktig fisk, zon för zon. Varje band över det första kräver också ett spö, en nivå högre varje gång: band 1 kräver Järnrullen på nivå 2, band 2 Silverströmmen på nivå 3, band 3 Stormrullen på nivå 4, band 4 Tidssmidda spöet på nivå 5 och band 5 Klockrullen på nivå 6. Band 2 öppnar vid 150 och de tre sista vid taket 200. Färdighetsgrinden flyttar sig en gång till och stannar: från taket är spöet det enda som höjer tabellen, vilket är de tillverkade spönas syfte och där de tre djupvattenfångsterna finns. Ditt effektiva band är det lägre av vad färdigheten förtjänat och vad spöet stöder. Med ett sämre spö fångar du fortfarande fisk från det lägre bandets tabell, så kontrollera spöet först om fångsterna känns fastlåsta medan färdigheten stiger.\n\nVarje zons vatten har sitt par fiskar för Matlagning, fisk på högre nivå ju djupare zonen är, alla köksreagenser som måste tillagas innan de återställer något. Från band 3 och uppåt tillkommer ytterligare tre med samma vikt i varje zons tabell, så ett recept som nämner en av dem kräver samma sak av fiskaren överallt. Resten av tabellen är fiskarens skatt: ogräs, enstaka stövlar och tom krok, som aldrig helt försvinner. Hur mycket du betalar beror på vattnet flötet landar i, inte var du står: ett kast når 24 yard, och spökravet, tabellen, bedriften och hur långt vattnet lär ut beror på zonen vattnet tillhör, avgjort när linan landar. Varje zon är skriven för ett band, Dalen för 0, träsket för 1 och topparna för 2. Fiske ett band under gör ungefär en tredjedel av kasten till tomma krokar, två band under mer än hälften. Spöet får dig till vattnet, färdigheten får det att löna sig, och klättringen drar fiskaren djupare eftersom bättre band, bortom Dalen, är de enda vatten som fortsätter lära ut. {rare} är den enda raden som bara beror på fångstbandet: samma odds i varje zon och sex gånger sannolikare vid band 2 än 0, så det sällsyntaste på bryggan är det en Mästerfiskare faktiskt är bättre på.",
         "bandHeading": "Skicklighetsband {band}: skicklighet {at} och uppåt, spönivå {rod}",
         "colCatch": "Fångst",
         "colOdds": "Odds",
         "pctFmt": "{pct}%",
         "emptyHook": "Ingenting nappar",
         "koiHeading": "Solglintens koi",
-        "koiBodyBandFlat": "Every body of water in the game hides the same prize: the Sunglint Koi, an uncommon gleam on the line worth 75 copper to a vendor and rather more to your pride. Its odds answer to your catch band and to nothing else, the same in every zone: a 1 percent row of the catch table at band 0, 3 at band 1, and 6 from band 2 upward, drawn on every reeled-in cast, so the koi comes to the angler who earned the deep tables. Landing one records Glimmer of Hope in your Book of Deeds, a zero-Renown collector's mark. When it happens, the log makes sure you know."
+        "koiBodyBandFlat": "Varje vattensamling i spelet döljer samma pris: Solglimtkoin, en ovanlig glimt på linan värd 75 koppar hos en handlare och mer för din stolthet. Dess odds beror endast på ditt fångstband och är lika i varje zon: en rad på 1 procent i fångsttabellen vid band 0, 3 vid band 1 och 6 från band 2 och uppåt, dragen vid varje invevat kast. Koin kommer alltså till fiskaren som förtjänat de djupa tabellerna. Att landa en skriver in Hoppets glimt i Bedrifternas bok, ett samlarmärke utan Rykte. När det händer ser loggen till att du vet det."
       },
       "farm": {
-        "rhythmHeading": "The farming rhythm",
-        "rhythmBody": "Planting is the short visible cast: {plant} seconds flat at every rung, because a hoe opens ground rather than buying speed. Pulling a ripe crop is instant. There is no cast to interrupt and no bag check to refuse it, and a bed that has come ready waits as long as you leave it, so a full pack costs a farmer nothing but the walk to empty it.\n\nWhat a harvest pays is produce and farming proficiency. Unlike a vein, it grants no character XP at all, so the beds are a trade to work rather than a way to level.",
-        "gainHeading": "What a harvest teaches",
-        "gainBody": "Gain is deterministic and keyed to your own counter rather than to the crop: {g1} proficiency a harvest below {p1}, {g2} below {p2}, {g3} below {p3}, and {g4} the rest of the way to the cap of {cap}. It is never a skill-up roll, so the climb is exactly as long as the arithmetic makes it.\n\nWhat the crop tier decides is how far a bed can carry you. A tier 1 crop teaches to {c1} and grays there, a tier 2 crop to {c2}, and tier 3 and above to the cap, so moving up the beds is what keeps the counter moving at all.",
-        "yieldsHeading": "What a harvest yields",
-        "yieldsBody": "A bed pays picks rather than a graded pull. Every plot starts with a floor of {floor} lives, and each pick rolls a chance not to spend one: {keep0} percent at a fresh counter and {keepCap} percent at the cap, which works out at roughly three and a half picks at the start and six at the end.\n\nQuality rides those same picks instead of replacing them. Each pick has a {fine0} percent chance at a fresh counter, {fineCap} percent at the cap, of coming up as the crop the bed grew in its fine grade rather than its plain one, so a fine pick upgrades a pick and never adds one. There is no common-to-legendary ladder on a bed: a crop mints its own two grades and nothing else.\n\nTwo things add picks outright, and both land at the plain grade. An alchemist's growth tonic, armed when you plant, pays {tonicPicks} more picks on a {tonicPct} percent chance, and a slotted quantity effect adds {effectCap}, which is the cap farming puts on a Maker's Charm so the tonic keeps a reason to exist. A charged Artisan's Eye works on quality instead, adding {fineBonus} percentage points to every fine roll.",
-        "bedsHeading": "Working the beds",
-        "bedsBody": "The loop is short. Buy seeds and compost from the farmer beside the beds: Jessica in Eastbrook stocks the Vale pair, the Fenbridge farmer the marsh pair, Hollis on the Highwatch terraces the mountain crops, and Verbena the Evergarden parterre. A high-tier harvest also hands back a seed or two of its own, any seed changes hands on the World Market, and the mountain and parterre seeds now turn up in endgame drops and on the Heroic Quartermaster's counter besides, so the farmer beside the beds is the way in rather than the only way. Sow with a hoe in your bags, and tip the odds if you like: compost from the counter and the farmer's watch, paid in produce as you plant, each raise a crop's chance of coming through, an alchemist's growth tonic gives the harvest a shot at a larger yield, and once your skill has climbed a full band past a crop's tier that crop never fails at all. Then walk away. The bed keeps growing while you are logged out, a ripe crop waits as long as you leave it, and the Harvest Journal (Shift+K by default, or the Farming row of your professions window) lists every bed you have planted with its timer.\n\nA crop that fails leaves withered husks in place of produce, and any farmer trades husks for compost, so a bad season buys the next one's insurance. What you bring in feeds more than your own recipes: the produce cooks into the farm dishes at the kitchens, and it now goes into Cook Marlow's own trainer ladder and into the apothecary's elixirs besides, so a farmer has a buyer from the very first rung. And the garden no longer stops at the trainer ladder: the terrace crops season the raid's own role plates and every apex flask, and the Evergarden beds feed the two skill-125 capstone stations, so the last rung of both crafts is bought from a farmer too. Marlow's wheat and rice orders take Vale Wheat and Marsh Rice off your hands for coin on the same clock as every other work order.",
-        "bedsBodyScribeBuyer": "The scribe's desk buys from the beds too: the rung-50 Sunpetal Scroll takes a Frost Gourd off the Highwatch terraces, the same gourd the Elixir of the Serpent takes, which prices the two routes to that buff even.",
-        "tableHeading": "From the beds to the table",
+        "rhythmHeading": "Jordbrukets rytm",
+        "rhythmBody": "Planteringen är det korta synliga kastet: alltid {plant} sekunder på varje steg, eftersom en hacka öppnar jord i stället för att köpa fart. Att dra upp en mogen gröda sker genast. Det finns inget kast att avbryta och ingen väskkontroll som kan neka det, och en färdig bädd väntar hur länge du än lämnar den, så en full packning kostar bonden endast promenaden för att tömma den.\n\nEn skörd ger grödor och färdighet i Jordbruk. Till skillnad från en åder ger den ingen karaktärs-XP, så bäddarna är ett yrke att arbeta med, inte ett sätt att levla.",
+        "gainHeading": "Vad en skörd lär dig",
+        "gainBody": "Vinsten är deterministisk och knuten till din egen räknare, inte grödan: {g1} färdighet per skörd under {p1}, {g2} under {p2}, {g3} under {p3}, och {g4} resten av vägen till taket på {cap}. Det är aldrig ett kast för färdighetshöjning, så klättringen är exakt så lång som matematiken säger.\n\nGrödans nivå avgör hur långt en bädd kan bära dig. En gröda på nivå 1 lär ut till {c1} och grånar där, en på nivå 2 till {c2}, och nivå 3 och högre till taket, så högre bäddar håller räknaren i rörelse.",
+        "yieldsHeading": "Vad en skörd ger",
+        "yieldsBody": "En bädd ger skördar snarare än ett kvalitetsbedömt uttag. Varje ruta börjar med minst {floor} liv, och varje skörd har chans att inte förbruka ett: {keep0} procent med en färsk räknare och {keepCap} procent vid taket, ungefär tre och en halv skördar i början och sex i slutet.\n\nKvaliteten följer samma skördar i stället för att ersätta dem. Varje skörd har {fine0} procents chans med färsk räknare, {fineCap} procent vid taket, att komma upp som bäddens gröda i fin grad i stället för vanlig. En fin skörd uppgraderar en skörd men lägger aldrig till en. Det finns ingen stege från vanlig till legendarisk i en bädd: en gröda skapar sina två grader och inget annat.\n\nTvå saker lägger till skördar direkt, båda i vanlig grad. En alkemists tillväxttonic, aktiverad när du planterar, ger {tonicPicks} ytterligare skördar med {tonicPct} procents chans, och en monterad mängdeffekt ger {effectCap}, gränsen Jordbruk sätter för en Skaparens berlock så att tonicen behåller sitt värde. Ett laddat Hantverkarens öga arbetar i stället med kvalitet och lägger till {fineBonus} procentenheter till varje kast för fin kvalitet.",
+        "bedsHeading": "Att arbeta med bäddarna",
+        "bedsBody": "Cykeln är kort. Köp frön och kompost av bonden vid bäddarna: Jessica i Östbäck har dalens båda sorter, bonden i Kärrbron träskets båda, Hollis på Högvaktens terrasser bergsgrödorna och Verbena Evergardens parterr. En skörd på hög nivå ger också tillbaka ett eller två frön av sin egen sort, alla frön kan handlas på Världsmarknaden, och bergs- och parterrfröna finns nu även som slutspelsbyte och hos den heroiska kvartersmästaren. Bonden vid bäddarna är alltså vägen in, inte den enda vägen. Så med en hacka i väskorna och förbättra oddsen om du vill: kompost från disken och bondens vakttid, som betalas i grödor när du planterar, höjer båda chansen att grödan lyckas. En alkemists tillväxttonic ger chansen till större avkastning, och när din färdighet stigit en hel nivågrupp över grödans nivå misslyckas den aldrig. Gå sedan därifrån. Bädden växer medan du är utloggad, en mogen gröda väntar hur länge du än lämnar den, och Skördedagboken (Shift+K som standard, eller raden Jordbruk i yrkesfönstret) visar varje planterad bädd med timer.\n\nEn misslyckad gröda lämnar vissna skal i stället för skörd, och varje bonde byter skal mot kompost, så en dålig säsong köper nästa säsongs försäkring. Det du tar hem försörjer mer än dina egna recept: grödorna blir bondrätter i köken, och går nu också till Kock Marlows tränarstege och apotekarens elixir, så bonden har en köpare från första steget. Trädgården slutar inte vid tränarstegen: terrassgrödorna kryddar raidens rollrätter och varje toppflaska, och Evergardens bäddar försörjer de två slutstationerna på färdighet 125, så även sista steget i båda hantverken köps av en bonde. Marlows beställningar på vete och ris tar Dalvete och Träskris mot mynt enligt samma klocka som andra arbetsordrar.",
+        "bedsBodyScribeBuyer": "Skrivarens skrivbord köper också från bäddarna: Solbladsrullen på steg 50 använder en Frostkalebass från Högvaktens terrasser, samma kalebass som Ormens elixir använder, vilket sätter samma pris på de två vägarna till den förstärkningen.",
+        "tableHeading": "Från bäddarna till bordet",
         "tableBody": "The kitchens are where a season pays forward. Beyond the everyday farm dishes, each crop tier has a richer dish that leaves you Well Fed: finish the meal and a lasting boon stays with you, the kind of edge a group wants eaten before the dungeon door. Crowning the set is the Harvest Feast, a spread a cook sets out in the world itself: everyone at hand takes a serving of their own, one each, and every finished meal pays the same Well Fed boon, so one farmer's season can set the table for a whole party. The top of that ladder, the two richest dishes and the feast itself, leans on the mountain and parterre crops, whose seeds the farmers beside those beds sell. The recipes are another matter: the upper rungs of the farm ladder are no longer taught at any counter, and are found in the endgame or bought with Heroic Marks like every other endgame recipe.\n\nLuck keeps a place at that table too. Every harvest you bring in rolls the same windfall chance the other gathering trades enjoy, and now and then a crop comes up golden: the yield lands far past a normal pull, something extra comes up with it (a seed for finer ground than you are working, or now and then one of those endgame recipes), the whole zone hears the find announced by name, and Golden Harvest is recorded in your Book of Deeds.",
-        "tableBodyOneMeal": "The kitchens are where a season pays forward. Beyond the everyday farm dishes, each crop tier has a richer dish that leaves you Well Fed: finish the meal and a lasting boon stays with you, the kind of edge a group wants eaten before the dungeon door. Only one Well Fed effect at a time: a newer meal replaces it. Crowning the set is the Harvest Feast, a spread a cook sets out in the world itself: everyone at hand takes a serving of their own, one each, and every finished meal pays the same Well Fed boon, so one farmer's season can set the table for a whole party. The top of that ladder, the two richest dishes and the feast itself, leans on the mountain and parterre crops, whose seeds the farmers beside those beds sell. The recipes are another matter: the upper rungs of the farm ladder are no longer taught at any counter, and are found in the endgame or bought with Heroic Marks like every other endgame recipe. The dish ladder itself is Cooking's work: the Cooking page carries every rung.\n\nLuck keeps a place at that table too. Every harvest you bring in rolls the same windfall chance the other gathering trades enjoy, and now and then a crop comes up golden: the yield lands far past a normal pull, something extra comes up with it (a seed for finer ground than you are working, or now and then one of those endgame recipes), the whole zone hears the find announced by name, and Golden Harvest is recorded in your Book of Deeds."
+        "tableBodyOneMeal": "Köken är där en säsong betalar vidare. Utöver vardagens bondrätter har varje grödonivå en rikare rätt som gör dig Välnärd: avsluta måltiden och en varaktig välsignelse stannar hos dig, den fördel en grupp vill ha före fängelsehålans dörr. Bara en Välnärd-effekt kan vara aktiv, en ny måltid ersätter den. Kronan på verket är Skördefesten, ett bord en kock dukar i världen: alla i närheten tar en egen portion, och varje färdig måltid ger samma Välnärd-välsignelse, så en bondes säsong kan duka för en hel grupp. De två rikaste rätterna och festen använder bergs- och parterrgrödor, vars frön bönderna vid bäddarna säljer. Recepten är en annan sak: bondstegens övre delar lärs inte ut vid någon disk utan hittas i slutspelet eller köps för Heroiska märken som andra slutspelsrecept. Matlagningens sida har varje steg på maträttsstegen.\n\nTuren har också plats vid bordet. Varje skörd slår samma chans till lyckofynd som andra samlaryrken har, och ibland kommer en gröda upp gyllene: avkastningen hamnar långt över en vanlig skörd, något extra följer med (ett frö till finare jord än den du arbetar, eller ibland ett slutspelsrecept), hela zonen hör fyndet kungöras vid namn, och Gyllene skörd skrivs in i Bedrifternas bok."
       },
       "econ": {
         "title": "Hantverksekonomi",
@@ -7507,7 +7507,7 @@ export const sv_SE: EnTranslations = {
         "commissionsBody": "En beställning är ett hantverk skapat för någon. När ett vapen, en rustningspjäs eller ett hållet off-hand tillverkas (en dryck kan inte bära en band), kan hantverkaren flagga hantverket som en beställning: det färdiga stycket beter sig normalt i tillverkarens egna händer, men det ögonblick det byter händer i en handel binds det till personen som tog emot det. Det är Tillverkarens Band: köparen får sin pjäs, och pjäsen kan inte lämnas vidare eller säljas.\n\nBand är inte för evigt, bara dyra. En stationsmästare kan lösa upp ett bundet stycke när du står vid deras station (en mobil station erbjuder aldrig den tjänsten), mot en avgift satt av föremålets kvalitet: 25 silver ovanlig, 1 guld sällsynt, 4 guld episk, med en legendarisk som betalar den episka taxan och ett beställt vanligt stycke den ovanliga.\n\nAvgiften köper en ren tavla, inte ett botemedel: stycket är fortfarande en beställning, så det binds igen till vem som tar emot det i nästa handel, och allt annat om det, signatur, mästerverk och förtrollningar, förblir orört.",
         "provenanceHeading": "Signerat arbete",
         "provenanceBody": "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; open Sources for the full list. Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
-        "provenanceBodyUndiscounted": "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; open Sources for the full list. Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one), unless that reagent is marked undiscountable; raid cores always keep their full cost. Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
+        "provenanceBodyUndiscounted": "Vissa föremål bär ett namn. Ett materials källrader anger vem som samlade varje grupp av enheter, medan en separat markering för signerad av anger den särskilda undertecknaren när det finns en. De uppgifterna är oberoende: vanligt insamlat material registrerar en samlare utan att få en signatur, och äldre signerat lager kan ange sin undertecknare samtidigt som det ärligt säger att ingen samlare registrerades. En färdig pjäs anger i stället vem som tillverkade den. Dessa uppgifter följer föremålet genom handel, banken, posten, Världsmarknaden och till och med en handlares återköp, och de bleknar aldrig.\n\nInsamling signerar automatiskt sitt bästa arbete: varje skörd som blir sällsynt eller bättre kommer signerad, och sällsynta fynd signerar hela sin femdubbla vinst. En lyckad kroppsskördsrullning signerar sin avkastning där familjen inte har något specimen att ge, och där den har det behålls avkastningen vanlig medan ett signerat orört specimen skapas bredvid. Tillverkning följer samma linje: varje kopia av ett sällsynt eller bättre resultat skapas signerad, och ett mästerverk signeras alltid oavsett kvalitet, så den finaste versionen av varje pjäs anger alltid sin tillverkare. Ett vanligt materials signatur följer själva enheterna och kan inte försvinna bara för att en kompatibel stapel redan innehåller en annan samlare eller undertecknare. Ett särskilt orört specimen är ett eget föremål och behöver fortfarande plats; om det inte får rum kvarstår den vanliga kroppsskörden men specimenet går förlorat.\n\nFärdiga föremål behåller en strikt identitet, så två kopior slås bara ihop när varje markering är exakt lika: samma föremål, samma undertecknare, samma mästerverksegenskaper, samma förtrollning, samma bindning. Kompatibla material delar en plats mellan samlare och undertecknare samtidigt som de behåller en räkning för varje källa. Verktygstipset vid hovring sammanfattar källorna; öppna Källor för hela listan. Separera efter samlare håller de staplarna isär i dina väskor, och sortering respekterar det valet. Överfört material kan staplas normalt med mottagarens material.\n\nSignaturer betalar tillbaka till hantverkare: att hålla en signerad kopia av ett nödvändigt reagens vid bänken, vem som än signerade det, lägger till 2 procentenheter till mästerverkschansen, och att hålla ett reagens signerat av din egen hand minskar den reagensens erforderliga mängd med en (aldrig under en), såvida reagensen inte är markerad som utan rabatt; raidkärnor behåller alltid sin fulla kostnad. Ditt eget signerade sällsynta eller bättre arbete fortsätter till och med att lära dig, i dag bara genom tillverkade drycker: drick en sällsynt brygd som du själv bryggt och signerat så återgår en liten strimma skicklighet till yrket som gjorde den, så länge yrket är ett av dina aktiva huvudyrken. Det är verkligen bara dryckesgrenen och inget annat, så ett elixir, en skrift eller en toppflaska lär dig inget tillbaka hur fint den än var signerad.",
         "collectorsHeading": "Samlare, trofeer, och priset pa en historia",
         "collectorsBody": "Handlare är blinda för ursprung: ett signerat föremål säljs till ett NPC för exakt sitt ordinarie pris. Premiumet på en signatur finns bara mellan spelare, vilket är precis vad som gör det intressant: en stapel vindfallsmalm signerad av en berömd samlare, ett Primärsnitt från en lycklig insamling, ett mästerverk-svärd som namnger en hantverkare som sedan gått i pension, alla kostar vad någons minne säger att de är värda.\n\nBedrifternas bok lutar sig mot samma instinkt: Oskadd åder, Urgammalt hjärtved, Månlyst blomma, Ett perfekt exemplar och Glimmer av hopp är noll-ryktbarhetens samlarmärken som finns enbart för att bevisa att ett ögonblick hände dig. Behåll föremålet som förtjänade bedriften och du har kvittot. Inget av detta är styrka; ursprung köper inga egenskaper och vinner inga strider, det är spelets pappersspår av goda dagar.",
         "castPaceHeading": "Kasttid och guldslukaren",
@@ -7521,38 +7521,38 @@ export const sv_SE: EnTranslations = {
         "castPaceRecharge": "Omladdning av verktygseffekt: {seconds} s kast",
         "castPaceBatch": "Satsvis tillverkning: upp till {count} i en order, ett kast var",
         "doctrineHeading": "Spelare handlar med spelare",
-        "introRaidCollections": "How coin moves through the trades: the exact fees and sinks, what actually sells, World Market rules, work orders, commissions, and the place of raid-funded collections alongside ordinary crafting.",
+        "introRaidCollections": "Hur mynt rör sig genom yrkena: de exakta avgifterna och sänkorna, vad som faktiskt säljer, Världsmarknadens regler, arbetsordrar, beställningar och raidfinansierade samlingars plats vid sidan av vanlig tillverkning.",
         "doctrineBody": "Hantverksekonomin är byggd på en idé: spelare försörjer spelare. Samlare matar hantverkare, hantverkare matar korsfarare och raidare, och avbrytare matar förtrollare, med handlare och stationsmästare på kanterna för att ta in skräp och mynt snarare än att konkurrera med dig. Om du vill tjäna pengar på ett yrke är din kund en person: lär dig vad andra spelare bränner igenom, prissätt mot Världsmarknaden, och behandla NPC-systemen som ett golv under dina priser, inte som marknaden själv.\n\nTillverkad utrustning är inställd för att ligga under raidgolvet: även ett mästerverk är alltid bara en kvalitetsnivå över sitt recept, aldrig förbi legendarisk, och dess statbudget stannar under raidlootbandet. Smedjan gör dig redo för det svåraste innehållet; den ersätter det inte. Det håller hantverkare, raidare och marknaden i en stabil triangel: raidfynd förblir aspirationsbaserade, och tillverkade pjäser förblir den bästa utrustning pengar faktiskt kan köpa.",
-        "doctrineBodyRaidCollections": "The crafting economy is built on one idea: players supply players. Gatherers feed crafters, crafters feed questers and raiders, and breakers feed enchanters, with vendors and station masters standing at the edges to absorb junk and coin rather than to compete with you. If you want to make money from a profession, your customer is a person: learn what other players burn through, price against the World Market, and treat the NPC systems as a floor under your prices, not as the market itself.\n\nOrdinary crafted equipment supports the climb into endgame. The Crucible's raid-funded collections also offer an alternative to current raid drops: their materials come from raiding, while crafting turns those materials into a chosen armor and role profile. Their three slot choices and any-two bonus allow different combinations with raid gear. They still share the global two-piece Masterwrought cap, so crafting complements the rest of the raid kit without supplying an entire replacement set.",
+        "doctrineBodyRaidCollections": "Hantverksekonomin bygger på en idé: spelare försörjer spelare. Samlare försörjer hantverkare, hantverkare försörjer uppdragsgörare och raidare och nedbrytare försörjer förtrollare, medan handlare och stationsmästare står vid kanterna för att ta hand om skräp och mynt i stället för att konkurrera med dig. Vill du tjäna pengar på ett yrke är din kund en människa: lär dig vad andra spelare förbrukar, prissätt mot Världsmarknaden och behandla NPC-systemen som ett golv under dina priser, inte som marknaden själv.\n\nVanlig tillverkad utrustning hjälper klättringen in i slutspelet. Smältdegelns raidfinansierade samlingar erbjuder också ett alternativ till aktuella raidfynd: deras material kommer från räder medan tillverkning gör materialen till en vald rustnings- och rollprofil. Deras tre platsval och bonusen för vilka två delar som helst tillåter olika kombinationer med raidutrustning. De delar fortfarande det globala taket på två Mästersmidda delar, så tillverkning kompletterar resten av raidutrustningen utan att ge en hel ersättningsuppsättning.",
         "orderBoardHeading": "Beställningstavlan",
         "orderBoardBody": "Du behöver inte hitta en hantverkare i chatten. Öppna ditt hantverksfönster, så är beställningstavlan ett klick bort i dess sidhuvud. Vem som helst kan lägga upp en order där: namnge receptet du vill ha tillverkat, och lämna det antingen öppet för vilken hantverkare som helst att ta, eller rikta det mot en namngiven hantverkare, som då är den enda som kan plocka upp det. En hantverkare som bläddrar i tavlan accepterar en order, och att acceptera binder dem, så ett jobb utförs alltid bara av en person i taget.\n\nInget hålls tillbaka när du lägger upp den: en order reserverar varken mynt eller material, så priset och vem som står för reagenserna stannar mellan er två, avtalat på samma sätt som varje beställning avtalas. Du kan avbryta din egen order medan den fortfarande är öppen, och en order som ingen accepterar går ut av sig själv efter en dag. När en hantverkare väl har accepterat är det leveransen som avslutar den.\n\nLeverans sker ansikte mot ansikte. Hantverkaren tillverkar pjäsen som en beställning, kommer till dig och lämnar över den, så håll en väskplats fri för att ta emot den. Det som anländer följer de vanliga beställningsreglerna nedan, och binds till dig genom Tillverkarens Band.",
         "commissionsBoardNote": "Det finns två vägar in i en beställning: en order du lägger upp på tavlan ovan, som för fram arbetet till en hantverkare, och att en hantverkare helt enkelt väljer att tillverka en pjäs åt dig. Båda slutar i samma band."
       },
       "prov": {
-        "title": "Provisioning: from the field to the raid",
-        "intro": "The gathering lines meet in one kitchen, and the ladder above it ends at a table a whole raid eats from.",
-        "suppliersHeading": "Who feeds the kitchen",
-        "suppliersBody": "Cooking takes from nearly every gathering line, and that is deliberate: a cook who also fishes, farms, or skins is never short of something to work with, and a cook who does none of those can buy the lot on the market.\n\nWhat each line brings is listed below, and it is read straight off the live recipe list rather than written down here, so it is always what the kitchen actually asks for today.",
-        "lineCountFmt": "{count} into cooking bills",
-        "lineCorpse": "Corpse harvesting",
-        "ladderHeading": "The ladder, rung by rung",
-        "ladderBody": "Cooking climbs in the usual brackets, and every rung is listed with what it teaches. The early rungs are single dishes you eat from your bags. Higher up the kitchen starts making things for other people: plates that carry a lasting buff, and above those the feasts, which you do not eat at all but set down on the ground for everyone standing near it.",
-        "rungFmt": "Cooking {skill}",
-        "placeableTag": "(placed, not eaten)",
-        "stationTag": "(field station)",
-        "tableHeading": "The table at the top",
-        "tableBody": "A feast is set down where you stand and anyone nearby takes one serving each. What a serving gives is exactly the dish that feast is built around, so a feast never has power of its own to learn: it is a way of handing a whole group the plate you already know how to cook.\n\nThe top of the ladder is three feasts rather than one, and picking between them is the only choice there is. They cost the same, ask for the same materials, and take the same skill; each simply serves a different one of the three great plates, so a group takes the one that suits what it is about to do. Only one feast of yours can stand at a time, whichever rung it came from, and it keeps for a few minutes before it is cleared away.",
-        "marketHeading": "If you cook none of it",
-        "marketBody": "None of this is a wall for anyone who does not cook. Every material on this page is ordinary tradable goods, so a fisher sells catches, a farmer sells crops, and a raider who does neither buys a feast outright from a cook who made a spare. The kitchen is a place the professions meet, never a toll on the ones who skip it.",
-        "cookingLink": "Cooking"
+        "title": "Proviantering: från fältet till räden",
+        "intro": "Insamlingsleden möts i ett kök, och stegen ovanför slutar vid ett bord som en hel räd äter från.",
+        "suppliersHeading": "Vem förser köket",
+        "suppliersBody": "Matlagning använder varor från nästan varje insamlingsyrke, och det är avsiktligt: en kock som också fiskar, odlar eller flår har alltid något att arbeta med, och en kock som inte gör någotdera kan köpa allt på marknaden.\n\nNedan visas vad varje yrke bidrar med. Uppgifterna hämtas direkt från den aktuella receptlistan i stället för att vara inskrivna här, så de visar alltid vad köket faktiskt behöver i dag.",
+        "lineCountFmt": "{count} till matlagningskostnader",
+        "lineCorpse": "Skörd från lik",
+        "ladderHeading": "Stegen, nivå för nivå",
+        "ladderBody": "Matlagning utvecklas i de vanliga intervallen, och varje steg visar hur mycket färdighet det ger. De första stegen är enskilda rätter som du äter ur väskorna. Högre upp börjar köket laga mat åt andra: rätter som ger en långvarig förstärkning och ovanför dem festmåltider, som du inte äter själv utan ställer på marken åt alla i närheten.",
+        "rungFmt": "Matlagning {skill}",
+        "placeableTag": "(placeras, äts inte)",
+        "stationTag": "(fältstation)",
+        "tableHeading": "Bordet på toppen",
+        "tableBody": "En festmåltid ställs där du står, och alla i närheten kan ta var sin portion. Portionen ger exakt samma effekt som den rätt festmåltiden bygger på. En festmåltid har alltså ingen egen styrka att lära sig: den är ett sätt att ge en hel grupp den rätt du redan kan laga.\n\nÖverst finns tre festmåltider i stället för en, och valet mellan dem är det enda du behöver göra. De kostar lika mycket, kräver samma material och samma färdighet; var och en serverar bara en annan av de tre stora rätterna, så gruppen väljer den som passar nästa aktivitet. Du kan bara ha en egen festmåltid utställd åt gången, oavsett vilket steg den kommer från, och den står kvar i några minuter innan den tas bort.",
+        "marketHeading": "Om du inte lagar något av det",
+        "marketBody": "Inget av detta hindrar den som inte lagar mat. Alla material på den här sidan är vanliga handelsvaror, så fiskare säljer fångster, odlare säljer grödor och raidare som inte gör någotdera köper en färdig festmåltid av en kock som lagat en extra. Köket är en mötesplats för yrkena, aldrig en avgift för dem som väljer bort det.",
+        "cookingLink": "Matlagning"
       },
       "faq": {
         "title": "Yrkens FAQ",
         "intro": "Snabba svar på de frågor hantverkare ställer oftast.",
-        "q1": "Why do my signed items not stack?",
-        "a1": "Finished items still follow the strict instance rule: two copies merge only when their signer, rolled properties, masterwork stats, enchant, bond, and other identity all match exactly. A signed blade therefore stays apart from a plain one.\n\nMaterials are the exception. Compatible stacks of the same material can merge even when their collectors or signers differ, because the stack keeps a count for each source. The hover tooltip summarizes the sources; open Sources for the full list. Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.",
+        "q1": "Varför staplas inte mina signerade föremål?",
+        "a1": "Färdiga föremål följer fortfarande den strikta instansregeln: två kopior slås bara ihop när undertecknare, rullade egenskaper, mästerverksegenskaper, förtrollning, bindning och all annan identitet matchar exakt. En signerad klinga hålls därför isär från en vanlig.\n\nMaterial är undantaget. Kompatibla staplar av samma material kan slås ihop även när deras samlare eller undertecknare skiljer sig, eftersom stapeln behåller ett antal för varje källa. Verktygstipset vid hovring sammanfattar källorna; öppna Källor för hela listan. Separera efter samlare håller staplarna isär i väskorna och sortering respekterar valet. Överfört material kan staplas normalt med mottagarens material.",
         "q2": "Höjer vanliga recept min skicklighet for evigt?",
-        "a2": "No. Every recipe is scored by how far it sits below your current bracket in that craft, the classic orange, yellow, green, gray reading: full gain at or above your bracket, half one tier below, a quarter two tiers below, and nothing three or more below. Brackets are every 25 skill, so the free skill 0 recipes stop teaching you anything at 75 skill.\n\nThe caps are also lower than the classic 300 you might expect: each of the ten earnable crafts caps at 125, Mining, Logging, and Herbalism cap at 100, and Fishing runs long at 200. Climbing means moving up to recipes at your own bracket, not grinding the cheapest one.",
+        "a2": "Nej. Varje recept bedöms efter hur långt det ligger under din nuvarande nivå i hantverket, den klassiska läsningen orange, gul, grön, grå: full vinst vid eller över din nivå, halv ett steg under, en fjärdedel två steg under och ingen vinst tre eller fler steg under. Nivåerna ligger var 25:e skicklighet, så de fria recepten vid skicklighet 0 slutar lära dig något vid 75.\n\nTaken är också lägre än de klassiska 300 du kanske väntar dig: vart och ett av de tio möjliga hantverken har taket 125, Gruvdrift, Skogsavverkning och Örtkunskap har 100 och Fiske går till 200. Att klättra innebär att gå vidare till recept på din egen nivå, inte att slipa det billigaste.",
         "q3": "Vad är skillnaden mellan att plundra och skörda en kropp?",
         "a3": "Det är två skilda handlingar på samma kropp. Allt ett lik innehåller, mynt och fynd plus insamlingsbara komponenter, öppnas i samma fönster, men interagera-tangenten och Ta byte plockar bara det vanliga bytet, som följer normala bytesregler. Insamling är yrkessidan, som lossar material från kroppen själv, och sker först när du väljer Skörda i det fönstret.\n\nInsamling är först till kvarn, engångsbasis: varje kropp kan skördas exakt en gång, av vem som helst som gör anspråk på det först, inbegripet online-föregångare. Ditt Stadsfokus formar vad du får: när du står i ett stadscentrum kan du fördela 10 fokuspoäng över de komponenttyper du bryr dig om, och varje fokuserad komponent rullar en bättre nivå (var 5:e poäng ökar det ett steg, som mest två steg) och ger mer (10 procent per poäng). Ofokuserade komponenter försämras aldrig.",
         "q4": "Varfor är min Ironbark-stock signerad?",
@@ -7560,17 +7560,17 @@ export const sv_SE: EnTranslations = {
         "q5": "Hur löser jag upp ett bestellt stycke, och vad kostar det?",
         "a5": "Gå till valfri hantverksstation med pjäsen i din väska och betala mästaren. Avgiften följer föremålets kvalitet: 25 silver för ett ovanligt stycke, 1 guld för ett sällsynt, 4 guld för ett episkt; ett legendariskt betalar den episka taxan, och ett beställt vanligt stycke betalar den ovanliga. Det måste vara en riktig station: en mobil station erbjuder aldrig tjänsten.\n\nAvgiften köper en ren tavla, inte ett botemedel: pjäsen förblir en beställning, så det binds igen till vem som tar emot det i nästa handel. Om flera bundna kopior delar en stapel lossas en kopia av och löses upp per betalning.",
         "q6": "Var lär jag mig recept, och vad kostar de?",
-        "a6ThreeRods": "The nine common field recipes and the six crafted land-tool recipes are known to everyone from the start, and so are three station-bound recipes (the Kilnscale Mantle, the Wardweave Cowl, and the Duskhide Wraps), which need no trainer, only their station. Everything else is taught by the resident masters at their stations across the three hub towns: most stand in Eastbrook, the tanner keeps the tannery in Fenbridge, and the alchemist keeps the apothecary in Highwatch.\n\nTrainer recipes run in rungs: skill 0, 25, and 50 for the gear and consumable crafts, priced free, 25 silver, and 1 gold as one-time fees, and every craft adds one 75-rung intermediate above them at its station (Enchanting's is the Lucent Reagent, beside its two charm recipes on the 25 rung); the toolmaker also teaches two of the three crafted fishing rods, at 75 and 125 for 4 and 16 gold (the apex rung is learned from a schematic instead, so no trainer quotes it a fee). A master teaches a recipe once your bracket in that craft has reached the recipe's own bracket, and you must be standing at their station to learn: a mobile station does not count.",
+        "a6ThreeRods": "De nio vanliga fältrecepten och de sex tillverkade recepten på landverktyg är kända av alla från början, liksom tre stationsbundna recept (Kilnskalsmanteln, Vävarskyddshuvalen och Skymningshudslindorna), som inte behöver någon tränare utan bara sin station. Allt annat lärs ut av de fasta mästarna vid sina stationer i de tre navstäderna: de flesta finns i Östbäck, garvaren håller till vid garveriet i Fenbridge och alkemisten vid apoteket i Högvakt.\n\nTränarrecepten går i steg: skicklighet 0, 25 och 50 för utrustnings- och förbrukningshantverken, med engångsavgifter på gratis, 25 silver och 1 guld. Varje hantverk lägger till en mellanprodukt på steg 75 vid sin station (Förtrollnings är det lysande reagenset, bredvid dess två berlockrecept på steg 25); verktygsmakaren lär också ut två av de tre tillverkade fiskespöna, vid 75 och 125 för 4 respektive 16 guld (toppsteget lärs i stället från en ritning, så ingen tränare anger någon avgift för det). En mästare lär ut ett recept när ditt steg i det hantverket har nått receptets eget steg, och du måste stå vid deras station för att lära dig: en mobil station räknas inte.",
         "q7": "Varfor gick min insamling plötsligt langsamt?",
-        "a7RetunedTaper": "The gather cast starts at 2.5 seconds and is shaved down two ways: 0.4 seconds for every tool tier you carry and can wield above the node's own tier, and 0.15 seconds once your trade's counter crosses its 100 band, with a floor of 1.5 seconds. Move from tier 1 nodes up to tier 3 nodes and your surplus vanishes, so the same pick swings slower again. Holding exactly the required tier buys no speed; it only opens the node.\n\nSkill gain fades the same way crafting does: a node grays out as your proficiency climbs past its tier (tier 1 nodes teach nothing from proficiency 75 on), so the answer to slow gains is higher tier nodes. Those need a tool of at least their tier in your bags (no node is ever worked bare-handed, tier 1 included), and a land tool above tier 1 also wants its wield mark first, 40/70/85/100 in its own trade for tiers 2 through 5. Fishing follows its own taper: 0.08 per catch below 50 proficiency, 0.05 below 100, 0.04 below 150 and 0.03 below 200, junk catches teach nothing at all from 100 on, and the water itself caps the lesson (tier 1 waters stop teaching at 100, the marsh at 150), so a stalled counter can also mean you have outgrown the water.",
+        "a7RetunedTaper": "Insamlingskastet börjar på 2,5 sekunder och kortas på två sätt: 0,4 sekunder för varje verktygsnivå du bär och kan använda över nodens egen nivå, samt 0,15 sekunder när ditt yrkes räknare passerar 100, med ett golv på 1,5 sekunder. Går du från noder på nivå 1 till nivå 3 försvinner överskottet, så samma hacka svingas långsammare igen. Exakt den nivå som krävs ger ingen fart, den öppnar bara noden.\n\nFärdighetsvinsten avtar som vid tillverkning: en nod grånar när din färdighet går förbi dess nivå (noder på nivå 1 lär inget från färdighet 75), så svaret på långsamma vinster är noder på högre nivå. De kräver minst ett verktyg av sin nivå i väskorna (ingen nod bearbetas barhänt, inte heller nivå 1), och landverktyg över nivå 1 kräver först sin användningsgräns, 40/70/85/100 i sitt eget yrke för nivå 2 till 5. Fiske har sin egen avtrappning: 0,08 per fångst under 50 i färdighet, 0,05 under 100, 0,04 under 150 och 0,03 under 200. Skräpfångster lär ingenting från 100, och vattnet sätter också taket (vatten på nivå 1 slutar lära ut vid 100, träsket vid 150), så en stannad räknare kan betyda att du har vuxit ifrån vattnet.",
         "q8": "Kan jag tillverka utanfor staden?",
         "a8": "Delvis. De nio vanliga fältrecepten (nybörjarvapnet, rustningen, maten och trolldryckerna) tillverkas var som helst, när som helst, och det gör även de tre kombinationsrecepten hos de svurna paren. Allt annat ovanför dem är bundet till en stationstyp: smedja, kök, apotek, garveri, vävstol eller verktygsverkstad, och du måste vara inom 20 yard från stationen för att hantverket ska gå igenom.\n\nVid 75 skicklighet i ett hantverk specialiserar du dig, och tillsammans med 20 procent materialrabatt får du en mobil station: ställ upp den i fält så står den i 10 minuter och betjänar det hantverkets recept som om du stod vid den riktiga. Den mobila stationen är bara till för att tillverka: att lära sig recept och att lösa upp beställningar kräver alltid den riktiga stationen i staden.",
         "q9": "Hur får jag något tillverkat åt mig?",
         "a9": "Lägg upp den på beställningstavlan. Öppna hantverksfönstret, öppna tavlan från dess sidhuvud, och namnge receptet du vill ha tillverkat: lämna ordern öppen för vilken hantverkare som helst att acceptera, eller rikta den mot en hantverkare du redan känner. Att acceptera binder den hantverkaren till jobbet, och en order hålls alltid bara av en person i taget.\n\nInget mynt och inga material hålls kvar när du lägger upp den, så kom överens om priset och vem som tar med reagenserna er emellan, på samma sätt som beställningar alltid har avtalats. Du kan avbryta din egen order medan den fortfarande är öppen, och en order som ingen accepterar går ut efter en dag. Leverans sker personligen: stå nära din hantverkare med en ledig väskplats när pjäsen är klar. Den anländer bunden till dig genom Tillverkarens Band, vilket vilken stationsmästare som helst löser upp mot den vanliga avgiften.",
         "q10": "Vad är en amulett, och vad händer när den tar slut?",
         "a10": "En amulett är en monterad verktygseffekt: en förtrollares arbete som sitter i ett insamlingsverktyg och förbättrar det som kommer upp. Samlarens gömma lägger till en enhet till en skörd, Hantverkarens öga höjer dess grad, och Fixare Gizzel lär ut båda vid verktygsverkstaden i Östbäck vid 25 i Förtrollning. En laddning förbrukas bara när amuletten faktiskt ändrade utfallet, så en skörd den inte kunde förbättra kostar dig ingenting, och en plats kan ställas in på att fråga vid varje användning om du hellre vill avgöra det laddning för laddning.\n\nEn färsk amulett bär 20 laddningar på ett vanligt verktyg och 10 fler för varje sällsynthetssteg däröver, så ett episkt verktyg börjar på 50. Att ta slut förstör inte amuletten: verktygets ägare laddar om platsen, 10 laddningar per arkant material, där materialet följer det bättre av verktyget de bär och det bästa verktyg platsen någonsin fyllts med (Klingdamm för ett vanligt eller ovanligt verktyg, Klingessens för ett sällsynt, en Klingskarva för ett episkt). Att banka det bra verktyget före en omladdning gör den aldrig billigare, bara mindre till samma pris, och att montera en färsk amulett medan du bär det sämre verktyget är vägen tillbaka ner till ett billigare steg. Förtrollaren som signerade amuletten betalar hälften för att ladda om sin egen, och mindre ännu med en specialisering i Förtrollning.",
-        "q11": "How do I make an orange item?",
-        "a11Promotion": "Craft or buy an apex Masterwrought piece, then perfect it: with 125 skill in the craft that made it, each attempt spends one Maker's Ember, one Sundered Essence, and one Prismglass Setting, succeeds four times in five, and never harms the piece when it misses. The first attempt binds the piece to you, and four successful ranks make it Perfected. Then spend one Deed of Making, an inscriptionist's skill-125 writ anyone can buy or commission, to promote the Perfected copy into a legendary named whatever you choose. The promotion is deterministic: no roll, stats unchanged, only the name and the color change."
+        "q11": "Hur skapar jag ett orange föremål?",
+        "a11Promotion": "Tillverka eller köp en Mästersmidd toppdel och fullända den: med 125 i skicklighet i yrket som skapade den förbrukar varje försök en Skaparens glöd, en Söndrad essens och en Prismglasinfattning, lyckas fyra gånger av fem och skadar aldrig delen när det misslyckas. Det första försöket binder delen till dig, och fyra lyckade ranghöjningar gör den fulländad. Använd sedan en Skapandets bedrift, en skrivarehandling på skicklighet 125 som vem som helst kan köpa eller beställa, för att befordra den fulländade kopian till en legendarisk del med vilket namn du väljer. Befordran är deterministisk: ingen rullning, egenskaperna ändras inte och bara namn och färg ändras."
       },
       "findingNodesNote": "Du behöver inte hitta dessa med ögat. Varje fyndplats i zonen är utritad på zonkartan var kartan än visar den marken, och på minikartan när du passerar den, så en insamlingsrunda kan planeras från kartskärmen innan du ger dig av. En fyndplats dina verktyg ännu inte kan bearbeta är markerad snarare än dold: den behåller sin plats med en genomstruken, nedtonad markering, så du kan se marken du tränar dig mot. På datorn räcker det att föra muspekaren över en ådra, ett bestånd eller en fläck i världen: den namnges, du får veta vilket verktyg den vill ha, och när du väl har bearbetat den räknas din egen återspawning ner till sekunden. På pekskärm finns det inget att föra en pekare över, så minikartans markeringar berättar samma historia.",
       "specimenBodyFamilies": "Håll lite ledigt väskutrymme när du samlar: ett signerat vindfall behöver en egen plats eller en matchande signerad stapel att landa i, och om inget passar anländer utbytet ändå, men signaturen går förlorad. Kroppsskörd har också sin egen premiumarm: omkring {pct}% av varje skördad komponent kommer upp sällsynt eller bättre. En familj med ett perfekt exemplar att ge (hud, silke, gift, klo, kött) håller sitt vanliga utbyte enkelt och präglar det signerade exemplaret bredvid; de andra fem, huggtand, tyg, bete, horn och gälar, signerar själva utbytet."
@@ -7642,7 +7642,7 @@ export const sv_SE: EnTranslations = {
       "lootCommonBody": "Vanliga fynd kan gå laget runt i gruppen eller till den som plundrar, medan bättre fynd läggs upp för en rullning så att alla får en rättvis chans.",
       "lootRollTitle": "Behov, Girighet eller Avstå.",
       "lootRollBody": "När ett föremål går till en rullning väljer varje berättigad medlem Behov om de vill ha det, Girighet om de bara skulle ta det till övers, eller Avstå för att kliva av. Den högsta rullningen vinner.",
-      "lootRollBodyNeedBeatsGreed": "When an item goes to a roll, each eligible member chooses Need if they want it, Greed if they would only take it spare, or Pass to bow out. Need beats Greed: if anyone rolls Need, the item goes to the highest Need roll and the Greed rolls do not count; otherwise the highest Greed roll wins.",
+      "lootRollBodyNeedBeatsGreed": "När ett föremål lottas ut väljer varje berättigad medlem Behov om de behöver det, Girighet om de bara vill ha det som reserv eller Pass om de avstår. Behov går före Girighet: om någon slår för Behov går föremålet till det högsta Behov-slaget och Girighet-slagen räknas inte. Annars vinner det högsta Girighet-slaget.",
       "lootMasterTitle": "Bytesmästare.",
       "lootMasterBody": "Ledaren kan i stället ta hand om de bättre fynden och dela ut vart och ett till den medlem som bör få det. Det hindrar eftertraktad utrustning från att gå till ett vilset kast, så som en organiserad grupp kör en fängelsehåla.",
       "friendsHeading": "Vänner, ignorera och blockera",
@@ -7656,10 +7656,10 @@ export const sv_SE: EnTranslations = {
       "slashHeading": "Praktiska snedstreckskommandon",
       "slashBody": "Några vardagskommandon är värda att lägga på minnet: /w Namn skickar en viskning och /r svarar på den senaste du fick, /invite bjuder in någon i din grupp, /follow faller in i steg bakom en vän, /roll kastar tärning för gruppen att se, /who visar vilka som är online, och /afk markerar dig som borta. Skriv /help i spelet för hela listan.",
       "emotesBody": "Din karaktär kan också tala utan ord: skriv en emote som /wave, /dance, /cheer eller /bow, rikta den mot en vän genom att välja denne först, eller håll in X för att öppna emotehjulet för ett snabbt uttryck ovanför huvudet.",
-      "emotesBodyNamedTarget": "Your character can also speak without words: type an emote like /wave, /dance, /cheer, or /bow, add a name to aim it at someone, as in /wave Aleph, or hold X, the emote wheel's default key, to open the emote wheel for a quick overhead expression. The Emotes button in the rail of window buttons, or under More on touch, opens the same wheel.",
+      "emotesBodyNamedTarget": "Din karaktär kan också tala utan ord. Skriv en gest som /wave, /dance, /cheer eller /bow och lägg till ett namn för att rikta den mot någon, till exempel /wave Aleph. Du kan också hålla ned X, gesthjulets standardtangent, för att öppna hjulet och snabbt visa ett uttryck ovanför huvudet. Knappen Gester i raden med fönsterknappar, eller under Mer på pekskärm, öppnar samma hjul.",
       "calendarHeading": "Händelsekalendern",
       "calendarBody": "Tryck I för att öppna evenemangskalendern. Den markerar de rikesdagar det lönar sig att planera kring, det veckovisa Raidkallet, Marknadsdagen, Arenadusten och Fisketävlingen, plus den månatliga Delve-dagen och Månportskommunionen, och det är där gillen håller sitt schema: gillesledaren och officerarna kan boka evenemang på den, och varje medlem ser dem på samma sida. Rikesdagarna är en uppmaning att samlas, inte en bonus; ingenting med din rollperson ändras för att en dag är markerad.",
-      "calendarBodyDoubleHonor": "Press I to open the event calendar. It marks the realm days worth planning around, the weekly Raid Call, Market Day, Arena Clash, Double Honor Weekend, and Fishing Derby, plus the monthly Delve Day and Moongate Communion, and it is where guilds keep their schedule: the guild leader and officers can book events on it, and every member sees them on the same page. The realm days are a prompt to gather rather than a bonus, with one exception: all through the Double Honor Weekend, Thornhollow Fields Honor pays double and a played-out loss pays like a win. Nothing else about your character changes because a day is marked.",
+      "calendarBodyDoubleHonor": "Tryck på I för att öppna evenemangskalendern. Den visar rikets dagar som är värda att planera kring: veckans Raidkallelse, Marknadsdag, Arenadrabbning, Dubbel Heder-helg och Fisketävling samt månadens Delve-dag och Månportskommunion. Där finns också gillets schema: gillesledaren och officerarna kan boka evenemang, och alla medlemmar ser dem på samma sida. Rikets dagar uppmuntrar till att samlas snarare än att ge bonusar, med ett undantag: under hela Dubbel Heder-helgen ger Törnhålefälten dubbelt så mycket heder, och en färdigspelad förlust ger lika mycket som en seger. Inget annat hos din karaktär ändras för att en dag är markerad.",
       "readyHeading": "Redokontroller",
       "readyBody": "Före en stor dragning kan gruppledaren skriva /ready för att fråga rummet: alla andra får en fråga om Redo eller Inte redo, och när alla har svarat, eller 30 sekunder runnit ut, ser hela gruppen en enda sammanfattning av räkningen. Ingen pekas ut; poängen är räkningen, inte den skyldige.",
       "markersHeading": "Målmarkörer",
@@ -7671,7 +7671,7 @@ export const sv_SE: EnTranslations = {
       "realmsScopeBody": "Det du gör stannar på världen du valde: dina karaktärer, din vänlista, ditt gille och Marknaden finns alla där, och gille- och spelartopplistorna du öppnar i spelet rankar bara den världen, medan topplistan på webbplatsen samlar alla världar tillsammans. Varje värld har också sin egen dagliga raidåterställning, i sin egen lokala tid.",
       "finderHeading": "Att hitta en grupp",
       "finderBody": "Du behöver inte ropa i Söker grupp för att fylla en körning. Öppna Fängelsehålsletaren, välj körningen du vill ha och rollerna du är villig att fylla, och gå med i kön på egen hand eller med gruppen du redan har. Letaren väntar tills den har en full uppsättning roller, och erbjuder sedan gruppen till alla på en gång: en popup ber var och en av er acceptera, och gruppen bildas i samma stund den sista personen säger ja. Att tacka nej till ett erbjudande, eller låta det rinna ut, ger dig en kort nedkylning innan kön erbjuder dig en till, så att kön fortsätter röra sig.",
-      "finderBodyLeaderQueues": "You do not have to shout in Looking for Group to fill a run. Open the Dungeon Finder, choose the run you want and the roles you are willing to fill, and join the queue on your own, or have your party leader queue the party you already have (only the leader can put a group in). The finder waits until it has a full set of roles, then offers the group to everyone at once: a popup asks each of you to accept, and the party forms the moment the last person says yes. Turning an offer down, or letting it run out, drops you, and any party you queued with, out of the queue and puts you on a short cooldown before you can join it again; everyone else in the offer keeps their place, unless they did the same or queued with someone who did, so the line keeps moving.",
+      "finderBodyLeaderQueues": "Du behöver inte ropa i gruppsökarkanalen för att fylla en grupp. Öppna Fängelsehålsletaren, välj turen du vill göra och rollerna du kan ta, och ställ dig i kö ensam. Du kan också låta gruppledaren köa med gruppen ni redan har; bara ledaren får köa en grupp. Sökaren väntar tills alla roller är fyllda och skickar sedan ett erbjudande till alla samtidigt. Var och en får en ruta att godkänna, och gruppen bildas så snart den sista tackar ja. Om du tackar nej eller låter erbjudandet löpa ut tas du och den grupp du köade med bort ur kön, och du får en kort väntetid innan du kan köa igen. Alla andra i erbjudandet behåller sina platser, om de inte också avböjde, lät tiden gå ut eller köade med någon som gjorde det. På så vis fortsätter kön att röra sig.",
       "finderBoardBody": "Letaren håller också en tavla med förberedda grupper. En ledare lägger upp en annons med taggar som säger vad körningen är till för, från ett första besök till en ren fullständig rensning, och du ansöker om den för att ledaren ska godkänna dig. Den automatiska kön fyller fängelsehålorna och slutspelsraiden, var och en på normal och heroisk, medan tavlan också kan bära solo-länkningsomgången, som kön aldrig fyller åt dig; delver och utflykter i den öppna världen är dina att ordna själv. Hur som helst bygger letaren bara gruppen: att gå till dörren, ställa in svårighetsgraden och komma överens om bytesreglerna är fortfarande upp till er.",
       "finderMore": "Se vad som finns inuti varje fängelsehåla",
       "blockBody": "Blockera är det tyngre verktyget, för en spelare som inte lämnar dig ifred. En blockering stänger av deras inbjudningar, viskningar och post liksom deras chatt, gör er osynliga för varandra i /who, och tar bort dem från din vänlista om de fanns på den. Blockera från högerklicksmenyn på deras namn eller med /block, /unblock hävdar den igen, och /blocklist visar vilka som är på den.",
@@ -9850,7 +9850,7 @@ export const sv_SE: EnTranslations = {
         "cooldownLockedHerb": "Uttömd örtfläck, verktyg låst",
         "station": "Hantverksstation: {name}",
         "service": "Tjänst: {name}",
-        "farmPatch": "Garden beds",
+        "farmPatch": "Odlingar",
         "partyMember": "Gruppmedlem: {name}",
         "deadPartyMember": "Död gruppmedlem: {name}",
         "partyMemberGeneric": "Gruppmedlem",
@@ -10285,8 +10285,8 @@ export const sv_SE: EnTranslations = {
       "soldJunkMany": "Sålde {count} skräpföremål för {money}.",
       "keptBoundOne": "Behöll {count} bunden kopia.",
       "keptBoundMany": "Behöll {count} bundna kopior.",
-      "keptLockedOne": "Kept {count} locked copy.",
-      "keptLockedMany": "Kept {count} locked copies.",
+      "keptLockedOne": "Behöll {count} låst kopia.",
+      "keptLockedMany": "Behöll {count} låsta kopior.",
       "friendOnline": "{name} har kopplat upp.",
       "friendOffline": "{name} har kopplat från."
     },
@@ -10540,13 +10540,13 @@ export const sv_SE: EnTranslations = {
     },
     "cast": {
       "fishing": "Fiske",
-      "farming": "Planting",
+      "farming": "Plantering",
       "gathering": "Insamling",
       "crafting": "Hantverk",
       "disenchanting": "Avförtrollning",
       "enchanting_apply": "Förtrollning",
       "salvaging": "Bärgning",
-      "sundering": "Sundering",
+      "sundering": "Klyvning",
       "tool_recharge": "Omladdning",
       "demonHeal": "Demonläkning",
       "thunzharrStormcall": "Stormrop",
@@ -10690,8 +10690,8 @@ export const sv_SE: EnTranslations = {
       "tool": "Verktyg",
       "potion": "Trolldryck",
       "elixir": "Elixir",
-      "flask": "Flask",
-      "scroll": "Scroll",
+      "flask": "Flaska",
+      "scroll": "Rulle",
       "bag": "Väska",
       "mount": "Riddjur"
     },
@@ -10718,17 +10718,17 @@ export const sv_SE: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "Använd: Återställer {amount} hälsa under {seconds} sek. Du måste förbli sittande medan du äter.",
       "useDrink": "Använd: Återställer {amount} mana under {seconds} sek. Du måste förbli sittande medan du dricker.",
-      "useElixir": "Use: Increases your {stat} by {value} for {minutes} min. Replaces any other elixir or scroll of the same stat. Usable in combat.",
-      "useElixirAura": "Use: Grants {aura} for {minutes} min. Replaces any other elixir or scroll of its kind. Usable in combat.",
-      "flaskOnlyOne": "Only one flask effect at a time. Drinking another flask replaces this one.",
-      "flaskOutranks": "A weaker elixir or scroll of the same stat cannot replace it.",
-      "flaskUnremovable": "It cannot be dispelled, stolen, or canceled by hand.",
-      "flaskThroughDeath": "The effect remains through death, but ends when you log out; instanced matches begin and end on a clean slate.",
-      "wellFed": "Well Fed: Increases your {stat} by {value} for {minutes} min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.",
-      "wellFedAura": "Well Fed: Grants {aura} for {minutes} min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.",
-      "useFeast": "Use: Sets out a feast others can eat from, one serving each ({servings} servings, lasts {minutes} min).",
-      "useFeastBuff": "Each serving grants {aura}: +{value} {stat} for {minutes} min when you finish the {seconds} sec meal. Only one Well Fed effect at a time: a newer meal replaces it.",
-      "useFeastBuffAura": "Each serving grants {aura} for {minutes} min when you finish the {seconds} sec meal. Only one Well Fed effect at a time: a newer meal replaces it.",
+      "useElixir": "Användning: Ökar din {stat} med {value} i {minutes} minuter. Ersätter annan elixir eller rulle med samma egenskap. Kan användas i strid.",
+      "useElixirAura": "Användning: Ger {aura} i {minutes} minuter. Ersätter annan elixir eller rulle av samma sort. Kan användas i strid.",
+      "flaskOnlyOne": "Endast en flaskeffekt åt gången. Att dricka en annan flaska ersätter den här.",
+      "flaskOutranks": "En svagare elixir eller rulle med samma egenskap kan inte ersätta den.",
+      "flaskUnremovable": "Den kan inte skingras, stjälas eller avbrytas för hand.",
+      "flaskThroughDeath": "Effekten består genom döden men slutar när du loggar ut, instansmatcher börjar och slutar med ett rent blad.",
+      "wellFed": "Mätt: Ökar din {stat} med {value} i {minutes} minuter när du har ätit klart. Bara en Mätt-effekt åt gången, en nyare måltid ersätter den.",
+      "wellFedAura": "Mätt: Ger {aura} i {minutes} minuter när du har ätit klart. Bara en Mätt-effekt åt gången, en nyare måltid ersätter den.",
+      "useFeast": "Användning: Dukar fram en fest som andra kan äta från, en portion var ({servings} portioner, varar {minutes} minuter).",
+      "useFeastBuff": "Varje portion ger {aura}: +{value} {stat} i {minutes} minuter när du avslutat måltiden på {seconds} sekunder. Bara en Mätt-effekt åt gången, en nyare måltid ersätter den.",
+      "useFeastBuffAura": "Varje portion ger {aura} i {minutes} minuter när du avslutat måltiden på {seconds} sekunder. Bara en Mätt-effekt åt gången, en nyare måltid ersätter den.",
       "questItem": "Uppdragsföremål",
       "questRelated": "Uppdrag: {quest}",
       "questRules": "Kan inte säljas, bankas eller bytas bort.",
@@ -10751,8 +10751,8 @@ export const sv_SE: EnTranslations = {
       "useManaPotion": "Använd: Återställer omedelbart {amount} mana. Användbar i strid. 1 min nedkylning.",
       "clickUseInstant": "Klicka för att använda omedelbart i strid",
       "clickUse": "Klicka för att använda",
-      "clickSetOut": "Click to set out",
-      "clickSetUp": "Click to set up",
+      "clickSetOut": "Klicka för att duka fram",
+      "clickSetUp": "Klicka för att placera",
       "clickBuyback": "Klicka för att köpa tillbaka",
       "bagSlots": "Väska med {slots} platser",
       "bagSlotsMaterials": "Materialväska med {slots} platser"
@@ -10838,7 +10838,7 @@ export const sv_SE: EnTranslations = {
       "filterTypeConsumable": "Förbrukningsvaror",
       "filterTypeMaterial": "Material",
       "filterTypeCosmetic": "Kosmetika",
-      "filterTypePattern": "Patterns",
+      "filterTypePattern": "Mönster",
       "filterTypeOther": "Övrigt",
       "filterArmorType": "Rustningstyp",
       "filterArmorAll": "All rustning",
@@ -11138,7 +11138,7 @@ export const sv_SE: EnTranslations = {
       },
       "cold_snap": {
         "name": "Vinterns kallelse",
-        "description": "Finishes the cooldown on Flitstep, Frostveil, and Greater Invisibility. (Mage talent)"
+        "description": "Avslutar nedkylningen för Fladdersteg, Frostslöja och Större osynlighet. (Magitalang)"
       },
       "greater_invisibility": {
         "name": "Förbättrad osynlighet",
@@ -11189,7 +11189,7 @@ export const sv_SE: EnTranslations = {
         "description": "Avfyra tre isprojektiler som vardera orsakar {damage} frostskada och lägger Vinterkyla på målet: de nästa 2 kompatibla besvärjelserna mot det behandlar det som fruset. Brain Freeze gör Winterlash omedelbar och hoppar över dess nedkylning. (Frost)"
       },
       "frozen_orb": {
-        "name": "Frostglobe",
+        "name": "Frostklot",
         "description": "Släpp ett klot av virvlande frost som driver framåt i 8 sekunder, orsakar {damage} frostskada varje sekund på fiender i närheten och saktar ner dem med 30 %. Varje träffande puls skapar en istapp. (Frost)"
       },
       "blizzard": {
@@ -11197,7 +11197,7 @@ export const sv_SE: EnTranslations = {
         "description": "Kallar en isstorm över målområdet i 6 sek, orsakar {damage} Frost-skada varje sekund och saktar ner fiender med 40%. Varje träffad fiende minskar Frostglobes nedkylning med 0,5 sek, upp till 3 sek per kast. (Frost)"
       },
       "glacial_spike": {
-        "name": "Rimeneedle",
+        "name": "Frostnål",
         "description": "Frammanar en massiv istagge och förbrukar 5 Istappar för att orsaka {damage} Frost-skada och frysa målet på plats i 4 sek. (Frost)"
       },
       "glacial_front": {
@@ -11347,7 +11347,7 @@ export const sv_SE: EnTranslations = {
         "description": "Avslutande drag som sårar målet: det blöder var 2:e sek, i 6 sek plus 2 sek per kombopoäng (5 kombopoäng: 16 sek och {damage} total skada)."
       },
       "vanish": {
-        "name": "Smokefade",
+        "name": "Rökförsvinnande",
         "description": "Försvinn ur sikte och gå in i Duskveil även i strid. Du rör dig 50 % långsammare medan du är dold. Varar i upp till 10 sek."
       },
       "instant_poison": {
@@ -11954,7 +11954,7 @@ export const sv_SE: EnTranslations = {
         "description": "Gå in i ett sjudande raseri och generera 20 raseri. (Krigartalang)"
       },
       "crusader_strike": {
-        "name": "Oathstrike",
+        "name": "Edshugg",
         "description": "Träffar målet med vapenskada plus {damage} Helig skada. (paladintalang)"
       },
       "chain_heal": {
@@ -12058,7 +12058,7 @@ export const sv_SE: EnTranslations = {
         "description": "Bli en lich i 20 sek, vilket skapar 3 Själfragment och ökar er besvärjelseskada och besvärjelsehastighet med 20%. Era odöda vållar 50% mer skada och agerar 20% snabbare, och Soul Lance tränger igenom sitt mål och träffar upp till 2 närliggande fiender för 50% av sin skada. (Signatur för Nekromanti)"
       },
       "holy_shock": {
-        "name": "Lightjolt",
+        "name": "Ljusstöt",
         "description": "Chockar ett vänligt mål med helig energi och läker det för {damage}. (Helig signatur)"
       },
       "holy_shield": {
@@ -12086,7 +12086,7 @@ export const sv_SE: EnTranslations = {
         "description": "Ökar kritisk chans med besvärjelser med 50% i 15 sek. (Eldsignatur)"
       },
       "icy_veins": {
-        "name": "Coldsurge",
+        "name": "Köldvåg",
         "description": "Ökar besvärjelsehastighet med 30% och förhindrar avbrott och pushback i 10 sek. (Frostsignatur)"
       },
       "cold_blood": {
@@ -12270,7 +12270,7 @@ export const sv_SE: EnTranslations = {
         "description": "Dina autoattacker har en chans att låta dig använda Tidig grav på ett mål oavsett hälsa, utan raserikostnad. (Vapen)"
       },
       "storm_bolt": {
-        "name": "Thunderhurl",
+        "name": "Åskkast",
         "description": "Slunga ditt vapen mot målet för {damage} och bedöva det i 3 sek."
       },
       "piercing_howl": {
@@ -12294,7 +12294,7 @@ export const sv_SE: EnTranslations = {
         "description": "Besjäla ditt vapen med dina fienders blod: du och dina närstridsallierade får 10 % attackhastighet och 10 % skada i 20 sek."
       },
       "victory_rush": {
-        "name": "Victor's Surge",
+        "name": "Segerarens rusning",
         "description": "Slå för vapenskada plus {damage} och läk 20 % av din maximala hälsa. Kan endast användas inom 20 sek efter att du dödat en fiende."
       },
       "intimidating_shout": {
@@ -12334,7 +12334,7 @@ export const sv_SE: EnTranslations = {
         "description": "Bli en virvlande storm av stål och träffa alla fiender inom 6 meter för {damage} skada varje sekund i 4 sek."
       },
       "blink": {
-        "name": "Flitstep",
+        "name": "Fladdersteg",
         "description": "Teleporterar dig 15 m framåt och bryter rotningseffekter. (magikertalang)"
       },
       "bloodlust": {
@@ -12366,7 +12366,7 @@ export const sv_SE: EnTranslations = {
         "description": "Golpea a närliggande fiender con escarcha e inflige {damage} de daño de Frost. (magikertalang)"
       },
       "counterspell": {
-        "name": "Spellsever",
+        "name": "Magiklyvare",
         "description": "Avbryter målets besvärjelse och hindrar det från att kasta besvärjelser från den magiskolan i 6 sek."
       },
       "curse_of_exhaustion": {
@@ -12550,7 +12550,7 @@ export const sv_SE: EnTranslations = {
         "description": "Ökar förflyttningshastigheten med 35%, men offrar 2% av din maximala hälsa varje sekund. Kasta igen för att avbryta. Den stängs av vid 20% hälsa."
       },
       "spellsteal": {
-        "name": "Spellplunder",
+        "name": "Magirov",
         "description": "Stjäl en gynnsam magisk effekt från en fiende och överför den till dig."
       },
       "startle_shot": {
@@ -12846,7 +12846,7 @@ export const sv_SE: EnTranslations = {
         "name": "Arkanessens"
       },
       "arcane_shard": {
-        "name": "Arkanskarva"
+        "name": "Arkanskärva"
       },
       "fen_muster_order": {
         "name": "Kärrbros mönstringsorder"
@@ -13002,7 +13002,7 @@ export const sv_SE: EnTranslations = {
         "name": "Kazzix hjärtskärva"
       },
       "wyrmcult_orders": {
-        "name": "Broodsworn Orders"
+        "name": "Broodsworns order"
       },
       "ritual_phylactery": {
         "name": "Ritualfylakteri"
@@ -13065,7 +13065,7 @@ export const sv_SE: EnTranslations = {
         "name": "Gravlindormsfjällbrynja"
       },
       "wyrmcult_grand_robe": {
-        "name": "Broodsworn Grand Robe"
+        "name": "Broodsworns stora kåpa"
       },
       "wyrmscale_jerkin": {
         "name": "Lindormsfjällsväst"
@@ -13272,7 +13272,7 @@ export const sv_SE: EnTranslations = {
         "name": "Toriumhacka"
       },
       "arcanite_mining_pick": {
-        "name": "Glyphsteel Mining Pick"
+        "name": "Glyfhacka"
       },
       "ashwood_axe": {
         "name": "Askträdsyxa"
@@ -13290,7 +13290,7 @@ export const sv_SE: EnTranslations = {
         "name": "Toriummalm"
       },
       "arcanite_bar": {
-        "name": "Glyphsteel Bar"
+        "name": "Glyfstång"
       },
       "ashwood_log": {
         "name": "Askvedstock"
@@ -13521,7 +13521,7 @@ export const sv_SE: EnTranslations = {
         "name": "Toriumkrigsklinga"
       },
       "arcanite_war_axe": {
-        "name": "Glyphsteel War Axe"
+        "name": "Glyfstridsyxa"
       },
       "elderwood_battle_staff": {
         "name": "Äldrevedsstridsstav"
@@ -13734,7 +13734,7 @@ export const sv_SE: EnTranslations = {
         "name": "Skärvångmantel"
       },
       "wyrmcult_spellgrips": {
-        "name": "Broodsworn Spellgrips"
+        "name": "Broodsworns trollgrepp"
       },
       "thornpeak_wildwraps": {
         "name": "Törntoppets vildlindor"
@@ -13743,7 +13743,7 @@ export const sv_SE: EnTranslations = {
         "name": "Stormlöftesringbrynja"
       },
       "cryptbloom_shoulderguards": {
-        "name": "Tombpetal Shoulderguards"
+        "name": "Gravblommeaxelskydd"
       },
       "gravewyrm_thornmaul": {
         "name": "Gravlindormens törnklubba"
@@ -14157,7 +14157,7 @@ export const sv_SE: EnTranslations = {
         "name": "Hantverkarens öga"
       },
       "reins_terrorspark_groundshaker": {
-        "name": "Ignition Key: Dreadspark Groundshaker"
+        "name": "Tändningsnyckel: Skräckgnistas jordskakare"
       },
       "reins_goblin_rocket_sled": {
         "name": "Tändningsnyckel: Goblinraketsläde"
@@ -14244,481 +14244,481 @@ export const sv_SE: EnTranslations = {
         "name": "Vävbundna reagensväskan"
       },
       "hammered_copper_band": {
-        "name": "Hammered Copper Band"
+        "name": "Hamrat kopparband"
       },
       "polished_copper_loop": {
-        "name": "Polished Copper Loop"
+        "name": "polerad kopparslinga"
       },
       "coiled_copper_torc": {
-        "name": "Coiled Copper Torc"
+        "name": "Spunnen kopparhalsring"
       },
       "riveted_iron_signet": {
-        "name": "Riveted Iron Signet"
+        "name": "Nitförsedd järnsignetring"
       },
       "etched_iron_loop": {
-        "name": "Etched Iron Loop"
+        "name": "Etsad järnslinga"
       },
       "iron_link_choker": {
-        "name": "Iron Link Choker"
+        "name": "järnlänkshalsband"
       },
       "weighted_thorium_band": {
-        "name": "Weighted Osmium Band"
+        "name": "Viktat osmiumband"
       },
       "gleaming_thorium_loop": {
-        "name": "Gleaming Osmium Loop"
+        "name": "Glimrande osmiumslinga"
       },
       "burnished_thorium_amulet": {
-        "name": "Burnished Osmium Amulet"
+        "name": "Polerat osmiumamulett"
       },
       "silverleaf_primer": {
-        "name": "Sheenleaf Primer"
+        "name": "Glansbladsgrundare"
       },
       "goldleaf_folio": {
-        "name": "Goldleaf Folio"
+        "name": "Guldbladsfolio"
       },
       "sunpetal_grimoire": {
-        "name": "Sunpetal Grimoire"
+        "name": "Solbladens grimoar"
       },
       "silverleaf_scroll": {
-        "name": "Sheenleaf Scroll"
+        "name": "glansblad pergament"
       },
       "goldleaf_scroll": {
-        "name": "Goldleaf Scroll"
+        "name": "Guldbladsskrift"
       },
       "sunpetal_scroll": {
-        "name": "Sunpetal Scroll"
+        "name": "Solbladsskrift"
       },
       "duskforged_billet": {
-        "name": "Duskforged Billet"
+        "name": "Skymningssmitt ämne"
       },
       "forgefold_plating": {
-        "name": "Forgefold Plating"
+        "name": "Smedjeveks plåt"
       },
       "wyrmhide_cording": {
-        "name": "Wyrmhide Cording"
+        "name": "Lindormshudssnodd"
       },
       "sunspun_bolt": {
-        "name": "Sunspun Bolt"
+        "name": "Solspunnen tygbult"
       },
       "prismglass_setting": {
-        "name": "Prismglass Setting"
+        "name": "Prismglasinfattning"
       },
       "precision_chassis": {
-        "name": "Precision Chassis"
+        "name": "precisionschassi"
       },
       "quickening_catalyst": {
-        "name": "Quickening Catalyst"
+        "name": "påskyndningskatalysator"
       },
       "seasoned_stock": {
-        "name": "Seasoned Stock"
+        "name": "Kryddad buljong"
       },
       "lucent_reagent": {
-        "name": "Lucent Reagent"
+        "name": "lysande reagens"
       },
       "sablewax_vellum": {
-        "name": "Sablewax Vellum"
+        "name": "Sabelvaxpergament"
       },
       "spiritweld_girdle": {
-        "name": "Spiritweld Girdle"
+        "name": "Andevävd gördel"
       },
       "forgefold_legguards": {
-        "name": "Forgefold Legguards"
+        "name": "Smedjeveks benskydd"
       },
       "wardspeaker_sabatons": {
-        "name": "Wardspeaker Sabatons"
+        "name": "Skyddstalarkängor"
       },
       "briarstep_jerkin": {
-        "name": "Briarstep Jerkin"
+        "name": "Törnstegsjacka"
       },
       "fenbloom_breeches": {
-        "name": "Fenbloom Breeches"
+        "name": "Kärrblomsbyxor"
       },
       "barksong_handguards": {
-        "name": "Barksong Handguards"
+        "name": "Barksångshandskydd"
       },
       "sunspun_vestments": {
-        "name": "Sunspun Vestments"
+        "name": "Solspunna skrudar"
       },
       "sunspun_leggings": {
-        "name": "Sunspun Leggings"
+        "name": "Solspunna benkläder"
       },
       "sunspun_handwraps": {
-        "name": "Sunspun Handwraps"
+        "name": "Solspunna handlindor"
       },
       "sunspun_haversack": {
-        "name": "Sunspun Haversack"
+        "name": "Solspunnen ränsel"
       },
       "duskforged_warblade": {
-        "name": "Duskforged Warblade"
+        "name": "Skymningssmitt stridsblad"
       },
       "ridgebreaker": {
-        "name": "Ridgebreaker"
+        "name": "Åsbräckare"
       },
       "duskforged_bulwark": {
-        "name": "Duskforged Bulwark"
+        "name": "Skymningssmitt sköldmur"
       },
       "wyrmfall_pendant": {
-        "name": "Wyrmfall Pendant"
+        "name": "Wyrmfall-hänge"
       },
       "warhewn_signet": {
-        "name": "Warhewn Signet"
+        "name": "Krigshuggen signetring"
       },
       "prismglass_loop": {
-        "name": "Prismglass Loop"
+        "name": "Prismaglasring"
       },
       "gyrelens_array": {
-        "name": "Gyrelens Array"
+        "name": "Gyrelens matris"
       },
       "voidbound_grimoire": {
-        "name": "Voidbound Grimoire"
+        "name": "Tomhetsbunden grimoar"
       },
       "masters_field_forge": {
-        "name": "Master's Field Forge"
+        "name": "Mästarens fältsmedja"
       },
       "makers_charm": {
-        "name": "Maker's Charm"
+        "name": "Skaparens talisman"
       },
       "ironhusk_flask": {
-        "name": "Ironhusk Flask"
+        "name": "Järnskalsflaska"
       },
       "warboar_flask": {
-        "name": "Warboar Flask"
+        "name": "Stridsvildsvinsflaska"
       },
       "runewater_flask": {
-        "name": "Runewater Flask"
+        "name": "Runvattenflaska"
       },
       "stonepot_stew": {
-        "name": "Stonepot Stew"
+        "name": "Stengryta"
       },
       "warspice_skewers": {
-        "name": "Warspice Skewers"
+        "name": "Krigskryddade spett"
       },
       "sageleaf_chowder": {
-        "name": "Sageleaf Chowder"
+        "name": "Salviabladssoppa"
       },
       "grand_cauldron": {
-        "name": "Grand Cauldron"
+        "name": "storkittel"
       },
       "laden_hearth": {
-        "name": "The Laden Hearth"
+        "name": "Den välfyllda härden"
       },
       "pattern_spiritweld_girdle": {
-        "name": "Plans: Spiritweld Girdle"
+        "name": "Ritning: Andevävd gördel"
       },
       "pattern_forgefold_legguards": {
-        "name": "Plans: Forgefold Legguards"
+        "name": "Ritning: Smedjeveks benskydd"
       },
       "pattern_wardspeaker_sabatons": {
-        "name": "Plans: Wardspeaker Sabatons"
+        "name": "Ritning: Skyddstalarkängor"
       },
       "pattern_briarstep_jerkin": {
-        "name": "Pattern: Briarstep Jerkin"
+        "name": "Mönster: Törnstegsjacka"
       },
       "pattern_fenbloom_breeches": {
-        "name": "Pattern: Fenbloom Breeches"
+        "name": "Mönster: Kärrblomsbyxor"
       },
       "pattern_barksong_handguards": {
-        "name": "Pattern: Barksong Handguards"
+        "name": "Mönster: Barksångshandskydd"
       },
       "pattern_sunspun_vestments": {
-        "name": "Pattern: Sunspun Vestments"
+        "name": "Mönster: Solspunna skrudar"
       },
       "pattern_sunspun_leggings": {
-        "name": "Pattern: Sunspun Leggings"
+        "name": "Mönster: Solspunna benkläder"
       },
       "pattern_sunspun_handwraps": {
-        "name": "Pattern: Sunspun Handwraps"
+        "name": "Mönster: Solspunna handlindor"
       },
       "pattern_sunspun_haversack": {
-        "name": "Pattern: Sunspun Haversack"
+        "name": "Mönster: Solspunnen ränsel"
       },
       "pattern_duskforged_warblade": {
-        "name": "Plans: Duskforged Warblade"
+        "name": "Ritning: Skymningssmitt stridsblad"
       },
       "pattern_ridgebreaker": {
-        "name": "Plans: Ridgebreaker"
+        "name": "Ritning: Åsbräckare"
       },
       "pattern_duskforged_bulwark": {
-        "name": "Plans: Duskforged Bulwark"
+        "name": "Ritning: Skymningssmitt sköldmur"
       },
       "pattern_wyrmfall_pendant": {
-        "name": "Design: Wyrmfall Pendant"
+        "name": "Formgivning: Wyrmfall-hänge"
       },
       "pattern_warhewn_signet": {
-        "name": "Design: Warhewn Signet"
+        "name": "Formgivning: Krigshuggen signetring"
       },
       "pattern_prismglass_loop": {
-        "name": "Design: Prismglass Loop"
+        "name": "Formgivning: Prismaglasring"
       },
       "pattern_gyrelens_array": {
-        "name": "Schematic: Gyrelens Array"
+        "name": "Ritning: Gyrelens matris"
       },
       "pattern_masters_field_forge": {
-        "name": "Schematic: Master's Field Forge"
+        "name": "Ritning: Mästarens fältsmedja"
       },
       "pattern_makers_charm": {
-        "name": "Schematic: Maker's Charm"
+        "name": "Ritning: Skaparens talisman"
       },
       "pattern_voidbound_grimoire": {
-        "name": "Technique: Voidbound Grimoire"
+        "name": "Teknik: Tomhetsbunden grimoar"
       },
       "pattern_ironhusk_flask": {
-        "name": "Recipe: Ironhusk Flask"
+        "name": "Recept: Järnskalsflaska"
       },
       "pattern_warboar_flask": {
-        "name": "Recipe: Warboar Flask"
+        "name": "Recept: Stridsvildsvinsflaska"
       },
       "pattern_runewater_flask": {
-        "name": "Recipe: Runewater Flask"
+        "name": "Recept: Runvattenflaska"
       },
       "pattern_stonepot_stew": {
-        "name": "Recipe: Stonepot Stew"
+        "name": "Recept: Stengryta"
       },
       "pattern_warspice_skewers": {
-        "name": "Recipe: Warspice Skewers"
+        "name": "Recept: Krigskryddade spett"
       },
       "pattern_sageleaf_chowder": {
-        "name": "Recipe: Sageleaf Chowder"
+        "name": "Recept: Salviabladssoppa"
       },
       "pattern_grand_cauldron": {
-        "name": "Recipe: Grand Cauldron"
+        "name": "Recept: storkittel"
       },
       "pattern_laden_hearth": {
-        "name": "Recipe: The Laden Hearth"
+        "name": "Recept: Den välfyllda härden"
       },
       "vale_wheat_seed": {
-        "name": "Vale Wheat Seed"
+        "name": "Dalvetefrö"
       },
       "vale_wheat": {
-        "name": "Vale Wheat"
+        "name": "Dalvete"
       },
       "fine_vale_wheat": {
-        "name": "Fine Vale Wheat"
+        "name": "Fint dalvete"
       },
       "withered_husks": {
-        "name": "Withered Husks"
+        "name": "Vissna skal"
       },
       "compost": {
-        "name": "Compost"
+        "name": "kompost"
       },
       "growth_tonic": {
-        "name": "Growth Tonic"
+        "name": "tillväxtdryck"
       },
       "brook_carrot_seed": {
-        "name": "Brook Carrot Seed"
+        "name": "Bäckmorotsfrö"
       },
       "brook_carrot": {
-        "name": "Brook Carrot"
+        "name": "Bäckmorot"
       },
       "fine_brook_carrot": {
-        "name": "Fine Brook Carrot"
+        "name": "Fin bäckmorot"
       },
       "marsh_rice_seed": {
-        "name": "Marsh Rice Seed"
+        "name": "Träskrisfrö"
       },
       "marsh_rice": {
-        "name": "Marsh Rice"
+        "name": "Träskris"
       },
       "fine_marsh_rice": {
-        "name": "Fine Marsh Rice"
+        "name": "Fint träskris"
       },
       "bog_beet_seed": {
-        "name": "Bog Beet Seed"
+        "name": "Kärrbetefrö"
       },
       "bog_beet": {
-        "name": "Bog Beet"
+        "name": "Kärrbeta"
       },
       "fine_bog_beet": {
-        "name": "Fine Bog Beet"
+        "name": "Fin kärrbeta"
       },
       "highland_barley_seed": {
-        "name": "Highland Barley Seed"
+        "name": "Höglandskornsfrö"
       },
       "highland_barley": {
-        "name": "Highland Barley"
+        "name": "Höglandskorn"
       },
       "fine_highland_barley": {
-        "name": "Fine Highland Barley"
+        "name": "Fint höglandskorn"
       },
       "frost_gourd_seed": {
-        "name": "Frost Gourd Seed"
+        "name": "Frostkalebassfrö"
       },
       "frost_gourd": {
-        "name": "Frost Gourd"
+        "name": "Frostkalebass"
       },
       "fine_frost_gourd": {
-        "name": "Fine Frost Gourd"
+        "name": "Fin frostkalebass"
       },
       "thornpeak_cabbage_seed": {
-        "name": "Thornpeak Cabbage Seed"
+        "name": "Törntoppskålsfrö"
       },
       "thornpeak_cabbage": {
-        "name": "Thornpeak Cabbage"
+        "name": "Törntoppskål"
       },
       "fine_thornpeak_cabbage": {
-        "name": "Fine Thornpeak Cabbage"
+        "name": "Fin Törntoppskål"
       },
       "frost_lentils_seed": {
-        "name": "Frost Lentils Seed"
+        "name": "Frostlinsfrö"
       },
       "frost_lentils": {
-        "name": "Frost Lentils"
+        "name": "Frostlinser"
       },
       "fine_frost_lentils": {
-        "name": "Fine Frost Lentils"
+        "name": "Fina frostlinser"
       },
       "gilded_sunmelon_seed": {
-        "name": "Gilded Sunmelon Seed"
+        "name": "Förgyllt solmelonfrö"
       },
       "gilded_sunmelon": {
-        "name": "Gilded Sunmelon"
+        "name": "förgylld solmelon"
       },
       "fine_gilded_sunmelon": {
-        "name": "Fine Gilded Sunmelon"
+        "name": "Fin förgylld solmelon"
       },
       "evergarden_greens_seed": {
-        "name": "Evergarden Greens Seed"
+        "name": "Evergardens frö för gröna blad"
       },
       "evergarden_greens": {
-        "name": "Evergarden Greens"
+        "name": "Evergardens gröna blad"
       },
       "fine_evergarden_greens": {
-        "name": "Fine Evergarden Greens"
+        "name": "Fina Evergarden-gröna blad"
       },
       "gilded_yam_seed": {
-        "name": "Gilded Yam Seed"
+        "name": "Förgyllt jamsrotsfrö"
       },
       "gilded_yam": {
-        "name": "Gilded Yam"
+        "name": "Förgylld jamsrot"
       },
       "fine_gilded_yam": {
-        "name": "Fine Gilded Yam"
+        "name": "Fin förgylld jamsrot"
       },
       "evergarden_pumpkin_seed": {
-        "name": "Evergarden Pumpkin Seed"
+        "name": "Evergardenpumpafrö"
       },
       "evergarden_pumpkin": {
-        "name": "Evergarden Pumpkin"
+        "name": "Evergardenpumpa"
       },
       "fine_evergarden_pumpkin": {
-        "name": "Fine Evergarden Pumpkin"
+        "name": "Fin Evergardenpumpa"
       },
       "garden_hoe": {
-        "name": "Garden Hoe"
+        "name": "trädgårdshacka"
       },
       "bronze_hoe": {
-        "name": "Bronze Hoe"
+        "name": "Bronshacka"
       },
       "skysilver_hoe": {
-        "name": "Skysilver Hoe"
+        "name": "Himmelsilverhacka"
       },
       "osmium_hoe": {
-        "name": "Osmium Hoe"
+        "name": "Osmiumhacka"
       },
       "vale_hearth_loaf": {
-        "name": "Vale Hearth Loaf"
+        "name": "Dalhärdens limpa"
       },
       "eastbrook_root_pottage": {
-        "name": "Eastbrook Root Pottage"
+        "name": "Östbäcks rotgryta"
       },
       "fenbridge_rice_bowl": {
-        "name": "Fenbridge Rice Bowl"
+        "name": "Fenbridges risskål"
       },
       "fenbridge_beet_braise": {
-        "name": "Fenbridge Beet Braise"
+        "name": "Fenbridges bräserade betor"
       },
       "highwatch_barley_bannock": {
-        "name": "Highwatch Barley Bannock"
+        "name": "Högvakts kornkaka"
       },
       "highwatch_gourd_soup": {
-        "name": "Highwatch Gourd Soup"
+        "name": "Högvakts kalebassoppa"
       },
       "evergarden_sunmelon_tart": {
-        "name": "Evergarden Sunmelon Tart"
+        "name": "Evergardens solmelontårta"
       },
       "evergarden_harvest_platter": {
-        "name": "Evergarden Harvest Platter"
+        "name": "Evergardens skördfat"
       },
       "eastbrook_glazed_carrots": {
-        "name": "Eastbrook Glazed Carrots"
+        "name": "Östbäcks glaserade morötter"
       },
       "fenbridge_rice_pudding": {
-        "name": "Fenbridge Rice Pudding"
+        "name": "Fenbridges rispudding"
       },
       "highwatch_barley_porridge": {
-        "name": "Highwatch Barley Porridge"
+        "name": "Högvakts korngröt"
       },
       "evergarden_braised_greens": {
-        "name": "Evergarden Braised Greens"
+        "name": "Evergardens bräserade gröna blad"
       },
       "harvest_feast": {
-        "name": "Harvest Feast"
+        "name": "Skördefest"
       },
       "pattern_highwatch_gourd_soup": {
-        "name": "Recipe: Highwatch Gourd Soup"
+        "name": "Recept: Högvakts kalebassoppa"
       },
       "pattern_highwatch_barley_porridge": {
-        "name": "Recipe: Highwatch Barley Porridge"
+        "name": "Recept: Högvakts korngröt"
       },
       "pattern_evergarden_sunmelon_tart": {
-        "name": "Recipe: Evergarden Sunmelon Tart"
+        "name": "Recept: Evergardens solmelontårta"
       },
       "pattern_evergarden_harvest_platter": {
-        "name": "Recipe: Evergarden Harvest Platter"
+        "name": "Recept: Evergardens skördfat"
       },
       "pattern_evergarden_braised_greens": {
-        "name": "Recipe: Evergarden Braised Greens"
+        "name": "Recept: Evergardens bräserade gröna blad"
       },
       "pattern_harvest_feast": {
-        "name": "Recipe: Harvest Feast"
+        "name": "Recept: Skördefest"
       },
       "raw_deepbarb_catfish": {
-        "name": "Raw Deepbarb Catfish"
+        "name": "Rå djupskäggsmal"
       },
       "raw_hollowgill_sturgeon": {
-        "name": "Raw Hollowgill Sturgeon"
+        "name": "Rå ihålgälad stör"
       },
       "raw_stillmere_salmon": {
-        "name": "Raw Stillmere Salmon"
+        "name": "Rå Stillmerelax"
       },
       "clockreel_fishing_rod": {
-        "name": "Clockreel Fishing Rod"
+        "name": "Urverksspö"
       },
       "peppered_deepbarb_catfish": {
-        "name": "Peppered Deepbarb Catfish"
+        "name": "Pepparad djupskäggsmal"
       },
       "roast_hollowgill_sturgeon": {
-        "name": "Roast Hollowgill Sturgeon"
+        "name": "Rostad ihålgälad stör"
       },
       "pattern_peppered_deepbarb_catfish": {
-        "name": "Recipe: Peppered Deepbarb Catfish"
+        "name": "Recept: Pepparad djupskäggsmal"
       },
       "pattern_roast_hollowgill_sturgeon": {
-        "name": "Recipe: Roast Hollowgill Sturgeon"
+        "name": "Recept: Rostad ihålgälad stör"
       },
       "pattern_clockreel_fishing_rod": {
-        "name": "Schematic: Clockreel Fishing Rod"
+        "name": "Ritning: Urverksspö"
       },
       "evergarden_hoe": {
-        "name": "Evergarden Hoe"
+        "name": "Evergardens hacka"
       },
       "stonepot_feast": {
-        "name": "Stonepot Feast"
+        "name": "Stengrytefest"
       },
       "warspice_feast": {
-        "name": "Warspice Feast"
+        "name": "Krigskryddsfest"
       },
       "sageleaf_feast": {
-        "name": "Sageleaf Feast"
+        "name": "Salviabladsfest"
       },
       "pattern_stonepot_feast": {
-        "name": "Recipe: Stonepot Feast"
+        "name": "Recept: Stengrytefest"
       },
       "pattern_warspice_feast": {
-        "name": "Recipe: Warspice Feast"
+        "name": "Recept: Krigskryddsfest"
       },
       "pattern_sageleaf_feast": {
-        "name": "Recipe: Sageleaf Feast"
+        "name": "Recept: Salviabladsfest"
       },
       "ps_briny_lure": {
         "name": "Salt lockbete"
@@ -14736,7 +14736,7 @@ export const sv_SE: EnTranslations = {
         "name": "Den sista lågans kärna"
       },
       "forgefathers_ember": {
-        "name": "Forgefather's Ember"
+        "name": "Smedjefaderns glöd"
       },
       "slagbreaker_helmet": {
         "name": "Slagkrossarens hjälm"
@@ -15309,7 +15309,7 @@ export const sv_SE: EnTranslations = {
         "name": "Glödväktarens barriär"
       },
       "orb_of_the_last_spring": {
-        "name": "Den sista vårens klot"
+        "name": "Sistakällans klot"
       },
       "cinder_of_the_first_design": {
         "name": "Den första skapelsens glöd"
@@ -15330,7 +15330,7 @@ export const sv_SE: EnTranslations = {
         "name": "Slutets hjärta, storklinga"
       },
       "staff_of_the_last_spring": {
-        "name": "Den sista vårens stav"
+        "name": "Sistakällans stav"
       },
       "forgefire_spire": {
         "name": "Smideseldens spira"
@@ -15342,151 +15342,151 @@ export const sv_SE: EnTranslations = {
         "name": "De slocknade gnistornas stav"
       },
       "cogwheel_blank": {
-        "name": "Cogwheel Blank"
+        "name": "tom kugghjulsblankett"
       },
       "copperlens_ocular": {
-        "name": "Copperlens Ocular"
+        "name": "Kopparlinsokular"
       },
       "deed_of_making": {
-        "name": "Deed of Making"
+        "name": "Skapandets bedrift"
       },
       "crucible_str_mail_chest": {
-        "name": "Crucible Striker's Hauberk"
+        "name": "Degelns anfallarjacka"
       },
       "crucible_str_mail_waist": {
-        "name": "Crucible Striker's Girdle"
+        "name": "Degelns anfallarbälte"
       },
       "crucible_str_mail_feet": {
-        "name": "Crucible Striker's Sabatons"
+        "name": "Degelns anfallarstövlar"
       },
       "crucible_tank_mail_chest": {
-        "name": "Crucible Guardian's Hauberk"
+        "name": "Degelns väktarbrynja"
       },
       "crucible_tank_mail_waist": {
-        "name": "Crucible Guardian's Girdle"
+        "name": "Degelns väktargördel"
       },
       "crucible_tank_mail_feet": {
-        "name": "Crucible Guardian's Sabatons"
+        "name": "Degelns väktarharneskskor"
       },
       "crucible_caster_mail_chest": {
-        "name": "Crucible Spellcaster's Hauberk"
+        "name": "Degelns besvärjarbrynja"
       },
       "crucible_caster_mail_waist": {
-        "name": "Crucible Spellcaster's Girdle"
+        "name": "Degelns besvärjargördel"
       },
       "crucible_caster_mail_feet": {
-        "name": "Crucible Spellcaster's Sabatons"
+        "name": "Degelns besvärjarharneskskor"
       },
       "crucible_healer_mail_chest": {
-        "name": "Crucible Healer's Hauberk"
+        "name": "Degelns helarbrynja"
       },
       "crucible_healer_mail_waist": {
-        "name": "Crucible Healer's Girdle"
+        "name": "Degelns helargördel"
       },
       "crucible_healer_mail_feet": {
-        "name": "Crucible Healer's Sabatons"
+        "name": "Degelns helarharneskskor"
       },
       "crucible_agi_leather_chest": {
-        "name": "Crucible Skirmisher's Jerkin"
+        "name": "Degelns skärmytslarjacka"
       },
       "crucible_agi_leather_waist": {
-        "name": "Crucible Skirmisher's Belt"
+        "name": "Degelns skärmytslarbälte"
       },
       "crucible_agi_leather_feet": {
-        "name": "Crucible Skirmisher's Boots"
+        "name": "Degelns skärmytslarstövlar"
       },
       "crucible_str_leather_chest": {
-        "name": "Crucible Prowler's Jerkin"
+        "name": "Degelns smygarjacka"
       },
       "crucible_str_leather_waist": {
-        "name": "Crucible Prowler's Belt"
+        "name": "Degelns smygarbälte"
       },
       "crucible_str_leather_feet": {
-        "name": "Crucible Prowler's Boots"
+        "name": "Degelns smygarstövlar"
       },
       "crucible_tank_leather_chest": {
-        "name": "Crucible Guardian's Jerkin"
+        "name": "Degelns väktarjacka"
       },
       "crucible_tank_leather_waist": {
-        "name": "Crucible Guardian's Belt"
+        "name": "Degelns väktarbälte"
       },
       "crucible_tank_leather_feet": {
-        "name": "Crucible Guardian's Boots"
+        "name": "Degelns väktarstövlar"
       },
       "crucible_caster_leather_chest": {
-        "name": "Crucible Spellcaster's Jerkin"
+        "name": "Degelns besvärjarjacka"
       },
       "crucible_caster_leather_waist": {
-        "name": "Crucible Spellcaster's Belt"
+        "name": "Degelns besvärjarbälte"
       },
       "crucible_caster_leather_feet": {
-        "name": "Crucible Spellcaster's Boots"
+        "name": "Degelns besvärjarstövlar"
       },
       "crucible_healer_leather_chest": {
-        "name": "Crucible Healer's Jerkin"
+        "name": "Degelns helarjacka"
       },
       "crucible_healer_leather_waist": {
-        "name": "Crucible Healer's Belt"
+        "name": "Degelns helarbälte"
       },
       "crucible_healer_leather_feet": {
-        "name": "Crucible Healer's Boots"
+        "name": "Degelns helarstövlar"
       },
       "crucible_caster_cloth_chest": {
-        "name": "Crucible Spellcaster's Robe"
+        "name": "Degelns besvärjarrock"
       },
       "crucible_caster_cloth_waist": {
-        "name": "Crucible Spellcaster's Sash"
+        "name": "Degelns besvärjarskärp"
       },
       "crucible_caster_cloth_feet": {
-        "name": "Crucible Spellcaster's Slippers"
+        "name": "Degelns besvärjartofflor"
       },
       "crucible_healer_cloth_chest": {
-        "name": "Crucible Healer's Robe"
+        "name": "Degelns helarrock"
       },
       "crucible_healer_cloth_waist": {
-        "name": "Crucible Healer's Sash"
+        "name": "Degelns helarskärp"
       },
       "crucible_healer_cloth_feet": {
-        "name": "Crucible Healer's Slippers"
+        "name": "Degelns helartofflor"
       },
       "pattern_crucible_str_mail": {
-        "name": "Pattern: Crucible Striker's Mail"
+        "name": "Mönster: Degelns anfallarringbrynja"
       },
       "pattern_crucible_tank_mail": {
-        "name": "Pattern: Crucible Guardian's Mail"
+        "name": "Mönster: Degelns väktarringbrynja"
       },
       "pattern_crucible_caster_mail": {
-        "name": "Pattern: Crucible Spellcaster's Mail"
+        "name": "Mönster: Degelns besvärjarringbrynja"
       },
       "pattern_crucible_healer_mail": {
-        "name": "Pattern: Crucible Healer's Mail"
+        "name": "Mönster: Degelns helarringbrynja"
       },
       "pattern_crucible_agi_leather": {
-        "name": "Pattern: Crucible Skirmisher's Leather"
+        "name": "Mönster: Degelns skärmytslarläder"
       },
       "pattern_crucible_str_leather": {
-        "name": "Pattern: Crucible Prowler's Leather"
+        "name": "Mönster: Degelns smygarläder"
       },
       "pattern_crucible_tank_leather": {
-        "name": "Pattern: Crucible Guardian's Leather"
+        "name": "Mönster: Degelns väktarläder"
       },
       "pattern_crucible_caster_leather": {
-        "name": "Pattern: Crucible Spellcaster's Leather"
+        "name": "Mönster: Degelns besvärjarläder"
       },
       "pattern_crucible_healer_leather": {
-        "name": "Pattern: Crucible Healer's Leather"
+        "name": "Mönster: Degelns helarläder"
       },
       "pattern_crucible_caster_cloth": {
-        "name": "Pattern: Crucible Spellcaster's Cloth"
+        "name": "Mönster: Degelns besvärjartyg"
       },
       "pattern_crucible_healer_cloth": {
-        "name": "Pattern: Crucible Healer's Cloth"
+        "name": "Mönster: Degelns helartyg"
       },
       "formula_lastflame_zeal": {
-        "name": "Formula: Last Flame's Zeal"
+        "name": "Formel: Sista lågans iver"
       },
       "field_kit": {
-        "name": "Field Kit"
+        "name": "Fältutrustning"
       },
       "bramblehide_crown": {
         "name": "Rotens Törnhudskrona"
@@ -15675,7 +15675,7 @@ export const sv_SE: EnTranslations = {
         "name": "Voss helgade stridsklubba"
       },
       "wyrmcult_soulsteps": {
-        "name": "Broodsworn Soulsteps"
+        "name": "Broodsworns själsteg"
       },
       "wyrmshadow_harness": {
         "name": "Nightfang-sele"
@@ -16014,13 +16014,13 @@ export const sv_SE: EnTranslations = {
         "name": "Heroiskt märke"
       },
       "wyrmfall_core": {
-        "name": "Wyrmfall Core"
+        "name": "Wyrmfall-kärna"
       },
       "sundered_essence": {
-        "name": "Sundered Essence"
+        "name": "Söndrad essens"
       },
       "makers_ember": {
-        "name": "Maker's Ember"
+        "name": "Skaparens glöd"
       },
       "eastbrook_buckler": {
         "name": "Östbäcks rundsköld"
@@ -16092,7 +16092,7 @@ export const sv_SE: EnTranslations = {
         "name": "Benfrostlina"
       },
       "mistforged_pauldrons": {
-        "name": "Fogforged Pauldrons"
+        "name": "Dimmittade skulderskydd"
       },
       "tideguard_faceguard": {
         "name": "Tidvaktens visir"
@@ -16317,7 +16317,7 @@ export const sv_SE: EnTranslations = {
         "name": "Tyglar till Åskstoltseraren, den stora kalkonen"
       },
       "varkhul_forgebreaker": {
-        "name": "Smedjebrytaren, Varkhuls maskin"
+        "name": "Forgebrytaren, Varkhuls maskin"
       },
       "varkhul_emberward": {
         "name": "Glödväktaren, Varkhuls bålverk"
@@ -16403,7 +16403,7 @@ export const sv_SE: EnTranslations = {
         "name": "Träningsdocka"
       },
       "hub_healing_dummy": {
-        "name": "Healing Dummy"
+        "name": "Läkningsdocka"
       },
       "ridge_stalker": {
         "name": "Åssmygare"
@@ -16427,10 +16427,10 @@ export const sv_SE: EnTranslations = {
         "name": "Skärvherre Kazzix"
       },
       "wyrmcult_zealot": {
-        "name": "Broodsworn Zealot"
+        "name": "Broodsworn-fanatiker"
       },
       "wyrmcult_necromancer": {
-        "name": "Broodsworn Necromancer"
+        "name": "Broodsworn-nekromantiker"
       },
       "boneclad_revenant": {
         "name": "Benklädd gengångare"
@@ -16751,7 +16751,7 @@ export const sv_SE: EnTranslations = {
         "name": "Kärrälva"
       },
       "frostmane_yeti": {
-        "name": "Rimemane Yeti"
+        "name": "Frostmanad yeti"
       },
       "terrace_howler": {
         "name": "Terrassernas tjutare"
@@ -16799,7 +16799,7 @@ export const sv_SE: EnTranslations = {
         "name": "Sjömörkret"
       },
       "harvest_sprite": {
-        "name": "Gleaning Sprite"
+        "name": "Skördeskördare"
       },
       "mere_lurker": {
         "name": "Sjölurkare"
@@ -16823,7 +16823,7 @@ export const sv_SE: EnTranslations = {
         "name": "Skymningsvandrare"
       },
       "nightkin_stargazer": {
-        "name": "Gloamkin Stargazer"
+        "name": "Gloamkins stjärnskådare"
       },
       "barrow_king": {
         "name": "Gravhögskungen"
@@ -17263,7 +17263,7 @@ export const sv_SE: EnTranslations = {
       },
       "provisioner_fenna": {
         "name": "Proviantmästaren Fenna",
-        "title": "Eldershine Provisioner",
+        "title": "Eldershines proviantmästare",
         "greeting": "Bröd fortfarande varmt, vatten fortfarande sött. Hålan förser, och det gör jag också."
       },
       "wardsmith_orun": {
@@ -17388,12 +17388,12 @@ export const sv_SE: EnTranslations = {
       },
       "sexton_marrow": {
         "name": "Klockaren Marrow",
-        "title": "Sexton of Gibbetmere",
+        "title": "Klockare i Gibbetmere",
         "greeting": "Vi begraver dem djupt här, och vi ringer klockorna så att de minns att stanna nere."
       },
       "widow_tansy": {
         "name": "Änkan Tansy",
-        "title": "Candlewright of Gibbetmere",
+        "title": "Gibbetmeres ljusmakare",
         "greeting": "Ett ljus för varje grav, och inte ett enda får slockna. Inte ett enda, hör du mig?"
       },
       "vicar_creel": {
@@ -17527,24 +17527,24 @@ export const sv_SE: EnTranslations = {
         "greeting": "Mät två gånger och häll en gång, {className}. Apotekaren har inget tålamod för utspillda reagenser."
       },
       "farmer_jessica": {
-        "name": "Farmer Jessica",
-        "title": "Allotment Keeper",
-        "greeting": "Good soil and fair weather, {playerName}. Buy a seed from me, sow it in one of those beds, and go about your day. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer."
+        "name": "Bonden Jessica",
+        "title": "Odlottsföreståndare",
+        "greeting": "God jord och tjänligt väder, {playerName}. Köp ett frö av mig, så det i en av bäddarna och fortsätt med din dag. Det växer medan du är borta och förstörs aldrig. Din skördedagbok (Skift+K, eller odlingsraden i yrkesfönstret) visar varje planterad bädd och dess timer."
       },
       "farmer_teasel": {
-        "name": "Farmer Teasel",
-        "title": "Fen Paddy Farmer",
-        "greeting": "Marsh rice and bog beet seed, {className}, and compost to feed them. The paddies drain slow, so mind where you tread."
+        "name": "Bonden Teasel",
+        "title": "Fenbridges risfältsbonde",
+        "greeting": "Träskris och kärrbeta, {className}, och kompost som ger dem näring. Risfälten dränerar långsamt, så se var du sätter fötterna."
       },
       "farmer_hollis": {
-        "name": "Farmer Hollis",
-        "title": "Highwatch Terrace Farmer",
-        "greeting": "The terraces give what the mountain allows, {className}. I sell seed and compost, and if a crop of yours comes up withered I will work the husks back into good soil for you."
+        "name": "Bonden Hollis",
+        "title": "Högvakts terrassbonde",
+        "greeting": "Terrasserna ger vad berget tillåter, {className}. Jag säljer frön och kompost, och om en av dina grödor vissnar arbetar jag tillbaka skalen till god jord åt dig."
       },
       "farmer_verbena": {
-        "name": "Farmer Verbena",
-        "title": "Parterre Gardener",
-        "greeting": "Mind the edging, {playerName}, these beds are the pride of the parterre. Seed and compost are what I sell, and I will turn any withered husks you carry into more of it."
+        "name": "Bonden Verbena",
+        "title": "Parterrets trädgårdsmästare",
+        "greeting": "Akta kanten, {playerName}, de här bäddarna är parterrens stolthet. Jag säljer frön och kompost och gör om alla vissna skal du bär hit till mer av samma vara."
       },
       "wayfarer_bryn": {
         "name": "Vägfarande Bryn",
@@ -17592,9 +17592,9 @@ export const sv_SE: EnTranslations = {
         "greeting": "Tidvattnet tar och tidvattnet betalar, {playerName}. Jag för räkenskap över båda: det krabborna knipsar loss från vraken, och det ärliga händer bär tillbaka upp den här stigen."
       },
       "drillmaster_hale": {
-        "name": "Drillmaster Hale",
-        "title": "Quay Sparring Master",
-        "greeting": "That dummy behind me never swings back and never goes down, {className}. What matters is the tally: your Damage Meters count every blow you land on it. Target it and open the meters, and I will walk you through the rest."
+        "name": "Övningsmästare Hale",
+        "title": "Kajens sparringmästare",
+        "greeting": "Dockan bakom mig slår aldrig tillbaka och faller aldrig, {className}. Det viktiga är räkningen: dina skademätare räknar varje träff du sätter i den. Välj den som mål och öppna mätarna, så leder jag dig genom resten."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -17614,15 +17614,15 @@ export const sv_SE: EnTranslations = {
         }
       },
       "q_farm_intro": {
-        "title": "First Furrow",
-        "text": "Take this hoe and a pinch of vale wheat seed, {playerName}. Sow the seed in one of the beds beside me, then go about your business. Come back whenever you like and bring the crop in; I will be here.",
-        "completion": "There, your first crop in your own hands. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer. Come back for seed whenever the beds call you, {playerName}.",
+        "title": "Första fåran",
+        "text": "Ta den här hackan och en nypa dalvetefrön, {playerName}. Så fröna i en av bäddarna bredvid mig och fortsätt sedan med dina ärenden. Kom tillbaka när du vill och hämta skörden, jag finns här.",
+        "completion": "Där, din första gröda i dina egna händer. Den växer medan du är borta och förstörs aldrig. Din skördedagbok (Skift+K, eller odlingsraden i yrkesfönstret) visar varje planterad bädd och dess timer. Kom tillbaka efter frön när bäddarna kallar på dig, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Vale Wheat planted"
+            "label": "Dalvete planterat"
           },
           "1": {
-            "label": "Vale Wheat harvested"
+            "label": "Dalvete skördat"
           }
         }
       },
@@ -18173,7 +18173,7 @@ export const sv_SE: EnTranslations = {
       },
       "q_drogmar": {
         "title": "Krigsherre Drogmar",
-        "text": "Warlord Drogmar took the Broodsworn's coin and swore the clans to the mountain's waking. He is the hammer they mean to swing at my wall, and when he slams the ground, {playerName}, do not be standing near him. Take your companions into the war-camp and end him, for Highwatch.",
+        "text": "Krigsherren Drogmar tog Broodsworns mynt och svor klanerna till bergets uppvaknande. Han är hammaren de tänker svinga mot min mur, och när han slår i marken, {playerName}, får du inte stå nära honom. Ta dina följeslagare till krigslägret och gör slut på honom, för Högvakts skull.",
         "completion": "Drogmar, död i sitt eget läger. Klanerna kommer att skingras till de höga passen - du har köpt min mur en vinter, {playerName}.",
         "objectives": {
           "0": {
@@ -18213,11 +18213,11 @@ export const sv_SE: EnTranslations = {
       },
       "q_zealots": {
         "title": "Sånger på vinden",
-        "text": "When the wind comes off the southern peaks, {playerName}, it carries chanting. The Broodsworn no longer hides: they have raised tents below the Sanctum and they sing to what sleeps beneath it. Silence twelve zealots. Every voice stilled buys the mountain another night of sleep.",
+        "text": "När vinden kommer från de södra topparna, {playerName}, bär den sång. Broodsworn gömmer sig inte längre: de har rest tält under Sanctum och sjunger för det som sover därunder. Tysta tolv fanatiker. Varje tystad röst köper berget ännu en natts sömn.",
         "completion": "Vinden är tystare. Men det som oroar mig är inte mässandet, {playerName} - det är att något kanske mässar tillbaka.",
         "objectives": {
           "0": {
-            "label": "Broodsworn Zealot slain"
+            "label": "Broodsworn-fanatiker dödad"
           }
         }
       },
@@ -18290,7 +18290,7 @@ export const sv_SE: EnTranslations = {
             "label": "Lindormskultsfanatiker dödad"
           },
           "1": {
-            "label": "Broodsworn Necromancer slain"
+            "label": "Broodsworn-nekromantiker dödad"
           }
         }
       },
@@ -18446,22 +18446,22 @@ export const sv_SE: EnTranslations = {
         }
       },
       "q_forgefathers_requiem": {
-        "title": "The Forgefather's Requiem",
-        "text": "Varkhul kept an ember of the Last Spring at his heart. Recover it from him and use it to learn the shaping of Forgebreaker and begin Requiem at the Forge. This requires Weaponcrafting skill 125. You can also bring the ember to me to learn the shaping. His defeat on either difficulty will yield the ember while this task is active.",
-        "completion": "It still sings. Keep the ember: your hammer will need its voice. I have taught you one shaping of Forgebreaker. Use the ember to begin Requiem at the Forge. The ember and the shaping are spent only when your craft succeeds.",
+        "title": "Smedjefaderns rekviem",
+        "text": "Varkhul höll en glöd från Sistakällan vid sitt hjärta. Hämta den från honom och för den till mig. Med 125 i vapensmide kan du lära dig att själv smida Forgebrytaren. Hans nederlag på valfri svårighetsgrad ger glöden medan uppdraget är aktivt.",
+        "completion": "Den sjunger fortfarande. Behåll glöden, din hammare behöver dess röst. Jag har lärt dig hur Forgebrytaren smids. Glöden och ritningen förbrukas bara när din tillverkning lyckas.",
         "objectives": {
           "0": {
-            "label": "Forgefather's Ember recovered"
+            "label": "Smedjefaderns glöd återfunnen"
           }
         }
       },
       "q_requiem_at_the_forge": {
-        "title": "Requiem at the Forge",
-        "text": "Take the ember, fifteen Cores of the Last Flame, Fine Osmium Ore and Fine Highpine Logs to a forge. Shape Forgebreaker yourself to complete this quest immediately and receive your rewards. You keep the hammer, and it binds to you. If you already forged it, you can bring it to me in your bags or equipped. This shaping can create only one hammer.",
-        "completion": "The spring's voice carries through the iron. What Varkhul chained, your hands have set free. Carry Forgebreaker well, smith.",
+        "title": "Rekviem vid smedjan",
+        "text": "Ta glöden, femton kärnor från Sista lågan, fint osmium och fina Highpine-stockar till en smedja. Smid Forgebrytaren själv och återvänd till mig med den i väskorna eller utrustad. Du behåller hammaren och den binds till dig. Detta hantverk kan bara skapa en hammare.",
+        "completion": "Källans röst bär genom järnet. Det Varkhul fjättrade har dina händer befriat. Bär Forgebrytaren väl, smed.",
         "objectives": {
           "0": {
-            "label": "Forgebreaker forged and carried"
+            "label": "Forgebrytaren smidd och buren"
           }
         }
       },
@@ -18576,22 +18576,22 @@ export const sv_SE: EnTranslations = {
         }
       },
       "q_prof_workorder_kitchens_wheat": {
-        "title": "Kitchens Wheat Order",
-        "text": "Bread does not bake itself, {playerName}, and my flour bins are scraping bottom. Bring me eight sheaves of vale wheat and I will pay you honest coin for the lot. Grown by your own hand or bought off the market, I do not care, so long as it grinds.",
-        "completion": "Good dry grain, and plenty of it. There is your pay, counted out. When the next crop comes in, you know which door to knock on.",
+        "title": "Köksbeställning: vete",
+        "text": "Bröd bakar inte sig självt, {playerName}, och mina mjölbehållare är nästan tomma. Ge mig åtta kärvar dalvete så betalar jag ärliga mynt för partiet. Odlat med egen hand eller köpt på marknaden spelar ingen roll, bara det går att mala.",
+        "completion": "Bra torr säd, och gott om den. Här är din betalning, uppräknad. När nästa skörd kommer in vet du på vilken dörr du ska knacka.",
         "objectives": {
           "0": {
-            "label": "Vale Wheat delivered"
+            "label": "Dalvete levererat"
           }
         }
       },
       "q_prof_workorder_kitchens_rice": {
-        "title": "Kitchens Rice Order",
-        "text": "The marsh folk swear by their rice, {playerName}, and I mean to find out why. Fetch me five measures of marsh rice and there is coin waiting for you here. Keep it dry on the road, mind: wet rice is porridge, and I did not order porridge.",
-        "completion": "Plump and dry, every grain. Here is your coin. If the marsh keeps giving, so do I.",
+        "title": "Köksbeställning: ris",
+        "text": "Träskfolket svär vid sitt ris, {playerName}, och jag tänker ta reda på varför. Hämta fem mått träskris, så väntar mynt på dig här. Håll det torrt på vägen, märk väl: blött ris blir gröt, och jag beställde inte gröt.",
+        "completion": "Fylligt och torrt, varje korn. Här är dina mynt. Om träsket fortsätter att ge, gör jag det också.",
         "objectives": {
           "0": {
-            "label": "Marsh Rice delivered"
+            "label": "Träskris levererat"
           }
         }
       },
@@ -18803,7 +18803,7 @@ export const sv_SE: EnTranslations = {
       },
       "q_hollow_old_marrowshell": {
         "title": "Det gamla skalet i grunden",
-        "text": "The first name is Old Marrowshell, a crab the size of a cart that has hunted the eastern shallows since before Eldershine had a gate. It wanders, {playerName}, so you will have to walk the shoreline until you cross its track. Do not go alone, and do not trust its stillness.",
+        "text": "Den förste heter Gamle Marrowshell, en krabba stor som en kärra som har jagat i de östra grunden sedan innan Eldershine hade en port. Den vandrar, {playerName}, så du måste följa strandlinjen tills du korsar dess spår. Gå inte ensam och lita inte på dess stillhet.",
         "completion": "Grunden är bara vatten igen. Jag har sett det skalet krossa bättre jägare än mig, {playerName}. Inte dig.",
         "objectives": {
           "0": {
@@ -19103,7 +19103,7 @@ export const sv_SE: EnTranslations = {
         "completion": "Fyra hinkar tillbaka på sina krokar och raderna har blivit tysta. Du har en tyngre hand med älvor än jag har, {playerName}, och idag är jag glad över det.",
         "objectives": {
           "0": {
-            "label": "Gleaning Sprite driven off"
+            "label": "Skördesprite fördriven"
           },
           "1": {
             "label": "Savtappshink återfunnen"
@@ -19245,7 +19245,7 @@ export const sv_SE: EnTranslations = {
       },
       "q_nb_eyes_on_the_vigil": {
         "title": "Ögon på vakan",
-        "text": "Something has the striders bold and the herds uneasy, {playerName}, and I cannot read it in the flowers. Cassian can read it in the sky. He keeps his observatory camp by the Standing Vigil east of here, where the gloamkin drift among the stones. Find him, and ask what the stars are saying.",
+        "text": "Något har gjort strövarna djärva och hjordarna oroliga, {playerName}, och jag kan inte läsa det i blommorna. Cassian kan läsa det i himlen. Han håller sitt observatorieläger vid Stående vakten öster härifrån, där gloamkinen driver mellan stenarna. Hitta honom och fråga vad stjärnorna säger.",
         "completion": "Lira skickade dig? Då känner trädgårdarna det också. Sätt dig vid kikaren ett ögonblick, {playerName}. Stjärnorna har varit rastlösa i en månad, och varje karta jag ritar lutar norrut mot gravhögen.",
         "objectives": {
           "0": {
@@ -19255,7 +19255,7 @@ export const sv_SE: EnTranslations = {
       },
       "q_nb_charts_of_the_stones": {
         "title": "Kartorna i stenarna",
-        "text": "The Vigil stones are older than Moonrest, older than the gloamkin who tend them, and their faces are cut with star charts I have spent my life learning to read. The sky has shifted, {playerName}, and I must know how far. Read the charts on three of the stones and bring me their bearings.",
+        "text": "Vaktstenarna är äldre än Moonrest, äldre än gloamkinen som vårdar dem, och deras ytor är skurna med stjärnkartor som jag har ägnat mitt liv åt att lära mig läsa. Himlen har förskjutits, {playerName}, och jag måste veta hur långt. Läs kartorna på tre av stenarna och ge mig deras bäringar.",
         "completion": "Inget tvivel finns kvar. Varenda bäring har krupit mot Den sömnlösa gravhögen, som om himlen själv lutar sig över den högen för att vaka. De gamla kungarna begravdes under uppradade stjärnor av en anledning, {playerName}.",
         "objectives": {
           "0": {
@@ -19279,7 +19279,7 @@ export const sv_SE: EnTranslations = {
       "q_nb_the_barrow_king": {
         "title": "Gravhögskungen vaknar",
         "text": "Varje bäring, varje rastlös stjärna, varje öppnad hög pekar mot en sak: Gravhögskungen vaknar under den stora högen, och detta rike har ingen gryning som håller honom tillbaka. Han måste läggas till ro innan han minns sin krona, {playerName}. Gå inte ensam: ta med en vän, och håll blomljuset i ryggen.",
-        "completion": "The stars have settled for the first time in a season, {playerName}. The mounds are closed, the gloamkin have gone still at their stones, and the king sleeps below once more. Wear this mantle: Moonrest cut it for whoever the night finally trusted.",
+        "completion": "Stjärnorna har lagt sig för första gången på en årstid, {playerName}. Gravhögarna är stängda, gloamkinen har stillnat vid sina stenar och kungen sover åter därunder. Bär den här manteln: Moonrest skar den åt den som natten till sist litade på.",
         "objectives": {
           "0": {
             "label": "Gravhögskungen lagd till ro"
@@ -19287,9 +19287,9 @@ export const sv_SE: EnTranslations = {
         }
       },
       "q_ww_bells_of_gallowmere": {
-        "title": "The Bells of Gibbetmere",
-        "text": "Hear that tolling, {playerName}? That is Gibbetmere, up the north road, ringing its dead to sleep. Sexton Marrow keeps the count of every soul under the canopy, living and buried. Go and be counted, before the wood counts you itself.",
-        "completion": "Cobb sent you up the road whole, did he? Good man. He has kept those gate lanterns lit for thirty years, and the wood has never once got past him. Welcome to Gibbetmere, {playerName}. Mind the bells.",
+        "title": "Gibbetmeres klockor",
+        "text": "Hör du klockklangen, {playerName}? Det är Gibbetmere norrut längs vägen som ringer sina döda till ro. Klockaren Marrow håller räkning på varje själ under trädkronorna, både levande och begravda. Gå dit och låt honom räkna in dig innan skogen gör det själv.",
+        "completion": "Cobb skickade hela vägen upp, eller hur? En god man. Han har hållit portlyktorna tända i trettio år och skogen har aldrig tagit sig förbi honom. Välkommen till Gibbetmere, {playerName}. Akta klockorna.",
         "objectives": {
           "0": {
             "label": "Rapportera till Klockaren Marrow"
@@ -19318,7 +19318,7 @@ export const sv_SE: EnTranslations = {
       },
       "q_ww_candles_at_the_bounds": {
         "title": "Ljus vid gränserna",
-        "text": "Four boundary stones ring Gibbetmere, {playerName}, one on each road out, and a grave-candle burns on every stone. While they burn, the buried stay buried. The drizzle has drowned them, all four, and I am too old to walk the bounds alone. Take my taper and relight them, quickly.",
+        "text": "Fyra gränsstenar omringar Gibbetmere, {playerName}, en vid varje väg ut, och på varje sten brinner ett gravljus. Så länge de brinner stannar de begravda i sina gravar. Duggregnet har dränkt dem alla fyra, och jag är för gammal för att gå gränsen ensam. Ta min fackla och tänd dem igen, snabbt.",
         "completion": "Alla fyra brinnande? Andas då ut, {playerName}. Du hörde det inte, men hela byn gjorde det: klockorna ringde lättare i samma stund den sista veken fattade.",
         "objectives": {
           "0": {
@@ -19348,7 +19348,7 @@ export const sv_SE: EnTranslations = {
       },
       "q_ww_what_the_bark_holds": {
         "title": "Vad barken håller",
-        "text": "In the Hanging Glade east of Gibbetmere the spinners hang their silk-wrapped dead from the boughs, and the gravenbark shamblers stand guard beneath like patient pallbearers. Those are our people up there, {playerName}. Break five shamblers, cut down three of the wrapped dead, and bring them home to soil.",
+        "text": "I Hängande gläntan öster om Gibbetmere hänger spinnerskorna sina silkessvepta döda från grenarna och gravbarksvandrarna står vakt nedanför som tålmodiga bärare. Det är vårt folk där uppe, {playerName}. Krossa fem vandrare, skär ner tre av de svepta döda och för dem hem till jorden.",
         "completion": "Tre själar tillbaka under ärlig jord innan mörkrets inbrott. Raglarna kommer växa tillbaka, bark gör alltid det, men i natt hänger gläntan tom, och det räcker.",
         "objectives": {
           "0": {
@@ -19362,17 +19362,17 @@ export const sv_SE: EnTranslations = {
       "q_ww_walking_mosley_home": {
         "title": "Föra Mosley hem",
         "text": "Min gravgrävare Mosley tog kapellvägen för tre dagar sedan för att öppna en grav på den gamla gården, och grävningen rasade över honom. Han klöste sig ut, dåren lever, men han sitter hopkrupen vid kapellets gravar och vägrar röra sig för spindlar på vägen. För honom hem, {playerName}. Jag kan inte ringa klockorna för en levande man.",
-        "completion": "He came through the gate on his own two feet, swearing he will dig nothing deeper than a turnip bed from now on. He will be back at the yard by Sunday, they always are. Thank you, {playerName}. Gibbetmere keeps its people, that is the whole of our law.",
+        "completion": "Han kom genom porten på egna ben och svor att han inte skulle gräva djupare än en rovbädd hädanefter. Han är tillbaka på gården före söndag, det är de alltid. Tack, {playerName}. Gibbetmere behåller sitt folk, det är hela vår lag.",
         "objectives": {
           "0": {
-            "label": "Gravedigger Mosley walked safely back to Gibbetmere"
+            "label": "Gravgrävaren Mosley följde tryggt tillbaka till Gibbetmere"
           }
         }
       },
       "q_ww_horn_of_the_huntsman": {
         "title": "Jägarens horn",
         "text": "Du har hört hornet vid det här laget, {playerName}, tunt och avlägset, ljudet hela skogen håller andan för. Den bleka jägaren rider sin glänta norr om här, och varje grav han passerar blir grundare. Han var en människa en gång, och han begravdes fel, och jag är klar med att låtsas att bön räcker. Ta med en vän, ta med två, och rid av honom.",
-        "completion": "The horn stopped mid-note. Every bell in Gibbetmere rang once, on its own, and then the wood went quieter than I have heard it in thirty years. You have done the rite I could not, {playerName}. Wear this, and walk under the canopy unafraid.",
+        "completion": "Hornet tystnade mitt i tonen. Varje klocka i Gibbetmere ringde en gång av sig själv och sedan blev skogen tystare än jag hört den på trettio år. Du har utfört den rit jag inte kunde, {playerName}. Bär detta och gå under trädkronorna utan fruktan.",
         "objectives": {
           "0": {
             "label": "Den bleka jägaren avriden"
@@ -19845,22 +19845,22 @@ export const sv_SE: EnTranslations = {
         }
       },
       "q_hub_know_your_numbers": {
-        "title": "Know Your Numbers",
-        "text": "Strength you cannot measure is strength you cannot improve, {playerName}. Target the training dummy, open your Damage Meters, and land ten blows on it, swings or spells, while you watch the window count what you deal. When the ten are in, come back and tell me the number.",
-        "completion": "Ten blows, and now you know what they are worth. Every time you take a new weapon, a new talent or a new idea, {playerName}, come back to this post and put a number on it. The meters are honest even when the vale is not.",
+        "title": "Känn dina siffror",
+        "text": "Styrka du inte kan mäta är styrka du inte kan förbättra, {playerName}. Välj träningsdockan som mål, öppna dina skademätare och träffa den tio gånger, med slag eller besvärjelser, medan du ser fönstret räkna vad du gör. När de tio träffarna är inne, kom tillbaka och berätta siffran.",
+        "completion": "Tio träffar, och nu vet du vad de är värda. Varje gång du får ett nytt vapen, en ny talang eller en ny idé, {playerName}, kom tillbaka till den här posten och sätt en siffra på den. Mätaren är ärlig, även när dalen inte är det.",
         "objectives": {
           "0": {
-            "label": "Blow landed on the Training Dummy"
+            "label": "Träff på träningsdockan"
           }
         }
       },
       "q_hub_healing_numbers": {
-        "title": "Numbers That Heal",
-        "text": "A post is not the only thing worth measuring, {playerName}. Target the Healing Dummy beside it, open your Damage Meters, and switch to the Healing tab. Land three heals that actually restore health while you watch the window count them the same way it counted blows.",
-        "completion": "Healed numbers, not hurt ones, but numbers all the same, {playerName}. A healer who never watches those meters is guessing at their own worth.",
+        "title": "Siffror som läker",
+        "text": "En post är inte det enda värt att mäta, {playerName}. Välj läkningsdockan bredvid den som mål, öppna dina skademätare och byt till fliken Läkning. Landa tre läkningar som faktiskt återställer hälsa medan du ser fönstret räkna dem på samma sätt som det räknade träffar.",
+        "completion": "Läkta siffror, inte skadade, men siffror likväl, {playerName}. En helare som aldrig ser på sina mätare gissar om sitt eget värde.",
         "objectives": {
           "0": {
-            "label": "Effective heal landed on the Healing Dummy"
+            "label": "Effektiv läkning träffade läkningsdockan"
           }
         }
       },
@@ -20030,7 +20030,7 @@ export const sv_SE: EnTranslations = {
             "label": "Skimmertjärnen"
           },
           "7": {
-            "label": "Broodsworn Tents"
+            "label": "Broodsworns tält"
           },
           "8": {
             "label": "Gengångarfälten"
@@ -20042,7 +20042,7 @@ export const sv_SE: EnTranslations = {
       },
       "veiled_hollow": {
         "name": "Slöjhålan",
-        "welcome": "The air hums with old magic. Seek Keeper Saelwyn beneath the great tree of Eldershine.",
+        "welcome": "Luften surrar av gammal magi. Sök upp Väktare Saelwyn under Eldershines stora träd.",
         "pois": {
           "0": {
             "label": "Eldershine"
@@ -20183,7 +20183,7 @@ export const sv_SE: EnTranslations = {
             "label": "Nattporten"
           },
           "2": {
-            "label": "The Moonspring"
+            "label": "Månkällan"
           },
           "3": {
             "label": "Skymningsfältet"
@@ -20198,7 +20198,7 @@ export const sv_SE: EnTranslations = {
       },
       "wraithwood": {
         "name": "Vålnadsskogen",
-        "welcome": "The canopy closes over the road like a lid. Keep to the lanterns of Gibbetmere, and do not answer if the wood calls your name.",
+        "welcome": "Trädvalvet sluter sig över vägen som ett lock. Håll dig till Gibbetmeres lyktor och svara inte om skogen ropar ditt namn.",
         "pois": {
           "0": {
             "label": "Gibbetmere"
@@ -20467,9 +20467,9 @@ export const sv_SE: EnTranslations = {
         "body": "Din grupp klarade den heroiska prövningen medan du kämpade i eftertruppen eller låg fallen. Din låsning registrerades ändå, så din andel heroiska märken skickades hit i stället för att gå förlorad. Använd dem väl.\n\n- Heroisk kvartermästare"
       },
       "wyrmfall_core_reward": {
-        "sender": "The Heroic Quartermaster",
-        "subject": "Your Wyrmfall Cores",
-        "body": "The beast fell while you fought from the back, or from the dirt. Your share of its Wyrmfall Cores flies to you here rather than being lost to the corpse-pickers. Put them to good work at a bench.\n\n- The Heroic Quartermaster"
+        "sender": "Den heroiska kvartermästaren",
+        "subject": "Din Wyrmfall-kärna",
+        "body": "Odjuret föll medan du stred från dess rygg eller från marken. Din andel av dess Wyrmfall-kärnor flygs hit till dig i stället för att gå förlorad till plundrare. Använd dem väl vid en arbetsbänk.\n\n- Den heroiska kvartermästaren"
       },
       "guild_trend_engineering_alchemy": {
         "sender": "Hantverksgillet",
@@ -20690,48 +20690,48 @@ export const sv_SE: EnTranslations = {
         "bonus6": "Ökar attack- och kastningshastigheten med 4 procent och träffsäkerheten med 3 procent. Dina vapens kritiska träffar splittrar målet med Bensplitter och får det att blöda 5 skada varannan sek i 12 sek. Staplas upp till 3 gånger."
       },
       "crucible_agi_leather": {
-        "name": "Crucible Skirmisher's Leather",
-        "bonus2": "Your direct Physical damage and your pets' direct Physical damage build a charge, at most once per second. At 6 charges, you and your pets deal 8% more damage for 6 sec. Charges expire after 8 sec without a qualifying hit and cannot build during the damage bonus. Charges and the damage bonus end when you leave combat or stop wearing two pieces of this collection."
+        "name": "Degelns skärmytslarläder",
+        "bonus2": "Din direkta fysiska skada och dina husdjurs direkta fysiska skada bygger upp en laddning, högst en gång per sekund. Vid 6 laddningar orsakar du och dina husdjur 8 % mer skada i 6 sekunder. Laddningar försvinner efter 8 sekunder utan en kvalificerande träff och kan inte byggas under skadebonusen. Laddningar och skadebonusen upphör när du lämnar strid eller slutar bära två delar av denna samling."
       },
       "crucible_caster_cloth": {
-        "name": "Crucible Spellcaster's Cloth",
-        "bonus2": "Your magic damage and your pets' magic damage build a charge, at most once per second, including damage over time. At 6 charges, you and your pets deal 8% more damage for 6 sec. Charges expire after 8 sec without a qualifying hit and cannot build during the damage bonus. Charges and the damage bonus end when you leave combat or stop wearing two pieces of this collection."
+        "name": "Degelns besvärjartyg",
+        "bonus2": "Din magiska skada och dina husdjurs magiska skada bygger upp en laddning, högst en gång per sekund, även skada över tid. Vid 6 laddningar orsakar du och dina husdjur 8 % mer skada i 6 sekunder. Laddningar försvinner efter 8 sekunder utan en kvalificerande träff och kan inte byggas under skadebonusen. Laddningar och skadebonusen upphör när du lämnar strid eller slutar bära två delar av denna samling."
       },
       "crucible_caster_leather": {
-        "name": "Crucible Spellcaster's Leather",
-        "bonus2": "Your magic damage and your pets' magic damage build a charge, at most once per second, including damage over time. At 6 charges, you and your pets deal 8% more damage for 6 sec. Charges expire after 8 sec without a qualifying hit and cannot build during the damage bonus. Charges and the damage bonus end when you leave combat or stop wearing two pieces of this collection."
+        "name": "Degelns besvärjarläder",
+        "bonus2": "Din magiska skada och dina husdjurs magiska skada bygger upp en laddning, högst en gång per sekund, även skada över tid. Vid 6 laddningar orsakar du och dina husdjur 8 % mer skada i 6 sekunder. Laddningar försvinner efter 8 sekunder utan en kvalificerande träff och kan inte byggas under skadebonusen. Laddningar och skadebonusen upphör när du lämnar strid eller slutar bära två delar av denna samling."
       },
       "crucible_caster_mail": {
-        "name": "Crucible Spellcaster's Mail",
-        "bonus2": "Your magic damage and your pets' magic damage build a charge, at most once per second, including damage over time. At 6 charges, you and your pets deal 8% more damage for 6 sec. Charges expire after 8 sec without a qualifying hit and cannot build during the damage bonus. Charges and the damage bonus end when you leave combat or stop wearing two pieces of this collection."
+        "name": "Degelns besvärjarringbrynja",
+        "bonus2": "Din magiska skada och dina husdjurs magiska skada bygger upp en laddning, högst en gång per sekund, även skada över tid. Vid 6 laddningar orsakar du och dina husdjur 8 % mer skada i 6 sekunder. Laddningar försvinner efter 8 sekunder utan en kvalificerande träff och kan inte byggas under skadebonusen. Laddningar och skadebonusen upphör när du lämnar strid eller slutar bära två delar av denna samling."
       },
       "crucible_healer_cloth": {
-        "name": "Crucible Healer's Cloth",
-        "bonus2": "Healing an ally who is in combat turns 20% of your overhealing into a shield on that ally for 6 sec. Includes healing over time and damage converted into healing. This also works when healing yourself in combat. Protection from all wearers is limited to 5% of the recipient's maximum health. Additional overhealing fills the shield without extending its duration. This protection does not trigger other healing effects. Your shields end when the shielded ally leaves combat, you die, or you stop wearing two pieces of this collection."
+        "name": "Degelns helartyg",
+        "bonus2": "Att läka en allierad som är i strid omvandlar 20 % av din överläkning till en sköld på den allierade i 6 sekunder. Omfattar läkning över tid och skada som omvandlas till läkning. Detta fungerar även när du läker dig själv i strid. Skyddet från alla bärare är begränsat till 5 % av mottagarens maximala hälsa. Ytterligare överläkning fyller skölden utan att förlänga dess varaktighet. Skyddet utlöser inga andra läkande effekter. Dina sköldar försvinner när den sköldade allierade lämnar strid, du dör eller du slutar bära två delar av denna samling."
       },
       "crucible_healer_leather": {
-        "name": "Crucible Healer's Leather",
-        "bonus2": "Healing an ally who is in combat turns 20% of your overhealing into a shield on that ally for 6 sec. Includes healing over time and damage converted into healing. This also works when healing yourself in combat. Protection from all wearers is limited to 5% of the recipient's maximum health. Additional overhealing fills the shield without extending its duration. This protection does not trigger other healing effects. Your shields end when the shielded ally leaves combat, you die, or you stop wearing two pieces of this collection."
+        "name": "Degelns helarläder",
+        "bonus2": "Att läka en allierad som är i strid omvandlar 20 % av din överläkning till en sköld på den allierade i 6 sekunder. Omfattar läkning över tid och skada som omvandlas till läkning. Detta fungerar även när du läker dig själv i strid. Skyddet från alla bärare är begränsat till 5 % av mottagarens maximala hälsa. Ytterligare överläkning fyller skölden utan att förlänga dess varaktighet. Skyddet utlöser inga andra läkande effekter. Dina sköldar försvinner när den sköldade allierade lämnar strid, du dör eller du slutar bära två delar av denna samling."
       },
       "crucible_healer_mail": {
-        "name": "Crucible Healer's Mail",
-        "bonus2": "Healing an ally who is in combat turns 20% of your overhealing into a shield on that ally for 6 sec. Includes healing over time and damage converted into healing. This also works when healing yourself in combat. Protection from all wearers is limited to 5% of the recipient's maximum health. Additional overhealing fills the shield without extending its duration. This protection does not trigger other healing effects. Your shields end when the shielded ally leaves combat, you die, or you stop wearing two pieces of this collection."
+        "name": "Degelns helarringbrynja",
+        "bonus2": "Att läka en allierad som är i strid omvandlar 20 % av din överläkning till en sköld på den allierade i 6 sekunder. Omfattar läkning över tid och skada som omvandlas till läkning. Detta fungerar även när du läker dig själv i strid. Skyddet från alla bärare är begränsat till 5 % av mottagarens maximala hälsa. Ytterligare överläkning fyller skölden utan att förlänga dess varaktighet. Skyddet utlöser inga andra läkande effekter. Dina sköldar försvinner när den sköldade allierade lämnar strid, du dör eller du slutar bära två delar av denna samling."
       },
       "crucible_str_leather": {
-        "name": "Crucible Prowler's Leather",
-        "bonus2": "Your direct Physical damage and your pets' direct Physical damage build a charge, at most once per second. At 6 charges, you and your pets deal 8% more damage for 6 sec. Charges expire after 8 sec without a qualifying hit and cannot build during the damage bonus. Charges and the damage bonus end when you leave combat or stop wearing two pieces of this collection."
+        "name": "Degelns smygarläder",
+        "bonus2": "Din direkta fysiska skada och dina husdjurs direkta fysiska skada bygger upp en laddning, högst en gång per sekund. Vid 6 laddningar orsakar du och dina husdjur 8 % mer skada i 6 sekunder. Laddningar försvinner efter 8 sekunder utan en kvalificerande träff och kan inte byggas under skadebonusen. Laddningar och skadebonusen upphör när du lämnar strid eller slutar bära två delar av denna samling."
       },
       "crucible_str_mail": {
-        "name": "Crucible Striker's Mail",
-        "bonus2": "Your direct Physical damage and your pets' direct Physical damage build a charge, at most once per second. At 6 charges, you and your pets deal 8% more damage for 6 sec. Charges expire after 8 sec without a qualifying hit and cannot build during the damage bonus. Charges and the damage bonus end when you leave combat or stop wearing two pieces of this collection."
+        "name": "Degelns anfallarringbrynja",
+        "bonus2": "Din direkta fysiska skada och dina husdjurs direkta fysiska skada bygger upp en laddning, högst en gång per sekund. Vid 6 laddningar orsakar du och dina husdjur 8 % mer skada i 6 sekunder. Laddningar försvinner efter 8 sekunder utan en kvalificerande träff och kan inte byggas under skadebonusen. Laddningar och skadebonusen upphör när du lämnar strid eller slutar bära två delar av denna samling."
       },
       "crucible_tank_leather": {
-        "name": "Crucible Guardian's Leather",
-        "bonus2": "Enemy damage starts a 10 sec counting period. When health lost during that period reaches 40% of your maximum health, gain a shield absorbing 8% of your maximum health for 6 sec. Can occur once every 20 sec. Absorbed damage and self-damage do not count. Stored damage and the shield end when you leave combat or stop wearing two pieces of this collection. The cooldown does not reset."
+        "name": "Degelns väktarläder",
+        "bonus2": "Fiendeskada inleder en räkningsperiod på 10 sekunder. När den hälsa du förlorat under perioden når 40 % av din maximala hälsa får du en sköld som absorberar 8 % av din maximala hälsa i 6 sekunder. Kan inträffa en gång var 20:e sekund. Absorberad skada och självskada räknas inte. Lagrad skada och skölden upphör när du lämnar strid eller slutar bära två delar av denna samling. Nedkylningen återställs inte."
       },
       "crucible_tank_mail": {
-        "name": "Crucible Guardian's Mail",
-        "bonus2": "Enemy damage starts a 10 sec counting period. When health lost during that period reaches 40% of your maximum health, gain a shield absorbing 8% of your maximum health for 6 sec. Can occur once every 20 sec. Absorbed damage and self-damage do not count. Stored damage and the shield end when you leave combat or stop wearing two pieces of this collection. The cooldown does not reset."
+        "name": "Degelns väktarringbrynja",
+        "bonus2": "Fiendeskada inleder en räkningsperiod på 10 sekunder. När den hälsa du förlorat under perioden når 40 % av din maximala hälsa får du en sköld som absorberar 8 % av din maximala hälsa i 6 sekunder. Kan inträffa en gång var 20:e sekund. Absorberad skada och självskada räknas inte. Lagrad skada och skölden upphör när du lämnar strid eller slutar bära två delar av denna samling. Nedkylningen återställs inte."
       },
       "dawnforged": {
         "name": "Gryningssmidda klädnader",
@@ -20939,7 +20939,7 @@ export const sv_SE: EnTranslations = {
     "delveRiteShrineSkullInteract": "Skallhelgedom: Tryck på F för att röra vid den",
     "mailboxName": "Brevlåda",
     "noticeboardName": "Anslagstavla",
-    "farmPatchName": "Garden Beds",
+    "farmPatchName": "Trädgårdsbäddar",
     "realmBuilderMonumentName": "Riksbyggarmonument"
   }
 };

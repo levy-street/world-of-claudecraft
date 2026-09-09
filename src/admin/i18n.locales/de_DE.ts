@@ -1241,4 +1241,55 @@ export const de_DE: Record<string, string> = {
   'realmBuilders.saveNew': 'Veröffentlichen',
   'realmBuilders.useNextMonth': 'Nächsten Monat',
   'realmBuilders.yearLabel': 'Jahr',
+  'error.clearItemNameAllLiteral': 'all muss das Literal true sein',
+  'error.clearItemNameBagIndex': 'bag muss eine nichtnegative ganze Zahl sein',
+  'error.clearItemNameBagPair':
+    'ein Taschenziel benötigt sowohl den Zellindex als auch seine Gegenstands-ID',
+  'error.clearItemNameBagRange': 'bag muss eine ganze Zahl von {min} bis {max} sein',
+  'error.clearItemNameCameOnline':
+    'der Charakter war online, bevor das Entfernen wirksam wurde; trennen Sie ihn und versuchen Sie es erneut',
+  'error.clearItemNameLeased':
+    'der Charakter hält eine aktive Sitzungssperre; trennen Sie ihn (oder warten Sie, bis die Sperre abläuft) und versuchen Sie es erneut',
+  'error.clearItemNameNoMatch': 'keine benannte Kopie passte zu diesem Ziel',
+  'error.clearItemNameOnline': 'der Charakter ist auf diesem Reich online; trennen Sie ihn zuerst',
+  'error.clearItemNameTargetForms':
+    'nennen Sie genau ein Ziel: einen getragenen Platz, eine Taschenzelle oder all: true',
+  'error.clearItemNameUnknownSlot': 'unbekannter Ausrüstungsplatz',
+  'error.clearItemNameWentOffline':
+    'der Charakter ging offline, bevor das Entfernen wirksam wurde; versuchen Sie es erneut',
+  'error.itemNameClearFailed': 'das Löschen des Gegenstandsnamen ist fehlgeschlagen',
+  'loadFailure.forbiddenDetail':
+    'Ihre Mitarbeiterrollen haben nicht die Berechtigung für diese Ansicht. Bitten Sie einen Superadmin, sie zu erteilen, und laden Sie dann neu.',
+  'loadFailure.forbiddenTitle': 'Berechtigung verweigert',
+  'marketMetrics.autoRefresh': 'Automatisch aktualisieren ({seconds}s)',
+  'marketMetrics.bucketCompost': 'Kompost',
+  'marketMetrics.bucketCores': 'Kerne',
+  'marketMetrics.bucketEmpty': 'keine aktiven Angebote',
+  'marketMetrics.bucketEssence': 'Essenz',
+  'marketMetrics.bucketPatterns': 'Muster',
+  'marketMetrics.bucketProduce': 'Erzeugnisse',
+  'marketMetrics.bucketSeeds': 'Samen',
+  'marketMetrics.bucketSold':
+    'In den letzten {days} Tagen verkauft: {sales} Verkäufe, {quantity} Gegenstände, {copper}',
+  'marketMetrics.bucketSummary':
+    '{listings} Angebote, {quantity} Einheiten, {listed} von {tracked} Gegenständen angeboten',
+  'marketMetrics.colItem': 'Gegenstand',
+  'marketMetrics.colListings': 'Angebote',
+  'marketMetrics.colLowest': 'Niedrigster Preis (pro Einheit)',
+  'marketMetrics.colMedian': 'Median (pro Einheit)',
+  'marketMetrics.colQuantity': 'Menge',
+  'marketMetrics.empty': 'keine aktiven Angebote in einer der verfolgten Kategorien',
+  'marketMetrics.essenceNote':
+    'Diese Materialien sind seelengebunden und können nie angeboten werden. Jede Zeile bedeutet, dass die Treuhand-Invariante des Marktes verletzt wurde und technische Aufmerksamkeit benötigt.',
+  'marketMetrics.hint':
+    'Aktive Weltmarkt-Angebote für die verfolgten Versorgungskategorien: was gerade angeboten wird, nicht das Verkaufsvolumen. Der Server speichert diese Anzeige etwa 15 Sekunden lang.',
+  'marketMetrics.loadFailed': 'Marktmetriken konnten nicht geladen werden',
+  'marketMetrics.loading': 'Wird geladen …',
+  'marketMetrics.realm': 'Reich: {realm}',
+  'marketMetrics.soldNone': 'In den letzten {days} Tagen verkauft: nichts',
+  'marketMetrics.soldUnavailable':
+    'Das Verkaufsvolumen ist momentan nicht verfügbar; daher werden unten nur aktive Angebote angezeigt.',
+  'moderationHistory.actionClearItemName': 'Gegenstandsname gelöscht',
+  'nav.marketMetrics': 'Marktmetriken',
+  'poi.thornpeak_heights.7': 'Broodsworn-Zelte',
 };

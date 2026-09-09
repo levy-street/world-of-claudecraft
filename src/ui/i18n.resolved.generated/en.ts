@@ -4004,7 +4004,7 @@ export const en: EnTranslations = {
       },
       "roster": {
         "seats": "{count} of {cap} seats",
-        "expand": "Expand roster (+{seats} seats for {price})",
+        "expand": "Expand roster",
         "maxed": "The roster is at its largest size",
         "confirm": "Expand the guild roster by {seats} seats for {price}? The gold comes from your own purse and is not refunded.",
         "confirmAction": "Expand",

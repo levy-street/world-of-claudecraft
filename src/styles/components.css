@@ -12386,6 +12386,15 @@
   }
   .soc-add.soc-leave {
     justify-content: flex-end;
+    /* Two buttons share this row on the guild tab (below); a long label (the
+       disabled roster-maxed reading in a wordy locale on a phone) wraps the
+       second button onto its own line instead of squeezing both. */
+    flex-wrap: wrap;
+  }
+  /* The guild footer: the leader-only Expand roster button leads the same row the
+     disband / leave button ends, so the auto margin pushes it to the start edge. */
+  .soc-add.soc-leave .soc-foot-start {
+    margin-right: auto;
   }
   .soc-add input {
     flex: 1;

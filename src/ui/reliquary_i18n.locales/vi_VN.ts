@@ -151,23 +151,33 @@ export const table: ReliquaryLocaleTable = {
     desc: 'Những chiếc nhẫn Rạn Nứt riêng, đúc cho mọi nhà vô địch trong tổ đội giành lượt hoàn thành đầu tiên của một Rạn Nứt xếp hạng. Mỗi nhân vật chỉ có thể giữ của riêng mình.',
   },
   conquerors_ignivar: {
-    name: 'Crucible of the Last Spring',
-    desc: 'Chiến lợi phẩm sử thi từ Ignivar, Herald of the Last Flame.',
+    name: 'Lò Luyện Suối Nguồn Cuối Cùng',
+    desc: 'Chiến lợi phẩm sử thi từ Ignivar, Sứ Giả Ngọn Lửa Cuối Cùng.',
   },
   conquerors_ignivar_heroic: {
-    name: 'Anh Hùng: Crucible of the Last Spring',
-    desc: 'Vũ khí chỉ rơi ở chế độ anh hùng từ Ignivar, Herald of the Last Flame.',
+    name: 'Anh Hùng: Lò Luyện Suối Nguồn Cuối Cùng',
+    desc: 'Vũ khí chỉ rơi ở chế độ anh hùng từ Ignivar, Sứ Giả Ngọn Lửa Cuối Cùng.',
   },
   conquerors_varkhul: {
-    name: 'The Inner Crucible',
-    desc: 'Chiến lợi phẩm sử thi từ Varkhul, Forgefather of the Last Flame.',
+    name: 'Lò Luyện Bên Trong',
+    desc: 'Chiến lợi phẩm sử thi từ Varkhul, Tổ Phụ Lò Rèn của Ngọn Lửa Cuối Cùng.',
   },
   conquerors_varkhul_heroic: {
-    name: 'Anh Hùng: The Inner Crucible',
-    desc: 'Khiên và vũ khí chỉ rơi ở chế độ anh hùng từ Varkhul, Forgefather of the Last Flame.',
+    name: 'Anh Hùng: Lò Luyện Bên Trong',
+    desc: 'Khiên và vũ khí chỉ rơi ở chế độ anh hùng từ Varkhul, Tổ Phụ Lò Rèn của Ngọn Lửa Cuối Cùng.',
   },
   conquerors_set_bramblehide: {
     name: 'Da Gai Của Roots',
-    desc: 'Trọn bộ giáp da Bramblehide.',
+    desc: 'Trọn bộ giáp da Da Gai.',
+  },
+  professions_crucible: {
+    desc: 'Mười một bộ sưu tập chế tạo từ raid, mỗi bộ có một món ngực, eo và chân. Sổ tay và công thức là kiến thức, không phải thánh vật.',
+
+    name: 'Tài Nghệ Chế Tác Lò Luyện',
+  },
+
+  professions_forgebreaker: {
+    name: 'Kẻ Phá Lò',
+    desc: 'Tiếng nói của Suối Nguồn Cuối Cùng, được giải phóng khỏi lò rèn và mang theo trong chiếc búa do chính tay bạn chế tác.',
   },
 };
