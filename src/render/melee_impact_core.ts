@@ -36,6 +36,7 @@ export const MELEE_IMPACTS: Readonly<Record<string, MeleeImpactProfile>> = {
   heroic_strike: contact(0.58, 'edge', -0.95, 1.25, 0.075, 0.95),
   slam: contact(0.56, 'crush', 0.1, 1.45, 0.12, 1.4),
   mortal_strike: contact(0.63, 'split', -0.35, 1.65, 0.12, 1.65),
+  deep_wounds: contact(0.63, 'serrated', -0.35, 1.2, 0.09, 0.6, true),
   execute: contact(0.7, 'split', 0.18, 2.05, 0.16, 2.1, true),
   breachmaker: contact(0.57, 'pierce', 0.05, 1.45, 0.095, 1.4),
   overpower: contact(0.57, 'edge', 1.15, 1.35, 0.075, 1.05),
@@ -82,7 +83,8 @@ export const MELEE_IMPACTS: Readonly<Record<string, MeleeImpactProfile>> = {
 export function isBleedContinuation(id: string | undefined, primaryId?: string | null): boolean {
   return (
     !primaryId &&
-    (id === 'garrote' ||
+    (id === 'deep_wounds' ||
+      id === 'garrote' ||
       id === 'rupture' ||
       id === 'hemorrhage' ||
       id === 'venomrend' ||

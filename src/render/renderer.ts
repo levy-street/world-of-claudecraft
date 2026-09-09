@@ -3023,6 +3023,7 @@ export class Renderer {
       localPlayerId: () => this.sim.player.id,
       warriorSpecOf: (id) => id === this.sim.playerId ? this.sim.talentSpec : null,
       isLivingWarrior: (id) => isLivingWarriorAttentionSource(this.sim.entities.get(id)),
+      isWarrior: (id) => { const source = this.sim.entities.get(id); return source?.kind === 'player' && source.templateId === 'warrior'; },
       visualVariantOf: (id, caster) => ritualVariantAbilityId(id, this.sim.entities.get(caster)?.auras ?? []),
       hasGestureClip: (id, abilityId) => {
         const v = this.views.get(id);

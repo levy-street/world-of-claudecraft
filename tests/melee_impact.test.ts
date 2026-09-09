@@ -17,7 +17,7 @@ describe('anatomical contact ownership', () => {
     expect(damageEventStartsAttackAnimation({kind:'player'},view,false,ABILITIES.sinister_strike.name,'sinister_strike')).toBe(true);
   });
   it('does not replay attacks on bleed ticks or their final expiry tick', () => {
-    for (const id of ['garrote', 'rupture', 'hemorrhage', 'venomrend']) {
+    for (const id of ['deep_wounds', 'garrote', 'rupture', 'hemorrhage', 'venomrend']) {
       expect(
         damageEventStartsAttackAnimation(
           { kind: 'player' },
@@ -48,11 +48,11 @@ describe('anatomical contact ownership', () => {
       damageEventStartsAttackAnimation({ kind: 'player' }, null, false, null),
     ).toBe(true);
   });
-  it('gives periodic damage a wound without another flinch hold', () => {
+  it.each(['garrote', 'deep_wounds'])('gives %s periodic damage a wound without another flinch hold', (id) => {
     const visual = { respondToElement: vi.fn(), holdFrame: vi.fn() };
     damageContact(
       visual as unknown as CharacterVisual,
-      { school: 'physical', amount: 20, ability: ABILITIES.garrote.name },
+      { school: 'physical', amount: 20, ability: ABILITIES[id].name },
       true,
       false,
     );

@@ -131,6 +131,7 @@ export interface AbilityVfxDeps {
   // The local player's entity id (cast-acknowledgment gestures).
   localPlayerId?: () => number;
   isLivingWarrior?: (entityId: number) => boolean;
+  isWarrior?: (entityId: number) => boolean;
   warriorSpecOf?: (entityId: number) => string | null;
   visualVariantOf?: (abilityId: string, casterId: number) => string;
   // True when the entity's rig authors a per-ability one-shot clip
@@ -579,6 +580,14 @@ export class AbilityVfx {
   // Returns true when this painter fully handled the event (the renderer skips
   // its generic school-colored arm), false to fall through unchanged.
   handleSpellfx(ev: AbilityVfxSpellfxEvent): boolean {
+    // Physical Warrior ticks are wounds. The wire's tick companion has no
+    // ability label, so preserve its recipient cue without an ivory magic puff.
+    if (ev.fx === 'tick' && ev.school === 'physical' && this.deps.isWarrior?.(ev.sourceId)) {
+      const at = this.deps.anchor(ev.targetId, 0.63);
+      if (at && this.budget.admitAccent(this.now()))
+        this.deps.fx.burstAt(at.x, at.y, at.z, 0xa9152d, 9, 0.65, 'blood', 0.23);
+      return true;
+    }
     const originalEvent = ev;
     const ability = ev.ability;
     if (!ability) return false;
@@ -1459,6 +1468,12 @@ export class AbilityVfx {
     }
     const abilityId = attackAbilityId(ev.ability);
     if (isBleedContinuation(abilityId, ev.abilityId)) {
+      if (abilityId === 'deep_wounds') {
+        // Damage owns the short surface incision, including the final tick
+        // after expiry. Its paired tick event owns the loose blood droplets.
+        this.deps.fx.contact(ev.sourceId, ev.targetId, 'physical-blood', 0.8, abilityId, 0);
+        return true;
+      }
       // Periodic wounds and consumed-bleed payoffs belong to the struck body.
       // This also covers the last tick, when the aura has already been removed.
       const wound = this.deps.anchor(ev.targetId, meleeImpactProfile(abilityId!)?.height ?? 0.55);

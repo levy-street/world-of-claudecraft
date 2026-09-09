@@ -5,7 +5,7 @@ import { ArchetypeSequencer, type SequencerHost } from '../src/render/ability_vf
 import { WARRIOR_BLADE_STYLES } from '../src/render/ability_vfx/warrior_blades';
 import { ABILITIES } from '../src/sim/data';
 
-function fixture(disposed = false) {
+function fixture(disposed = false, sourceAlive = true) {
   const sequencer = new ArchetypeSequencer();
   const screenFx = vi.fn();
   const host = new Proxy(
@@ -32,6 +32,8 @@ function fixture(disposed = false) {
       vfx: { burst: vi.fn() },
       anchor: () => ({ x: 4, y: 1, z: 0 }),
       localPlayerId: () => 1,
+      isLivingWarrior: (id: number) => sourceAlive && id === 1,
+      isWarrior: (id: number) => id === 1,
       animHold: hold,
     } as unknown as AbilityVfxDeps,
     () => 0,
@@ -51,6 +53,29 @@ function damage(id: string) {
     crit: false,
   };
 }
+
+it('gives Gaping Wounds its recipient incision without another physical strike', () => {
+  const h = fixture();
+  expect(h.painter.onDamage({ ...damage('deep_wounds'), abilityId: null })).toBe(true);
+  expect(h.host.contact).toHaveBeenCalledWith(1, 2, 'physical-blood', 0.8, 'deep_wounds', 0);
+  expect(h.hold).not.toHaveBeenCalled();
+  expect(h.host.burstAt).not.toHaveBeenCalled();
+  h.sequencer.update(h.host, 0.2);
+  expect(h.host.contact).toHaveBeenCalledTimes(1);
+});
+
+it.each([true, false])(
+  'keeps Warrior bleeding after caster death (alive=%s), with other sources fallback',
+  (alive) => {
+    const h = fixture(false, alive);
+    const tick = { sourceId: 1, targetId: 2, fx: 'tick', school: 'physical' };
+    expect(h.painter.handleSpellfx(tick)).toBe(true);
+    expect(h.host.burstAt).toHaveBeenCalledWith(4, 1, 0, 0xa9152d, 9, 0.65, 'blood', 0.23);
+    expect(h.painter.handleSpellfx({ ...tick, sourceId: 3 })).toBe(false);
+    expect(h.painter.handleSpellfx({ ...tick, school: 'fire' })).toBe(false);
+    expect(h.host.burstAt).toHaveBeenCalledTimes(1);
+  },
+);
 
 it.each([...Object.keys(WARRIOR_BLADE_STYLES), 'shield_slam', 'breachmaker'])(
   '%s suppresses the immediate generic hit and lands one authored contact',

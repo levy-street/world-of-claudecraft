@@ -1,0 +1,1868 @@
+{
+  "sourceReport": "C:\\Users\\tony\\Documents\\Codex\\2026-09-06\\new-chat\\work\\studio-contact-pass\\warrior-final-forms-voice-2\\report.json",
+  "sourceReportSha256": "8d66045970d198db9191a3c5d5f28cd6665ee078ec993f6b1394671420818b6c",
+  "sourceAtStart": {
+    "public/models/chars/players/warrior_ability_anims.glb": "8aefecd84783b12220f87a09df76d9ea11d1b6c919f362742619b76f1d487edd",
+    "public/models/chars/players/warrior_contact_anims.glb": "62cb2c30ca0c87fe810371a98c0c97f8bf40df8a10b0775479af83a5dd91beb1",
+    "public/textures/vfx/production/warrior_power.webp": "68450efac5cc151da9592de459cf7b0b06994759fb85f2e68b1a3775794684ef",
+    "scripts/anim/warrior_control_poses.mjs": "117e0d2ab9449950c60acc7b99e9a206cfde2cbb5a38f1c3697f76f8c83daf48",
+    "scripts/anim/warrior_reaver_pose.mjs": "096a723ea4e4f8fa49dc36df6fd7380b3753ff75dcc55ee5eb2fb4ee291e9efe",
+    "scripts/anim/warrior_rush.mjs": "fc3ad82708f398ec95a42e0d05ef02628a2f1c3d8705d0e17db50e1a88b06ba7",
+    "scripts/build_warrior_ability_anims.mjs": "6c4675fbd0c43012de31329bdae2f5b48bc2b1d510bfe1849fc0b686efac0260",
+    "scripts/build_warrior_contact_anims.mjs": "254c26fa340bc41007573156a61d0f0b116449c515fd6b61f36f276b3a33608b",
+    "src/fury_audio_core.ts": "327888ecc23436565e3e939b7eab11763845299fdd791097674f13c0f66592da",
+    "src/render/ability_vfx/action_contact.ts": "9da040bea2cc884fc9e98adf56a237d470769b235417087367cbd3896b6d114b",
+    "src/render/ability_vfx/active_kit_prewarm.ts": "3b943a061b149c55fad2b028c8ebd5eaad548f1555516883d68bccfc7eb0b6a7",
+    "src/render/ability_vfx/baked_impact_layers.ts": "ee2ac653cbc4c7b31775cf9fc21336f98a5b399e7afe77f28e19245b4a1386be",
+    "src/render/ability_vfx/bloodhook.ts": "dd2e31f78623ea5e13b307a072b6e4a9e388bb11e6d9b60c8e665107702c5b2e",
+    "src/render/ability_vfx/breachmaker.ts": "495b7551f2fe07e44083f064cfa87e4cda392f98c000f107410beb3e87b9b424",
+    "src/render/ability_vfx/cast_language.ts": "73e8ed99ddd82d621d4afd7dcdc97518ac309c98e259feb0c074b1117535fb68",
+    "src/render/ability_vfx/catalogue_materials.ts": "7dc8d3826f118bdcc7a860b9c3c23847487c12ddd5e56d75042c33a044b3f259",
+    "src/render/ability_vfx/ceremonies.ts": "4430445ea44555affa653025072c2a0630a862ea8c80619965fe8be71d298060",
+    "src/render/ability_vfx/contact_assets.ts": "1ff03f779804d5806497797b5071a533858d6807105e62fc956c59047019e48c",
+    "src/render/ability_vfx/crest_prewarm.ts": "f49de8808c4395ba3359d5233677abb9dc014106a61f9915bdf01acbdaff6e8f",
+    "src/render/ability_vfx/decals.ts": "e03c11cfe05498918e419272b71f8bcf50eb5a098db2a238b7f75b0c4580c636",
+    "src/render/ability_vfx/elemental_form_geometry.ts": "9ea475b44a27c7ad6a14b20fd3be3f3e643f90c79cc83d1bda1ba9974d602e54",
+    "src/render/ability_vfx/elemental_forms.ts": "2ac136c3ceeecefe4b3ff502f595b2acbf4aac4f31b49c4fb52ddac83753fc13",
+    "src/render/ability_vfx/elemental_performance_core.ts": "69cd63f631f7ce5778c180733c6274c21f26691fbdd10fa3e7a24ad3c6f05c96",
+    "src/render/ability_vfx/encounter_specs.ts": "e9b2232d0d4fcae6eb1cd5b64600bfc5a317c91fef182703bd91198bacf8837a",
+    "src/render/ability_vfx/flipbooks.ts": "f555cda391b6af4d0e3a8edac83c9542167b24cf08706785d3d44bd51fe6f864",
+    "src/render/ability_vfx/fury_audio.ts": "4e5fa4b22c85330010b753bdd85683d1b2114d57a70ee910b01bbc7a6ccb62ff",
+    "src/render/ability_vfx/fury_choreography.ts": "7414db55fd2dde74a01d6d7d1e95d4b2af71a04025f718586fd71fcfac46cca6",
+    "src/render/ability_vfx/fury_shapes.ts": "0584d27eddbfdf8baf98018d5131b79fd2b0ebb3977c21499a6ba0550937f2db",
+    "src/render/ability_vfx/fury_surface.ts": "ade23d5740eb72dae73627805e724501dddc1b24c45acf7c96fdcb6a76e583ee",
+    "src/render/ability_vfx/fx.ts": "401420b1572df50f9516e157a4337019699ee4b1310828c76af2355d2412941d",
+    "src/render/ability_vfx/fx_textures.ts": "3d83ad262c36a322393047d6b3bdb9d7b62adbd5769a4ffd3e83dd9994b400e4",
+    "src/render/ability_vfx/ground_auras.ts": "dc55a99933171e236d189536c3d290f323e87de611d7e1edc3d4c2f85118986f",
+    "src/render/ability_vfx/guard_prewarm.ts": "34aa91d73b554016f540affff1705b7b34bca6b9c4ccdf850ff06fa2a77e1d18",
+    "src/render/ability_vfx/held_conduction.ts": "f71491b302ff0b66aa16cc6214318c0d27ef1cb2a71cf3f3869b7bf4720b5ad4",
+    "src/render/ability_vfx/held_warrior_storm.ts": "0e310e610dccbfd834b3d25382908247e9d1bdc3ab1519926d631b22f9f52707",
+    "src/render/ability_vfx/hunter_pet_contact.ts": "74d866a5384aebb953078c05efbdaf211cbff6a95702276264101ee132da0040",
+    "src/render/ability_vfx/hunter_volley.ts": "3894de99a269950a7d630addb6da550525f20a2ffa3076428fb12b57a4194ca7",
+    "src/render/ability_vfx/index.ts": "71c0dff9c2e4f6fb4fbe7774e291c81a3e42d196a0e9f62f28433065d9a1bb07",
+    "src/render/ability_vfx/ironguard.ts": "501e54d22c22d89b41d9c5ef614e3069a817467cc409630624da5f0124a4cf2e",
+    "src/render/ability_vfx/ironguard_shapes.ts": "824dd2a7080a569ab9a6b4844dec73c44a6b3bb64626fc1db326723fee36818f",
+    "src/render/ability_vfx/kit_contact.ts": "a5d7d7005bacc5d6f85c3febddce9ccbaf5d63077be9f0eaa113a41b081bbef2",
+    "src/render/ability_vfx/material_response_core.ts": "b5f985dee473aa49bed3aab7b7702c91e551fa93839016270abc5282af8c1ba7",
+    "src/render/ability_vfx/overlay_sprites.ts": "29dee3c0cbd0a75b996f2f7dc523e487b8be525acc9e528a08ea64dd453c63a7",
+    "src/render/ability_vfx/painter.ts": "881be343383df7249d6de02b8f357309eb44cb5b10351918af4a710f19d0f880",
+    "src/render/ability_vfx/physical_choreography.ts": "4b049e7e615a8818397fa655bba6e60a35ff2d604aa7ac1dcb6cb0e31fa6fb99",
+    "src/render/ability_vfx/physical_choreography_core.ts": "d64c52833d80217c6e309aa6e13bac308eb4b813d5e47af85a52033f8b92b39a",
+    "src/render/ability_vfx/physical_contact.ts": "49555bcf3fc74fba55775f7d347af0fae9be7bb513e70b74d2718ec069237bd7",
+    "src/render/ability_vfx/pillars.ts": "811c7bc9028b7d9469d7ec919718f801cd6dad911bf892e6dd0959dab9f3a3a5",
+    "src/render/ability_vfx/prewarm.ts": "9e94eba55400e0e6987220340ff6f50ebd939495e9ca62dbdba45ea298d91f23",
+    "src/render/ability_vfx/primitive_prewarm.ts": "b6c52af07a19145be6e3865441af548bf7ed33f47dd9545d017a581b75f9858b",
+    "src/render/ability_vfx/production_assets.ts": "7e32e8555510172faeb02bf7945a1ead40942a984f5f8abc0c6d3a4eb46bada2",
+    "src/render/ability_vfx/ribbons.ts": "9619707b14cdfb8a9d0ad1229a426e8ab42e4c5573e2d3252bc707dc26b58ab7",
+    "src/render/ability_vfx/rings.ts": "6b558adeae0291b4f91579e0a0ae12839a03919cd659896dcc423d9e33171506",
+    "src/render/ability_vfx/ritual_choreography.ts": "3ed2642365230dc8d5843c71815f18fef2414363b97cdd9d43ab4c12eaaec03d",
+    "src/render/ability_vfx/ritual_choreography_core.ts": "d0630ba456bad8bb19729dd2cf47fb37d84f7b721001c26dc6ec28f2f99c552c",
+    "src/render/ability_vfx/ritual_sculptures.ts": "30072b190fea4861509893c21c19b17b0deafb65d638c1f7cfcf065331512e46",
+    "src/render/ability_vfx/sequencer.ts": "3a582a775e60759d0a0aba906c463bb90939407361c683bff17438b6f96eca3b",
+    "src/render/ability_vfx/shells.ts": "67afe7b4f342b2da590e7b2b54a609cf12d3619192497c4d3c00192413793f9a",
+    "src/render/ability_vfx/signature_choreography.ts": "88b6239898354705dff248d9f55a47bc40b84f8caf7f8a42c05610ab779c8c2c",
+    "src/render/ability_vfx/signature_core.ts": "e0864ee656b7ddb307ef637db9160aa536e126235f4d58c6c3e0af1d699db2c0",
+    "src/render/ability_vfx/signature_crests.ts": "adab9ce0499f5aabafd9e140ecf1ccd1ee13152934a2ed0f2a83b0bddd305144",
+    "src/render/ability_vfx/signature_details.ts": "fcb8dd5cdc1a4d508d18a9f8b462e0fd358ae82e2e8d5de4bead13c0ce68d3b5",
+    "src/render/ability_vfx/signature_material_response.ts": "579b6e3f36ed365f28cdacecfc6b1cd0448750911277197e645ad30ca3216ef4",
+    "src/render/ability_vfx/signature_shapes.ts": "aaf65d3699cf049530703c44e197dc45da28f09369c84f2ddd2bbcad5b354cb4",
+    "src/render/ability_vfx/signature_texture.ts": "d8cee5f386eb12b9886833941b08217bee5658d9a8cb8e358be2c0a61eba03d1",
+    "src/render/ability_vfx/simulation_assets.ts": "cf0efd83bda4a6faa5a1e92b2c049006a477c0d0bbad1e607d4a3dfe1d3a587b",
+    "src/render/ability_vfx/solar_execution.ts": "8cd18356e3638ab989d4e7090cd8d8ebb979646ba11d5fa7b3e9c4ffe7652a55",
+    "src/render/ability_vfx/solid_impact_fragments.ts": "2f2d036ec14f877a84975fb5e7092f5047c5d9c701840ce45070fe48ebeef1f9",
+    "src/render/ability_vfx/spectacle.ts": "051a02a76ec2f5742f8147da9afd6b2f8bd70172af2d6d5ad7f69e19b56c7aa5",
+    "src/render/ability_vfx/spirits.ts": "d1acf86a61f788ed1d69cab4f5dfb89077a79f55291b29292e1ad7894e5076cc",
+    "src/render/ability_vfx/steel_sweep.ts": "81c73beda857c234b009d60569a850d5ed9e19fa119104402911e167f04a5c59",
+    "src/render/ability_vfx/warrior_area.ts": "004789475d7980ceb952f50ce521e4fff4fc1595d9ddafffcc73ad6844e5ff10",
+    "src/render/ability_vfx/warrior_area_shapes.ts": "495747edffb2af727afccc95bc52733254356a767ec0fbd16055592359acc72c",
+    "src/render/ability_vfx/warrior_attention.ts": "4b6e458fbf6754b99da0dfb3c6bca4e413f3393f33b06be6687942c22c61b932",
+    "src/render/ability_vfx/warrior_attention_atlas.ts": "5034a79823303222878493a1aeba71f5431e70e93488a753de78d8e5b4468639",
+    "src/render/ability_vfx/warrior_attention_core.ts": "8b172951d67627a9589d962b92f8f8a09db326dbee7e8825d4580b5e17341d22",
+    "src/render/ability_vfx/warrior_avatar_bracer.ts": "6720b62db8269f4ebc148c865c7792cd35a3f64dd699ccd2527e6d20619f8fd7",
+    "src/render/ability_vfx/warrior_avatar_rupture.ts": "ebe5ac0abf1037c8646607066cb74ce57630301c097f300e0c01cf37239fc5ca",
+    "src/render/ability_vfx/warrior_avatar_shape.ts": "dc782d9dd4565b5601422ae541fabab5a0d2951c293a7e9658d1b2df5af19ead",
+    "src/render/ability_vfx/warrior_blade_shape.ts": "79cc318780613e0854cc45eea92d5865a4c3787ab9e10c43ab124f92d65609aa",
+    "src/render/ability_vfx/warrior_blades.ts": "10c001083e98a20193537ffe1a82af014d7d74d8abf34a0feccae46cfbe7b3c0",
+    "src/render/ability_vfx/warrior_control.ts": "10c79dd557ff44a23dbba16f341ac319d59fbbf9c44583431594de9a2a8bf220",
+    "src/render/ability_vfx/warrior_control_atlas.ts": "74b413460bb4720d112e6b8dda937d030d12e3f120152bdbdb3489bd8d1b239e",
+    "src/render/ability_vfx/warrior_control_marks.ts": "05546b2340f5a99f08d60e278859b4adc4ed1d8fe0ff9cc6d4ab9904ee9f5a3f",
+    "src/render/ability_vfx/warrior_fracture_atlas.ts": "f3eb364de2eecd08c714434f23ed93af26f2e9fcbf4afc1ad28e2c0eb3c171d9",
+    "src/render/ability_vfx/warrior_fury_feedback.ts": "4569c307e1353077b6533293400a51eb685388b899c4f4568b61f47bd84aa003",
+    "src/render/ability_vfx/warrior_fury_state_shapes.ts": "a9925d6cea199ca374f957d894aeb7277b48cd78625f01125b75ad7a83143ec6",
+    "src/render/ability_vfx/warrior_fury_states.ts": "0baf02a251eb0c67442bd53c6a7c0b7f4330358126c7541767e8599ea5976ecb",
+    "src/render/ability_vfx/warrior_goad.ts": "c7f433bec6156f8c6b533d1a518005f211cbdd75789eff6d3a89a716ecf0c97f",
+    "src/render/ability_vfx/warrior_guard_cast.ts": "70dc9659acf84b16fd872943a250c449bddf40efaa98399e88ed87c1e478789c",
+    "src/render/ability_vfx/warrior_guard_geometry.ts": "3e72a2d30252775375e65107cf2ec11c42a43cf33b38226b6e31987f7dfc3458",
+    "src/render/ability_vfx/warrior_guard_plates.ts": "3b1421accdaa2067369b739d858eabfbf84cb43238175a52cbc45cccb0753d8d",
+    "src/render/ability_vfx/warrior_gyre.ts": "8313cf991d9f11ce6aecaa6779b82664e532b745667e33f321925c543930effa",
+    "src/render/ability_vfx/warrior_gyre_shape.ts": "976000c2227fec12dcc74d434cffb690d4b83c16a5f9a0dc74dd50f6942a01d8",
+    "src/render/ability_vfx/warrior_hammer.ts": "0427f21c581c0de820cc0652cc5dadc7475f449830f99e9b790d3189db6d2d84",
+    "src/render/ability_vfx/warrior_heavy_shapes.ts": "92808ef27248180de56d88c1a591326c516bc4151a631b438dd189463fa1fc91",
+    "src/render/ability_vfx/warrior_leap.ts": "d97f081bae3832986f94b134b0b4429ab1fb6a6a18c4e1f392540726efb9a003",
+    "src/render/ability_vfx/warrior_leap_shape.ts": "a3fe994f5c165443b816e01c2e145c5a7fa8ccbf9242ec10f560234fd91a0c6f",
+    "src/render/ability_vfx/warrior_mark_atlas.ts": "670b35e736950409980fc77f5158a83943ae74fc1d6fd3a1942a8b41d5951844",
+    "src/render/ability_vfx/warrior_mobility.ts": "44dec1c71f2cd5f1d2b2300605baa5a27a85094db6a8d865a92d8b6cf12a0408",
+    "src/render/ability_vfx/warrior_power_cast.ts": "2db69c34dd44a8876c545156dd81c25a8c2143253c1d0d822653f0c7696f64e7",
+    "src/render/ability_vfx/warrior_power_forms.ts": "1fbee8424de67be08873d55ca003458c209191b43e1083dc9a436a5de863582b",
+    "src/render/ability_vfx/warrior_power_geometry.ts": "d98f98786c992c8983bdff7128da0632fe5f05c1db68f90e7321d6de87d5fb25",
+    "src/render/ability_vfx/warrior_rage_material.ts": "f30951ae20447726a704e07941c9fa2bce44040c9a85c4160e7736e9caa572f2",
+    "src/render/ability_vfx/warrior_readiness.ts": "273a64639b175e64206626727f0b587dbaddfd83856525a61c35ca0e1b856b2e",
+    "src/render/ability_vfx/warrior_readiness_cast.ts": "4762a35ebbc0eaef4ab12fedd1452b4360e5efb1f51f4f7886afca11561aa527",
+    "src/render/ability_vfx/warrior_readiness_shapes.ts": "0dc713be8fe67d2bc0f7edb83bcfda368dea9130e77d24be2fda9065905f7e22",
+    "src/render/ability_vfx/warrior_shield.ts": "58c3fc966b1ad39084064a1f34fd9781eb06ab150503610d06f03303e9a2a12f",
+    "src/render/ability_vfx/warrior_shield_shape.ts": "c19ba1b8a85cad20b7c1b94d2e5d8e036ae4c7f770b13b25bed5080611ec4513",
+    "src/render/ability_vfx/warrior_shout_shapes.ts": "a7ee6c245bdb06ca277e942e0878ea2f13fed622ab5f9ae6eb81c8914d7f9380",
+    "src/render/ability_vfx/warrior_shouts.ts": "cf0c1225b40a46a36c7ad78b460e74a4578be3b84329e373dbe322c76647820a",
+    "src/render/ability_vfx/warrior_worn_marks.ts": "298a45154c3415a8b37b7c7013dacafe238c2dd22204365acdb5a405d9dba197",
+    "src/render/ability_vfx/water_volumes.ts": "b028deaca0955b75af23aeafe028d076be09e3e563faf5e560717e5061304f7a",
+    "src/render/character_effects.ts": "6b598bc1ca8258c0063dbbda36d62f826eb5b65d4ae25f031493d1ebe573f50d",
+    "src/render/characters/action_props.ts": "b0b51b7f830a6738604f951b9bc47a4b0b0565bd7eb6b9066eaa6b4b47a85d73",
+    "src/render/characters/anim_state.ts": "4673ce7b771308fa769c83ba0e76fef639aceeed6fa50b14463bc6ff38d74b7b",
+    "src/render/characters/anim_state_entity_core.ts": "26eee6b3995ba9380a5cef5e0a43f6fa0df02cb2da07ce3145879ee45c635bf7",
+    "src/render/characters/armor_dye.ts": "f93c0608d77235ac7e147eaaa7e2643d3d5cbb993509eb0371b04d837249b9ad",
+    "src/render/characters/asset_miss_log.ts": "5a1af34dadd1471515eaf1a95000fa7688fdc13e63bf78b67b55d709c875e34e",
+    "src/render/characters/assets.ts": "5ce98c7b2a2d74711b04f3c2b9862d4f490bb80cbb5f5f7c220b350d3fe78405",
+    "src/render/characters/back_grips.ts": "98fdb0dbfc185c5086f54d131ba187b1c994016043660f7903902212af0b41b1",
+    "src/render/characters/beast_ability_clips.ts": "958ace2961dd35e5cda53d817bc8c446ebabb59b133cbc6a0c37ec177ddd9c55",
+    "src/render/characters/cast_locomotion.ts": "059ac04899747a6a278a156db8b561a565460c5edb46f2bfc6474218be206bfc",
+    "src/render/characters/cast_performance.ts": "d11e6f0c458355b2cd8d06f48ac9cd4037d1045a57ecc09dfc5a7c7185c9e6f2",
+    "src/render/characters/caster_clips.ts": "c77ca1270f320aaaee50e8ddf4b68209e38e4d2d83d6661e8b98f007068fc1f0",
+    "src/render/characters/damage_attack_animation.ts": "9f9088e458574106137182eacd965da04b6f0adc40264b8a9ca169b1e03f420c",
+    "src/render/characters/death_grounding_core.ts": "4c59378592d6299434f1a643e5827f31f030c00317d2bebb9e99c43c49199070",
+    "src/render/characters/dequantize_attribute.ts": "988620db995fc6501da57e8bc5ac9889a4576c2e54ea9ac4f8499aaff8acd61d",
+    "src/render/characters/design_code_core.ts": "7e99a73b0748b75af42d0c4a76c142b7dc35915aefde632ce244a2d46b720998",
+    "src/render/characters/effect_materials.ts": "835a2e4c52bcae72c5e644c01056206d5b2b211514b1a9108b2323b713e3a2a5",
+    "src/render/characters/far_lod_reveal_core.ts": "c1224c73ed088d82a4521534d69d0853440a03b0878bbe12caf41d3fcc116a35",
+    "src/render/characters/form_visual_selection_core.ts": "228a49d48165f39cdc4d7d8c7296da3ab74ed4eb6e0e467b81e9f3c55ab0a5b1",
+    "src/render/characters/fury_poses.ts": "f30af78e5134813590cac696d731aac82070515bc77702afe1319f2119771f14",
+    "src/render/characters/hair_sway.ts": "10474cc94548bd052195956e34c15c3dfdb366016abd7a4d38a027b5fc5edbf7",
+    "src/render/characters/halo.ts": "18793d52f9aaa8012a0a5b0e85775e9fe561b1083d13472621ec0eda4f39208f",
+    "src/render/characters/held_item_grips.ts": "25ea7e52358ea3cdd04c0a66d91ae864de1469c54a0aa258629f84c677f1afc1",
+    "src/render/characters/held_prop_idle.ts": "be48598578d1a2937509d85123eeec05de27b3c1587096fbb43092a96094b93d",
+    "src/render/characters/index.ts": "422f3ed9cd7846e13e51d6a494ce32c77d8baea9f5538f4a686152577d5b4ca4",
+    "src/render/characters/look_pieces.ts": "326763643ed9dcad309860633473b3ce735f5cffda697b2ffa7fb8756755bb65",
+    "src/render/characters/makeup.ts": "72fd9d03a9eafa76275b52b4158eceda7f23625af213c08f11290c5002d5aaad",
+    "src/render/characters/manifest.ts": "99443958d861cd00f4ca56e73a0c5c13eb2355af665a583a1c5005018db77758",
+    "src/render/characters/material_program_shape_core.ts": "e2e4fbe1f6bc6354f0c30ed1bdc57edbc55e19d29ec859486b55cfd606df11a9",
+    "src/render/characters/melee_clips.ts": "fa312de248d8d0e1e89067cefdf1e37c74a868b4d40b9b695d64b013d5dd50d3",
+    "src/render/characters/metamorph_wing_motion_core.ts": "67bde813bae3ddefdc10acfcc3dd6b6ecc5e66698e82e4587867a77c6dfe5f33",
+    "src/render/characters/modular.ts": "91d367587f22d01cb3004d06b607e956c637ba2fa2c32897aebdda0e980c21b8",
+    "src/render/characters/named_action_clips.ts": "a2830572f5c895055a7f928d71d224757f28a3dda81ad8e5ae8dbcfb29b2b312",
+    "src/render/characters/npc_looks.ts": "9ac8d488db8007fcdf5684f1dc9ce37be844765430344511c2242dc146bfb8ea",
+    "src/render/characters/paladin_bastion_sweep_clip.ts": "82ffefd8a29cb5465dc826a4621ab3ca0992f2b9d5c893769c1cbb8925e4fc09",
+    "src/render/characters/paladin_bastion_sweep_fx.ts": "c521e9191e9155cd195cde8c1948895dfa6d16365dd075be66d644435f8b3979",
+    "src/render/characters/paladin_templars_verdict_clip.ts": "04a67bd2c909251efdc293c9b437359d799b3ef4f0d1350b8d15627afa9a027f",
+    "src/render/characters/paladin_templars_verdict_fx.ts": "669414421b140f0932cbb786f82f5729d8973930134ff0e8be9730c1c2a9eeb1",
+    "src/render/characters/player_look_core.ts": "cb2f38ad6d3f784558b669003cb04fb83044dd6d9137a03ac1e98771e4a9cadf",
+    "src/render/characters/pooled_visual_lifecycle.ts": "cc26f63c9c8bd4c442f0a456d55d7efdf2bbbf797a85d160f7bd299fa40513d6",
+    "src/render/characters/portrait.ts": "26769451410b8f1bfe2af9294602cf9c9ec2e090dd8117c28c7b108e343aa3e8",
+    "src/render/characters/portrait_bitmap_encode.ts": "1b6709758db02c0bf6bcbf7d8a706b9b34313a90c282df0e849fbc1666f085cf",
+    "src/render/characters/portrait_bitmap_transfer_core.ts": "93396bd855b68830fbdcdef636fc144344862f0840d7b957c8d7d5592005efef",
+    "src/render/characters/portrait_capture_lane_core.ts": "cb3a01c0f0c7b777950078942ca2e2125470e2671a2303655ae968ac77df3ca9",
+    "src/render/characters/portrait_encode_worker.ts": "cf84199127f58e22fc1f3730b31597b2e33e66edd8149e69b09f7b1ee01578e7",
+    "src/render/characters/portrait_framing.ts": "6627cc6ea036ee9c7b5480242eb2b8f2326a99669423589ed8ba5cd73512664a",
+    "src/render/characters/portrait_png_encode.ts": "83111e423f4c9a39915acd6560ccf4d416ea0b00f1d060894bf8482450398a35",
+    "src/render/characters/portrait_prewarm_core.ts": "4d3284289cde443d1a469cbd4dddc92307399e36a6e579f041536884cf286ca4",
+    "src/render/characters/portrait_readback_core.ts": "e9f0839e0e2a9ef6b570566ba25f50e7c08dbde45b629019b157cd2f7a04a546",
+    "src/render/characters/portrait_snapshot.ts": "3ab00b55768f7e19931ed22f6b71038566187cf401475a809d4fe0fc5da79b8b",
+    "src/render/characters/preview.ts": "643b69bee9c8ca45bfd24db5c484b7027493f66aad32724a8d394cbd8c0d49ac",
+    "src/render/characters/preview_appearance.ts": "e80cbf75d5f84deb594cce7f74d313915a31835682d3831d232f09b4022ccf60",
+    "src/render/characters/preview_framing.ts": "6e11a314fad215c7a1e2f147019804bf3aeea0d5b7079acc6d631c31cd526650",
+    "src/render/characters/preview_open_gate_core.ts": "3c33fd33e61376fd8fb1133365f9ff21b5a732c41d39e50a34ed8f36997b944d",
+    "src/render/characters/preview_policy.ts": "67f616105576ace82e05d04e0c8ec98fb8116839bd634767ed14a126b97523fb",
+    "src/render/characters/rig_merge.ts": "eddcfeacd4b74daee568dfb0a5299a6b993389126762d430c3ca9b4544bbec21",
+    "src/render/characters/sanguine_weapon_sheath.ts": "5cb88e8d78946253235c007d1ca3dff934bdb3062011d59aa2913ac306303aa9",
+    "src/render/characters/shadow_depth_materials.ts": "5cff6930304b28533adb0722dfa28195a28f85d81b6d9b54e7ed16c7740c17af",
+    "src/render/characters/shadow_policy.ts": "1936747a3831fccffbdd6ae0e3ebe095f1bf5cc42310a96721fde5a9e182164b",
+    "src/render/characters/signature_clips.ts": "9a0c6150bb12efa342d72044a533f66c2681e1ea5b82d8ff7281362cee50bcfe",
+    "src/render/characters/signature_poses.ts": "b86ed97b09b134dcee299d93e2b5f5b98651d0b2223f0ac45b07a0416c9b7b81",
+    "src/render/characters/skeleton_update_cache.ts": "d7c6843d0f4b3b06ce98f8fab572beb93e480911213713364ee84d7020d95ca3",
+    "src/render/characters/skeleton_update_core.ts": "c53ce85f7f04fc2ff3889b1927b9c9ce061972aaa5405a0c4e9988ea3932ac9a",
+    "src/render/characters/skin_attack.ts": "d4ccb1fe8906c54b94009d6676be99de473bc5b0948343d48407f1ac212de613",
+    "src/render/characters/skin_gpu_layout.ts": "ece99c96b81a88f116ea713569e4233d39d4fb33d7d63c03b746dd79ff838734",
+    "src/render/characters/skinned_sort_spheres.ts": "620851283d3f19f73bc43a4c0d7b5fe93683c619919df61fbe1fc1c9cce4e3a5",
+    "src/render/characters/soul_rend_overlay.ts": "e6bd5c02fab8f9877e284f22f89d277033cb5b8738b16c0ff2513351a339a01a",
+    "src/render/characters/soul_rend_prewarm_core.ts": "703444dd408341e37c9c26ccf85ce08d9fbb3edffa9b73228ffe95f2e228b5fc",
+    "src/render/characters/stow_transition.ts": "6ac7428d47fa4c36313004f11cd6d4f921ffb3399f6fa8774c0b6143a5a9e7cb",
+    "src/render/characters/stubble.ts": "e2864cbad3f516f4868566dd8da18eb407cfb92bd46a8979fddead05f1bde254",
+    "src/render/characters/surface_response.ts": "35858ab4f68cefcdfb5191046e52c78e1e0ffc8d27902cf9aff5822aee36e57b",
+    "src/render/characters/tinted_material_cache_core.ts": "592dc69964e48701e0b190076fde7c7f6ae1ba579da70bb10868e6b38abbfaaf",
+    "src/render/characters/underhair.generated.ts": "508c635038fca94c11b16c52d39a235532a6b493e2023ac8899496eecf7b6353",
+    "src/render/characters/visual.ts": "5cebb7d3f2a09edf348e19b209a23edffd461ad6ba71b38bc13c9de01e8a076f",
+    "src/render/characters/visual_pool.ts": "3d72e430f1fdcb934e6e6cfb855443e4249c233d865617cabbce35349aaf3bb7",
+    "src/render/characters/visual_pool_policy.ts": "e8077c72f05dce15aa1a1917d225cb88b23d92ffa36f4fa706a5783f6a129f1a",
+    "src/render/characters/warrior_rush_pose.ts": "4b9e4c6f73f12fb596404845774857583be552f8098a7c91f51b9961ed9aacf5",
+    "src/render/characters/weapon_attack_style_core.ts": "561d64504b4c591c31f8c21f2ab2e8a0d1e29eec63c4963a6a1c8ce6eab2ae31",
+    "src/render/characters/weapon_grip.ts": "5431b18d9c2ca92d20550782e61b521b7caf59f5eda100118ad8cca1ae2c5524",
+    "src/render/characters/weapon_skin_materials.ts": "1e9da625dfabe4c2e762c4f6a3fdb5a41efaf4ecd1ae1b469a2883e6e57dd3aa",
+    "src/render/compile_target_readiness.ts": "754c3523912f7fc4c09b913b5fde92b5e695f60b745dd851d802d0acfe7afa6e",
+    "src/render/renderer.ts": "fde14a43e77393b5a70fac73c42d2ff703c1500a529142cd2e1ad8d34e8a0445",
+    "src/render/warrior_fury_state_core.ts": "72bf1081690cc906d03996dc5ed766c3fdda58e03d6da08f6d408f3db0b08e92",
+    "src/render/warrior_power_anchor.ts": "4d7d09da549f7346ea56a68cbebf99af671884b0c742691b0fa1a2c3c8521242",
+    "src/render/warrior_power_core.ts": "81053c4a37aec9ad05c27751721fb8a0222584590ea141d5f7422ad25f9485d0",
+    "src/render/warrior_readiness_core.ts": "34e8f2d1f801e15c82fd902ff159b18b924acf158da07d001518439287873e1d",
+    "src/render/warrior_vfx_specs.ts": "e92b394394f8d37b8ded7418d1a8a65f620325b62b2d6d421ae164337dd860bc",
+    "src/render/weapon_trail_anchor.ts": "e2b4d8cc9dde304db761965fc16f28939d018e863a5c82b76e5f317dbe9d2eaa",
+    "src/sim/combat/effect_dispatch.ts": "39cef13ee9811a09de9ce0b75e277036a7dca0a301550671e132deb1552bc9db",
+    "src/sim/content/classes.ts": "afcd0d765d530ce4f0cd6a7ac3b5b66a0a8eba3842460939df84309d9dae2e60",
+    "src/sim/content/warrior_rows.ts": "0a1c8127c31e317be6f35408409b99a03eb711fa8b0a1865b08eaccec2c69eec",
+    "src/vfx_studio/loadout.ts": "2b8d442b11a7f9c6ef845ea7635d9f0974f7ecf60698b7d5309092cfb3c79f90",
+    "src/vfx_studio/session.ts": "32f4285ed102c6dc153fe8fedd03578cfa2b30a5297760ce0720e6f602f79722",
+    "src/vfx_studio/stage_cast.ts": "4694f2fbd5eee4c566ef786129f3a6eb57f93748dbeba6f1cc2c9d93b512c16d",
+    "src/vfx_studio/stage_prerequisites.ts": "c1ae6aeeef8e88dde24803e647baf180a740fac593605d598cbc9fdd72c8cdf0",
+    "src/vfx_studio/studio.css": "b7282517130c9c027768f45b745be59e01b03a39f96bd62cbabc9e7e5b1f5fec",
+    "src/warrior_control_audio.ts": "6740e64581d2f13f55e25392254b320efc96606727a021dabc3a4bfb79a4b831",
+    "src/warrior_recovery_core.ts": "5f2eb1c2d1a190e45f9dead83c7e47839add3b234e8f5284ddf8d4a453e5f871"
+  },
+  "sourceAtEnd": {
+    "public/models/chars/players/warrior_ability_anims.glb": "8aefecd84783b12220f87a09df76d9ea11d1b6c919f362742619b76f1d487edd",
+    "public/models/chars/players/warrior_contact_anims.glb": "62cb2c30ca0c87fe810371a98c0c97f8bf40df8a10b0775479af83a5dd91beb1",
+    "public/textures/vfx/production/warrior_power.webp": "68450efac5cc151da9592de459cf7b0b06994759fb85f2e68b1a3775794684ef",
+    "scripts/anim/warrior_control_poses.mjs": "117e0d2ab9449950c60acc7b99e9a206cfde2cbb5a38f1c3697f76f8c83daf48",
+    "scripts/anim/warrior_reaver_pose.mjs": "096a723ea4e4f8fa49dc36df6fd7380b3753ff75dcc55ee5eb2fb4ee291e9efe",
+    "scripts/anim/warrior_rush.mjs": "fc3ad82708f398ec95a42e0d05ef02628a2f1c3d8705d0e17db50e1a88b06ba7",
+    "scripts/build_warrior_ability_anims.mjs": "6c4675fbd0c43012de31329bdae2f5b48bc2b1d510bfe1849fc0b686efac0260",
+    "scripts/build_warrior_contact_anims.mjs": "254c26fa340bc41007573156a61d0f0b116449c515fd6b61f36f276b3a33608b",
+    "src/fury_audio_core.ts": "327888ecc23436565e3e939b7eab11763845299fdd791097674f13c0f66592da",
+    "src/render/ability_vfx/action_contact.ts": "9da040bea2cc884fc9e98adf56a237d470769b235417087367cbd3896b6d114b",
+    "src/render/ability_vfx/active_kit_prewarm.ts": "3b943a061b149c55fad2b028c8ebd5eaad548f1555516883d68bccfc7eb0b6a7",
+    "src/render/ability_vfx/baked_impact_layers.ts": "ee2ac653cbc4c7b31775cf9fc21336f98a5b399e7afe77f28e19245b4a1386be",
+    "src/render/ability_vfx/bloodhook.ts": "dd2e31f78623ea5e13b307a072b6e4a9e388bb11e6d9b60c8e665107702c5b2e",
+    "src/render/ability_vfx/breachmaker.ts": "495b7551f2fe07e44083f064cfa87e4cda392f98c000f107410beb3e87b9b424",
+    "src/render/ability_vfx/cast_language.ts": "73e8ed99ddd82d621d4afd7dcdc97518ac309c98e259feb0c074b1117535fb68",
+    "src/render/ability_vfx/catalogue_materials.ts": "7dc8d3826f118bdcc7a860b9c3c23847487c12ddd5e56d75042c33a044b3f259",
+    "src/render/ability_vfx/ceremonies.ts": "4430445ea44555affa653025072c2a0630a862ea8c80619965fe8be71d298060",
+    "src/render/ability_vfx/contact_assets.ts": "1ff03f779804d5806497797b5071a533858d6807105e62fc956c59047019e48c",
+    "src/render/ability_vfx/crest_prewarm.ts": "f49de8808c4395ba3359d5233677abb9dc014106a61f9915bdf01acbdaff6e8f",
+    "src/render/ability_vfx/decals.ts": "e03c11cfe05498918e419272b71f8bcf50eb5a098db2a238b7f75b0c4580c636",
+    "src/render/ability_vfx/elemental_form_geometry.ts": "9ea475b44a27c7ad6a14b20fd3be3f3e643f90c79cc83d1bda1ba9974d602e54",
+    "src/render/ability_vfx/elemental_forms.ts": "2ac136c3ceeecefe4b3ff502f595b2acbf4aac4f31b49c4fb52ddac83753fc13",
+    "src/render/ability_vfx/elemental_performance_core.ts": "69cd63f631f7ce5778c180733c6274c21f26691fbdd10fa3e7a24ad3c6f05c96",
+    "src/render/ability_vfx/encounter_specs.ts": "e9b2232d0d4fcae6eb1cd5b64600bfc5a317c91fef182703bd91198bacf8837a",
+    "src/render/ability_vfx/flipbooks.ts": "f555cda391b6af4d0e3a8edac83c9542167b24cf08706785d3d44bd51fe6f864",
+    "src/render/ability_vfx/fury_audio.ts": "4e5fa4b22c85330010b753bdd85683d1b2114d57a70ee910b01bbc7a6ccb62ff",
+    "src/render/ability_vfx/fury_choreography.ts": "7414db55fd2dde74a01d6d7d1e95d4b2af71a04025f718586fd71fcfac46cca6",
+    "src/render/ability_vfx/fury_shapes.ts": "0584d27eddbfdf8baf98018d5131b79fd2b0ebb3977c21499a6ba0550937f2db",
+    "src/render/ability_vfx/fury_surface.ts": "ade23d5740eb72dae73627805e724501dddc1b24c45acf7c96fdcb6a76e583ee",
+    "src/render/ability_vfx/fx.ts": "401420b1572df50f9516e157a4337019699ee4b1310828c76af2355d2412941d",
+    "src/render/ability_vfx/fx_textures.ts": "3d83ad262c36a322393047d6b3bdb9d7b62adbd5769a4ffd3e83dd9994b400e4",
+    "src/render/ability_vfx/ground_auras.ts": "dc55a99933171e236d189536c3d290f323e87de611d7e1edc3d4c2f85118986f",
+    "src/render/ability_vfx/guard_prewarm.ts": "34aa91d73b554016f540affff1705b7b34bca6b9c4ccdf850ff06fa2a77e1d18",
+    "src/render/ability_vfx/held_conduction.ts": "f71491b302ff0b66aa16cc6214318c0d27ef1cb2a71cf3f3869b7bf4720b5ad4",
+    "src/render/ability_vfx/held_warrior_storm.ts": "0e310e610dccbfd834b3d25382908247e9d1bdc3ab1519926d631b22f9f52707",
+    "src/render/ability_vfx/hunter_pet_contact.ts": "74d866a5384aebb953078c05efbdaf211cbff6a95702276264101ee132da0040",
+    "src/render/ability_vfx/hunter_volley.ts": "3894de99a269950a7d630addb6da550525f20a2ffa3076428fb12b57a4194ca7",
+    "src/render/ability_vfx/index.ts": "71c0dff9c2e4f6fb4fbe7774e291c81a3e42d196a0e9f62f28433065d9a1bb07",
+    "src/render/ability_vfx/ironguard.ts": "501e54d22c22d89b41d9c5ef614e3069a817467cc409630624da5f0124a4cf2e",
+    "src/render/ability_vfx/ironguard_shapes.ts": "824dd2a7080a569ab9a6b4844dec73c44a6b3bb64626fc1db326723fee36818f",
+    "src/render/ability_vfx/kit_contact.ts": "a5d7d7005bacc5d6f85c3febddce9ccbaf5d63077be9f0eaa113a41b081bbef2",
+    "src/render/ability_vfx/material_response_core.ts": "b5f985dee473aa49bed3aab7b7702c91e551fa93839016270abc5282af8c1ba7",
+    "src/render/ability_vfx/overlay_sprites.ts": "29dee3c0cbd0a75b996f2f7dc523e487b8be525acc9e528a08ea64dd453c63a7",
+    "src/render/ability_vfx/painter.ts": "881be343383df7249d6de02b8f357309eb44cb5b10351918af4a710f19d0f880",
+    "src/render/ability_vfx/physical_choreography.ts": "4b049e7e615a8818397fa655bba6e60a35ff2d604aa7ac1dcb6cb0e31fa6fb99",
+    "src/render/ability_vfx/physical_choreography_core.ts": "d64c52833d80217c6e309aa6e13bac308eb4b813d5e47af85a52033f8b92b39a",
+    "src/render/ability_vfx/physical_contact.ts": "49555bcf3fc74fba55775f7d347af0fae9be7bb513e70b74d2718ec069237bd7",
+    "src/render/ability_vfx/pillars.ts": "811c7bc9028b7d9469d7ec919718f801cd6dad911bf892e6dd0959dab9f3a3a5",
+    "src/render/ability_vfx/prewarm.ts": "9e94eba55400e0e6987220340ff6f50ebd939495e9ca62dbdba45ea298d91f23",
+    "src/render/ability_vfx/primitive_prewarm.ts": "b6c52af07a19145be6e3865441af548bf7ed33f47dd9545d017a581b75f9858b",
+    "src/render/ability_vfx/production_assets.ts": "7e32e8555510172faeb02bf7945a1ead40942a984f5f8abc0c6d3a4eb46bada2",
+    "src/render/ability_vfx/ribbons.ts": "9619707b14cdfb8a9d0ad1229a426e8ab42e4c5573e2d3252bc707dc26b58ab7",
+    "src/render/ability_vfx/rings.ts": "6b558adeae0291b4f91579e0a0ae12839a03919cd659896dcc423d9e33171506",
+    "src/render/ability_vfx/ritual_choreography.ts": "3ed2642365230dc8d5843c71815f18fef2414363b97cdd9d43ab4c12eaaec03d",
+    "src/render/ability_vfx/ritual_choreography_core.ts": "d0630ba456bad8bb19729dd2cf47fb37d84f7b721001c26dc6ec28f2f99c552c",
+    "src/render/ability_vfx/ritual_sculptures.ts": "30072b190fea4861509893c21c19b17b0deafb65d638c1f7cfcf065331512e46",
+    "src/render/ability_vfx/sequencer.ts": "3a582a775e60759d0a0aba906c463bb90939407361c683bff17438b6f96eca3b",
+    "src/render/ability_vfx/shells.ts": "67afe7b4f342b2da590e7b2b54a609cf12d3619192497c4d3c00192413793f9a",
+    "src/render/ability_vfx/signature_choreography.ts": "88b6239898354705dff248d9f55a47bc40b84f8caf7f8a42c05610ab779c8c2c",
+    "src/render/ability_vfx/signature_core.ts": "e0864ee656b7ddb307ef637db9160aa536e126235f4d58c6c3e0af1d699db2c0",
+    "src/render/ability_vfx/signature_crests.ts": "adab9ce0499f5aabafd9e140ecf1ccd1ee13152934a2ed0f2a83b0bddd305144",
+    "src/render/ability_vfx/signature_details.ts": "fcb8dd5cdc1a4d508d18a9f8b462e0fd358ae82e2e8d5de4bead13c0ce68d3b5",
+    "src/render/ability_vfx/signature_material_response.ts": "579b6e3f36ed365f28cdacecfc6b1cd0448750911277197e645ad30ca3216ef4",
+    "src/render/ability_vfx/signature_shapes.ts": "aaf65d3699cf049530703c44e197dc45da28f09369c84f2ddd2bbcad5b354cb4",
+    "src/render/ability_vfx/signature_texture.ts": "d8cee5f386eb12b9886833941b08217bee5658d9a8cb8e358be2c0a61eba03d1",
+    "src/render/ability_vfx/simulation_assets.ts": "cf0efd83bda4a6faa5a1e92b2c049006a477c0d0bbad1e607d4a3dfe1d3a587b",
+    "src/render/ability_vfx/solar_execution.ts": "8cd18356e3638ab989d4e7090cd8d8ebb979646ba11d5fa7b3e9c4ffe7652a55",
+    "src/render/ability_vfx/solid_impact_fragments.ts": "2f2d036ec14f877a84975fb5e7092f5047c5d9c701840ce45070fe48ebeef1f9",
+    "src/render/ability_vfx/spectacle.ts": "051a02a76ec2f5742f8147da9afd6b2f8bd70172af2d6d5ad7f69e19b56c7aa5",
+    "src/render/ability_vfx/spirits.ts": "d1acf86a61f788ed1d69cab4f5dfb89077a79f55291b29292e1ad7894e5076cc",
+    "src/render/ability_vfx/steel_sweep.ts": "81c73beda857c234b009d60569a850d5ed9e19fa119104402911e167f04a5c59",
+    "src/render/ability_vfx/warrior_area.ts": "004789475d7980ceb952f50ce521e4fff4fc1595d9ddafffcc73ad6844e5ff10",
+    "src/render/ability_vfx/warrior_area_shapes.ts": "495747edffb2af727afccc95bc52733254356a767ec0fbd16055592359acc72c",
+    "src/render/ability_vfx/warrior_attention.ts": "4b6e458fbf6754b99da0dfb3c6bca4e413f3393f33b06be6687942c22c61b932",
+    "src/render/ability_vfx/warrior_attention_atlas.ts": "5034a79823303222878493a1aeba71f5431e70e93488a753de78d8e5b4468639",
+    "src/render/ability_vfx/warrior_attention_core.ts": "8b172951d67627a9589d962b92f8f8a09db326dbee7e8825d4580b5e17341d22",
+    "src/render/ability_vfx/warrior_avatar_bracer.ts": "6720b62db8269f4ebc148c865c7792cd35a3f64dd699ccd2527e6d20619f8fd7",
+    "src/render/ability_vfx/warrior_avatar_rupture.ts": "ebe5ac0abf1037c8646607066cb74ce57630301c097f300e0c01cf37239fc5ca",
+    "src/render/ability_vfx/warrior_avatar_shape.ts": "dc782d9dd4565b5601422ae541fabab5a0d2951c293a7e9658d1b2df5af19ead",
+    "src/render/ability_vfx/warrior_blade_shape.ts": "79cc318780613e0854cc45eea92d5865a4c3787ab9e10c43ab124f92d65609aa",
+    "src/render/ability_vfx/warrior_blades.ts": "10c001083e98a20193537ffe1a82af014d7d74d8abf34a0feccae46cfbe7b3c0",
+    "src/render/ability_vfx/warrior_control.ts": "10c79dd557ff44a23dbba16f341ac319d59fbbf9c44583431594de9a2a8bf220",
+    "src/render/ability_vfx/warrior_control_atlas.ts": "74b413460bb4720d112e6b8dda937d030d12e3f120152bdbdb3489bd8d1b239e",
+    "src/render/ability_vfx/warrior_control_marks.ts": "05546b2340f5a99f08d60e278859b4adc4ed1d8fe0ff9cc6d4ab9904ee9f5a3f",
+    "src/render/ability_vfx/warrior_fracture_atlas.ts": "f3eb364de2eecd08c714434f23ed93af26f2e9fcbf4afc1ad28e2c0eb3c171d9",
+    "src/render/ability_vfx/warrior_fury_feedback.ts": "4569c307e1353077b6533293400a51eb685388b899c4f4568b61f47bd84aa003",
+    "src/render/ability_vfx/warrior_fury_state_shapes.ts": "a9925d6cea199ca374f957d894aeb7277b48cd78625f01125b75ad7a83143ec6",
+    "src/render/ability_vfx/warrior_fury_states.ts": "0baf02a251eb0c67442bd53c6a7c0b7f4330358126c7541767e8599ea5976ecb",
+    "src/render/ability_vfx/warrior_goad.ts": "c7f433bec6156f8c6b533d1a518005f211cbdd75789eff6d3a89a716ecf0c97f",
+    "src/render/ability_vfx/warrior_guard_cast.ts": "70dc9659acf84b16fd872943a250c449bddf40efaa98399e88ed87c1e478789c",
+    "src/render/ability_vfx/warrior_guard_geometry.ts": "3e72a2d30252775375e65107cf2ec11c42a43cf33b38226b6e31987f7dfc3458",
+    "src/render/ability_vfx/warrior_guard_plates.ts": "3b1421accdaa2067369b739d858eabfbf84cb43238175a52cbc45cccb0753d8d",
+    "src/render/ability_vfx/warrior_gyre.ts": "8313cf991d9f11ce6aecaa6779b82664e532b745667e33f321925c543930effa",
+    "src/render/ability_vfx/warrior_gyre_shape.ts": "976000c2227fec12dcc74d434cffb690d4b83c16a5f9a0dc74dd50f6942a01d8",
+    "src/render/ability_vfx/warrior_hammer.ts": "0427f21c581c0de820cc0652cc5dadc7475f449830f99e9b790d3189db6d2d84",
+    "src/render/ability_vfx/warrior_heavy_shapes.ts": "92808ef27248180de56d88c1a591326c516bc4151a631b438dd189463fa1fc91",
+    "src/render/ability_vfx/warrior_leap.ts": "d97f081bae3832986f94b134b0b4429ab1fb6a6a18c4e1f392540726efb9a003",
+    "src/render/ability_vfx/warrior_leap_shape.ts": "a3fe994f5c165443b816e01c2e145c5a7fa8ccbf9242ec10f560234fd91a0c6f",
+    "src/render/ability_vfx/warrior_mark_atlas.ts": "670b35e736950409980fc77f5158a83943ae74fc1d6fd3a1942a8b41d5951844",
+    "src/render/ability_vfx/warrior_mobility.ts": "44dec1c71f2cd5f1d2b2300605baa5a27a85094db6a8d865a92d8b6cf12a0408",
+    "src/render/ability_vfx/warrior_power_cast.ts": "2db69c34dd44a8876c545156dd81c25a8c2143253c1d0d822653f0c7696f64e7",
+    "src/render/ability_vfx/warrior_power_forms.ts": "1fbee8424de67be08873d55ca003458c209191b43e1083dc9a436a5de863582b",
+    "src/render/ability_vfx/warrior_power_geometry.ts": "d98f98786c992c8983bdff7128da0632fe5f05c1db68f90e7321d6de87d5fb25",
+    "src/render/ability_vfx/warrior_rage_material.ts": "f30951ae20447726a704e07941c9fa2bce44040c9a85c4160e7736e9caa572f2",
+    "src/render/ability_vfx/warrior_readiness.ts": "273a64639b175e64206626727f0b587dbaddfd83856525a61c35ca0e1b856b2e",
+    "src/render/ability_vfx/warrior_readiness_cast.ts": "4762a35ebbc0eaef4ab12fedd1452b4360e5efb1f51f4f7886afca11561aa527",
+    "src/render/ability_vfx/warrior_readiness_shapes.ts": "0dc713be8fe67d2bc0f7edb83bcfda368dea9130e77d24be2fda9065905f7e22",
+    "src/render/ability_vfx/warrior_shield.ts": "58c3fc966b1ad39084064a1f34fd9781eb06ab150503610d06f03303e9a2a12f",
+    "src/render/ability_vfx/warrior_shield_shape.ts": "c19ba1b8a85cad20b7c1b94d2e5d8e036ae4c7f770b13b25bed5080611ec4513",
+    "src/render/ability_vfx/warrior_shout_shapes.ts": "a7ee6c245bdb06ca277e942e0878ea2f13fed622ab5f9ae6eb81c8914d7f9380",
+    "src/render/ability_vfx/warrior_shouts.ts": "cf0c1225b40a46a36c7ad78b460e74a4578be3b84329e373dbe322c76647820a",
+    "src/render/ability_vfx/warrior_worn_marks.ts": "298a45154c3415a8b37b7c7013dacafe238c2dd22204365acdb5a405d9dba197",
+    "src/render/ability_vfx/water_volumes.ts": "b028deaca0955b75af23aeafe028d076be09e3e563faf5e560717e5061304f7a",
+    "src/render/character_effects.ts": "6b598bc1ca8258c0063dbbda36d62f826eb5b65d4ae25f031493d1ebe573f50d",
+    "src/render/characters/action_props.ts": "b0b51b7f830a6738604f951b9bc47a4b0b0565bd7eb6b9066eaa6b4b47a85d73",
+    "src/render/characters/anim_state.ts": "4673ce7b771308fa769c83ba0e76fef639aceeed6fa50b14463bc6ff38d74b7b",
+    "src/render/characters/anim_state_entity_core.ts": "26eee6b3995ba9380a5cef5e0a43f6fa0df02cb2da07ce3145879ee45c635bf7",
+    "src/render/characters/armor_dye.ts": "f93c0608d77235ac7e147eaaa7e2643d3d5cbb993509eb0371b04d837249b9ad",
+    "src/render/characters/asset_miss_log.ts": "5a1af34dadd1471515eaf1a95000fa7688fdc13e63bf78b67b55d709c875e34e",
+    "src/render/characters/assets.ts": "5ce98c7b2a2d74711b04f3c2b9862d4f490bb80cbb5f5f7c220b350d3fe78405",
+    "src/render/characters/back_grips.ts": "98fdb0dbfc185c5086f54d131ba187b1c994016043660f7903902212af0b41b1",
+    "src/render/characters/beast_ability_clips.ts": "958ace2961dd35e5cda53d817bc8c446ebabb59b133cbc6a0c37ec177ddd9c55",
+    "src/render/characters/cast_locomotion.ts": "059ac04899747a6a278a156db8b561a565460c5edb46f2bfc6474218be206bfc",
+    "src/render/characters/cast_performance.ts": "d11e6f0c458355b2cd8d06f48ac9cd4037d1045a57ecc09dfc5a7c7185c9e6f2",
+    "src/render/characters/caster_clips.ts": "c77ca1270f320aaaee50e8ddf4b68209e38e4d2d83d6661e8b98f007068fc1f0",
+    "src/render/characters/damage_attack_animation.ts": "9f9088e458574106137182eacd965da04b6f0adc40264b8a9ca169b1e03f420c",
+    "src/render/characters/death_grounding_core.ts": "4c59378592d6299434f1a643e5827f31f030c00317d2bebb9e99c43c49199070",
+    "src/render/characters/dequantize_attribute.ts": "988620db995fc6501da57e8bc5ac9889a4576c2e54ea9ac4f8499aaff8acd61d",
+    "src/render/characters/design_code_core.ts": "7e99a73b0748b75af42d0c4a76c142b7dc35915aefde632ce244a2d46b720998",
+    "src/render/characters/effect_materials.ts": "835a2e4c52bcae72c5e644c01056206d5b2b211514b1a9108b2323b713e3a2a5",
+    "src/render/characters/far_lod_reveal_core.ts": "c1224c73ed088d82a4521534d69d0853440a03b0878bbe12caf41d3fcc116a35",
+    "src/render/characters/form_visual_selection_core.ts": "228a49d48165f39cdc4d7d8c7296da3ab74ed4eb6e0e467b81e9f3c55ab0a5b1",
+    "src/render/characters/fury_poses.ts": "f30af78e5134813590cac696d731aac82070515bc77702afe1319f2119771f14",
+    "src/render/characters/hair_sway.ts": "10474cc94548bd052195956e34c15c3dfdb366016abd7a4d38a027b5fc5edbf7",
+    "src/render/characters/halo.ts": "18793d52f9aaa8012a0a5b0e85775e9fe561b1083d13472621ec0eda4f39208f",
+    "src/render/characters/held_item_grips.ts": "25ea7e52358ea3cdd04c0a66d91ae864de1469c54a0aa258629f84c677f1afc1",
+    "src/render/characters/held_prop_idle.ts": "be48598578d1a2937509d85123eeec05de27b3c1587096fbb43092a96094b93d",
+    "src/render/characters/index.ts": "422f3ed9cd7846e13e51d6a494ce32c77d8baea9f5538f4a686152577d5b4ca4",
+    "src/render/characters/look_pieces.ts": "326763643ed9dcad309860633473b3ce735f5cffda697b2ffa7fb8756755bb65",
+    "src/render/characters/makeup.ts": "72fd9d03a9eafa76275b52b4158eceda7f23625af213c08f11290c5002d5aaad",
+    "src/render/characters/manifest.ts": "99443958d861cd00f4ca56e73a0c5c13eb2355af665a583a1c5005018db77758",
+    "src/render/characters/material_program_shape_core.ts": "e2e4fbe1f6bc6354f0c30ed1bdc57edbc55e19d29ec859486b55cfd606df11a9",
+    "src/render/characters/melee_clips.ts": "fa312de248d8d0e1e89067cefdf1e37c74a868b4d40b9b695d64b013d5dd50d3",
+    "src/render/characters/metamorph_wing_motion_core.ts": "67bde813bae3ddefdc10acfcc3dd6b6ecc5e66698e82e4587867a77c6dfe5f33",
+    "src/render/characters/modular.ts": "91d367587f22d01cb3004d06b607e956c637ba2fa2c32897aebdda0e980c21b8",
+    "src/render/characters/named_action_clips.ts": "a2830572f5c895055a7f928d71d224757f28a3dda81ad8e5ae8dbcfb29b2b312",
+    "src/render/characters/npc_looks.ts": "9ac8d488db8007fcdf5684f1dc9ce37be844765430344511c2242dc146bfb8ea",
+    "src/render/characters/paladin_bastion_sweep_clip.ts": "82ffefd8a29cb5465dc826a4621ab3ca0992f2b9d5c893769c1cbb8925e4fc09",
+    "src/render/characters/paladin_bastion_sweep_fx.ts": "c521e9191e9155cd195cde8c1948895dfa6d16365dd075be66d644435f8b3979",
+    "src/render/characters/paladin_templars_verdict_clip.ts": "04a67bd2c909251efdc293c9b437359d799b3ef4f0d1350b8d15627afa9a027f",
+    "src/render/characters/paladin_templars_verdict_fx.ts": "669414421b140f0932cbb786f82f5729d8973930134ff0e8be9730c1c2a9eeb1",
+    "src/render/characters/player_look_core.ts": "cb2f38ad6d3f784558b669003cb04fb83044dd6d9137a03ac1e98771e4a9cadf",
+    "src/render/characters/pooled_visual_lifecycle.ts": "cc26f63c9c8bd4c442f0a456d55d7efdf2bbbf797a85d160f7bd299fa40513d6",
+    "src/render/characters/portrait.ts": "26769451410b8f1bfe2af9294602cf9c9ec2e090dd8117c28c7b108e343aa3e8",
+    "src/render/characters/portrait_bitmap_encode.ts": "1b6709758db02c0bf6bcbf7d8a706b9b34313a90c282df0e849fbc1666f085cf",
+    "src/render/characters/portrait_bitmap_transfer_core.ts": "93396bd855b68830fbdcdef636fc144344862f0840d7b957c8d7d5592005efef",
+    "src/render/characters/portrait_capture_lane_core.ts": "cb3a01c0f0c7b777950078942ca2e2125470e2671a2303655ae968ac77df3ca9",
+    "src/render/characters/portrait_encode_worker.ts": "cf84199127f58e22fc1f3730b31597b2e33e66edd8149e69b09f7b1ee01578e7",
+    "src/render/characters/portrait_framing.ts": "6627cc6ea036ee9c7b5480242eb2b8f2326a99669423589ed8ba5cd73512664a",
+    "src/render/characters/portrait_png_encode.ts": "83111e423f4c9a39915acd6560ccf4d416ea0b00f1d060894bf8482450398a35",
+    "src/render/characters/portrait_prewarm_core.ts": "4d3284289cde443d1a469cbd4dddc92307399e36a6e579f041536884cf286ca4",
+    "src/render/characters/portrait_readback_core.ts": "e9f0839e0e2a9ef6b570566ba25f50e7c08dbde45b629019b157cd2f7a04a546",
+    "src/render/characters/portrait_snapshot.ts": "3ab00b55768f7e19931ed22f6b71038566187cf401475a809d4fe0fc5da79b8b",
+    "src/render/characters/preview.ts": "643b69bee9c8ca45bfd24db5c484b7027493f66aad32724a8d394cbd8c0d49ac",
+    "src/render/characters/preview_appearance.ts": "e80cbf75d5f84deb594cce7f74d313915a31835682d3831d232f09b4022ccf60",
+    "src/render/characters/preview_framing.ts": "6e11a314fad215c7a1e2f147019804bf3aeea0d5b7079acc6d631c31cd526650",
+    "src/render/characters/preview_open_gate_core.ts": "3c33fd33e61376fd8fb1133365f9ff21b5a732c41d39e50a34ed8f36997b944d",
+    "src/render/characters/preview_policy.ts": "67f616105576ace82e05d04e0c8ec98fb8116839bd634767ed14a126b97523fb",
+    "src/render/characters/rig_merge.ts": "eddcfeacd4b74daee568dfb0a5299a6b993389126762d430c3ca9b4544bbec21",
+    "src/render/characters/sanguine_weapon_sheath.ts": "5cb88e8d78946253235c007d1ca3dff934bdb3062011d59aa2913ac306303aa9",
+    "src/render/characters/shadow_depth_materials.ts": "5cff6930304b28533adb0722dfa28195a28f85d81b6d9b54e7ed16c7740c17af",
+    "src/render/characters/shadow_policy.ts": "1936747a3831fccffbdd6ae0e3ebe095f1bf5cc42310a96721fde5a9e182164b",
+    "src/render/characters/signature_clips.ts": "9a0c6150bb12efa342d72044a533f66c2681e1ea5b82d8ff7281362cee50bcfe",
+    "src/render/characters/signature_poses.ts": "b86ed97b09b134dcee299d93e2b5f5b98651d0b2223f0ac45b07a0416c9b7b81",
+    "src/render/characters/skeleton_update_cache.ts": "d7c6843d0f4b3b06ce98f8fab572beb93e480911213713364ee84d7020d95ca3",
+    "src/render/characters/skeleton_update_core.ts": "c53ce85f7f04fc2ff3889b1927b9c9ce061972aaa5405a0c4e9988ea3932ac9a",
+    "src/render/characters/skin_attack.ts": "d4ccb1fe8906c54b94009d6676be99de473bc5b0948343d48407f1ac212de613",
+    "src/render/characters/skin_gpu_layout.ts": "ece99c96b81a88f116ea713569e4233d39d4fb33d7d63c03b746dd79ff838734",
+    "src/render/characters/skinned_sort_spheres.ts": "620851283d3f19f73bc43a4c0d7b5fe93683c619919df61fbe1fc1c9cce4e3a5",
+    "src/render/characters/soul_rend_overlay.ts": "e6bd5c02fab8f9877e284f22f89d277033cb5b8738b16c0ff2513351a339a01a",
+    "src/render/characters/soul_rend_prewarm_core.ts": "703444dd408341e37c9c26ccf85ce08d9fbb3edffa9b73228ffe95f2e228b5fc",
+    "src/render/characters/stow_transition.ts": "6ac7428d47fa4c36313004f11cd6d4f921ffb3399f6fa8774c0b6143a5a9e7cb",
+    "src/render/characters/stubble.ts": "e2864cbad3f516f4868566dd8da18eb407cfb92bd46a8979fddead05f1bde254",
+    "src/render/characters/surface_response.ts": "35858ab4f68cefcdfb5191046e52c78e1e0ffc8d27902cf9aff5822aee36e57b",
+    "src/render/characters/tinted_material_cache_core.ts": "592dc69964e48701e0b190076fde7c7f6ae1ba579da70bb10868e6b38abbfaaf",
+    "src/render/characters/underhair.generated.ts": "508c635038fca94c11b16c52d39a235532a6b493e2023ac8899496eecf7b6353",
+    "src/render/characters/visual.ts": "5cebb7d3f2a09edf348e19b209a23edffd461ad6ba71b38bc13c9de01e8a076f",
+    "src/render/characters/visual_pool.ts": "3d72e430f1fdcb934e6e6cfb855443e4249c233d865617cabbce35349aaf3bb7",
+    "src/render/characters/visual_pool_policy.ts": "e8077c72f05dce15aa1a1917d225cb88b23d92ffa36f4fa706a5783f6a129f1a",
+    "src/render/characters/warrior_rush_pose.ts": "4b9e4c6f73f12fb596404845774857583be552f8098a7c91f51b9961ed9aacf5",
+    "src/render/characters/weapon_attack_style_core.ts": "561d64504b4c591c31f8c21f2ab2e8a0d1e29eec63c4963a6a1c8ce6eab2ae31",
+    "src/render/characters/weapon_grip.ts": "5431b18d9c2ca92d20550782e61b521b7caf59f5eda100118ad8cca1ae2c5524",
+    "src/render/characters/weapon_skin_materials.ts": "1e9da625dfabe4c2e762c4f6a3fdb5a41efaf4ecd1ae1b469a2883e6e57dd3aa",
+    "src/render/compile_target_readiness.ts": "754c3523912f7fc4c09b913b5fde92b5e695f60b745dd851d802d0acfe7afa6e",
+    "src/render/renderer.ts": "fde14a43e77393b5a70fac73c42d2ff703c1500a529142cd2e1ad8d34e8a0445",
+    "src/render/warrior_fury_state_core.ts": "72bf1081690cc906d03996dc5ed766c3fdda58e03d6da08f6d408f3db0b08e92",
+    "src/render/warrior_power_anchor.ts": "4d7d09da549f7346ea56a68cbebf99af671884b0c742691b0fa1a2c3c8521242",
+    "src/render/warrior_power_core.ts": "81053c4a37aec9ad05c27751721fb8a0222584590ea141d5f7422ad25f9485d0",
+    "src/render/warrior_readiness_core.ts": "34e8f2d1f801e15c82fd902ff159b18b924acf158da07d001518439287873e1d",
+    "src/render/warrior_vfx_specs.ts": "e92b394394f8d37b8ded7418d1a8a65f620325b62b2d6d421ae164337dd860bc",
+    "src/render/weapon_trail_anchor.ts": "e2b4d8cc9dde304db761965fc16f28939d018e863a5c82b76e5f317dbe9d2eaa",
+    "src/sim/combat/effect_dispatch.ts": "39cef13ee9811a09de9ce0b75e277036a7dca0a301550671e132deb1552bc9db",
+    "src/sim/content/classes.ts": "afcd0d765d530ce4f0cd6a7ac3b5b66a0a8eba3842460939df84309d9dae2e60",
+    "src/sim/content/warrior_rows.ts": "0a1c8127c31e317be6f35408409b99a03eb711fa8b0a1865b08eaccec2c69eec",
+    "src/vfx_studio/loadout.ts": "2b8d442b11a7f9c6ef845ea7635d9f0974f7ecf60698b7d5309092cfb3c79f90",
+    "src/vfx_studio/session.ts": "32f4285ed102c6dc153fe8fedd03578cfa2b30a5297760ce0720e6f602f79722",
+    "src/vfx_studio/stage_cast.ts": "4694f2fbd5eee4c566ef786129f3a6eb57f93748dbeba6f1cc2c9d93b512c16d",
+    "src/vfx_studio/stage_prerequisites.ts": "c1ae6aeeef8e88dde24803e647baf180a740fac593605d598cbc9fdd72c8cdf0",
+    "src/vfx_studio/studio.css": "b7282517130c9c027768f45b745be59e01b03a39f96bd62cbabc9e7e5b1f5fec",
+    "src/warrior_control_audio.ts": "6740e64581d2f13f55e25392254b320efc96606727a021dabc3a4bfb79a4b831",
+    "src/warrior_recovery_core.ts": "5f2eb1c2d1a190e45f9dead83c7e47839add3b234e8f5284ddf8d4a453e5f871"
+  },
+  "sourceUnchanged": true,
+  "errors": [],
+  "consoleErrors": [],
+  "missing": [],
+  "case": {
+    "key": "arms:mortal_strike",
+    "id": "mortal_strike",
+    "fixture": {
+      "level": 20,
+      "spec": "arms",
+      "rows": {
+        "5": "war_row_double_charge",
+        "8": "war_row_second_wind",
+        "11": "war_row_piercing_howl",
+        "14": "war_row_anger_management",
+        "17": "war_row_recklessness",
+        "20": "war_row_colossal_might"
+      }
+    },
+    "status": "complete",
+    "captures": [
+      {
+        "name": "arms-mortal_strike-t0.05.png",
+        "seconds": 0.05,
+        "tick": 41,
+        "simTime": 2.0500000000000007,
+        "clip": "Signature_mortal_strike",
+        "clipTime": 0.05,
+        "player": {
+          "id": 994,
+          "hp": 902,
+          "maxHp": 902,
+          "dead": false,
+          "pos": {
+            "x": 135448,
+            "y": 0,
+            "z": 3.9000000000000004
+          },
+          "facing": 0,
+          "resource": 73,
+          "autoAttack": false,
+          "swingTimer": 0,
+          "queuedOnSwing": null,
+          "equipment": {
+            "mainhand": "wyrmfang_greatblade",
+            "chest": "recruit_tunic"
+          },
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3597.9499999999925,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            },
+            {
+              "id": "colossal_might_cap",
+              "name": "Colossal Might",
+              "kind": "internal_cd",
+              "value": 2.7,
+              "remaining": 29.95,
+              "duration": 30,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "forcedTargetId": null,
+          "forcedTargetTimer": 0
+        },
+        "target": {
+          "id": 999,
+          "hp": 999868,
+          "maxHp": 999999,
+          "dead": false,
+          "pos": {
+            "x": 135448,
+            "y": 0,
+            "z": 6
+          },
+          "facing": 0,
+          "resource": 0,
+          "autoAttack": false,
+          "swingTimer": 0,
+          "queuedOnSwing": null,
+          "equipment": {},
+          "auras": [
+            {
+              "id": "mortal_strike",
+              "name": "Maiming Strike",
+              "kind": "mortal_wound",
+              "remaining": 9.95,
+              "duration": 10,
+              "value": 0.5,
+              "sourceId": 994,
+              "school": "physical"
+            },
+            {
+              "id": "deep_wounds",
+              "name": "Gaping Wounds",
+              "kind": "dot",
+              "remaining": 5.95,
+              "duration": 6,
+              "value": 20,
+              "tickInterval": 3,
+              "tickTimer": 2.95,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "forcedTargetId": null,
+          "forcedTargetTimer": 0
+        },
+        "contextLost": false
+      },
+      {
+        "name": "arms-mortal_strike-t0.15.png",
+        "seconds": 0.15000000000000002,
+        "tick": 43,
+        "simTime": 2.1500000000000004,
+        "clip": "Signature_mortal_strike",
+        "clipTime": 0.15000000000000002,
+        "player": {
+          "id": 994,
+          "hp": 902,
+          "maxHp": 902,
+          "dead": false,
+          "pos": {
+            "x": 135448,
+            "y": 0,
+            "z": 3.9000000000000004
+          },
+          "facing": 0,
+          "resource": 73,
+          "autoAttack": false,
+          "swingTimer": 0,
+          "queuedOnSwing": null,
+          "equipment": {
+            "mainhand": "wyrmfang_greatblade",
+            "chest": "recruit_tunic"
+          },
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3597.849999999992,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            },
+            {
+              "id": "colossal_might_cap",
+              "name": "Colossal Might",
+              "kind": "internal_cd",
+              "value": 2.7,
+              "remaining": 29.849999999999998,
+              "duration": 30,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "forcedTargetId": null,
+          "forcedTargetTimer": 0
+        },
+        "target": {
+          "id": 999,
+          "hp": 999868,
+          "maxHp": 999999,
+          "dead": false,
+          "pos": {
+            "x": 135448,
+            "y": 0,
+            "z": 6
+          },
+          "facing": 0,
+          "resource": 0,
+          "autoAttack": false,
+          "swingTimer": 0,
+          "queuedOnSwing": null,
+          "equipment": {},
+          "auras": [
+            {
+              "id": "mortal_strike",
+              "name": "Maiming Strike",
+              "kind": "mortal_wound",
+              "remaining": 9.849999999999998,
+              "duration": 10,
+              "value": 0.5,
+              "sourceId": 994,
+              "school": "physical"
+            },
+            {
+              "id": "deep_wounds",
+              "name": "Gaping Wounds",
+              "kind": "dot",
+              "remaining": 5.8500000000000005,
+              "duration": 6,
+              "value": 20,
+              "tickInterval": 3,
+              "tickTimer": 2.8500000000000005,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "forcedTargetId": null,
+          "forcedTargetTimer": 0
+        },
+        "contextLost": false
+      },
+      {
+        "name": "arms-mortal_strike-t0.30.png",
+        "seconds": 0.30000000000000004,
+        "tick": 46,
+        "simTime": 2.3,
+        "clip": "Signature_mortal_strike",
+        "clipTime": 0.3,
+        "player": {
+          "id": 994,
+          "hp": 902,
+          "maxHp": 902,
+          "dead": false,
+          "pos": {
+            "x": 135448,
+            "y": 0,
+            "z": 3.9000000000000004
+          },
+          "facing": 0,
+          "resource": 73,
+          "autoAttack": false,
+          "swingTimer": 0,
+          "queuedOnSwing": null,
+          "equipment": {
+            "mainhand": "wyrmfang_greatblade",
+            "chest": "recruit_tunic"
+          },
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3597.6999999999916,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            },
+            {
+              "id": "colossal_might_cap",
+              "name": "Colossal Might",
+              "kind": "internal_cd",
+              "value": 2.7,
+              "remaining": 29.699999999999996,
+              "duration": 30,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "forcedTargetId": null,
+          "forcedTargetTimer": 0
+        },
+        "target": {
+          "id": 999,
+          "hp": 999868,
+          "maxHp": 999999,
+          "dead": false,
+          "pos": {
+            "x": 135448,
+            "y": 0,
+            "z": 6
+          },
+          "facing": 0,
+          "resource": 0,
+          "autoAttack": false,
+          "swingTimer": 0,
+          "queuedOnSwing": null,
+          "equipment": {},
+          "auras": [
+            {
+              "id": "mortal_strike",
+              "name": "Maiming Strike",
+              "kind": "mortal_wound",
+              "remaining": 9.699999999999996,
+              "duration": 10,
+              "value": 0.5,
+              "sourceId": 994,
+              "school": "physical"
+            },
+            {
+              "id": "deep_wounds",
+              "name": "Gaping Wounds",
+              "kind": "dot",
+              "remaining": 5.700000000000001,
+              "duration": 6,
+              "value": 20,
+              "tickInterval": 3,
+              "tickTimer": 2.700000000000001,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "forcedTargetId": null,
+          "forcedTargetTimer": 0
+        },
+        "contextLost": false
+      },
+      {
+        "name": "arms-mortal_strike-t0.65.png",
+        "seconds": 0.65,
+        "tick": 53,
+        "simTime": 2.6499999999999986,
+        "clip": "Signature_mortal_strike",
+        "clipTime": 0.65,
+        "player": {
+          "id": 994,
+          "hp": 902,
+          "maxHp": 902,
+          "dead": false,
+          "pos": {
+            "x": 135448,
+            "y": 0,
+            "z": 3.9000000000000004
+          },
+          "facing": 0,
+          "resource": 73,
+          "autoAttack": false,
+          "swingTimer": 0,
+          "queuedOnSwing": null,
+          "equipment": {
+            "mainhand": "wyrmfang_greatblade",
+            "chest": "recruit_tunic"
+          },
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3597.3499999999904,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            },
+            {
+              "id": "colossal_might_cap",
+              "name": "Colossal Might",
+              "kind": "internal_cd",
+              "value": 2.7,
+              "remaining": 29.34999999999999,
+              "duration": 30,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "forcedTargetId": null,
+          "forcedTargetTimer": 0
+        },
+        "target": {
+          "id": 999,
+          "hp": 999868,
+          "maxHp": 999999,
+          "dead": false,
+          "pos": {
+            "x": 135448,
+            "y": 0,
+            "z": 6
+          },
+          "facing": 0,
+          "resource": 0,
+          "autoAttack": false,
+          "swingTimer": 0,
+          "queuedOnSwing": null,
+          "equipment": {},
+          "auras": [
+            {
+              "id": "mortal_strike",
+              "name": "Maiming Strike",
+              "kind": "mortal_wound",
+              "remaining": 9.34999999999999,
+              "duration": 10,
+              "value": 0.5,
+              "sourceId": 994,
+              "school": "physical"
+            },
+            {
+              "id": "deep_wounds",
+              "name": "Gaping Wounds",
+              "kind": "dot",
+              "remaining": 5.350000000000002,
+              "duration": 6,
+              "value": 20,
+              "tickInterval": 3,
+              "tickTimer": 2.3500000000000023,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "forcedTargetId": null,
+          "forcedTargetTimer": 0
+        },
+        "contextLost": false
+      },
+      {
+        "name": "arms-mortal_strike-t1.50.png",
+        "seconds": 1.5,
+        "tick": 70,
+        "simTime": 3.4999999999999956,
+        "clip": "Idle",
+        "clipTime": 0.8000000000000002,
+        "player": {
+          "id": 994,
+          "hp": 902,
+          "maxHp": 902,
+          "dead": false,
+          "pos": {
+            "x": 135448,
+            "y": 0,
+            "z": 3.9000000000000004
+          },
+          "facing": 0,
+          "resource": 73,
+          "autoAttack": false,
+          "swingTimer": 0,
+          "queuedOnSwing": null,
+          "equipment": {
+            "mainhand": "wyrmfang_greatblade",
+            "chest": "recruit_tunic"
+          },
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3596.4999999999873,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            },
+            {
+              "id": "colossal_might_cap",
+              "name": "Colossal Might",
+              "kind": "internal_cd",
+              "value": 2.7,
+              "remaining": 28.49999999999998,
+              "duration": 30,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "forcedTargetId": null,
+          "forcedTargetTimer": 0
+        },
+        "target": {
+          "id": 999,
+          "hp": 999868,
+          "maxHp": 999999,
+          "dead": false,
+          "pos": {
+            "x": 135448,
+            "y": 0,
+            "z": 6
+          },
+          "facing": 0,
+          "resource": 0,
+          "autoAttack": false,
+          "swingTimer": 0,
+          "queuedOnSwing": null,
+          "equipment": {},
+          "auras": [
+            {
+              "id": "mortal_strike",
+              "name": "Maiming Strike",
+              "kind": "mortal_wound",
+              "remaining": 8.499999999999979,
+              "duration": 10,
+              "value": 0.5,
+              "sourceId": 994,
+              "school": "physical"
+            },
+            {
+              "id": "deep_wounds",
+              "name": "Gaping Wounds",
+              "kind": "dot",
+              "remaining": 4.500000000000005,
+              "duration": 6,
+              "value": 20,
+              "tickInterval": 3,
+              "tickTimer": 1.500000000000003,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "forcedTargetId": null,
+          "forcedTargetTimer": 0
+        },
+        "contextLost": false
+      },
+      {
+        "name": "arms-mortal_strike-t3.20.png",
+        "seconds": 3.2,
+        "tick": 104,
+        "simTime": 5.1999999999999895,
+        "clip": "Idle",
+        "clipTime": 0.36666655540466386,
+        "player": {
+          "id": 994,
+          "hp": 902,
+          "maxHp": 902,
+          "dead": false,
+          "pos": {
+            "x": 135448,
+            "y": 0,
+            "z": 3.9000000000000004
+          },
+          "facing": 0,
+          "resource": 73,
+          "autoAttack": false,
+          "swingTimer": 0,
+          "queuedOnSwing": null,
+          "equipment": {
+            "mainhand": "wyrmfang_greatblade",
+            "chest": "recruit_tunic"
+          },
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3594.799999999981,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            },
+            {
+              "id": "colossal_might_cap",
+              "name": "Colossal Might",
+              "kind": "internal_cd",
+              "value": 2.7,
+              "remaining": 26.799999999999955,
+              "duration": 30,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "forcedTargetId": null,
+          "forcedTargetTimer": 0
+        },
+        "target": {
+          "id": 999,
+          "hp": 999846,
+          "maxHp": 999999,
+          "dead": false,
+          "pos": {
+            "x": 135448,
+            "y": 0,
+            "z": 6
+          },
+          "facing": 0,
+          "resource": 0,
+          "autoAttack": false,
+          "swingTimer": 0,
+          "queuedOnSwing": null,
+          "equipment": {},
+          "auras": [
+            {
+              "id": "mortal_strike",
+              "name": "Maiming Strike",
+              "kind": "mortal_wound",
+              "remaining": 6.799999999999977,
+              "duration": 10,
+              "value": 0.5,
+              "sourceId": 994,
+              "school": "physical"
+            },
+            {
+              "id": "deep_wounds",
+              "name": "Gaping Wounds",
+              "kind": "dot",
+              "remaining": 2.8000000000000114,
+              "duration": 6,
+              "value": 20,
+              "tickInterval": 3,
+              "tickTimer": 2.800000000000003,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "forcedTargetId": null,
+          "forcedTargetTimer": 0
+        },
+        "contextLost": false
+      },
+      {
+        "name": "arms-mortal_strike-t6.10.png",
+        "seconds": 6.1000000000000005,
+        "tick": 162,
+        "simTime": 8.09999999999998,
+        "clip": "Idle",
+        "clipTime": 0.06666638851166003,
+        "player": {
+          "id": 994,
+          "hp": 902,
+          "maxHp": 902,
+          "dead": false,
+          "pos": {
+            "x": 135448,
+            "y": 0,
+            "z": 3.9000000000000004
+          },
+          "facing": 0,
+          "resource": 73,
+          "autoAttack": false,
+          "swingTimer": 0,
+          "queuedOnSwing": null,
+          "equipment": {
+            "mainhand": "wyrmfang_greatblade",
+            "chest": "recruit_tunic"
+          },
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3591.8999999999705,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            },
+            {
+              "id": "colossal_might_cap",
+              "name": "Colossal Might",
+              "kind": "internal_cd",
+              "value": 2.7,
+              "remaining": 23.899999999999913,
+              "duration": 30,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "forcedTargetId": null,
+          "forcedTargetTimer": 0
+        },
+        "target": {
+          "id": 999,
+          "hp": 999824,
+          "maxHp": 999999,
+          "dead": false,
+          "pos": {
+            "x": 135448,
+            "y": 0,
+            "z": 6
+          },
+          "facing": 0,
+          "resource": 0,
+          "autoAttack": false,
+          "swingTimer": 0,
+          "queuedOnSwing": null,
+          "equipment": {},
+          "auras": [
+            {
+              "id": "mortal_strike",
+              "name": "Maiming Strike",
+              "kind": "mortal_wound",
+              "remaining": 3.899999999999987,
+              "duration": 10,
+              "value": 0.5,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "forcedTargetId": null,
+          "forcedTargetTimer": 0
+        },
+        "contextLost": false
+      },
+      {
+        "name": "arms-mortal_strike-t10.10.png",
+        "seconds": 10.100000000000001,
+        "tick": 242,
+        "simTime": 12.100000000000037,
+        "clip": "Idle",
+        "clipTime": 0.8666662216186565,
+        "player": {
+          "id": 994,
+          "hp": 902,
+          "maxHp": 902,
+          "dead": false,
+          "pos": {
+            "x": 135448,
+            "y": 0,
+            "z": 3.9000000000000004
+          },
+          "facing": 0,
+          "resource": 73,
+          "autoAttack": false,
+          "swingTimer": 0,
+          "queuedOnSwing": null,
+          "equipment": {
+            "mainhand": "wyrmfang_greatblade",
+            "chest": "recruit_tunic"
+          },
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3587.899999999956,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            },
+            {
+              "id": "colossal_might_cap",
+              "name": "Colossal Might",
+              "kind": "internal_cd",
+              "value": 2.7,
+              "remaining": 19.899999999999856,
+              "duration": 30,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "forcedTargetId": null,
+          "forcedTargetTimer": 0
+        },
+        "target": {
+          "id": 999,
+          "hp": 999824,
+          "maxHp": 999999,
+          "dead": false,
+          "pos": {
+            "x": 135448,
+            "y": 0,
+            "z": 6
+          },
+          "facing": 0,
+          "resource": 0,
+          "autoAttack": false,
+          "swingTimer": 0,
+          "queuedOnSwing": null,
+          "equipment": {},
+          "auras": [],
+          "forcedTargetId": null,
+          "forcedTargetTimer": 0
+        },
+        "contextLost": false
+      }
+    ],
+    "errors": [],
+    "start": {
+      "tick": 40,
+      "simTime": 2.000000000000001,
+      "DT": 0.05,
+      "playerId": 994,
+      "targetId": 999,
+      "profile": {
+        "settings": {
+          "graphicsConfigVersion": 21,
+          "tier": "ultra",
+          "effectsTier": "ultra",
+          "bucketBands": {
+            "resolution": {
+              "min": 0.68,
+              "baseline": 1,
+              "max": 1,
+              "roi": 0.88,
+              "cost": "gpu",
+              "governable": true
+            },
+            "grass": {
+              "min": 0.78,
+              "baseline": 1,
+              "max": 1,
+              "roi": 0.86,
+              "cost": "gpu",
+              "governable": true
+            },
+            "foliage": {
+              "min": 0.78,
+              "baseline": 1,
+              "max": 1,
+              "roi": 0.72,
+              "cost": "gpu",
+              "governable": true
+            },
+            "props": {
+              "min": 0.86,
+              "baseline": 1,
+              "max": 1,
+              "roi": 0.58,
+              "cost": "mixed",
+              "governable": false
+            },
+            "lighting": {
+              "min": 0.78,
+              "baseline": 1,
+              "max": 1,
+              "roi": 0.7,
+              "cost": "gpu",
+              "governable": true
+            },
+            "materials": {
+              "min": 0.86,
+              "baseline": 1,
+              "max": 1,
+              "roi": 0.78,
+              "cost": "gpu",
+              "governable": false
+            },
+            "waterSky": {
+              "min": 0.86,
+              "baseline": 1,
+              "max": 1,
+              "roi": 0.82,
+              "cost": "gpu",
+              "governable": false
+            },
+            "vfx": {
+              "min": 0.86,
+              "baseline": 1,
+              "max": 1,
+              "roi": 0.7,
+              "cost": "mixed",
+              "governable": true
+            },
+            "characters": {
+              "min": 0.94,
+              "baseline": 1,
+              "max": 1,
+              "roi": 1,
+              "cost": "mixed",
+              "governable": false
+            },
+            "weapons": {
+              "min": 1,
+              "baseline": 1,
+              "max": 1,
+              "roi": 1,
+              "cost": "mixed",
+              "governable": false
+            },
+            "worldStreaming": {
+              "min": 0.7,
+              "baseline": 1,
+              "max": 1,
+              "roi": 0.62,
+              "cost": "cpu",
+              "governable": true
+            },
+            "ui": {
+              "min": 0.9,
+              "baseline": 1,
+              "max": 1,
+              "roi": 0.86,
+              "cost": "cpu",
+              "governable": false
+            }
+          },
+          "bucketBaselines": {
+            "resolution": 1,
+            "grass": 1,
+            "foliage": 1,
+            "props": 1,
+            "lighting": 1,
+            "materials": 1,
+            "waterSky": 1,
+            "vfx": 1,
+            "characters": 1,
+            "weapons": 1,
+            "worldStreaming": 1,
+            "ui": 1
+          },
+          "budget": {
+            "targetFps": 60,
+            "minRenderScaleDesktop": 0.78,
+            "minRenderScaleMobile": 0.68,
+            "maxRenderScale": 1,
+            "dropFrameMs": 30,
+            "urgentFrameMs": 44,
+            "recoverFrameMs": 15,
+            "dropStep": 0.08,
+            "urgentDropStep": 0.12,
+            "recoverStep": 0.04,
+            "recoverStableSeconds": 3,
+            "cooldownSeconds": 0.85
+          },
+          "autoGovernor": true,
+          "composer": true,
+          "gradePass": true,
+          "ao": true,
+          "msaaSamples": 0,
+          "pixelRatioCap": 1.75,
+          "dynamicShadows": true,
+          "shadowMap": 4096,
+          "standardMaterials": true,
+          "surfaceDetail": true,
+          "surfaceDetailTaps": 3,
+          "surfaceDetailClampK": 0.85,
+          "bladeCarpetRadius": 34,
+          "cliffScree": true,
+          "canopyDetail": true,
+          "terrainRelief": 3,
+          "aoFullRes": true,
+          "smaa": true,
+          "fxaa": false,
+          "bloom": true,
+          "terrainCastShadows": true,
+          "lowPlus": false,
+          "leanFoliage": false,
+          "denseDressing": false,
+          "grassRadius": 82,
+          "grassStep": 1.8,
+          "farGrassDensityFloor": 0.75,
+          "terrainSplat": true,
+          "windSway": true,
+          "maxPointLights": 6,
+          "constrainedMemory": false,
+          "iosMemoryProfile": false,
+          "tightMemory": false,
+          "maxPooledCharacterVisuals": 128,
+          "maxPooledObjects": null,
+          "farCharacterAnimScale": 1.3,
+          "vistaTier": "ultra",
+          "waterTier": "ultra"
+        },
+        "fingerprint": "{\"ao\":true,\"aoFullRes\":true,\"autoGovernor\":true,\"bladeCarpetRadius\":34,\"bloom\":true,\"bucketBands\":{\"characters\":{\"baseline\":1,\"cost\":\"mixed\",\"governable\":false,\"max\":1,\"min\":0.94,\"roi\":1},\"foliage\":{\"baseline\":1,\"cost\":\"gpu\",\"governable\":true,\"max\":1,\"min\":0.78,\"roi\":0.72},\"grass\":{\"baseline\":1,\"cost\":\"gpu\",\"governable\":true,\"max\":1,\"min\":0.78,\"roi\":0.86},\"lighting\":{\"baseline\":1,\"cost\":\"gpu\",\"governable\":true,\"max\":1,\"min\":0.78,\"roi\":0.7},\"materials\":{\"baseline\":1,\"cost\":\"gpu\",\"governable\":false,\"max\":1,\"min\":0.86,\"roi\":0.78},\"props\":{\"baseline\":1,\"cost\":\"mixed\",\"governable\":false,\"max\":1,\"min\":0.86,\"roi\":0.58},\"resolution\":{\"baseline\":1,\"cost\":\"gpu\",\"governable\":true,\"max\":1,\"min\":0.68,\"roi\":0.88},\"ui\":{\"baseline\":1,\"cost\":\"cpu\",\"governable\":false,\"max\":1,\"min\":0.9,\"roi\":0.86},\"vfx\":{\"baseline\":1,\"cost\":\"mixed\",\"governable\":true,\"max\":1,\"min\":0.86,\"roi\":0.7},\"waterSky\":{\"baseline\":1,\"cost\":\"gpu\",\"governable\":false,\"max\":1,\"min\":0.86,\"roi\":0.82},\"weapons\":{\"baseline\":1,\"cost\":\"mixed\",\"governable\":false,\"max\":1,\"min\":1,\"roi\":1},\"worldStreaming\":{\"baseline\":1,\"cost\":\"cpu\",\"governable\":true,\"max\":1,\"min\":0.7,\"roi\":0.62}},\"bucketBaselines\":{\"characters\":1,\"foliage\":1,\"grass\":1,\"lighting\":1,\"materials\":1,\"props\":1,\"resolution\":1,\"ui\":1,\"vfx\":1,\"waterSky\":1,\"weapons\":1,\"worldStreaming\":1},\"budget\":{\"cooldownSeconds\":0.85,\"dropFrameMs\":30,\"dropStep\":0.08,\"maxRenderScale\":1,\"minRenderScaleDesktop\":0.78,\"minRenderScaleMobile\":0.68,\"recoverFrameMs\":15,\"recoverStableSeconds\":3,\"recoverStep\":0.04,\"targetFps\":60,\"urgentDropStep\":0.12,\"urgentFrameMs\":44},\"canopyDetail\":true,\"cliffScree\":true,\"composer\":true,\"constrainedMemory\":false,\"denseDressing\":false,\"dynamicShadows\":true,\"effectsTier\":\"ultra\",\"farCharacterAnimScale\":1.3,\"farGrassDensityFloor\":0.75,\"fxaa\":false,\"gradePass\":true,\"graphicsConfigVersion\":21,\"grassRadius\":82,\"grassStep\":1.8,\"iosMemoryProfile\":false,\"leanFoliage\":false,\"lowPlus\":false,\"maxPointLights\":6,\"maxPooledCharacterVisuals\":128,\"maxPooledObjects\":Infinity,\"msaaSamples\":0,\"pixelRatioCap\":1.75,\"shadowMap\":4096,\"smaa\":true,\"standardMaterials\":true,\"surfaceDetail\":true,\"surfaceDetailClampK\":0.85,\"surfaceDetailTaps\":3,\"terrainCastShadows\":true,\"terrainRelief\":3,\"terrainSplat\":true,\"tier\":\"ultra\",\"tightMemory\":false,\"vistaTier\":\"ultra\",\"waterTier\":\"ultra\",\"windSway\":true}",
+        "forcedTier": null,
+        "softwareRendering": false,
+        "epoch": 2
+      },
+      "prerequisite": null,
+      "preCast": {
+        "hp": 902,
+        "resource": 100,
+        "auras": [
+          {
+            "id": "battle_stance",
+            "name": "Battle Stance",
+            "kind": "battle_stance",
+            "remaining": 3597.9999999999927,
+            "duration": 3600,
+            "value": 0,
+            "sourceId": 994,
+            "school": "physical"
+          }
+        ],
+        "equipment": {
+          "mainhand": "wyrmfang_greatblade",
+          "chest": "recruit_tunic"
+        }
+      },
+      "resolved": {
+        "name": "Maiming Strike",
+        "effects": [
+          {
+            "type": "weaponStrike",
+            "bonus": 50
+          },
+          {
+            "type": "buffTarget",
+            "kind": "mortal_wound",
+            "value": 0.5,
+            "duration": 10
+          },
+          {
+            "type": "dot",
+            "total": 30,
+            "duration": 6,
+            "interval": 3,
+            "auraId": "deep_wounds"
+          }
+        ]
+      },
+      "postCast": {
+        "hp": 902,
+        "resource": 73,
+        "auras": [
+          {
+            "id": "battle_stance",
+            "name": "Battle Stance",
+            "kind": "battle_stance",
+            "remaining": 3597.9999999999927,
+            "duration": 3600,
+            "value": 0,
+            "sourceId": 994,
+            "school": "physical"
+          },
+          {
+            "id": "colossal_might_cap",
+            "name": "Colossal Might",
+            "kind": "internal_cd",
+            "value": 2.7,
+            "remaining": 30,
+            "duration": 30,
+            "sourceId": 994,
+            "school": "physical"
+          }
+        ]
+      },
+      "finiteEnd": 10.1,
+      "castTotal": 0,
+      "commands": [
+        {
+          "tick": 40,
+          "command": {
+            "kind": "cast",
+            "abilityId": "mortal_strike",
+            "targetId": 999
+          }
+        }
+      ]
+    },
+    "events": [
+      {
+        "type": "aura",
+        "targetId": 994,
+        "name": "Colossal Might",
+        "gained": true,
+        "sourceId": 994,
+        "abilityId": "colossal_might_cap"
+      },
+      {
+        "type": "damage",
+        "sourceId": 994,
+        "targetId": 999,
+        "amount": 131,
+        "crit": false,
+        "school": "physical",
+        "ability": "Maiming Strike",
+        "abilityId": "mortal_strike",
+        "kind": "hit"
+      },
+      {
+        "type": "aura",
+        "targetId": 999,
+        "name": "Maiming Strike",
+        "gained": true,
+        "sourceId": 994,
+        "abilityId": "mortal_strike"
+      },
+      {
+        "type": "aura",
+        "targetId": 999,
+        "name": "Gaping Wounds",
+        "gained": true,
+        "sourceId": 994,
+        "abilityId": "deep_wounds"
+      },
+      {
+        "type": "spellfx",
+        "sourceId": 994,
+        "targetId": 999,
+        "school": "physical",
+        "fx": "tick"
+      },
+      {
+        "type": "damage",
+        "sourceId": 994,
+        "targetId": 999,
+        "amount": 22,
+        "crit": false,
+        "school": "physical",
+        "ability": "Gaping Wounds",
+        "abilityId": null,
+        "kind": "hit"
+      },
+      {
+        "type": "heal",
+        "targetId": 1000,
+        "amount": 0,
+        "source": "food",
+        "sfxTick": true
+      },
+      {
+        "type": "heal",
+        "targetId": 1001,
+        "amount": 0,
+        "source": "food",
+        "sfxTick": true
+      },
+      {
+        "type": "heal",
+        "targetId": 1002,
+        "amount": 0,
+        "source": "food",
+        "sfxTick": true
+      },
+      {
+        "type": "heal",
+        "targetId": 1003,
+        "amount": 0,
+        "source": "food",
+        "sfxTick": true
+      },
+      {
+        "type": "heal",
+        "targetId": 1004,
+        "amount": 0,
+        "source": "food",
+        "sfxTick": true
+      },
+      {
+        "type": "spellfx",
+        "sourceId": 994,
+        "targetId": 999,
+        "school": "physical",
+        "fx": "tick"
+      },
+      {
+        "type": "damage",
+        "sourceId": 994,
+        "targetId": 999,
+        "amount": 22,
+        "crit": false,
+        "school": "physical",
+        "ability": "Gaping Wounds",
+        "abilityId": null,
+        "kind": "hit"
+      },
+      {
+        "type": "aura",
+        "targetId": 999,
+        "name": "Gaping Wounds",
+        "gained": false
+      },
+      {
+        "type": "heal",
+        "targetId": 1000,
+        "amount": 0,
+        "source": "food",
+        "sfxTick": true
+      },
+      {
+        "type": "heal",
+        "targetId": 1001,
+        "amount": 0,
+        "source": "food",
+        "sfxTick": true
+      },
+      {
+        "type": "heal",
+        "targetId": 1002,
+        "amount": 0,
+        "source": "food",
+        "sfxTick": true
+      },
+      {
+        "type": "heal",
+        "targetId": 1003,
+        "amount": 0,
+        "source": "food",
+        "sfxTick": true
+      },
+      {
+        "type": "heal",
+        "targetId": 1004,
+        "amount": 0,
+        "source": "food",
+        "sfxTick": true
+      },
+      {
+        "type": "aura",
+        "targetId": 999,
+        "name": "Maiming Strike",
+        "gained": false
+      }
+    ],
+    "eventRows": [
+      {
+        "tick": 40,
+        "simTime": 2.000000000000001,
+        "event": {
+          "type": "aura",
+          "targetId": 994,
+          "name": "Colossal Might",
+          "gained": true,
+          "sourceId": 994,
+          "abilityId": "colossal_might_cap"
+        }
+      },
+      {
+        "tick": 40,
+        "simTime": 2.000000000000001,
+        "event": {
+          "type": "damage",
+          "sourceId": 994,
+          "targetId": 999,
+          "amount": 131,
+          "crit": false,
+          "school": "physical",
+          "ability": "Maiming Strike",
+          "abilityId": "mortal_strike",
+          "kind": "hit"
+        }
+      },
+      {
+        "tick": 40,
+        "simTime": 2.000000000000001,
+        "event": {
+          "type": "aura",
+          "targetId": 999,
+          "name": "Maiming Strike",
+          "gained": true,
+          "sourceId": 994,
+          "abilityId": "mortal_strike"
+        }
+      },
+      {
+        "tick": 40,
+        "simTime": 2.000000000000001,
+        "event": {
+          "type": "aura",
+          "targetId": 999,
+          "name": "Gaping Wounds",
+          "gained": true,
+          "sourceId": 994,
+          "abilityId": "deep_wounds"
+        }
+      },
+      {
+        "tick": 100,
+        "simTime": 4.99999999999999,
+        "event": {
+          "type": "spellfx",
+          "sourceId": 994,
+          "targetId": 999,
+          "school": "physical",
+          "fx": "tick"
+        }
+      },
+      {
+        "tick": 100,
+        "simTime": 4.99999999999999,
+        "event": {
+          "type": "damage",
+          "sourceId": 994,
+          "targetId": 999,
+          "amount": 22,
+          "crit": false,
+          "school": "physical",
+          "ability": "Gaping Wounds",
+          "abilityId": null,
+          "kind": "hit"
+        }
+      },
+      {
+        "tick": 120,
+        "simTime": 5.999999999999987,
+        "event": {
+          "type": "heal",
+          "targetId": 1000,
+          "amount": 0,
+          "source": "food",
+          "sfxTick": true
+        }
+      },
+      {
+        "tick": 120,
+        "simTime": 5.999999999999987,
+        "event": {
+          "type": "heal",
+          "targetId": 1001,
+          "amount": 0,
+          "source": "food",
+          "sfxTick": true
+        }
+      },
+      {
+        "tick": 120,
+        "simTime": 5.999999999999987,
+        "event": {
+          "type": "heal",
+          "targetId": 1002,
+          "amount": 0,
+          "source": "food",
+          "sfxTick": true
+        }
+      },
+      {
+        "tick": 120,
+        "simTime": 5.999999999999987,
+        "event": {
+          "type": "heal",
+          "targetId": 1003,
+          "amount": 0,
+          "source": "food",
+          "sfxTick": true
+        }
+      },
+      {
+        "tick": 120,
+        "simTime": 5.999999999999987,
+        "event": {
+          "type": "heal",
+          "targetId": 1004,
+          "amount": 0,
+          "source": "food",
+          "sfxTick": true
+        }
+      },
+      {
+        "tick": 160,
+        "simTime": 7.99999999999998,
+        "event": {
+          "type": "spellfx",
+          "sourceId": 994,
+          "targetId": 999,
+          "school": "physical",
+          "fx": "tick"
+        }
+      },
+      {
+        "tick": 160,
+        "simTime": 7.99999999999998,
+        "event": {
+          "type": "damage",
+          "sourceId": 994,
+          "targetId": 999,
+          "amount": 22,
+          "crit": false,
+          "school": "physical",
+          "ability": "Gaping Wounds",
+          "abilityId": null,
+          "kind": "hit"
+        }
+      },
+      {
+        "tick": 160,
+        "simTime": 7.99999999999998,
+        "event": {
+          "type": "aura",
+          "targetId": 999,
+          "name": "Gaping Wounds",
+          "gained": false
+        }
+      },
+      {
+        "tick": 240,
+        "simTime": 12.000000000000036,
+        "event": {
+          "type": "heal",
+          "targetId": 1000,
+          "amount": 0,
+          "source": "food",
+          "sfxTick": true
+        }
+      },
+      {
+        "tick": 240,
+        "simTime": 12.000000000000036,
+        "event": {
+          "type": "heal",
+          "targetId": 1001,
+          "amount": 0,
+          "source": "food",
+          "sfxTick": true
+        }
+      },
+      {
+        "tick": 240,
+        "simTime": 12.000000000000036,
+        "event": {
+          "type": "heal",
+          "targetId": 1002,
+          "amount": 0,
+          "source": "food",
+          "sfxTick": true
+        }
+      },
+      {
+        "tick": 240,
+        "simTime": 12.000000000000036,
+        "event": {
+          "type": "heal",
+          "targetId": 1003,
+          "amount": 0,
+          "source": "food",
+          "sfxTick": true
+        }
+      },
+      {
+        "tick": 240,
+        "simTime": 12.000000000000036,
+        "event": {
+          "type": "heal",
+          "targetId": 1004,
+          "amount": 0,
+          "source": "food",
+          "sfxTick": true
+        }
+      },
+      {
+        "tick": 240,
+        "simTime": 12.000000000000036,
+        "event": {
+          "type": "aura",
+          "targetId": 999,
+          "name": "Maiming Strike",
+          "gained": false
+        }
+      }
+    ],
+    "commands": [
+      {
+        "tick": 40,
+        "command": {
+          "kind": "cast",
+          "abilityId": "mortal_strike",
+          "targetId": 999
+        }
+      }
+    ],
+    "damageOutcomes": [
+      {
+        "type": "damage",
+        "sourceId": 994,
+        "targetId": 999,
+        "amount": 131,
+        "crit": false,
+        "school": "physical",
+        "ability": "Maiming Strike",
+        "abilityId": "mortal_strike",
+        "kind": "hit"
+      }
+    ],
+    "contactReview": "positive-contact"
+  },
+  "captures": {
+    "current-arms-mortal_strike-t3.20.png": "132e4b69e0bb64190833de89e242c195325e886023c5250af979aede2ecb6a60",
+    "current-arms-mortal_strike-t6.10.png": "c643de6ce6de93b845fde5ba809bc550fd756827dc1da046e9600cc1b4d76355"
+  }
+}

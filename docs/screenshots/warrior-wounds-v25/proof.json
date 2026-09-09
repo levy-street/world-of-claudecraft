@@ -1,0 +1,38 @@
+{
+  "scope": "Arms Maiming Strike and its two earned Gaping Wounds ticks",
+  "captures": {
+    "before-arms-mortal_strike-t0.05.png": "c019e01f07dea32c86752d94637dae83562026a13c0b27bdfafacc36124204b5",
+    "before-arms-mortal_strike-t0.15.png": "385c1d5a4898d1e58ee1845cb5b76c07c6a4d7b33e1b43f949e2c62f7caa0403",
+    "before-arms-mortal_strike-t0.30.png": "4218a3412497079c67c3dd20a5b9d7da95a694523dbb6dea7069d323891425ca",
+    "before-arms-mortal_strike-t0.65.png": "f6a7134794a576e30bbb947f749a31f4a342e3b6cf268bfe6521bcf74b611db6",
+    "before-arms-mortal_strike-t1.50.png": "c00f2beac5bd1ed12293094b2fc7cc8d53c5084dbe3a5cbfac4a53a50f5a33b0",
+    "before-arms-mortal_strike-t3.20.png": "9c80c0468c08ac4289c0c6f0063a6ef53c17d8369096e192f68a4ea627538000",
+    "before-arms-mortal_strike-t6.10.png": "9e864dc85a5b62ca377c48dd0a4af2f354d05694b64a31dc9a31405a097dc157",
+    "before-arms-mortal_strike-t10.10.png": "0609b9cf3b3bf9a1980c9bbb4b9157251fc4b33e126e8d71efcb4e36aada8dd7",
+    "after-arms-mortal_strike-t0.05.png": "77d4d02f1dfa30b24a7ef969900c088f4c0f48a9f6d2978f2db4a01ecc0c52b0",
+    "after-arms-mortal_strike-t0.15.png": "822b4bcb8cfafcb00bbcd7ac5ad3dd9d1bbf0d178274f1de7b2b383b28d25d6d",
+    "after-arms-mortal_strike-t0.30.png": "324e72d0350d5276ee9ffd051af3c5391122f7ef5208e7ffea814381e42dcfe2",
+    "after-arms-mortal_strike-t0.65.png": "3c3c19dfbb622f6a7202d170548359e75370e6a8e7d947c112023bf96b1768be",
+    "after-arms-mortal_strike-t1.50.png": "a7cc845c4f441d3fe69c12bf9a659d6bf778294036fa53db5987d2227b5e6835",
+    "after-arms-mortal_strike-t3.20.png": "ce5c76b94bd686129ed1f595d86de21e1b78e780dc32e22d408aec680a4805b7",
+    "after-arms-mortal_strike-t6.10.png": "bd1f028d8a3c7d212b9a3591bf49436d4c4c3be2c25f526cc9302c46db68e2d3",
+    "after-arms-mortal_strike-t10.10.png": "6ab7f37f451d5ecd01aeda6c01d382c6d9b20e4c9e433bd494878645840491e1"
+  },
+  "limitations": [
+    "Ultra Studio camera only; whole-kit quality/world/pressure review remains separate."
+  ],
+  "combatOutcomesUnchanged": [
+    [
+      22,
+      "hit",
+      "physical",
+      null
+    ],
+    [
+      22,
+      "hit",
+      "physical",
+      null
+    ]
+  ]
+}

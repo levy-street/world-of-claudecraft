@@ -36,7 +36,7 @@ export function impactContact(
     Math.min(0.95, 0.55 + weight * 0.15),
     profile,
   );
-  if (periodic) return;
+  if (periodic || abilityId === 'deep_wounds') return;
   if (!reducedMotion)
     visual?.holdFrame(0.18, Math.min(0.045, 0.018 + weight * 0.01));
   if (
