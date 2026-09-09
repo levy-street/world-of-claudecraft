@@ -241,3 +241,19 @@ Committed current-release evidence is under
 reset by Vite's initial dependency optimization; the warmed launch passed
 without source changes. Expected offline API failures and unrelated startup
 preload diagnostics remain distinguished from encounter errors in the receipts.
+
+The broad release gate caught stale inventory and resolver assumptions in the
+release's guards; those now include the new untagged templates and exact Roach
+cast labels. CI sparse checkouts include the encounter's committed evidence.
+The canonical Eastbrook runtime-input reseal updates only provenance hashes;
+its historical captures and all measurements remain unchanged. A fresh
+read-only review independently reproduced those hashes and checked that none
+of the guard repairs narrowed coverage.
+
+The current release also retains the stream-order fixture failure described
+in the initial record. Its real subprocess delivers complete stdout/stderr
+and the correct exit status, but a later stdout burst can evict an earlier
+stderr marker from the bounded combined tail. The fixture repair exercises
+both overflow streams independently, keeps each required suffix on its own
+ordered stream, and verifies both complete sinks and the unchanged tail bound.
+No runner behavior, timeout, retry, or exit-code policy changes.
