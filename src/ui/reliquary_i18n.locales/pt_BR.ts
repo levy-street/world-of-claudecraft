@@ -151,23 +151,31 @@ export const table: ReliquaryLocaleTable = {
     desc: 'Os anéis de Fenda pessoais, cunhados para cada campeão do grupo que vence a primeira conquista de uma Fenda classificada. Cada personagem só pode ter o seu.',
   },
   conquerors_ignivar: {
-    name: 'Crucible of the Last Spring',
-    desc: 'Espólios épicos de Ignivar, Herald of the Last Flame.',
+    name: 'Crisol da Última Chama',
+    desc: 'Espólios épicos de Ignivar, Arauto da Última Chama.',
   },
   conquerors_ignivar_heroic: {
-    name: 'Heroico: Crucible of the Last Spring',
-    desc: 'Armas exclusivas do modo heroico de Ignivar, Herald of the Last Flame.',
+    name: 'Heroico: Crisol da Última Chama',
+    desc: 'Armas exclusivas do modo heroico de Ignivar, Arauto da Última Chama.',
   },
   conquerors_varkhul: {
-    name: 'The Inner Crucible',
-    desc: 'Espólios épicos de Varkhul, Forgefather of the Last Flame.',
+    name: 'O Crisol Interior',
+    desc: 'Espólios épicos de Varkhul, Pai da Forja da Última Chama.',
   },
   conquerors_varkhul_heroic: {
-    name: 'Heroico: The Inner Crucible',
-    desc: 'Escudos e armas exclusivos do modo heroico de Varkhul, Forgefather of the Last Flame.',
+    name: 'Heroico: Crisol Interior',
+    desc: 'Escudos e armas exclusivos do modo heroico de Varkhul, Pai da Forja da Última Chama.',
   },
   conquerors_set_bramblehide: {
     name: 'Couro de Sarça de Roots',
-    desc: 'A família completa de couro Bramblehide.',
+    desc: 'A família completa de couro Couro de Sarça de Roots.',
+  },
+  professions_crucible: {
+    name: 'Artesanato do Crisol',
+    desc: 'Onze coleções criadas em raides, cada uma com uma peça de peito, cintura e pés. Manuais e fórmulas são conhecimento, não relíquias.',
+  },
+  professions_forgebreaker: {
+    name: 'Quebra-forja',
+    desc: 'A voz da Última Fonte, libertada da forja e carregada em um martelo feito por você.',
   },
 };

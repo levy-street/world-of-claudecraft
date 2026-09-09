@@ -445,7 +445,10 @@ const MONOLITHS: MonolithRow[] = [
     // measured combined count is below both parent pins (18574 / 18489).
     // Compose the mount cosmetics and practice lesson extractions.
     // Measured combined size; retain zero headroom after the release merge.
-    ceiling: 18472,
+    // LOWERED for the coin-icon money readout extraction (moneyHtml moved out
+    // to src/ui/money_html.ts so the social tab's roster confirm shares it);
+    // the coordinator keeps three one-line deps wirings. Exact count, zero slack.
+    ceiling: 18461,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

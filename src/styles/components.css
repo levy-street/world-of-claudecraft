@@ -1051,84 +1051,152 @@
   }
 
   /* ---------- harvest-preference ---------- */
-  /* The shared corpse-harvest preference picker (Intentional Gathering PR3):
-     the same small cold-settings shape as town-focus above, reused by the
-     Field Kit use, Professions, and corpse Change entrances. Apply/Cancel
-     reuse the existing .btn/.btn-secondary family; only this content's own
-     rows need rules. */
+  /* One framed picker across corpse, Field Kit and Professions entrances.
+     The inner column must fill the flex window, not shrink to label width. */
   #harvest-preference-window {
-    width: 340px;
+    width: 420px;
+    --window-pad: var(--spacing-md);
+    overflow: hidden;
   }
-  /* Dynamic content (the resolved material name in the title, the retired
-     stored-material notice, the pick hint) is interpolated player-facing
-     text; wrap it rather than forcing the fixed-width popup to scroll
-     horizontally. */
-  .harvest-preference-title,
+  .harvest-preference {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+  }
+  .harvest-preference-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    flex: 0 0 auto;
+    padding-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--border);
+  }
+  .harvest-preference-emblem,
+  .harvest-preference-icon {
+    display: block;
+    width: 40px;
+    height: 40px;
+    flex: 0 0 auto;
+    object-fit: cover;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--panel-edge);
+  }
+  .harvest-preference-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    line-height: 1.3;
+    font-weight: 600;
+    color: var(--color-accent);
+    overflow-wrap: anywhere;
+  }
+  .harvest-preference-body {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: var(--spacing-xs);
+    margin: calc(-1 * var(--spacing-xs));
+  }
   .harvest-preference-current-unavailable,
   .harvest-preference-hint {
     overflow-wrap: anywhere;
-  }
-  .harvest-preference-title {
-    font-weight: 600;
-    margin-bottom: 6px;
+    margin-bottom: var(--spacing-sm);
+    font-size: 13px;
+    line-height: 1.4;
   }
   .harvest-preference-current-unavailable {
-    font-size: 12px;
     color: var(--color-text-error);
-    margin-bottom: 6px;
   }
   .harvest-preference-hint {
-    font-size: 11px;
-    opacity: 0.75;
-    margin-bottom: 6px;
+    color: var(--color-text-muted);
   }
   .harvest-preference-rows {
+    display: grid;
+    gap: var(--spacing-sm);
     list-style: none;
-    margin: 0 0 8px;
+    margin: 0;
     padding: 0;
   }
-  /* Each row IS the radio button (role="radio"), full-width and left-aligned
-     so the whole row is the >=40px touch target, not just its text. */
+  .harvest-preference-rows li {
+    min-width: 0;
+  }
   .harvest-preference-row {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
     width: 100%;
-    min-height: 40px;
-    padding: 8px 10px;
-    border: 1px solid transparent;
-    border-left: 3px solid transparent;
-    border-radius: 4px;
-    background: transparent;
-    color: inherit;
+    min-height: 60px;
+    padding: var(--spacing-sm);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--panel-bg);
+    color: var(--color-text-light);
     font-family: var(--ui-font);
-    font-size: 12px;
+    font-size: 15px;
     text-align: left;
     cursor: var(--cursor-point);
   }
-  /* Each row is the SOLE child of its own `<li>` (role="none"), so
-     `.harvest-preference-row:not(:last-child)` never matched; the list items,
-     not the buttons, are the siblings. */
-  .harvest-preference-rows li:not(:last-child) {
-    margin-bottom: 2px;
+  .harvest-preference-label {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
   }
-  /* A custom control (role=radio on a plain button, not .btn), so it needs its
-     own steady, tokenized ring rather than relying on the UA default (the
-     .tal-row-opt idiom for a house radio/option-row family). */
+  .harvest-preference-row:hover {
+    border-color: var(--color-accent);
+  }
   .harvest-preference-row:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
   }
-  /* The non-colour selected indicator: a left accent bar plus bold weight, so
-     the checked row reads without relying on colour alone. */
   .harvest-preference-row[aria-checked="true"] {
-    border-left-color: var(--color-accent);
-    font-weight: 600;
+    border-color: var(--color-accent);
+    box-shadow: inset 3px 0 0 var(--color-accent);
+    background: color-mix(in srgb, var(--color-accent) 12%, var(--panel-base));
+    font-weight: 700;
+  }
+  .harvest-preference-radio {
+    display: grid;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+    flex: 0 0 auto;
+    border: 2px solid var(--color-text-muted);
+    border-radius: 50%;
+  }
+  .harvest-preference-row[aria-checked="true"] .harvest-preference-radio {
+    border-color: var(--color-accent);
+  }
+  .harvest-preference-row[aria-checked="true"] .harvest-preference-radio::after {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-accent);
   }
   .harvest-preference-actions {
     display: flex;
-    gap: 8px;
+    gap: var(--spacing-sm);
+    flex: 0 0 auto;
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--border);
   }
   .harvest-preference-actions .btn {
     flex: 1;
+    min-height: 40px;
+  }
+  @media (forced-colors: active) {
+    .harvest-preference-row[aria-checked="true"] {
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+    }
+    .harvest-preference-row[aria-checked="true"] .harvest-preference-radio::after {
+      background: Highlight;
+      forced-color-adjust: none;
+    }
   }
   /* Source-info detail (Intentional Gathering PR5): the GENERAL picker only
      (Field Kit use, Professions), shown for the drafted material row.
@@ -12318,6 +12386,15 @@
   }
   .soc-add.soc-leave {
     justify-content: flex-end;
+    /* Two buttons share this row on the guild tab (below); a long label (the
+       disabled roster-maxed reading in a wordy locale on a phone) wraps the
+       second button onto its own line instead of squeezing both. */
+    flex-wrap: wrap;
+  }
+  /* The guild footer: the leader-only Expand roster button leads the same row the
+     disband / leave button ends, so the auto margin pushes it to the start edge. */
+  .soc-add.soc-leave .soc-foot-start {
+    margin-right: auto;
   }
   .soc-add input {
     flex: 1;

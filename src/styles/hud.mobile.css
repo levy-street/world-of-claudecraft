@@ -4490,7 +4490,7 @@
     );
     transform: none;
     box-sizing: border-box;
-    overflow-y: auto;
+    overflow: hidden;
   }
   /* The shared harvest-preference picker's Apply/Cancel ride the plain .btn
      shape, whose desktop 6px/16px padding falls short of the 40px touch
@@ -4498,6 +4498,41 @@
      (components.css min-height:40px). */
   body.mobile-touch #harvest-preference-window .btn {
     min-height: 40px;
+  }
+  @media (orientation: landscape) {
+    body.mobile-touch #harvest-preference-window {
+      width: 560px;
+      max-width: calc(
+        (
+          var(--app-vw, 100dvw) -
+          max(10px, env(safe-area-inset-left)) -
+          max(10px, env(safe-area-inset-right))
+        ) /
+        var(--window-scale, 1)
+      );
+      left: calc(
+        (
+          var(--app-vw, 100dvw) +
+          max(10px, env(safe-area-inset-left)) -
+          max(10px, env(safe-area-inset-right))
+        ) /
+        var(--window-scale, 1) /
+        2
+      );
+      right: auto;
+      transform: translateX(-50%);
+    }
+    body.mobile-touch .harvest-preference-rows {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    body.mobile-touch .harvest-preference-header {
+      margin-bottom: var(--spacing-sm);
+      padding-bottom: var(--spacing-sm);
+    }
+    body.mobile-touch .harvest-preference-actions {
+      margin-top: var(--spacing-sm);
+      padding-top: var(--spacing-sm);
+    }
   }
   /* $WOC Exchange browse tab on touch: one column, detail pane stacked under
      the table. The desktop template reserves a 240px-min side column, which on

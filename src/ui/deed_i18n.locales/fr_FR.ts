@@ -88,6 +88,7 @@ export const table: DeedLocaleTable = {
     desc: 'Recoltez un filon de minerai, un bosquet de bois et un carre d herbes a Nightbloom.',
   },
   chr_nightbloom_first_cast: {
+    name: 'Une ondulation sur la Source lunaire',
     desc: 'Pechez un poisson dans les eaux de Nightbloom.',
   },
   chr_wraithwood_gatherer: {
@@ -201,6 +202,7 @@ export const table: DeedLocaleTable = {
   },
   prog_master_gatherer: {
     name: 'Maître récolteur',
+    desc: 'Atteignez 100 points de maîtrise dans trois métiers de récolte différents.',
   },
   prog_first_craft: { name: 'Fait main', desc: 'Réussissez votre première fabrication.' },
   prog_craft_specialist: {
@@ -314,6 +316,7 @@ export const table: DeedLocaleTable = {
     title: 'Terrasse-wyrm',
   },
   dgn_sanctum_speed: {
+    name: 'Course du Sanctum',
     desc: 'Vainquez Korzul le Gravewyrm dans les 15 minutes suivant la prise du Sanctuaire du Gravewyrm par votre groupe.',
   },
   dgn_nythraxis_gravebreaker: {
@@ -353,7 +356,7 @@ export const table: DeedLocaleTable = {
     desc: 'Nettoyer la Litanie noyée au palier héroïque.',
   },
   dlv_lore_journal: {
-    name: 'Marginalia',
+    name: 'Notes marginales',
     desc: 'Débloquer les cinq entrées du journal de plongée.',
   },
   dlv_companion_max: {
@@ -456,6 +459,7 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_chapter_iii: {
     name: 'Chronique de Thornpeak',
+    desc: 'Découvrez toute l’histoire de la montagne : les Broodsworn brisés, le Sanctum réduit au silence, le Pic éveillé abattu et chaque terreur nommée des crêtes vaincue.',
     title: 'de Thornpeak',
   },
   chr_peaks_sparring: {
@@ -1067,7 +1071,7 @@ export const table: DeedLocaleTable = {
   },
   dgn_ignivar: {
     name: 'Le Héraut tombe',
-    desc: 'Vainquez Ignivar, Héraut de la Dernière Flamme, dans le Crucible of the Last Spring.',
+    desc: 'Vainquez Ignivar, Héraut de la Dernière Flamme, dans le Creuset de la Dernière Source.',
   },
   dgn_ignivar_heroic: {
     name: 'Héroïque : Le Héraut tombe',
@@ -1075,7 +1079,7 @@ export const table: DeedLocaleTable = {
   },
   dgn_varkhul: {
     name: 'La Forge se refroidit',
-    desc: "Vainquez Varkhul, Père de la Forge de la Dernière Flamme, dans l'Inner Crucible.",
+    desc: 'Vainquez Varkhul, Père de la Forge de la Dernière Flamme, dans le Creuset intérieur.',
   },
   dgn_varkhul_heroic: {
     name: 'Héroïque : La Forge se refroidit',
@@ -1089,6 +1093,81 @@ export const table: DeedLocaleTable = {
   col_set_bramblehide: {
     name: 'Peau de Ronces de Roots',
     desc: 'Découvrir chaque pièce de la Peau de Ronces de Roots.',
+  },
+  prog_jewelcrafting_rare: {
+    name: 'Poli jusqu’à l’éclat',
+    desc: 'Fabriquez votre premier objet de palier rare en Joaillerie.',
+  },
+  prog_jewelcrafting_50: {
+    name: 'Facette et filigrane',
+    desc: 'Atteignez 50 points de compétence en Joaillerie.',
+  },
+  prog_grandmaster_jewelcrafting: {
+    name: 'Grand maître de la joaillerie',
+    desc: 'Atteignez 125 points de compétence en Joaillerie, le sommet de ce métier.',
+    title: 'Grand maître de la joaillerie',
+  },
+  prog_inscription_rare: {
+    name: 'Écrit à l’encre fine',
+    desc: 'Fabriquez votre premier objet de palier rare en Calligraphie.',
+  },
+  prog_inscription_50: {
+    name: 'Plume et pigment',
+    desc: 'Atteignez 50 points de compétence en Calligraphie.',
+  },
+  prog_grandmaster_inscription: {
+    name: 'Grand maître de l’inscription',
+    desc: 'Atteignez 125 points de compétence en Calligraphie, le sommet de ce métier.',
+    title: 'Grand maître de l’inscription',
+  },
+  col_deepest_cast: {
+    name: 'Le lancer le plus profond',
+    desc: 'Obtenez une canne à pêche Rouage-horloge, la seule canne qui atteigne les prises les plus profondes.',
+  },
+  prog_first_planting: {
+    name: 'Tout commence par semer',
+    desc: 'Plantez votre première culture dans un carré de culture.',
+  },
+  chr_vale_first_harvest: {
+    name: 'Premiers fruits du val',
+    desc: 'Récoltez votre première culture florissante dans un carré de culture de la vallée d’Eastbrook.',
+  },
+  chr_marsh_first_harvest: {
+    name: 'Pousses dans la tourbe',
+    desc: 'Récoltez votre première culture florissante dans un carré de culture du marais de Mirefen.',
+  },
+  chr_peaks_first_harvest: {
+    name: 'Une récolte entre les crêtes',
+    desc: 'Récoltez votre première culture florissante dans un carré de culture des hauteurs de Thornpeak.',
+  },
+  chr_evergarden_first_harvest: {
+    name: 'Une parcelle au paradis',
+    desc: 'Récoltez votre première culture florissante dans un carré de culture de l’Evergarden.',
+  },
+  col_golden_harvest: {
+    name: 'Récolte dorée',
+    desc: 'Récoltez une récolte dorée et faites-en profiter toute la zone.',
+  },
+  prog_farming_100: {
+    name: 'Maître des récoltes',
+    desc: 'Atteignez 100 points de maîtrise en Culture.',
+    title: 'Maître des récoltes',
+  },
+  col_farm_roster: {
+    name: 'Chaque sillon rempli',
+    desc: 'Récoltez toutes les cultures produites par les quatre jardins.',
+  },
+  prog_field_to_feast: {
+    name: 'Du champ au festin',
+    desc: 'Cuisinez un festin d’apogée, le repas dont tout un raid peut manger.',
+  },
+  prog_legendmaker: {
+    name: 'Faiseur de légendes',
+    desc: 'Élevez une œuvre perfectionnée au rang de légende avec un acte de création, puis donnez-lui un nom unique.',
+  },
+  hid_forgebreaker: {
+    name: 'Une source déchaînée',
+    desc: 'Façonnez vous-même Brise-forge et rapportez le marteau terminé à Maelin.',
   },
 };
 

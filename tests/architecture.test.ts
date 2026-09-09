@@ -226,6 +226,11 @@ const UI_PURE_CORES = [
   'src/ui/aura_overlay_view.ts',
   'src/ui/banner_queue.ts',
   'src/ui/item_kind_label.ts',
+  // The coin-icon money readout (moneyHtml): the shared money markup authority
+  // the Hud's PainterHost deps, the bags / bank / vault / mailbox windows and
+  // the social tab's roster confirm compose; bare-named, so its import bans
+  // are enforced here rather than only by the residual no-host rule.
+  'src/ui/money_html.ts',
   // The shared item-tooltip authority (the phase 13 QA): a bare-named pure
   // core several registered cores and the DOM windows beside them import, so
   // its import bans are enforced here rather than only by the residual
@@ -900,6 +905,7 @@ const BARE_NAMED = [
   'src/ui/market_name_color.ts',
   'src/ui/market_armor_badge.ts',
   'src/ui/usd_text.ts',
+  'src/ui/money_html.ts',
   'src/ui/woc_tokens_text.ts',
   'src/ui/woc_log_tones.ts',
   'src/ui/hud/professions/profession_log_tones.ts',
@@ -2040,6 +2046,7 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/minimap_markers.ts',
   'src/ui/mob_idle_sfx.ts',
   'src/ui/mobile_hud_layout.ts',
+  'src/ui/money_html.ts',
   'src/ui/party_collapse.ts',
   'src/ui/party_frames.ts',
   'src/ui/pet_action_icons.ts',

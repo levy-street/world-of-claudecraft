@@ -282,3 +282,24 @@ The other inherited local fixture, `desktop_publish_guard`, reproduced its
 Vite config through stdin. The fixture now supplies a temporary filename,
 matching the real build workflow, and always removes it afterward. Patterns,
 positive/negative cases, and production build guards remain unchanged.
+
+## Final validation and release refresh
+
+At `e66219fce4`, the canonical local gate passed artifact generation and
+freshness, security, lint, and the full Node suite. Its browser stage stopped
+on two timeouts and a shader-worker readiness failure. The complete browser
+suite then passed with `--maxWorkers=2`, without changing assertions or
+timeouts. The remaining type-check and build stages were run from the
+canonical `buildFullGateSteps` list and passed separately. This is staged
+validation, not an uninterrupted green gate run. The PR records the exact
+test totals and CI receipt.
+
+The active release advanced to `e3f9c3b598` during that run. Its translation
+fill overlaps the encounter's non-Latin catalog entries, so the follow-up
+merge retains both source sets and regenerates resolved localization through
+the owning tools. Its clean harvesting and guild-roster changes retain the
+release implementations. The HUD's extracted money formatter and lower
+coordinator ceiling compose with the branch's existing render and network
+ceilings. No encounter animation, model, renderer, or reward code changes
+in this refresh. The PR records validation for the resulting merge separately
+from the earlier full-suite receipt.

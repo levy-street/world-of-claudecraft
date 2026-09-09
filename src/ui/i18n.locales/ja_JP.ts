@@ -1242,7 +1242,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.social.billboard.result.notOfficer':
     '掲示板を編集できるのは幹部とギルドマスターだけです。',
   'hudChrome.social.roster.seats': '{count} / {cap} 席',
-  'hudChrome.social.roster.expand': '名簿を拡張（+{seats}席、{price}）',
+  'hudChrome.social.roster.expand': '名簿を拡張',
   'hudChrome.social.roster.maxed': '名簿はすでに最大です',
   'hudChrome.social.roster.confirm':
     '{price}でギルド名簿を{seats}席拡張しますか？ゴールドはあなた自身の所持金から支払われ、返金されません。',
@@ -13680,7 +13680,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.continentMap.title': 'ワールドマップ',
   'hudChrome.continentMap.summary': 'ワールドマップ。地域を選ぶとその地図が開きます。',
   'hudChrome.continentMap.toWorld': 'ワールドマップ',
-  'hudChrome.continentMap.toggleAria': 'ワールドマップとゾーンマップを切り替える',
+  'hudChrome.continentMap.toggleAria':
+    'ワールドマップ、ゾーンマップ、インスタンスマップを切り替える',
   'hudChrome.continentMap.levels': 'レベル {min} から {max}',
   'hudChrome.continentMap.toZone': 'ゾーンマップ',
   'hudChrome.enchanting.wornTagIndexed': '装備中 ({slot}{index})',
@@ -15332,8 +15333,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.healEcho': '体力が{threshold}%未満になると体力を{value}回復する',
   'hudChrome.auraEffect.hunterFerocity':
     '群れの獰猛さ{stacks}スタック：ペットの与えるダメージが{pct}%上昇',
-  'hudChrome.auraEffect.icicles':
-    'アイシクル{value}/{max}。{max}でグレイシャル・スパイクを使用できる',
+  'hudChrome.auraEffect.icicles': 'アイシクル{value}/{max}。{max}でリムニードルを使用できる',
   'hudChrome.auraEffect.internalCooldown': 'タイマー終了までこの効果は再発動しない',
   'hudChrome.auraEffect.leadenHexLock': 'レドン・ヘックスはまだこの対象を再び移動不能にできない',
   'hudChrome.auraEffect.mendingCurrent':
@@ -15377,7 +15377,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.sweepingStrikes':
     '単体攻撃が近くの敵{targets}体にも{pct}%のダメージを与える',
   'hudChrome.auraEffect.temporalEcho':
-    '術者の秘術ダメージのうち、単体なら{singlePct}%、範囲なら{areaPct}%があなたへの回復になる',
+    '術者の秘術ダメージのうち、単体なら{singlePct}%、範囲なら{areaPct}%があなたへの回復になる。エーテルサージとエーテルダートは個別の時の残響に4倍のボーナスを使う。グループの残響は同量の回復予備を作り、体力が60%未満の標識付き味方へ失った体力に応じて分配する',
   'hudChrome.auraEffect.veiledEdge': '次に放つ「潜伏者の一撃」は2倍のダメージを与える',
   'hudChrome.auraEffect.veiledEdgeStrike': '次に放つ「潜伏者の一撃」の武器ダメージが{pct}%増加する',
   'hudChrome.auraEffect.coldsightRead':
@@ -16758,6 +16758,18 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'マウントスキンはこのキャラクターが乗るどのマウントにも重ねて描かれます。速度は変わりません。',
   'hudChrome.cosmetics.mechIntro':
     'コンバットメカはこのキャラクターの身体を置き換えます。装着できるクロマは一度に一つです。',
+  'hudChrome.auraTracks.mode': 'オン',
+  'hudChrome.auraTracks.row': '{unit} に {aura}',
+  'hudChrome.auraTracks.selfRow': '{aura}',
+  'hudChrome.crafting.oncePerDay': '1日1回',
+  'hudChrome.masterwrought.slotsValue': '{used} / {cap}',
+  'hudChrome.meters.millions': '{value}m',
+  'hudChrome.meters.thousands': '{value}k',
+  'hudChrome.practiceDps.liveDps': '{value} DPS',
+  'hudChrome.practiceDps.liveLabel': '今回の練習',
+  'hudChrome.practiceDps.runLabel': '{index}回目の練習',
+  'hudChrome.practiceDps.runSummary': '{time} で {total}',
+
   'entities.abilities.grove_awakening.description':
     'グループまたはレイドの、40ヤード以内で視線の通る倒れたメンバー全員をあなたのそばに呼び戻し、体力とマナが30%の状態で蘇生する。戦闘中は詠唱できない。（回復）',
   'entities.abilities.grove_awakening.name': '樹林の覚醒',
@@ -16767,6 +16779,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.wildwake.description':
     '倒れた味方を不意の開花へと促し、戦闘の最中でも、体力とマナが35%の状態であなたのそばに蘇生させる。（回復）',
   'entities.abilities.wildwake.name': '野性の目覚め',
+
+  'devCommand.actions.farmgrow.description':
+    '作物を植えたすべての畝、またはIDで指定した畝一つを収穫可能な時刻まで進めます。それ以外は変わりません。収穫の結果は植えた時点で抽選済みです。',
+  'devCommand.actions.farmgrow.label': '作物を成熟させる',
+  'devCommand.fields.bed': '畝のID（任意）',
+  'guide.profPages.oncePerDay': '1日1回',
   'sim.rift.roachKing.coronation': '汚穢の戴冠',
   'sim.rift.roachKing.tributeFeast': '貢物の饗宴',
   'sim.rift.roachKing.crown': 'ゴキブリ王の王冠',

@@ -72,6 +72,9 @@ import {
   zh_CN,
   zh_TW,
 } from '../src/ui/i18n';
+import { fr_FR as frenchSource } from '../src/ui/i18n.locales/fr_FR';
+import { it_IT as italianSource } from '../src/ui/i18n.locales/it_IT';
+import { nl_NL as dutchSource } from '../src/ui/i18n.locales/nl_NL';
 import {
   ensureReliquaryLocalesLoaded,
   reliquaryPageName,
@@ -949,6 +952,17 @@ describe('i18n Localization Key Coverage', () => {
     expect(battleShoutDesc).not.toContain('{buff}');
   });
 
+  it('should explicitly provide the native Compost cognate in French, Italian, and Dutch', () => {
+    // French Canadian inherits the French source. Pin handwritten values so a
+    // removed translation cannot pass through the generated English fallback.
+    const key = 'entities.items.compost.name';
+    expect(ITEMS.compost.name).toBe('Compost');
+    for (const source of [frenchSource, italianSource, dutchSource]) {
+      expect(Object.hasOwn(source, key)).toBe(true);
+      expect(source[key]).toBe('Compost');
+    }
+  });
+
   it('should provide every item translation in every locale without canonical fallbacks', () => {
     const itemEntries = entityTranslationManifest().filter((entry) => entry.group === 'item');
     // Heroic upgraded variants (heroicOf) carry no name key: they share the base
@@ -969,6 +983,14 @@ describe('i18n Localization Key Coverage', () => {
         // for an untranslated item name, which is legal on a PR (a `pending` row)
         // and blocked only at the release gate (matches the world-content check below).
         if (RELEASE_TIER && lang !== 'en' && lang !== 'en_CA') {
+          if (
+            entry.key === 'entities.items.compost.name' &&
+            ['fr_FR', 'fr_CA', 'it_IT', 'nl_NL'].includes(lang)
+          ) {
+            expect(entry.source).toBe('Compost');
+            expect(rendered).toBe('Compost');
+            continue;
+          }
           expect(
             rendered,
             `${lang}.${entry.key} should not copy canonical English item text`,

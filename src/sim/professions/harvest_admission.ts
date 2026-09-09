@@ -62,6 +62,7 @@ export interface HarvestActorFacts {
    */
   readonly priorityKey: string;
   readonly alive: boolean;
+  /** Informational only: combat does not block corpse harvesting. */
   readonly inCombat: boolean;
   /** Any cast or session already running: one harvest at a time. */
   readonly alreadyCasting: boolean;
@@ -108,6 +109,7 @@ export interface HarvestAdmissionInput {
 export type HarvestAdmissionReason =
   | 'malformed_input'
   | 'actor_dead'
+  // Kept for older server replies; current admission never emits this reason.
   | 'actor_in_combat'
   | 'actor_busy'
   | 'corpse_invalid'
@@ -202,7 +204,6 @@ export function admitCorpseHarvest(input: HarvestAdmissionInput): HarvestAdmissi
   const { actor, corpse, preference } = input;
   if (isMalformed(input)) return { ok: false, reason: 'malformed_input' };
   if (!actor.alive) return { ok: false, reason: 'actor_dead' };
-  if (actor.inCombat) return { ok: false, reason: 'actor_in_combat' };
   if (actor.alreadyCasting) return { ok: false, reason: 'actor_busy' };
   if (!corpse.valid || corpse.remainingSeconds <= 0) return { ok: false, reason: 'corpse_invalid' };
   if (!actor.sameWorld) return { ok: false, reason: 'wrong_world' };

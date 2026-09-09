@@ -89,6 +89,8 @@ export const table: DeedLocaleTable = {
   },
   chr_nightbloom_first_cast: {
     desc: 'Chyt rybu ve vodach Nightbloomu.',
+
+    name: 'První hod v noci',
   },
   chr_wraithwood_gatherer: {
     name: 'Sklizen pod korunami',
@@ -182,6 +184,8 @@ export const table: DeedLocaleTable = {
   prog_herbalism_100: { name: 'Mistr lučin', desc: 'Dosáhni zdatnosti 100 v bylinkářství.' },
   prog_master_gatherer: {
     name: 'Mistr sběrač',
+
+    desc: 'Dosáhni dovednosti 100 v libovolných třech sběratelských řemeslech.',
   },
   prog_first_craft: { name: 'Vlastníma rukama', desc: 'Dokonči svou první úspěšnou výrobu.' },
   prog_craft_specialist: {
@@ -290,6 +294,8 @@ export const table: DeedLocaleTable = {
   },
   dgn_sanctum_speed: {
     desc: 'Poraz Korzula Hrobodraka do 15 minut od chvíle, kdy si tvá skupina zabrala Svatyni Hrobodraka.',
+
+    name: 'Rychlý průchod svatyní',
   },
   dgn_nythraxis_gravebreaker: {
     name: 'Před králem nepokleknu',
@@ -429,6 +435,8 @@ export const table: DeedLocaleTable = {
   chr_peaks_chapter_iii: {
     name: 'Kronika Thornpeaku',
     title: 'z Thornpeaku',
+
+    desc: 'Dokonči celý příběh Výšin: odhal Nekromanta Plemene draků, očisti Svatyni Gravewyrma a poraz každý pojmenovaný děs Výšin.',
   },
   chr_peaks_sparring: {
     name: 'Dril na hradbách',
@@ -1001,7 +1009,7 @@ export const table: DeedLocaleTable = {
   },
   dgn_ignivar: {
     name: 'Posel padá',
-    desc: 'Poraz Ignivara, posla posledního plamene, v tavírně posledního pramene.',
+    desc: 'Poraz Ignivara, posla posledního plamene, v Tavicím kelímku Posledního pramene.',
   },
   dgn_ignivar_heroic: {
     name: 'Hrdinská: Posel padá',
@@ -1009,7 +1017,7 @@ export const table: DeedLocaleTable = {
   },
   dgn_varkhul: {
     name: 'Výheň chladne',
-    desc: 'Poraz Varkhula, kovotce posledního plamene, ve vnitřní tavírně.',
+    desc: 'Poraz Varkhula, kovotce posledního plamene, ve Vnitřním tavicím kelímku.',
   },
   dgn_varkhul_heroic: {
     name: 'Hrdinská: Výheň chladne',
@@ -1023,5 +1031,91 @@ export const table: DeedLocaleTable = {
   col_set_bramblehide: {
     name: 'Rootsova ostružinová kůže',
     desc: 'Objev každý kus Rootsovy ostružinové kůže.',
+  },
+  prog_jewelcrafting_rare: {
+    desc: 'Vytvoř svůj první vzácný předmět v klenotnictví.',
+
+    name: 'Vybroušeno do vzácnosti',
+  },
+  prog_jewelcrafting_50: {
+    desc: 'Dosáhni dovednosti 50 v klenotnictví.',
+    name: 'Fazety a filigrán',
+  },
+  prog_grandmaster_jewelcrafting: {
+    desc: 'Dosáhni dovednosti 125 v klenotnictví, samotného vrcholu řemesla.',
+
+    name: 'Velmistr klenotnictví',
+    title: 'Velmistr klenotnictví',
+  },
+  prog_inscription_rare: {
+    desc: 'Vytvoř svůj první vzácný předmět v písařství.',
+
+    name: 'Psáno jemným inkoustem',
+  },
+  prog_inscription_50: { desc: 'Dosáhni dovednosti 50 v písařství.', name: 'Pero a pigment' },
+  prog_grandmaster_inscription: {
+    desc: 'Dosáhni dovednosti 125 v písařství, samotného vrcholu řemesla.',
+
+    name: 'Velmistr písařství',
+    title: 'Velmistr písařství',
+  },
+  col_deepest_cast: {
+    desc: 'Získej rybářský prut Clockreel, jediný prut, který dosáhne k nejhlubším úlovkům.',
+
+    name: 'Nejhlubší hod',
+  },
+  prog_first_planting: {
+    desc: 'Zasaď svou první plodinu na zahradním záhonu.',
+    name: 'Tady začíná setí',
+  },
+  chr_vale_first_harvest: {
+    desc: 'Sklid svou první prospívající plodinu ze zahradního záhonu v Eastbrookském údolí.',
+
+    name: 'Údolní prvotiny',
+  },
+  chr_marsh_first_harvest: {
+    desc: 'Sklid svou první prospívající plodinu ze zahradního záhonu v Mirefenském močálu.',
+
+    name: 'Výhonky v rašelině',
+  },
+  chr_peaks_first_harvest: {
+    desc: 'Sklid svou první prospívající plodinu ze zahradního záhonu v Thornpeakských výšinách.',
+
+    name: 'Sklizeň mezi útesy',
+  },
+  chr_evergarden_first_harvest: {
+    desc: 'Sklid svou první prospívající plodinu ze zahradního záhonu v Evergardenu.',
+
+    name: 'Políčko v ráji',
+  },
+  col_golden_harvest: {
+    desc: 'Sklid zlatou úrodu a nech o ní vědět celou zónu.',
+
+    name: 'Zlatá úroda',
+  },
+  prog_farming_100: {
+    desc: 'Dosáhni zdatnosti 100 v zemědělství.',
+    name: 'Mistr sklizně',
+    title: 'Mistr sklizně',
+  },
+  col_farm_roster: {
+    desc: 'Sklid každou plodinu, kterou vypěstují čtyři zahrady.',
+
+    name: 'Každá brázda plná',
+  },
+  prog_field_to_feast: {
+    desc: 'Uvař vrcholnou hostinu, ze které se nají celý raid.',
+
+    name: 'Z pole na hostinu',
+  },
+  prog_legendmaker: {
+    desc: 'Pozvedni dokonalé dílo na legendární úroveň pomocí Listiny tvorby a dej mu vlastní jméno.',
+
+    name: 'Tvůrce legend',
+  },
+  hid_forgebreaker: {
+    desc: 'Ukovej si sám Drtič kovárny a vrať se k Maelinovi s hotovým kladivem.',
+
+    name: 'Osvobozený pramen',
   },
 };

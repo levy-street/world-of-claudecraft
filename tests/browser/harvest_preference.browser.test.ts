@@ -112,6 +112,7 @@ function mount(mobile: boolean, info: CorpseHarvestInfo | null, now = () => Date
     playerId: 7,
     entities: new Map([[90, corpse]]),
     partyInfo: null,
+    inventory: [{ itemId: 'field_kit', count: 1 }],
     // The SAME stored character preference the corpse-status query (`info`)
     // reports back: both read off one PlayerMeta.harvestPreference in
     // production, so a fixture that hardcoded this to All while `info` named
@@ -249,6 +250,15 @@ describe('harvest-preference picker: real controllers, real DOM', () => {
     const denied = button(h.lootRoot, '.corpse-harvest-btn');
     expect(denied.disabled).toBe(true);
     expect(getComputedStyle(denied).filter).not.toBe(readyAppearance[0]);
+  });
+
+  it('keeps a harvest-only corpse closed without a carried field kit', () => {
+    const h = mount(false, SETTLED_ALL);
+    h.world.inventory = [{ itemId: 'rough_hide', count: 20 }];
+    openCorpse(h);
+    expect(h.lootRoot.style.display).not.toBe('block');
+    expect(h.lootRoot.querySelector('.corpse-harvest')).toBeNull();
+    expect(h.world.corpseHarvestInfo).not.toHaveBeenCalled();
   });
 
   it('opening the corpse never auto-harvests', () => {
@@ -429,6 +439,36 @@ describe('harvest-preference picker: real controllers, real DOM', () => {
       for (const row of radioRows(h.harvestPreferenceRoot)) expectTouchable(row);
       expectTouchable(button(h.harvestPreferenceRoot, '.harvest-preference-actions .btn'));
       expectTouchable(button(h.harvestPreferenceRoot, '.btn-secondary'));
+    },
+  );
+
+  it.each([
+    { layout: 'landscape', width: 844, height: 390 },
+    { layout: 'portrait', width: 390, height: 568 },
+  ])(
+    'general catalog $layout: scrolls materials and source details above reachable actions',
+    async ({ width, height }) => {
+      await page.viewport(width, height);
+      const h = mount(true, {
+        ...SETTLED_ALL,
+        preference: { kind: 'material', itemId: 'rough_hide' },
+      });
+      h.harvestPreference.open();
+      const body = h.harvestPreferenceRoot.querySelector<HTMLElement>('.harvest-preference-body');
+      if (!body) throw new Error('Missing picker body');
+      expect(
+        h.harvestPreferenceRoot.querySelector('.harvest-preference-source-container')?.textContent
+          ?.length,
+      ).toBeGreaterThan(0);
+      expect(body.scrollHeight).toBeGreaterThan(body.clientHeight);
+      const apply = button(h.harvestPreferenceRoot, '.harvest-preference-actions .btn');
+      const before = apply.getBoundingClientRect();
+      body.scrollTop = body.scrollHeight;
+      expect(body.scrollTop).toBeGreaterThan(0);
+      expect(apply.getBoundingClientRect().top).toBe(before.top);
+      expect(before.bottom).toBeLessThanOrEqual(innerHeight);
+      expectTouchable(apply);
+      expectNoHorizontalOverflow(h.harvestPreferenceRoot);
     },
   );
 

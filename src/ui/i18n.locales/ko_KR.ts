@@ -1234,7 +1234,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.social.billboard.result.notOfficer':
     '게시판은 임원과 길드 마스터만 수정할 수 있습니다.',
   'hudChrome.social.roster.seats': '{count} / {cap} 자리',
-  'hudChrome.social.roster.expand': '명단 확장 (+{seats}자리, {price})',
+  'hudChrome.social.roster.expand': '명단 확장',
   'hudChrome.social.roster.maxed': '명단이 이미 최대 규모입니다',
   'hudChrome.social.roster.confirm':
     '{price}(으)로 길드 명단을 {seats}자리 확장하시겠습니까? 골드는 본인의 소지금에서 차감되며 환불되지 않습니다.',
@@ -13648,7 +13648,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.continentMap.title': '세계 지도',
   'hudChrome.continentMap.summary': '세계 지도. 지역을 선택하면 해당 지도가 열립니다.',
   'hudChrome.continentMap.toWorld': '세계 지도',
-  'hudChrome.continentMap.toggleAria': '세계 지도와 지역 지도 전환',
+  'hudChrome.continentMap.toggleAria': '세계 지도, 지역 지도, 인스턴스 지도 전환',
   'hudChrome.continentMap.levels': '레벨 {min}부터 {max}까지',
   'hudChrome.continentMap.toZone': '지역 지도',
   'hudChrome.enchanting.wornTagIndexed': '착용 중 ({slot} {index})',
@@ -15301,7 +15301,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.hunterFerocity':
     '무리의 흉포함 {stacks}중첩: 야수가 입히는 피해가 {pct}% 증가합니다',
   'hudChrome.auraEffect.icicles':
-    '고드름 {value}/{max}개. {max}개면 빙하 쐐기를 사용할 수 있습니다',
+    '고드름 {value}/{max}개. {max}개면 서리 바늘을 사용할 수 있습니다',
   'hudChrome.auraEffect.internalCooldown': '타이머가 끝날 때까지 이 효과가 다시 발동하지 않습니다',
   'hudChrome.auraEffect.leadenHexLock':
     '납빛 주술이 아직 이 대상을 다시 이동 불가로 만들 수 없습니다',
@@ -15348,7 +15348,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.sweepingStrikes':
     '단일 대상 공격이 주변 적 {targets}명에게도 {pct}% 피해를 줍니다',
   'hudChrome.auraEffect.temporalEcho':
-    '시전자의 비전 피해가 단일 대상 피해의 {singlePct}%, 광역 피해의 {areaPct}%만큼 당신을 치유합니다',
+    '시전자의 비전 피해가 단일 대상 피해의 {singlePct}%, 광역 피해의 {areaPct}%만큼 당신을 치유합니다. 에테르 쇄도와 에테르 화살은 개별 시간의 메아리에 4배 보너스를 적용합니다. 집단 메아리는 같은 양의 치유 예비량을 만들고, 체력이 60% 미만인 표식이 있는 아군에게 잃은 생명력에 따라 나눠 줍니다',
   'hudChrome.auraEffect.veiledEdge': '다음 잠복자의 일격이 두 배의 피해를 입힙니다',
   'hudChrome.auraEffect.veiledEdgeStrike':
     '다음 잠복자의 일격이 입히는 무기 피해가 {pct}% 증가합니다',
@@ -16724,6 +16724,18 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '탈것 스킨은 이 캐릭터가 타는 어떤 탈것 위에도 덧입혀집니다. 속도는 바뀌지 않습니다.',
   'hudChrome.cosmetics.mechIntro':
     '전투 메카는 이 캐릭터의 몸을 대체합니다. 한 번에 하나의 크로마만 착용합니다.',
+  'hudChrome.auraTracks.mode': '켜짐',
+  'hudChrome.auraTracks.row': '{unit}에게 {aura} 적용',
+  'hudChrome.auraTracks.selfRow': '{aura}',
+  'hudChrome.crafting.oncePerDay': '하루 한 번',
+  'hudChrome.masterwrought.slotsValue': '{used} / {cap}',
+  'hudChrome.meters.millions': '{value}m',
+  'hudChrome.meters.thousands': '{value}k',
+  'hudChrome.practiceDps.liveDps': '{value} DPS',
+  'hudChrome.practiceDps.liveLabel': '이번 연습',
+  'hudChrome.practiceDps.runLabel': '{index}번째 연습',
+  'hudChrome.practiceDps.runSummary': '{time} 동안 {total}',
+
   'entities.abilities.grove_awakening.description':
     '파티 또는 공격대에서 40야드 내 시야가 닿는 쓰러진 모든 구성원을 당신 곁으로 불러 생명력과 마나 30%로 되살립니다. 전투 중에는 시전할 수 없습니다. (회복)',
   'entities.abilities.grove_awakening.name': '숲의 각성',
@@ -16733,6 +16745,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.wildwake.description':
     '쓰러진 아군을 갑작스러운 개화로 이끌어, 치열한 전투 중에도 생명력과 마나 35%로 당신 곁에 되살립니다. (회복)',
   'entities.abilities.wildwake.name': '야생의 소생',
+
+  'devCommand.actions.farmgrow.description':
+    '심어 둔 모든 경작지 또는 ID로 지정한 경작지 하나를 수확 가능한 시점까지 진행시킵니다. 그 외에는 바뀌지 않습니다. 수확 결과는 심을 때 이미 무작위로 결정되었습니다.',
+  'devCommand.actions.farmgrow.label': '작물 익히기',
+  'devCommand.fields.bed': '경작지 ID (선택 사항)',
+  'guide.profPages.oncePerDay': '하루 한 번',
   'sim.rift.roachKing.coronation': '오물의 대관식',
   'sim.rift.roachKing.tributeFeast': '공물의 향연',
   'sim.rift.roachKing.crown': '바퀴벌레 왕의 왕관',

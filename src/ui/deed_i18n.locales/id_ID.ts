@@ -89,6 +89,8 @@ export const table: DeedLocaleTable = {
   },
   chr_nightbloom_first_cast: {
     desc: 'Tangkap ikan dari perairan Nightbloom.',
+
+    name: 'Kuncup Malam Pertama',
   },
   chr_wraithwood_gatherer: {
     name: 'Panen di Bawah Kanopi',
@@ -150,9 +152,9 @@ export const table: DeedLocaleTable = {
     desc: 'Pilih satu opsi pada keenam baris talenta dalam satu build.',
   },
   prog_veteran: {
-    name: 'Veteran',
+    name: 'Pejuang Berpengalaman',
     desc: 'Kumpulkan total 250.000 pengalaman sepanjang hayat.',
-    title: 'Veteran',
+    title: 'Pejuang Berpengalaman',
   },
   prog_champion: {
     name: 'Juara',
@@ -186,6 +188,7 @@ export const table: DeedLocaleTable = {
   prog_herbalism_100: { name: 'Penguasa Padang Rumput', desc: 'Capai 100 kecakapan Herbalisme.' },
   prog_master_gatherer: {
     name: 'Pengumpul Ulung',
+    desc: 'Capai kecakapan 100 dalam tiga kerajinan pengumpulan apa pun.',
   },
   prog_first_craft: { name: 'Buatan Tangan', desc: 'Selesaikan hasil kerajinan sukses pertamamu.' },
   prog_craft_specialist: {
@@ -300,6 +303,8 @@ export const table: DeedLocaleTable = {
   },
   dgn_sanctum_speed: {
     desc: 'Kalahkan Korzul sang Gravewyrm dalam 15 menit sejak party-mu mengklaim Sanktum Gravewyrm.',
+
+    name: 'Sanktum Kilat',
   },
   dgn_nythraxis_gravebreaker: {
     name: 'Tak Bertekuk Lutut pada Raja',
@@ -393,6 +398,7 @@ export const table: DeedLocaleTable = {
     desc: 'Bantai 3 Serigala Hutan dalam waktu 10 detik.',
   },
   chr_vale_cup_debut: {
+    desc: 'Masuki lapangan dan sentuh bola dalam pertandingan Piala Vale di Sowfield. Pertandingan Piala Vale tidak lagi dapat dimainkan, jadi ini tidak dapat diperoleh lagi.',
     name: 'Penantang Ember Tembaga',
   },
   chr_vale_rares: {
@@ -564,9 +570,9 @@ export const table: DeedLocaleTable = {
   },
   pvp_arena_1v1_1750: { name: 'Rival Koliseum', desc: 'Capai rating 1750 di divisi arena 1v1.' },
   pvp_arena_1v1_1900: {
-    name: 'Gladiator',
+    name: 'Gladiator Arena',
     desc: 'Capai rating 1900 di divisi arena 1v1.',
-    title: 'Gladiator',
+    title: 'Gladiator Arena',
   },
   pvp_arena_2v2_1600: { name: 'Kuat Berdua', desc: 'Capai rating 1600 di divisi arena 2v2.' },
   pvp_arena_2v2_1750: { name: 'Duet Maut', desc: 'Capai rating 1750 di divisi arena 2v2.' },
@@ -580,53 +586,72 @@ export const table: DeedLocaleTable = {
     desc: 'Kalah dalam duel dengan martabat yang sebagian besar masih utuh.',
   },
   pvp_vcup_first_match: {
+    desc: 'Selesaikan pertandingan Piala Vale penuh di Sowfield, menang atau kalah. Pertandingan Piala Vale tidak lagi dapat dimainkan, jadi ini tidak dapat diperoleh lagi.',
     name: 'Turun ke Lapangan',
   },
   pvp_vcup_first_win: {
+    desc: 'Menangkan pertandingan Piala Vale berperingkat. Pertandingan Piala Vale tidak lagi dapat dimainkan, jadi ini tidak dapat diperoleh lagi.',
     name: 'Trofi Pertama',
   },
   pvp_vcup_wins_10: {
+    desc: 'Menangkan 10 pertandingan Piala Vale berperingkat. Pertandingan Piala Vale tidak lagi dapat dimainkan, jadi ini tidak dapat diperoleh lagi.',
     name: 'Pebola Babi Hutan Kawakan',
   },
   pvp_vcup_wins_25: {
+    desc: 'Menangkan 25 pertandingan Piala Vale berperingkat. Pertandingan Piala Vale tidak lagi dapat dimainkan, jadi ini tidak dapat diperoleh lagi.',
     name: 'Legenda Bola Babi Hutan',
     title: 'Legenda Bola Babi Hutan',
   },
   pvp_vcup_first_goal: {
+    desc: 'Cetak gol dalam pertandingan Piala Vale berperingkat. Pertandingan Piala Vale tidak lagi dapat dimainkan, jadi ini tidak dapat diperoleh lagi.',
     name: 'Pecah Telur',
   },
   pvp_vcup_hat_trick: {
+    desc: 'Cetak tiga gol dalam satu pertandingan Piala Vale berperingkat, di kelompok 3v3 atau lebih besar. Pertandingan Piala Vale tidak lagi dapat dimainkan, jadi ini tidak dapat diperoleh lagi.',
     name: 'Pahlawan Hat-trick',
   },
   pvp_vcup_golden_goal: {
+    desc: 'Cetak gol emas yang menentukan pertandingan Piala Vale berperingkat. Pertandingan Piala Vale tidak lagi dapat dimainkan, jadi ini tidak dapat diperoleh lagi.',
     name: 'Momen Emas',
   },
   pvp_vcup_first_save: {
+    desc: 'Lakukan penyelamatan sebagai penjaga gawang dalam pertandingan Piala Vale berperingkat di kelompok 3v3 atau lebih besar. Hanya tembakan yang cukup cepat untuk menguji peganganmu yang dihitung; tangkapan lembut tidak dihitung. Pertandingan Piala Vale tidak lagi dapat dimainkan, jadi ini tidak dapat diperoleh lagi.',
     name: 'Tangan Andal',
   },
   pvp_vcup_clean_sheet: {
+    desc: 'Menangkan pertandingan Piala Vale berperingkat sebagai penjaga gawang tanpa kebobolan, di kelompok 3v3 atau lebih besar. Pertandingan Piala Vale tidak lagi dapat dimainkan, jadi ini tidak dapat diperoleh lagi.',
     name: 'Tak Satu Pun Lolos',
   },
   pvp_vcup_guild_win: {
+    desc: 'Menangkan pertandingan Piala Vale berperingkat dengan panji guild-mu. Pertandingan Piala Vale tidak lagi dapat dimainkan, jadi ini tidak dapat diperoleh lagi.',
     name: 'Demi Sang Panji',
   },
   pvp_fiesta_first_bout: {
+    desc: 'Jalani pertarungan Fiesta 2v2 penuh, menang atau kalah. Pertarungan Fiesta tidak lagi ditawarkan dalam antrean Arena, jadi ini tidak dapat diperoleh lagi.',
     name: 'Penyusup Pesta',
   },
-  pvp_fiesta_first_win: { name: 'Bintang Fiesta' },
+  pvp_fiesta_first_win: {
+    name: 'Bintang Fiesta',
+    desc: 'Menangkan pertarungan Fiesta 2v2. Pertarungan Fiesta tidak lagi ditawarkan dalam antrean Arena, jadi ini tidak dapat diperoleh lagi.',
+  },
   pvp_fiesta_double: {
+    desc: 'Jatuhkan dua lawan dalam Fiesta dalam waktu empat detik. Pertarungan Fiesta tidak lagi ditawarkan dalam antrean Arena, jadi ini tidak dapat diperoleh lagi.',
     name: 'Sekali Dayung, Dua Tumbang',
   },
   pvp_fiesta_shutdown: {
+    desc: 'Jatuhkan lawan Fiesta yang sedang memiliki rentetan tiga atau lebih. Pertarungan Fiesta tidak lagi ditawarkan dalam antrean Arena, jadi ini tidak dapat diperoleh lagi.',
     name: 'Perusak Pesta',
   },
   pvp_fiesta_full_build: {
+    desc: 'Menangkan pertarungan Fiesta dengan satu penguatan terkunci dari ketiga gelombang. Pertarungan Fiesta tidak lagi ditawarkan dalam antrean Arena, jadi ini tidak dapat diperoleh lagi.',
     name: 'Berdandan untuk Pesta',
   },
   pvp_fiesta_powerups: {
+    desc: 'Ambil keempat peningkat kekuatan cincin setidaknya sekali: Speed Demon, Colossus, Moon Boots, dan Berserker. Pertarungan Fiesta tidak lagi ditawarkan dalam antrean Arena, jadi ini tidak dapat diperoleh lagi.',
     name: 'Cicipi Semuanya',
   },
   pvp_fiesta_five_kills: {
+    desc: 'Jatuhkan lima lawan dalam satu pertarungan Fiesta. Pertarungan Fiesta tidak lagi ditawarkan dalam antrean Arena, jadi ini tidak dapat diperoleh lagi.',
     name: 'Tulang Punggung Pesta',
   },
   soc_first_party: {
@@ -1036,7 +1061,7 @@ export const table: DeedLocaleTable = {
   },
   dgn_ignivar_heroic: {
     name: 'Heroik: Sang Utusan Tumbang',
-    desc: 'Kalahkan Ignivar, Utusan Api Terakhir, pada tingkat kesulitan Heroik.',
+    desc: 'Kalahkan Ignivar, Utusan Api Terakhir, di Tungku Mata Air Terakhir pada tingkat kesulitan heroik.',
   },
   dgn_varkhul: {
     name: 'Tungku Mendingin',
@@ -1044,15 +1069,90 @@ export const table: DeedLocaleTable = {
   },
   dgn_varkhul_heroic: {
     name: 'Heroik: Tungku Mendingin',
-    desc: 'Kalahkan Varkhul, Bapak Penempa Api Terakhir, pada tingkat kesulitan Heroik.',
+    desc: 'Kalahkan Varkhul, Bapak Penempa Api Terakhir, di Tungku Dalam pada tingkat kesulitan heroik.',
   },
   dgn_varkhul_flawless: {
     name: 'Tak Sebutir Bara Pun Hilang',
-    desc: 'Kalahkan Varkhul, Bapak Penempa Api Terakhir, pada tingkat kesulitan Heroik tanpa satu pun anggota raid yang mati.',
+    desc: 'Kalahkan Varkhul, Bapak Penempa Api Terakhir, di Tungku Dalam tanpa ada pemain yang gugur.',
     title: 'sang Nirbakar',
   },
   col_set_bramblehide: {
-    name: 'Kulit Semak Duri Roots',
-    desc: 'Temukan setiap bagian dari Kulit Semak Duri Roots.',
+    name: 'Kulit Semak Duri',
+    desc: 'Temukan setiap bagian dari Kulit Semak Duri.',
+  },
+  prog_jewelcrafting_rare: {
+    desc: 'Buat item tingkat langka pertamamu dalam Perhiasan.',
+    name: 'Dipoles hingga Cemerlang',
+  },
+  prog_jewelcrafting_50: { desc: 'Capai keahlian 50 dalam Perhiasan.', name: 'Segi dan Filigran' },
+  prog_grandmaster_jewelcrafting: {
+    desc: 'Capai keahlian 125 dalam Perhiasan, puncak kerajinan ini.',
+
+    name: 'Pembuatan Perhiasan Mahaguru',
+    title: 'Pembuatan Perhiasan Mahaguru',
+  },
+  prog_inscription_rare: {
+    desc: 'Buat item tingkat langka pertamamu dalam Inskripsi.',
+    name: 'Tertulis dengan Tinta Halus',
+  },
+  prog_inscription_50: { desc: 'Capai keahlian 50 dalam Inskripsi.', name: 'Pena dan Pigmen' },
+  prog_grandmaster_inscription: {
+    desc: 'Capai keahlian 125 dalam Inskripsi, puncak kerajinan ini.',
+
+    name: 'Prasasti Mahaguru',
+    title: 'Prasasti Mahaguru',
+  },
+  col_deepest_cast: {
+    desc: 'Dapatkan Joran Clockreel, satu-satunya joran yang mencapai tangkapan terdalam.',
+
+    name: 'Lemparan Terdalam',
+  },
+  prog_first_planting: { desc: 'Tanam tanaman pertamamu di petak kebun.', name: 'Benih Awal' },
+  chr_vale_first_harvest: {
+    desc: 'Panen tanaman subur pertamamu dari petak kebun di Eastbrook Vale.',
+
+    name: 'Buah Pertama Lembah',
+  },
+  chr_marsh_first_harvest: {
+    desc: 'Panen tanaman subur pertamamu dari petak kebun di Rawa Mirefen.',
+
+    name: 'Tunas di Gambut',
+  },
+  chr_peaks_first_harvest: {
+    desc: 'Panen tanaman subur pertamamu dari petak kebun di Puncak Thornpeak.',
+
+    name: 'Tanaman di Antara Tebing',
+  },
+  chr_evergarden_first_harvest: {
+    desc: 'Panen tanaman subur pertamamu dari petak kebun di Evergarden.',
+
+    name: 'Petak di Firdaus',
+  },
+  col_golden_harvest: {
+    desc: 'Panen emas dan biarkan seluruh zona mendengarnya.',
+    name: 'Panen Emas',
+  },
+  prog_farming_100: {
+    desc: 'Capai kecakapan 100 dalam Bertani.',
+    name: 'Master Panen',
+    title: 'Master Panen',
+  },
+  col_farm_roster: {
+    desc: 'Panen setiap tanaman yang ditumbuhkan keempat kebun.',
+    name: 'Setiap Alur Terisi',
+  },
+  prog_field_to_feast: {
+    desc: 'Masak pesta tingkat puncak yang dapat disantap seluruh raid.',
+    name: 'Dari Ladang ke Pesta',
+  },
+  prog_legendmaker: {
+    desc: 'Naikkan karya yang Disempurnakan menjadi legenda dengan Surat Pembuatan, lalu beri nama yang sepenuhnya milikmu.',
+
+    name: 'Pembuat Legenda',
+  },
+  hid_forgebreaker: {
+    desc: 'Bentuk Pemecah Tempa dengan tanganmu sendiri dan kembali ke Maelin membawa palu yang sudah selesai.',
+
+    name: 'Mata Air Terbelenggu',
   },
 };

@@ -1202,7 +1202,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.social.billboard.result.set': '公會公告板已更新。',
   'hudChrome.social.billboard.result.notOfficer': '只有幹部和會長可以編輯公告板。',
   'hudChrome.social.roster.seats': '{count} / {cap} 席位',
-  'hudChrome.social.roster.expand': '擴充名冊（+{seats} 席位，{price}）',
+  'hudChrome.social.roster.expand': '擴充名冊',
   'hudChrome.social.roster.maxed': '名冊已達最大規模',
   'hudChrome.social.roster.confirm':
     '花費 {price} 為公會名冊擴充 {seats} 個席位？金幣將從你自己的錢包扣除，不予退還。',
@@ -13026,7 +13026,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.continentMap.title': '世界地圖',
   'hudChrome.continentMap.summary': '世界地圖。選擇一個地區以開啟其地圖。',
   'hudChrome.continentMap.toWorld': '世界地圖',
-  'hudChrome.continentMap.toggleAria': '在世界地圖與地區地圖之間切換',
+  'hudChrome.continentMap.toggleAria': '在世界地圖、地區地圖與副本地圖之間切換',
   'hudChrome.continentMap.levels': '等級 {min} 至 {max}',
   'hudChrome.continentMap.toZone': '地區地圖',
   'hudChrome.enchanting.wornTagIndexed': '已裝備（{slot}{index}）',
@@ -14601,7 +14601,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '幽暝：第{stacks}/{max}層。自暮紗中使用先制技各累積1層。達到{max}層時，你的先制技可在明處使用，且下一次施展不消耗資源，耗盡全部3層並開啟暗影纏身',
   'hudChrome.auraEffect.healEcho': '生命值低於 {threshold}% 時恢復 {value} 點生命值',
   'hudChrome.auraEffect.hunterFerocity': '{stacks} 層獸群凶性：你的寵物造成的傷害提高 {pct}%',
-  'hudChrome.auraEffect.icicles': '{value}/{max} 根冰柱；達到 {max} 根時可施放冰川尖刺',
+  'hudChrome.auraEffect.icicles': '{value}/{max} 根冰柱；達到 {max} 根時可施放凝霜冰針',
   'hudChrome.auraEffect.internalCooldown': '計時結束前此效果無法再次觸發',
   'hudChrome.auraEffect.leadenHexLock': '鉛沉妖術暫時無法再次定身此目標',
   'hudChrome.auraEffect.mendingCurrent': '儲存 {value} 點治療量，隨時間釋放或由湧流癒合消耗',
@@ -14642,7 +14642,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.sureCrit': '接下來 {charges} 個傷害技能必定造成致命一擊',
   'hudChrome.auraEffect.sweepingStrikes': '單體攻擊還會對附近 {targets} 個敵人造成 {pct}% 傷害',
   'hudChrome.auraEffect.temporalEcho':
-    '施法者的秘法傷害會治療你，單體傷害轉化 {singlePct}%，範圍傷害轉化 {areaPct}%',
+    '施法者的秘法傷害會治療你，單體傷害轉化 {singlePct}%，範圍傷害轉化 {areaPct}%。以太湧動和乙太飛鏢在單獨的時光迴響上按4倍加成計算。群體迴響會產生等量的治療儲備，按照缺失生命值在生命低於60%的被標記盟友之間分配',
   'hudChrome.auraEffect.veiledEdge': '你的下一次潛伏者一擊造成雙倍傷害',
   'hudChrome.auraEffect.veiledEdgeStrike': '你的下一次潛伏者一擊造成的武器傷害提高{pct}%',
   'hudChrome.auraEffect.coldsightRead':
@@ -15930,6 +15930,18 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cosmetics.mechEmpty': '尚未擁有戰鬥機甲配色。',
   'hudChrome.cosmetics.mountsIntro': '坐騎造型會覆蓋在此角色騎乘的任何坐騎上，絕不改變速度。',
   'hudChrome.cosmetics.mechIntro': '戰鬥機甲會取代此角色的身體。一次只能穿戴一種配色。',
+  'hudChrome.auraTracks.mode': '開啟',
+  'hudChrome.auraTracks.row': '{aura} 對 {unit} 生效',
+  'hudChrome.auraTracks.selfRow': '{aura}',
+  'hudChrome.crafting.oncePerDay': '每天一次',
+  'hudChrome.masterwrought.slotsValue': '{used} / {cap}',
+  'hudChrome.meters.millions': '{value}m',
+  'hudChrome.meters.thousands': '{value}k',
+  'hudChrome.practiceDps.liveDps': '{value} DPS',
+  'hudChrome.practiceDps.liveLabel': '本次練習',
+  'hudChrome.practiceDps.runLabel': '第 {index} 次練習',
+  'hudChrome.practiceDps.runSummary': '{time} 內 {total}',
+
   'entities.abilities.grove_awakening.description':
     '呼喚隊伍或團隊中 40 碼內且在你視線內的所有陣亡成員回到你身邊復活，並恢復30%生命值和法力值。戰鬥中無法施放。（恢復）',
   'entities.abilities.grove_awakening.name': '林地覺醒',
@@ -15939,6 +15951,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.wildwake.description':
     '催發倒下的盟友驟然綻放，使其回到你身邊復活，恢復35%生命值和法力值，即使激戰正酣也能施放。（恢復）',
   'entities.abilities.wildwake.name': '野性復甦',
+
+  'devCommand.actions.farmgrow.description':
+    '將所有已種植的田畦推進至成熟時間，也可按ID指定一處田畦。其他內容保持不變：收穫結果在種植時就已隨機決定。',
+  'devCommand.actions.farmgrow.label': '催熟作物',
+  'devCommand.fields.bed': '田畦ID（選填）',
+  'guide.profPages.oncePerDay': '每日一次',
   'sim.rift.roachKing.coronation': '污穢加冕',
   'sim.rift.roachKing.tributeFeast': '貢品盛宴',
   'sim.rift.roachKing.crown': '蟑螂王之冠',

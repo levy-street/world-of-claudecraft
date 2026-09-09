@@ -89,6 +89,8 @@ export const table: DeedLocaleTable = {
   },
   chr_nightbloom_first_cast: {
     desc: 'Nightbloom sularindan bir balik yakala.',
+
+    name: 'Ay Kaynağında Bir Dalgalanma',
   },
   chr_wraithwood_gatherer: {
     name: 'Golge Altinda Hasat',
@@ -186,6 +188,7 @@ export const table: DeedLocaleTable = {
   },
   prog_master_gatherer: {
     name: 'Usta Toplayıcı',
+    desc: 'Herhangi üç toplama zanaatında 100 yetkinliğe ulaş.',
   },
   prog_first_craft: { name: 'El Emeği Göz Nuru', desc: 'İlk başarılı üretimini tamamla.' },
   prog_craft_specialist: {
@@ -291,6 +294,8 @@ export const table: DeedLocaleTable = {
   },
   dgn_sanctum_speed: {
     desc: "Grubunun Mezarejderi Mabedi'ni almasından itibaren 15 dakika içinde Mezarejderi Korzul'u alt et.",
+
+    name: 'Mabed Yarışı',
   },
   dgn_nythraxis_gravebreaker: {
     name: 'Hiçbir Krala Diz Çökme',
@@ -384,6 +389,7 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_packbreaker: { name: 'Sürü Kıran', desc: '10 saniye içinde 3 Orman Kurdu öldür.' },
   chr_vale_cup_debut: {
+    desc: "Domuz Tarlası'da bir Vale Kupası maçında sahaya çıkıp topa dokun. Vale Kupası maçları artık oynanamadığından bu başarı artık kazanılamaz.",
     name: 'Bakır Kova Adayı',
   },
   chr_vale_rares: {
@@ -430,6 +436,8 @@ export const table: DeedLocaleTable = {
   chr_peaks_chapter_iii: {
     name: "Dikenzirve'nin Vakayinamesi",
     title: 'Dikenzirveli',
+
+    desc: 'Dağın tüm hikâyesini gör: Broodsworn’u kır, Mabedi sustur, Uyanan Zirve’yi devir ve kayalıkların adı geçen her dehşetini yere ser.',
   },
   chr_peaks_sparring: {
     name: 'Sur Talimi',
@@ -548,49 +556,72 @@ export const table: DeedLocaleTable = {
     desc: 'Onurunu büyük ölçüde koruyarak bir düello kaybet.',
   },
   pvp_vcup_first_match: {
+    desc: "Domuz Tarlası'da bir Vale Kupası maçını kazanarak ya da kaybederek baştan sona tamamla. Vale Kupası maçları artık oynanamadığından bu başarı artık kazanılamaz.",
     name: 'Sahaya İlk Adım',
   },
-  pvp_vcup_first_win: { name: 'İlk Kupa' },
+  pvp_vcup_first_win: {
+    name: 'İlk Kupa',
+    desc: 'Dereceli bir Vale Kupası maçı kazan. Vale Kupası maçları artık oynanamadığından bu başarı artık kazanılamaz.',
+  },
   pvp_vcup_wins_10: {
+    desc: '10 dereceli Vale Kupası maçı kazan. Vale Kupası maçları artık oynanamadığından bu başarı artık kazanılamaz.',
     name: 'Domuztopunun Eski Kurdu',
   },
   pvp_vcup_wins_25: {
+    desc: '25 dereceli Vale Kupası maçı kazan. Vale Kupası maçları artık oynanamadığından bu başarı artık kazanılamaz.',
     name: 'Domuztopu Efsanesi',
     title: 'Domuztopu Efsanesi',
   },
-  pvp_vcup_first_goal: { name: 'Siftah' },
+  pvp_vcup_first_goal: {
+    name: 'Siftah',
+    desc: 'Dereceli bir Vale Kupası maçında gol at. Vale Kupası maçları artık oynanamadığından bu başarı artık kazanılamaz.',
+  },
   pvp_vcup_hat_trick: {
+    desc: "3'e 3 veya daha büyük kategorideki dereceli bir Vale Kupası maçında tek maçta üç gol at. Vale Kupası maçları artık oynanamadığından bu başarı artık kazanılamaz.",
     name: 'Hat-Trick Kahramanı',
   },
   pvp_vcup_golden_goal: {
+    desc: 'Dereceli bir Vale Kupası maçını karara bağlayan altın golü at. Vale Kupası maçları artık oynanamadığından bu başarı artık kazanılamaz.',
     name: 'Altın An',
   },
   pvp_vcup_first_save: {
+    desc: "3'e 3 veya daha büyük kategorideki dereceli bir Vale Kupası maçında kaleci olarak kurtarış yap. Yalnızca tutuşunu sınayacak kadar hızlı bir şut sayılır; yumuşak bir yakalama sayılmaz. Vale Kupası maçları artık oynanamadığından bu başarı artık kazanılamaz.",
     name: 'Güvenli Eller',
   },
   pvp_vcup_clean_sheet: {
+    desc: "3'e 3 veya daha büyük kategorideki dereceli bir Vale Kupası maçını kaleci olarak gol yemeden kazan. Vale Kupası maçları artık oynanamadığından bu başarı artık kazanılamaz.",
     name: 'Bu Kaleden Geçilmez',
   },
   pvp_vcup_guild_win: {
+    desc: 'Loncanın sancağı altında girilen dereceli bir Vale Kupası maçı kazan. Vale Kupası maçları artık oynanamadığından bu başarı artık kazanılamaz.',
     name: 'Sancak İçin',
   },
   pvp_fiesta_first_bout: {
+    desc: "Kazansan da kaybetsen de eksiksiz bir 2'ye 2 Fiesta karşılaşmasına katıl. Fiesta karşılaşmaları artık Arena sırasından sunulmadığından bu başarı artık kazanılamaz.",
     name: 'Davetsiz Misafir',
   },
-  pvp_fiesta_first_win: { name: "Fiesta'nın Neşesi" },
+  pvp_fiesta_first_win: {
+    name: "Fiesta'nın Neşesi",
+    desc: "Bir 2'ye 2 Fiesta karşılaşması kazan. Fiesta karşılaşmaları artık Arena sırasından sunulmadığından bu başarı artık kazanılamaz.",
+  },
   pvp_fiesta_double: {
+    desc: 'Dört saniye içinde iki Fiesta rakibini yere ser. Fiesta karşılaşmaları artık Arena sırasından sunulmadığından bu başarı artık kazanılamaz.',
     name: 'Çifte Bela',
   },
   pvp_fiesta_shutdown: {
+    desc: 'Üç veya daha uzun galibiyet serisi olan bir Fiesta rakibini yere ser. Fiesta karşılaşmaları artık Arena sırasından sunulmadığından bu başarı artık kazanılamaz.',
     name: 'Oyunbozan',
   },
   pvp_fiesta_full_build: {
+    desc: 'Üç dalganın her birinden sabitlenmiş bir güçlendirmeyle bir Fiesta karşılaşması kazan. Fiesta karşılaşmaları artık Arena sırasından sunulmadığından bu başarı artık kazanılamaz.',
     name: 'Tepeden Tırnağa Hazır',
   },
   pvp_fiesta_powerups: {
+    desc: 'Dört çember güçlendirmesinin her birini en az bir kez al: Hız Şeytanı, Dev, Ay Çizmeleri ve Berserker. Fiesta karşılaşmaları artık Arena sırasından sunulmadığından bu başarı artık kazanılamaz.',
     name: 'Her Şeyden Bir Tane',
   },
   pvp_fiesta_five_kills: {
+    desc: 'Tek bir Fiesta karşılaşmasında beş rakibi yere ser. Fiesta karşılaşmaları artık Arena sırasından sunulmadığından bu başarı artık kazanılamaz.',
     name: 'Partiyi Sırtlayan',
   },
   soc_first_party: {
@@ -990,27 +1021,99 @@ export const table: DeedLocaleTable = {
   },
   dgn_ignivar: {
     name: 'Haberci Düştü',
-    desc: "Crucible of the Last Spring'de Ignivar, Herald of the Last Flame'yi alt et.",
+    desc: 'Son Pınar Potası’nda Ignivar, Son Alevin Habercisi’ni alt et.',
   },
   dgn_ignivar_heroic: {
     name: 'Kahramanca: Haberci Düştü',
-    desc: "Ignivar, Herald of the Last Flame'yi Kahramanca zorlukta alt et.",
+    desc: 'Kahramanca zorlukta Ignivar, Son Alevin Habercisi’ni alt et.',
   },
   dgn_varkhul: {
     name: 'Ocak Soğuyor',
-    desc: "The Inner Crucible'de Varkhul, Forgefather of the Last Flame'yi alt et.",
+    desc: 'İç Pota’da Varkhul, Son Alevin Demirhane Babası’nı alt et.',
   },
   dgn_varkhul_heroic: {
     name: 'Kahramanca: Ocak Soğuyor',
-    desc: "Varkhul, Forgefather of the Last Flame'yi Kahramanca zorlukta alt et.",
+    desc: 'Kahramanca zorlukta Varkhul, Son Alevin Demirhane Babası’nı alt et.',
   },
   dgn_varkhul_flawless: {
     name: 'Tek Bir Kor Bile Sönmedi',
-    desc: "Tek bir akıncı bile ölmeden Varkhul, Forgefather of the Last Flame'yi Kahramanca zorlukta alt et.",
+    desc: 'Tek bir akıncı bile ölmeden Varkhul, Son Alevin Demirhane Babası’nı Kahramanca zorlukta alt et.',
     title: 'Yanmaz',
   },
   col_set_bramblehide: {
     name: "Roots'un Dikenli Postu",
     desc: "Roots'un Dikenli Postu'nun her parçasını keşfet.",
+  },
+  prog_jewelcrafting_rare: {
+    desc: 'Kuyumculukta ilk nadir kademe eşyayı üret.',
+    name: 'Parlaklığa Parlatılmış',
+  },
+  prog_jewelcrafting_50: { desc: 'Kuyumculukta 50 beceriye ulaş.', name: 'Faset ve Telkari' },
+  prog_grandmaster_jewelcrafting: {
+    desc: 'Zanaatın en üstü olan Kuyumculukta 125 beceriye ulaş.',
+    name: 'Büyük Usta Mücevher İşleme',
+    title: 'Büyük Usta Mücevher İşleme',
+  },
+  prog_inscription_rare: {
+    desc: 'Tılsımcılıkta ilk nadir kademe eşyayı üret.',
+    name: 'İnce Mürekkeple Yazılmış',
+  },
+  prog_inscription_50: { desc: 'Tılsımcılıkta 50 beceriye ulaş.', name: 'Kalem ve Pigment' },
+  prog_grandmaster_inscription: {
+    desc: 'Zanaatın en üstü olan Tılsımcılıkta 125 beceriye ulaş.',
+    name: 'Büyük Usta Tılsımcılık',
+    title: 'Büyük Usta Tılsımcılık',
+  },
+  col_deepest_cast: {
+    desc: 'En derin avlara ulaşabilen tek olta olan Saat Çarkı Olta edin.',
+    name: 'En Derin Atış',
+  },
+  prog_first_planting: { desc: 'Bir bahçe yatağına ilk ekinini dik.', name: 'Ekim Böyle Başlar' },
+  chr_vale_first_harvest: {
+    desc: 'Eastbrook Vale içindeki bir bahçe yatağından ilk sağlıklı ekinini hasat et.',
+
+    name: 'Vadinin İlk Meyveleri',
+  },
+  chr_marsh_first_harvest: {
+    desc: 'Mirefen Bataklığı içindeki bir bahçe yatağından ilk sağlıklı ekinini hasat et.',
+
+    name: 'Torf İçindeki Filizler',
+  },
+  chr_peaks_first_harvest: {
+    desc: 'Thornpeak Heights içindeki bir bahçe yatağından ilk sağlıklı ekinini hasat et.',
+
+    name: 'Kayalıklar Arasında Bir Ekin',
+  },
+  chr_evergarden_first_harvest: {
+    desc: 'Evergarden içindeki bir bahçe yatağından ilk sağlıklı ekinini hasat et.',
+
+    name: 'Cennette Bir Parsel',
+  },
+  col_golden_harvest: {
+    desc: 'Altın bir hasat yap ve tüm bölgenin bunu duymasını sağla.',
+    name: 'Altın Hasat',
+  },
+  prog_farming_100: {
+    desc: 'Tarımda 100 yetkinliğe ulaş.',
+    name: 'Hasat Ustası',
+    title: 'Hasat Ustası',
+  },
+  col_farm_roster: {
+    desc: 'Dört bahçenin yetiştirdiği her ekini hasat et.',
+    name: 'Her Karık Dolu',
+  },
+  prog_field_to_feast: {
+    desc: 'Tüm akının yiyebileceği bir zirve şöleni pişir.',
+    name: 'Tarladan Şölene',
+  },
+  prog_legendmaker: {
+    desc: 'Bir Üretim Senedi ile Kusursuzlaştırılmış bir işi efsaneye yükselt ve ona kendine özgü bir ad ver.',
+
+    name: 'Efsane Yaratan',
+  },
+  hid_forgebreaker: {
+    desc: "Dövme Kıran'ı kendi ellerinle şekillendir ve bitmiş çekiçle Maelin'e dön.",
+
+    name: 'Zincirlerinden Kurtulmuş Bir Kaynak',
   },
 };

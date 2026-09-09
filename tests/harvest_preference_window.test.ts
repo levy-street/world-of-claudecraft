@@ -184,7 +184,12 @@ describe('harvest preference picker: painter behavior', () => {
     expect(() =>
       render(container, { preference: material(hostileId), componentTags: ['hide'] }),
     ).not.toThrow();
-    expect(container.querySelector('img')).toBeNull();
+    expect([...container.querySelectorAll('img')].map((img) => img.getAttribute('src'))).toEqual([
+      '/ui/items/field_kit.webp',
+      '/ui/items/field_kit.webp',
+      '/ui/items/rough_hide.webp',
+    ]);
+    expect(container.querySelector('.harvest-preference-current-unavailable img')).toBeNull();
     expect(container.innerHTML).not.toContain('onerror');
     expect(container.textContent).toContain(t('hudChrome.harvestPreference.unknownMaterial'));
   });

@@ -151,23 +151,31 @@ export const table: ReliquaryLocaleTable = {
     desc: "Les anneaux de Faille personnels, frappés pour chaque champion du groupe qui remporte la première conquête d'une Faille classée. Un personnage ne peut jamais détenir que le sien.",
   },
   conquerors_ignivar: {
-    name: 'Crucible of the Last Spring',
-    desc: 'Butins épiques de Ignivar, Herald of the Last Flame.',
+    name: 'Creuset de la Dernière Source',
+    desc: 'Butins épiques d’Ignivar, Héraut de la Dernière Flamme.',
   },
   conquerors_ignivar_heroic: {
-    name: 'Héroïque : Crucible of the Last Spring',
-    desc: 'Armes exclusives au mode héroïque de Ignivar, Herald of the Last Flame.',
+    name: 'Héroïque : Creuset de la Dernière Source',
+    desc: 'Armes exclusives au mode héroïque d’Ignivar, Héraut de la Dernière Flamme.',
   },
   conquerors_varkhul: {
-    name: 'The Inner Crucible',
-    desc: 'Butins épiques de Varkhul, Forgefather of the Last Flame.',
+    name: 'Le Creuset intérieur',
+    desc: 'Butins épiques de Varkhul, Père de la Forge de la Dernière Flamme.',
   },
   conquerors_varkhul_heroic: {
-    name: 'Héroïque : The Inner Crucible',
-    desc: 'Boucliers et armes exclusifs au mode héroïque de Varkhul, Forgefather of the Last Flame.',
+    name: 'Héroïque : le Creuset intérieur',
+    desc: 'Boucliers et armes exclusifs au mode héroïque de Varkhul, Père de la Forge de la Dernière Flamme.',
   },
   conquerors_set_bramblehide: {
     name: 'Peau de Ronces de Roots',
-    desc: 'La famille complète de cuir Bramblehide.',
+    desc: 'La famille complète de cuir Peau de Ronces de Roots.',
+  },
+  professions_crucible: {
+    name: 'Artisanat du Creuset',
+    desc: 'Onze collections fabriquées en raid, chacune proposant une pièce de torse, de taille et de pieds. Les manuels et les formules sont des connaissances, pas des reliques.',
+  },
+  professions_forgebreaker: {
+    name: 'Brise-forge',
+    desc: 'La voix de la Dernière Source, libérée de la forge et portée dans un marteau que vous avez façonné vous-même.',
   },
 };

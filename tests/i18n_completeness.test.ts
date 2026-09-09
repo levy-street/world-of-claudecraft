@@ -227,64 +227,32 @@ describe('i18n whole-catalog completeness', () => {
   });
 
   it('keeps every localized marker accessibility meaning pinned per locale', () => {
-    // Two merges wrote this table. This branch re-derived every row on 2026-08-30
-    // at the merge of release/v0.41.0 (tip 3e801dc925), where both parents had
-    // added marker keys and the merged digest matched neither parent; the release
-    // side then re-derived thirteen of the rows at v0.42.0, where it filled the
-    // two boss marker labels (mapMarkerLabels.bossEnemy and .bossAggressiveEnemy)
-    // in the Latin overlays. Both facts hold in the merged tree: the row SET is
-    // this branch's (the extra hud.core.mapMarkerLabels.farmPatch row the release
-    // never had), and thirteen of the row VALUES are the release's new fills, so
-    // those thirteen digests belong to neither parent.
-    // RE-DERIVED over the merged tree on 2026-08-31, at the v0.42.0 sync (ours
-    // 2ab5c2f7d0, theirs 22e909839f, base e6b8edb375). Every row below was read
-    // out of this assertion's own derivation, run over freshly regenerated
-    // resolved tables (`node scripts/i18n_build.mjs`, confirmed idempotent: a
-    // second run left every emitted slice byte-identical), never hand-computed
-    // and never copied from a parent.
-    //
-    // WHICH rows moved, and why, derived rather than assumed. The release filled
-    // the two boss marker labels (mapMarkerLabels.bossEnemy and
-    // .bossAggressiveEnemy) in TWELVE overlays under src/ui/i18n.locales/: de_DE,
-    // fr_FR, it_IT, pt_BR, cs_CZ, nl_NL, pl_PL, id_ID, tr_TR, sv_SE, vi_VN,
-    // da_DK. fr_CA adds a thirteenth moved digest without an overlay edit of its
-    // own: it resolves through fr_FR, so its rows follow that fill. The other
-    // seven (es, es_ES, zh_CN, zh_TW, ko_KR, ja_JP, ru_RU) got no boss fill from
-    // either parent, so they still read this branch's v0.41.0 values, and their
-    // digests below are unchanged from that re-derivation.
-    // This branch contributed no marker-row edit at this merge, so the thirteen
-    // moved digests are the release's fill measured through THIS branch's row
-    // set: they match neither parent's literal.
-    //
-    // Digests stay PINNED literals, not computed at test time: the whole point of
-    // the row is to red on an unintended change to a marker's accessibility
-    // meaning, and a digest recomputed from the same table it is compared against
-    // would assert nothing. Re-derivation recipe, unchanged: regenerate the
-    // resolved tables (`npm run i18n:gen`), run this file, and re-pin each locale
-    // from the reported digest, which is sha256 over JSON.stringify of the
-    // hud.core.mapMarker rows in table order, exactly as the assertion below
-    // computes them.
+    // The release fill translates mapMarkerLabels.farmPatch in the Latin locales.
+    // Re-derived after inspecting those labels and regenerating the resolved tables.
+    // Keep literal digests over the 101 marker rows so unintended copy changes fail.
+    // Recipe: sha256(JSON.stringify(Object.entries(flatten(TABLES[lang]))
+    //   .filter(([key]) => key.startsWith('hud.core.mapMarker')))).
     const expected = {
-      es: '71280fba077d6d0e9fdb251edd2a9c90b22e76e6d72b7f072759529e5cbc7de3',
-      es_ES: '71280fba077d6d0e9fdb251edd2a9c90b22e76e6d72b7f072759529e5cbc7de3',
-      fr_FR: '7011bb7f227cdec0e53df1c6f22b0e4067f6a4bbf904e16c11ec24baadb85a97',
-      fr_CA: '7011bb7f227cdec0e53df1c6f22b0e4067f6a4bbf904e16c11ec24baadb85a97',
-      it_IT: '1417bf6d753bfff5a8b221602981143fce47be9b8fbdd666386b17e654796863',
-      de_DE: '060fc7fd120253737179daf3258a622caf665200028ad509103588cf79fba6e5',
+      es: '3daf9e259a1a3b24e8f241f1667e9e1d3e9f2f8e3f7032318da82f1b4cd15c6b',
+      es_ES: '3daf9e259a1a3b24e8f241f1667e9e1d3e9f2f8e3f7032318da82f1b4cd15c6b',
+      fr_FR: 'dc36f6ed6338af304cce2e5d53c4b3491d269d47ccd0a9378c78f578e8008074',
+      fr_CA: 'dc36f6ed6338af304cce2e5d53c4b3491d269d47ccd0a9378c78f578e8008074',
+      it_IT: 'ba0466c32d4b2d7ffc155a9d9bd1d7717cb6bbc1ce03960e814960c32eace9d3',
+      de_DE: 'fd01982d829e034585f1d31ad4425b932b30b7411ecb96cc2a63d15c75255ae2',
       zh_CN: '88655d9dcd570ef3031925e758bd28f9480d378e6e074b7c30bc4e1e4fad73bc',
       zh_TW: 'd013561d91c7bd77ee5f7c309bd39e147e4e67a45b4982faf4f9975396ba0865',
       ko_KR: 'd35b9d6cb07a9394455c31e2cf465c74888e2bf86463098d6ce09fbe64d63bb6',
       ja_JP: 'aaad77f83c6acd5bd443c654cf4930f565e31deca0f1e0f8eba460c9686fe065',
-      pt_BR: '3f8e5a1774351140940464f317eecb089fe2bef0e4154661dda232a91f18e7ca',
+      pt_BR: '1a5c6cb8c56acddaced5044695d3ca88d66b54d371a20b8033eb6ba75b38a377',
       ru_RU: '869bb35098d22e182aa7c693786f69148769fc6c93228a2b959a9b2b719d6794',
-      cs_CZ: '17fd408e52c09a8d06a9f90635afdcd8de2f935622a0582125c89ea810188dcd',
-      nl_NL: 'a911f15718c1bf47701e1e01e6b5467b37bbab274359dbcd42ddd85114a19dfa',
-      pl_PL: '76217062945651b618324148f8d891e7a84d9ec030efaf02b2b4ac4537ad756a',
-      id_ID: '3ea89d7c84cf648f0f2e3076388f635cbccfdb32195b7452fb32386c59010d43',
-      tr_TR: '41b00dec2daf97f66c97550735027f0ed98d9fda39cc36a6fd7fde5ac4dee98f',
-      sv_SE: '883f417a069dce0068b7c733f0bfd7b3e34d405e4c6440dcc9d6a6f324f194e6',
-      vi_VN: 'a6292828742e853efcb1fd7c2ac17f558991316ac90916ebfd162ed11db4fcce',
-      da_DK: '9e0db1b8079913f713ba0322593e405b33d002d8044e292ca423f0eea0da7ffa',
+      cs_CZ: 'e06f9fcb980af89709eddd34e513f023160c58cc75af676f233ae4734a3e47fc',
+      nl_NL: 'ff68554eebe066bd1a310566ae2873fc5fc5f13499492ebdd49a718f822a0a07',
+      pl_PL: 'afa206ca243447213caf64c76d39d17742a794c5652ecced7837ad55d6bace7e',
+      id_ID: 'ad6dbbc261c401a8fb526c971e89d82f5a1f452c74445d31868ea3ee6876d22c',
+      tr_TR: '37a88da6de960736d7c5f91da80485c63bfedd361435cf396791a06a29c7a85e',
+      sv_SE: 'd90fc2002bb19aa2672f223e13efa9f286d9c92c92a88e0be434a18a00d19108',
+      vi_VN: 'd2f840b0956fac7ef5da11dce02e2e22e64f306ccc2b23f2320932c681f9c964',
+      da_DK: 'b45a7a5e160ae134622460c14fbebed0c552d6b0452ea4cd4bc4cb03b05bf365',
     } as const satisfies Partial<Record<SupportedLanguage, string>>;
 
     for (const [lang, digest] of Object.entries(expected) as Array<

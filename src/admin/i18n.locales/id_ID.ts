@@ -1223,4 +1223,53 @@ export const id_ID: Record<string, string> = {
   'realmBuilders.saveNew': 'Publikasikan',
   'realmBuilders.useNextMonth': 'Bulan depan',
   'realmBuilders.yearLabel': 'Tahun',
+  'error.clearItemNameAllLiteral': 'all harus berupa literal true',
+  'error.clearItemNameBagIndex': 'bag harus berupa bilangan bulat non-negatif',
+  'error.clearItemNameBagPair': 'target tas memerlukan indeks sel dan ID item',
+  'error.clearItemNameBagRange': 'bag harus berupa bilangan bulat dari {min} hingga {max}',
+  'error.clearItemNameCameOnline':
+    'karakter online sebelum penghapusan diterapkan; tendang mereka dan coba lagi',
+  'error.clearItemNameLeased':
+    'karakter memegang sewa sesi aktif; tendang mereka (atau tunggu hingga sewa berakhir) dan coba lagi',
+  'error.clearItemNameNoMatch': 'tidak ada salinan bernama yang cocok dengan target itu',
+  'error.clearItemNameOnline':
+    'karakter sedang online di alam ini; putuskan sambungannya terlebih dahulu',
+  'error.clearItemNameTargetForms':
+    'sebutkan tepat satu target: slot yang dipakai, sel tas, atau all: true',
+  'error.clearItemNameUnknownSlot': 'slot perlengkapan tidak dikenal',
+  'error.clearItemNameWentOffline': 'karakter offline sebelum penghapusan diterapkan; coba lagi',
+  'error.itemNameClearFailed': 'gagal menghapus nama item',
+  'loadFailure.forbiddenDetail':
+    'Peran staf Anda tidak memiliki izin yang dibaca tampilan ini. Minta superadmin memberikannya, lalu muat ulang.',
+  'loadFailure.forbiddenTitle': 'Izin ditolak',
+  'marketMetrics.autoRefresh': 'Penyegaran otomatis ({seconds} dtk)',
+  'marketMetrics.bucketCompost': 'Kompos',
+  'marketMetrics.bucketCores': 'Inti',
+  'marketMetrics.bucketEmpty': 'tidak ada listing aktif',
+  'marketMetrics.bucketEssence': 'Esensi',
+  'marketMetrics.bucketPatterns': 'Pola',
+  'marketMetrics.bucketProduce': 'Hasil bumi',
+  'marketMetrics.bucketSeeds': 'Benih',
+  'marketMetrics.bucketSold':
+    'Terjual dalam {days} hari terakhir: {sales} penjualan, {quantity} item, {copper}',
+  'marketMetrics.bucketSummary':
+    '{listings} listing, {quantity} unit, {listed} dari {tracked} item terdaftar',
+  'marketMetrics.colItem': 'Item',
+  'marketMetrics.colListings': 'Listing',
+  'marketMetrics.colLowest': 'Terendah (per unit)',
+  'marketMetrics.colMedian': 'Median (per unit)',
+  'marketMetrics.colQuantity': 'Jumlah',
+  'marketMetrics.empty': 'tidak ada listing aktif di bucket mana pun yang dilacak',
+  'marketMetrics.essenceNote':
+    'Material ini terikat jiwa dan tidak pernah dapat didaftarkan. Setiap baris di sini berarti invariannya escrow pasar rusak dan memerlukan perhatian teknis.',
+  'marketMetrics.hint':
+    'Listing Pasar Dunia aktif untuk bucket pasokan yang dilacak: apa yang ada di buku saat ini, bukan volume terjual. Server menyimpan tampilan ini dalam cache sekitar 15 detik.',
+  'marketMetrics.loadFailed': 'gagal memuat metrik pasar',
+  'marketMetrics.loading': 'memuat…',
+  'marketMetrics.realm': 'Alam: {realm}',
+  'marketMetrics.soldNone': 'Terjual dalam {days} hari terakhir: tidak ada',
+  'marketMetrics.soldUnavailable':
+    'Volume penjualan sedang tidak tersedia, jadi hanya listing aktif yang ditampilkan di bawah.',
+  'moderationHistory.actionClearItemName': 'Nama item dihapus',
+  'nav.marketMetrics': 'Metrik pasar',
 };

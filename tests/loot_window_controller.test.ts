@@ -26,7 +26,12 @@ vi.mock('../src/ui/i18n', async (importOriginal) => {
   };
 });
 
-import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
+import { corpseHarvestInspectionReply } from '../server/corpse_harvest_inspection';
+import {
+  corpseLootAvailability,
+  corpseLootAvailabilityInWorld,
+} from '../src/game/corpse_loot_availability';
+import { CorpseHarvestInfoRequest } from '../src/net/corpse_harvest_info_request';
 import { ITEMS, MOBS } from '../src/sim/data';
 import { isHarvestableCorpse } from '../src/sim/professions/gathering';
 import type { Entity } from '../src/sim/types';
@@ -116,6 +121,8 @@ function harness(
   const world = {
     entities,
     playerId: 7,
+    partyInfo: null,
+    inventory: [{ itemId: 'field_kit', count: 1 }],
     player: { pos: { x: 0, y: 0, z: 0 }, dead: false },
     townFocus,
     lootCorpse,
@@ -1559,5 +1566,70 @@ describe('LootWindowController: Professions entry orchestration', () => {
     expect(h.showError).toHaveBeenCalledWith('Nothing to interact with.');
     expect(h.element.style.display).not.toBe('block');
     expect(h.harvestCorpse).not.toHaveBeenCalled();
+  });
+});
+
+describe('live inventory and server inspection integration', () => {
+  it('keeps the rendered preference stable when wall-clock polling beats sim time', async () => {
+    const body = entity(42, { kind: 'mob', templateId: harvestMobId });
+    const info = harvestInfo({
+      corpseId: body.id,
+      componentTags: harvestMobTags,
+      preference: { kind: 'material', itemId: 'rough_hide' },
+      tierBonus: 2,
+    });
+    const sim = { time: 10, corpseHarvestInfo: vi.fn((): CorpseHarvestInfo | null => info) };
+    const session = {};
+    const request = new CorpseHarvestInfoRequest((id, rid) => {
+      const reply = corpseHarvestInspectionReply(sim, session, { id, rid }, 7);
+      if (reply) request.onReply({ t: 'corpseHarvestInfo', ...reply });
+    });
+    const h = harness([body], undefined, {}, (id) => request.issue(id));
+    h.controller.openCorpse(body.id, 100, 100);
+    await flush();
+    const initial = h.element.innerHTML;
+    for (let i = 0; i < 4; i++) {
+      sim.time = 10 + i * 0.45;
+      h.advanceClock(500);
+      h.controller.updateProximity();
+      await flush();
+      expect(h.element.innerHTML).toBe(initial);
+      expect(harvestBtn(h.element)?.disabled).toBe(false);
+    }
+    expect(sim.corpseHarvestInfo).toHaveBeenCalledTimes(2);
+    sim.time = 12;
+    sim.corpseHarvestInfo.mockReturnValueOnce(null);
+    h.advanceClock(500);
+    h.controller.updateProximity();
+    await flush();
+    expect(h.element.innerHTML).not.toBe(initial);
+    expect(harvestBtn(h.element)?.disabled).toBe(true);
+    h.controller.close();
+    request.reset();
+  });
+
+  it('removes harvest controls when the kit leaves inventory and preserves Take Loot', () => {
+    const body = entity(42, {
+      kind: 'mob',
+      templateId: harvestMobId,
+      loot: { copper: 25, items: [] },
+    });
+    const h = harness([body], (mob) => corpseLootAvailabilityInWorld(h.world, mob));
+    h.world.inventory = [];
+    h.controller.openCorpse(body.id, 100, 100);
+    expect(harvestBtn(h.element)).toBeNull();
+    expect(h.element.querySelector('.corpse-harvest-change-btn')).toBeNull();
+    expect(takeLootBtn(h.element)).not.toBeNull();
+    expect(h.corpseHarvestInfo).not.toHaveBeenCalled();
+    h.world.inventory = [{ itemId: 'field_kit', count: 1 }];
+    h.controller.updateProximity();
+    expect(harvestBtn(h.element)).not.toBeNull();
+    h.world.inventory = [];
+    h.controller.updateProximity();
+    expect(harvestBtn(h.element)).toBeNull();
+    expect(takeLootBtn(h.element)).not.toBeNull();
+    body.loot = null;
+    h.controller.updateProximity();
+    expect(h.element.style.display).toBe('none');
   });
 });

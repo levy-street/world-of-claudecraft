@@ -6,7 +6,7 @@ import {
 } from '../sim/corpse_loot_state';
 import { MOBS } from '../sim/data';
 import { corpseHasDecayed } from '../sim/respawn_policy';
-import type { Entity } from '../sim/types';
+import type { Entity, InvSlot } from '../sim/types';
 
 /** Resolve the exact corpse content the local player can open in the loot popup.
  *
@@ -51,6 +51,7 @@ export function corpseLootAvailability(
   playerId: number,
   harvestStateReliable = true,
   partyMemberIds: readonly number[] | null = null,
+  hasFieldKit = true,
 ) {
   if (corpseHasDecayed(mob.dead, mob.corpseTimer)) {
     return {
@@ -64,6 +65,7 @@ export function corpseLootAvailability(
   }
   const componentTags = MOBS[mob.templateId]?.componentTags;
   const harvestable =
+    hasFieldKit &&
     mob.ownerId == null &&
     corpseHarvestClaimOpen(mob.templateId, mob.harvestClaimedBy, harvestStateReliable);
   const tappedById = mob.tappedById ?? null;
@@ -110,13 +112,25 @@ export function localPartyMemberIds(
   return partyInfo ? partyInfo.members.map((m) => m.pid) : null;
 }
 
-/** Supply the live viewer identity and party roster to the shared popup rule. */
+/** A carried kit enables corpse gathering; banked or zero-count slots do not. */
+export function carriesFieldKit(inventory: readonly Pick<InvSlot, 'itemId' | 'count'>[]): boolean {
+  return inventory.some((slot) => slot.itemId === 'field_kit' && slot.count > 0);
+}
+
+/** Supply live inventory as well as loot rights to the shared popup rule. */
 export function corpseLootAvailabilityInWorld(
   world: {
     playerId: number;
+    inventory: readonly Pick<InvSlot, 'itemId' | 'count'>[];
     partyInfo: { members: readonly { pid: number }[] } | null;
   },
   mob: Entity,
 ) {
-  return corpseLootAvailability(mob, world.playerId, true, localPartyMemberIds(world.partyInfo));
+  return corpseLootAvailability(
+    mob,
+    world.playerId,
+    true,
+    localPartyMemberIds(world.partyInfo),
+    carriesFieldKit(world.inventory),
+  );
 }

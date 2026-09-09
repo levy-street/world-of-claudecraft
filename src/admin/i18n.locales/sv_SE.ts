@@ -1219,4 +1219,53 @@ export const sv_SE: Record<string, string> = {
   'realmBuilders.saveNew': 'Publicera',
   'realmBuilders.useNextMonth': 'Nästa månad',
   'realmBuilders.yearLabel': 'år',
+  'error.clearItemNameAllLiteral': 'all måste vara det bokstavliga värdet true',
+  'error.clearItemNameBagIndex': 'bag måste vara ett icke-negativt heltal',
+  'error.clearItemNameBagPair': 'ett väskmål behöver både cellindex och föremåls-id',
+  'error.clearItemNameBagRange': 'bag måste vara ett heltal från {min} till {max}',
+  'error.clearItemNameCameOnline':
+    'karaktären kom online innan borttagningen hann göras, koppla från den och försök igen',
+  'error.clearItemNameLeased':
+    'karaktären har ett aktivt sessionslån, koppla från den (eller vänta tills lånet går ut) och försök igen',
+  'error.clearItemNameNoMatch': 'ingen namngiven kopia matchade målet',
+  'error.clearItemNameOnline': 'karaktären är online i denna värld, koppla från den först',
+  'error.clearItemNameTargetForms':
+    'ange exakt ett mål: en buren slot, en väskcell eller all: true',
+  'error.clearItemNameUnknownSlot': 'okänd utrustningsslot',
+  'error.clearItemNameWentOffline':
+    'karaktären gick offline innan borttagningen hann göras, försök igen',
+  'error.itemNameClearFailed': 'rensning av föremålsnamn misslyckades',
+  'loadFailure.forbiddenDetail':
+    'Dina personalroller har inte behörigheten som den här vyn läser. Be en superadministratör att ge den och ladda sedan om.',
+  'loadFailure.forbiddenTitle': 'Behörighet saknas',
+  'marketMetrics.autoRefresh': 'Automatisk uppdatering ({seconds} s)',
+  'marketMetrics.bucketCompost': 'Kompost',
+  'marketMetrics.bucketCores': 'Kärnor',
+  'marketMetrics.bucketEmpty': 'inga aktiva listningar',
+  'marketMetrics.bucketEssence': 'Essens',
+  'marketMetrics.bucketPatterns': 'Mönster',
+  'marketMetrics.bucketProduce': 'Skörd',
+  'marketMetrics.bucketSeeds': 'Frön',
+  'marketMetrics.bucketSold':
+    'Sålt de senaste {days} dagarna: {sales} försäljningar, {quantity} föremål, {copper}',
+  'marketMetrics.bucketSummary':
+    '{listings} listningar, {quantity} enheter, {listed} av {tracked} föremål listade',
+  'marketMetrics.colItem': 'Föremål',
+  'marketMetrics.colListings': 'Listningar',
+  'marketMetrics.colLowest': 'Lägst (per enhet)',
+  'marketMetrics.colMedian': 'Median (per enhet)',
+  'marketMetrics.colQuantity': 'Antal',
+  'marketMetrics.empty': 'inga aktiva listningar i någon spårad kategori',
+  'marketMetrics.essenceNote':
+    'De här materialen är själsbundna och kan aldrig listas. Varje rad här betyder att marknadsescrowens invariant bröts och behöver teknisk uppmärksamhet.',
+  'marketMetrics.hint':
+    'Aktiva världsmarknadslistningar för de spårade försörjningskategorierna: vad som finns i boken just nu, inte försäljningsvolym. Servern cachelagrar avläsningen i omkring 15 sekunder.',
+  'marketMetrics.loadFailed': 'kunde inte läsa in marknadsmått',
+  'marketMetrics.loading': 'läser in…',
+  'marketMetrics.realm': 'Värld: {realm}',
+  'marketMetrics.soldNone': 'Sålt de senaste {days} dagarna: ingenting',
+  'marketMetrics.soldUnavailable':
+    'Försäljningsvolym är inte tillgänglig just nu, så endast aktiva listningar visas nedan.',
+  'moderationHistory.actionClearItemName': 'Föremålsnamn rensat',
+  'nav.marketMetrics': 'Marknadsmått',
 };

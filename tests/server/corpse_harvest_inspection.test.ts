@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   corpseHarvestInspectionReply,
   dispatchCorpseHarvestInspection,
+  type InspectCorpseHarvestSession,
   validInspectCorpseHarvestCommand,
 } from '../../server/corpse_harvest_inspection';
 import type { CorpseHarvestInfo } from '../../src/world_api';
@@ -106,5 +107,40 @@ describe('dispatchCorpseHarvestInspection', () => {
     const send = vi.fn();
     dispatchCorpseHarvestInspection(sim, {}, { id: 7 }, 9, send);
     expect(send).not.toHaveBeenCalled();
+  });
+});
+
+describe('polling across wall and simulation clock boundaries', () => {
+  it('replays only the same viewer/body/simulation until the original deadline', () => {
+    const info = {
+      ...SAMPLE_INFO,
+      preference: { kind: 'material' as const, itemId: 'rough_hide' },
+    };
+    const sim = fakeSim(info, 10);
+    const session: InspectCorpseHarvestSession = {};
+    expect(corpseHarvestInspectionReply(sim, session, { id: 7, rid: 1 }, 9)?.info).toEqual(info);
+    sim.time = 10.45;
+    for (let rid = 2; rid <= 5; rid++) {
+      expect(corpseHarvestInspectionReply(sim, session, { id: 7, rid }, 9)).toEqual({
+        id: 7,
+        rid,
+        info,
+      });
+    }
+    expect(sim.corpseHarvestInfo).toHaveBeenCalledTimes(1);
+    expect(session.nextCorpseHarvestInspectAt).toBe(10.5);
+    expect(corpseHarvestInspectionReply(sim, session, { id: 8, rid: 6 }, 9)?.info).toBeNull();
+    expect(corpseHarvestInspectionReply(sim, session, { id: 7, rid: 7 }, 10)?.info).toBeNull();
+    const replacement = fakeSim(info, sim.time);
+    expect(
+      corpseHarvestInspectionReply(replacement, session, { id: 7, rid: 8 }, 9)?.info,
+    ).toBeNull();
+    expect(replacement.corpseHarvestInfo).not.toHaveBeenCalled();
+    sim.time = 10.5;
+    sim.corpseHarvestInfo.mockReturnValueOnce(null);
+    expect(corpseHarvestInspectionReply(sim, session, { id: 7, rid: 9 }, 9)?.info).toBeNull();
+    sim.time = 10.95;
+    expect(corpseHarvestInspectionReply(sim, session, { id: 7, rid: 10 }, 9)?.info).toBeNull();
+    expect(sim.corpseHarvestInfo).toHaveBeenCalledTimes(2);
   });
 });

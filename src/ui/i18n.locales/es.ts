@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const es: Partial<Record<TranslationKey, string>> = {
+  'abilityUi.cast.farming': 'Plantar',
   'hudChrome.barEditor.armed': 'Toca una ranura para colocar {name}.',
   'hudChrome.barEditor.buttonHeader': 'Botón {button}',
   'hudChrome.barEditor.cellAria': 'Botón {button}, {direction}: {action}',
@@ -424,7 +425,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.tutorialGreeting.bellHomeNote':
     '¿Ya de vuelta de la costa? Esa era la campana del transbordador que hiciste sonar. Su gemela cuelga justo ahí, junto al buzón del Correo del Cuervo: hazla sonar cuando quieras y la travesía te llevará de vuelta a la Costa de la Prueba. No pasa nada, decidas lo que decidas.',
   'hudChrome.tutorialGreeting.islandArrivalNote':
-    'Bienvenido a la Costa de la Prueba. El Guardián Tam te espera un poco más allá, en la playa: ve a verlo.',
+    'Bienvenido a la Costa de la Prueba. El Guardián Tam te espera un poco más allá, en la playa: ve a verlo. Cuando quieras marcharte, toca la campana junto a mi muelle y te llevará al valle en cualquier momento.',
   'hudChrome.tutorialGreeting.noteClose': 'Entendido',
   'hudChrome.walletBridge.badResponse':
     'Tu cartera devolvió una respuesta que no se puede usar. Inténtalo de nuevo.',
@@ -3460,7 +3461,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.sureCrit':
     'Tus próximas {charges} facultades dañinas tienen golpe crítico garantizado',
   'hudChrome.auraEffect.temporalEcho':
-    'El daño Arcano del taumaturgo te sana un {singlePct}% del daño a un objetivo o un {areaPct}% del daño de área. Oleada de éter y Dardos de éter obtienen una bonificación de x4 con un Eco Temporal individual. Los Ecos grupales generan una reserva de sanación equivalente que se reparte entre los aliados marcados con menos del 60% de salud según la salud que les falte',
+    'El daño Arcano del taumaturgo te sana un {singlePct}% del daño a un objetivo o un {areaPct}% del daño de área. Impulso de Éter y Dardos de éter obtienen una bonificación de x4 con un Eco Temporal individual. Los Ecos grupales generan una reserva de sanación equivalente que se reparte entre los aliados marcados con menos del 60% de salud según la salud que les falte',
   'hudChrome.auraEffect.arcaneCharge':
     '{stacks} cargas Arcanas: Oleada de éter inflige un {damagePct}% más, se lanza un {castPct}% más rápido y cuesta {costMult} veces más maná',
   'hudChrome.auraEffect.physicalReduction': 'Reduce el daño Físico recibido un {pct}%',
@@ -3517,7 +3518,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.wintersChill':
     '{charges} cargas: los hechizos válidos tratan a este objetivo como congelado',
   'hudChrome.auraEffect.icicles':
-    '{value} de {max} Carámbanos; con {max}, puedes lanzar Pica glacial',
+    '{value} de {max} Carámbanos; con {max}, puedes lanzar Rimeneedle',
   'hudChrome.auraEffect.desolation':
     '{charges} cargas: tu próxima Descarga de caos se lanza un {castPct}% más rápido o tu próxima Lluvia de fuego cae al instante',
   'hudChrome.auraEffect.ruinousBrand':
@@ -3728,7 +3729,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.deathless_rage':
     'Furia Inmortal (se interrumpe en las piedras de guardia)',
   'hudChrome.finder.mech.dread_curse':
-    'Maldicion Pavorosa (solo heroico, perjuicio acumulativo para cambio de tanque)',
+    'Maldición pavorosa (perjuicio acumulativo para cambiar de tanque, cambia con 2 acumulaciones)',
   'hudChrome.finder.mech.deathstalker_cleave': 'Tajo del Acechador de la Muerte (tajo frontal)',
   'hudChrome.finder.mech.enrage': 'Entra en furia al tener poca salud',
   'hudChrome.finder.mech.grave_cleaver': 'Hacha Funebra (tajo frontal)',
@@ -3747,7 +3748,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.shadow_pulse': 'Pulso de Sombra (dano de area pulsante)',
   'hudChrome.finder.mech.shuddering_stomp': 'Pisada Estremecedora (aturdimiento de area)',
   'hudChrome.finder.mech.soul_rend':
-    'Desgarro de Alma (los jugadores marcados deben dispersarse y recibir curacion)',
+    'Desgarro de alma (los jugadores marcados se agrupan y luego salen del fuego)',
   'hudChrome.finder.mech.summons_adds': 'Invoca refuerzos',
   'hudChrome.finder.mech.wardstones': 'Canalizacion de piedras de guardia (transicion de fase)',
   'hudChrome.finder.needs': 'Necesita {roles}',
@@ -10918,7 +10919,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.hedge_knight.name': 'Caballero de Dawnhold',
   'entities.mobs.ice_wisp.name': 'Fuego Fatuo del Hielo',
   'entities.mobs.idol_guardian.name': 'El Guardián del Ídolo',
-  'entities.mobs.ignivar_heart_of_the_end.name': 'Ignivar Ashcaller',
+  'entities.mobs.ignivar_heart_of_the_end.name': 'Ignivar, Invocacenizas',
   'entities.mobs.ignivar_herald_of_the_last_flame.name': 'Ignivar, Heraldo de la Última Llama',
   'entities.mobs.lily_wisp.name': 'Fuego Fatuo del Lirio',
   'entities.mobs.mere_lurker.name': 'Acechador del Mere',
@@ -11946,7 +11947,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.continentMap.title': 'Mapa del Mundo',
   'hudChrome.continentMap.toWorld': 'Mapa del mundo',
   'hudChrome.continentMap.toZone': 'Mapa de la zona',
-  'hudChrome.continentMap.toggleAria': 'Alternar entre el mapa del mundo y el mapa de la zona',
+  'hudChrome.continentMap.toggleAria':
+    'Alternar entre el mapa del mundo, el mapa de zona y el mapa de instancia',
   'guide.bestiary.flavor.sethrael_palecoil':
     'Una serpiente pálida como el hueso que se desliza por la profunda plataforma del Glimmermere, guardiana silenciosa de las aguas que ha reclamado. Los nadadores que comparten el lago con ella rara vez vuelven a la superficie.',
   'guide.combat.metersBody':
@@ -13921,15 +13923,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Consume 3 de Ferocidad de Manada después de que tu mascota golpee por 83 a 105 de daño Físico y sacuda a todos los enemigos a menos de 6 metros por 26 a 34. El golpe y la sacudida usan la bonificación completa del 30% de daño de mascota de la Ferocidad de Manada y aumentan con el poder de ataque de la mascota. Durante los 8 s siguientes, la mascota inflige un 25% más de daño, ataca un 35% más rápido y hace que el Disparo Funesto alcance hasta a 2 enemigos cercanos.',
   'entities.abilities.wildheart.description': 'Restaura al instante el 30% de tu salud máxima.',
   'entities.abilities.ancestor_return.name': 'Retorno de los Ancestros',
-  'entities.abilities.grove_awakening.description':
-    'Devuelve a la vida a todos los miembros caídos de tu grupo o banda en un radio de 40 yardas y dentro de tu línea de visión, de vuelta a tu lado con un 30% de salud y maná. No puede lanzarse en combate. (Corazón del Bosque)',
-  'entities.abilities.grove_awakening.name': 'Despertar del Bosque',
-  'entities.abilities.prayer_of_returning.description':
-    'Devuelve a la vida a todos los miembros caídos de tu grupo o banda en un radio de 40 yardas y dentro de tu línea de visión, de vuelta a tu lado con un 30% de salud y maná. No puede lanzarse en combate. (Bendición y Doctrina)',
-  'entities.abilities.prayer_of_returning.name': 'Plegaria del Retorno',
-  'entities.abilities.wildwake.description':
-    'Incita a un aliado caído a florecer de pronto, devolviéndolo a la vida a tu lado con un 35% de su salud y maná, incluso en pleno combate. (Corazón del Bosque)',
-  'entities.abilities.wildwake.name': 'Despertar Silvestre',
   'entities.abilities.galeheart_weapon.name': 'Arma Corazón de Vendaval',
   'entities.abilities.lifespring_weapon.name': 'Arma Manantial de Vida',
   'entities.abilities.primal_exaltation.name': 'Exaltación Primigenia',
@@ -14047,7 +14040,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.oldBlood':
     'Sangre Antigua: fase {stacks} de {max}. Los golpes conectados de lobo y Bruin comparten este banco; con {max}, Mordisco Sangriento o Rompehuesos se transforma',
   'hudChrome.auraEffect.verdance':
-    'Verdor: fase {stacks} de {max}. Los lanzamientos completados de Floración Silvestre y Segundo Florecer lo llenan; con {max}, Alivio presto se convierte en Sobrefloración',
+    'Verdor {stacks}/{max}. Cada Floración Silvestre o Segundo Florecer NUEVO que plantes añade 1. Con {max}, Alivio presto se convierte en Sobrefloración',
   'hudChrome.riftTracker.title': 'Brecha',
   'hudChrome.riftTracker.floor': 'Piso {current} de {total}',
   'hudChrome.riftTracker.closesIn': 'Se cierra en {time}',
@@ -14594,7 +14587,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.ignivar.movement':
     'Movimiento: evita los conos y meteoros de Lluvia de cenizas, muévete con Infierno giratorio y usa los dos huecos de Ola de la Forja.',
   'hudChrome.raidBossGuide.ignivar.apocalypse':
-    'Apocalipsis: mata a Ignivar Ashcaller antes de que termine su lanzamiento.',
+    'Apocalipsis: mata a Ignivar, Invocacenizas antes de que termine su lanzamiento.',
   'hudChrome.raidBossGuide.ignivar.judgment':
     'Juicio de la Forja: identifica el refugio distinto durante el aviso y reuníos dentro de su límite marcado cuando arda el suelo.',
   'hudChrome.raidBossGuide.ignivar.finale':
@@ -14880,9 +14873,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.heroic': 'Heroico',
   'hudChrome.raidBossGuide.ignivar.apocalypseName': 'Apocalipsis',
   'hudChrome.raidBossGuide.ignivar.apocalypseResponse':
-    'Cambiad todo el daño disponible a Ignivar Ashcaller y derrotadlo antes de que termine el lanzamiento.',
+    'Cambiad todo el daño disponible a Ignivar, Invocacenizas y derrotadlo antes de que termine el lanzamiento.',
   'hudChrome.raidBossGuide.ignivar.apocalypseSummary':
-    'Ignivar invoca a un Ashcaller. Si el refuerzo termina Apocalipsis, la banda es derrotada de inmediato.',
+    'Ignivar invoca a un Invocacenizas. Si el refuerzo termina Apocalipsis, la banda es derrotada de inmediato.',
   'hudChrome.raidBossGuide.ignivar.brandHeroicResponse':
     'Repartíos. Abrid un conducto con Torrente abrasador y purificad a un jugador marcado cada vez. Cada purificación desencadena un Contragolpe purificador que afecta a toda la banda.',
   'hudChrome.raidBossGuide.ignivar.brandName': 'Marca de la Pira',
@@ -14920,10 +14913,10 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.ignivar.lastInfernoSummary':
     'Ignivar entra en furia y prepara una aniquilación mientras Lluvia de cenizas, Torrente abrasador e Infierno giratorio se aceleran.',
   'hudChrome.raidBossGuide.ignivar.overview':
-    'Varkhul forjó a Ignivar como heraldo, sello viviente y llave de The Inner Crucible. El encuentro pone a prueba el control de los conductos de agua, el movimiento preciso y el daño prioritario rápido.',
+    'Varkhul forjó a Ignivar como heraldo, sello viviente y llave de el Crisol Interior. El encuentro pone a prueba el control de los conductos de agua, el movimiento preciso y el daño prioritario rápido.',
   'hudChrome.raidBossGuide.ignivar.phaseApocalypseName': 'Intermedio: Apocalipsis',
   'hudChrome.raidBossGuide.ignivar.phaseApocalypseSummary':
-    'Con {health} de salud, Ignivar invoca a un Ashcaller que intenta terminar el encuentro.',
+    'Con {health} de salud, Ignivar invoca a un Invocacenizas que intenta terminar el encuentro.',
   'hudChrome.raidBossGuide.ignivar.phaseFinaleName': 'Final: Último Infierno',
   'hudChrome.raidBossGuide.ignivar.phaseFinaleSummary':
     'Con {health} de salud, Ignivar comienza una fase final de quema con un plazo límite estricto y mecánicas repetidas más rápidas.',
@@ -15708,7 +15701,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.social.roster.confirm':
     '¿Ampliar la lista del gremio con asientos {seats} para {price}? El oro proviene de tu propio bolso y no se reembolsa.',
   'hudChrome.social.roster.confirmAction': 'Expandir',
-  'hudChrome.social.roster.expand': 'Ampliar lista (+ asientos {seats} para {price})',
+  'hudChrome.social.roster.expand': 'Ampliar lista',
   'hudChrome.social.roster.expandedLine':
     '{name} ha ampliado la lista del gremio a miembros de {cap}.',
   'hudChrome.social.roster.maxed': 'La plantilla está en su mayor tamaño',
@@ -16018,4 +16011,1281 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.nythraxis.soulfireSummary':
     'Cada detonación de Desgarro de alma deja un charco de fuego morado con {radius} yd de radio donde estaba cada marca, que arde durante {seconds} s e inflige {tickNormal} de la salud máxima cada segundo. Estar donde los charcos se solapan aplica un pulso de cada uno. Los charcos nunca aparecen a menos de {clearance} yd de una piedra de resguardo.',
   'hudChrome.interfaceUnlock.frameNames.procOverlayFrost': 'Carámbanos',
+  'abilityUi.cast.sundering': 'Quebrantar',
+  'hud.core.mapMarkerLabels.farmPatch': 'Parcelas de cultivo',
+  'hud.logs.keptLockedMany': 'Se conservaron {count} copias bloqueadas.',
+  'hud.logs.keptLockedOne': 'Se conservó {count} copia bloqueada.',
+  'hudChrome.auraEffect.increase.str': 'Aumenta la Fuerza en {value}',
+  'hudChrome.auraEffect.reduce.str': 'Reduce la Fuerza en {value}',
+  'hudChrome.auraEffect.victoryRush': 'Arremetida victoriosa lista',
+  'hudChrome.auraOverlay.procs.victoryRush': 'Arremetida victoriosa',
+  'hudChrome.auraTracks.defensives': 'Enfriamientos defensivos',
+  'hudChrome.auraTracks.friendly': 'Mis beneficios sobre aliados',
+  'hudChrome.auraTracks.mode': 'activado',
+  'hudChrome.auraTracks.overflow': '{count} más no mostrados',
+  'hudChrome.auraTracks.power': 'Enfriamientos ofensivos',
+  'hudChrome.auraTracks.row': '{aura} sobre {unit}',
+  'hudChrome.auraTracks.self': 'Mis beneficios',
+  'hudChrome.auraTracks.selfRow': 'Aura: {aura}',
+  'hudChrome.auraTracks.shields': 'Mis escudos',
+  'hudChrome.auraTracks.utility': 'Movimiento y sigilo',
+  'hudChrome.commissionBoard.crafterRecordLabel': 'Historial del artesano:',
+  'hudChrome.commissionBoard.trackButton': 'Seguir',
+  'hudChrome.corpseHarvest.allBenefit':
+    'Recolecta todos los materiales disponibles de este cadáver.',
+  'hudChrome.corpseHarvest.changeButton': 'Cambiar',
+  'hudChrome.corpseHarvest.checkingStatus': 'Comprobando el estado de recolección...',
+  'hudChrome.corpseHarvest.denial.actorBusy': 'Ya estás ocupado.',
+  'hudChrome.corpseHarvest.denial.actorDead': 'Debes estar vivo para recolectar.',
+  'hudChrome.corpseHarvest.denial.actorInCombat': 'No puedes recolectar durante el combate.',
+  'hudChrome.corpseHarvest.denial.bagsFull': 'Tus bolsas están demasiado llenas para recolectar.',
+  'hudChrome.corpseHarvest.denial.corpseExpiring':
+    'Este cadáver no durará lo suficiente para recolectarlo.',
+  'hudChrome.corpseHarvest.denial.corpseInvalid': 'Este cadáver ya no se puede recolectar.',
+  'hudChrome.corpseHarvest.denial.malformedInput': 'Algo salió mal. Inténtalo de nuevo.',
+  'hudChrome.corpseHarvest.denial.materialUnavailable': '{material} no está en este cadáver.',
+  'hudChrome.corpseHarvest.denial.materialUnavailableWithList':
+    '{material} no está en este cadáver. Disponible: {materials}.',
+  'hudChrome.corpseHarvest.denial.noFieldKit': 'Necesitas un Kit de campo para recolectar.',
+  'hudChrome.corpseHarvest.denial.nothingToHarvest':
+    'Este cadáver no contiene nada que tu Kit de campo pueda recolectar.',
+  'hudChrome.corpseHarvest.denial.outOfRange': 'Acércate para recolectar este cadáver.',
+  'hudChrome.corpseHarvest.denial.preferenceMalformed':
+    'Tu preferencia de recolección no es válida. Elige una para continuar.',
+  'hudChrome.corpseHarvest.denial.priorityProtected':
+    'Otro jugador tiene prioridad sobre este cadáver ahora mismo.',
+  'hudChrome.corpseHarvest.denial.reservedOther': '{name} está recolectando este cadáver.',
+  'hudChrome.corpseHarvest.denial.reservedOtherUnknown':
+    'Otro jugador está recolectando este cadáver.',
+  'hudChrome.corpseHarvest.denial.reservedSelf': 'Ya estás recolectando este cadáver.',
+  'hudChrome.corpseHarvest.denial.wrongWorld': 'Este cadáver no está en tu mundo.',
+  'hudChrome.corpseHarvest.focusBenefit': 'Concentra la recolección en {material}.',
+  'hudChrome.corpseHarvest.harvestActionTooltip':
+    'Recolecta según tu preferencia actual durante {seconds} s. Requiere un Kit de campo. Cada cadáver se puede recolectar una vez. El asesino y su grupo tienen prioridad durante {prioritySeconds} s. El botín que cae sigue disponible.',
+  'hudChrome.corpseHarvest.harvestStarting': 'Iniciando la recolección...',
+  'hudChrome.corpseHarvest.preferenceLabel': 'Preferencia de recolección: {preference}',
+  'hudChrome.corpseHarvest.statusUnavailable':
+    'El estado de recolección no está disponible ahora mismo.',
+  'hudChrome.corpseHarvest.tierBonusHint':
+    'Concentra la recolección en {material}: +{tierBonus} nivel frente a Todos los materiales.',
+  'hudChrome.cosmetics.applied': 'Aplicado',
+  'hudChrome.cosmetics.apply': 'Aplicar',
+  'hudChrome.cosmetics.cardAria': 'Objeto: {name}, {rarity}',
+  'hudChrome.cosmetics.close': 'Cerrar cosméticos',
+  'hudChrome.cosmetics.detach': 'Separar',
+  'hudChrome.cosmetics.legend':
+    'Cuenta: compartido por todos los personajes. Personaje: solo este personaje.',
+  'hudChrome.cosmetics.mechEmpty': 'Aún no tienes cromas de Mecano de combate.',
+  'hudChrome.cosmetics.mechIntro':
+    'El Mecano de combate reemplaza el cuerpo de este personaje. Solo se lleva un croma a la vez.',
+  'hudChrome.cosmetics.mountsIntro':
+    'Una apariencia de montura se dibuja sobre la montura que cabalgue este personaje. Nunca cambia la velocidad.',
+  'hudChrome.cosmetics.mountsNoMount':
+    'Consigue primero una montura: una apariencia necesita algo que montar.',
+  'hudChrome.cosmetics.owned': 'En propiedad',
+  'hudChrome.cosmetics.scopeAccount': 'Cuenta',
+  'hudChrome.cosmetics.scopeCharacter': 'Personaje',
+  'hudChrome.cosmetics.skinsApplyHint': 'Equipa un {type} para aplicar esta apariencia.',
+  'hudChrome.cosmetics.skinsEmpty': 'Aún no tienes apariencias de arma. Visita la Tienda de WOC.',
+  'hudChrome.cosmetics.storeOnly': 'Disponible en la Tienda de WOC',
+  'hudChrome.cosmetics.tabMech': 'Mecano',
+  'hudChrome.cosmetics.tabMounts': 'Monturas',
+  'hudChrome.cosmetics.tabSkins': 'Apariencias',
+  'hudChrome.cosmetics.tabsLabel': 'Secciones de cosméticos',
+  'hudChrome.cosmetics.takeOff': 'Quitar',
+  'hudChrome.cosmetics.title': 'Cosméticos',
+  'hudChrome.cosmetics.wear': 'Equipar',
+  'hudChrome.cosmetics.worn': 'Equipado',
+  'hudChrome.crafting.apexChip': 'Cumbre',
+  'hudChrome.crafting.apexPatternDrop': 'Su patrón se encuentra por el mundo.',
+  'hudChrome.crafting.apexPatternRaid': 'Su patrón es un trofeo de banda poco común.',
+  'hudChrome.crafting.apexPatternRift':
+    'Su patrón se obtiene al completar Brechas de rango alto con victoria.',
+  'hudChrome.crafting.apexPatternVendor':
+    'El intendente heroico vende su patrón a cambio de Marcas heroicas.',
+  'hudChrome.crafting.dailyLimit': 'Solo puedes fabricarlo una vez al día.',
+  'hudChrome.crafting.dailyLimitRetry':
+    'Solo puedes fabricarlo una vez al día. Disponible de nuevo en {duration}.',
+  'hudChrome.crafting.goalQtyDecreaseAria': 'Reducir cantidad objetivo, ahora {count}',
+  'hudChrome.crafting.goalQtyIncreaseAria': 'Aumentar cantidad objetivo, ahora {count}',
+  'hudChrome.crafting.goalQtyRowAria': 'Cantidad objetivo',
+  'hudChrome.crafting.legendaryLine': '{item} renace como {name}, ¡una leyenda!',
+  'hudChrome.crafting.legendaryZoneLine': '¡{player} convirtió {item} en la leyenda {name}!',
+  'hudChrome.crafting.oncePerDay': 'Una vez al día',
+  'hudChrome.crafting.perfectingLink': 'Perfeccionamiento',
+  'hudChrome.crafting.trackGoalButton': 'Seguir',
+  'hudChrome.crafting.trackGoalButtonAria':
+    'Seguir {count} fabricaciones de {name} como objetivo de recolección',
+  'hudChrome.enchantDescription.enchant_weapon_lastflame_zeal':
+    'Tus ataques cuerpo a cuerpo que impactan pueden otorgar 50 de Fuerza durante 15 s y curarte 200 de salud. Se aplican los modificadores de curación. Cada golpe tiene una probabilidad del 1 % por cada 0,6 s de velocidad base del arma atacante. No tiene enfriamiento interno. Cada mano tiene su propio beneficio; los activadores repetidos renuevan el de esa mano. Los ataques a distancia no activan este efecto. Forma de lobo usa en su lugar su velocidad de golpe base de 1 s.',
+  'hudChrome.enchantName.enchant_chest_armor': 'Grabado de pecho: Refuerzo',
+  'hudChrome.enchantName.enchant_chest_greater_stamina': 'Grabado de pecho: Aguante superior',
+  'hudChrome.enchantName.enchant_chest_lucent_stamina': 'Grabado de pecho: Aguante luminoso',
+  'hudChrome.enchantName.enchant_chest_runeweave': 'Grabado de pecho: Tejido rúnico',
+  'hudChrome.enchantName.enchant_chest_spirit': 'Grabado de pecho: Espíritu',
+  'hudChrome.enchantName.enchant_chest_stamina': 'Grabado de pecho: Aguante',
+  'hudChrome.enchantName.enchant_feet_agility': 'Grabado de botas: Agilidad',
+  'hudChrome.enchantName.enchant_feet_lucent_agility': 'Grabado de botas: Agilidad luminosa',
+  'hudChrome.enchantName.enchant_feet_stamina': 'Grabado de botas: Aguante',
+  'hudChrome.enchantName.enchant_feet_strength': 'Grabado de botas: Fuerza',
+  'hudChrome.enchantName.enchant_gloves_agility': 'Grabado de guantes: Agilidad',
+  'hudChrome.enchantName.enchant_gloves_greater_agility': 'Grabado de guantes: Agilidad superior',
+  'hudChrome.enchantName.enchant_gloves_intellect': 'Grabado de guantes: Poder con hechizos',
+  'hudChrome.enchantName.enchant_gloves_strength': 'Grabado de guantes: Fuerza',
+  'hudChrome.enchantName.enchant_helmet_armor': 'Grabado de casco: Refuerzo',
+  'hudChrome.enchantName.enchant_helmet_fortitude': 'Grabado de casco: Entereza',
+  'hudChrome.enchantName.enchant_helmet_greater_fortitude': 'Grabado de casco: Entereza superior',
+  'hudChrome.enchantName.enchant_helmet_intellect': 'Grabado de casco: Intelecto',
+  'hudChrome.enchantName.enchant_helmet_runed_links': 'Grabado de casco: Eslabones rúnicos',
+  'hudChrome.enchantName.enchant_legs_greater_stamina': 'Grabado de piernas: Aguante superior',
+  'hudChrome.enchantName.enchant_legs_intellect': 'Grabado de piernas: Intelecto',
+  'hudChrome.enchantName.enchant_legs_runed_hide': 'Grabado de piernas: Pellejo rúnico',
+  'hudChrome.enchantName.enchant_legs_stamina': 'Grabado de piernas: Aguante',
+  'hudChrome.enchantName.enchant_lucent_infusion': 'Infusión luminosa',
+  'hudChrome.enchantName.enchant_neck_agility': 'Grabado de collar: Agilidad',
+  'hudChrome.enchantName.enchant_neck_intellect': 'Grabado de collar: Intelecto',
+  'hudChrome.enchantName.enchant_neck_spirit': 'Grabado de collar: Espíritu',
+  'hudChrome.enchantName.enchant_offhand_stamina': 'Grabado de mano izquierda: Aguante',
+  'hudChrome.enchantName.enchant_ring_agility': 'Grabado de anillo: Agilidad',
+  'hudChrome.enchantName.enchant_ring_intellect': 'Grabado de anillo: Intelecto',
+  'hudChrome.enchantName.enchant_ring_spirit': 'Grabado de anillo: Espíritu',
+  'hudChrome.enchantName.enchant_ring_strength': 'Grabado de anillo: Fuerza',
+  'hudChrome.enchantName.enchant_shoulder_agility': 'Grabado de hombros: Agilidad',
+  'hudChrome.enchantName.enchant_shoulder_intellect': 'Grabado de hombros: Intelecto',
+  'hudChrome.enchantName.enchant_shoulder_strength': 'Grabado de hombros: Fuerza',
+  'hudChrome.enchantName.enchant_waist_agility': 'Grabado de cintura: Agilidad',
+  'hudChrome.enchantName.enchant_waist_stamina': 'Grabado de cintura: Aguante',
+  'hudChrome.enchantName.enchant_waist_strength': 'Grabado de cintura: Fuerza',
+  'hudChrome.enchantName.enchant_weapon_agility': 'Grabado de arma: Agilidad',
+  'hudChrome.enchantName.enchant_weapon_greater_might': 'Grabado de arma: Poder superior',
+  'hudChrome.enchantName.enchant_weapon_greater_spellpower':
+    'Grabado de arma: Poder con hechizos superior',
+  'hudChrome.enchantName.enchant_weapon_intellect': 'Grabado de arma: Intelecto',
+  'hudChrome.enchantName.enchant_weapon_lastflame_zeal': 'Grabado de arma: Celo de la última llama',
+  'hudChrome.enchantName.enchant_weapon_lucent_might': 'Grabado de arma: Poder luminoso',
+  'hudChrome.enchantName.enchant_weapon_lucent_spellpower':
+    'Grabado de arma: Poder con hechizos luminoso',
+  'hudChrome.enchantName.enchant_weapon_might': 'Grabado de arma: Poder',
+  'hudChrome.enchantName.enchant_weapon_runed_edge': 'Grabado de arma: Filo rúnico',
+  'hudChrome.enchantName.enchant_weapon_runed_focus': 'Grabado de arma: Concentración rúnica',
+  'hudChrome.enchanting.enchantSkillTooLow':
+    'Tu habilidad de Encantamiento es demasiado baja para ese encantamiento.',
+  'hudChrome.enchanting.notPerfected':
+    'Solo un objeto perfeccionado puede llevar ese encantamiento.',
+  'hudChrome.enchanting.recipeNotLearned':
+    'Aprende la fórmula antes de aplicar este encantamiento.',
+  'hudChrome.enchanting.replaceConfirmKeepsPerfecting': 'Perfeccionamiento',
+  'hudChrome.enchanting.sunderConfirmBody':
+    'Esto destruye {item} y produce Esencia quebrada. No se puede deshacer.',
+  'hudChrome.enchanting.sunderConfirmBodySpecial':
+    'Esto destruye una copia especial de {item} (firmada, obra maestra o encantada) y produce Esencia quebrada. No se puede deshacer.',
+  'hudChrome.enchanting.sunderConfirmTitle': '¿Quebrantar {item}?',
+  'hudChrome.enchanting.tier.lucent': 'Encantamientos luminosos',
+  'hudChrome.farming.denied.bad_bed': 'No hay ninguna parcela de cultivo ahí.',
+  'hudChrome.farming.denied.bad_crop': 'No puedes plantar eso aquí.',
+  'hudChrome.farming.denied.bed_taken': 'Ya tienes un cultivo creciendo ahí.',
+  'hudChrome.farming.denied.feast_active': 'Tu festín ya está servido.',
+  'hudChrome.farming.denied.feast_eaten': 'Ya has comido de ese festín.',
+  'hudChrome.farming.denied.feast_expired': 'Ese festín ha desaparecido.',
+  'hudChrome.farming.denied.feast_finished': 'Ese festín ha quedado agotado.',
+  'hudChrome.farming.denied.locked': 'Hay un objeto bloqueado que pagaría eso.',
+  'hudChrome.farming.denied.no_compost': 'No tienes compost.',
+  'hudChrome.farming.denied.no_farmer':
+    'Debes estar cerca de un granjero para cambiar cáscaras por compost.',
+  'hudChrome.farming.denied.no_feast': 'No tienes ningún festín que servir.',
+  'hudChrome.farming.denied.no_fee_produce':
+    'No tienes productos para pagar la tasa de vigilancia.',
+  'hudChrome.farming.denied.no_husks': 'No tienes suficientes cáscaras marchitas.',
+  'hudChrome.farming.denied.no_plot': 'No hay nada plantado en esa parcela.',
+  'hudChrome.farming.denied.no_seed': 'No tienes semillas para ese cultivo.',
+  'hudChrome.farming.denied.no_tonic': 'No tienes tónico de crecimiento.',
+  'hudChrome.farming.denied.not_ready': 'Ese cultivo aún está creciendo.',
+  'hudChrome.farming.denied.range': 'Estás demasiado lejos de esa parcela.',
+  'hudChrome.farming.denied.skill':
+    'Tu habilidad de Agricultura es demasiado baja para ese cultivo.',
+  'hudChrome.farming.denied.tool': 'No tienes una azada de agricultura adecuada para ese cultivo.',
+  'hudChrome.farming.feastPlacedLine': 'Has servido tu festín de cosecha.',
+  'hudChrome.farming.feastTitle': 'Festín de cosecha de {name}',
+  'hudChrome.farming.goldenBonusLine': 'La cosecha dorada produce: {name}.',
+  'hudChrome.farming.harvestFineLine': 'También obtienes: {name}.',
+  'hudChrome.farming.harvestFineLineQty': 'También obtienes: {name} x{qty}.',
+  'hudChrome.farming.harvestLine': 'Obtienes: {name}.',
+  'hudChrome.farming.harvestLineQty': 'Obtienes: {name} x{qty}.',
+  'hudChrome.farming.huskTrade': 'Cambiar cáscaras por compost',
+  'hudChrome.farming.huskTradeAria': 'Cambiar cáscaras por compost con {name}',
+  'hudChrome.farming.husksConvertedLine': 'Cambias {husksName} x{husks} por {name}.',
+  'hudChrome.farming.husksConvertedLineQty': 'Cambias {husksName} x{husks} por {name} x{qty}.',
+  'hudChrome.farming.plantLine': 'Plantas: {name}.',
+  'hudChrome.farming.plantSheet.close': 'Cerrar la ventana de la parcela',
+  'hudChrome.farming.plantSheet.empty': 'No tienes semillas que puedas sembrar en esta parcela.',
+  'hudChrome.farming.plantSheet.plant': 'Plantar',
+  'hudChrome.farming.plantSheet.sowAria': 'Sembrar {name}',
+  'hudChrome.farming.plantSheet.title': 'Plantar un cultivo',
+  'hudChrome.farming.pressTarget.feastOverHarvest':
+    'Un festín y tu cultivo están al alcance. Interactuar toma primero el festín; aléjate del festín para abrir la ventana de la parcela.',
+  'hudChrome.farming.pressTarget.feastOverPlant':
+    'Un festín y una parcela vacía están al alcance. Interactuar toma primero el festín; aléjate del festín para plantar.',
+  'hudChrome.farming.readyLine': 'Hay un cultivo listo para cosechar.',
+  'hudChrome.farming.readyLineQty': 'Hay {count} cultivos listos para cosechar.',
+  'hudChrome.farming.readyWitheredLine': 'Un cultivo se ha marchitado en su parcela.',
+  'hudChrome.farming.readyWitheredLineQty': '{count} cultivos se han marchitado en sus parcelas.',
+  'hudChrome.farming.sageleafFeastTitle': 'Festín de hoja sabia de {name}',
+  'hudChrome.farming.seedBackLine': 'Recuperas semillas: {name}.',
+  'hudChrome.farming.seedBackLineQty': 'Recuperas semillas: {name} x{qty}.',
+  'hudChrome.farming.stonepotFeastTitle': 'Festín de maceta pétrea de {name}',
+  'hudChrome.farming.warspiceFeastTitle': 'Festín de especias de guerra de {name}',
+  'hudChrome.farming.witheredLine': 'El cultivo se marchitó. Despejas la parcela: {name}.',
+  'hudChrome.farming.witheredLineQty':
+    'El cultivo se marchitó. Despejas la parcela: {name} x{qty}.',
+  'hudChrome.gathering.corpseHarvesting': 'Recolección de cadáveres',
+  'hudChrome.gathering.downgradeMarkCrop':
+    'Bolsas llenas: la cosecha se guardó sin la marca de su cultivador.',
+  'hudChrome.gathering.farming': 'Agricultura',
+  'hudChrome.gathering.noNodeNearby.farming': 'No hay ninguna parcela al alcance.',
+  'hudChrome.gathering.tierRequired.farming': 'Requiere una azada de agricultura de nivel {tier}',
+  'hudChrome.gathering.toolRequired.farming':
+    'Necesitas una azada de agricultura para trabajar esta parcela.',
+  'hudChrome.gathering.toolTierUnmet.farming':
+    'Necesitas una azada de agricultura de nivel {tier} para trabajar esta parcela.',
+  'hudChrome.gathering.toolTooltip.kind.farming': 'Herramienta de agricultura (nivel {tier})',
+  'hudChrome.gathering.toolTooltip.rodBandCatch':
+    'Desbloquea {fish} con habilidad de pesca {skill} o superior.',
+  'hudChrome.gathering.toolTooltip.unlocks.farming':
+    'Necesaria para plantar cultivos hasta el nivel {tier}.',
+  'hudChrome.gathering.toolTooltip.use.farming':
+    'Funciona desde tus bolsas al plantar en una parcela.',
+  'hudChrome.gathering.wieldUnmet.farming':
+    'Necesitas Agricultura {skill} para blandir la azada que llevas en las bolsas.',
+  'hudChrome.gatheringGoal.clearButton': 'Borrar',
+  'hudChrome.gatheringGoal.close': 'Borrar objetivo de recolección',
+  'hudChrome.gatheringGoal.commissionGoalLabel': 'Encargo: {name} x{count}',
+  'hudChrome.gatheringGoal.craftCountLine': '{count} fabricaciones seguidas',
+  'hudChrome.gatheringGoal.currentPreferenceAria': '{name} es tu preferencia actual de recolección',
+  'hudChrome.gatheringGoal.currentPreferenceLabel': 'Preferencia actual de recolección',
+  'hudChrome.gatheringGoal.empty': 'No se ha establecido ningún objetivo de recolección.',
+  'hudChrome.gatheringGoal.invalidGoalLabel': 'Ya no se sigue',
+  'hudChrome.gatheringGoal.materialCarried': '{count} transportadas',
+  'hudChrome.gatheringGoal.materialInaccessible': '{count} no disponibles para fabricar',
+  'hudChrome.gatheringGoal.materialLine': '{name}: {reachable} de {required}',
+  'hudChrome.gatheringGoal.materialMissing': 'Faltan {count}',
+  'hudChrome.gatheringGoal.materialStored': '{count} almacenadas',
+  'hudChrome.gatheringGoal.payableCraftsLine': 'Suficiente para {count} fabricaciones más.',
+  'hudChrome.gatheringGoal.readyHint':
+    'Materiales disponibles. Fabricar aún requiere oro, una estación y espacio en las bolsas.',
+  'hudChrome.gatheringGoal.reasonBatchLimit': 'Ese tamaño de lote ya no es válido.',
+  'hudChrome.gatheringGoal.reasonCommissionUnavailable':
+    'Ese encargo ya no se sigue. Vuelve a seguirlo desde el tablón si aún aparece.',
+  'hudChrome.gatheringGoal.reasonDailyLimit': 'Esa receta ya se ha fabricado hoy.',
+  'hudChrome.gatheringGoal.reasonInvalidGoal': 'Este objetivo ya no es válido.',
+  'hudChrome.gatheringGoal.reasonRecipeUnavailable': 'Esa receta ya no está disponible para ti.',
+  'hudChrome.gatheringGoal.reasonUnknownRecipe': 'Esa receta ya no existe.',
+  'hudChrome.gatheringGoal.recipeGoalLabel': 'Receta: {name} x{count}',
+  'hudChrome.gatheringGoal.setPreferenceButton': 'Establecer como preferencia de recolección',
+  'hudChrome.gatheringGoal.setPreferenceButtonAria':
+    'Establecer {name} como preferencia de recolección',
+  'hudChrome.gatheringGoal.sourcesToggle': 'Fuentes',
+  'hudChrome.gatheringGoal.sourcesToggleAria': 'Fuentes de {name}',
+  'hudChrome.gatheringGoal.statusCancelled': 'Cancelado',
+  'hudChrome.gatheringGoal.statusCollecting': 'Recolectando',
+  'hudChrome.gatheringGoal.statusDelivered': 'Entregado',
+  'hudChrome.gatheringGoal.statusExpired': 'Caducado',
+  'hudChrome.gatheringGoal.statusReady': 'Listo',
+  'hudChrome.gatheringGoal.statusUnavailable': 'No disponible',
+  'hudChrome.gatheringGoal.storageRestrictedNote':
+    'Algunos materiales están almacenados en un lugar al que no puedes acceder desde aquí.',
+  'hudChrome.gatheringGoal.title': 'Objetivo de recolección',
+  'hudChrome.gatheringGoal.unknownRecipeLabel': 'Receta desconocida',
+  'hudChrome.gatheringSource.corpseExample': 'Cadáver: {creature} ({zone})',
+  'hudChrome.gatheringSource.corpseExampleTagged': 'Cadáver: {creature} ({zone}, {tag})',
+  'hudChrome.gatheringSource.eliteTag': 'élite',
+  'hudChrome.gatheringSource.farmNote':
+    'Cultivado a partir de una semilla plantada, listo tras unos {duration}. Requiere Agricultura {skill}+ y una azada de nivel {tier}+.',
+  'hudChrome.gatheringSource.fishingZoneProven':
+    'Aguas de {zone} (pericia {skill}+, caña de nivel {tier}+)',
+  'hudChrome.gatheringSource.fishingZoneUnproven':
+    'Algunas aguas requieren pericia {skill}+ y una caña de nivel {tier}+; aún no se ha confirmado un lugar concreto.',
+  'hudChrome.gatheringSource.gatedTag': 'requiere misión',
+  'hudChrome.gatheringSource.moreSources': 'y {count} más',
+  'hudChrome.gatheringSource.moreZones': 'y {count} zonas más',
+  'hudChrome.gatheringSource.nodeFineNote':
+    'Una herramienta de recolección de nivel {tier}+ mejora esto a su grado fino en una veta adecuada.',
+  'hudChrome.gatheringSource.nodeZone': '{zone} (herramienta de nivel {tier}+)',
+  'hudChrome.gatheringSource.premiumChance':
+    'Las recolecciones raras o mejores de {material} también producen {specimen} si hay espacio en tus bolsas.',
+  'hudChrome.gatheringSource.rareTag': 'raro',
+  'hudChrome.gatheringSource.specimenOfBase':
+    '{material} es una bonificación de recolección rara o mejor de {base}, de las mismas criaturas mostradas arriba; nunca es un hallazgo garantizado aparte.',
+  'hudChrome.gatheringSource.title': 'Dónde encontrar {material}',
+  'hudChrome.harvestJournal.bedLine': '{zone}, parcela {index}',
+  'hudChrome.harvestJournal.bedLineUnknown': 'Parcela desconocida',
+  'hudChrome.harvestJournal.careNone': 'Sin extras',
+  'hudChrome.harvestJournal.careWatch': 'Vigilancia del granjero',
+  'hudChrome.harvestJournal.close': 'Cerrar',
+  'hudChrome.harvestJournal.emptyBody':
+    'Siembra una semilla en cualquier parcela y aquí aparecerá con su temporizador.',
+  'hudChrome.harvestJournal.emptyTitle': 'No hay cultivos plantados',
+  'hudChrome.harvestJournal.finishing': 'Terminando',
+  'hudChrome.harvestJournal.growing': 'Listo en {time}',
+  'hudChrome.harvestJournal.listLabel': 'Parcelas plantadas',
+  'hudChrome.harvestJournal.noviceBody':
+    'La habilidad de Agricultura aumenta cada vez que recoges un cultivo. Siembra una semilla en cualquier parcela para empezar.',
+  'hudChrome.harvestJournal.noviceTitle': 'Aún no has trabajado una parcela',
+  'hudChrome.harvestJournal.ready': 'Listo para cosechar',
+  'hudChrome.harvestJournal.readyAnnounce': 'Listo para cosechar: {name}',
+  'hudChrome.harvestJournal.remainingDaysHours': '{days} d {hours} h',
+  'hudChrome.harvestJournal.remainingHoursMinutes': '{hours} h {minutes} min',
+  'hudChrome.harvestJournal.remainingMinutesSeconds': '{minutes} min {seconds} s',
+  'hudChrome.harvestJournal.remainingSeconds': '{seconds} s',
+  'hudChrome.harvestJournal.stageMaturing': 'Madurando',
+  'hudChrome.harvestJournal.stageRipe': 'Maduro',
+  'hudChrome.harvestJournal.stageSeedling': 'Plántula',
+  'hudChrome.harvestJournal.stageSprout': 'Brote',
+  'hudChrome.harvestJournal.title': 'Diario de cosecha',
+  'hudChrome.harvestJournal.withered': 'Marchito',
+  'hudChrome.harvestPreference.allLabel': 'Todos los materiales',
+  'hudChrome.harvestPreference.applyButton': 'Aplicar',
+  'hudChrome.harvestPreference.cancelButton': 'Cancelar',
+  'hudChrome.harvestPreference.currentChoiceLabel': 'Actual: {choice}',
+  'hudChrome.harvestPreference.currentUnavailable':
+    'Tu elección actual, {material}, no se ofrece aquí.',
+  'hudChrome.harvestPreference.pickHint': 'Elige qué recolectar antes de aplicar.',
+  'hudChrome.harvestPreference.title': 'Preferencia de recolección',
+  'hudChrome.harvestPreference.unknownMaterial': 'Material no disponible',
+  'hudChrome.hubLesson.ackContinue': 'Continuar',
+  'hudChrome.hubLesson.ackDone': 'Listo',
+  'hudChrome.hubLesson.act': 'Asesta un golpe para iniciar la medición.',
+  'hudChrome.hubLesson.actDamage': 'Ataca al muñeco para iniciar la medición.',
+  'hudChrome.hubLesson.actHealing': 'Lanza una curación al muñeco para iniciar la medición.',
+  'hudChrome.hubLesson.addAttackToBar':
+    'Añade tu ataque desde el libro de hechizos a la barra de acción y úsalo sobre el muñeco.',
+  'hudChrome.hubLesson.addToBar':
+    'Añade tu curación a la barra de acción desde el libro de hechizos y lánzala sobre el muñeco.',
+  'hudChrome.hubLesson.compareAgain':
+    'Vuelve a Actual con la flecha derecha y ataca al mismo muñeco durante aproximadamente el mismo tiempo.',
+  'hudChrome.hubLesson.endHealingRun':
+    'Deja de curar durante 5 segundos para terminar esta sesión; después podrás repetir la lección.',
+  'hudChrome.hubLesson.endRun':
+    'Desactiva Atacar y deja de lanzar hechizos. La sesión termina tras 5 segundos sin golpear.',
+  'hudChrome.hubLesson.findRun': 'Usa las flechas del medidor para volver a tu sesión de práctica.',
+  'hudChrome.hubLesson.inspectHistory':
+    'Usa la flecha del historial para revisar esa sesión terminada.',
+  'hudChrome.hubLesson.openTab': 'Cambia a la pestaña derecha.',
+  'hudChrome.hubLesson.openTabDamage': 'Cambia a la pestaña Daño.',
+  'hudChrome.hubLesson.openTabHealing': 'Cambia a la pestaña Curación.',
+  'hudChrome.hubLesson.openWindow': 'Abre {meters}.',
+  'hudChrome.hubLesson.openWindowTouch': 'Abre {menu} → {more} → {meters}.',
+  'hudChrome.hubLesson.readRow': 'Lee tu fila y pulsa Continuar.',
+  'hudChrome.hubLesson.readRowDamage':
+    'Total es todo tu daño en esta sesión. DPS es el daño por segundo durante la sesión. Mira tu fila y pulsa Continuar.',
+  'hudChrome.hubLesson.readRowHealing':
+    'Total cuenta la salud restaurada; curar por encima de la salud completa suma cero. HPS es la salud restaurada por segundo durante la sesión. Lee tu fila y pulsa Continuar.',
+  'hudChrome.hubLesson.replay':
+    'Lección completada. Practica libremente o repite estas instrucciones.',
+  'hudChrome.hubLesson.replayAction': 'Practicar de nuevo',
+  'hudChrome.hubLesson.replayTarget': 'Seleccionarlo de nuevo',
+  'hudChrome.hubLesson.reviewComparison':
+    'Usa las flechas para comparar Total, DPS y duración con tu primera sesión. Vuelve a esta sesión y pulsa Listo.',
+  'hudChrome.hubLesson.target': 'Selecciona el muñeco para empezar.',
+  'hudChrome.hubLesson.viewBreakdown':
+    'Pasa el cursor, enfoca o mantén pulsada tu fila para ver el desglose por habilidad.',
+  'hudChrome.itemMasterwrought': 'Equipado único: Maestroforjado ({count})',
+  'hudChrome.itemMenu.combine': 'Combinar pilas de materiales',
+  'hudChrome.itemMenu.separateByGatherer': 'Separar por recolector',
+  'hudChrome.itemMenu.sunder': 'Quebrantar',
+  'hudChrome.itemMenu.takeChosenQuantity': 'Retirar la cantidad elegida',
+  'hudChrome.itemMenu.viewSources': 'Ver fuentes',
+  'hudChrome.itemTooltip.materialSourceGathererSigned':
+    '{count} × Recolectado por {name}, firmado por {signer}',
+  'hudChrome.itemTooltip.materialSourceGatherer': '{count} × Recolectado por {name}',
+  'hudChrome.itemTooltip.materialSourceMore': '+{sources} fuentes más, {units} unidades',
+  'hudChrome.itemTooltip.materialSourceUnrecorded': '{count} × Sin recolector registrado',
+  'hudChrome.itemTooltip.materialSourceUnrecordedSigned':
+    '{count} × Sin recolector registrado, firmado por {name}',
+  'hudChrome.itemTooltip.perfectedBadge': 'Perfeccionado',
+  'hudChrome.itemTooltip.perfectingRank': 'Perfeccionamiento: rango {rank} de {ranks}',
+  'hudChrome.masterwrought.pieceMark': 'Maestroforjado',
+  'hudChrome.masterwrought.slotsLabel': 'Ranuras maestroforjadas:',
+  'hudChrome.masterwrought.slotsValue': 'Usadas: {used} / {cap}',
+  'hudChrome.masterwrought.tooltipAtCap': 'Las {cap} ranuras maestroforjadas están en uso.',
+  'hudChrome.masterwrought.tooltipLegendaryLimit':
+    'Solo se puede llevar {cap} pieza maestroforjada legendaria.',
+  'hudChrome.masterwrought.tooltipWorn':
+    'Ocupa una ranura maestroforjada ({used} de {cap} en uso).',
+  'hudChrome.materialHint.arcaneDust':
+    'Reactivo de fabricación. Se obtiene al desencantar equipo común y poco común.',
+  'hudChrome.materialHint.arcaneEssence':
+    'Reactivo de fabricación. Se obtiene al desencantar equipo raro.',
+  'hudChrome.materialHint.banditBandana':
+    'Reactivo de fabricación. Los bandidos lo sueltan aproximadamente la mitad de las veces y sus líderes con nombre siempre llevan uno.',
+  'hudChrome.materialHint.crackedOgreTusk':
+    'Reactivo de fabricación. Brutok Rompecráneos lleva uno cada vez que cae y es su única fuente.',
+  'hudChrome.materialHint.crackedWyrmScale':
+    'Reactivo de fabricación. Los guardas de escamas del Santuario lo sueltan aproximadamente la mitad de las veces y ninguna otra criatura lo lleva.',
+  'hudChrome.materialHint.deedOfMaking':
+    'Escrito de inscripción. Se consume para elevar una obra maestra maestroforjada perfeccionada a legendaria y darle un nombre.',
+  'hudChrome.materialHint.emberwingCinderscale':
+    'Reactivo de fabricación. Voskar el Ala de Ascua deja uno cada vez que cae y ninguna otra bestia lo lleva.',
+  'hudChrome.materialHint.growthTonic':
+    'Suministro de agricultura. Se gasta al plantar un cultivo para aumentar ligeramente la cosecha. Si el cultivo se marchita, el tónico se pierde con él.',
+  'hudChrome.materialHint.masterwroughtIntermediate': 'Componente de fabricación maestroforjado.',
+  'hudChrome.materialHint.mudfinScale':
+    'Reactivo de fabricación. Los merodeadores aleta de lodo lo sueltan aproximadamente la mitad de las veces, los peces del pantano profundo algo menos y los terrores con nombre de esas aguas siempre.',
+  'hudChrome.materialHint.oldCragmawsPelt':
+    'Reactivo de fabricación. Cragmal viejo deja uno cada vez que cae y ninguna otra bestia lo lleva.',
+  'hudChrome.materialHint.quickeningCatalyst':
+    'Catalizador de fabricación. Un alquimista solo puede fabricar uno al día.',
+  'hudChrome.materialHint.tallowCandle':
+    'Reactivo de fabricación. Los excavadores de Roca Profunda lo sueltan más de la mitad de las veces y los cultistas de los Clamamuertos de vez en cuando; los líderes con nombre de ambos siempre llevan uno.',
+  'hudChrome.materialHint.wyrmfallCore':
+    'Catalizador de fabricación maestroforjado. El jefe final de banda suelta de 1 a 3 para cada jugador una vez al día en cada dificultad. Los jefes finales de mazmorra heroica sueltan de 1 a 3 para cada jugador una vez al día. Tu primera victoria diaria de carrera de Brecha de rango A o S otorga 1 en rango A o 2 en rango S. El intendente heroico vende uno a cambio de Marcas heroicas.',
+  'hudChrome.materialSources.cancel': 'Cancelar',
+  'hudChrome.materialSources.choose': 'Fuentes',
+  'hudChrome.materialSources.chooseAria': 'Elegir las fuentes de materiales que mover para {item}',
+  'hudChrome.materialSources.close': 'Cerrar fuentes de materiales',
+  'hudChrome.materialSources.confirm': 'Mover unidades seleccionadas',
+  'hudChrome.materialSources.decreaseAria': 'Reducir unidades de {source}',
+  'hudChrome.materialSources.detailsTitle': 'Fuentes de {item}',
+  'hudChrome.materialSources.gatherer': 'Recolectado por {name}',
+  'hudChrome.materialSources.gathererSigned': 'Recolectado por {name}, firmado por {signer}',
+  'hudChrome.materialSources.increaseAria': 'Aumentar unidades de {source}',
+  'hudChrome.materialSources.listAria': 'Lista de fuentes de materiales',
+  'hudChrome.materialSources.pickerTitle': 'Elegir fuentes de {item}',
+  'hudChrome.materialSources.quantityAria': 'Unidades de {source}, hasta {count}',
+  'hudChrome.materialSources.row': '{count} unidades: {source}',
+  'hudChrome.materialSources.total': '{units} unidades en esta pila',
+  'hudChrome.materialSources.unrecorded': 'Sin recolector registrado',
+  'hudChrome.materialSources.unrecordedSigned': 'Sin recolector registrado, firmado por {name}',
+  'hudChrome.materialSources.view': 'Fuentes',
+  'hudChrome.materialSources.viewAria': 'Ver todas las fuentes de materiales de {item}',
+  'hudChrome.materialStackSelectionUnavailable':
+    'Esa selección de materiales ya no está disponible.',
+  'hudChrome.meters.millions': '{value} M',
+  'hudChrome.meters.thousands': '{value} mil',
+  'hudChrome.mounts.desc_rallycart_skin': 'Un pequeño coche de carreras con un rugido enorme.',
+  'hudChrome.mounts.name_terrorspark_groundshaker': 'Sacudetierra Chispa de Terror',
+  'hudChrome.options.showDefensivesTrack': 'Mostrar enfriamientos defensivos',
+  'hudChrome.options.showFriendlyTrack': 'Mostrar mis beneficios sobre aliados',
+  'hudChrome.options.showOffensiveTrack': 'Mostrar enfriamientos ofensivos',
+  'hudChrome.options.showSelfBuffTrack': 'Mostrar mis beneficios',
+  'hudChrome.options.showShieldTrack': 'Mostrar mis escudos',
+  'hudChrome.options.showUtilityModes': 'Incluir modos de sigilo y viaje',
+  'hudChrome.options.showUtilityTrack': 'Mostrar movimiento y sigilo',
+  'hudChrome.pattern.teaches': 'Uso: te enseña a fabricar {item}.',
+  'hudChrome.pattern.teachesEnchant': 'Uso: te enseña a aplicar {enchant}.',
+  'hudChrome.perfecting.attempt': 'Intentar perfeccionar',
+  'hudChrome.perfecting.attemptCost': 'Coste del intento',
+  'hudChrome.perfecting.bagCopy': 'Copia de bolsa {index} de {count}',
+  'hudChrome.perfecting.bindConfirmAccept': 'Vincular e intentar',
+  'hudChrome.perfecting.bindConfirmCancel': 'Cancelar',
+  'hudChrome.perfecting.bindConfirmText':
+    'Tu primer intento vincula {name} a ti. ¿Intentarlo de todos modos?',
+  'hudChrome.perfecting.bindWarn': 'Tu primer intento de perfeccionamiento vincula {name} a ti.',
+  'hudChrome.perfecting.bindWarnDetail':
+    'El perfeccionamiento nunca reduce un rango: un intento fallido solo gasta sus materiales. Una pieza con progreso de perfeccionamiento o ya perfeccionada no se puede desvincular, y una promoción es permanente.',
+  'hudChrome.perfecting.close': 'Cerrar la ventana de perfeccionamiento',
+  'hudChrome.perfecting.empty':
+    'No tienes ninguna pieza maestroforjada. Las recetas de cumbre forjan una.',
+  'hudChrome.perfecting.enchantInactive':
+    'Encantamiento inactivo: esta pieza debe estar perfeccionada. El encantamiento se conserva.',
+  'hudChrome.perfecting.equipBlocked':
+    'No pudiste equiparla tras promocionarla. Desequipa primero la pieza incompatible.',
+  'hudChrome.perfecting.matCount': '{have} de {required}',
+  'hudChrome.perfecting.nameCancel': 'Cancelar',
+  'hudChrome.perfecting.nameCount': '{count} de {max}',
+  'hudChrome.perfecting.nameHint':
+    'De 2 a 32 caracteres: letras, espacios, apóstrofes y guiones, empezando por una letra.',
+  'hudChrome.perfecting.nameInputAria': 'Nombre legendario',
+  'hudChrome.perfecting.nameLabel': 'Inscribir un nombre para {name}. El nombre es permanente.',
+  'hudChrome.perfecting.nameSubmit': 'Forjar la leyenda',
+  'hudChrome.perfecting.nameSubmitBusy': 'Forjando',
+  'hudChrome.perfecting.nameTitle': 'Nombrar la leyenda',
+  'hudChrome.perfecting.namingSelectionUnconfirmed':
+    'Tus bolsas cambiaron: no se pudo confirmar la pieza que se iba a nombrar. Comprueba la selección antes de forjar.',
+  'hudChrome.perfecting.openButton': 'Perfeccionamiento',
+  'hudChrome.perfecting.openButtonAria': 'Abrir la ventana de perfeccionamiento',
+  'hudChrome.perfecting.perfectedAnnounce': '{name} ahora está perfeccionado.',
+  'hudChrome.perfecting.perfectedLead': 'Perfeccionado. Dale un nombre para forjar una leyenda.',
+  'hudChrome.perfecting.promote': 'Nombrar y promocionar',
+  'hudChrome.perfecting.promoteCost': 'Coste de promoción',
+  'hudChrome.perfecting.promotedAnnounce': '{name} se forja como {chosen}.',
+  'hudChrome.perfecting.promotedLine': 'Una leyenda terminada: no queda nada que perfeccionar.',
+  'hudChrome.perfecting.rankAnnounce':
+    '{name} alcanza el rango de perfeccionamiento {rank} de {ranks}.',
+  'hudChrome.perfecting.rowPerfected': 'Perfeccionado',
+  'hudChrome.perfecting.rowPromoted': 'Legendario',
+  'hudChrome.perfecting.rowRank': 'Rango {rank} de {ranks}',
+  'hudChrome.perfecting.skillMet': 'Cumplido.',
+  'hudChrome.perfecting.skillNeed': 'Requiere habilidad {skill} de {craft}.',
+  'hudChrome.perfecting.skillSyncing': 'Comprobando tu habilidad de oficio.',
+  'hudChrome.perfecting.skillUnmet': 'No cumplido.',
+  'hudChrome.perfecting.swapAction': 'Revisar intercambio de rangos',
+  'hudChrome.perfecting.swapBusy':
+    'Sal del combate y termina tu acción actual antes de intercambiar rangos.',
+  'hudChrome.perfecting.swapChanged':
+    'Las piezas seleccionadas han cambiado. Elígelas de nuevo y revisa los rangos nuevos.',
+  'hudChrome.perfecting.swapChoose': 'Elige una segunda pieza para previsualizar el intercambio.',
+  'hudChrome.perfecting.swapConfirm':
+    'Ambas piezas quedarán vinculadas a ti permanentemente. ¿Intercambiar sus rangos de perfeccionamiento?',
+  'hudChrome.perfecting.swapConfirmAccept': 'Vincular e intercambiar rangos',
+  'hudChrome.perfecting.swapDead': 'Debes estar vivo para intercambiar rangos.',
+  'hudChrome.perfecting.swapEnchantActive':
+    'Su encantamiento exclusivo de perfeccionados vuelve a estar activo.',
+  'hudChrome.perfecting.swapEnchantInactive':
+    'Su encantamiento exclusivo de perfeccionados queda inactivo hasta que esta pieza vuelva a estar perfeccionada.',
+  'hudChrome.perfecting.swapInterrupted':
+    'No pudimos confirmar el intercambio tras reconectar. Comprueba los rangos de ambas piezas antes de elegir otro intercambio.',
+  'hudChrome.perfecting.swapIntro':
+    'Elige otra pieza que poseas de esta colección. Intercambia rangos en la estación de fabricación correspondiente, fuera de combate y con habilidad de oficio {skill}. No requiere materiales ni tirada de fallo.',
+  'hudChrome.perfecting.swapInvalid':
+    'Estas piezas tienen un progreso de perfeccionamiento no compatible y no pueden intercambiar rangos.',
+  'hudChrome.perfecting.swapLocked': 'Desbloquea ambas piezas antes de intercambiar rangos.',
+  'hudChrome.perfecting.swapPending': 'Intercambiando rangos',
+  'hudChrome.perfecting.swapPreserve':
+    'Ningún objeto se consume. Los nombres, la promoción cosmética a legendario y los encantamientos permanecen en sus piezas originales. Los límites de equipo siguen aplicándose.',
+  'hudChrome.perfecting.swapRank': '{name}: rango {before} a {after}',
+  'hudChrome.perfecting.swapSameRank':
+    'Estas piezas ya tienen el mismo rango de perfeccionamiento.',
+  'hudChrome.perfecting.swapSkill': 'Necesitas habilidad {skill} en el oficio de esta colección.',
+  'hudChrome.perfecting.swapStation':
+    'Ve a la estación de fabricación correspondiente para intercambiar rangos.',
+  'hudChrome.perfecting.swapSuccess':
+    'Rangos de perfeccionamiento intercambiados. Ambas piezas están vinculadas permanentemente.',
+  'hudChrome.perfecting.swapTitle': 'Intercambiar rangos de perfeccionamiento',
+  'hudChrome.perfecting.title': 'Perfeccionamiento',
+  'hudChrome.perfecting.unknownItem': 'Objeto desconocido',
+  'hudChrome.perfecting.wornChip': 'Usado',
+  'hudChrome.plurals.commissionLegendaries.few': '{count} legendarios',
+  'hudChrome.plurals.commissionLegendaries.many': '{count} legendarios',
+  'hudChrome.plurals.commissionLegendaries.one': '{count} legendario',
+  'hudChrome.plurals.commissionLegendaries.other': '{count} legendarios',
+  'hudChrome.plurals.commissionMasterworks.few': '{count} obras maestras',
+  'hudChrome.plurals.commissionMasterworks.many': '{count} obras maestras',
+  'hudChrome.plurals.commissionMasterworks.one': '{count} obra maestra',
+  'hudChrome.plurals.commissionMasterworks.other': '{count} obras maestras',
+  'hudChrome.practiceDps.liveDps': 'DPS: {value}',
+  'hudChrome.practiceDps.liveLabel': 'Esta sesión',
+  'hudChrome.practiceDps.previous': 'Sesiones anteriores',
+  'hudChrome.practiceDps.prompt': 'Ataca al muñeco para iniciar una sesión',
+  'hudChrome.practiceDps.runLabel': 'Sesión {index}',
+  'hudChrome.practiceDps.runSummary': '{total} en {time}',
+  'hudChrome.practiceDps.title': 'Muñeco de prácticas',
+  'hudChrome.professions.harvestBodyButton': 'Recolectar un cadáver',
+  'hudChrome.professions.harvestBodyHint':
+    'Abre la elección para un cadáver al alcance que aún se pueda recolectar. No se recoge nada hasta que elijas.',
+  'hudChrome.professions.mobileStationTooltip.duration': 'Dura {minutes} minutos.',
+  'hudChrome.professions.mobileStationTooltip.kind': 'Estación de campo',
+  'hudChrome.professions.mobileStationTooltip.notConsumed': 'Nunca se consume.',
+  'hudChrome.professions.mobileStationTooltip.radius':
+    'Puedes fabricar en ella desde cualquier lugar; los miembros del grupo deben estar a {radius} yardas o menos.',
+  'hudChrome.professions.mobileStationTooltip.replace':
+    'Colocarla reemplaza tu estación de campo activa, incluida una colocada por especialidad.',
+  'hudChrome.professions.mobileStationTooltip.use':
+    'Coloca una {station} compartida por el grupo a tus pies.',
+  'hudChrome.professions.toolEffectName.makersCharm': 'Amuleto del artesano',
+  'hudChrome.professions.toolEffectTooltip.bonus.makersCharm':
+    '+2 de producción por cosecha mientras esté cargado, o +1 con una herramienta de agricultura.',
+  'hudChrome.reliquary.markFind.gather_event_golden_harvest': 'Cosecha dorada',
+  'hudChrome.reliquary.markFind.masterwork_inscription': 'Obra maestra de inscripción',
+  'hudChrome.reliquary.markFind.masterwork_jewelcrafting': 'Obra maestra de joyería',
+  'hudChrome.unbind.perfecting':
+    'Una pieza en la senda de perfeccionamiento, o ya perfeccionada, permanece vinculada.',
+  'hudChrome.wocStore.mountSkinType': 'Apariencia de montura',
+  'hudChrome.wocStore.skins.winterbite.name': 'Mordisco Invernal',
+  'itemUi.kind.flask': 'Frasco',
+  'itemUi.kind.scroll': 'Pergamino',
+  'itemUi.market.filterTypePattern': 'Patrones',
+  'itemUi.tooltip.clickSetOut': 'Haz clic para servir',
+  'itemUi.tooltip.clickSetUp': 'Haz clic para preparar',
+  'itemUi.tooltip.flaskOnlyOne':
+    'Solo puede haber un efecto de frasco a la vez. Beber otro frasco reemplaza este.',
+  'itemUi.tooltip.flaskOutranks':
+    'Un elixir o pergamino más débil del mismo atributo no puede reemplazarlo.',
+  'itemUi.tooltip.flaskThroughDeath':
+    'El efecto persiste tras la muerte, pero termina al cerrar sesión; las partidas con instancia empiezan y terminan sin efectos previos.',
+  'itemUi.tooltip.flaskUnremovable': 'No se puede disipar, robar ni cancelar manualmente.',
+  'itemUi.tooltip.useElixir':
+    'Uso: aumenta tu {stat} en {value} durante {minutes} min. Reemplaza cualquier otro elixir o pergamino del mismo atributo. Se puede usar en combate.',
+  'itemUi.tooltip.useElixirAura':
+    'Uso: otorga {aura} durante {minutes} min. Reemplaza cualquier otro elixir o pergamino de su tipo. Se puede usar en combate.',
+  'itemUi.tooltip.useFeast':
+    'Uso: sirve un festín del que otros pueden comer, una ración por persona ({servings} raciones, dura {minutes} min).',
+  'itemUi.tooltip.useFeastBuff':
+    'Cada ración otorga {aura}: +{value} de {stat} durante {minutes} min al terminar la comida de {seconds} s. Solo puede haber un efecto Bien alimentado a la vez: una comida nueva lo reemplaza.',
+  'itemUi.tooltip.useFeastBuffAura':
+    'Cada ración otorga {aura} durante {minutes} min al terminar la comida de {seconds} s. Solo puede haber un efecto Bien alimentado a la vez: una comida nueva lo reemplaza.',
+  'itemUi.tooltip.wellFed':
+    'Bien alimentado: aumenta tu {stat} en {value} durante {minutes} min al terminar de comer. Solo puede haber un efecto Bien alimentado a la vez: una comida nueva lo reemplaza.',
+  'itemUi.tooltip.wellFedAura':
+    'Bien alimentado: otorga {aura} durante {minutes} min al terminar de comer. Solo puede haber un efecto Bien alimentado a la vez: una comida nueva lo reemplaza.',
+
+  'entities.abilities.grove_awakening.description':
+    'Devuelve a la vida a todos los miembros caídos de tu grupo o banda en un radio de 40 yardas y dentro de tu línea de visión, de vuelta a tu lado con un 30% de salud y maná. No puede lanzarse en combate. (Corazón del Bosque)',
+  'entities.abilities.grove_awakening.name': 'Despertar del Bosque',
+  'entities.abilities.prayer_of_returning.description':
+    'Devuelve a la vida a todos los miembros caídos de tu grupo o banda en un radio de 40 yardas y dentro de tu línea de visión, de vuelta a tu lado con un 30% de salud y maná. No puede lanzarse en combate. (Bendición y Doctrina)',
+  'entities.abilities.prayer_of_returning.name': 'Plegaria del Retorno',
+  'entities.abilities.wildwake.description':
+    'Incita a un aliado caído a florecer de pronto, devolviéndolo a la vida a tu lado con un 35% de su salud y maná, incluso en pleno combate. (Corazón del Bosque)',
+  'entities.abilities.wildwake.name': 'Despertar Silvestre',
+  'devCommand.actions.farmgrow.description':
+    'Lleva tus parcelas plantadas hasta su momento de estar listas, o una parcela concreta por id. No cambia nada más: el resultado se determinó al plantar.',
+  'devCommand.actions.farmgrow.label': 'Madurar cultivos',
+  'devCommand.fields.bed': 'Id de parcela (opcional)',
+  'entities.abilities.blink.name': 'Paso fugaz',
+  'entities.abilities.blizzard.description':
+    'Invoca una tormenta de hielo sobre la zona objetivo durante 6 s, que inflige {damage} de daño de Escarcha cada segundo y ralentiza a los enemigos un 40%. Cada enemigo golpeado reduce 0,5 s el enfriamiento de Globo de escarcha, hasta 3 s por lanzamiento. (Escarcha)',
+  'entities.abilities.cold_snap.description':
+    'Completa el enfriamiento de Paso fugaz, Velo de escarcha y Gran invisibilidad. (Talento de Mago)',
+  'entities.abilities.counterspell.name': 'Cercenhechizos',
+  'entities.abilities.crusader_strike.name': 'Golpe del juramento',
+  'entities.abilities.frozen_orb.name': 'Globo de escarcha',
+  'entities.abilities.glacial_spike.name': 'Aguja de escarcha',
+  'entities.abilities.holy_shock.name': 'Latigazo de luz',
+  'entities.abilities.icy_veins.name': 'Oleada gélida',
+  'entities.abilities.spellsteal.name': 'Saqueo de hechizos',
+  'entities.abilities.storm_bolt.name': 'Lanzarrayos',
+  'entities.abilities.vanish.name': 'Fuga de humo',
+  'entities.abilities.victory_rush.name': 'Arremetida del vencedor',
+  'entities.itemSets.crucible_agi_leather.bonus2':
+    'Tu daño Físico directo y el daño Físico directo de tus mascotas acumulan una carga, como máximo una vez por segundo. Con 6 cargas, tú y tus mascotas infligís un 8% más de daño durante 6 s. Las cargas expiran tras 8 s sin un golpe válido y no pueden acumularse durante la bonificación de daño. Las cargas y la bonificación terminan al salir del combate o dejar de llevar dos piezas de esta colección.',
+  'entities.itemSets.crucible_agi_leather.name': 'Cuero de escaramuzador del Crisol',
+  'entities.itemSets.crucible_caster_cloth.bonus2':
+    'Tu daño mágico y el daño mágico de tus mascotas acumulan una carga, como máximo una vez por segundo, incluido el daño en el tiempo. Con 6 cargas, tú y tus mascotas infligís un 8% más de daño durante 6 s. Las cargas expiran tras 8 s sin un golpe válido y no pueden acumularse durante la bonificación de daño. Las cargas y la bonificación terminan al salir del combate o dejar de llevar dos piezas de esta colección.',
+  'entities.itemSets.crucible_caster_cloth.name': 'Tela de hechicero del Crisol',
+  'entities.itemSets.crucible_caster_leather.bonus2':
+    'Tu daño mágico y el daño mágico de tus mascotas acumulan una carga, como máximo una vez por segundo, incluido el daño en el tiempo. Con 6 cargas, tú y tus mascotas infligís un 8% más de daño durante 6 s. Las cargas expiran tras 8 s sin un golpe válido y no pueden acumularse durante la bonificación de daño. Las cargas y la bonificación terminan al salir del combate o dejar de llevar dos piezas de esta colección.',
+  'entities.itemSets.crucible_caster_leather.name': 'Cuero de hechicero del Crisol',
+  'entities.itemSets.crucible_caster_mail.bonus2':
+    'Tu daño mágico y el daño mágico de tus mascotas acumulan una carga, como máximo una vez por segundo, incluido el daño en el tiempo. Con 6 cargas, tú y tus mascotas infligís un 8% más de daño durante 6 s. Las cargas expiran tras 8 s sin un golpe válido y no pueden acumularse durante la bonificación de daño. Las cargas y la bonificación terminan al salir del combate o dejar de llevar dos piezas de esta colección.',
+  'entities.itemSets.crucible_caster_mail.name': 'Malla de hechicero del Crisol',
+  'entities.itemSets.crucible_healer_cloth.bonus2':
+    'Curar a un aliado que está en combate convierte el 20% de tu sobrecuración en un escudo sobre ese aliado durante 6 s. Incluye la curación en el tiempo y el daño convertido en curación. También funciona al curarte a ti mismo en combate. La protección de todos los portadores se limita al 5% de la salud máxima del receptor. La sobrecuración adicional llena el escudo sin prolongar su duración. Esta protección no activa otros efectos de curación. Tus escudos terminan cuando el aliado protegido sale del combate, mueres o dejas de llevar dos piezas de esta colección.',
+  'entities.itemSets.crucible_healer_cloth.name': 'Tela de sanador del Crisol',
+  'entities.itemSets.crucible_healer_leather.bonus2':
+    'Curar a un aliado que está en combate convierte el 20% de tu sobrecuración en un escudo sobre ese aliado durante 6 s. Incluye la curación en el tiempo y el daño convertido en curación. También funciona al curarte a ti mismo en combate. La protección de todos los portadores se limita al 5% de la salud máxima del receptor. La sobrecuración adicional llena el escudo sin prolongar su duración. Esta protección no activa otros efectos de curación. Tus escudos terminan cuando el aliado protegido sale del combate, mueres o dejas de llevar dos piezas de esta colección.',
+  'entities.itemSets.crucible_healer_leather.name': 'Cuero de sanador del Crisol',
+  'entities.itemSets.crucible_healer_mail.bonus2':
+    'Curar a un aliado que está en combate convierte el 20% de tu sobrecuración en un escudo sobre ese aliado durante 6 s. Incluye la curación en el tiempo y el daño convertido en curación. También funciona al curarte a ti mismo en combate. La protección de todos los portadores se limita al 5% de la salud máxima del receptor. La sobrecuración adicional llena el escudo sin prolongar su duración. Esta protección no activa otros efectos de curación. Tus escudos terminan cuando el aliado protegido sale del combate, mueres o dejas de llevar dos piezas de esta colección.',
+  'entities.itemSets.crucible_healer_mail.name': 'Malla de sanador del Crisol',
+  'entities.itemSets.crucible_str_leather.bonus2':
+    'Tu daño Físico directo y el daño Físico directo de tus mascotas acumulan una carga, como máximo una vez por segundo. Con 6 cargas, tú y tus mascotas infligís un 8% más de daño durante 6 s. Las cargas expiran tras 8 s sin un golpe válido y no pueden acumularse durante la bonificación de daño. Las cargas y la bonificación terminan al salir del combate o dejar de llevar dos piezas de esta colección.',
+  'entities.itemSets.crucible_str_leather.name': 'Cuero de merodeador del Crisol',
+  'entities.itemSets.crucible_str_mail.bonus2':
+    'Tu daño Físico directo y el daño Físico directo de tus mascotas acumulan una carga, como máximo una vez por segundo. Con 6 cargas, tú y tus mascotas infligís un 8% más de daño durante 6 s. Las cargas expiran tras 8 s sin un golpe válido y no pueden acumularse durante la bonificación de daño. Las cargas y la bonificación terminan al salir del combate o dejar de llevar dos piezas de esta colección.',
+  'entities.itemSets.crucible_str_mail.name': 'Malla de golpeador del Crisol',
+  'entities.itemSets.crucible_tank_leather.bonus2':
+    'El daño enemigo inicia un periodo de conteo de 10 s. Cuando la salud perdida durante ese periodo alcanza el 40% de tu salud máxima, obtienes un escudo que absorbe un 8% de tu salud máxima durante 6 s. Puede ocurrir una vez cada 20 s. El daño absorbido y el daño propio no cuentan. El daño almacenado y el escudo terminan al salir del combate o dejar de llevar dos piezas de esta colección. El enfriamiento no se reinicia.',
+  'entities.itemSets.crucible_tank_leather.name': 'Cuero de guardián del Crisol',
+  'entities.itemSets.crucible_tank_mail.bonus2':
+    'El daño enemigo inicia un periodo de conteo de 10 s. Cuando la salud perdida durante ese periodo alcanza el 40% de tu salud máxima, obtienes un escudo que absorbe un 8% de tu salud máxima durante 6 s. Puede ocurrir una vez cada 20 s. El daño absorbido y el daño propio no cuentan. El daño almacenado y el escudo terminan al salir del combate o dejar de llevar dos piezas de esta colección. El enfriamiento no se reinicia.',
+  'entities.itemSets.crucible_tank_mail.name': 'Malla de guardián del Crisol',
+  'entities.items.barksong_handguards.name': 'Guanteletes de Cantocorteza',
+  'entities.items.bog_beet.name': 'Remolacha del pantano',
+  'entities.items.bog_beet_seed.name': 'Semilla de remolacha del pantano',
+  'entities.items.briarstep_jerkin.name': 'Jubón de Paso de Zarza',
+  'entities.items.bronze_hoe.name': 'Azada de bronce',
+  'entities.items.brook_carrot.name': 'Zanahoria del arroyo',
+  'entities.items.brook_carrot_seed.name': 'Semilla de zanahoria del arroyo',
+  'entities.items.burnished_thorium_amulet.name': 'Amuleto de osmio bruñido',
+  'entities.items.clockreel_fishing_rod.name': 'Caña Reloj de Marea',
+  'entities.items.cogwheel_blank.name': 'Pieza de engranaje en blanco',
+  'entities.items.coiled_copper_torc.name': 'Torque de cobre enrollado',
+  'entities.items.compost.name': 'Abono',
+  'entities.items.copperlens_ocular.name': 'Ocular Lente de Cobre',
+  'entities.items.crucible_agi_leather_chest.name': 'Jubón de escaramuzador del Crisol',
+  'entities.items.crucible_agi_leather_feet.name': 'Botas de escaramuzador del Crisol',
+  'entities.items.crucible_agi_leather_waist.name': 'Cinturón de escaramuzador del Crisol',
+  'entities.items.crucible_caster_cloth_chest.name': 'Túnica de hechicero del Crisol',
+  'entities.items.crucible_caster_cloth_feet.name': 'Zapatillas de hechicero del Crisol',
+  'entities.items.crucible_caster_cloth_waist.name': 'Faja de hechicero del Crisol',
+  'entities.items.crucible_caster_leather_chest.name': 'Jubón de hechicero del Crisol',
+  'entities.items.crucible_caster_leather_feet.name': 'Botas de hechicero del Crisol',
+  'entities.items.crucible_caster_leather_waist.name': 'Cinturón de hechicero del Crisol',
+  'entities.items.crucible_caster_mail_chest.name': 'Camisote de hechicero del Crisol',
+  'entities.items.crucible_caster_mail_feet.name': 'Escarpes de hechicero del Crisol',
+  'entities.items.crucible_caster_mail_waist.name': 'Fajín de hechicero del Crisol',
+  'entities.items.crucible_healer_cloth_chest.name': 'Túnica de sanador del Crisol',
+  'entities.items.crucible_healer_cloth_feet.name': 'Zapatillas de sanador del Crisol',
+  'entities.items.crucible_healer_cloth_waist.name': 'Faja de sanador del Crisol',
+  'entities.items.crucible_healer_leather_chest.name': 'Jubón de sanador del Crisol',
+  'entities.items.crucible_healer_leather_feet.name': 'Botas de sanador del Crisol',
+  'entities.items.crucible_healer_leather_waist.name': 'Cinturón de sanador del Crisol',
+  'entities.items.crucible_healer_mail_chest.name': 'Camisote de sanador del Crisol',
+  'entities.items.crucible_healer_mail_feet.name': 'Escarpes de sanador del Crisol',
+  'entities.items.crucible_healer_mail_waist.name': 'Fajín de sanador del Crisol',
+  'entities.items.crucible_str_leather_chest.name': 'Jubón de merodeador del Crisol',
+  'entities.items.crucible_str_leather_feet.name': 'Botas de merodeador del Crisol',
+  'entities.items.crucible_str_leather_waist.name': 'Cinturón de merodeador del Crisol',
+  'entities.items.crucible_str_mail_chest.name': 'Camisote de golpeador del Crisol',
+  'entities.items.crucible_str_mail_feet.name': 'Escarpes de golpeador del Crisol',
+  'entities.items.crucible_str_mail_waist.name': 'Fajín de golpeador del Crisol',
+  'entities.items.crucible_tank_leather_chest.name': 'Jubón de guardián del Crisol',
+  'entities.items.crucible_tank_leather_feet.name': 'Botas de guardián del Crisol',
+  'entities.items.crucible_tank_leather_waist.name': 'Cinturón de guardián del Crisol',
+  'entities.items.crucible_tank_mail_chest.name': 'Camisote de guardián del Crisol',
+  'entities.items.crucible_tank_mail_feet.name': 'Escarpes de guardián del Crisol',
+  'entities.items.crucible_tank_mail_waist.name': 'Fajín de guardián del Crisol',
+  'entities.items.cryptbloom_shoulderguards.name': 'Hombreras de Flor de Tumba',
+  'entities.items.deed_of_making.name': 'Escritura de creación',
+  'entities.items.duskforged_billet.name': 'Lingote de Forja Crepuscular',
+  'entities.items.duskforged_bulwark.name': 'Baluarte de Forja Crepuscular',
+  'entities.items.duskforged_warblade.name': 'Hoja de guerra de Forja Crepuscular',
+  'entities.items.eastbrook_glazed_carrots.name': 'Zanahorias glaseadas de Eastbrook',
+  'entities.items.eastbrook_root_pottage.name': 'Potaje de raíces de Eastbrook',
+  'entities.items.etched_iron_loop.name': 'Aro de hierro grabado',
+  'entities.items.evergarden_braised_greens.name': 'Verduras braseadas de Evergarden',
+  'entities.items.evergarden_greens.name': 'Verduras de Evergarden',
+  'entities.items.evergarden_greens_seed.name': 'Semilla de verduras de Evergarden',
+  'entities.items.evergarden_harvest_platter.name': 'Fuente de cosecha de Evergarden',
+  'entities.items.evergarden_hoe.name': 'Azada de Evergarden',
+  'entities.items.evergarden_pumpkin.name': 'Calabaza de Evergarden',
+  'entities.items.evergarden_pumpkin_seed.name': 'Semilla de calabaza de Evergarden',
+  'entities.items.evergarden_sunmelon_tart.name': 'Tarta de melón solar de Evergarden',
+  'entities.items.fenbloom_breeches.name': 'Calzones de Flor de Pantano',
+  'entities.items.fenbridge_beet_braise.name': 'Remolacha braseada de Fenbridge',
+  'entities.items.fenbridge_rice_bowl.name': 'Cuenco de arroz de Fenbridge',
+  'entities.items.fenbridge_rice_pudding.name': 'Arroz con leche de Fenbridge',
+  'entities.items.field_kit.name': 'Kit de campo',
+  'entities.items.fine_bog_beet.name': 'Remolacha fina del pantano',
+  'entities.items.fine_brook_carrot.name': 'Zanahoria fina del arroyo',
+  'entities.items.fine_evergarden_greens.name': 'Verduras finas de Evergarden',
+  'entities.items.fine_evergarden_pumpkin.name': 'Calabaza fina de Evergarden',
+  'entities.items.fine_frost_gourd.name': 'Calabaza fina de escarcha',
+  'entities.items.fine_frost_lentils.name': 'Lentejas finas de escarcha',
+  'entities.items.fine_gilded_sunmelon.name': 'Melón solar dorado fino',
+  'entities.items.fine_gilded_yam.name': 'Batata dorada fina',
+  'entities.items.fine_highland_barley.name': 'Cebada fina de las Alturas',
+  'entities.items.fine_marsh_rice.name': 'Arroz fino del pantano',
+  'entities.items.fine_thornpeak_cabbage.name': 'Col fina de Thornpeak',
+  'entities.items.fine_vale_wheat.name': 'Trigo fino del Valle',
+  'entities.items.forgefathers_ember.name': 'Ascua del Padre de la Forja',
+  'entities.items.forgefold_legguards.name': 'Guardapiernas de Pliegue de Forja',
+  'entities.items.forgefold_plating.name': 'Placas de Pliegue de Forja',
+  'entities.items.formula_lastflame_zeal.name': 'Fórmula: Celo de la Última Llama',
+  'entities.items.frost_gourd.name': 'Calabaza de escarcha',
+  'entities.items.frost_gourd_seed.name': 'Semilla de calabaza de escarcha',
+  'entities.items.frost_lentils.name': 'Lentejas de escarcha',
+  'entities.items.frost_lentils_seed.name': 'Semilla de lentejas de escarcha',
+  'entities.items.garden_hoe.name': 'Azada de jardín',
+  'entities.items.gilded_sunmelon.name': 'Melón solar dorado',
+  'entities.items.gilded_sunmelon_seed.name': 'Semilla de melón solar dorado',
+  'entities.items.gilded_yam.name': 'Batata dorada',
+  'entities.items.gilded_yam_seed.name': 'Semilla de batata dorada',
+  'entities.items.gleaming_thorium_loop.name': 'Aro de osmio reluciente',
+  'entities.items.goldleaf_folio.name': 'Folio de Hoja Dorada',
+  'entities.items.goldleaf_scroll.name': 'Pergamino de Hoja Dorada',
+  'entities.items.grand_cauldron.name': 'Gran caldero',
+  'entities.items.growth_tonic.name': 'Tónico de crecimiento',
+  'entities.items.gyrelens_array.name': 'Matriz de girolentes',
+  'entities.items.hammered_copper_band.name': 'Sortija de cobre martillado',
+  'entities.items.harvest_feast.name': 'Festín de la cosecha',
+  'entities.items.highland_barley.name': 'Cebada de las Alturas',
+  'entities.items.highland_barley_seed.name': 'Semilla de cebada de las Alturas',
+  'entities.items.highwatch_barley_bannock.name': 'Torta de cebada de Highwatch',
+  'entities.items.highwatch_barley_porridge.name': 'Gachas de cebada de Highwatch',
+  'entities.items.highwatch_gourd_soup.name': 'Sopa de calabaza de Highwatch',
+  'entities.items.iron_link_choker.name': 'Gargantilla de eslabones de hierro',
+  'entities.items.ironhusk_flask.name': 'Frasco de Cáscara de Hierro',
+  'entities.items.laden_hearth.name': 'Hogar rebosante',
+  'entities.items.lucent_reagent.name': 'Reactivo luminoso',
+  'entities.items.makers_charm.name': 'Talismán del creador',
+  'entities.items.makers_ember.name': 'Ascua del creador',
+  'entities.items.marsh_rice.name': 'Arroz del pantano',
+  'entities.items.marsh_rice_seed.name': 'Semilla de arroz del pantano',
+  'entities.items.masters_field_forge.name': 'Forja de campo del maestro',
+  'entities.items.mistforged_pauldrons.name': 'Hombreras de Niebla Forjada',
+  'entities.items.osmium_hoe.name': 'Azada de osmio',
+  'entities.items.pattern_barksong_handguards.name': 'Patrón: Guanteletes de Cantocorteza',
+  'entities.items.pattern_briarstep_jerkin.name': 'Patrón: Jubón de Paso de Zarza',
+  'entities.items.pattern_clockreel_fishing_rod.name': 'Esquema: Caña Reloj de Marea',
+  'entities.items.pattern_crucible_agi_leather.name': 'Patrón: Cuero de escaramuzador del Crisol',
+  'entities.items.pattern_crucible_caster_cloth.name': 'Patrón: Tela de hechicero del Crisol',
+  'entities.items.pattern_crucible_caster_leather.name': 'Patrón: Cuero de hechicero del Crisol',
+  'entities.items.pattern_crucible_caster_mail.name': 'Patrón: Malla de hechicero del Crisol',
+  'entities.items.pattern_crucible_healer_cloth.name': 'Patrón: Tela de sanador del Crisol',
+  'entities.items.pattern_crucible_healer_leather.name': 'Patrón: Cuero de sanador del Crisol',
+  'entities.items.pattern_crucible_healer_mail.name': 'Patrón: Malla de sanador del Crisol',
+  'entities.items.pattern_crucible_str_leather.name': 'Patrón: Cuero de merodeador del Crisol',
+  'entities.items.pattern_crucible_str_mail.name': 'Patrón: Malla de golpeador del Crisol',
+  'entities.items.pattern_crucible_tank_leather.name': 'Patrón: Cuero de guardián del Crisol',
+  'entities.items.pattern_crucible_tank_mail.name': 'Patrón: Malla de guardián del Crisol',
+  'entities.items.pattern_duskforged_bulwark.name': 'Planos: Baluarte de Forja Crepuscular',
+  'entities.items.pattern_duskforged_warblade.name': 'Planos: Hoja de guerra de Forja Crepuscular',
+  'entities.items.pattern_evergarden_braised_greens.name':
+    'Receta: Verduras braseadas de Evergarden',
+  'entities.items.pattern_evergarden_harvest_platter.name':
+    'Receta: Fuente de cosecha de Evergarden',
+  'entities.items.pattern_evergarden_sunmelon_tart.name':
+    'Receta: Tarta de melón solar de Evergarden',
+  'entities.items.pattern_fenbloom_breeches.name': 'Patrón: Calzones de Flor de Pantano',
+  'entities.items.pattern_forgefold_legguards.name': 'Planos: Guardapiernas de Pliegue de Forja',
+  'entities.items.pattern_grand_cauldron.name': 'Receta: Gran caldero',
+  'entities.items.pattern_gyrelens_array.name': 'Esquema: Matriz de girolentes',
+  'entities.items.pattern_harvest_feast.name': 'Receta: Festín de la cosecha',
+  'entities.items.pattern_highwatch_barley_porridge.name': 'Receta: Gachas de cebada de Highwatch',
+  'entities.items.pattern_highwatch_gourd_soup.name': 'Receta: Sopa de calabaza de Highwatch',
+  'entities.items.pattern_ironhusk_flask.name': 'Receta: Frasco de Cáscara de Hierro',
+  'entities.items.pattern_laden_hearth.name': 'Receta: Hogar rebosante',
+  'entities.items.pattern_makers_charm.name': 'Esquema: Talismán del creador',
+  'entities.items.pattern_masters_field_forge.name': 'Esquema: Forja de campo del maestro',
+  'entities.items.pattern_peppered_deepbarb_catfish.name':
+    'Receta: Siluro de barba profunda especiado',
+  'entities.items.pattern_prismglass_loop.name': 'Diseño: Aro de vidrio prismático',
+  'entities.items.pattern_ridgebreaker.name': 'Planos: Rompecrestas',
+  'entities.items.pattern_roast_hollowgill_sturgeon.name':
+    'Receta: Esturión de branquia hueca asado',
+  'entities.items.pattern_runewater_flask.name': 'Receta: Frasco de Agua Rúnica',
+  'entities.items.pattern_sageleaf_chowder.name': 'Receta: Sopa de hoja de salvia',
+  'entities.items.pattern_sageleaf_feast.name': 'Receta: Festín de hoja de salvia',
+  'entities.items.pattern_spiritweld_girdle.name': 'Planos: Fajín de Soldadura Espiritual',
+  'entities.items.pattern_stonepot_feast.name': 'Receta: Festín de olla de piedra',
+  'entities.items.pattern_stonepot_stew.name': 'Receta: Estofado de olla de piedra',
+  'entities.items.pattern_sunspun_handwraps.name': 'Patrón: Vendas de Sol Hilado',
+  'entities.items.pattern_sunspun_haversack.name': 'Patrón: Morral de Sol Hilado',
+  'entities.items.pattern_sunspun_leggings.name': 'Patrón: Calzas de Sol Hilado',
+  'entities.items.pattern_sunspun_vestments.name': 'Patrón: Vestiduras de Sol Hilado',
+  'entities.items.pattern_voidbound_grimoire.name': 'Técnica: Grimorio ligado al vacío',
+  'entities.items.pattern_warboar_flask.name': 'Receta: Frasco de jabalí de guerra',
+  'entities.items.pattern_wardspeaker_sabatons.name': 'Planos: Escarpes de Vociguardia',
+  'entities.items.pattern_warhewn_signet.name': 'Diseño: Sello tallado por la guerra',
+  'entities.items.pattern_warspice_feast.name': 'Receta: Festín de especias de guerra',
+  'entities.items.pattern_warspice_skewers.name': 'Receta: Brochetas de especias de guerra',
+  'entities.items.pattern_wyrmfall_pendant.name': 'Diseño: Colgante de Caída del Wyrm',
+  'entities.items.peppered_deepbarb_catfish.name': 'Siluro de barba profunda especiado',
+  'entities.items.polished_copper_loop.name': 'Aro de cobre pulido',
+  'entities.items.precision_chassis.name': 'Chasis de precisión',
+  'entities.items.prismglass_loop.name': 'Aro de vidrio prismático',
+  'entities.items.prismglass_setting.name': 'Engaste de vidrio prismático',
+  'entities.items.quickening_catalyst.name': 'Catalizador de aceleración',
+  'entities.items.raw_deepbarb_catfish.name': 'Siluro de barba profunda crudo',
+  'entities.items.raw_hollowgill_sturgeon.name': 'Esturión de branquia hueca crudo',
+  'entities.items.raw_stillmere_salmon.name': 'Salmón de Stillmere crudo',
+  'entities.items.reins_terrorspark_groundshaker.name':
+    'Llave de ignición: Triturador Chispa de Terror',
+  'entities.items.ridgebreaker.name': 'Rompecrestas',
+  'entities.items.riveted_iron_signet.name': 'Sello de hierro remachado',
+  'entities.items.roast_hollowgill_sturgeon.name': 'Esturión de branquia hueca asado',
+  'entities.items.runewater_flask.name': 'Frasco de Agua Rúnica',
+  'entities.items.sablewax_vellum.name': 'Pergamino de cera negra',
+  'entities.items.sageleaf_chowder.name': 'Sopa de hoja de salvia',
+  'entities.items.sageleaf_feast.name': 'Festín de hoja de salvia',
+  'entities.items.seasoned_stock.name': 'Caldo sazonado',
+  'entities.items.silverleaf_primer.name': 'Imprimación de Hoja de Brillo',
+  'entities.items.silverleaf_scroll.name': 'Pergamino de Hoja de Brillo',
+  'entities.items.skysilver_hoe.name': 'Azada de plata celeste',
+  'entities.items.spiritweld_girdle.name': 'Fajín de Soldadura Espiritual',
+  'entities.items.stonepot_feast.name': 'Festín de olla de piedra',
+  'entities.items.stonepot_stew.name': 'Estofado de olla de piedra',
+  'entities.items.sundered_essence.name': 'Esencia hendida',
+  'entities.items.sunpetal_grimoire.name': 'Grimorio de pétalos solares',
+  'entities.items.sunpetal_scroll.name': 'Pergamino de pétalos solares',
+  'entities.items.sunspun_bolt.name': 'Bobina de Sol Hilado',
+  'entities.items.sunspun_handwraps.name': 'Vendas de Sol Hilado',
+  'entities.items.sunspun_haversack.name': 'Morral de Sol Hilado',
+  'entities.items.sunspun_leggings.name': 'Calzas de Sol Hilado',
+  'entities.items.sunspun_vestments.name': 'Vestiduras de Sol Hilado',
+  'entities.items.thornpeak_cabbage.name': 'Col de Thornpeak',
+  'entities.items.thornpeak_cabbage_seed.name': 'Semilla de col de Thornpeak',
+  'entities.items.vale_hearth_loaf.name': 'Hogaza del hogar del Valle',
+  'entities.items.vale_wheat.name': 'Trigo del Valle',
+  'entities.items.vale_wheat_seed.name': 'Semilla de trigo del Valle',
+  'entities.items.voidbound_grimoire.name': 'Grimorio ligado al vacío',
+  'entities.items.warboar_flask.name': 'Frasco de jabalí de guerra',
+  'entities.items.wardspeaker_sabatons.name': 'Escarpes de Vociguardia',
+  'entities.items.warhewn_signet.name': 'Sello tallado por la guerra',
+  'entities.items.warspice_feast.name': 'Festín de especias de guerra',
+  'entities.items.warspice_skewers.name': 'Brochetas de especias de guerra',
+  'entities.items.weighted_thorium_band.name': 'Sortija de osmio ponderado',
+  'entities.items.withered_husks.name': 'Cáscaras marchitas',
+  'entities.items.wyrmcult_grand_robe.name': 'Gran túnica de los Juramentados de la Nidada',
+  'entities.items.wyrmcult_orders.name': 'Órdenes de los Juramentados de la Nidada',
+  'entities.items.wyrmcult_soulsteps.name': 'Pasos de alma de los Juramentados de la Nidada',
+  'entities.items.wyrmcult_spellgrips.name':
+    'Empuñaduras de hechizo de los Juramentados de la Nidada',
+  'entities.items.wyrmfall_core.name': 'Núcleo de Caída del Wyrm',
+  'entities.items.wyrmfall_pendant.name': 'Colgante de Caída del Wyrm',
+  'entities.items.wyrmhide_cording.name': 'Cordón de piel de wyrm',
+  'entities.letters.wyrmfall_core_reward.body':
+    'La bestia cayó mientras luchabas desde su lomo o desde el suelo. Tu parte de sus Núcleos de Caída del Wyrm vuela hasta aquí en vez de perderse entre los saqueadores de cadáveres. Úsalos bien en un banco.\n\n- El intendente heroico',
+  'entities.letters.wyrmfall_core_reward.sender': 'El intendente heroico',
+  'entities.letters.wyrmfall_core_reward.subject': 'Tus Núcleos de Caída del Wyrm',
+  'entities.mobs.harvest_sprite.name': 'Duende recolector',
+  'entities.mobs.hub_healing_dummy.name': 'Muñeco de sanación',
+  'entities.mobs.wyrmcult_necromancer.name': 'Nigromante juramentado de la Nidada',
+  'entities.mobs.wyrmcult_zealot.name': 'Fanático juramentado de la Nidada',
+  'entities.npcs.drillmaster_hale.greeting':
+    'Ese muñeco detrás de mí nunca devuelve el golpe ni cae, {className}. Lo que importa es el recuento: tus medidores de daño cuentan cada golpe que le asestas. Selecciónalo y abre los medidores, y te explicaré el resto.',
+  'entities.npcs.drillmaster_hale.name': 'Maestro de instrucción Hale',
+  'entities.npcs.drillmaster_hale.title': 'Maestro de duelos del muelle',
+  'entities.npcs.farmer_hollis.greeting':
+    'Las terrazas dan lo que permite la montaña, {className}. Vendo semillas y compost, y si un cultivo tuyo sale marchito convertiré las cáscaras en buena tierra para ti.',
+  'entities.npcs.farmer_hollis.name': 'Granjero Hollis',
+  'entities.npcs.farmer_hollis.title': 'Granjero de terrazas de Highwatch',
+  'entities.npcs.farmer_jessica.greeting':
+    'Buena tierra y buen tiempo, {playerName}. Cómprame una semilla, siémbrala en uno de esos bancales y sigue con tu día. Crecerá mientras estés fuera y nunca se echará a perder. Tu Diario de cosecha (Mayús+K, o la fila Agricultura de tu ventana de Profesiones) muestra cada parcela plantada y su temporizador.',
+  'entities.npcs.farmer_jessica.name': 'Granjera Jessica',
+  'entities.npcs.farmer_jessica.title': 'Guardiana de parcelas',
+  'entities.npcs.farmer_teasel.greeting':
+    'Arroz del pantano y semillas de remolacha del pantano, {className}, y compost para alimentarlos. Los arrozales drenan despacio, así que mira dónde pisas.',
+  'entities.npcs.farmer_teasel.name': 'Granjera Teasel',
+  'entities.npcs.farmer_teasel.title': 'Granjera de arrozales de Fen',
+  'entities.npcs.farmer_verbena.greeting':
+    'Cuidado con los bordes, {playerName}, estos bancales son el orgullo del parterre. Vendo semillas y compost, y convertiré cualquier cáscara marchita que traigas en más tierra.',
+  'entities.npcs.farmer_verbena.name': 'Granjera Verbena',
+  'entities.npcs.farmer_verbena.title': 'Jardinera del parterre',
+  'entities.quests.q_af_sprites_and_spigots.objectives.0.label': 'Duende recolector ahuyentado',
+  'entities.quests.q_cult_orders.objectives.0.label': 'Órdenes de las profundidades',
+  'entities.quests.q_farm_intro.completion':
+    'Ahí tienes, tu primera cosecha en tus propias manos. Seguirá creciendo mientras estés fuera y nunca se echará a perder. Tu Diario de cosecha (Mayús+K, o la fila Agricultura de tu ventana de Profesiones) muestra cada parcela plantada y su temporizador. Vuelve por semillas cuando los bancales te llamen, {playerName}.',
+  'entities.quests.q_farm_intro.objectives.0.label': 'Trigo del Valle plantado',
+  'entities.quests.q_farm_intro.objectives.1.label': 'Trigo del Valle cosechado',
+  'entities.quests.q_farm_intro.text':
+    'Toma esta azada y una pizca de semillas de trigo del Valle, {playerName}. Siémbralas en uno de los bancales que hay junto a mí y sigue con tus asuntos. Vuelve cuando quieras a recoger la cosecha; yo estaré aquí.',
+  'entities.quests.q_farm_intro.title': 'Primer surco',
+  'entities.quests.q_forgefathers_requiem.completion':
+    'Todavía canta. Quédate la ascua: tu martillo necesitará su voz. Te he enseñado una forma de forjar Rompeforjas. La ascua y la técnica solo se gastan cuando tu fabricación tiene éxito.',
+  'entities.quests.q_forgefathers_requiem.objectives.0.label':
+    'Ascua del Padre de la Forja recuperada',
+  'entities.quests.q_forgefathers_requiem.text':
+    'Varkhul guardaba una ascua de la Última Fuente en el corazón. Recupérala y tráemela. Con 125 de habilidad en Armas, puedes aprender a forjar Rompeforjas. Su derrota en cualquier dificultad entregará la ascua mientras esta tarea esté activa.',
+  'entities.quests.q_forgefathers_requiem.title': 'Réquiem del Padre de la Forja',
+  'entities.quests.q_hub_healing_numbers.completion':
+    'Números curados, no heridos, pero números al fin y al cabo, {playerName}. Un sanador que nunca mira esos medidores está adivinando su propio valor.',
+  'entities.quests.q_hub_healing_numbers.objectives.0.label':
+    'Curación efectiva sobre el muñeco de sanación',
+  'entities.quests.q_hub_healing_numbers.text':
+    'Un poste no es lo único que merece medirse, {playerName}. Selecciona el muñeco de sanación que tiene al lado, abre tus medidores de daño y cambia a la pestaña Sanación. Lanza tres curas que restauren salud de verdad mientras observas cómo la ventana las cuenta igual que contó los golpes.',
+  'entities.quests.q_hub_healing_numbers.title': 'Números que sanan',
+  'entities.quests.q_hub_know_your_numbers.completion':
+    'Diez golpes, y ahora sabes cuánto valen. Cada vez que consigas un arma nueva, un talento nuevo o una idea nueva, {playerName}, vuelve a este poste y ponle un número. Los medidores son honestos aunque el Valle no lo sea.',
+  'entities.quests.q_hub_know_your_numbers.objectives.0.label':
+    'Golpe sobre el muñeco de entrenamiento',
+  'entities.quests.q_hub_know_your_numbers.text':
+    'La fuerza que no puedes medir es fuerza que no puedes mejorar, {playerName}. Selecciona el muñeco de entrenamiento, abre tus medidores de daño y aséstale diez golpes, físicos o mágicos, mientras observas cómo la ventana cuenta lo que infliges. Cuando estén los diez, vuelve y dime la cifra.',
+  'entities.quests.q_hub_know_your_numbers.title': 'Conoce tus números',
+  'entities.quests.q_nb_charts_of_the_stones.text':
+    'Las piedras de la Vigilia son más antiguas que Moonrest, más antiguas que los penumbrines que las cuidan, y sus caras están talladas con cartas estelares que he pasado la vida aprendiendo a leer. El cielo ha cambiado, {playerName}, y necesito saber cuánto. Lee las cartas de tres piedras y tráeme sus coordenadas.',
+  'entities.quests.q_nb_eyes_on_the_vigil.text':
+    'Algo ha vuelto atrevidos a los zancudos y ha inquietado a los rebaños, {playerName}, y no puedo leerlo en las flores. Cassian puede leerlo en el cielo. Tiene su campamento de observación junto a la Vigilia Permanente, al este de aquí, donde los penumbrines vagan entre las piedras. Encuéntralo y pregúntale qué dicen las estrellas.',
+  'entities.quests.q_nb_the_barrow_king.completion':
+    'Las estrellas se han asentado por primera vez en una estación, {playerName}. Los túmulos están cerrados, los penumbrines se han quedado quietos junto a sus piedras y el rey vuelve a dormir bajo tierra. Ponte este manto: Moonrest lo hizo para quien finalmente recibiera la confianza de la noche.',
+  'entities.quests.q_necromancers.objectives.0.label': 'Frenesí ritual',
+  'entities.quests.q_prof_workorder_kitchens_rice.completion':
+    'Grano grueso y seco, cada uno. Aquí tienes tus monedas. Si el pantano sigue dando, yo también.',
+  'entities.quests.q_prof_workorder_kitchens_rice.objectives.0.label':
+    'Arroz del pantano entregado',
+  'entities.quests.q_prof_workorder_kitchens_rice.text':
+    'La gente del pantano jura por su arroz, {playerName}, y quiero averiguar por qué. Tráeme cinco medidas de arroz del pantano y aquí te esperará la paga. Mantenlo seco durante el viaje: el arroz mojado se convierte en gachas, y no he pedido gachas.',
+  'entities.quests.q_prof_workorder_kitchens_rice.title': 'Pedido de arroz de cocina',
+  'entities.quests.q_prof_workorder_kitchens_wheat.completion':
+    'Buen grano seco, y abundante. Aquí tienes tu paga, contada. Cuando llegue la próxima cosecha, ya sabes a qué puerta llamar.',
+  'entities.quests.q_prof_workorder_kitchens_wheat.objectives.0.label': 'Trigo del Valle entregado',
+  'entities.quests.q_prof_workorder_kitchens_wheat.text':
+    'El pan no se hornea solo, {playerName}, y mis sacos de harina están tocando fondo. Tráeme ocho gavillas de trigo del Valle y te pagaré unas monedas honestas por todo. Me da igual si lo has cultivado tú o lo compraste en el mercado, mientras se pueda moler.',
+  'entities.quests.q_prof_workorder_kitchens_wheat.title': 'Pedido de trigo de cocina',
+  'entities.quests.q_requiem_at_the_forge.completion':
+    'La voz de la fuente recorre el hierro. Lo que Varkhul encadenó, tus manos lo han liberado. Lleva bien Rompeforjas, herrero.',
+  'entities.quests.q_requiem_at_the_forge.objectives.0.label': 'Rompeforjas forjado y llevado',
+  'entities.quests.q_requiem_at_the_forge.text':
+    'Lleva la ascua, quince Núcleos de la Última Llama, Mineral de Osmio fino y Troncos de Pino Alto finos a una forja. Forja Rompeforjas tú mismo y vuelve conmigo con él en tus bolsas o equipado. Te quedas el martillo y se liga a ti. Esta forja solo puede crear un martillo.',
+  'entities.quests.q_requiem_at_the_forge.title': 'Réquiem en la forja',
+  'entities.quests.q_voice_below.objectives.0.label': 'Primera Voz Threnos silenciada',
+  'entities.quests.q_voice_below.objectives.1.label':
+    'Nigromante juramentado de la Nidada asesinado',
+  'entities.quests.q_zealots.objectives.0.label': 'Fanático juramentado de la Nidada asesinado',
+  'entities.quests.q_zealots.text':
+    'Cuando el viento baja de los picos del sur, {playerName}, trae cantos consigo. Los juramentados ya no se esconden: han levantado tiendas bajo el Santuario y cantan a lo que duerme debajo. Silencia a doce fanáticos. Cada voz callada compra otra noche de sueño para la montaña.',
+  'entities.zones.nightbloom.pois.2.label': 'La Fuente Lunar',
+  'entities.zones.thornpeak_heights.pois.7.label': 'Tiendas de los Juramentados',
+  'gatherEvent.goldenHarvest': '¡{finder} ha cosechado una cosecha dorada!',
+  'guide.arenaPage.honorFinalNoteSoldBack':
+    'Las compras de Honor son definitivas. La lista de recompra solo contiene lo que vendiste: una compra con monedas normalmente puede venderse por su precio de venta y recuperarse de la lista si vuelves a cambiar de idea, pero el equipo de Guerra se liga al alma en cuanto lo compras, así que nunca puede intercambiarse, enviarse por correo ni venderse, y nunca llega a esa lista. La tienda pide confirmación por eso: lee la pieza antes de pulsar.',
+  'guide.arenaPage.rewardsBodyLossShare':
+    'Una victoria puntuada paga Honor, la moneda de jugador contra jugador, y una derrota que juegas hasta el final también paga una parte menor, igual que un empate, así que la clasificación es lo único que realmente cuesta una derrota. El Honor recompensa partidas reales: vencer al mismo rival o equipo otra vez el mismo día no paga más, ni tampoco volver a perder contra ellos. Un día de victorias largo paga completo durante su primer tramo y luego reduce a la mitad el pago, vuelve a reducirlo más adelante y se queda así. Una partida que el rival abandona aún mueve tu clasificación, pero no paga Honor. El día pertenece al reino y cambia a la hora del reinicio nocturno, el mismo límite en que se reinician los bloqueos diarios.',
+  'guide.arenaPage.warfareBodyStatsStay':
+    'Cada pieza de Guerra lleva índice de Ofensiva de Guerra e índice de Defensa de Guerra, y esos índices no hacen nada contra monstruos. Solo se aplican al luchar contra otro jugador, en duelo, arena o campo de batalla: la Ofensiva aumenta el daño que infliges y la Defensa reduce el daño que recibes, cada una hasta su propio límite. Cada familia de armadura también es un conjunto, y sus bonificaciones son índices o efectos de Guerra que solo funcionan contra jugadores, así que las bonificaciones de un conjunto completo de Honor no sirven contra un jefe de mazmorra. Las piezas mantienen sus estadísticas normales, armadura y daño de arma, que sí funcionan en todas partes; contra monstruos solo se apagan los índices de Guerra y sus bonificaciones.',
+  'guide.arenaPage.warfareTradeBodyRatingSpent':
+    'Ese es el intercambio deliberado. El equipo de Guerra está hecho para combatir jugadores, no para saltarse los niveles de mazmorra: una pieza de Guerra nunca lleva los índices de combate que tendría un épico de mazmorra en el mismo hueco, y los índices y bonificaciones de Guerra que sí lleva se gastan por completo contra otros jugadores. Si quieres competir en arena, cómpralo. Si quieres limpiar heroicas más rápido, consigue tu equipo en las mazmorras.',
+  'guide.controls.harvestJournal': 'Diario de cosecha',
+  'guide.gear.masterwroughtBodyLegendary':
+    'El mejor equipo fabricado lleva en su descripción una etiqueta dorada «Único equipado: Maestroforjado». Estas piezas son la cumbre de las profesiones de fabricación, hechas por maestros con materiales raros y comerciadas libremente en el mercado abierto, y se sitúan junto a los tesoros de las mazmorras más profundas. La etiqueta es una regla familiar: un personaje puede llevar como máximo dos piezas de Maestroforjado a la vez, vengan de la profesión que vengan, así que elige los dos huecos donde mejor sirvan a tu configuración. La familia tiene una regla final: quien haya perfeccionado una pieza de Maestroforjado puede convertirla en una legendaria con el nombre que elija, como explica la página de Profesiones, y puede llevar como máximo una legendaria de Maestroforjado entre esas dos.',
+  'guide.gear.masterwroughtTitle': 'Maestroforjado: la cumbre fabricada',
+  'guide.interfacePage.framesGovernedAuraTracks':
+    'Editar marcos también libera las seis pistas de auras opcionales cuando las activas en la pestaña Combate de las mismas opciones de Interfaz: Mis beneficios, Enfriamientos defensivos, Mis escudos, Enfriamientos ofensivos, Movimiento y sigilo, y Mis beneficios sobre aliados. Todas están desactivadas de forma predeterminada y cada una muestra su propia etiqueta cuando está libre.',
+  'guide.interfacePage.framesGovernedExtra':
+    'Editar marcos también libera la pila de rastreadores inferior, con tus misiones y objetivos seguidos, progreso de gestas, páginas del Relicario, la Profundidad actual, cualquier Brecha en la que participes y la receta o comisión que sigas; además de la barra de acción de mascota, los puntos de objetivo para tus perjuicios en enemigos cercanos, el medallón Devoción del paladín, la Barra de aflicción del brujo, la superposición de activaciones de hechizos, el temporizador de mano izquierda para quienes empuñan dos armas y la ventana de medidores de daño con pestañas. Cada elemento lleva su propia etiqueta cuando está libre.',
+  'guide.interfacePage.framesMoveBodyEditFrames':
+    'Puedes mover tu marco, el marco de objetivo y los marcos de grupo. Cada uno tiene un pequeño botón de mover en una esquina: desbloquéalo, arrastra el marco donde quieras y vuelve a bloquearlo para que un clic perdido no lo desplace. Editar marcos, arriba de la pestaña Marcos en las opciones de Interfaz, libera el resto de la interfaz de una vez junto con esos tres: barras de acción, barra de lanzamiento, barra de golpes, barra de experiencia, minimapa, raíl de botones, marco de mascota, barra de postura, filas de beneficios y perjuicios y etiqueta de recordatorio de deseos. Si algo queda en un lugar que no quieres, Restablecer valores predeterminados, al pie de esa pestaña, devuelve todo a su posición inicial.',
+  'guide.interfacePage.gatheringGoalTrackerBody':
+    'Un rastreador de objetivos de recolección se une a la pila cuando sigues una receta en la ventana de fabricación o una comisión en el tablón: indica la receta o comisión, cuánto estás reuniendo y cuánto aportan tus materiales guardados y almacenados. Seguir reemplaza el objetivo actual y Borrar lo elimina explícitamente; ninguno cambia tu preferencia de cosecha.',
+  'guide.interfacePage.hubPracticeTrackerBody':
+    'Cerca del centro de Eastbrook se une un rastreador de práctica cuando aceptas allí las lecciones guiadas: mantiene visibles tus mejores intentos contra los muñecos de práctica. Mientras una lección está activa, una franja de entrenamiento te guía por el paso actual, desde abrir los medidores de daño hasta comparar un segundo intento.',
+  'guide.interfacePage.mapBodyZoneFirst':
+    'M abre el mapa del mundo en la zona donde estás, con tu propia flecha, los puntos de interés cercanos, los emisores de misiones con sus marcas y las áreas de tus objetivos, estaciones de fabricación, buzones, tablones y bancales, entradas de mazmorra y todos los nodos de recolección de la zona, apagados mientras reaparecen y marcados cuando tus herramientas no bastan. Tu grupo también aparece. Haz clic derecho en el mapa o pulsa su botón Mapa del mundo para alejarlo hasta el continente, con cada zona dibujada y nombrada; al hacer clic en una zona se abre su mapa. Entra en una Profundidad, mazmorra, Brecha o fortaleza y el mapa cambia al plano del lugar; el campo de batalla de Campos Espinosos tiene su propio mapa.\n\nA la derecha, bajo el minimapa, una pila de rastreadores mantiene a la vista tus asuntos actuales: misiones y objetivos seguidos, progreso de gestas, páginas del Relicario, la Profundidad actual y cualquier Brecha en la que participes. El rastreador de misiones se contrae cuando quieres recuperar espacio en pantalla.',
+  'guide.interfacePage.mobileBodyTwoPages':
+    'Los controles táctiles aparecen solos y el diseño se adapta a tu pantalla: disposición compacta en un teléfono pequeño, estándar en uno grande y más espaciosa en una tableta.\n\nTus facultades se colocan en un anillo en vez de una fila numérica: el botón de ataque con cuatro botones de acción y un conmutador que alterna el anillo entre sus {pages} páginas, que juntas alcanzan las {slots} ranuras de facultades aunque las barras de escritorio adicionales estén activadas. La quinta posición del arco es el asiento de consumibles: tócala para usar lo que contiene, mantenla pulsada o deslízala hacia dentro para abrir una fila que se llena con lo que llevas. Alrededor del anillo están los botones más usados en táctil: cambiar de objetivo, usar lo que tienes delante y saltar.\n\nUn control de Acciones rápidas ocupa el borde inferior en lugar de una fila de botones. Abre el resto: montura, chat, mapa, bolsas, social, misiones, personaje, grimorio, menú del juego y una entrada Más con las demás ventanas, incluida la búsqueda de mazmorras, PvP, gestos y la wiki. Aquí las ventanas llenan la pantalla en vez de flotar sobre ella.\n\nMover los marcos de unidad es cosa del escritorio: en táctil el diseño los coloca por ti.',
+  'guide.interfacePage.winMoreBodyNoValeCup':
+    'El mapa del mundo (M), la ventana PvP (G), la clasificación (K) y el calendario de eventos (I) funcionan igual. La rueda de gestos (X) es la excepción: mantén su tecla y aparecerá, después suéltala sobre un gesto para reproducirlo. La clasificación merece una visita: tiene una pestaña de jugadores, otra de hermandades, otra que ordena cuentas completas por Renombre del Libro de Gestas, otra de posiciones diarias y una pestaña Desarrolladores para quienes crean el juego, salvo que desactives Mostrar insignias de desarrollador.\n\nSelecciona a otro jugador y haz clic derecho en su marco de objetivo, toca dos veces o mantén pulsado en táctil, o haz clic derecho en su nombre del chat, y se abrirá Información del jugador: el equipo que lleva, con descripciones, y los datos públicos de su personaje. Es solo una consulta. El equipo requiere que esté cerca: si buscas un nombre del chat estando lejos, solo recibes la parte pública de la tarjeta, su retrato, nombre, nivel, clase y hermandad.',
+  'guide.interfacePage.worldWindowsBodyStationMaster':
+    'Hay ventanas que no abres con una tecla: aparecen al hablar con la persona correcta o pulsar el objeto adecuado.\n\nUn mercader abre la ventana de vendedor, con sus existencias y una lista de recompra al pie del mismo panel para recuperar algo vendido por error. Junto a las existencias hay botones de cantidad, para comprar una pila de reactivos de cinco o diez en una pulsación, además de una cantidad personalizada. Tus facultades de clase no necesitan entrenador, llegan con los niveles; los entrenadores son los maestros residentes de las estaciones de fabricación, y Entrenamiento abre las recetas que pueden enseñarte ahora, las que ya conoces y las que siguen bloqueadas por habilidad.\n\nUn banquero abre tu banco, con una pestaña Personal para el arca de espacios extra que puedes comprar y una pestaña Bóveda que guarda materiales por tipo. Si tu hermandad ha abierto un banco, aparece una pestaña Hermandad: cualquiera puede mirar aunque no tenga permiso para retirar nada, los rangos deciden quién puede depositar, retirar y mover las monedas de la hermandad, y un registro anota cada movimiento.\n\nUn buzón de Correo del Cuervo abre tus cartas, con lo recibido en una pestaña y un formulario de envío, con adjuntos, en otra. El Mercado mundial, en el Mercader de Eastbrook o la Subastadora Voss de Highwatch, tiene su propia ventana: explorar y comprar en una pestaña, poner tus bienes a la venta en otra y recoger lo vendido en una tercera. Intercambiar cara a cara con otro jugador abre una ventana de comercio con un lado para cada uno.',
+  'guide.profPages.bandsBodySplitLadder':
+    'Las bandas de competencia son la escala compartida 0/100/200 del contador de un oficio de tierra: cruzar la banda de 100 reduce el lanzamiento de recolección y el límite terrestre hace que la banda 1 sea el techo. Pesca tiene su propia escala, con seis peldaños en 0, 100, 150 y tres más en 200. Sus bandas no reducen nada; seleccionan las tablas de capturas, cada una con una caña adecuada. Tras el tercer peldaño la barrera avanza una vez más hasta el límite 200 y se detiene: desde el límite, solo la caña decide hasta dónde llega la tabla. La subida es lo que lleva al pescador a aguas profundas, donde viven las mejores tablas y las lecciones posteriores.',
+  'guide.profPages.craftIntro.alchemy':
+    'La Alquimia convierte hierbas, glándulas y vidrio en frascos que ganan combates: brebajes de sanación y maná para cuando las cosas salen mal, elixires de aguante que permanecen en tu barra durante una mazmorra entera y, arriba, los frascos, uno por función, que te acompañan incluso después de morir.',
+  'guide.profPages.craftIntro.cooking':
+    'La Cocina convierte la pesca del día y la cosecha de la estación en comidas que sanan durante 18 s de descanso, la curación más barata del juego, desde Cecina salada hasta el Gran asado de Marlow y los tres platos de función cumbre, que sanan más que cualquier otra comida y dejan un beneficio Bien alimentado a quien termina el plato. Todo el mundo come, así que ninguna profesión es más bienvenida en un grupo.',
+  'guide.profPages.craftIntro.enchanting':
+    'El Encantamiento desmonta el equipo y devuelve su poder: rompe piezas no deseadas para obtener materiales arcanos y gástalos en una bonificación permanente para una pieza que quieras conservar. Desmontar y encantar no requieren estación ni entrenador y cualquiera puede empezar el primer día; solo sus tres recetas de entrenador piden más, los dos talismanes y el Reactivo luminoso, enseñados y trabajados en los talleres.',
+  'guide.profPages.craftIntro.engineering':
+    'La Ingeniería fabrica las herramientas que acaba queriendo todo recolector serio: picos, hachas y hoces de niveles 4 y 5, además de las tres cañas que suben del nivel 4 al 6. Ningún mostrador vende estas piezas por monedas y cada una consume la herramienta inferior.',
+  'guide.profPages.craftIntro.inscription':
+    'La Inscripción es el escritorio de escritura del boticario de Highwatch: tomos de lanzador para la mano izquierda y pergaminos de aguante para todos, molidos con las mismas hierbas que usan los brebajes de al lado. Sus pergaminos son la segunda puerta a los beneficios de elixir de batalla, así que incluso un luchador que nunca empuña un libro tiene motivos para llamar.',
+  'guide.profPages.craftIntro.jewelcrafting':
+    'La Joyería es el banco fino de la forja de Eastbrook: anillos y collares de cobre, hierro y osmio raro, con un anillo de Fuerza, uno de Intelecto y un collar de Agilidad en cada peldaño. La joyería no tiene armadura ni bloqueo de clase, así que sus clientes son todos los que tengan dedos y cuello.',
+  'guide.profPages.craftProse.alchemy.identityBody': `La profesión se trabaja en la botica de Highwatch, hogar de la alquimista Verane, maestra de la botica, que enseña la escala de recetas, vende viales de cristal por 12 cobres y paga monedas por hierbas mediante sus pedidos.\n\nEn el anillo de profesiones, Alquimia se sitúa entre los oficios de prueba y error, junto a Ingeniería y Cocina. Tiene dos identidades de pareja: Bombardero (Ingeniería y Alquimia, adoptada ante el manitas Gizzel en Eastbrook) y Boticario (Alquimia y Cocina, jurada ante el cocinero Marlow). Vincúlate a cualquiera para convertir Alquimia en profesión principal y que tu propio trabajo firmado te enseñe; Bombardero también abre el brebaje combinado Elixir del oso, mientras Boticario todavía no tiene receta combinada. La escala de 0 a 50 no espera: todos sus peldaños están dentro del nivel raro que pueden usar las profesiones no declaradas, así que se puede subir antes de cualquier juramento. Dos cosas están por encima de ese techo y solo enseñan a una profesión principal: el Catalizador de aceleración, intermedio de 75 que también enseña Verane, y los peldaños de patrón encontrado. Un alquimista no declarado o aficionado los prepara por los bienes, no por los puntos.`,
+  'guide.profPages.craftProse.alchemy.ladderBody': `Todo el mundo conoce la Poción de sanación menor desde el principio y puede mezclarla en cualquier sitio. La escala real la enseña Verane en la botica, peldaño a peldaño: las recetas de habilidad 0 son gratis, el peldaño de 25 cuesta 25 platas por receta y el de 50 cuesta 1 oro. Cada peldaño contiene un brebaje de sanación, uno de maná y un elixir de aguante, desde botellas comunes de Hoja de brillo (120 de salud, 160 de maná), pasando por Hoja dorada poco común (200 de salud, 260 de maná), hasta Pétalo solar raro (335 de salud, 425 de maná). Desde la economía de trofeos, el peldaño 25 también enseña una Poción de sanación inferior hecha con sebo, más barata y un poco más débil que la de Hoja dorada.\n\nLos elixires suben igual: el Elixir del jabalí otorga 6 de Aguante durante 10 minutos, el Elixir de Mordedura de víbora 9 durante 15 minutos y el Elixir de la serpiente 12 durante 15 minutos, siendo este último el único que produce dos botellas por fabricación. Hay otra receta aparte: Elixir del oso, que Verane enseña por 25 platas al alcanzar 25 de Alquimia, se puede mezclar en cualquier lugar, pero solo por un Bombardero vinculado con Alquimia e Ingeniería a 25.\n\nPor encima está el peldaño de frascos, que ningún entrenador enseña y procede de patrones encontrados. Un frasco otorga 13 durante 20 minutos y añade Poder de ataque e Intelecto junto al Aguante, un frasco por función. Solo puede haber un frasco activo, un elixir o pergamino más débil no lo reemplaza, y no se elimina por disipar, robar o cancelar manualmente. Te acompaña tras morir, pero termina al cerrar sesión.`,
+  'guide.profPages.craftProse.alchemy.routeBody': `Los brebajes y elixires nunca hacen obras maestras; esa activación pertenece al equipo con estadísticas. Tu nombre sí viaja: los brebajes raros de Pétalo solar llegan firmados, igual que cada botella del Elixir de la serpiente de doble lote, así que ningún objeto raro de esta profesión sale sin firma. A habilidad 75 te especializas y todas las recetas de Alquimia consumen desde entonces un 20% menos de materiales.\n\nAdopta Herboristería pronto y recoge mientras subes: la Hoja de brillo abunda en el Valle, y el peldaño gratuito te lleva a 25 con hierbas que ya recogerías. Aprende el peldaño 25 en cuanto se abra, recoge Hoja dorada en el pantano y usa el pedido de Verane, seis hierbas de Hoja dorada por 45 cobres, repetible cada 30 minutos, para recuperar unas monedas.\n\nDesde 50 prepara brebajes de Pétalo solar y lotes de Serpiente con pétalos de Thornpeak y algo de vegetación del Valle y pantano. Por encima están los tres frascos y, al final, el Gran caldero, hito de habilidad 125: ningún entrenador los enseña, proceden de patrones encontrados y solo enseñan a una profesión principal jurada. El tramo de 100 a 125 es deliberadamente lento, así que prepara lo que se venda en vez de quemar hierbas por el número. El Libro de Gestas marca Brebajes extraños a 50 y Gran maestría de Alquimia en el límite.`,
+  'guide.profPages.craftProse.cooking.identityBodyOneMeal': `Come una comida cocinada y te sanará durante 18 segundos de descanso, la curación más barata del juego entre combates. La escala va de la perca de río a la sartén de 90 de salud hasta el Gran asado de Marlow de 980, y por encima están tres platos de función cumbre de 1.392, la mayor curación en reposo y el beneficio Bien alimentado más fuerte. Solo puede existir un efecto Bien alimentado: una comida nueva lo reemplaza.\n\nEn el anillo, Cocina está entre Alquimia y Peletería. Su pareja activa es Boticario, Alquimia y Cocina, jurada ante Marlow en las cocinas de Eastbrook tras cazar cuatro jabalíes; la pareja Trampero con Peletería aparece en el anillo, pero todavía no tiene misión de juramento.`,
+  'guide.profPages.craftProse.cooking.routeBody': `Cocina es la excepción honesta de la historia de las obras maestras: una comida no tiene estadísticas que mejorar, así que los platos nunca activan una obra maestra y ningún cocinero debe perseguirla. El dominio del oficio llega con la especialización a 75: consume una quinta parte menos de cada ingrediente, un ahorro que se acumula deprisa en los platos por lotes, y permite una cocina de campo móvil para preparar la cena en la puerta de la mazmorra.
+
+Cocina lo que pescas: combina la subida con una sesión de pesca y ambas habilidades se alimentan mutuamente hasta el final. La cecina y el peldaño gratuito te llevan a 25, a un punto por fabricación; el peldaño intermedio lleva a 50 y el raro a 75. Por encima del peldaño raro está la cocina cumbre, con los tres platos de función y el Hogar Rebosante: ningún entrenador los enseña, proceden de patrones encontrados. Para un cocinero cuya profesión principal incluya Cocina, lo que hoy significa el Boticario juramentado, una fabricación cumbre otorga la ganancia completa hasta el límite de 125; por debajo del techo de una profesión principal no enseña nada, así que un cocinero sin declaración o aficionado la hace por el plato, no por los puntos. En cualquier caso, los platos raros llevan el último tramo, con media ganancia y después cuarta ganancia, aproximadamente 150 fabricaciones más. Trátalo como abastecimiento, no como una molienda: un gremio se come cada ración.
+
+Los pedidos de cocina de Marlow compran ocho carnes de caza cada 30 minutos a cambio de monedas y experiencia. El Libro de Deeds marca Chef sazonado a habilidad 50, camino al título Gran maestro de Cocina a 125.`,
+  'guide.profPages.craftProse.enchanting.identityBody': `Todos conocen cada encantamiento desde el principio, cualquiera puede desencantar desde el día uno y ninguna de las dos acciones necesita estación; la habilidad tiene un límite de 125, como todos los oficios. La única parte enseñada del oficio son tres recetas, todas de Tinker Gizzel en los talleres de la esquina suroeste de la plaza de Eastbrook, y todas se trabajan allí: los dos talismanes, Caché del Recolector y Ojo del Artesano, por la tarifa del nivel normal cuando Encantamiento llega a 25, y por encima de ellos el Reactivo Luminoso, material propio del nivel cumbre, a 75.
+
+En el anillo se sitúa entre Inscripción y Joyería, así que sus dos identidades de pareja son el Arcanista, con Inscripción y Encantamiento, y el Engarcejoyas, con Encantamiento y Joyería. Ninguna puede jurarse todavía: los oficios vecinos ya tienen sus propias escalas, Inscripción en la botica y Joyería en la forja, pero ninguna pareja tiene aún una misión de juramento. Por eso Encantamiento sube hoy como oficio de cualquiera: es gratuito hasta el nivel raro antes de cualquier juramento y una elección natural como afición para un Bombardero o un Boticario. Los encantadores también mantienen en marcha el mundo de recolección: los dos efectos insertables de herramientas son trabajo suyo, y el artesano original recarga sus propios efectos con descuento, aún mayor después de especializarse.`,
+  'guide.profPages.craftProse.enchanting.levelingBody': `Tres acciones mueven la habilidad: desencantar una pieza, aplicar un encantamiento y fabricar las dos recetas de talismán, que siguen la curva normal de fabricación. La tercera receta enseñada, el Reactivo Luminoso, es la excepción: a habilidad 75 queda por encima del techo raro bajo el que trabaja todo encantador, porque Encantamiento no tiene pareja de juramento y nunca es una profesión principal. Una receta por encima de tu techo no enseña nada, así que se fabrica por el reactivo, no por los puntos. Cada éxito vale hasta un punto, según la seriedad del trabajo: la rareza de la pieza que rompes o el nivel del reactivo del encantamiento que aplicas. Los desencantamientos comunes y los encantamientos que solo producen polvo cuentan como trabajo común; los desencantamientos poco comunes y los encantamientos de esencia cuentan como poco comunes; los desencantamientos raros y todos los encantamientos Rúnicos o Superiores cuentan como raros; los desencantamientos épicos y legendarios, y todos los encantamientos Luminosos, ocupan rangos aún más altos en la tabla. Sin embargo, ninguna identidad de Encantamiento alcanza hoy más allá del peldaño raro, así que en la práctica pagan lo mismo que el trabajo raro. Hay una regla importante en la mesa de ruptura: una pieza que salió del banco de un jugador, ya sea fabricada, firmada o perfeccionada, se convierte en materiales pero no enseña nada. Un ciclo de fabricar y romper no sube la habilidad; las lecciones están en el equipo encontrado en el mundo.
+
+La pérdida de dominio conocida se aplica en tramos de 25 puntos: el trabajo de grado común se vuelve gris a habilidad 75, el poco común a 100 y el trabajo de nivel raro exactamente en el límite de 125. Encantamiento tiene además una concesión propia: una entrada por encima del techo de tu arquetipo se redondea hacia abajo hasta ese techo en lugar de anularse, así que antes de sintonizarte un desencantamiento épico cuenta como raro en vez de no enseñar nada. Si Encantamiento queda dormido detrás de otra identidad, romper y aplicar cuentan como trabajo común y la subida se atasca en 75; los dos talismanes, que siguen la curva de fabricación por encima del techo común, no enseñan nada a un encantador inactivo. Mantenlo como afición y el trabajo raro seguirá pagando, aunque más despacio después de 75.`,
+  'guide.profPages.craftProse.engineering.identityBody': `La Ingeniería se trabaja en los talleres de la esquina suroeste de la plaza de Eastbrook, hogar de Tinker Gizzel, Maestro de los Talleres. Los niveles 1 a 3 de cada línea de herramientas son existencias normales de vendedor; cada peldaño superior sale del banco de un ingeniero o del mostrador de la incursión de la Letanía Ahogada, comprado con Marcas de Profundidades tras superar sus puertas de acceso, y nunca de un puesto por monedas. Las líneas de herramientas de tierra terminan en el nivel 5; la línea de cañas sube uno más, hasta la Clockreel de nivel 6.
+
+En el anillo se encuentra con los oficios de prueba y error, junto a Alquimia y Peletería, y ofrece dos identidades de pareja: el Bombardero, Ingeniería y Alquimia, que se puede adoptar antes que el propio Gizzel, y el Artífice Mecánico, Peletería e Ingeniería, cuyo nombre existe pero cuyo juramento aún no se puede prestar. Hay una advertencia que sigue siendo importante: cada peldaño de la escala de herramientas está por encima del techo de nivel raro que usan los aficionados y los artesanos sin declaración, así que la escala solo mueve la habilidad de un artesano cuya profesión principal incluya Ingeniería, lo que hoy significa el Bombardero. El banco ya no está cerrado a todos los demás: Gizzel empieza a enseñar a cualquiera con habilidad 0 la Pieza de Engranaje en Blanco y la Azada de Bronce, ambas gratis, y enseña el Ocular de Lente de Cobre a 25 por la tarifa normal. De ese modo un ingeniero sin sintonizar o aficionado puede subir por los primeros peldaños; un oficio dejado inactivo detrás de otra identidad solo obtiene habilidad de las dos lecciones de habilidad 0. Cualquiera puede construir las herramientas de tierra, pero un artesano sin sintonizar no aprende nada de ellas, y dos de las tres recetas de cañas también exigen la enseñanza de Gizzel; el peldaño de nivel 6 sale en cambio de un esquema.`,
+  'guide.profPages.craftProse.engineering.ladderBody': `Cada peldaño de la escala de herramientas está ligado a la estación de los talleres. Las azadas fabricadas que el maestro de herramientas también enseña tienen su propia nota en la página de recolección, al igual que sus dos lecciones iniciales. Las seis recetas de herramientas de tierra se conocen automáticamente y nunca cobran tarifa de entrenador: el pico, el hacha y la hoz de nivel 4 a habilidad 75, y sus versiones de nivel 5 a habilidad 125, el propio nivel límite. Los requisitos de habilidad nunca bloquean una fabricación; solo determinan la ganancia, así que puedes construir una herramienta de nivel 5 el día que tengas sus reactivos y la predecesora de nivel 4. Dos de las tres cañas fabricadas son la excepción enseñada: Gizzel enseña la Stormreel a habilidad 75 por 4 de oro y la Tidewrought a habilidad 125 por 16 de oro, cada una en cuanto tu nivel del oficio alcanza el suyo. La Clockreel de nivel 6 es la tercera y ningún entrenador le pone precio: su esquema está en el mostrador del Intendente Heroico y enseña la receta directamente.
+
+Toda herramienta terminada tiene calidad rara o épica y sale firmada, así que tu nombre recorre las zonas en los cinturones de herramientas de otros jugadores. Ingeniería también aporta la mitad de una receta de combinación: el Elixir del Oso, preparado por un Bombardero sintonizado que tenga Ingeniería y Alquimia a 25.`,
+  'guide.profPages.craftProse.engineering.materialsBodyThreeRods': `Cada receta de herramienta de tierra consume la herramienta del nivel inmediatamente inferior y un material de calidad FINA. Esa combinación forma toda la escala de tierra: cuatro menas de hierro Fino y un Pico de Minería de Plata Celeste se convierten en el Pico de Minería de Osmio; después, dos lingotes de Acero Glífico, dos menas de osmio Fino y ese pico de osmio se convierten en el Pico de Minería de Acero Glífico. Las líneas del hacha y la hoz reflejan la misma forma de material fino más herramienta anterior, con madera de fresno Fina y troncos de pino alto Fino, y hoja dorada Fina y hierbas pétalo solar Finas. Sus peldaños de nivel 5 no piden lingotes de Acero Glífico: el pico es la única línea cuyo coste aumenta arriba. Las tres recetas de caña rompen el patrón a propósito: la Stormreel pide cuatro koi Brillo Solar y una caña Corriente de Plata; la Tidewrought, dos koi, ocho carpas Aleta de Pizarra Cruda y esa Stormreel; y la Clockreel, dos koi, diez esturiones Branquia Hueca Crudos y esa Tidewrought. Por eso la cima de la escala del pescador se paga en el agua y no en una veta.
+
+Un material Fino no se vende en ninguna parte ni cae de una cosecha normal: se obtiene trabajando una veta de grado completo de una zona con una herramienta cuyo nivel supera al del material. En la práctica es la herramienta del peldaño inmediatamente inferior a la que intentas construir; las vetas fáciles que una zona reserva para viajeros dan el material corriente con cualquier herramienta. Es intencionado: en la ruta del oficio una herramienta de nivel 5 nace de usar de verdad la de nivel 4, no de una visita a las tiendas. El mostrador de Marcas de Profundidades es la única forma de saltarse ese paso. La única excepción es el Lingote de Acero Glífico, refinado y exclusivo de vendedor: cuesta 1 plata y 60 cobres por lingote a la Intendenta Bree en Highwatch o en el propio mostrador de Gizzel. Solo el Pico de Minería de Acero Glífico lleva ese suelo fijo de monedas en su coste.`,
+  'guide.profPages.craftProse.inscription.identityBody': `La escala tiene tres peldaños dobles: un tomo de lanzador para la mano izquierda y un pergamino de aguante para cualquiera, primero de Hoja de brillo, después de Hoja dorada y al final de Pétalo solar raro. Los tomos son objetos de estadísticas para las seis clases de maná y llevan Intelecto y Espíritu desde el primer peldaño; los pergaminos son consumibles sin bloqueo de clase, así que la mitad de cada peldaño se vende a todo el reino.\n\nEn el anillo se sitúa entre Sastrería y Encantamiento, con las parejas Tejetrama y Arcanista. Ninguna tiene misión de juramento, así que Inscripción sube como profesión de cualquiera: los tres peldaños de la escala de 0 a 50 están dentro del nivel raro de las profesiones no declaradas. El Pergamino de cera negra, intermedio de 75 que también enseña Verane, y el peldaño de patrón encontrado están por encima y no enseñan a nadie hasta que la pareja pueda jurarse; se escriben por los bienes, no por los puntos.`,
+  'guide.profPages.craftProse.inscription.identityHeading':
+    'Tinta para la mente, pergaminos para el camino',
+  'guide.profPages.craftProse.inscription.ladderBody': `Inscripción no tiene estación propia: todo el catálogo se trabaja en la botica de Highwatch, el mismo banco en el que se prepara Alquimia, y allí lo enseña la Alquimista Verane. La escala tiene seis recetas de entrenador en tres peldaños: el peldaño de hoja de brillo, con su imprimación y pergamino, es gratuito a habilidad 0; el peldaño de hoja dorada, con folio y pergamino, cuesta 25 platas por receta a habilidad 25; y el peldaño de pétalo solar, con grimorio y pergamino, cuesta 1 oro por receta a habilidad 50. Cada peldaño se puede enseñar en cuanto tu nivel del oficio alcanza el suyo. El pergamino del peldaño 50 sale del escritorio de dos en dos.
+
+No hay recetas de campo ni pieza de combinación: cada peldaño enseñado depende de la botica y del entrenador, y el peldaño de patrón encontrado que queda por encima también está ligado a la botica, aunque no se compra en ningún sitio. Este oficio se aprende y se practica de pie donde están los alquimistas.`,
+  'guide.profPages.craftProse.inscription.ladderHeading': 'Enseñada junto a los alambiques',
+  'guide.profPages.craftProse.inscription.materialsBodyFrostGourd': `El escritorio usa Herboristería y el banco de rotura. Hoja de brillo sale de los parches de hierba de nivel 1 de Eastbrook, Hoja dorada de Mirefen y Pétalo solar de Thornpeak, molidas en pigmento con un Vial de cristal de 12 cobres del maestro de la botica en cada receta. La mitad mágica de la tinta sale del banco: Polvo de campanilla cubre el peldaño de Hoja de brillo, Esencia de campanilla los de Hoja dorada y Pétalo solar, y el pergamino solar vuelve a ligar una pizca de polvo.\n\nEl peldaño solar refina ambas recetas: el grimorio raro usa dos Hojas doradas además de su Pétalo solar para dar tamaño a las iluminaciones, y el lote doble de pergaminos usa una segunda esencia, esa pizca de polvo y una Calabaza de escarcha de las terrazas de Highwatch. La calabaza iguala su coste al Elixir de la serpiente, cuyo beneficio imita. Ningún mostrador vende hierbas, polvo o calabaza; solo se compra el vial por monedas.`,
+  'guide.profPages.craftProse.inscription.materialsHeading':
+    'Hierbas, tinta y un vial que la contenga',
+  'guide.profPages.craftProse.inscription.routeBody': `Los pergaminos son la regla característica del oficio: el pergamino de cada peldaño concede exactamente el beneficio del elixir de vigor de su banda, las bandas del jabalí, de víborasear y de la serpiente, y ambas fuentes comparten un único espacio en la barra de beneficios. Leer un pergamino mientras tienes un elixir lo reemplaza; beber un elixir mientras tienes un pergamino hace lo mismo. Siempre gana la aplicación más reciente. Un pergamino es, por tanto, otra puerta al mismo beneficio, nunca una segunda acumulación encima.
+
+Los tomos tienen estadísticas reales, así que cada fabricación de tomo tira la posibilidad de obra maestra siempre que la calidad fina que salga esté dentro de tu techo de nivel; los pergaminos, consumibles sin estadísticas, nunca activan una. La subida sigue la ruta normal: hoja de brillo hasta 25, el peldaño de hoja dorada desde el día en que se abre hasta 50 y después pétalo solar hasta 75. Por encima está un peldaño cumbre que Verane no enseña: su patrón se encuentra y no se compra. Es un tomo que puedes fabricar, no un atajo para subir la escala: el patrón cumbre queda muy por encima del techo raro bajo el que trabajan hoy todos los escribas, y una receta por encima de tu techo no enseña nada. La habilidad que concede espera a que se abran las parejas de este oficio y la Inscripción se convierta en profesión principal. Sea cual sea tu identidad, las recetas de pétalo solar llevan la subida con media y después cuarta ganancia: calcula unas 150 fabricaciones más para llegar al límite de 125 y financia la ruta con honestidad, porque los pergaminos se venden a todas las clases del juego.
+
+El Libro de Deeds marca Escrito con tinta fina para tu primera pieza de nivel raro, Pluma y pigmento a habilidad 50 y Gran maestro de Inscripción en el límite de 125.`,
+  'guide.profPages.craftProse.inscription.routeHeading':
+    'Pergaminos, elixires y una ruta hasta 125',
+  'guide.profPages.craftProse.jewelcrafting.identityBody': `La escala tiene tres peldaños de tres piezas: un anillo de Fuerza, un anillo de Intelecto y un collar de Agilidad, primero de cobre, después de hierro y finalmente de osmio raro. La Joyería no tiene armadura ni bloqueo de clase, y hasta las piezas de cobre llegan con estadísticas reales, porque un anillo sin estadísticas no serviría de nada.
+
+En el anillo de oficios se sitúa entre Encantamiento y Fabricación de Armas, con dos identidades de pareja: el Engarcejoyas, Encantamiento y Joyería, y el Forjahoja, Joyería y Fabricación de Armas. Ninguna tiene misión de juramento todavía, así que Joyería sube hoy como oficio de cualquiera: los tres peldaños de 0 a 50 están dentro del nivel raro de los oficios sin declaración y la escala queda abierta antes de cualquier juramento. Por encima están el Engaste de Vidriocristal, el intermedio de 75 que también enseña Darva, y el peldaño de patrón encontrado. Como ninguna pareja puede jurarse aún, hoy no enseñan nada a nadie; córtalos por los materiales, no por los puntos.`,
+  'guide.profPages.craftProse.jewelcrafting.identityHeading': 'El trabajo fino de la forja',
+  'guide.profPages.craftProse.jewelcrafting.ladderBody': `Joyería no tiene estación propia: todo el catálogo se trabaja en la forja de Eastbrook, el mismo yunque que comparten Armería y Fabricación de Armas, y allí lo enseña la Maestra de la Forja Darva. La escala tiene nueve recetas de entrenador en tres peldaños: el peldaño de cobre, con banda, aro y torques, es gratuito a habilidad 0; el peldaño de hierro, con sello, aro y gargantilla, cuesta 25 platas por receta a habilidad 25; y el peldaño de osmio, con banda, aro y amuleto, cuesta 1 oro por receta a habilidad 50. Cada peldaño se puede enseñar en cuanto tu nivel del oficio alcanza el suyo.
+
+No hay recetas de campo ni pieza de combinación: cada peldaño enseñado depende de la forja y del entrenador, y el peldaño de patrón encontrado que queda por encima también está ligado a la forja, aunque no se compra en ningún sitio. Este oficio se aprende y se practica de pie donde están los herreros.`,
+  'guide.profPages.craftProse.jewelcrafting.ladderHeading': 'Enseñada junto al yunque',
+  'guide.profPages.craftProse.jewelcrafting.materialsBody': `El banco usa minería y rotura. La mena de cobre sale de las vetas de nivel 1 del Valle de Eastbrook, la de hierro del Pantano de Mirefen y la de osmio de las Alturas de Thornpeak. Cada receta lleva uno o dos frascos de Fundente de Herrería, a 20 cobres cada uno con la Maestra de la Forja Darva. La otra mitad de cada pieza sale de la mesa de rotura: el Polvo de Campanilla sostiene el peldaño de cobre y la Esencia de Campanilla los de hierro y osmio. Por eso un joyero es el cliente más constante de un encantador o mantiene su propia costumbre de desencantar.
+
+El peldaño de osmio añade un refinamiento: cada pieza rara usa también dos menas de hierro, trabajadas como soldadura para los engastes finos. Ningún mostrador vende las menas ni el polvo: salen del mundo o de otro jugador, por intercambio o en el Mercado Mundial. Solo el fundente se compra por monedas.`,
+  'guide.profPages.craftProse.jewelcrafting.materialsHeading': 'Mineral, polvo y esencia',
+  'guide.profPages.craftProse.jewelcrafting.routeBody': `Aquí no hay peldaño sin estadísticas: cada pieza de la escala tiene una línea estadística real, así que cada fabricación tira la probabilidad de obra maestra siempre que la calidad superior quepa dentro de tu techo de nivel. El hierro y el osmio cuentan como materiales de nivel 1 para la tirada. Los peldaños de cobre y hierro, poco comunes por su fabricación, pueden convertirse en raros mediante una obra maestra tanto para un joyero aficionado como para uno sin declaración. Las tres piezas de osmio ya son raras, así que sus obras maestras épicas esperan un techo por encima del raro, que ningún joyero tiene hasta que se abran las parejas del oficio.
+
+La subida sigue la ruta normal: cobre hasta 25, hierro desde el día en que se abre hasta 50 y después osmio hasta 75. Por encima está un peldaño cumbre que ningún entrenador enseña: sus patrones se encuentran y no se compran. Es un objeto que puedes fabricar, no un atajo de la escala, porque el mismo techo se aplica a la ganancia de habilidad y a las obras maestras. Un patrón cumbre está muy por encima del techo raro bajo el que trabaja hoy todo joyero, así que fabricarlo no enseña nada hasta que se abran las parejas y pueda ser profesión principal. En cualquier caso, las recetas de osmio llevan la subida con media y después cuarta ganancia: calcula unas 150 fabricaciones para llegar al límite de 125 y financia la ruta con honestidad, porque todas las clases llevan joyas y muchos viajeros suben con los huecos de anillo y cuello vacíos.
+
+El Libro de Deeds marca Pulido brillante para tu primera pieza rara, Faceta y filigrana a habilidad 50 y Gran maestro de Joyería en el límite de 125.`,
+  'guide.profPages.craftProse.jewelcrafting.routeHeading': 'Obras maestras y una ruta hasta 125',
+  'guide.profPages.craftProse.tailoring.identityBody': `La escala sube desde las prendas básicas de hilado casero, pasa por el conjunto de Tejido Dorado y llega al peldaño raro, el Atuendo del Tejedor de Seda y las piezas de Tejido Solar. Su segundo producto sirve a todos: la Cartera de Seda Hilada tiene diez espacios y ninguna clase, especialización o nivel rechaza más espacio en las bolsas.
+
+En el anillo, Sastrería se sitúa entre Peletería e Inscripción. Su pareja activa es el Equipador, Peletería y Sastrería juntas, juramentado ante la Tejedora Ottilie en el telar de Eastbrook después de eliminar cuatro arañas de madera de telaraña para obtener su seda. La pareja Tejetrama con Inscripción también figura en el anillo; como el catálogo base de Inscripción ya está preparado, solo espera su propia misión de juramento.`,
+  'guide.profPages.craftProse.weaponcrafting.identityBody': `En todos los grupos alguien quiere este oficio, porque el peldaño raro cubre las tres necesidades: la Hoja de Guerra de Osmio para el combate cuerpo a cuerpo de Fuerza, el Hacha de Guerra de Acero Glífico para luchadores de Agilidad y el Bastón de Batalla de Pino Alto, con Intelecto y Espíritu, para quienes llevan túnica.
+
+En el anillo de oficios se encuentra entre Armería y Joyería. Su identidad activa es el Herrero, la pareja de Fabricación de Armas y Armería, juramentada ante la Maestra de la Forja Darva en la forja tras trabajar con tus propias manos tres vetas de mineral. La pareja Forjahoja con Joyería también figura en el anillo; aunque Joyería ya tiene su escala de joyas de 0 a 50 en esta misma forja, la pareja espera su misión de juramento antes de poder prestarlo.`,
+  'guide.profPages.craftProse.weaponcrafting.routeBody': `Cualquier pieza con una línea de estadísticas real, que en esta escala significa el peldaño de hierro y los superiores, puede salir del yunque como obra maestra siempre que la calidad fina que salga esté dentro de tu techo de nivel. Las piezas comunes de cobre sin estadísticas nunca activan una, porque no tienen nada que mejorar. El hierro y el osmio cuentan como materiales de nivel 1 para la bonificación de obra maestra; el pino alto y el acero glífico cuentan como nivel 2; y tener habilidad por encima del nivel propio de una receta añade su propio punto por cada nivel. Por eso, entre las tres piezas de osmio, el hacha de guerra y el bastón de batalla tienen la ventaja del material, y un peldaño sigue activando mejores resultados después de que lo hayas superado.
+
+Sube el peldaño de cobre hasta 25, aprende el de hierro el día que se abra y llévalo hasta 50, y después lleva el de osmio hasta 75. Por encima de las tres piezas de osmio hay un peldaño cumbre que Darva no enseña: sus patrones se encuentran y no se compran. Para un herrero cuya profesión principal incluya Fabricación de Armas, lo que hoy significa el Herrero juramentado, una fabricación cumbre da la ganancia completa hasta el límite de 125; por debajo del techo de una profesión principal, un herrero sin declaración o aficionado la hace por el arma, no por los puntos. En cualquier caso, las recetas de osmio llevan la subida con media y después cuarta ganancia: calcula unas 150 fabricaciones más para llegar a 125. Como cada fabricación tarda de verdad, un lote largo se regula por su duración y no por una cuota.
+
+Financia la subida mientras avanzas: el pedido de forja de Darva acepta ocho menas de cobre cada 30 minutos a cambio de unas monedas y experiencia, y los peldaños de hierro y osmio se venden honestamente a quienes están subiendo personajes cuerpo a cuerpo. El Libro de Deeds marca Filo y temple a habilidad 50 y corona Gran maestro de Fabricación de Armas a 125.`,
+  'guide.profPages.econ.doctrineBodyRaidCollections': `La economía de fabricación se basa en una idea: los jugadores abastecen a los jugadores. Los recolectores alimentan a los artesanos, los artesanos a quienes hacen misiones y a los asaltantes, y quienes rompen objetos alimentan a los encantadores. Los vendedores y maestros de estación quedan en los bordes para absorber basura y monedas, no para competir contigo. Si quieres ganar dinero con un oficio, tu cliente es una persona: aprende qué consumen otros jugadores, fija precios frente al Mercado Mundial y trata los sistemas de PNJ como el suelo de tus precios, no como el mercado entero.
+
+El equipo fabricado normal sostiene el ascenso al final del juego. Las colecciones del Crisol financiadas por incursiones ofrecen también una alternativa a los botines de incursión actuales: los materiales salen de las incursiones y la fabricación los convierte en la armadura y el perfil de función que elijas. Sus tres elecciones de ranura y la bonificación de dos piezas permiten combinarlas con equipo de incursión. Siguen compartiendo el límite global de dos piezas Forjadas por un Maestro, así que la fabricación complementa el conjunto de incursión sin suministrar un reemplazo completo.`,
+  'guide.profPages.econ.introRaidCollections':
+    'Cómo circulan las monedas: tarifas exactas, sumideros, ventas, reglas del Mercado mundial, pedidos, comisiones y lugar de las colecciones financiadas por bandas junto a la fabricación ordinaria.',
+  'guide.profPages.econ.provenanceBodyUndiscounted': `Algunos objetos llevan un nombre. Las líneas de origen de un material dicen quién recogió cada grupo de unidades, mientras que una marca independiente de firmante identifica al artesano premium cuando existe. Son datos independientes: el material recolectado normal registra al recolector sin ganar firma, y las existencias antiguas firmadas pueden nombrar a su firmante diciendo honestamente que no se registró recolector. Una pieza terminada dice quién la fabricó. Estos registros viajan con el objeto por intercambios, banco, correo, Mercado Mundial e incluso recompra de vendedor, y nunca desaparecen.
+
+La recolección firma automáticamente su mejor trabajo: toda cosecha que resulte rara o superior llega firmada, y los hallazgos raros firman su ganancia completa de cinco unidades. Una tirada afortunada de cosecha de cadáver firma el rendimiento cuando esa familia no tiene espécimen que entregar; cuando sí lo tiene, mantiene el rendimiento normal y crea junto a él el espécimen prístino firmado. La fabricación firma del mismo modo: cada copia de una salida rara o superior crea una versión firmada, y una obra maestra siempre firma cualquiera que sea su calidad. Así, la versión más fina de cada pieza nombra siempre a su creador. La firma de un material normal viaja con las unidades y no se pierde solo porque una acumulación compatible ya contenga otro recolector o firmante. Un espécimen prístino es un objeto separado y necesita espacio; si no cabe, queda el rendimiento normal del cadáver pero se pierde el espécimen.
+
+Los objetos terminados conservan una identidad estricta: dos copias solo se fusionan cuando coinciden exactamente el objeto, el firmante, las estadísticas de obra maestra, el encantamiento y el vínculo. Los materiales compatibles comparten espacio entre recolectores y firmantes mientras conservan un recuento por origen. La ayuda emergente resume los orígenes; abre Orígenes para la lista completa. Separar por recolector mantiene esas acumulaciones aparte en las bolsas y la ordenación respeta la elección. El material transferido puede acumularse normalmente con el del receptor.
+
+Las firmas devuelven algo a los artesanos: si sostienes en el banco una copia firmada de un reactivo necesario, quien la firmó añade 2 puntos porcentuales a la probabilidad de obra maestra. Si el reactivo está firmado por ti, reduce en uno la cantidad exigida, nunca por debajo de uno, salvo cuando el reactivo sea indiscountable. Los núcleos de incursión conservan siempre su coste completo. Tu propia obra rara o superior firmada también puede seguir enseñándote, hoy solo mediante pociones fabricadas: beber un brebaje raro que preparaste y firmaste devuelve un pequeño goteo de habilidad al oficio que lo creó, si ese oficio es una de tus profesiones principales activas. Solo funciona con la rama de pociones: un elixir, un pergamino o un frasco cumbre no enseña nada aunque lleve una firma excelente.`,
+  'guide.profPages.effectFeast': 'Coloca un festín: {servings} raciones durante {minutes} min.',
+  'guide.profPages.effectFeastServing':
+    'Cada ración restaura {amount} de salud durante {seconds} s.',
+  'guide.profPages.effectFeastWellFed':
+    'Bien alimentado al terminar: +{value} de {stat} durante {minutes} min.',
+  'guide.profPages.effectFood': 'Restaura {amount} de salud durante {seconds} s al comerlo.',
+  'guide.profPages.effectWellFed':
+    'Bien alimentado al terminar de comer: +{value} de {stat} durante {minutes} min.',
+  'guide.profPages.effectWellFedAura': 'Otorga {aura} durante {minutes} min al terminar de comer.',
+  'guide.profPages.ench.enchantsNoteRaidFormula': `Los encantamientos tienen cuatro niveles. El nivel base usa Polvo de Campanilla, con algo de Esencia en la parte alta, y cubre el arma, la mano secundaria y cada ranura de armadura. Hay suficientes ejes de estadísticas para que cada configuración encuentre una opción por ranura; los escudos y las manos secundarias de lanzadores llevan su propio encantamiento de Aguante, así que ninguna ranura equipada queda sin uso. El nivel Superior cuesta un Fragmento de Campanilla y Esencia y ofrece bonificaciones más fuertes en las ranuras de mayor impacto. Los fragmentos también alimentan otros tres consumos: las dos recetas de talismán, a cinco cada una, la recarga superior de efectos de herramienta y el nivel Luminoso, donde arma y pecho usan uno cada uno y la Infusión usa dos. Guarda algunos antes de gastar.
+
+Entre ambos están los cinco encantamientos Rúnicos, uno para cada estadística secundaria, para que nada que muelas sea un callejón sin salida: Filo Rúnico para arma y Fuerza, Sigilo Rúnico para arma e Intelecto, Tejido Rúnico para pecho y Espíritu, Piel Rúnica para piernas y Agilidad y Vínculos Rúnicos para casco y Aguante. Cada uno usa además dos Esencias de Campanilla. Cuando una ranura y estadística tienen encantamiento base y Superior, la bonificación Rúnica cae entre ambos; Tejido Rúnico es directamente el encantamiento de Espíritu de pecho más fuerte y Piel Rúnica es el único de Agilidad para piernas. La tabla siguiente contiene las bonificaciones exactas.
+
+Por encima de los niveles bajos normales está el nivel Luminoso, el trabajo cumbre normal del oficio: Encantamiento 100 para los cuatro primeros y 125 para la Infusión, como muestra la columna Habilidad. Cada uno usa un Reactivo Luminoso y añade otro paso a su ranura: el arma, con opción de Poderío o Poder de Hechizo, el pecho y las botas. La última, Infusión Luminosa, solo se aplica a una pieza Perfeccionada. Perfeccionar es trabajo del portador, no del encantador; la página Profesiones explica cómo gana una pieza ese estado.
+
+El Fervor de la Última Llama es una fórmula de incursión separada, no un encantamiento normal gratuito. Aprende su fórmula comerciable a Encantamiento 100 antes de aplicarla. Cada aplicación usa 3 Núcleos de la Última Llama y 2 Fragmentos de Campanilla; la fórmula puede caer en el Crisol o comprarse al intendente por un núcleo. Sus reglas de velocidad de arma y activación cuerpo a cuerpo aparecen completas más abajo.`,
+  'guide.profPages.ench.formulaRequired': 'Requiere fórmula',
+  'guide.profPages.ench.perfectedOnly': 'Solo perfeccionado',
+  'guide.profPages.ench.tier.lucent': 'Luminoso',
+  'guide.profPages.faq.a1': `Los objetos terminados siguen la regla estricta de instancia: dos copias se fusionan solo cuando coinciden exactamente su firmante, sus propiedades aleatorias, sus estadísticas de obra maestra, su encantamiento, su vínculo y cualquier otro dato de identidad. Una hoja firmada, por tanto, permanece separada de una hoja normal.
+
+Los materiales son la excepción. Las acumulaciones compatibles del mismo material pueden fusionarse aunque difieran sus recolectores o firmantes, porque la acumulación conserva un recuento de cada origen. La ayuda emergente resume los orígenes; abre Orígenes para ver la lista completa. Separar por recolector mantiene esas acumulaciones apartadas en tus bolsas y la ordenación respeta esa decisión. El material transferido puede acumularse normalmente con los materiales del receptor.`,
+  'guide.profPages.faq.a11Promotion':
+    'Fabrica o compra una pieza cumbre de calidad Maestroforjada y después perfecciónala: con 125 de habilidad en el oficio que la creó, cada intento gasta una Brasa del Hacedor, una Esencia Quebrada y un Engaste de Vidriocristal; tiene éxito cuatro veces de cada cinco y nunca daña la pieza cuando falla. El primer intento vincula la pieza contigo y cuatro rangos exitosos la vuelven Perfeccionada. Después gasta una Escritura de creación, un escrito de Inscripción de habilidad 125 que cualquiera puede comprar o encargar, para promocionar la copia Perfeccionada a legendaria con el nombre que elijas. La promoción es determinista: no hay tirada, las estadísticas no cambian y solo cambian el nombre y el color.',
+  'guide.profPages.faq.a2': `No. Cada receta se puntúa por cuánto queda bajo tu tramo, con los colores clásicos naranja, amarillo, verde y gris: ganancia completa en el actual o superior, mitad un nivel abajo, cuarto dos niveles abajo y nada tres o más abajo. Los tramos son cada 25 puntos, así que las recetas gratuitas de habilidad 0 dejan de enseñar a 75.
+
+Los límites son menores que los 300 clásicos: cada una de las diez profesiones fabricables llega a 125, Minería, Tala y Herboristería llegan a 100 y Pesca llega a 200. Subir significa pasar a recetas de tu propio tramo, no repetir la más barata.`,
+  'guide.profPages.faq.a6ThreeRods': `Las nueve recetas comunes de campo y las seis recetas fabricadas de herramientas de tierra se conocen desde el principio, al igual que tres recetas ligadas a estación, el Manto de Escama de Horno, la Capucha de Tejido de Guardia y las Envolturas de Piel Crepuscular. No necesitan entrenador, solo su estación. Todo lo demás lo enseñan los maestros residentes en sus estaciones de las tres ciudades centrales: la mayoría está en Eastbrook, el curtidor trabaja en la curtiduría de Fenbridge y el alquimista en la botica de Highwatch.
+
+Las recetas de entrenador avanzan por peldaños: habilidad 0, 25 y 50 para los oficios de equipo y consumibles, con tarifas únicas gratuitas, de 25 platas y de 1 oro. Cada oficio tiene además una receta intermedia de peldaño 75 en su estación; la de Encantamiento es el Reactivo Luminoso, junto a sus dos talismanes del peldaño 25. El maestro de herramientas también enseña dos de las tres cañas fabricadas, a 75 y 125 por 4 y 16 de oro; el peldaño cumbre se aprende de un esquema y ningún entrenador cobra por él. Un maestro enseña una receta cuando tu tramo en ese oficio alcanza el tramo propio de la receta, y debes estar en su estación para aprenderla: una estación móvil no cuenta.`,
+  'guide.profPages.faq.a7RetunedTaper': `El lanzamiento de recolección empieza en 2,5 segundos y se recorta de dos formas: 0,4 segundos por cada nivel de herramienta que lleves y puedas usar por encima del nivel propio de la veta, y 0,15 segundos cuando el contador del oficio cruza su banda de 100, con un suelo de 1,5 segundos. Al pasar de vetas de nivel 1 a vetas de nivel 3 desaparece el exceso, así que el mismo pico vuelve a golpear más despacio. Llevar exactamente el nivel exigido no compra velocidad; solo abre la veta.
+
+La ganancia de habilidad se desvanece como en fabricación: una veta se vuelve gris cuando tu competencia supera su nivel. Las vetas de nivel 1 no enseñan nada desde competencia 75, así que para ganar despacio la respuesta son vetas superiores. Necesitan una herramienta de al menos su nivel en las bolsas, sin excepciones, y una herramienta de tierra por encima del nivel 1 también exige haber obtenido primero su marca de uso, 40, 70, 85 y 100 en su propio oficio para los niveles 2 a 5. Pesca tiene su propia reducción: 0,08 por captura por debajo de competencia 50, 0,05 por debajo de 100, 0,04 por debajo de 150 y 0,03 por debajo de 200. Las capturas basura no enseñan nada desde 100 y el agua también limita la lección: las aguas de nivel 1 dejan de enseñar a 100 y el pantano a 150. Un contador estancado puede significar que has superado el agua.`,
+  'guide.profPages.faq.q1': '¿Por qué no se apilan mis objetos firmados?',
+  'guide.profPages.faq.q11': '¿Cómo fabrico un objeto naranja?',
+  'guide.profPages.farm.bedsBody':
+    'Compra semillas y compost a la granjera junto a los bancales: Jessica en Eastbrook vende el par del Valle, la granjera de Fenbridge el del pantano, Hollis en las terrazas de Highwatch los cultivos de montaña y Verbena el parterre de Evergarden. Una cosecha de nivel alto devuelve una o dos semillas de su tipo, cualquier semilla se intercambia en el Mercado mundial y las de montaña y parterre también aparecen en botines de final de juego y en el mostrador del intendente heroico. Siembra con una azada en la bolsa. Puedes mejorar las probabilidades con compost del mostrador y la vigilancia de la granjera, pagada en productos al plantar; un tónico de crecimiento da una posibilidad de mayor rendimiento, y cuando tu habilidad supera en una banda completa el nivel del cultivo, este nunca falla. El bancal crece mientras estás desconectado, una cosecha madura espera y el Diario de cosecha (Mayús+K, o la fila Agricultura de tu ventana de profesiones) lista cada bancal con su temporizador.\n\nUn cultivo fallido deja cáscaras marchitas y cualquier granjero las cambia por compost, convirtiendo una mala estación en seguro para la siguiente. Los productos alimentan los platos de granja, la escala de entrenador de Marlow y los elixires de la botica. Las cosechas de terraza sazonan los platos de función de banda y todos los frascos cumbre; los bancales de Evergarden alimentan las dos estaciones de habilidad 125. Los pedidos de trigo y arroz de Marlow compran Trigo del Valle y Arroz del pantano por monedas cada 30 minutos.',
+  'guide.profPages.farm.bedsBodyScribeBuyer':
+    'El escritorio del escriba también compra de los bancales: el Pergamino de pétalos solares de nivel 50 usa una Calabaza de escarcha de las terrazas de Highwatch, la misma que necesita el Elixir de la serpiente.',
+  'guide.profPages.farm.bedsHeading': 'Trabajar los bancales',
+  'guide.profPages.farm.gainBody': `La ganancia es determinista y depende de tu propio contador, no del cultivo: {g1} de competencia por una cosecha inferior a {p1}, {g2} por debajo de {p2}, {g3} por debajo de {p3} y {g4} durante el resto del camino hasta el límite de {cap}. Nunca hay una tirada de subida, así que la duración de la progresión es exactamente la que dicta la aritmética.
+
+Lo que decide el nivel del cultivo es hasta dónde puede llevarte un bancal. Un cultivo de nivel 1 enseña hasta {c1} y se vuelve gris allí; uno de nivel 2 hasta {c2}; y el nivel 3 o superior llega hasta el límite. Subir a bancales mejores es lo que mantiene avanzando el contador.`,
+  'guide.profPages.farm.gainHeading': 'Qué enseña una cosecha',
+  'guide.profPages.farm.rhythmBody': `Plantar es el lanzamiento visible y corto: dura exactamente {plant} segundos en todos los peldaños, porque la azada abre la tierra en vez de comprar velocidad. Extraer un cultivo maduro es instantáneo. No hay lanzamiento que interrumpir ni comprobación de bolsas que lo rechace, y un bancal listo espera todo el tiempo que tardes en volver, así que una bolsa llena solo le cuesta al agricultor el paseo para vaciarla.
+
+Una cosecha paga productos y competencia de Agricultura. A diferencia de una veta, no concede experiencia de personaje, así que los bancales son un oficio para trabajar y no una forma de subir de nivel.`,
+  'guide.profPages.farm.rhythmHeading': 'El ritmo de la agricultura',
+  'guide.profPages.farm.tableBodyOneMeal': `Las cocinas son donde una temporada da sus frutos. Además de los platos cotidianos de la granja, cada nivel de cultivo tiene un plato más rico que deja el beneficio Bien alimentado: terminas la comida y una mejora duradera permanece contigo, justo la ventaja que un grupo quiere consumir antes de la puerta de la mazmorra. Solo puede haber un efecto Bien alimentado; una comida nueva reemplaza al anterior. El broche de la colección es el Festín de la Cosecha, una bandeja que el cocinero coloca en el propio mundo: cada persona cercana recibe su propia ración, una por persona, y cada comida terminada concede el mismo beneficio Bien alimentado. Así, la temporada de un agricultor puede poner la mesa para todo un grupo. La cima, con los dos platos más ricos y el festín, usa cultivos de montaña y de parterre, cuyas semillas venden los agricultores junto a esos bancales. Las recetas son otra cuestión: los peldaños superiores de la escala agrícola ya no se enseñan en ningún mostrador, sino que se encuentran en el contenido final o se compran con Marcas Heroicas como cualquier otra receta final. La escala de platos pertenece a Cocina; la página de Cocina contiene todos sus peldaños.
+
+La suerte también tiene un sitio en esa mesa. Cada cosecha tira la misma posibilidad de hallazgo extraordinario que los demás oficios de recolección y, de vez en cuando, un cultivo sale dorado: la cantidad queda muy por encima de una extracción normal, aparece algo adicional, como una semilla para terreno más fino o a veces una receta final, toda la zona oye el hallazgo anunciado por nombre y Cosecha Dorada queda registrada en tu Libro de Deeds.`,
+  'guide.profPages.farm.tableHeading': 'Del bancal a la mesa',
+  'guide.profPages.farm.yieldsBody': `Un bancal paga extracciones en vez de una cosecha graduada. Cada parcela empieza con un suelo de {floor} extracciones, y cada extracción tiene una probabilidad de no gastar una: {keep0} por ciento con el contador nuevo y {keepCap} por ciento en el límite, lo que da aproximadamente tres extracciones y media al principio y seis al final.
+
+La calidad usa esas mismas extracciones en vez de sustituirlas. Cada extracción tiene una probabilidad de {fine0} por ciento con el contador nuevo y {fineCap} por ciento en el límite de producir el cultivo fino del bancal en vez del normal. Una extracción fina mejora una extracción y nunca añade otra. No existe una escala de común a legendario en un bancal: cada cultivo crea sus dos calidades y ninguna más.
+
+Dos cosas añaden extracciones directamente y ambas llegan con calidad normal. Un tónico de crecimiento de alquimista, activado al plantar, concede {tonicPicks} extracciones más con una probabilidad de {tonicPct} por ciento. Un efecto de cantidad insertado añade {effectCap}, el límite que Agricultura aplica a un Talismán del Hacedor para que el tónico conserve una razón de existir. Un Ojo del Artesano cargado actúa sobre la calidad y añade {fineBonus} puntos porcentuales a cada tirada fina.`,
+  'guide.profPages.farm.yieldsHeading': 'Qué produce una cosecha',
+  'guide.profPages.fish.koiBodyBandFlat': `Cada masa de agua del juego esconde el mismo premio: el Koi Brillo Solar, un destello poco común en el sedal que vale 75 cobres al vendedor y bastante más para tu orgullo. Sus probabilidades responden a tu banda de captura y a nada más, igual en todas las zonas: una fila del 1 por ciento de la tabla en la banda 0, del 3 por ciento en la banda 1 y del 6 por ciento desde la banda 2, en cada lance recogido. El koi llega al pescador que se ha ganado las tablas profundas. Sacar uno registra Brillo de Esperanza en tu Libro de Deeds, una marca de coleccionista sin Renombre. Cuando ocurre, el registro se asegura de que lo sepas.`,
+  'guide.profPages.fish.scheduleNoteRetuned':
+    'Pesca sigue un calendario fijo: 0,08 por captura bajo 50, 0,05 bajo 100, 0,04 bajo 150 y 0,03 de 150 a 200. La curva es deliberadamente suave: la subida completa hasta 200 dura unas once horas de pesca activa y ningún cuarto cuesta más de un tercio del total, así que los últimos 50 puntos son un tramo largo, no todo el viaje.\n\nLa basura deja de enseñar en {cutoff}: desde ahí, las malas hierbas y botas solo son malas hierbas y botas. El agua también limita: las aguas de nivel 1 del Valle y toda costa joven dejan de enseñar después de 100, el pantano se detiene en 150 y solo Thornpeak enseña hasta 200. Cada captura válida gana al ritmo previsto, así que cuando el contador se detiene debes buscar aguas más profundas.',
+  'guide.profPages.fish.startBodyThreeRods': `Una Caña de Pescar Sencilla cuesta 20 cobres a Pescador Brandt en Eastbrook. Busca al Viejo Marinero en el extremo este de la ciudad, junto al camino al Lago Espejo. Tinker Gizzel, el Proveedor Hale en Fenbridge y la Intendenta Bree en Highwatch también tienen cañas. Usa la caña mirando a un agua suficientemente profunda para contener peces, hasta unos 24 metros por delante, y el flotador saldrá disparado.
+
+No puedes lanzar en combate, mientras nadas o estando muerto: lanzar desde la orilla es la postura prevista. El agua se vuelve más difícil como la tierra: el pantano exige al menos la Ironreel de nivel 2 y las cumbres la Silverstream de nivel 3. Un lance sin la caña que exige el agua nunca abandona tu mano. Por encima están Stormreel, Tidewrought y Clockreel: los ingenieros fabrican las tres en los talleres con lo que sube del agua, y el mostrador de las profundidades de la Letanía Ahogada vende las dos primeras por Marcas de Profundidades tras sus puertas de acceso, nunca por monedas. Ningún agua exige esas tres, pero no son solo comodidad: cada una abre una banda de captura que la habilidad por sí sola no puede alcanzar. Cuando el contador está al límite, la caña es lo único que decide la profundidad de tu tabla. También acortan la espera y amplían la ventana de recogida; en el peldaño superior eso significa una picada exactamente a los tres segundos.`,
+  'guide.profPages.fish.tablesNoteSixBands': `Tu competencia selecciona una de seis bandas de captura: banda 0 desde el principio, banda 1 a 100, banda 2 a 150 y las tres superiores a 200. Cada banda desplaza peso de basura y anzuelos vacíos hacia peces reales según la zona. Cada banda por encima de la primera exige también una caña, un nivel más cada vez: banda 1 pide Ironreel de nivel 2, banda 2 Silverstream de nivel 3, banda 3 Stormreel de nivel 4, banda 4 Tidewrought de nivel 5 y banda 5 Clockreel de nivel 6. La banda 2 abre a 150 y las tres últimas esperan el límite de 200. Desde el límite, la caña es lo único que eleva la tabla, que es para lo que sirven las cañas fabricadas y donde viven las tres capturas de aguas profundas. Tu banda efectiva es la menor entre la que ganó tu habilidad y la que admite tu caña. El límite es silencioso: con una caña inferior sigues pescando, pero en la tabla inferior, así que si tus capturas se estancan mientras sube la habilidad revisa primero la caña.
+
+Las aguas de cada zona tienen su propia pareja de capturas de cocina, peces de nivel superior cuanto más profunda sea la zona, y todos son reactivos que deben cocinarse antes de restaurar nada. Desde la banda 3, tres peces más se unen a la tabla de cada zona con el mismo peso; una receta que nombre uno pide lo mismo al pescador en cualquier agua. El resto es el impuesto del pescador: algas, una bota ocasional y el anzuelo vacío, que nunca desaparece por completo. Lo que pagas depende del agua donde cae el flotador, no de dónde estás: el lance llega hasta 24 metros y la zona decide la caña, la tabla, el Deed y hasta dónde enseña en el momento en que cae el sedal. El Valle está escrito para la banda 0, el pantano para la 1 y las cumbres para la 2. Pescar una banda por debajo convierte aproximadamente un tercio de los lances en anzuelos vacíos y pescar dos por debajo más de la mitad. La caña te lleva al agua; la habilidad hace que pague y la subida te lleva más hondo, porque después del Valle solo las bandas mejores siguen enseñando. {rare} es la única fila que responde solo a la banda: tiene las mismas probabilidades en toda zona y es seis veces más probable en banda 2 que en banda 0, así que la captura más rara del muelle es aquella en la que un Maestro Pescador realmente es mejor.`,
+  'guide.profPages.gainNever': 'nunca',
+  'guide.profPages.gatherDeeds.farmingSown': `Agricultura tiene ahora su propio estante en el Libro de Deeds. Sembrar es empezar marca tu primer cultivo plantado y cuatro páginas de crónica marcan la primera cosecha próspera en cada emplazamiento de bancales, desde el Valle de Eastbrook hasta el Evergarden. Una cosecha dorada registra su propia marca de coleccionista sin Renombre y la competencia de Agricultura cuenta para Maestro recolector, que se obtiene con 100 en tres oficios de recolección cualesquiera. Surco completo reúne toda la lista en una página: cultiva cada cultivo que ofrecen los cuatro jardines y la colección se cierra. El broche superior es Maestro de cosechas, el título del oficio a 100 de competencia; con las semillas de montaña y parterre ya en los mostradores de sus agricultores, es una progresión que puedes terminar hoy. Los Deeds solo dan títulos y Renombre, nunca poder.`,
+  'guide.profPages.gatherIntro.farming': `Agricultura es el único oficio de recolección que atiendes en vez de extraer: cultivos criados desde semillas en bancales de jardín trabajados, que crecen según su propio reloj tanto si te quedas como si te vas y se recogen maduros al volver, porque nada de un bancal se estropea. Hay un agricultor junto a cada emplazamiento, desde los terrenos de Eastbrook y pasando por Fenbridge y Highwatch hasta el parterre del Evergarden. La Agricultora Jessica en Eastbrook es donde empieza el oficio: vende la azada de jardín y las primeras semillas, y su recado guía al nuevo agricultor por su primer cultivo. Cada peldaño de la escala produce sus propios cultivos, dos en los peldaños inferiores y cuatro en los superiores, cada uno con una calidad fina que una mano experta puede recoger. Los ingenieros fabrican las azadas para el terreno más duro después de los bancales iniciales. El oficio usa su propio contador hasta un límite de 100.`,
+  'guide.profPages.howBody': `Abre la ventana de fabricación, con la tecla T por defecto, y cada receta que conoces aparecerá con lo que necesita y lo que tienes. Las recetas ligadas a estación exigen estar a menos de 20 metros de la estación correcta en la ciudad; las recetas de campo se fabrican en cualquier parte. Romper y encantar en Encantamiento tampoco requiere estación, aunque sus tres recetas de entrenador sí se trabajan en los talleres. No existe una tirada de fallo: una fabricación con los materiales necesarios siempre tiene éxito.
+
+Dos pequeñas fricciones mantienen honesta la economía. Cada fabricación exitosa cobra 2 cobres por cada punto del presupuesto de estadísticas del objeto, y cada acción de una familia de fabricación tiene un tiempo real de lanzamiento: los oficios de campo rondan los dos segundos, los peldaños difíciles tardan más y desencantar, encantar, recuperar y recargar una herramienta duran aproximadamente un segundo y medio. Los materiales, la tarifa de oro, las estaciones y los límites de habilidad hacen el resto; nadie te reprende por trabajar demasiado deprisa.`,
+  'guide.profPages.masterworkBodyRaidCollections': `Cada fabricación exitosa es exactamente lo que promete la receta y a veces algo más: una obra maestra termina la misma pieza con una calidad un nivel superior y las estadísticas adicionales ya incorporadas al fabricar. Solo añade, nunca degrada. La fabricación normal sigue su escala de equipo; las colecciones del Crisol financiadas por incursiones son una alternativa separada en el nivel de incursión actual.
+
+Las fabricaciones Forjadas por un Maestro cumbre son la excepción y pagan la misma tirada de otra forma. Una pieza cumbre ya está en lo alto de su escala, así que no hay nivel superior al que terminarla; allí una obra maestra entrega la pieza un rango dentro de Perfeccionamiento, el primer rango gratuito de los cuatro descritos en la página Profesiones. Las estadísticas no reciben nada incorporado y se usan las probabilidades y puertas indicadas abajo.
+
+La probabilidad es pública: {base}% de base, más {perTier}% por cada nivel que tu habilidad supere el de la receta, más {signed}% cuando entra un reactivo firmado, más {spec}% cuando estás especializado. Los materiales de nivel superior añaden 1 a 2% más y todo queda limitado a {cap}%. Solo una pieza con estadísticas reales puede mejorar, así que objetos comunes sin estadísticas, herramientas y consumibles nunca activan la tirada; un oficio inactivo nunca produce una y un oficio aficionado no puede hacer una obra maestra por encima de su techo raro.
+
+El trabajo fino lleva a su creador. Las salidas raras y superiores quedan firmadas, cada copia muestra Fabricado por y los materiales recolectados muestran Recolectado por; una obra maestra siempre queda firmada sea cual sea su calidad. La firma es procedencia, no bloqueo: los bienes firmados se intercambian, envían y anuncian libremente en el Mercado Mundial.`,
+  'guide.profPages.oncePerDay': 'Una vez al día',
+  'guide.profPages.prov.cookingLink': 'Cocina',
+  'guide.profPages.prov.intro':
+    'Las líneas de recolección se reúnen en una cocina y su escala termina en una mesa de la que come toda una banda.',
+  'guide.profPages.prov.ladderBody': `Cocina sube mediante los tramos habituales y cada peldaño aparece con lo que enseña. Los primeros son platos individuales que consumes desde tus bolsas. Más arriba la cocina empieza a preparar cosas para otras personas: platos que llevan un beneficio duradero y, por encima, los festines, que no consumes sino que colocas en el suelo para todos los que estén cerca.`,
+  'guide.profPages.prov.ladderHeading': 'La escala, peldaño a peldaño',
+  'guide.profPages.prov.lineCorpse': 'Recolección de cadáveres',
+  'guide.profPages.prov.lineCountFmt': '{count} para los pedidos de cocina',
+  'guide.profPages.prov.marketBody': `Nada de esto es una barrera para quien no cocina. Todos los materiales de esta página son bienes normales comerciables: un pescador vende sus capturas, un agricultor vende sus cultivos y un asaltante que no hace ninguna de las dos cosas compra directamente un festín a un cocinero que preparó uno de sobra. La cocina es un lugar donde se encuentran las profesiones, nunca un peaje para quienes la omiten.`,
+  'guide.profPages.prov.marketHeading': 'Si no cocinas nada',
+  'guide.profPages.prov.placeableTag': '(se coloca, no se come)',
+  'guide.profPages.prov.rungFmt': 'Cocina {skill}',
+  'guide.profPages.prov.stationTag': '(estación de campo)',
+  'guide.profPages.prov.suppliersBody': `Cocina obtiene materiales de casi todas las líneas de recolección, y es intencionado: un cocinero que también pesca, cultiva o despelleja nunca se queda sin algo que trabajar, y quien no hace ninguna de esas cosas puede comprarlo todo en el mercado.
+
+La lista siguiente muestra lo que aporta cada línea. Se lee directamente de la lista de recetas activa en vez de copiarla aquí, así que siempre refleja lo que la cocina pide hoy.`,
+  'guide.profPages.prov.suppliersHeading': 'Quién alimenta la cocina',
+  'guide.profPages.prov.tableBody': `Un festín se coloca donde estás y cada persona cercana toma una ración. Lo que concede una ración es exactamente el plato en torno al que se construyó el festín, así que un festín no tiene poder propio que aprender: es una forma de dar a todo un grupo el plato que ya sabes cocinar.
+
+La cima de la escala son tres festines y no uno, y elegir entre ellos es la única decisión. Cuestan lo mismo, piden los mismos materiales y requieren la misma habilidad; cada uno sirve uno de los tres grandes platos, así que el grupo toma el que encaja con lo que está a punto de hacer. Solo puede haber un festín tuyo colocado a la vez, sin importar de qué peldaño proceda, y permanece unos minutos antes de desaparecer.`,
+  'guide.profPages.prov.tableHeading': 'La mesa de arriba',
+  'guide.profPages.prov.title': 'Provisiones: del campo a la banda',
+  'guide.profPages.rareBodyFourFlavors': `Cada cosecha, sin importar tu habilidad, tiene una probabilidad de 1 entre {oneIn} de hallar algo raro: una veta prístina de mineral, duramen antiguo en la madera, una flor iluminada por la luna entre las hierbas o una cosecha dorada de un bancal. El hallazgo multiplica {mult} veces el rendimiento de esa cosecha; cada unidad llega firmada con tu nombre sin importar la calidad obtenida, y toda la zona oye el anuncio por su nombre. Cada variedad también graba su propio Deed de coleccionista sin Renombre en tu Libro de Deeds, una marca que existe solo para demostrar que te ocurrió a ti.`,
+  'guide.profPages.sourceDrop': 'De un patrón encontrado',
+  'guide.profPages.sourceDropAndVendor': 'De un patrón encontrado o del intendente heroico',
+  'guide.profPages.sourceVendor': 'Lo vende el intendente heroico',
+  'guide.profPages.specializationBodyUndiscounted': `A habilidad {at}, este oficio te especializa sin necesidad de misión: desde entonces los materiales de recetas con descuento cuestan un {pct}% menos y la especialización añade su propio aumento a la probabilidad de obra maestra. Los costes del núcleo de incursión nunca reciben descuento.
+
+Los especialistas también aprenden a llevarse el taller: un artesano especializado puede montar una estación móvil en el campo durante diez minutos cada vez, de modo que las recetas ligadas a estación se trabajen junto a la mina en vez de volver a la ciudad. Sus límites son intencionados: nunca cuenta para entrenar con un maestro ni para desvincular una pieza encargada y expira cuando acaba su temporizador, aunque no la hayas usado.`,
+  'guide.profPages.toolsNoteFishingPageMarks': `Cada veta necesita la herramienta de su oficio en las bolsas, incluido el nivel 1: sin pico no hay mineral y sin caña no hay pez. La escala de vendedor cubre los niveles 1 a 3 en los tres centros del corazón: la herramienta de nivel 1 se vende en los tres, los niveles superiores aparecen donde empieza el terreno que los usa, Fenbridge añade nivel 2 y Highwatch nivel 3. Los asentamientos más jóvenes no tienen herramientas, así que prepara el equipo antes de viajar. Agricultura compra en otro lugar: la azada de nivel 1 la vende la agricultora del primer terreno, en los bancales de Eastbrook, no en un mostrador de herramientas, y ninguna azada superior se vende por monedas. Cada mostrador vende libremente todos los niveles que tiene y cualquier herramienta pasa por intercambio directo. Todos los niveles aparecen también en el Mercado y viajan por correo salvo los cuatro arrancadores de tierra de 20 cobres, Pico de Minería de Cobre, Hacha de Mano, Hoz de Recolección y Azada de Jardín, que solo se compran en un mostrador o se pasan de mano en mano; nunca se recompran, envían ni anuncian.
+
+Lo que está limitado es el uso. Una herramienta de tierra por encima del nivel 1 solo funciona cuando la competencia de su oficio ha alcanzado {tier2Prof} para nivel 2, {tier3Prof} para nivel 3, 85 para nivel 4 y 100 para nivel 5. El vendedor, la ayuda emergente y la tabla siguiente muestran el requisito desde el principio. Hasta entonces la herramienta comprada por adelantado espera en tus bolsas: no abre terreno, no compra velocidad ni crea calidades finas; empieza a usarse cuando el contador toca su número. Las cañas son la excepción: no tienen requisito de uso y el Comerciante Wilkes en Eastbrook ofrece deliberadamente las de nivel 2 y 3 a pescadores que compran por adelantado. Una herramienta no ocupa ranura de equipo ni se desgasta, así que cada una se compra una sola vez; solo importa el nivel y una herramienta más rara del mismo nivel no abre nada adicional. La rareza sí hace que un efecto insertado dure más y, en una caña, amplía la ventana de recogida.
+
+Una herramienta mejor compra tres cosas. Abre terreno superior, acorta el lanzamiento y mejora lo que sale: trabaja una veta con una herramienta de nivel SUPERIOR al material propio de la zona y la cosecha llega fina en vez de normal. Debe ser una veta de grado completo; las vetas fáciles para viajeros siguen dando material normal. Las recetas de herramientas consumen materiales finos, y el grado fino cuenta como la versión normal donde una receta o pedido la solicita, así que mejorar nunca te deja tirado: tu mena de cobre simplemente llega como Mena de Cobre Fina.
+
+Por encima de los vendedores, los tres oficios de nodos tienen dos herramientas fabricadas, niveles 4 y 5, hechas en los talleres, con recetas conocidas por todos aunque el trabajo suba Ingeniería, o compradas con Marcas de Profundidades en el mostrador de la Letanía Ahogada una vez superadas sus puertas. Ningún mercader las vende por monedas. Agricultura tiene la escala más larga: cada azada por encima de la inicial de 20 cobres se fabrica, niveles 2 a 5, las cuatro enseñadas por el maestro de herramientas, y las dos superiores también aparecen en el mostrador de Marcas. Pesca tiene tres propias y se aprenden: el maestro enseña Stormreel de nivel 4 y Tidewrought de nivel 5, y Clockreel de nivel 6 se fabrica con un esquema. Stormreel y Tidewrought también están en el mostrador tras las mismas puertas y la tabla de pesca muestra sus precios. Las cañas son la única escala cuyos niveles superiores compran acceso al agua: cada una abre una banda que la habilidad no puede alcanzar, así que una caña mejor no es solo comodidad. Ningún nodo actual pide más de nivel 3, por lo que sus herramientas 4 y 5 compran velocidad y grado hasta que llegue terreno superior. Agricultura queda entre ambos: plantar necesita la azada, de modo que un bancal de nivel N pide azada de nivel N hasta el cuarto y último cultivo; el quinto nivel ya no abre terreno nuevo.`,
+  'guide.profPages.trainingBody': `Las recetas de entrenador proceden de los maestros residentes y se enseñan en sus estaciones. La regla es una sola: un maestro enseña una receta cuando tu nivel del oficio alcanza el nivel propio de la receta y nada más la bloquea, ni tu nivel, ni tu arquetipo. Las escalas de equipo y consumibles tienen peldaños de habilidad 0, 25 y 50, y cada oficio añade un intermedio de 75 en su estación; el de Encantamiento es el Reactivo Luminoso junto a sus dos talismanes del peldaño 25. Las dos lecciones de caña de Ingeniería continúan su escala a 75 y 125, de modo que el nuevo peldaño se abre mientras suben tus niveles.
+
+Las tarifas son únicas y fijas por peldaño: el inicial es gratis, el de habilidad 25 cuesta {tier1} por receta, el de habilidad 50 cuesta {tier2} y los de 75 y 125 tienen sus propias tarifas, mostradas junto a cada receta de la tabla. Debes estar en la estación real del maestro para entrenar; una estación móvil nunca cuenta. Las recetas comunes de campo y las seis recetas de herramientas de tierra no necesitan entrenamiento: todos las conocen desde el principio.`,
+  'guide.professions.crucibleCollectionsBody': `Cada una de las once colecciones del Crisol ofrece piezas de pecho, cintura y pies con su propia armadura y perfil de función. Cualquier dos piezas activan su único bonus de conjunto, incluso antes de Perfeccionar; no hay bonus de tres piezas. Cada objeto empieza en nivel de objeto 35 y cuesta 3 Núcleos de la Última Llama más materiales comunes de recolección de alta calidad, así que una pareja cuesta seis núcleos antes de comprar el manual opcional. La fabricación base no exige Núcleo de Wyrmfall, intermedio diario ni Brasa del Hacedor. En rango cuatro, Perfeccionar eleva el presupuesto de estadísticas primarias al nivel de objeto 38. El Perfeccionamiento sigue su propia progresión semanal de Brasas, independiente de conseguir y vestir el equipo base.
+
+Puedes intercambiar rangos de Perfeccionamiento entre dos copias de la misma colección en la estación apropiada, con habilidad 125, estando vivo, quieto y fuera de combate. Los rangos se intercambian, nunca se duplican, y cada ranura aplica su propio bonus Perfeccionado. El intercambio no cuesta materiales ni tiene enfriamiento. Ambas copias se vinculan contigo; sus nombres, encantamientos y marcas de creador individuales permanecen en sus objetos originales.`,
+  'guide.professions.curveBodyRetunedFishing': `La ganancia de habilidad sigue una regla en todas partes, la Curva de Maestría de cuatro estados. Cada {step} puntos de habilidad forman un nivel y cada receta se puntúa según su posición frente al tuyo: en tu nivel o por encima da ganancia completa, un nivel por debajo da la mitad, dos niveles por debajo un cuarto y tres o más por debajo no da nada.
+
+La ventana de fabricación pinta esto directamente en la lista con los colores clásicos: naranja para ganancia completa, amarillo para reducida, verde para un goteo y gris para ninguna. Las ganancias son deterministas, nunca una tirada de subida; la misma fabricación en el mismo nivel siempre mueve la habilidad exactamente lo mismo, y una receta que se vuelve amarilla te indica que entrenes el siguiente peldaño.
+
+La recolección usa la misma curva y el mismo salto de nivel, comparando con la veta en vez de la receta: las vetas fáciles se vuelven grises al superarlas y las más ricas de las zonas posteriores terminan la subida. Pesca mantiene su propio calendario: 0,08 puntos por captura por debajo de competencia 50, 0,05 hasta 100, 0,04 hasta 150 y 0,03 hasta 200; las capturas basura no enseñan nada desde 100.`,
+  'guide.professions.deedsBody': `El Libro de Deeds acompaña cada paso. Tu primera sintonización obtiene Juramentado del Oficio y tu primera obra maestra obtiene Maestro Hacedor, ambos disponibles como títulos. Los diez oficios que se pueden ganar marcan un Deed de hito a habilidad 50 y coronan su límite con un título de Gran maestro; Pesca obtiene Viejo Marinero a competencia 100 y Maestro Pescador a 200.
+
+También hay páginas más discretas: Deeds para tu primera cosecha y fabricación, para los hallazgos raros que trae la suerte en el campo y para adoptar la recuperación. Todo es cosmético, títulos y Renombre. Un Deed nunca concede poder; solo demuestra que estuviste allí.`,
+  'guide.professions.endgameBodyRaidCollections':
+    'Maestroforjado es la familia compartida con la etiqueta Único equipado: Maestroforjado. La escala cumbre antigua usa patrones encontrados, fabricaciones intermedias diarias y materiales de final de juego. Las colecciones del Crisol son una ruta separada financiada por bandas, no un coste adicional que se apila sobre esa escala. Ambas familias comparten el límite de dos piezas, así que compiten por los mismos huecos. Las piezas terminadas se comercian hasta que Perfeccionamiento o una comisión liga la copia.',
+  'guide.professions.endgameHeading': 'El final de juego de Maestroforjado',
+  'guide.professions.endgameMaterialsBodyAnyRaid': `Tres materiales compartidos alimentan la cadena. El Núcleo de Wyrmfall es el catalizador comerciable: cada victoria final del contenido más profundo concede al personaje acreditado de 1 a 3 núcleos, una vez por fuente y día; los despejes de brecha superior dan además una cantidad fija propia con el mismo reloj diario, y el Intendente Heroico vende uno por 12 Marcas Heroicas como respaldo contra la mala suerte. Los núcleos se comercian libremente. La Esencia Quebrada está ligada al alma y quebrar es su única fuente: cualquier personaje puede quebrar, sin exigir oficio, y el lanzamiento convierte una pieza épica de equipo ganada en una incursión, en cualquier incursión y dificultad, en exactamente una esencia; el equipo es el precio. La Brasa del Hacedor también está ligada al alma y es el reloj de la cadena: una por semana y personaje, concedida en la primera finalización de contenido final elegible de la semana. Una semana perdida no se pierde, porque las brasas se acumulan y pagan en la siguiente finalización.`,
+  'guide.professions.endgamePatternsBodyCollections': `Los patrones de equipo antiguo se encuentran en vez de venderse; los patrones de consumibles antiguos los vende el Intendente Heroico por Marcas Heroicas, y los patrones de Agricultura usan ambas rutas. Los manuales de colecciones del Crisol y la fórmula del Fervor de la Última Llama caen de cualquiera de los dos jefes del Crisol en cualquier dificultad. Su grupo compartido tiene un 30% de probabilidad por jefe y elige uno de doce pergaminos con igual probabilidad. El intendente del Crisol también vende cualquiera por un núcleo, una alternativa determinista al hallazgo afortunado. Cada manual de colección enseña sus tres recetas a habilidad 100. Un manual parcialmente aprendido completa las lecciones que faltan y consume un solo pergamino. Manuales y fórmulas se pueden comerciar.`,
+  'guide.professions.perfectingBody': `Una pieza cumbre terminada no acaba ahí su historia. Su dueño, con habilidad 125 en el oficio que la creó, puede subirla por cuatro rangos de Perfeccionamiento. Cada intento gasta una Brasa del Hacedor, una Esencia Quebrada y un Engaste de Vidriocristal, y tiene éxito cuatro veces de cada cinco; un fallo consume los materiales y nada más, pues la pieza nunca sufre ni retrocede. El primer intento vincula la pieza con quien la perfecciona, así que una copia destinada a la venta se vende antes de empezar. Una pieza Perfeccionada lleva una bonificación de estadísticas sobre la base y es exactamente lo que espera la Infusión Luminosa: el único encantamiento que la página de Encantamiento marca como exclusivo de piezas Perfeccionadas.
+
+El recorrido puede comenzar con un rango. Una obra maestra de una fabricación cumbre no puede terminar la pieza con un nivel de calidad superior, porque la cumbre ya está arriba de la escala; por eso concede el adelanto: la pieza sale del banco en el primer rango de Perfeccionamiento y le quedan tres rangos en vez de cuatro. Es la misma tirada y las mismas probabilidades que publica la sección de Obras maestras de cada página, gastadas en un rango y no en calidad.`,
+  'guide.professions.perfectingHeading': 'Perfeccionamiento y promoción naranja',
+  'guide.professions.promotionBody':
+    'El último paso es la promoción naranja y es el propósito entero de la Escritura de creación. Lleva una pieza Perfeccionada y una Escritura de creación, un escrito de Inscripción de habilidad 125, y la copia se promociona a legendaria con el nombre que elijas. No hay una tirada: la promoción es determinista, las estadísticas no cambian y solo cambian el nombre y el color. La Escritura se puede comerciar, así que escriba y portador no tienen que ser la misma persona, y el límite de familia conserva una línea adicional: un personaje lleva como máximo una pieza legendaria Maestroforjada entre las dos.',
+  'guide.professions.ringBody':
+    'Cada profesión del anillo llega a 125: Armas, Armaduras, Joyería, Inscripción, Sastrería, Peletería, Cocina, Alquimia, Ingeniería y Encantamiento. En el límite sigue funcionando y las obras maestras pueden ocurrir; solo deja de subir el número. Elige una tarjeta para ver sus recetas y valores.',
+  'guide.professions.ringWaveNote':
+    'Con Inscripción ocupando sus plumas, cada asiento del anillo tiene recetas reales. El anillo está completo, no terminado: los límites subirán con futuras zonas, así que alcanzar el límite hoy prepara la expansión.',
+  'guide.professions.stationsBody': `Seis estaciones especializadas sirven a los nueve oficios ligados a estación y se reparten entre los tres centros. Eastbrook tiene la forja, que comparten Fabricación de Armas, Armería y Joyería, además de cocinas, telar y talleres. Fenbridge conserva la curtiduría y Highwatch la botica, compartida por Alquimia e Inscripción. Cada estación tiene al lado un maestro residente que entrena recetas, publica pedidos de trabajo y ofrece el servicio de desvinculación.
+
+El radio de trabajo es de 20 metros, aproximadamente el patio de la estación, así que fabricas junto al yunque y no desde el otro lado de la ciudad. Encantamiento es el único oficio sin estación y funciona en cualquier parte por diseño.`,
+  'guide.professions.toolEffectsBody': `Una herramienta de recolección tiene una ranura y en ella entra un talismán fabricado. La Caché del Recolector añade una unidad al rendimiento, el Ojo del Artesano eleva el grado de lo extraído y el Talismán del Hacedor añade dos unidades del mismo modo. Los dos primeros son trabajo de Encantamiento: Tinker Gizzel, Maestro de los Talleres en Eastbrook, los enseña a encantadores con habilidad 25. El Talismán del Hacedor es de Ingeniería, usa un patrón caído y se fabrica a habilidad 100; los tres se hacen en sus talleres.
+
+Un talismán recién insertado tiene 20 cargas en una herramienta común y 10 más por cada nivel de rareza sobre común, así que el mismo talismán en un pico épico empieza con 50. Solo se gasta una carga cuando el talismán cambia el resultado, nunca en una cosecha que no mejora. La ranura puede pedir confirmación en cada uso y esperar hasta que digas Usar una carga. Insertar un talismán nuevo vuelve a acuñar la ranura según la herramienta que llevas: se llena hasta lo que esa herramienta admite, no hasta una marca alta anterior, y una reinserción que no cambiaría nada se rechaza sin consumir el talismán.
+
+Agotar las cargas no destruye el talismán. El dueño de la herramienta rellena la ranura, 10 cargas por cada material arcano gastado, y el material exigido depende del mejor entre la herramienta que llevas y la mejor que haya llenado esa ranura: Polvo de Campanilla para herramienta común o poco común, Esencia de Campanilla para rara y Fragmento de Campanilla para épica. Dejar la herramienta buena en el banco no compra una recarga más barata, solo una menor al mismo precio. Para bajar de nivel de forma honesta, inserta un talismán nuevo llevando la herramienta inferior y acuña allí la ranura. Si el techo de la ranura supera lo que la herramienta actual puede llenar, la recarga se detiene donde se detiene la herramienta y te pide llevar la mejor. La recarga cuesta la mitad de materiales si eres quien firmó el talismán y menos todavía si estás especializado en su oficio: Encantamiento para Caché u Ojo e Ingeniería para Talismán del Hacedor. Cualquier otra persona paga la tarifa completa. Recargar es un lanzamiento corto, como el resto de la familia.`,
+  'guide.professions.whatBody': `Las profesiones son la vida de trabajo del mundo: los oficios de recolección extraen materias primas directamente de la tierra y un anillo de diez fabricaciones las convierte en equipo, comidas, pociones y herramientas. Todo alimenta a otra cosa. La mena que minas se vuelve una hoja, la hoja recibe un encantamiento y el encantamiento necesita polvo obtenido al romper equipo viejo; recolector, artesano y técnico son eslabones de una cadena.
+
+No hay un límite de profesiones que debas temer. Cada personaje puede subir nueve de los diez oficios de fabricación y todos los de recolección a la vez. Ingeniería es la única excepción: sus recetas empiezan por encima del techo gratuito, así que su escala espera el juramento del Bombardero. La única elección exclusiva es tu arquetipo, la identidad a la que acabas jurando. Una vez que te sintonizas, los oficios que quedan inactivos detrás de él solo suben con sus recetas comunes y después de habilidad 75 ya no suben. La habilidad nunca baja y nada aprendido se pierde.`,
+  'guide.social.calendarBodyDoubleHonor': `Pulsa I para abrir el calendario de eventos. Marca los días del reino que conviene planificar: la Llamada de Incursión semanal, el Día del Mercado, el Choque de Arena, el Fin de Semana de Honor Doble y el Derby de Pesca, además del Día de las Profundidades y la Comunión de la Puerta Lunar mensuales. También es donde los gremios guardan su agenda: el líder y los oficiales pueden reservar eventos y cada miembro los ve en la misma página. Los días del reino son una invitación a reunirse, no una bonificación, con una excepción: durante todo el Fin de Semana de Honor Doble, el Honor de los Campos de Espinaclara paga el doble y una derrota completa paga como una victoria. Nada más de tu personaje cambia porque haya un día marcado.`,
+  'guide.social.emotesBodyNamedTarget': `Tu personaje también puede hablar sin palabras: escribe un gesto como /wave, /dance, /cheer o /bow, añade un nombre para dirigirlo a alguien, como /wave Aleph, o mantén X, la tecla predeterminada de la rueda de gestos, para abrirla y mostrar rápidamente una expresión sobre la cabeza. El botón Gestos de la fila de botones de ventanas, o dentro de Más en dispositivos táctiles, abre la misma rueda.`,
+  'guide.social.finderBodyLeaderQueues': `No tienes que gritar en Buscar grupo para llenar una incursión. Abre el Buscador de Mazmorras, elige la actividad y los roles que estás dispuesto a cubrir y únete a la cola por tu cuenta, o pide al líder de tu grupo que ponga en cola el grupo que ya tienes, porque solo el líder puede hacerlo. El buscador espera hasta reunir todos los roles y ofrece el grupo a todos a la vez: una ventana emergente pide aceptar a cada persona y el grupo se forma en cuanto la última dice que sí. Rechazar la oferta o dejar que se agote te saca a ti y a cualquier grupo con el que hicieras cola, y aplica un breve enfriamiento antes de que puedas volver a entrar. Los demás de la oferta conservan su sitio, salvo que también la rechacen o estuvieran en cola con alguien que lo hizo, así que la fila sigue avanzando.`,
+  'guide.social.lootRollBodyNeedBeatsGreed':
+    'Cuando un objeto va a tirada, cada miembro elegible elige Necesidad, Codicia o Pasar. Necesidad vence a Codicia: si alguien elige Necesidad, gana la tirada de Necesidad más alta y las de Codicia no cuentan; de lo contrario gana la Codicia más alta.',
+  'guide.worldPage.peaksPlaceNotes':
+    'Highwatch sostiene la muralla. Stalker Ridge y las Madrigueras de Roca Profunda pertenecen a felinos y excavadores; las Estribaciones de Ogro y el Campamento de guerra de Drogmar a mercenarios. Stormcrag chisporrotea de elementales y bajo él brilla Glimmermere, cuya orilla guarda la puerta de luz pálida al Templo Ahogado. Las Tiendas de los Juramentados y los Campos de los Renacidos rodean las alturas del culto, con el Santuario del Gravewyrm en la cima.',
+  'worldContent.farmPatchName': 'Bancales de jardín',
 };

@@ -1213,4 +1213,52 @@ export const da_DK: Record<string, string> = {
   'realmBuilders.saveNew': 'Udgiv',
   'realmBuilders.useNextMonth': 'Næste måned',
   'realmBuilders.yearLabel': 'år',
+  'error.clearItemNameAllLiteral': 'all skal være den bogstavelige værdi true',
+  'error.clearItemNameBagIndex': 'bag skal være et ikke-negativt heltal',
+  'error.clearItemNameBagPair': 'et taskemål behøver både celleindeks og genstands-id',
+  'error.clearItemNameBagRange': 'bag skal være et heltal fra {min} til {max}',
+  'error.clearItemNameCameOnline':
+    'figuren kom online før fjernelsen nåede frem, afbryd den og prøv igen',
+  'error.clearItemNameLeased':
+    'figuren har et aktivt sessionslån, afbryd den (eller vent på at lånet udløber) og prøv igen',
+  'error.clearItemNameNoMatch': 'ingen navngivet kopi matchede målet',
+  'error.clearItemNameOnline': 'figuren er online i denne verden, afbryd den først',
+  'error.clearItemNameTargetForms':
+    'angiv præcis ét mål: en båret slot, en taskecelle eller all: true',
+  'error.clearItemNameUnknownSlot': 'ukendt udstyrsslot',
+  'error.clearItemNameWentOffline': 'figuren gik offline før fjernelsen nåede frem, prøv igen',
+  'error.itemNameClearFailed': 'rydning af genstandsnavn mislykkedes',
+  'loadFailure.forbiddenDetail':
+    'Dine personaleområder har ikke den tilladelse, som denne visning læser. Bed en superadministrator om at give den, og genindlæs derefter.',
+  'loadFailure.forbiddenTitle': 'Tilladelse nægtet',
+  'marketMetrics.autoRefresh': 'Automatisk opdatering ({seconds} s)',
+  'marketMetrics.bucketCompost': 'Kompost',
+  'marketMetrics.bucketCores': 'Kerner',
+  'marketMetrics.bucketEmpty': 'ingen aktive annoncer',
+  'marketMetrics.bucketEssence': 'Essens',
+  'marketMetrics.bucketPatterns': 'Mønstre',
+  'marketMetrics.bucketProduce': 'Afgrøder',
+  'marketMetrics.bucketSeeds': 'Frø',
+  'marketMetrics.bucketSold':
+    'Solgt de seneste {days} dage: {sales} salg, {quantity} genstande, {copper}',
+  'marketMetrics.bucketSummary':
+    '{listings} annoncer, {quantity} enheder, {listed} af {tracked} genstande annonceret',
+  'marketMetrics.colItem': 'Genstand',
+  'marketMetrics.colListings': 'Annoncer',
+  'marketMetrics.colLowest': 'Lavest (pr. enhed)',
+  'marketMetrics.colMedian': 'Median (pr. enhed)',
+  'marketMetrics.colQuantity': 'Antal',
+  'marketMetrics.empty': 'ingen aktive annoncer i nogen sporet kategori',
+  'marketMetrics.essenceNote':
+    'Disse materialer er sjælebundne og kan aldrig annonceres. Enhver række her betyder, at markedets escrow-invariant brød sammen og kræver teknisk opmærksomhed.',
+  'marketMetrics.hint':
+    'Aktive Verdensmarkedsannoncer for de sporede forsyningskategorier: hvad der står i bogen lige nu, ikke salgsvolumen. Serveren cacher denne aflæsning i omkring 15 sekunder.',
+  'marketMetrics.loadFailed': 'kunne ikke indlæse markedsmålinger',
+  'marketMetrics.loading': 'indlæser…',
+  'marketMetrics.realm': 'Verden: {realm}',
+  'marketMetrics.soldNone': 'Solgt de seneste {days} dage: intet',
+  'marketMetrics.soldUnavailable':
+    'Salgsvolumen er ikke tilgængelig lige nu, så kun aktive annoncer vises nedenfor.',
+  'moderationHistory.actionClearItemName': 'Genstandsnavn ryddet',
+  'nav.marketMetrics': 'Markedsmålinger',
 };

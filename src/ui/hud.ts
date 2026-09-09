@@ -596,7 +596,6 @@ import {
   formatMoney as formatLocalizedMoney,
   formatNumber,
   getLanguage,
-  moneyParts,
   type SupportedLanguage,
   type TranslationKey,
   t,
@@ -711,6 +710,7 @@ import {
 import { type MobTooltipI18n, type MobTooltipModel, mobTooltipHtml } from './mob_tooltip_view';
 import { bindMobileFrameLongPress as bindMobileFrameLongPressCore } from './mobile_frame_long_press';
 import { MobileMoreDialogController } from './mobile_more_dialog';
+import { moneyHtml } from './money_html';
 import { MOUNT_DESC_KEYS, mountSpecLines } from './mount_labels';
 import { MountRaceControls } from './mount_race_controls';
 import { MountRaceStrip } from './mount_race_strip';
@@ -2369,7 +2369,7 @@ export class Hud {
         number: (value) => this.questNumber(value),
         progress: (label, current, total) => this.questProgressText(label, current, total),
         suggestedPlayers: (count) => this.questSuggestedPlayersHtml(count),
-        money: (copper) => this.moneyHtml(copper),
+        money: (copper) => moneyHtml(copper),
       },
       openFocusTrap: (root) => this.focusManager.open({ root }),
       closeTransient: () => this.closeOtherWindows('#quest-dialog'),
@@ -2405,7 +2405,7 @@ export class Hud {
       showError: (text) => this.showError(text),
       hideTooltip: () => this.hideTooltip(),
       entityName: entityDisplayName,
-      money: (copper) => this.moneyHtml(copper),
+      money: (copper) => moneyHtml(copper),
       coinIconUrl: () => iconDataUrl('item', 'coin_gold'),
       itemIcon: (item, quality) => this.itemIcon(item, quality),
       itemTooltip: (item, instance?: ItemInstancePayload) => this.itemTooltip(item, true, instance),
@@ -5145,7 +5145,7 @@ export class Hud {
   private readonly presentationBag: PainterHostPresentation = {
     openMaterialSources: openMaterialSourcesDialog,
     itemIcon: (item, quality) => this.itemIcon(item, quality),
-    moneyHtml: (copper) => this.moneyHtml(copper),
+    moneyHtml: (copper) => moneyHtml(copper),
     itemTooltip: (item, instance, materialSources) =>
       this.itemTooltip(item, true, instance, materialSources),
     attachTooltip: (el, html) => this.attachTooltip(el, html),
@@ -6149,17 +6149,6 @@ export class Hud {
 
   private itemIcon(item: ItemDef, quality?: ItemDef['quality']): string {
     return knownItemIconHtml(item, quality);
-  }
-
-  moneyHtml(copper: number): string {
-    const parts = moneyParts(copper);
-    const coin = (value: number, cls: 'g' | 's' | 'c', unitKey: TranslationKey): string =>
-      `<span class="coin-part"><span class="coin-amount">${esc(formatNumber(value, { maximumFractionDigits: 0 }))}</span><span class="coin ${cls}" aria-hidden="true"></span><span class="visually-hidden">${esc(t(unitKey))}</span></span>`;
-    let html = '';
-    if (parts.gold > 0) html += coin(parts.gold, 'g', 'itemUi.money.gold');
-    if (parts.silver > 0 || parts.gold > 0) html += coin(parts.silver, 's', 'itemUi.money.silver');
-    html += coin(parts.copper, 'c', 'itemUi.money.copper');
-    return `<span class="money-inline" aria-label="${esc(formatLocalizedMoney(copper, 'long'))}">${html}</span>`;
   }
 
   // The connected wallet's $WOC balance, shown left of the coins in the bag

@@ -554,7 +554,7 @@ export const it_IT: Record<string, string> = {
   'poi.thornpeak_heights.4': 'Accampamento di Guerra di Drogmar',
   'poi.thornpeak_heights.5': 'Rupe della Tempesta',
   'poi.thornpeak_heights.6': 'Il Lago Baluginante',
-  'poi.thornpeak_heights.7': 'Tende dei Broodsworn',
+  'poi.thornpeak_heights.7': 'Tende dei Giurati della Stirpe',
   'poi.thornpeak_heights.8': 'Campi dei Revenant',
   'poi.thornpeak_heights.9': 'Santuario del Gravewyrm',
   'location.kind.overworld': 'Mondo aperto',
@@ -1247,4 +1247,54 @@ export const it_IT: Record<string, string> = {
   'realmBuilders.saveNew': 'Pubblica',
   'realmBuilders.useNextMonth': 'Il mese prossimo',
   'realmBuilders.yearLabel': 'Anno',
+  'error.clearItemNameAllLiteral': 'all deve essere il valore letterale true',
+  'error.clearItemNameBagIndex': 'bag deve essere un numero intero non negativo',
+  'error.clearItemNameBagPair':
+    'un obiettivo borsa richiede sia l’indice della cella sia l’id dell’oggetto',
+  'error.clearItemNameBagRange': 'bag deve essere un numero intero da {min} a {max}',
+  'error.clearItemNameCameOnline':
+    'il personaggio è tornato online prima della rimozione; espellilo e riprova',
+  'error.clearItemNameLeased':
+    'il personaggio ha una concessione di sessione attiva; espellilo (o attendi la scadenza) e riprova',
+  'error.clearItemNameNoMatch': 'nessuna copia nominata corrisponde a quell’obiettivo',
+  'error.clearItemNameOnline': 'il personaggio è online in questo reame; disconnettilo prima',
+  'error.clearItemNameTargetForms':
+    'nomina esattamente un obiettivo: uno slot indossato, una cella della borsa o all: true',
+  'error.clearItemNameUnknownSlot': 'slot equipaggiamento sconosciuto',
+  'error.clearItemNameWentOffline':
+    'il personaggio è andato offline prima della rimozione; riprova',
+  'error.itemNameClearFailed': 'rimozione del nome dell’oggetto fallita',
+  'loadFailure.forbiddenDetail':
+    'I tuoi ruoli dello staff non possiedono il permesso letto da questa vista. Chiedi a un superamministratore di concederlo, poi ricarica.',
+  'loadFailure.forbiddenTitle': 'Permesso negato',
+  'marketMetrics.autoRefresh': 'Aggiornamento automatico ({seconds}s)',
+  'marketMetrics.bucketCompost': 'Concime',
+  'marketMetrics.bucketCores': 'Nuclei',
+  'marketMetrics.bucketEmpty': 'nessuna inserzione attiva',
+  'marketMetrics.bucketEssence': 'Essenza',
+  'marketMetrics.bucketPatterns': 'Modelli',
+  'marketMetrics.bucketProduce': 'Prodotti',
+  'marketMetrics.bucketSeeds': 'Semi',
+  'marketMetrics.bucketSold':
+    'Venduti negli ultimi {days} giorni: {sales} vendite, {quantity} oggetti, {copper}',
+  'marketMetrics.bucketSummary':
+    '{listings} inserzioni, {quantity} unità, {listed} di {tracked} oggetti inseriti',
+  'marketMetrics.colItem': 'Oggetto',
+  'marketMetrics.colListings': 'Inserzioni',
+  'marketMetrics.colLowest': 'Minimo (per unità)',
+  'marketMetrics.colMedian': 'Mediana (per unità)',
+  'marketMetrics.colQuantity': 'Quantità',
+  'marketMetrics.empty': 'nessuna inserzione attiva in alcun lotto seguito',
+  'marketMetrics.essenceNote':
+    'Questi materiali sono vincolati all’anima e non possono mai essere inseriti. Una riga qui indica che l’invariante del deposito del mercato è stata violata e richiede l’attenzione degli ingegneri.',
+  'marketMetrics.hint':
+    'Inserzioni attive del Mercato Mondiale per i lotti di fornitura seguiti: ciò che è nel registro adesso, non il volume venduto. Il server memorizza questa lettura per circa 15 secondi.',
+  'marketMetrics.loadFailed': 'impossibile caricare le metriche del mercato',
+  'marketMetrics.loading': 'caricamento…',
+  'marketMetrics.realm': 'Reame: {realm}',
+  'marketMetrics.soldNone': 'Venduti negli ultimi {days} giorni: nulla',
+  'marketMetrics.soldUnavailable':
+    'Il volume venduto non è disponibile ora, quindi sotto vengono mostrate solo le inserzioni attive.',
+  'moderationHistory.actionClearItemName': 'Nome oggetto rimosso',
+  'nav.marketMetrics': 'Metriche del mercato',
 };

@@ -1,6 +1,8 @@
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
+import { runInNewContext } from 'node:vm';
+import { transformSync } from 'esbuild';
 import * as fs from 'fs';
 import path from 'path';
 import { describe, expect, it } from 'vitest';
@@ -202,9 +204,9 @@ describe('i18n status registry: states', () => {
     // against the scanner's own arithmetic: a key no source block of a locale
     // carries reads pending, a key the block carries reads translated, and the
     // English dialect (en_CA, whose base is en) reads translated for every key.
-    // Non-vacuity: at least one pending sim row must exist today (the rift
-    // mechanic names alone are English in the Latin locales until the Phase 20
-    // fill), and at least one carried row must exist per locale.
+    // Source presence remains authoritative after the release fill makes
+    // every locale complete. The independent literal-row witness below catches
+    // an export that accidentally claims fallback rows as locale-owned rows.
     const langs = NON_EN.filter((l) => l !== 'en_CA');
     let pendingSeen = 0;
     let carriedSeen = 0;
@@ -225,18 +227,15 @@ describe('i18n status registry: states', () => {
         violations.push(`${ck} en_CA: ${entry.locales.en_CA.state}, the English dialect inherits`);
     }
     expect(violations).toEqual([]);
-    expect(pendingSeen, 'the sim scope has unfilled rows today').toBeGreaterThan(0);
     expect(carriedSeen, 'the sim scope has filled rows today').toBeGreaterThan(0);
-    // The assembled DICT stays dense (the runtime English spread is the
-    // fallback, not the coverage): the two readings must disagree somewhere
-    // or the pin above is a self-comparison.
+    // Runtime dictionaries remain dense even if a future source row is missing.
     const dense = simDICT as unknown as Record<string, Record<string, string>>;
     const denseCount = langs.reduce(
       (n, lang) => n + Object.keys(dense.en).filter((k) => Boolean(dense[lang][k])).length,
       0,
     );
     expect(denseCount).toBe(Object.keys(simDICT.en).length * langs.length);
-    expect(denseCount).toBeGreaterThan(carriedSeen);
+    expect(carriedSeen + pendingSeen).toBeLessThanOrEqual(denseCount);
   });
 
   // The two arms below anchor simDictProvidedKeys on something OTHER than
@@ -284,6 +283,36 @@ describe('i18n status registry: states', () => {
     expect(dictLiteral).toContain("'log.arenaQueueAutoLeave1v1': ARENA_QUEUE_AUTO_LEAVE_1V1[lang]");
     expect(exportBody).toContain('ARENA_QUEUE_AUTO_LEAVE_1V1[lang]');
     expect(exportBody).toContain("provided.add('log.arenaQueueAutoLeave1v1')");
+  });
+
+  it('keeps an omitted or blank source row absent even when runtime fallback is dense', () => {
+    // Exercise the actual provider body against a sparse fixture. This stays
+    // decisive after every shipping locale has been filled, when the live
+    // source and dense runtime tables legitimately contain the same keys.
+    const start = simSource.indexOf('export function simDictProvidedKeys');
+    const end = simSource.indexOf('\n}\n', start) + 2;
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    const code = transformSync(simSource.slice(start, end), {
+      loader: 'ts',
+      format: 'cjs',
+    }).code;
+    const context = {
+      exports: {},
+      module: { exports: {} as { simDictProvidedKeys: (lang: string) => Set<string> } },
+      BASE_DICT: { cs_CZ: { owned: 'Překlad', blank: '   ' } },
+      PET_DICT: { cs_CZ: { pet: 'Společník' } },
+      RAID_BOSS_DIALOGUE_DICT: {},
+      IGNIVAR_DICT: {},
+      ARENA_QUEUE_AUTO_LEAVE_1V1: {},
+      DICT: { cs_CZ: { owned: 'Překlad', blank: 'English', omitted: 'English' } },
+    };
+    runInNewContext(code, context);
+    expect([...context.module.exports.simDictProvidedKeys('cs_CZ')].sort()).toEqual([
+      'owned',
+      'pet',
+    ]);
+    expect([...context.module.exports.simDictProvidedKeys('da_DK')]).toEqual([]);
   });
 
   it('every provided sim row is a literal row of some locale block (source-text anchor)', () => {
@@ -335,14 +364,13 @@ describe('i18n status registry: states', () => {
     }
     expect(violations).toEqual([]);
     expect(checked).toBeGreaterThan(700);
-    // And no single locale is granted the whole table: every non-English
-    // locale's own sources stop short of the dense DICT today.
-    for (const lang of supportedLanguages) {
-      if (lang === 'en') continue;
+    // A completed locale may now provide the whole table. Source rows must
+    // still never invent a key absent from the authoritative English table.
+    for (const [lang, keys] of providedBy) {
       expect(
-        providedBy.get(lang)!.size,
-        `${lang} provides fewer keys than DICT holds`,
-      ).toBeLessThan(Object.keys(simDICT.en).length);
+        [...keys].filter((key) => !(key in simDICT.en)),
+        `${lang} unknown keys`,
+      ).toEqual([]);
     }
   });
 });
@@ -427,15 +455,30 @@ describe('i18n status registry: blocked rows are load-bearing (no over-allow)', 
     // English-fill accounting and the release ledger disagree.
     const { pending } = await import('../src/ui/i18n.resolved.generated/pending');
     const langs = Object.keys(pending);
-    // Non-vacuity: an empty or shrunken pending table would make the loop
-    // below constant-true. The set is populated, and the retired leaf's LIVE
-    // successor is still pending in at least one locale, proving the
-    // exclusion filtered the retired key rather than emptying the set.
-    expect(langs.length).toBeGreaterThan(0);
-    expect(langs.reduce((n, l) => n + pending[l].length, 0)).toBeGreaterThan(0);
-    expect(langs.some((l) => pending[l].includes('guide.profPages.gatherDeeds.farmingSown'))).toBe(
-      true,
+    expect(langs).toEqual(NON_EN);
+    // Shipping locales can be fully translated. Exercise the actual builder
+    // against an omitted live successor and its retired predecessor instead:
+    // deleting the retired filter or emptying all pending sets must both fail.
+    const buildSource = fs.readFileSync(path.join(root, 'scripts/i18n_build.mjs'), 'utf8');
+    const start = buildSource.indexOf('const isPresent =');
+    const end = buildSource.indexOf('\n}\n', start) + 2;
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    const fixturePending = runInNewContext(
+      `${buildSource.slice(start, end)}; computePending(englishFixture, { cs_CZ: {} })`,
+      {
+        flatten,
+        LOCALES: ['en', 'cs_CZ', 'en_CA'],
+        DIALECT_BASE: { en_CA: 'en' },
+        RETIRED_KEY_SET,
+        englishFixture: {
+          'guide.profPages.gatherDeeds.farming': 'Retired farming copy',
+          'guide.profPages.gatherDeeds.farmingSown': 'Live farming copy',
+        },
+      },
     );
+    expect(fixturePending.cs_CZ).toEqual(['guide.profPages.gatherDeeds.farmingSown']);
+    expect(fixturePending.en_CA).toEqual([]);
     for (const [lang, keys] of Object.entries(pending)) {
       for (const key of keys) {
         expect(RETIRED_KEY_SET.has(key), `${lang} runtime-pending retired key ${key}`).toBe(false);

@@ -8764,6 +8764,119 @@ export const TARGETS = [
     },
   },
   {
+    key: 'guild-roster-expand',
+    label: 'Social window: Guild tab footer (Expand roster beside Disband) and its confirm prompt',
+    // Match the SOURCE files (`.ts` suffix, same reason as guild-roster above); the
+    // coin-icon readout module renders the confirm prompt's price.
+    when: ['ui/social_window.ts', 'ui/money_html.ts'],
+    // Social is online-only, so the offline Sim reports socialInfo=null: inject a
+    // two-member guild led by the player with a roster page still for sale, so the
+    // footer shows Expand roster AND Disband guild on one row. The `confirm`
+    // variants then click Expand roster and clip the prompt stack (the price there
+    // is the coin-icon readout with bare digits).
+    variants: [
+      { key: 'desktop', charName: 'Rueweaver', charClass: 'paladin', beforeLoad: seedLowGraphicsPreset },
+      {
+        key: 'desktop-confirm',
+        charName: 'Rueweaver',
+        charClass: 'paladin',
+        confirm: true,
+        beforeLoad: seedLowGraphicsPreset,
+      },
+      {
+        key: 'mobile',
+        charName: 'Rueweaver',
+        charClass: 'paladin',
+        mobile: true,
+        beforeLoad: seedLowGraphicsPreset,
+      },
+      {
+        key: 'mobile-confirm',
+        charName: 'Rueweaver',
+        charClass: 'paladin',
+        mobile: true,
+        confirm: true,
+        beforeLoad: seedLowGraphicsPreset,
+      },
+    ],
+    async capture(page, variant) {
+      await dismissTutorialGreeting(page);
+      // Under load the entry flow can hand over before the offline Sim has a
+      // player; give the world a few seconds to appear before staging on it.
+      for (let i = 0; i < 20; i++) {
+        if (await page.evaluate(() => Boolean(window.__game?.sim?.player))) break;
+        await wait(500);
+      }
+      const staged = await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        if (!sim?.player) return { ok: false, reason: 'offline world is unavailable' };
+        const me = sim.player.name;
+        const member = (over) => ({
+          realm: 'Aurora',
+          status: 'online',
+          lastLogin: null,
+          activeTitle: null,
+          joinedAt: null,
+          ...over,
+        });
+        // A leaf assignment: socialInfo is typed `null` on the offline Sim, but at
+        // runtime it is a plain field the HUD reads through IWorld.
+        sim.socialInfo = {
+          friends: [],
+          blocks: [],
+          ignores: [],
+          guild: {
+            id: 1,
+            name: 'Emberwatch Vanguard',
+            rank: 'leader',
+            memberCap: 300,
+            // A four-digit page price, so the prompt shows the bare-digit reading.
+            nextRosterPrice: 1736 * 10000,
+            members: [
+              member({
+                id: 1,
+                name: me,
+                cls: 'paladin',
+                level: 60,
+                online: true,
+                zone: 'zone:stormwind',
+                rank: 'leader',
+              }),
+              member({
+                id: 2,
+                name: 'Seraphine',
+                cls: 'priest',
+                level: 58,
+                online: true,
+                zone: 'zone:deadmines',
+                rank: 'officer',
+              }),
+            ],
+          },
+        };
+        const el = document.querySelector('#social-window');
+        if (el) el.classList.remove('open');
+        window.__game?.hud?.toggleSocial?.();
+        return { ok: true };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+      if (!(await pollForSize(page, '#social-window'))) return {};
+      await page.evaluate(() => {
+        document.querySelector('.soc-tab[data-tab="guild"]')?.click();
+      });
+      await wait(400);
+      if (!variant?.confirm) return { clip: '#social-window' };
+      await page.evaluate(() => {
+        document.querySelector('[data-act="guild-expand"]')?.click();
+      });
+      if (!(await pollForSize(page, '#prompt-stack .prompt'))) {
+        return { skip: 'the roster confirm prompt never opened' };
+      }
+      await wait(300);
+      return { clip: '#prompt-stack' };
+    },
+  },
+  {
     key: 'guild-billboard',
     label: 'Social window: Guild tab billboard (officer edit vs member read-only)',
     // Match the SOURCE files (`.ts` suffix, same reason as guild-roster above).
