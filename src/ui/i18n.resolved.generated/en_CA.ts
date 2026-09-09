@@ -11797,7 +11797,7 @@ export const en_CA: EnTranslations = {
       },
       "ruinous_brand": {
         "name": "Ruinous Brand",
-        "description": "Brands an enemy for 15 sec. Your next 3 direct spells echo for 25% damage against the branded enemy, or copy 50% damage to it when cast against another target."
+        "description": "Brands an enemy for 15 sec. Your next 3 direct spells echo for 25% damage against the branded enemy, or copy 50% damage to it when cast against another target. Ruinbolt echoes also count as critical hits, without another critical damage multiplier."
       },
       "wrath": {
         "name": "Wildbolt",
@@ -12351,7 +12351,7 @@ export const en_CA: EnTranslations = {
       },
       "chaos_bolt": {
         "name": "Ruinbolt",
-        "description": "Spends 3 Wrack to hurl a heavy bolt of chaotic fire for {damage} Fire damage. Desolation shortens its cast by 30%."
+        "description": "Spends 3 Wrack to hurl a heavy bolt of chaotic fire for {damage} Fire damage before critical damage is applied. Always critically strikes when it hits. Desolation shortens its cast by 30%."
       },
       "dark_pact": {
         "name": "Sanguine Covenant",

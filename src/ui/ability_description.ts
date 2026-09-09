@@ -54,7 +54,16 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
   const primary = abilityPrimaryEffect(res);
   if (primary) {
     switch (primary.type) {
-      case 'directDamage':
+      case 'directDamage': {
+        const mult = primary.damageMult ?? 1;
+        const bonus = scaling ? abilityDamageBonus(res, primary, scaling) * mult : 0;
+        return (
+          abilityAmountRange(primary.min * mult, primary.max * mult) +
+          (bonus > 0
+            ? ` ${t('hudChrome.abilityScaling.bonus', { value: formatAbilityNumber(bonus) })}`
+            : '')
+        );
+      }
       case 'aoeDamage':
       case 'aoeRoot':
       case 'chainDamage':

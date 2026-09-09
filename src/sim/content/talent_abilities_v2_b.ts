@@ -173,16 +173,24 @@ export const TALENT_ABILITIES_V2_B = {
     learnLevel: 5,
     cost: 65,
     ruinCost: 3,
-    castTime: 2.5,
+    castTime: 2.3,
     cooldown: 0,
     range: 30,
     school: 'fire',
     requiresTarget: true,
     specs: ['destruction'],
     projectileFx: 'heavyBolt',
-    effects: [{ type: 'directDamage', min: 192, max: 235 }],
+    effects: [
+      {
+        type: 'directDamage',
+        min: 192,
+        max: 235,
+        spellPowerCoeff: 2.5 / 3.5,
+        guaranteedCrit: true,
+      },
+    ],
     description:
-      'Spends 3 Wrack to hurl a heavy bolt of chaotic fire for $d Fire damage. Desolation shortens its cast by 30%.',
+      'Spends 3 Wrack to hurl a heavy bolt of chaotic fire for $d Fire damage before critical damage is applied. Always critically strikes when it hits. Desolation shortens its cast by 30%.',
   },
 
   typhoon: {

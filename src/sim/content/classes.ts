@@ -5347,27 +5347,53 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'shadow',
     requiresTarget: true,
     effects: [{ type: 'directDamage', min: 36, max: 50 }],
+    // Preserve the former rank coefficients after the Destruction cast passive.
+    // The faster casts reduce the entire hit once, including Spell Power.
     ranks: [
       {
         rank: 2,
         level: 8,
         cost: 38,
-        castTime: 2.2,
-        effects: [{ type: 'directDamage', min: 67, max: 87 }],
+        castTime: 2.0,
+        effects: [
+          {
+            type: 'directDamage',
+            min: 67,
+            max: 87,
+            damageMult: 0.8,
+            spellPowerCoeff: (2.2 * 0.97) / 3.5,
+          },
+        ],
       },
       {
         rank: 3,
         level: 14,
         cost: 55,
-        castTime: 2.7,
-        effects: [{ type: 'directDamage', min: 118, max: 148 }],
+        castTime: 2.0,
+        effects: [
+          {
+            type: 'directDamage',
+            min: 118,
+            max: 148,
+            damageMult: 0.8,
+            spellPowerCoeff: (2.7 * 0.97) / 3.5,
+          },
+        ],
       },
       {
         rank: 4,
         level: 20,
         cost: 80,
-        castTime: 3.0,
-        effects: [{ type: 'directDamage', min: 126, max: 156 }],
+        castTime: 2.0,
+        effects: [
+          {
+            type: 'directDamage',
+            min: 126,
+            max: 156,
+            damageMult: 0.8,
+            spellPowerCoeff: (3.0 * 0.97) / 3.5,
+          },
+        ],
       },
     ],
     description: 'Sends a shadowy bolt at the enemy for $d Shadow damage.',
@@ -5749,7 +5775,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     specs: ['destruction'],
     effects: [{ type: 'ruinousBrand', duration: 15, charges: 3 }],
     description:
-      'Brands an enemy for 15 sec. Your next 3 direct spells echo for 25% damage against the branded enemy, or copy 50% damage to it when cast against another target.',
+      'Brands an enemy for 15 sec. Your next 3 direct spells echo for 25% damage against the branded enemy, or copy 50% damage to it when cast against another target. Ruinbolt echoes also count as critical hits, without another critical damage multiplier.',
   },
   // Ruination's personal defensive. It is the siege caster's only active
   // mitigation: Fiendhide is passive armor and Sanguine Covenant costs a

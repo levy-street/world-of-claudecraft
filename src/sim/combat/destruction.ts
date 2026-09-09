@@ -459,7 +459,9 @@ function copyRuinousBrandDamage(
     player,
     branded,
     amount,
-    false,
+    // The copied amount already includes Ruinbolt's critical multiplier.
+    // This flag records that outcome; resolvedHpLoss below prevents new procs.
+    ability.id === 'chaos_bolt',
     ability.school,
     'Ruinous Brand',
     'hit',

@@ -279,7 +279,7 @@ export function dealDamage(
     return 0;
   }
   amount = Math.max(0, amount);
-  amount = Math.round(amount * veilboundMarkDamageMultiplier(source, target));
+  if (!resolvedHpLoss) amount = Math.round(amount * veilboundMarkDamageMultiplier(source, target));
   const attackAnimation = attackAnimationStarted ? { attackAnimationStarted: true as const } : {};
 
   // Cauterize (fire spec): +12% Fire damage to enemies while the caster is burning
@@ -550,7 +550,7 @@ export function dealDamage(
   // Ignition (fire mage mastery, combat/fire_mage.ts): a Fire-school ABILITY
   // crit banks a stacking burn of the RESOLVED amount. Guards inside; a burn
   // tick carries crit=false so it can never re-ignite itself. Draws no rng.
-  igniteOnCrit(ctx, source, target, amount, crit, school, ability);
+  if (!resolvedHpLoss) igniteOnCrit(ctx, source, target, amount, crit, school, ability);
 
   // Debt of Light answers BEFORE the generic shields: it is a deliberately armed
   // single-hit answer, so it must be the thing that eats the blow the paladin
@@ -1145,7 +1145,7 @@ export function dealDamage(
     // fifth of all damage dealt as mana. Deterministic, no rng, no events.
     elementalTranceManaFromDamage(ctx, source, amount);
     // Talent procs listening for spell crits (deterministic, no rng draw).
-    if (crit && school !== 'physical' && ability) {
+    if (!resolvedHpLoss && crit && school !== 'physical' && ability) {
       onSpellCrit(ctx, source, abilityId, target);
     }
     if (source.resourceType === 'rage' && !noRage && school === 'physical' && !ability) {

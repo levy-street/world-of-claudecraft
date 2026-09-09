@@ -19,6 +19,8 @@ export interface WarlockBalanceResult {
   manaEndPct: number;
   starvedPct: number;
   damageByAbility: Record<string, number>;
+  castsByAbility: Record<string, number>;
+  equipment: PlayerEquipment;
 }
 
 const TALENT_ROWS = {
@@ -69,6 +71,12 @@ export const WARLOCK_FULL_BIS_GEAR: PlayerEquipment = {
 export interface WarlockProbeScenario {
   targetLevel: number;
   nythraxisArmor: boolean;
+  /** Optional fixed equipment; omitted preserves the historical anchor. */
+  equipment?: PlayerEquipment;
+  secondaryTarget?: boolean;
+  usePyre?: boolean;
+  /** Remove unrelated world actors for a repeatable isolated combat study. */
+  isolated?: boolean;
 }
 export const WARLOCK_LEVEL_20_SCENARIO: WarlockProbeScenario = {
   targetLevel: 20,
@@ -88,7 +96,7 @@ function face(source: Entity, target: Entity): void {
   source.prevFacing = source.facing;
 }
 
-function addBossDummy(sim: ProbeSim, scenario: WarlockProbeScenario): Entity {
+function addBossDummy(sim: ProbeSim, scenario: WarlockProbeScenario, secondary = false): Entity {
   const player = sim.player;
   const templateId = 'warlock_balance_boss_dummy';
   MOBS[templateId] ??= {
@@ -97,10 +105,12 @@ function addBossDummy(sim: ProbeSim, scenario: WarlockProbeScenario): Entity {
     name: 'Warlock Balance Dummy',
     boss: true,
   };
-  const target = createMob(99_800, MOBS[templateId], scenario.targetLevel, {
+  // Both fixtures stay on the training room center line so its side walls
+  // cannot block the cross-target Brand.
+  const target = createMob(secondary ? 99_801 : 99_800, MOBS[templateId], scenario.targetLevel, {
     x: player.pos.x,
     y: player.pos.y,
-    z: player.pos.z + 18,
+    z: player.pos.z + (secondary ? 16 : 18),
   });
   target.hostile = true;
   target.hp = target.maxHp = 10_000_000;
@@ -182,10 +192,10 @@ function prepareDemonology(sim: Sim, target: Entity): void {
   addSoulFragments(sim.ctx, sim.player, 5);
 }
 
-function equipFullBis(sim: Sim): void {
+function equipFullBis(sim: Sim, equipment = WARLOCK_FULL_BIS_GEAR): void {
   const meta = sim.ctx.players.get(sim.player.id);
   if (!meta) throw new Error('Warlock benchmark player metadata is missing');
-  meta.equipment = { ...WARLOCK_FULL_BIS_GEAR };
+  meta.equipment = { ...equipment };
   recalcPlayerStats(
     sim.player,
     meta.cls,
@@ -217,9 +227,18 @@ function tryAffliction(sim: Sim, target: Entity): boolean {
   return cast(sim, 'needle_of_fate', target);
 }
 
-function tryDestruction(sim: Sim, target: Entity): boolean {
+function tryDestruction(
+  sim: Sim,
+  target: Entity,
+  scenario: WarlockProbeScenario,
+  secondary?: Entity,
+): boolean {
   const player = sim.player;
-  if (cooldownReady(player, 'summon_infernal') && cast(sim, 'summon_infernal', target)) {
+  if (
+    scenario.usePyre !== false &&
+    cooldownReady(player, 'summon_infernal') &&
+    cast(sim, 'summon_infernal', target)
+  ) {
     return true;
   }
   const pactRemaining = auraRemaining(target, 'immolate', player.id);
@@ -228,7 +247,7 @@ function tryDestruction(sim: Sim, target: Entity): boolean {
   if (
     pactRemaining >= 6 &&
     cooldownReady(player, 'ruinous_brand') &&
-    cast(sim, 'ruinous_brand', target)
+    cast(sim, 'ruinous_brand', secondary ?? target)
   ) {
     return true;
   }
@@ -270,9 +289,14 @@ function attributeDamage(
   sim: Sim,
   target: Entity,
   result: WarlockBalanceResult,
+  secondary?: Entity,
 ): void {
   for (const event of events) {
-    if (event.type !== 'damage' || event.targetId !== target.id) continue;
+    if (
+      event.type !== 'damage' ||
+      (event.targetId !== target.id && event.targetId !== secondary?.id)
+    )
+      continue;
     const source = sim.entities.get(event.sourceId);
     if (event.sourceId !== sim.player.id && source?.ownerId !== sim.player.id) continue;
     result.damage += event.amount;
@@ -292,8 +316,16 @@ export function runWarlockBalanceProbe(
   if (!sim.applyTalents({ spec, rows: TALENT_ROWS[spec] })) {
     throw new Error(`Could not apply ${spec} benchmark talents`);
   }
-  equipFullBis(sim);
+  if (scenario.isolated) {
+    for (const entity of [...sim.entities.values()]) {
+      if (entity.id !== sim.player.id) sim.ctx.dropEntity(entity.id);
+    }
+  }
+  equipFullBis(sim, scenario.equipment);
   const target = addBossDummy(sim, scenario);
+  const secondary = scenario.secondaryTarget ? addBossDummy(sim, scenario, true) : undefined;
+  sim.targetEntity(target.id);
+  face(sim.player, target);
   if (spec === 'affliction') prepareAffliction(sim, target);
   else if (spec === 'destruction') prepareDestruction(sim, target);
   else prepareDemonology(sim, target);
@@ -311,6 +343,8 @@ export function runWarlockBalanceProbe(
     manaEndPct: 0,
     starvedPct: 0,
     damageByAbility: {},
+    castsByAbility: {},
+    equipment: { ...sim.ctx.players.get(sim.player.id)!.equipment },
   };
   let manaPctTotal = 0;
   let starvedTicks = 0;
@@ -321,12 +355,16 @@ export function runWarlockBalanceProbe(
         spec === 'affliction'
           ? tryAffliction(sim, target)
           : spec === 'destruction'
-            ? tryDestruction(sim, target)
+            ? tryDestruction(sim, target, scenario, secondary)
             : tryDemonology(sim, target);
       if (!acted) starvedTicks++;
+      if (acted && player.castingAbility) {
+        const id = player.castingAbility;
+        result.castsByAbility[id] = (result.castsByAbility[id] ?? 0) + 1;
+      }
     }
     const events = sim.tick();
-    attributeDamage(events, sim, target, result);
+    attributeDamage(events, sim, target, result, secondary);
     manaPctTotal += player.maxResource > 0 ? player.resource / player.maxResource : 0;
   }
   result.dps = result.damage / seconds;
