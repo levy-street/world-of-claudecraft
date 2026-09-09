@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
-import { MageGroundFx } from '../src/render/mage_ground_fx';
 import { blizzardPerimeter } from '../src/render/blizzard_field';
+import { MageGroundFx } from '../src/render/mage_ground_fx';
 import type { ActiveBlizzard } from '../src/world_api';
 
 const row: ActiveBlizzard = {

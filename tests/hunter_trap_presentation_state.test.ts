@@ -1,10 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
-import { groundTelegraphWorld, groundTelegraphWireJson } from '../server/ground_telegraph_wire';
+import { groundTelegraphWireJson, groundTelegraphWorld } from '../server/ground_telegraph_wire';
 import { decodeHunterTraps } from '../src/net/ground_telegraph_wire';
-import { Sim } from '../src/sim/sim';
 import { ABILITIES } from '../src/sim/content/classes';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import { bareClient } from './helpers/bare_client';
 

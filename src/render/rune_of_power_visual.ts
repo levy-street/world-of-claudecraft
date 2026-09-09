@@ -1,8 +1,5 @@
 import * as THREE from 'three';
-import type {
-  ActiveRuneOfPower,
-  RuneOfPowerDisposition,
-} from '../world_api/combat';
+import type { ActiveRuneOfPower, RuneOfPowerDisposition } from '../world_api/combat';
 import { markSharedGeometry } from './shared_resource';
 
 const BAR = markSharedGeometry(new THREE.BoxGeometry(1, 1, 1));
@@ -66,10 +63,8 @@ export class RuneOfPowerVisual {
     this.strokes = new THREE.InstancedMesh(BAR, this.light, MAX_STROKES);
     this.backing = new THREE.InstancedMesh(BAR, this.ink, MAX_STROKES);
     this.crystals = new THREE.InstancedMesh(CRYSTAL, this.gem, 6);
-    for (let i = 0; i < MAX_STROKES; i++)
-      this.backing.setColorAt(i, this.color.setRGB(1, 1, 1));
-    for (const mesh of [this.strokes, this.backing, this.crystals])
-      mesh.frustumCulled = false;
+    for (let i = 0; i < MAX_STROKES; i++) this.backing.setColorAt(i, this.color.setRGB(1, 1, 1));
+    for (const mesh of [this.strokes, this.backing, this.crystals]) mesh.frustumCulled = false;
     this.group.add(this.backing, this.strokes, this.crystals);
     for (const resource of [
       this.strokes,
@@ -82,14 +77,7 @@ export class RuneOfPowerVisual {
       this.owned.add(resource);
   }
 
-  private line(
-    ax: number,
-    az: number,
-    bx: number,
-    bz: number,
-    color: number,
-    width = 0.055,
-  ): void {
+  private line(ax: number, az: number, bx: number, bz: number, color: number, width = 0.055): void {
     if (this.count >= MAX_STROKES)
       throw new Error('Rune inscription exceeds its prepared stroke budget');
     const ay = this.ground(ax, az),
@@ -108,15 +96,9 @@ export class RuneOfPowerVisual {
     this.backing.setMatrixAt(this.count++, this.pose.matrix);
   }
 
-  sync(
-    state: ActiveRuneOfPower,
-    ground: (x: number, z: number) => number,
-  ): void {
+  sync(state: ActiveRuneOfPower, ground: (x: number, z: number) => number): void {
     if (this.disposed) return;
-    if (
-      this.remaining !== state.remaining ||
-      this.duration !== state.duration
-    ) {
+    if (this.remaining !== state.remaining || this.duration !== state.duration) {
       this.elapsed = Math.max(0, state.duration - state.remaining);
       this.remaining = state.remaining;
       this.duration = state.duration;
@@ -210,22 +192,15 @@ export class RuneOfPowerVisual {
       else stroke(-0.1, -0.17, -0.1, -0.04);
     }
     this.strokes.count = this.backing.count = this.count;
-    this.strokes.instanceMatrix.needsUpdate =
-      this.backing.instanceMatrix.needsUpdate = true;
-    if (this.strokes.instanceColor)
-      this.strokes.instanceColor.needsUpdate = true;
+    this.strokes.instanceMatrix.needsUpdate = this.backing.instanceMatrix.needsUpdate = true;
+    if (this.strokes.instanceColor) this.strokes.instanceColor.needsUpdate = true;
     this.authoredColors.set(this.strokes.instanceColor!.array);
     this.setDetail(this.detail, true);
     for (let i = 0; i < 6; i++) {
       const a = (i * Math.PI) / 3;
-      this.crystalGround[i] = ground(
-        x + Math.cos(a) * r * 0.76,
-        z + Math.sin(a) * r * 0.76,
-      );
+      this.crystalGround[i] = ground(x + Math.cos(a) * r * 0.76, z + Math.sin(a) * r * 0.76);
     }
-    this.gem.color.setHex(
-      state.disposition === 'inactive' ? 0x897a9e : 0xc2a4ff,
-    );
+    this.gem.color.setHex(state.disposition === 'inactive' ? 0x897a9e : 0xc2a4ff);
     this.update(0, true);
   }
 
@@ -252,30 +227,19 @@ export class RuneOfPowerVisual {
     }
     this.crystals.instanceMatrix.needsUpdate = true;
     // Remaining lifetime affects the foci only, not the actionable ground edge.
-    const fraction = Math.max(
-      0,
-      Math.min(1, (this.duration - this.elapsed) / this.duration),
-    );
-    this.gem.color
-      .setHex(active ? 0xc2a4ff : 0x897a9e)
-      .multiplyScalar(0.7 + fraction * 0.3);
+    const fraction = Math.max(0, Math.min(1, (this.duration - this.elapsed) / this.duration));
+    this.gem.color.setHex(active ? 0xc2a4ff : 0x897a9e).multiplyScalar(0.7 + fraction * 0.3);
   }
 
   /** De-emphasize only duplicate inner conduits under overlapping support fields.
    * Capture edges, eligibility glyphs and the spell's full radius remain intact. */
   setDetail(value: number, force = false): void {
-    if (
-      this.disposed ||
-      (!force && value === this.detail) ||
-      !this.strokes.instanceColor
-    )
-      return;
+    if (this.disposed || (!force && value === this.detail) || !this.strokes.instanceColor) return;
     this.detail = value;
     this.backing.renderOrder = 2;
     this.strokes.renderOrder = value === 1 ? 4 : 3;
     const colors = this.strokes.instanceColor.array;
-    for (let i = 72 * 3; i < 216 * 3; i++)
-      colors[i] = this.authoredColors[i] * value;
+    for (let i = 72 * 3; i < 216 * 3; i++) colors[i] = this.authoredColors[i] * value;
     this.strokes.instanceColor.needsUpdate = true;
     const inkColors = this.backing.instanceColor!.array;
     for (let i = 72 * 3; i < 216 * 3; i++) inkColors[i] = value;
@@ -302,8 +266,7 @@ export class RuneOfPowerVisual {
         errors.push(error);
       }
     }
-    if (errors.length)
-      throw new AggregateError(errors, 'Rune resource disposal failed');
+    if (errors.length) throw new AggregateError(errors, 'Rune resource disposal failed');
   }
 }
 
@@ -350,17 +313,12 @@ export class RunesOfPowerVisuals {
         if (
           other.id === row.id ||
           other.remaining <= 0 ||
-          (other.disposition === 'eligible') !==
-            (row.disposition === 'eligible') ||
-          (other.x - row.x) ** 2 + (other.z - row.z) ** 2 >=
-            (other.radius + row.radius) ** 2
+          (other.disposition === 'eligible') !== (row.disposition === 'eligible') ||
+          (other.x - row.x) ** 2 + (other.z - row.z) ** 2 >= (other.radius + row.radius) ** 2
         )
           continue;
         const otherRank = this.rank(other, viewer);
-        if (
-          otherRank < priority ||
-          (otherRank === priority && other.id < row.id)
-        ) {
+        if (otherRank < priority || (otherRank === priority && other.id < row.id)) {
           overlapsPrimary = true;
           break;
         }
@@ -383,17 +341,11 @@ export class RunesOfPowerVisuals {
       }
   }
   update(dt: number, reducedMotion = false): void {
-    if (!this.disposed)
-      for (const visual of this.active.values())
-        visual.update(dt, reducedMotion);
+    if (!this.disposed) for (const visual of this.active.values()) visual.update(dt, reducedMotion);
   }
   dispose(): void {
     this.disposed = true;
-    const owned = new Set([
-      ...this.active.values(),
-      ...this.pool,
-      ...this.pendingCleanup,
-    ]);
+    const owned = new Set([...this.active.values(), ...this.pool, ...this.pendingCleanup]);
     this.active.clear();
     this.pool.length = 0;
     this.pendingCleanup.clear();
@@ -406,7 +358,6 @@ export class RunesOfPowerVisuals {
         errors.push(error);
       }
     }
-    if (errors.length)
-      throw new AggregateError(errors, 'Rune field disposal failed');
+    if (errors.length) throw new AggregateError(errors, 'Rune field disposal failed');
   }
 }

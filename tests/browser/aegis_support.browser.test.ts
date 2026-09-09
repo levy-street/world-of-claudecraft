@@ -1,12 +1,12 @@
 import * as THREE from 'three';
+import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js';
-import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { expect, it, vi } from 'vitest';
 import { page } from 'vitest/browser';
+import { persistentClassVfxCompileTargets } from '../../src/render/ability_vfx/prewarm';
 import { PaladinAegisVisual } from '../../src/render/paladin_aegis_visual';
 import { SupportRecipientVisual } from '../../src/render/support_recipient_visual';
-import { persistentClassVfxCompileTargets } from '../../src/render/ability_vfx/prewarm';
 
 it('renders Aegis channel and distinct support recipients without first-cast shader links', async () => {
   await page.viewport(1040, 740);
@@ -17,12 +17,8 @@ it('renders Aegis channel and distinct support recipients without first-cast sha
   });
   renderer.setSize(1020, 700);
   document.body.appendChild(renderer.domElement);
-  const ktx = new KTX2Loader()
-    .setTranscoderPath('/basis/')
-    .detectSupport(renderer);
-  const loader = new GLTFLoader()
-    .setKTX2Loader(ktx)
-    .setMeshoptDecoder(MeshoptDecoder);
+  const ktx = new KTX2Loader().setTranscoderPath('/basis/').detectSupport(renderer);
+  const loader = new GLTFLoader().setKTX2Loader(ktx).setMeshoptDecoder(MeshoptDecoder);
   const body = await loader.loadAsync('/models/chars/players/paladin.glb');
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x1a202b);
@@ -47,8 +43,7 @@ it('renders Aegis channel and distinct support recipients without first-cast sha
   camera.lookAt(0, 0.2, 0);
   // Compile the exact boot targets, including instanced color attributes.
   const warm = new THREE.Group();
-  for (const target of persistentClassVfxCompileTargets())
-    warm.add(target.object.clone());
+  for (const target of persistentClassVfxCompileTargets()) warm.add(target.object.clone());
   warm.traverse((o) => {
     o.visible = true;
   });
@@ -97,11 +92,7 @@ it('renders Aegis channel and distinct support recipients without first-cast sha
     const crowd: SupportRecipientVisual[] = [];
     for (let i = 0; i < 40; i++) {
       const visual = new SupportRecipientVisual();
-      visual.group.position.set(
-        (i % 8) * 1.4 - 5,
-        0,
-        Math.floor(i / 8) * 1.4 - 3,
-      );
+      visual.group.position.set((i % 8) * 1.4 - 5, 0, Math.floor(i / 8) * 1.4 - 3);
       scene.add(visual.group);
       visual.update(i % 2 ? 2 : 1, 1.8, null);
       crowd.push(visual);

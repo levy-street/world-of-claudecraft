@@ -1,14 +1,13 @@
-import { runeOfPowerDispositionFor } from './combat/rune_of_power';
 import type {
   AccountCosmetics,
   ActionBarLayout,
   ActionBarLayoutRestore,
+  ActiveBlizzard,
   ActiveConsecration,
   ActiveFrostRing,
   ActiveHunterTrap,
-  ActiveTemporalHourglass,
-  ActiveBlizzard,
   ActiveRuneOfPower,
+  ActiveTemporalHourglass,
   BankBonusSource,
   CivicServicePlacement,
   CraftingIdentityView,
@@ -24,7 +23,6 @@ import type {
   ToolEffectSlotView,
 } from '../world_api';
 import type { GroundAimPointXZ } from '../world_api/combat';
-import { temporalHourglassDispositionFor } from './combat/temporal_hourglass';
 import * as bagsMod from './bags';
 import {
   addStacked,
@@ -48,6 +46,8 @@ import * as bankSocketsMod from './bank_sockets';
 import { extractTradableCopyImpl, grantTradableCopyImpl } from './broker_custody';
 import { campSpawnOffset } from './camp_scatter';
 import type { CharacterState, PetState } from './character_state';
+import { runeOfPowerDispositionFor } from './combat/rune_of_power';
+import { temporalHourglassDispositionFor } from './combat/temporal_hourglass';
 
 export type { CharacterState, PetState } from './character_state';
 
@@ -2001,12 +2001,15 @@ export class Sim {
     return raidReadouts.collectActiveVarkhulCinderOrbProjectiles(this.ctx);
   }
   get activeBlizzards(): ActiveBlizzard[] {
-    return groundAoeReadouts.collectActiveBlizzards(this.groundAoEs,
-      sourceId => { const source = this.entities.get(sourceId); return !!source && !source.dead; });
+    return groundAoeReadouts.collectActiveBlizzards(this.groundAoEs, (sourceId) => {
+      const source = this.entities.get(sourceId);
+      return !!source && !source.dead;
+    });
   }
   get activeRunesOfPower(): ActiveRuneOfPower[] {
-    return groundAoeReadouts.collectActiveRunesOfPower(this.groundAoEs,
-      (sourceId) => this.runeOfPowerDispositionFor(sourceId, this.playerId));
+    return groundAoeReadouts.collectActiveRunesOfPower(this.groundAoEs, (sourceId) =>
+      this.runeOfPowerDispositionFor(sourceId, this.playerId),
+    );
   }
 
   runeOfPowerDispositionFor(sourceId: number, viewerId: number) {
@@ -2014,8 +2017,9 @@ export class Sim {
   }
 
   get activeTemporalHourglasses(): ActiveTemporalHourglass[] {
-    return groundAoeReadouts.collectActiveTemporalHourglasses(this.groundAoEs,
-      (sourceId) => this.temporalHourglassDispositionFor(sourceId, this.playerId));
+    return groundAoeReadouts.collectActiveTemporalHourglasses(this.groundAoEs, (sourceId) =>
+      this.temporalHourglassDispositionFor(sourceId, this.playerId),
+    );
   }
   temporalHourglassDispositionFor(sourceId: number, viewerId: number) {
     return temporalHourglassDispositionFor(this.ctx, sourceId, viewerId);

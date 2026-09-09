@@ -1,4 +1,4 @@
-import type { TemporalHourglassDisposition } from "../world_api/combat";
+import type { TemporalHourglassDisposition } from '../world_api/combat';
 
 export const HOURGLASS_FIELD_STYLES = {
   protective: { color: 0x8ff7ff, spires: 4, height: 0.22, turn: Math.PI },
@@ -13,9 +13,7 @@ export function hourglassTickRadius(
   mode: TemporalHourglassDisposition,
 ): number {
   if (part === 0) return radius;
-  return (
-    radius - (mode === "protective" ? 0.24 : mode === "hostile" ? 0.1 : 0.15)
-  );
+  return radius - (mode === 'protective' ? 0.24 : mode === 'hostile' ? 0.1 : 0.15);
 }
 
 export function hourglassSandFraction(value: number): number {

@@ -20,8 +20,7 @@ export function supportRecipientBits(
   let bits = 0;
   for (const aura of auras) {
     if (!(aura.remaining > 0) || !(aura.value > 0)) continue;
-    if (aura.id === 'rune_of_power' && aura.kind === 'buff_dmg_done')
-      bits |= RUNE_RECIPIENT;
+    if (aura.id === 'rune_of_power' && aura.kind === 'buff_dmg_done') bits |= RUNE_RECIPIENT;
     if (kind !== 'player') continue;
     if (
       Number.isInteger(aura.sourceId) &&
@@ -29,11 +28,7 @@ export function supportRecipientBits(
       aura.kind === 'shield_wall'
     )
       bits |= AEGIS_RECIPIENT;
-    if (
-      aura.id === 'aegis_first_dawn_speed' &&
-      aura.kind === 'buff_speed' &&
-      aura.value > 1
-    )
+    if (aura.id === 'aegis_first_dawn_speed' && aura.kind === 'buff_speed' && aura.value > 1)
       bits |= DAWN_SPEED_RECIPIENT;
   }
   return bits;

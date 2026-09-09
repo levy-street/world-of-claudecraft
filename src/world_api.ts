@@ -227,20 +227,20 @@ export type {
 export type { CardMinigameInfo } from './world_api/card_minigame';
 export { isOverheadEmoteId, OVERHEAD_EMOTES } from './world_api/chat';
 export type {
+  ActiveBlizzard,
   ActiveConsecration,
   ActiveFrostRing,
   ActiveHunterTrap,
   ActiveIgnivarMeteorWarning,
-  ActiveTemporalHourglass,
-  ActiveBlizzard,
   ActiveRuneOfPower,
-  RuneOfPowerDisposition,
-  TemporalHourglassDisposition,
+  ActiveTemporalHourglass,
   ActiveVarkhulAnvilMeteorWarning,
   ActiveVarkhulAssembly,
   ActiveVarkhulCinderFire,
   ActiveVarkhulCinderOrbProjectile,
   ActiveVarkhulForgestormWarning,
+  RuneOfPowerDisposition,
+  TemporalHourglassDisposition,
 } from './world_api/combat';
 export type { AccountCosmetics } from './world_api/cosmetics';
 export type {

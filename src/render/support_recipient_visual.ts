@@ -1,12 +1,12 @@
 import * as THREE from 'three';
-import { markSharedGeometry } from './shared_resource';
 import { syncRigMatrixFreeze } from './rig_visibility_freeze';
+import { markSharedGeometry } from './shared_resource';
 import {
   AEGIS_RECIPIENT,
   DAWN_SPEED_RECIPIENT,
   RUNE_RECIPIENT,
-  supportRecipientBits,
   type SupportAura,
+  supportRecipientBits,
 } from './support_recipient_core';
 
 const CRYSTAL = markSharedGeometry(new THREE.OctahedronGeometry(1, 0));
@@ -14,24 +14,13 @@ const CRYSTAL = markSharedGeometry(new THREE.OctahedronGeometry(1, 0));
 function solarWardGeometry(): THREE.BufferGeometry {
   const positions: number[] = [],
     colors: number[] = [];
-  const triangle = (
-    a: number[],
-    b: number[],
-    c: number[],
-    brightness: number,
-  ) => {
+  const triangle = (a: number[], b: number[], c: number[], brightness: number) => {
     for (const point of [a, b, c]) {
       positions.push(point[0], point[1], 0.015);
       colors.push(brightness, brightness, brightness);
     }
   };
-  const quad = (
-    a: number[],
-    b: number[],
-    c: number[],
-    d: number[],
-    brightness: number,
-  ) => {
+  const quad = (a: number[], b: number[], c: number[], d: number[], brightness: number) => {
     triangle(a, b, c, brightness);
     triangle(a, c, d, brightness);
   };
@@ -46,13 +35,7 @@ function solarWardGeometry(): THREE.BufferGeometry {
   for (let i = 0; i < corners.length; i++) {
     const a = corners[i],
       b = corners[(i + 1) % corners.length];
-    quad(
-      a,
-      b,
-      [b[0] * 0.77, b[1] * 0.77],
-      [a[0] * 0.77, a[1] * 0.77],
-      i % 2 ? 0.7 : 1.35,
-    );
+    quad(a, b, [b[0] * 0.77, b[1] * 0.77], [a[0] * 0.77, a[1] * 0.77], i % 2 ? 0.7 : 1.35);
   }
   for (const sign of [-1, 1])
     for (let row = 0; row < 3; row++) {
@@ -87,46 +70,20 @@ function solarWardGeometry(): THREE.BufferGeometry {
     );
   }
   const geometry = markSharedGeometry(new THREE.BufferGeometry());
-  geometry.setAttribute(
-    'position',
-    new THREE.Float32BufferAttribute(positions, 3),
-  );
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
   geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
   geometry.computeVertexNormals();
   return geometry;
 }
 const SOLAR_WARD = solarWardGeometry();
-const NAMES = [
-  'lowerarm.l',
-  'hand.l',
-  'lowerarm.r',
-  'hand.r',
-  'chest',
-  'foot.l',
-  'foot.r',
-];
+const NAMES = ['lowerarm.l', 'hand.l', 'lowerarm.r', 'hand.r', 'chest', 'foot.l', 'foot.r'];
 
 /** Three class-specific silhouettes, attached to the beneficiary's current rig. */
 export class SupportRecipientVisual {
   readonly group = new THREE.Group();
-  readonly conduits = this.mesh(
-    CRYSTAL,
-    0xa897ff,
-    16,
-    'rune-recipient-conduits',
-  );
-  readonly wards = this.mesh(
-    SOLAR_WARD,
-    0xffcc58,
-    2,
-    'aegis-recipient-sunward',
-  );
-  readonly feathers = this.mesh(
-    CRYSTAL,
-    0xffedaa,
-    12,
-    'dawn-recipient-feathers',
-  );
+  readonly conduits = this.mesh(CRYSTAL, 0xa897ff, 16, 'rune-recipient-conduits');
+  readonly wards = this.mesh(SOLAR_WARD, 0xffcc58, 2, 'aegis-recipient-sunward');
+  readonly feathers = this.mesh(CRYSTAL, 0xffedaa, 12, 'dawn-recipient-feathers');
   private readonly dummy = new THREE.Object3D();
   private readonly inverse = new THREE.Matrix4();
   private readonly farTransform = new THREE.Matrix4();
@@ -150,12 +107,7 @@ export class SupportRecipientVisual {
     }
   }
 
-  private mesh(
-    geometry: THREE.BufferGeometry,
-    color: number,
-    count: number,
-    name: string,
-  ) {
+  private mesh(geometry: THREE.BufferGeometry, color: number, count: number, name: string) {
     const mesh = new THREE.InstancedMesh(
       geometry,
       new THREE.MeshBasicMaterial({
@@ -194,9 +146,7 @@ export class SupportRecipientVisual {
       for (let i = 0; i < NAMES.length; i++)
         this.bones[i] =
           rig?.getObjectByName(NAMES[i]) ??
-          rig?.getObjectByName(
-            THREE.PropertyBinding.sanitizeNodeName(NAMES[i]),
-          ) ??
+          rig?.getObjectByName(THREE.PropertyBinding.sanitizeNodeName(NAMES[i])) ??
           null;
     }
     this.group.updateWorldMatrix(true, false);
@@ -210,15 +160,7 @@ export class SupportRecipientVisual {
       for (let side = 0; side < 2; side++) {
         const sign = side === 0 ? 1 : -1;
         this.anchor(side * 2, this.a, sign * 0.36, 1.1, 0.02, size, farBody);
-        this.anchor(
-          side * 2 + 1,
-          this.b,
-          sign * 0.43,
-          0.74,
-          0.08,
-          size,
-          farBody,
-        );
+        this.anchor(side * 2 + 1, this.b, sign * 0.43, 0.74, 0.08, size, farBody);
         for (let j = 0; j < 8; j++) {
           const t = j / 7,
             angle = t * Math.PI * 2 + side * Math.PI;
@@ -251,15 +193,7 @@ export class SupportRecipientVisual {
     }
     if (this.feathers.visible) {
       for (let side = 0; side < 2; side++) {
-        this.anchor(
-          5 + side,
-          this.a,
-          side ? -0.16 : 0.16,
-          0.15,
-          0,
-          size,
-          farBody,
-        );
+        this.anchor(5 + side, this.a, side ? -0.16 : 0.16, 0.15, 0, size, farBody);
         for (let j = 0; j < 6; j++) {
           this.dummy.position
             .copy(this.a)
@@ -271,11 +205,7 @@ export class SupportRecipientVisual {
               ),
             );
           this.dummy.rotation.set(-0.5, 0, (side ? 1 : -1) * (0.1 + j * 0.19));
-          this.dummy.scale.set(
-            0.025 * size,
-            (0.11 + j * 0.018) * size,
-            0.025 * size,
-          );
+          this.dummy.scale.set(0.025 * size, (0.11 + j * 0.018) * size, 0.025 * size);
           this.write(this.feathers, side * 6 + j, farBody);
         }
       }
@@ -297,11 +227,7 @@ export class SupportRecipientVisual {
     else out.set(x * size, y * size, z * size);
   }
 
-  private write(
-    mesh: THREE.InstancedMesh,
-    index: number,
-    farBody: THREE.Object3D | null,
-  ): void {
+  private write(mesh: THREE.InstancedMesh, index: number, farBody: THREE.Object3D | null): void {
     this.dummy.updateMatrix();
     if (farBody) this.dummy.matrix.premultiply(this.farTransform);
     mesh.setMatrixAt(index, this.dummy.matrix);
@@ -324,8 +250,7 @@ export class SupportRecipientVisual {
         errors.push(error);
       }
     }
-    if (errors.length)
-      throw new AggregateError(errors, 'Support recipient cleanup failed');
+    if (errors.length) throw new AggregateError(errors, 'Support recipient cleanup failed');
   }
 }
 

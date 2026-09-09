@@ -6,8 +6,8 @@ import type { Substance } from './signature_core';
 import { buildWarriorArea, type WarriorAreaShape } from './warrior_area_shapes';
 import { warriorAvatarRuptureShape } from './warrior_avatar_rupture';
 import { buildWarriorBlade } from './warrior_blade_shape';
-import { buildWarriorHeavyShape, type WarriorHeavyShape } from './warrior_heavy_shapes';
 import { warriorGyreShape } from './warrior_gyre_shape';
+import { buildWarriorHeavyShape, type WarriorHeavyShape } from './warrior_heavy_shapes';
 import { warriorLeapShape } from './warrior_leap_shape';
 import { buildWarriorShield } from './warrior_shield_shape';
 import {

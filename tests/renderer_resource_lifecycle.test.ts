@@ -28,7 +28,14 @@ describe('renderer resource lifecycle', () => {
     };
 
     disposeRendererPrewarmAndGroundFx(
-      { prewarmDepthMaterials, mageGroundFx, warlockMeteorFx, hunterTrapVisuals, abilityVfxFx, vfx },
+      {
+        prewarmDepthMaterials,
+        mageGroundFx,
+        warlockMeteorFx,
+        hunterTrapVisuals,
+        abilityVfxFx,
+        vfx,
+      },
       bestEffort,
     );
 

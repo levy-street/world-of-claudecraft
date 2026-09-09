@@ -743,7 +743,9 @@ describe('bow skin attack animation (hunter draw instead of crossbow aim)', () =
     // precedence, since a displayed bow never changes how a melee hit is
     // thrown (second review round on PR #2958).
     visual.playAttack('raptor_strike');
-    expect((visual as unknown as ActionPeek).current?.getClip().name).toBe('Signature_raptor_strike');
+    expect((visual as unknown as ActionPeek).current?.getClip().name).toBe(
+      'Signature_raptor_strike',
+    );
 
     // A self-buff aspect toggle (range-agnostic, no swing) also keeps its
     // authored raise/buff ceremony with the same bow skin displayed. The

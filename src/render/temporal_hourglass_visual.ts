@@ -1,11 +1,11 @@
-import * as THREE from "three";
-import type { ActiveTemporalHourglass } from "../world_api";
-import { surfaceMat } from "./gfx";
-import { cloneMaterialWithHooks } from "./material_clone_hooks";
-import { HourglassFieldVisual } from "./hourglass_field_visual";
-import { hourglassSandFraction } from "./hourglass_field_core";
+import * as THREE from 'three';
+import type { ActiveTemporalHourglass } from '../world_api';
+import { surfaceMat } from './gfx';
+import { hourglassSandFraction } from './hourglass_field_core';
+import { HourglassFieldVisual } from './hourglass_field_visual';
+import { cloneMaterialWithHooks } from './material_clone_hooks';
 
-export type TemporalHourglassMode = "hostile" | "protective" | "unknown";
+export type TemporalHourglassMode = 'hostile' | 'protective' | 'unknown';
 
 const BASE_GEOMETRY = new THREE.CylinderGeometry(0.34, 0.38, 0.08, 12);
 const PILLAR_GEOMETRY = new THREE.CylinderGeometry(0.025, 0.025, 0.66, 6);
@@ -112,12 +112,12 @@ export class TemporalHourglassVisual {
   private readonly lowerSand: THREE.Mesh;
 
   constructor(showOverhead = true) {
-    this.group.name = "temporal-hourglass-visual";
+    this.group.name = 'temporal-hourglass-visual';
     this.group.visible = false;
 
     for (const [name, y] of [
-      ["bottom", 0.06],
-      ["top", 0.76],
+      ['bottom', 0.06],
+      ['top', 0.76],
     ] as const) {
       const base = new THREE.Mesh(BASE_GEOMETRY, this.materials.gold);
       base.name = `temporal-hourglass-${name}`;
@@ -134,43 +134,34 @@ export class TemporalHourglassVisual {
     }
 
     const upperGlass = new THREE.Mesh(GLASS_GEOMETRY, this.materials.glass);
-    upperGlass.name = "temporal-hourglass-upper-glass";
+    upperGlass.name = 'temporal-hourglass-upper-glass';
     upperGlass.position.y = 0.57;
     upperGlass.rotation.z = Math.PI;
     this.group.add(upperGlass);
     const lowerGlass = new THREE.Mesh(GLASS_GEOMETRY, this.materials.glass);
-    lowerGlass.name = "temporal-hourglass-lower-glass";
+    lowerGlass.name = 'temporal-hourglass-lower-glass';
     lowerGlass.position.y = 0.25;
     lowerGlass.rotation.z = 0;
     this.group.add(lowerGlass);
 
     this.energy = new THREE.Group();
-    this.energy.name = "temporal-hourglass-energy";
-    const upperSand = new THREE.Mesh(
-      SAND_GEOMETRY,
-      this.materials.protectiveEnergy,
-    );
+    this.energy.name = 'temporal-hourglass-energy';
+    const upperSand = new THREE.Mesh(SAND_GEOMETRY, this.materials.protectiveEnergy);
     this.upperSand = upperSand;
-    upperSand.name = "temporal-hourglass-upper-sand";
+    upperSand.name = 'temporal-hourglass-upper-sand';
     upperSand.position.y = 0.57;
     upperSand.rotation.z = Math.PI;
-    const lowerSand = new THREE.Mesh(
-      SAND_GEOMETRY,
-      this.materials.protectiveEnergy,
-    );
+    const lowerSand = new THREE.Mesh(SAND_GEOMETRY, this.materials.protectiveEnergy);
     this.lowerSand = lowerSand;
-    lowerSand.name = "temporal-hourglass-lower-sand";
+    lowerSand.name = 'temporal-hourglass-lower-sand';
     lowerSand.position.y = 0.19;
     lowerSand.rotation.z = 0;
     const ring = new THREE.Mesh(RING_GEOMETRY, this.materials.protectiveEnergy);
-    ring.name = "temporal-hourglass-ring";
+    ring.name = 'temporal-hourglass-ring';
     ring.rotation.x = Math.PI / 2;
     ring.position.y = 0.035;
-    const stream = new THREE.Mesh(
-      STREAM_GEOMETRY,
-      this.materials.protectiveEnergy,
-    );
-    stream.name = "temporal-hourglass-sand-stream";
+    const stream = new THREE.Mesh(STREAM_GEOMETRY, this.materials.protectiveEnergy);
+    stream.name = 'temporal-hourglass-sand-stream';
     stream.position.y = 0.39;
     this.energy.add(upperSand, lowerSand, ring, stream);
     this.group.add(this.energy);
@@ -184,7 +175,7 @@ export class TemporalHourglassVisual {
         blending: THREE.AdditiveBlending,
       }),
     );
-    this.overheadClock.name = "temporal-hourglass-overhead-clock";
+    this.overheadClock.name = 'temporal-hourglass-overhead-clock';
     this.overheadClock.visible = showOverhead;
     this.overheadClock.scale.set(0.9, 0.9, 1);
     if (showOverhead) this.group.add(this.overheadClock);
@@ -210,25 +201,19 @@ export class TemporalHourglassVisual {
     this.group.visible = mode !== null;
     if (!mode) return;
     const material =
-      mode === "protective"
+      mode === 'protective'
         ? this.materials.protectiveEnergy
-        : mode === "hostile"
+        : mode === 'hostile'
           ? this.materials.hostileEnergy
           : this.materials.unknownEnergy;
-    for (const child of this.energy.children)
-      (child as THREE.Mesh).material = material;
+    for (const child of this.energy.children) (child as THREE.Mesh).material = material;
     this.overheadClock.material.color.setHex(
-      mode === "protective"
-        ? 0x8ff7ff
-        : mode === "hostile"
-          ? 0xff7d9b
-          : 0xd4bc83,
+      mode === 'protective' ? 0x8ff7ff : mode === 'hostile' ? 0xff7d9b : 0xd4bc83,
     );
     this.overheadClock.position.y = height + 0.65;
     this.time += Math.max(0, dt);
-    this.group.rotation.y = this.time * (mode === "protective" ? 0.55 : -0.8);
-    this.overheadClock.material.rotation =
-      this.time * (mode === "protective" ? -2.2 : 3.4);
+    this.group.rotation.y = this.time * (mode === 'protective' ? 0.55 : -0.8);
+    this.overheadClock.material.rotation = this.time * (mode === 'protective' ? -2.2 : 3.4);
     const pulse = 1 + Math.sin(this.time * 5) * 0.045;
     // Pulse the overhead cue, never push sand through its glass container.
     this.overheadClock.scale.setScalar(0.9 * pulse);
@@ -293,7 +278,7 @@ export class TemporalHourglassGroundVisuals {
         current = this.pool.pop() ?? {
           visual: new TemporalHourglassVisual(false),
           field: new HourglassFieldVisual(),
-          mode: "unknown",
+          mode: 'unknown',
           duration: 0,
           elapsed: 0,
           lastRemaining: -1,
@@ -309,24 +294,9 @@ export class TemporalHourglassGroundVisuals {
         current.elapsed = Math.max(0, state.duration - state.remaining);
         current.lastRemaining = state.remaining;
       }
-      current.visual.group.position.set(
-        state.x,
-        this.groundY(state.x, state.z) + 0.04,
-        state.z,
-      );
-      current.visual.update(
-        current.mode,
-        0,
-        1.8,
-        state.remaining / state.duration,
-      );
-      current.field.update(
-        state.x,
-        state.z,
-        state.radius,
-        current.mode,
-        this.groundY,
-      );
+      current.visual.group.position.set(state.x, this.groundY(state.x, state.z) + 0.04, state.z);
+      current.visual.update(current.mode, 0, 1.8, state.remaining / state.duration);
+      current.field.update(state.x, state.z, state.radius, current.mode, this.groundY);
     }
     for (const [id, current] of this.active) {
       if (this.ids.has(id)) continue;

@@ -26,12 +26,7 @@
       "recommendedRuntimeGain": 0.28,
       "randomPitchRecommended": false,
       "description": "Contained furnace pressure, tearing flame launch, deep combustion and falling cinders",
-      "layers": [
-        "furnace_pressure",
-        "turbulent_flame",
-        "ember_crackle",
-        "contained_resonance"
-      ],
+      "layers": ["furnace_pressure", "turbulent_flame", "ember_crackle", "contained_resonance"],
       "stemGainVsMixInput": 0.6,
       "mixProcessing": "Sum layers; spectral 25Hz highpass/17.5kHz lowpass; tanh saturation; -8dBFS source sample peak; one-shot edge fades; linear peak-constrained loudness normalization and canonical conformance checks during packaging",
       "masterSha256": "2cb0b8c1c2cdd4f1f7a9275d04ee7bd88da86bb4903d722e821850c7b93d6e63",
@@ -143,12 +138,7 @@
       "recommendedRuntimeGain": 0.28,
       "randomPitchRecommended": false,
       "description": "Crystalline stress, radial ice fracture, irregular shards and cold airborne dust",
-      "layers": [
-        "frozen_air",
-        "ice_tension",
-        "crystal_growth",
-        "deep_glacial_stress"
-      ],
+      "layers": ["frozen_air", "ice_tension", "crystal_growth", "deep_glacial_stress"],
       "stemGainVsMixInput": 0.6,
       "mixProcessing": "Sum layers; spectral 25Hz highpass/17.5kHz lowpass; tanh saturation; -8dBFS source sample peak; one-shot edge fades; linear peak-constrained loudness normalization and canonical conformance checks during packaging",
       "masterSha256": "5f755bc14f892857f3d9cb81da86930836ffc82042c235515226767c5a454b72",
@@ -260,12 +250,7 @@
       "recommendedRuntimeGain": 0.28,
       "randomPitchRecommended": false,
       "description": "Coronal charge, braided electrical discharge, branching crack and rolling thunder",
-      "layers": [
-        "corona_hiss",
-        "charged_coil",
-        "arcing_contacts",
-        "electrical_pressure"
-      ],
+      "layers": ["corona_hiss", "charged_coil", "arcing_contacts", "electrical_pressure"],
       "stemGainVsMixInput": 0.6,
       "mixProcessing": "Sum layers; spectral 25Hz highpass/17.5kHz lowpass; tanh saturation; -8dBFS source sample peak; one-shot edge fades; linear peak-constrained loudness normalization and canonical conformance checks during packaging",
       "masterSha256": "140a33eb8c345fa68238c18fd26926c854925c4fc0e18d362d01248fa0e7534d",
@@ -377,12 +362,7 @@
       "recommendedRuntimeGain": 0.28,
       "randomPitchRecommended": false,
       "description": "Suspended water circulation, fluid ribbon release, restorative liquid bloom and droplets",
-      "layers": [
-        "flowing_water",
-        "suspended_droplets",
-        "water_cavity",
-        "fine_water_fizz"
-      ],
+      "layers": ["flowing_water", "suspended_droplets", "water_cavity", "fine_water_fizz"],
       "stemGainVsMixInput": 0.6,
       "mixProcessing": "Sum layers; spectral 25Hz highpass/17.5kHz lowpass; tanh saturation; -8dBFS source sample peak; one-shot edge fades; linear peak-constrained loudness normalization and canonical conformance checks during packaging",
       "masterSha256": "c0a1ae070ee2cc5d3724abface7654bd5b4659b0ee85c57f2dc1a1c0bae77d77",
@@ -494,12 +474,7 @@
       "recommendedRuntimeGain": 0.28,
       "randomPitchRecommended": false,
       "description": "Breathy spectral gathering, organic wolf-like formant motion, soft transformation and spirit wake",
-      "layers": [
-        "spectral_breath",
-        "organic_formant",
-        "fur_rush",
-        "spirit_pressure"
-      ],
+      "layers": ["spectral_breath", "organic_formant", "fur_rush", "spirit_pressure"],
       "stemGainVsMixInput": 0.6,
       "mixProcessing": "Sum layers; spectral 25Hz highpass/17.5kHz lowpass; tanh saturation; -8dBFS source sample peak; one-shot edge fades; linear peak-constrained loudness normalization and canonical conformance checks during packaging",
       "masterSha256": "da3da980d62f57acc510d3cac248c1046d1de981eaba4b51061d9be827dc3d03",
@@ -622,12 +597,7 @@
       "recommendedRuntimeGain": 0.28,
       "randomPitchRecommended": false,
       "description": "Suspended radiant metal, broad air-cut, deep struck bronze and luminous alloy resonance",
-      "layers": [
-        "suspended_alloy",
-        "radiant_pressure",
-        "metallic_glints",
-        "air_lift"
-      ],
+      "layers": ["suspended_alloy", "radiant_pressure", "metallic_glints", "air_lift"],
       "stemGainVsMixInput": 0.6,
       "mixProcessing": "Sum layers; spectral 25Hz highpass/17.5kHz lowpass; tanh saturation; -8dBFS source sample peak; one-shot edge fades; linear peak-constrained loudness normalization and canonical conformance checks during packaging",
       "masterSha256": "1ccfdb33ed63a0a84c94381135159494e7bb54d42136f0d26abd6a84e4ddab41",
@@ -739,12 +709,7 @@
       "recommendedRuntimeGain": 0.28,
       "randomPitchRecommended": false,
       "description": "Tensioned steel and leather movement, accelerating heavy blade, dry contact and falling grit",
-      "layers": [
-        "tensioned_steel",
-        "leather_weight_shift",
-        "blade_stress",
-        "grip_friction"
-      ],
+      "layers": ["tensioned_steel", "leather_weight_shift", "blade_stress", "grip_friction"],
       "stemGainVsMixInput": 0.6,
       "mixProcessing": "Sum layers; spectral 25Hz highpass/17.5kHz lowpass; tanh saturation; -8dBFS source sample peak; one-shot edge fades; linear peak-constrained loudness normalization and canonical conformance checks during packaging",
       "masterSha256": "2d736057069bf4244f93fa4562624cc4f276d6e341643b74a1658980db0553cf",
@@ -856,12 +821,7 @@
       "recommendedRuntimeGain": 0.28,
       "randomPitchRecommended": false,
       "description": "Hollow spatial pressure, twisting torn-air release, implosive cavity and unstable dark residue",
-      "layers": [
-        "void_cavity",
-        "twisting_air",
-        "ragged_boundary",
-        "unstable_residue"
-      ],
+      "layers": ["void_cavity", "twisting_air", "ragged_boundary", "unstable_residue"],
       "stemGainVsMixInput": 0.6,
       "mixProcessing": "Sum layers; spectral 25Hz highpass/17.5kHz lowpass; tanh saturation; -8dBFS source sample peak; one-shot edge fades; linear peak-constrained loudness normalization and canonical conformance checks during packaging",
       "masterSha256": "029f624ba81c2fd9d9e718491ca26d5397728ff8035eb939d42c4fd7100df099",

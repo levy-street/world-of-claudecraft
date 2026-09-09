@@ -1,12 +1,12 @@
 import type { IWorld } from '../world_api';
 import {
-  decodeConsecrations,
   decodeBlizzards,
+  decodeConsecrations,
   decodeFrostRings,
   decodeHunterTraps,
   decodeIgnivarMeteors,
-  decodeTemporalHourglasses,
   decodeRunesOfPower,
+  decodeTemporalHourglasses,
   decodeVarkhulForgestormWarnings,
 } from './ground_telegraph_wire';
 import { decodeVarkhulAnvilMeteors, decodeVarkhulAssemblies } from './varkhul_assembly_wire';

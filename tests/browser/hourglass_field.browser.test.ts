@@ -1,16 +1,16 @@
-import * as THREE from "three";
-import { expect, it, vi } from "vitest";
-import { page } from "vitest/browser";
-import { ABILITY_MATERIAL_SOURCES } from "../../src/render/ability_material_prewarm";
-import { gfxInternalsForTest } from "../../src/render/gfx";
+import * as THREE from 'three';
+import { expect, it, vi } from 'vitest';
+import { page } from 'vitest/browser';
+import { ABILITY_MATERIAL_SOURCES } from '../../src/render/ability_material_prewarm';
+import { gfxInternalsForTest } from '../../src/render/gfx';
 import {
-  TemporalHourglassGroundVisuals,
   resetTemporalHourglassProfileCaches,
-} from "../../src/render/temporal_hourglass_visual";
+  TemporalHourglassGroundVisuals,
+} from '../../src/render/temporal_hourglass_visual';
 
-it("shows distinct clockwork capture states at combat camera and reuses prepared graphics variants", async () => {
+it('shows distinct clockwork capture states at combat camera and reuses prepared graphics variants', async () => {
   await page.viewport(920, 640);
-  const errors = vi.spyOn(console, "error");
+  const errors = vi.spyOn(console, 'error');
   const renderer = new THREE.WebGLRenderer({
     antialias: true,
     preserveDrawingBuffer: true,
@@ -34,8 +34,7 @@ it("shows distinct clockwork capture states at combat camera and reuses prepared
   camera.position.set(5, 6, 7);
   camera.lookAt(0, 0.2, 0);
   const entries = ABILITY_MATERIAL_SOURCES.filter(
-    (source) =>
-      source.id === "temporal-hourglass" || source.id === "hourglass-field",
+    (source) => source.id === 'temporal-hourglass' || source.id === 'hourglass-field',
   );
   let preparedCount = 0;
   try {
@@ -52,14 +51,10 @@ it("shows distinct clockwork capture states at combat camera and reuses prepared
       await renderer.compileAsync(warm, camera, scene);
       const fx = new TemporalHourglassGroundVisuals(scene, () => 0);
       try {
-        for (const disposition of [
-          "protective",
-          "hostile",
-          "unknown",
-        ] as const) {
+        for (const disposition of ['protective', 'hostile', 'unknown'] as const) {
           fx.sync([
             {
-              id: "trap",
+              id: 'trap',
               sourceId: 1,
               disposition,
               x: 0,
@@ -71,10 +66,9 @@ it("shows distinct clockwork capture states at combat camera and reuses prepared
           ]);
           fx.update(0);
           renderer.render(scene, camera);
-          if (tier === 1 && disposition === "unknown")
+          if (tier === 1 && disposition === 'unknown')
             preparedCount = renderer.info.programs?.length ?? 0;
-          if (tier > 1)
-            expect(renderer.info.programs?.length).toBe(preparedCount);
+          if (tier > 1) expect(renderer.info.programs?.length).toBe(preparedCount);
           if (tier === 1)
             await page.screenshot({
               path: `../../docs/screenshots/hourglass-field-${disposition}.png`,
@@ -82,9 +76,7 @@ it("shows distinct clockwork capture states at combat camera and reuses prepared
         }
         fx.sync([]);
         renderer.render(scene, camera);
-        expect(
-          scene.getObjectByName("temporal-hourglass-visual"),
-        ).toBeUndefined();
+        expect(scene.getObjectByName('temporal-hourglass-visual')).toBeUndefined();
       } finally {
         fx.dispose();
         restore();

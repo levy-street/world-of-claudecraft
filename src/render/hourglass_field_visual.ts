@@ -1,18 +1,12 @@
-import * as THREE from "three";
-import type { TemporalHourglassDisposition } from "../world_api/combat";
-import {
-  HOURGLASS_FIELD_STYLES,
-  hourglassTickRadius,
-} from "./hourglass_field_core";
-import { markSharedGeometry, markSharedMaterial } from "./shared_resource";
+import * as THREE from 'three';
+import type { TemporalHourglassDisposition } from '../world_api/combat';
+import { HOURGLASS_FIELD_STYLES, hourglassTickRadius } from './hourglass_field_core';
+import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 
 const TICK = markSharedGeometry(new THREE.BoxGeometry(1, 1, 1));
 TICK.setAttribute(
-  "color",
-  new THREE.BufferAttribute(
-    new Float32Array(TICK.getAttribute("position").count * 3).fill(1),
-    3,
-  ),
+  'color',
+  new THREE.BufferAttribute(new Float32Array(TICK.getAttribute('position').count * 3).fill(1), 3),
 );
 // Pierced clock hands: a narrow waist, split shoulder and open jewel socket.
 // Facet shading remains legible in the inexpensive material profile too.
@@ -49,26 +43,22 @@ function clockHandGeometry(): THREE.BufferGeometry {
     steps: 1,
   });
   geometry.translate(0, 0, -0.017);
-  const normal = geometry.getAttribute("normal"),
-    position = geometry.getAttribute("position");
+  const normal = geometry.getAttribute('normal'),
+    position = geometry.getAttribute('position');
   const colors = new Float32Array(normal.count * 3);
   for (let i = 0; i < normal.count; i++) {
     const value = Math.min(
       1,
-      0.46 +
-        Math.abs(normal.getZ(i)) * 0.38 +
-        Math.max(0, position.getY(i)) * 0.5,
+      0.46 + Math.abs(normal.getZ(i)) * 0.38 + Math.max(0, position.getY(i)) * 0.5,
     );
     colors.set([value, value, value], i * 3);
   }
-  geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
   geometry.clearGroups();
   return markSharedGeometry(geometry);
 }
 const TOOTH = clockHandGeometry();
-const INK = markSharedMaterial(
-  new THREE.MeshBasicMaterial({ color: 0x172333 }),
-);
+const INK = markSharedMaterial(new THREE.MeshBasicMaterial({ color: 0x172333 }));
 const COLORS = new Map<TemporalHourglassDisposition, THREE.MeshBasicMaterial>();
 export function hourglassFieldMaterial(
   mode: TemporalHourglassDisposition,
@@ -90,17 +80,9 @@ export function hourglassFieldMaterial(
  * neutral double ticks. The central hourglass stays the class identity. */
 export class HourglassFieldVisual {
   readonly group = new THREE.Group();
-  readonly ticks = new THREE.InstancedMesh(
-    TICK,
-    hourglassFieldMaterial("unknown"),
-    36,
-  );
+  readonly ticks = new THREE.InstancedMesh(TICK, hourglassFieldMaterial('unknown'), 36);
   readonly backing = new THREE.InstancedMesh(TICK, INK, 36);
-  readonly spires = new THREE.InstancedMesh(
-    TOOTH,
-    hourglassFieldMaterial("unknown"),
-    12,
-  );
+  readonly spires = new THREE.InstancedMesh(TOOTH, hourglassFieldMaterial('unknown'), 12);
   private readonly pose = new THREE.Object3D();
   private lastX = NaN;
   private lastZ = NaN;
@@ -109,9 +91,8 @@ export class HourglassFieldVisual {
   private disposed = false;
 
   constructor() {
-    this.group.name = "temporal-hourglass-capture-edge";
-    for (const mesh of [this.ticks, this.backing, this.spires])
-      mesh.frustumCulled = false;
+    this.group.name = 'temporal-hourglass-capture-edge';
+    for (const mesh of [this.ticks, this.backing, this.spires]) mesh.frustumCulled = false;
     this.group.add(this.backing, this.ticks, this.spires);
   }
 
@@ -147,14 +128,10 @@ export class HourglassFieldVisual {
         this.pose.position.set(px, groundY(px, pz) + 0.075, pz);
         this.pose.rotation.set(
           0,
-          -a + (part === 0 ? 0 : mode === "protective" ? side * 0.65 : 0),
+          -a + (part === 0 ? 0 : mode === 'protective' ? side * 0.65 : 0),
           0,
         );
-        this.pose.scale.set(
-          part === 0 ? 0.065 : 0.21,
-          0.035,
-          hour % 3 === 0 ? 0.12 : 0.07,
-        );
+        this.pose.scale.set(part === 0 ? 0.065 : 0.21, 0.035, hour % 3 === 0 ? 0.12 : 0.07);
         this.pose.updateMatrix();
         this.ticks.setMatrixAt(hour * 3 + part, this.pose.matrix);
         this.pose.position.y -= 0.023;

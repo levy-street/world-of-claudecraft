@@ -2763,12 +2763,14 @@ export function runEffects(
               talentDmgMult,
             ) * thundercallMult,
           allyBuffPct: eff.allyBuffPct,
-          blizzard: ability.id === 'blizzard'
-            ? { id: `blizzard:${p.id}:${ctx.tickCount}`, duration: eff.duration }
-            : undefined,
-          runeOfPower: ability.id === 'rune_of_power'
-            ? { id: `rune:${p.id}:${ctx.tickCount}`, duration: eff.duration }
-            : undefined,
+          blizzard:
+            ability.id === 'blizzard'
+              ? { id: `blizzard:${p.id}:${ctx.tickCount}`, duration: eff.duration }
+              : undefined,
+          runeOfPower:
+            ability.id === 'rune_of_power'
+              ? { id: `rune:${p.id}:${ctx.tickCount}`, duration: eff.duration }
+              : undefined,
           igniteFrac: eff.igniteFrac,
           slowMult: eff.slowMult,
           slowDuration: eff.slowDuration,

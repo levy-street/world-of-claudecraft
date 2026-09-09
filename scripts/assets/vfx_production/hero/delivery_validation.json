@@ -2,16 +2,10 @@
   "effects": {
     "pyroblast": {
       "source_frames": 64,
-      "source_resolution": [
-        744,
-        744
-      ],
+      "source_resolution": [744, 744],
       "source_png_bit_depth": 16,
       "source_png_color_type": "RGBA",
-      "runtime_dimensions": [
-        4096,
-        4096
-      ],
+      "runtime_dimensions": [4096, 4096],
       "runtime_bytes": 2204226,
       "webp_quality": 90,
       "runtime_sha256": "3cb9b1dacfb6674abb4182b47fc44d9164e9c746cdef423e6fd05809d07faaa7",
@@ -27,16 +21,10 @@
     },
     "frost_nova": {
       "source_frames": 64,
-      "source_resolution": [
-        744,
-        744
-      ],
+      "source_resolution": [744, 744],
       "source_png_bit_depth": 16,
       "source_png_color_type": "RGBA",
-      "runtime_dimensions": [
-        4096,
-        4096
-      ],
+      "runtime_dimensions": [4096, 4096],
       "runtime_bytes": 2271474,
       "webp_quality": 90,
       "runtime_sha256": "4fd0e06cc6602ac41f8c413fef9185664734ac262bf24f81700cf27cb9d89546",
@@ -52,16 +40,10 @@
     },
     "chain_heal": {
       "source_frames": 64,
-      "source_resolution": [
-        744,
-        744
-      ],
+      "source_resolution": [744, 744],
       "source_png_bit_depth": 16,
       "source_png_color_type": "RGBA",
-      "runtime_dimensions": [
-        4096,
-        4096
-      ],
+      "runtime_dimensions": [4096, 4096],
       "runtime_bytes": 2220696,
       "webp_quality": 90,
       "runtime_sha256": "3c1e1cf0903ffb8e7c6b22ac69dd2c838a30cb011d957f4bd2a92d94833e55e0",

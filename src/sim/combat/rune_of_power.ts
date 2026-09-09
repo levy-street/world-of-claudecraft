@@ -12,7 +12,6 @@ export function runeOfPowerDispositionFor(
     viewer = ctx.entities.get(viewerId);
   if (!source || !viewer || viewer.dead || viewer.hp <= 0) return 'unknown';
   if (source.dead || source.hp <= 0) return 'inactive';
-  if (source.id === viewer.id || ctx.isFriendlyTo(source, viewer))
-    return 'eligible';
+  if (source.id === viewer.id || ctx.isFriendlyTo(source, viewer)) return 'eligible';
   return ctx.isHostileTo(source, viewer) ? 'opponent' : 'unknown';
 }

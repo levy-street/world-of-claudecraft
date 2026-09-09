@@ -7,12 +7,12 @@
 import type { ActiveIgnivarMeteorWarning } from '../sim/ignivar_meteors';
 import type { ActiveVarkhulForgestormWarning } from '../sim/varkhul_forgestorm';
 import type {
+  ActiveBlizzard,
   ActiveConsecration,
   ActiveFrostRing,
   ActiveHunterTrap,
-  ActiveTemporalHourglass,
   ActiveRuneOfPower,
-  ActiveBlizzard,
+  ActiveTemporalHourglass,
 } from '../world_api/combat';
 
 export function decodeRunesOfPower(value: unknown): ActiveRuneOfPower[] {
@@ -20,17 +20,41 @@ export function decodeRunesOfPower(value: unknown): ActiveRuneOfPower[] {
   return value.flatMap((entry: unknown): ActiveRuneOfPower[] => {
     if (!entry || typeof entry !== 'object') return [];
     const row = entry as Record<string, unknown>;
-    if (typeof row.id !== 'string' || !row.id.length || row.id.length > 160 ||
-      ![row.x, row.z, row.r, row.dur, row.rem].every(n => typeof n === 'number' && Number.isFinite(n)) ||
-      (row.r as number) <= 0 || (row.dur as number) <= 0 || (row.rem as number) <= 0) return [];
-    const sourceId = Number.isSafeInteger(row.sourceId) && (row.sourceId as number) > 0
-      ? row.sourceId as number : null;
-    const disposition = sourceId !== null &&
-      (row.disposition === 'eligible' || row.disposition === 'opponent' || row.disposition === 'inactive')
-      ? row.disposition : 'unknown';
-    return [{ id: row.id, sourceId, disposition, x: row.x as number, z: row.z as number,
-      radius: row.r as number, duration: row.dur as number,
-      remaining: Math.min(row.rem as number, row.dur as number) }];
+    if (
+      typeof row.id !== 'string' ||
+      !row.id.length ||
+      row.id.length > 160 ||
+      ![row.x, row.z, row.r, row.dur, row.rem].every(
+        (n) => typeof n === 'number' && Number.isFinite(n),
+      ) ||
+      (row.r as number) <= 0 ||
+      (row.dur as number) <= 0 ||
+      (row.rem as number) <= 0
+    )
+      return [];
+    const sourceId =
+      Number.isSafeInteger(row.sourceId) && (row.sourceId as number) > 0
+        ? (row.sourceId as number)
+        : null;
+    const disposition =
+      sourceId !== null &&
+      (row.disposition === 'eligible' ||
+        row.disposition === 'opponent' ||
+        row.disposition === 'inactive')
+        ? row.disposition
+        : 'unknown';
+    return [
+      {
+        id: row.id,
+        sourceId,
+        disposition,
+        x: row.x as number,
+        z: row.z as number,
+        radius: row.r as number,
+        duration: row.dur as number,
+        remaining: Math.min(row.rem as number, row.dur as number),
+      },
+    ];
   });
 }
 
@@ -249,14 +273,34 @@ export function decodeBlizzards(value: unknown): ActiveBlizzard[] {
   return value.flatMap((entry: unknown): ActiveBlizzard[] => {
     if (!entry || typeof entry !== 'object') return [];
     const row = entry as Record<string, unknown>;
-    if (typeof row.id !== 'string' || !row.id.length || row.id.length > 160 ||
+    if (
+      typeof row.id !== 'string' ||
+      !row.id.length ||
+      row.id.length > 160 ||
       typeof row.active !== 'boolean' ||
-      ![row.x, row.z, row.r, row.dur, row.rem].every(n => typeof n === 'number' && Number.isFinite(n)) ||
-      (row.r as number) <= 0 || (row.dur as number) <= 0 || (row.rem as number) <= 0) return [];
-    const sourceId = Number.isSafeInteger(row.sourceId) && (row.sourceId as number) > 0
-      ? row.sourceId as number : null;
-    return [{ id: row.id, sourceId, active: sourceId !== null && row.active,
-      x: row.x as number, z: row.z as number, radius: row.r as number,
-      duration: row.dur as number, remaining: Math.min(row.rem as number, row.dur as number) }];
+      ![row.x, row.z, row.r, row.dur, row.rem].every(
+        (n) => typeof n === 'number' && Number.isFinite(n),
+      ) ||
+      (row.r as number) <= 0 ||
+      (row.dur as number) <= 0 ||
+      (row.rem as number) <= 0
+    )
+      return [];
+    const sourceId =
+      Number.isSafeInteger(row.sourceId) && (row.sourceId as number) > 0
+        ? (row.sourceId as number)
+        : null;
+    return [
+      {
+        id: row.id,
+        sourceId,
+        active: sourceId !== null && row.active,
+        x: row.x as number,
+        z: row.z as number,
+        radius: row.r as number,
+        duration: row.dur as number,
+        remaining: Math.min(row.rem as number, row.dur as number),
+      },
+    ];
   });
 }

@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import type { SimEvent } from '../src/sim/types';
-import { Sim } from '../src/sim/sim';
-import { EMPTY_TEST_WORLD } from './sim_shared';
-import { bareClient } from './helpers/bare_client';
-import { groundTelegraphWorld, groundTelegraphWireJson } from '../server/ground_telegraph_wire';
-import { decodeBlizzards } from '../src/net/ground_telegraph_wire';
+import { groundTelegraphWireJson, groundTelegraphWorld } from '../server/ground_telegraph_wire';
 import { applyGroundTelegraphSnapshot } from '../src/net/ground_snapshot';
+import { decodeBlizzards } from '../src/net/ground_telegraph_wire';
+import { Sim } from '../src/sim/sim';
+import type { SimEvent } from '../src/sim/types';
+import { bareClient } from './helpers/bare_client';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 function placed() {
   const sim = new Sim({ seed: 147, playerClass: 'mage', world: EMPTY_TEST_WORLD });

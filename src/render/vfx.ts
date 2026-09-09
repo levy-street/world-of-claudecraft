@@ -1522,15 +1522,18 @@ export class Vfx {
       const up = Math.random() * 0.9 + 0.1;
       const sp = (2 + Math.random() * 4.5) * power;
       // fire bursts read as flame puffs; everything else as spark showers
-      const sprite = school === 'blood' ? SPR.debris : isFire
-        ? i % 3 === 0
-          ? SPR.firePuff
-          : SPR.flame
-        : i % 3 === 0
-          ? SPR.star
-          : i % 2 === 0
-            ? SPR.sparkle
-            : SPR.sparkBurst;
+      const sprite =
+        school === 'blood'
+          ? SPR.debris
+          : isFire
+            ? i % 3 === 0
+              ? SPR.firePuff
+              : SPR.flame
+            : i % 3 === 0
+              ? SPR.star
+              : i % 2 === 0
+                ? SPR.sparkle
+                : SPR.sparkBurst;
       this.spawn(
         at.x,
         at.y,

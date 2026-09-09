@@ -27,13 +27,15 @@ export type CastPurpose =
   | 'lowstrike'
   | 'brace';
 const GROUPS: Readonly<Partial<Record<CastPurpose, string>>> = {
-  brace: 'feral_charge iron_resolve furious_mending bloodrage sweeping_strikes battle_stance berserker_stance defensive_stance cold_blood blade_flurry sprint',
+  brace:
+    'feral_charge iron_resolve furious_mending bloodrage sweeping_strikes battle_stance berserker_stance defensive_stance cold_blood blade_flurry sprint',
   bolt: 'chain_lightning smite fireball frostbolt shadow_bolt lightning_bolt wrath immolate searing_pain',
   lance: 'pyroblast glacial_spike mercy_lance soul_lance needle_of_fate chaos_bolt sunlance',
   flick:
     'venom_dart melting_acid scorch fire_blast ice_lance flurry conflagrate shadowburn flame_shock frost_shock',
   call: 'hour_of_judgment blizzard flamestrike meteor starfire rain_of_fire summon_infernal sun_gods_verdict valkyrs_calling',
-  place: 'smoke_screen rings_of_frost rune_of_power temporal_hourglass soulwell evil_eye earthbind consecration',
+  place:
+    'smoke_screen rings_of_frost rune_of_power temporal_hourglass soulwell evil_eye earthbind consecration',
   shape:
     'conjure_food conjure_water polymorph frozen_orb temporal_echo temporal_cascade arcane_surge arcane_missiles',
   ward: 'shellskin frost_armor temporal_barrier blazing_barrier ice_barrier mass_barrier power_word_shield seraphic_vigil martyrs_aegis demon_skin bone_armor cinderhide lightning_shield stoneward thorns barkskin mark_of_the_wild divine_protection holy_shield bastion_rite devotion_ward faithforged_guard aegis_first_dawn guardian_covenant',
@@ -70,9 +72,17 @@ export const CAST_PERFORMANCES: Readonly<Record<string, CastPurpose>> = Object.f
 export function castClass(key: string): string | null {
   const cls = key.replace(/^player_/, '').replace(/_modular$/, '');
   if (key === 'form_moonkin') return 'druid';
-  return ['mage', 'priest', 'warlock', 'shaman', 'druid', 'paladin', 'hunter', 'rogue', 'warrior'].includes(
-    cls,
-  )
+  return [
+    'mage',
+    'priest',
+    'warlock',
+    'shaman',
+    'druid',
+    'paladin',
+    'hunter',
+    'rogue',
+    'warrior',
+  ].includes(cls)
     ? cls
     : null;
 }

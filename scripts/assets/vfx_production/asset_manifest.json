@@ -6,10 +6,7 @@
     "master_file": "smoke_atlas.png",
     "source_blend": "smoke.blend",
     "source_script": "bake_assets.py",
-    "dimensions_px": [
-      2048,
-      2048
-    ],
+    "dimensions_px": [2048, 2048],
     "frame_count": 64,
     "fps": 30,
     "duration_seconds": 2.1333333333333333,
@@ -18,14 +15,8 @@
       "rows": 8,
       "order": "row-major, left-to-right, top-to-bottom"
     },
-    "tile_px": [
-      256,
-      256
-    ],
-    "content_px": [
-      248,
-      248
-    ],
+    "tile_px": [256, 256],
+    "content_px": [248, 248],
     "gutter_px": 4,
     "uv_rect_formula": {
       "u0": "((frame % 8)*256+4)/2048",
@@ -33,10 +24,7 @@
       "du": "248/2048",
       "dv": "248/2048"
     },
-    "pivot_uv_tile_top_origin": [
-      0.5,
-      0.8739120303666997
-    ],
+    "pivot_uv_tile_top_origin": [0.5, 0.8739120303666997],
     "color_space": "sRGB RGB; linear alpha",
     "alpha": "straight / unassociated",
     "channels": "neutral grayscale RGB for tinting; opacity in A",
@@ -51,10 +39,7 @@
       "application": "Blender 5.2.1",
       "engine": "EEVEE",
       "samples": 32,
-      "supersampled_frame_px": [
-        496,
-        496
-      ],
+      "supersampled_frame_px": [496, 496],
       "density": "Animated analytic volume with advected multiscale procedural turbulence",
       "lighting": "Three white area lights; volumetric self-shadowing"
     }
@@ -66,10 +51,7 @@
     "master_file": "shockwave_atlas.png",
     "source_blend": "shockwave.blend",
     "source_script": "bake_assets.py",
-    "dimensions_px": [
-      2048,
-      2048
-    ],
+    "dimensions_px": [2048, 2048],
     "frame_count": 64,
     "fps": 30,
     "duration_seconds": 2.1333333333333333,
@@ -78,14 +60,8 @@
       "rows": 8,
       "order": "row-major, left-to-right, top-to-bottom"
     },
-    "tile_px": [
-      256,
-      256
-    ],
-    "content_px": [
-      248,
-      248
-    ],
+    "tile_px": [256, 256],
+    "content_px": [248, 248],
     "gutter_px": 4,
     "uv_rect_formula": {
       "u0": "((frame % 8)*256+4)/2048",
@@ -93,10 +69,7 @@
       "du": "248/2048",
       "dv": "248/2048"
     },
-    "pivot_uv_tile_top_origin": [
-      0.5,
-      0.5
-    ],
+    "pivot_uv_tile_top_origin": [0.5, 0.5],
     "color_space": "sRGB RGB; linear alpha",
     "alpha": "straight / unassociated",
     "channels": "neutral grayscale RGB for tinting; opacity in A",
@@ -111,10 +84,7 @@
       "application": "Blender 5.2.1",
       "engine": "EEVEE",
       "samples": 32,
-      "supersampled_frame_px": [
-        496,
-        496
-      ],
+      "supersampled_frame_px": [496, 496],
       "density": "Animated analytic volume with advected multiscale procedural turbulence",
       "lighting": "Three white area lights; volumetric self-shadowing"
     }

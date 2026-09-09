@@ -1,13 +1,7 @@
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
-import {
-  RuneOfPowerVisual,
-  RunesOfPowerVisuals,
-} from '../src/render/rune_of_power_visual';
-import {
-  MageGroundFx,
-  handleMageGroundSpellfxEvent,
-} from '../src/render/mage_ground_fx';
+import { handleMageGroundSpellfxEvent, MageGroundFx } from '../src/render/mage_ground_fx';
+import { RuneOfPowerVisual, RunesOfPowerVisuals } from '../src/render/rune_of_power_visual';
 
 const row = {
   id: 'rune:opaque',
@@ -51,12 +45,7 @@ describe('persistent Rune inscription', () => {
       matrix = new THREE.Matrix4();
     const left = new THREE.Vector3(),
       right = new THREE.Vector3();
-    for (const disposition of [
-      'eligible',
-      'opponent',
-      'inactive',
-      'unknown',
-    ] as const) {
+    for (const disposition of ['eligible', 'opponent', 'inactive', 'unknown'] as const) {
       visual.sync({ ...row, disposition }, (x, z) => x * 0.03 + z * 0.02);
       for (let i = 0; i < 72; i++) {
         visual.strokes.getMatrixAt(i, matrix);

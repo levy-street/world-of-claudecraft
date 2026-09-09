@@ -24,9 +24,12 @@ export function prepareMeleeClips(
   clips: Map<string, THREE.AnimationClip>,
   overrides?: Readonly<Record<string, string>>,
 ): void {
-  const resolved = {...overrides};
-  if(clips.has('Rogue_Quick_Strike')) for(const id of ['hemorrhage','venomrend','ghostly_strike']) resolved[id] ??= 'Rogue_Quick_Strike';
-  if(clips.has('1H_Melee_Attack_Slice_Horizontal') && overrides?.mortal_strike) resolved.sunder_armor ??= '1H_Melee_Attack_Slice_Horizontal';
+  const resolved = { ...overrides };
+  if (clips.has('Rogue_Quick_Strike'))
+    for (const id of ['hemorrhage', 'venomrend', 'ghostly_strike'])
+      resolved[id] ??= 'Rogue_Quick_Strike';
+  if (clips.has('1H_Melee_Attack_Slice_Horizontal') && overrides?.mortal_strike)
+    resolved.sunder_armor ??= '1H_Melee_Attack_Slice_Horizontal';
   for (const [id, name] of Object.entries(resolved)) {
     if (!meleeImpactProfile(id) && id !== 'blind') continue;
     if (clips.has(`Signature_${id}`)) continue;

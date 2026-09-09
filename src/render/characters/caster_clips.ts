@@ -12,8 +12,20 @@ interface Performance {
 // Feet and root translations remain native; no presentation-driven movement.
 const POSES: Record<CastPurpose, Performance> = {
   brace: {
-    gather: { chest: [0, 8, -6], upperarmr: [-10, -80, 0], lowerarmr: [90, 0, 0], upperarml: [25, -75, 0], lowerarml: [-85, 0, 0] },
-    release: { chest: [0, -5, 6], upperarmr: [-18, -55, 0], lowerarmr: [110, 0, 0], upperarml: [35, -45, 0], lowerarml: [-100, 0, 0] },
+    gather: {
+      chest: [0, 8, -6],
+      upperarmr: [-10, -80, 0],
+      lowerarmr: [90, 0, 0],
+      upperarml: [25, -75, 0],
+      lowerarml: [-85, 0, 0],
+    },
+    release: {
+      chest: [0, -5, 6],
+      upperarmr: [-18, -55, 0],
+      lowerarmr: [110, 0, 0],
+      upperarml: [35, -45, 0],
+      lowerarml: [-100, 0, 0],
+    },
   },
   smear: {
     gather: { upperarmr: [-25, -50, -25], lowerarmr: [110, 0, 0], chest: [0, 8, -18] },

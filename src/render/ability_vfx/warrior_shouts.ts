@@ -1,8 +1,8 @@
 import type { SeqSlot, SequencerHost } from './sequencer';
 import {
+  type WarriorPressureKind,
   warriorPressureLayers,
   warriorPressurePoint,
-  type WarriorPressureKind,
 } from './warrior_shout_shapes';
 
 interface ShoutDesign {

@@ -13,12 +13,7 @@ const DOME_GEOMETRY = new THREE.SphereGeometry(
   0,
   Math.PI / 2,
 );
-const GROUND_RING_GEOMETRY = new THREE.TorusGeometry(
-  PALADIN_AEGIS_DOME_RADIUS,
-  0.08,
-  8,
-  64,
-);
+const GROUND_RING_GEOMETRY = new THREE.TorusGeometry(PALADIN_AEGIS_DOME_RADIUS, 0.08, 8, 64);
 const SUN_GEOMETRY = new THREE.SphereGeometry(0.72, 20, 12);
 const BLADE_GEOMETRY = new THREE.BoxGeometry(0.1, 1.75, 0.05);
 const GUARD_GEOMETRY = new THREE.BoxGeometry(0.7, 0.08, 0.08);
@@ -33,12 +28,8 @@ function buildSolarRuneTexture(): THREE.DataTexture {
       const radius = Math.hypot(dx, dy);
       const ring = Math.abs(radius - 20) < 1.8;
       const cross =
-        (Math.abs(dx) < 2 && Math.abs(dy) < 14) ||
-        (Math.abs(dy) < 2 && Math.abs(dx) < 14);
-      const diagonal =
-        Math.abs(Math.abs(dx) - Math.abs(dy)) < 1.5 &&
-        radius > 17 &&
-        radius < 27;
+        (Math.abs(dx) < 2 && Math.abs(dy) < 14) || (Math.abs(dy) < 2 && Math.abs(dx) < 14);
+      const diagonal = Math.abs(Math.abs(dx) - Math.abs(dy)) < 1.5 && radius > 17 && radius < 27;
       if (!ring && !cross && !diagonal) continue;
       const offset = (y * size + x) * 4;
       data[offset] = 255;
@@ -57,11 +48,7 @@ function buildSolarRuneTexture(): THREE.DataTexture {
 
 const SOLAR_RUNE_TEXTURE = buildSolarRuneTexture();
 
-function additiveMaterial(
-  color: number,
-  opacity: number,
-  side: THREE.Side = THREE.DoubleSide,
-) {
+function additiveMaterial(color: number, opacity: number, side: THREE.Side = THREE.DoubleSide) {
   return new THREE.MeshBasicMaterial({
     color,
     transparent: true,
@@ -74,18 +61,9 @@ function additiveMaterial(
 
 export class PaladinAegisVisual {
   readonly group = new THREE.Group();
-  private readonly dome: THREE.Mesh<
-    THREE.SphereGeometry,
-    THREE.MeshBasicMaterial
-  >;
-  private readonly groundRing: THREE.Mesh<
-    THREE.TorusGeometry,
-    THREE.MeshBasicMaterial
-  >;
-  private readonly sun: THREE.Mesh<
-    THREE.SphereGeometry,
-    THREE.MeshBasicMaterial
-  >;
+  private readonly dome: THREE.Mesh<THREE.SphereGeometry, THREE.MeshBasicMaterial>;
+  private readonly groundRing: THREE.Mesh<THREE.TorusGeometry, THREE.MeshBasicMaterial>;
+  private readonly sun: THREE.Mesh<THREE.SphereGeometry, THREE.MeshBasicMaterial>;
   private readonly sunHalo: THREE.Sprite;
   private readonly plantedWeapon = new THREE.Group();
   private readonly runes: THREE.Sprite[] = [];
@@ -100,10 +78,7 @@ export class PaladinAegisVisual {
     this.group.name = 'paladin-aegis-visual';
     this.group.visible = false;
 
-    this.dome = new THREE.Mesh(
-      DOME_GEOMETRY,
-      additiveMaterial(0xfff1b0, 0.13, THREE.BackSide),
-    );
+    this.dome = new THREE.Mesh(DOME_GEOMETRY, additiveMaterial(0xfff1b0, 0.13, THREE.BackSide));
     this.dome.material.onBeforeCompile = (shader) => {
       shader.uniforms.uAegisPulse = this.pulseUniform;
       shader.vertexShader = 'varying vec3 vAegisPoint;\n' + shader.vertexShader;
@@ -112,8 +87,7 @@ export class PaladinAegisVisual {
         '#include <begin_vertex>\nvAegisPoint=position;',
       );
       shader.fragmentShader =
-        'uniform float uAegisPulse;\nvarying vec3 vAegisPoint;\n' +
-        shader.fragmentShader;
+        'uniform float uAegisPulse;\nvarying vec3 vAegisPoint;\n' + shader.fragmentShader;
       shader.fragmentShader = shader.fragmentShader.replace(
         '#include <color_fragment>',
         `
@@ -129,16 +103,12 @@ export class PaladinAegisVisual {
       `,
       );
     };
-    this.dome.material.customProgramCacheKey = () =>
-      'paladin-aegis-solar-vault-v2';
+    this.dome.material.customProgramCacheKey = () => 'paladin-aegis-solar-vault-v2';
     this.dome.name = 'paladin-aegis-dome';
     this.dome.renderOrder = 6;
     this.group.add(this.dome);
 
-    this.groundRing = new THREE.Mesh(
-      GROUND_RING_GEOMETRY,
-      additiveMaterial(0xffd86a, 0.72),
-    );
+    this.groundRing = new THREE.Mesh(GROUND_RING_GEOMETRY, additiveMaterial(0xffd86a, 0.72));
     this.groundRing.name = 'paladin-aegis-ground-ring';
     this.groundRing.rotation.x = Math.PI / 2;
     this.groundRing.position.y = 0.06;
@@ -167,15 +137,9 @@ export class PaladinAegisVisual {
     this.sunHalo.renderOrder = 10;
     this.group.add(this.sunHalo);
 
-    const blade = new THREE.Mesh(
-      BLADE_GEOMETRY,
-      additiveMaterial(0xfff4bd, 0.9),
-    );
+    const blade = new THREE.Mesh(BLADE_GEOMETRY, additiveMaterial(0xfff4bd, 0.9));
     blade.position.y = 1.05;
-    const guard = new THREE.Mesh(
-      GUARD_GEOMETRY,
-      additiveMaterial(0xffcc58, 0.9),
-    );
+    const guard = new THREE.Mesh(GUARD_GEOMETRY, additiveMaterial(0xffcc58, 0.9));
     guard.position.y = 0.52;
     this.plantedWeapon.name = 'paladin-aegis-planted-weapon';
     this.plantedWeapon.add(blade, guard);
@@ -212,22 +176,14 @@ export class PaladinAegisVisual {
     if (completed) this.completionRemaining = 0.55;
   }
 
-  update(
-    active: boolean,
-    dt: number,
-    reducedMotion: boolean,
-    parentScale = 1,
-  ): void {
+  update(active: boolean, dt: number, reducedMotion: boolean, parentScale = 1): void {
     if (this.disposed) return;
     const seconds = Math.max(0, dt);
     this.pulseEnergy = Math.max(0, this.pulseEnergy - seconds * 3);
     this.completionRemaining = Math.max(0, this.completionRemaining - seconds);
     this.pulseUniform.value = this.pulseEnergy;
     this.group.visible = active || this.completionRemaining > 0;
-    this.dome.visible =
-      this.groundRing.visible =
-      this.plantedWeapon.visible =
-        active;
+    this.dome.visible = this.groundRing.visible = this.plantedWeapon.visible = active;
     for (const rune of this.runes) rune.visible = active;
     if (!this.group.visible) return;
     this.group.scale.setScalar(parentScale > 0 ? 1 / parentScale : 1);
@@ -236,20 +192,15 @@ export class PaladinAegisVisual {
     const phase = reducedMotion ? 0.35 : this.time * 0.48;
     this.dome.scale.setScalar(1);
     this.dome.material.opacity =
-      (reducedMotion ? 0.13 : 0.11 + Math.sin(this.time * 2.2) * 0.025) +
-      this.pulseEnergy * 0.055;
+      (reducedMotion ? 0.13 : 0.11 + Math.sin(this.time * 2.2) * 0.025) + this.pulseEnergy * 0.055;
     this.groundRing.rotation.z = phase * 0.35;
-    this.sun.scale.setScalar(
-      reducedMotion ? 1 : 1 + Math.sin(this.time * 5) * 0.08,
-    );
+    this.sun.scale.setScalar(reducedMotion ? 1 : 1 + Math.sin(this.time * 5) * 0.08);
     this.sunHalo.material.rotation = -phase * 1.7;
     const finish = this.completionRemaining / 0.55;
     this.sunHalo.material.opacity = active ? 0.95 : finish;
     this.sun.material.opacity = active ? 0.92 : finish;
     this.sunHalo.scale.setScalar(
-      active
-        ? 2.4 + this.pulseEnergy * 0.7
-        : 2.4 + (1 - finish) * (reducedMotion ? 0 : 1.6),
+      active ? 2.4 + this.pulseEnergy * 0.7 : 2.4 + (1 - finish) * (reducedMotion ? 0 : 1.6),
     );
     this.plantedWeapon.rotation.y = phase * 0.3;
 
@@ -257,17 +208,10 @@ export class PaladinAegisVisual {
       const angle = phase + (index / RUNE_COUNT) * TAU;
       const y = index % 2 === 0 ? 3.2 : 5.25;
       const horizontalRadius = Math.sqrt(
-        Math.max(
-          0,
-          PALADIN_AEGIS_DOME_RADIUS * PALADIN_AEGIS_DOME_RADIUS - y * y,
-        ),
+        Math.max(0, PALADIN_AEGIS_DOME_RADIUS * PALADIN_AEGIS_DOME_RADIUS - y * y),
       );
       const rune = this.runes[index];
-      rune.position.set(
-        Math.cos(angle) * horizontalRadius,
-        y,
-        Math.sin(angle) * horizontalRadius,
-      );
+      rune.position.set(Math.cos(angle) * horizontalRadius, y, Math.sin(angle) * horizontalRadius);
       rune.material.rotation = -angle + phase * 0.4;
     }
   }
@@ -289,8 +233,7 @@ export class PaladinAegisVisual {
         errors.push(error);
       }
     }
-    if (errors.length)
-      throw new AggregateError(errors, 'Aegis material cleanup failed');
+    if (errors.length) throw new AggregateError(errors, 'Aegis material cleanup failed');
   }
 }
 
@@ -320,21 +263,14 @@ export function syncPaladinAegisVisual(
 /** Claim identified Aegis cues before generic zone rehit/ring dispatch. */
 export function routePaladinAegisCue(
   event: Extract<SimEvent, { type: 'spellfxAt' }>,
-  views: ReadonlyMap<
-    number,
-    { group: THREE.Group; paladinAegisVisual: PaladinAegisVisual | null }
-  >,
+  views: ReadonlyMap<number, { group: THREE.Group; paladinAegisVisual: PaladinAegisVisual | null }>,
   scene: THREE.Scene,
   completed?: (sourceId: number) => void,
 ): boolean {
-  if (
-    event.ability !== 'aegis_first_dawn' ||
-    (event.fx !== 'tick' && event.fx !== 'burst')
-  )
+  if (event.ability !== 'aegis_first_dawn' || (event.fx !== 'tick' && event.fx !== 'burst'))
     return false;
   if (event.fx === 'burst' && event.sourceId !== undefined) completed?.(event.sourceId);
-  const view =
-    event.sourceId === undefined ? undefined : views.get(event.sourceId);
+  const view = event.sourceId === undefined ? undefined : views.get(event.sourceId);
   if (view) {
     if (!view.paladinAegisVisual) {
       view.paladinAegisVisual = new PaladinAegisVisual();

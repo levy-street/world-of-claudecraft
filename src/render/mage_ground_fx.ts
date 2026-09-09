@@ -19,11 +19,11 @@
 // cast. Math.random is fine here (render-only).
 
 import * as THREE from 'three';
-import { BlizzardFields, blizzardPerimeter } from './blizzard_field';
-import type { ActiveBlizzard, ActiveRuneOfPower } from '../world_api/combat';
-import { RunesOfPowerVisuals } from './rune_of_power_visual';
 import type { SimEvent } from '../sim/types';
+import type { ActiveBlizzard, ActiveRuneOfPower } from '../world_api/combat';
+import { BlizzardFields, blizzardPerimeter } from './blizzard_field';
 import { createGroundFireAoe, type GroundFireAoeHandle } from './ignivar_fire_vfx';
+import { RunesOfPowerVisuals } from './rune_of_power_visual';
 import { SCHOOL_COLORS } from './vfx';
 
 /** HSL lightness ceiling applied before a rune ring's additive brightening
@@ -192,7 +192,7 @@ export class MageGroundFx {
   private readonly runes: RuneFx[] = [];
   private readonly powerRunes: RunesOfPowerVisuals;
   private readonly snows: SnowFx[] = [];
-  private readonly blizzards = new BlizzardFields<SnowFx>(row => this.spawnSnow(row));
+  private readonly blizzards = new BlizzardFields<SnowFx>((row) => this.spawnSnow(row));
   private meteorGeo: THREE.IcosahedronGeometry | null = null;
   private meteorCoronaGeo: THREE.SphereGeometry | null = null;
   private meteorCrackGeos: THREE.TubeGeometry[] | null = null;
@@ -1236,8 +1236,13 @@ export class MageGroundFx {
   }
 
   spawnSnowEvent(event: MageGroundSpellfxEvent): void {
-    if (!event.persistentId) this.spawnSnow({ x: event.x, z: event.z,
-      radius: event.radius ?? 7, duration: event.duration ?? 6 });
+    if (!event.persistentId)
+      this.spawnSnow({
+        x: event.x,
+        z: event.z,
+        radius: event.radius ?? 7,
+        duration: event.duration ?? 6,
+      });
   }
 
   spawnSnow(opts: SnowZoneSpawn): SnowFx | null {
@@ -1285,7 +1290,10 @@ export class MageGroundFx {
           side: THREE.DoubleSide,
         }),
     );
-    const ring = new THREE.Mesh(blizzardPerimeter(opts.x, opts.z, opts.radius, this.groundY), ringMat);
+    const ring = new THREE.Mesh(
+      blizzardPerimeter(opts.x, opts.z, opts.radius, this.groundY),
+      ringMat,
+    );
     ring.name = 'mage-blizzard-boundary';
     ring.frustumCulled = false;
     this.scene.add(ring);
@@ -1651,11 +1659,11 @@ export class MageGroundFx {
       }
       sfx.points.geometry.attributes.position.needsUpdate = true;
       const snowFade = Math.max(0, Math.min(1, (sfx.duration - sfx.elapsed) / 0.6));
-      sfx.mat.opacity = 0.9 * snowFade * (sfx.active ? 1 : .25);
+      sfx.mat.opacity = 0.9 * snowFade * (sfx.active ? 1 : 0.25);
       // Keep the playable boundary readable until the authoritative zone
       // expires. Only the falling snow fades; the ring is removed on the
       // exact expiry branch above, so it never disappears early.
-      sfx.ringMat.opacity = (sfx.active ? .55 : .2) * (0.92 + Math.sin(sfx.elapsed * 2.4) * 0.08);
+      sfx.ringMat.opacity = (sfx.active ? 0.55 : 0.2) * (0.92 + Math.sin(sfx.elapsed * 2.4) * 0.08);
     }
   }
 }

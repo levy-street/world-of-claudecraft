@@ -27,8 +27,6 @@ import { type ArmorDyeSpec, attachArmorDye } from './armor_dye';
 import { backGripFor } from './back_grips';
 import { prepareBeastAbilityClips } from './beast_ability_clips';
 import { prepareCasterClips } from './caster_clips';
-import { prepareMeleeClips } from './melee_clips';
-import { prepareNamedActionClips } from './named_action_clips';
 import { dequantizeAttribute } from './dequantize_attribute';
 import { type HandGrip, KAYKIT_SHIELD_ACCESSORIES, KAYKIT_SHIELD_GRIPS } from './held_item_grips';
 import { pruneHeldPropIdles, registerHeldPropIdle } from './held_prop_idle';
@@ -53,6 +51,7 @@ import {
   weaponSkinModelUrls,
 } from './manifest';
 import { meshProgramShapeKey } from './material_program_shape_core';
+import { prepareMeleeClips } from './melee_clips';
 import {
   armorMaterialSet,
   bandMaterialSpec,
@@ -81,6 +80,7 @@ import {
   stubbleDecals,
   wearsFaceDecal,
 } from './modular';
+import { prepareNamedActionClips } from './named_action_clips';
 import {
   createPaladinBastionSweepClip,
   PALADIN_BASTION_SWEEP_CLIP,

@@ -3,7 +3,15 @@ import * as THREE from 'three';
 const TIMES = [0, 0.07, 0.15, 0.21, 0.34, 0.49, 0.66];
 const RAM = [0, -0.28, 0.42, 0.3, -0.08, -0.025, 0];
 const PAW = [0, -0.55, 0.65, 0.28, -0.12, -0.03, 0];
-const UTILITY_IDS = ['frenzied_regeneration', 'enrage', 'tigers_fury', 'prowl', 'dash', 'primal_reflexes', 'feral_charge'];
+const UTILITY_IDS = [
+  'frenzied_regeneration',
+  'enrage',
+  'tigers_fury',
+  'prowl',
+  'dash',
+  'primal_reflexes',
+  'feral_charge',
+];
 const BEAR_IDS = [
   ...UTILITY_IDS,
   'maul',

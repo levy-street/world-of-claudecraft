@@ -5,14 +5,14 @@
 // work); Sim keeps thin getters that delegate here so the IWorld surface
 // resolves unchanged.
 import type {
+  ActiveBlizzard,
   ActiveConsecration,
   ActiveFrostRing,
   ActiveHunterTrap,
-  ActiveTemporalHourglass,
   ActiveRuneOfPower,
-  ActiveBlizzard,
-  TemporalHourglassDisposition,
+  ActiveTemporalHourglass,
   RuneOfPowerDisposition,
+  TemporalHourglassDisposition,
 } from '../world_api';
 import type { GroundAoE } from './entity_roster';
 
@@ -24,10 +24,16 @@ export function collectActiveRunesOfPower(
   for (const ground of groundAoEs) {
     const rune = ground.runeOfPower;
     if (!rune || ground.remaining <= 0) continue;
-    rows.push({ id: rune.id, sourceId: ground.sourceId,
-      disposition: dispositionFor(ground.sourceId), x: ground.pos.x, z: ground.pos.z,
-      radius: ground.radius, duration: rune.duration,
-      remaining: Math.min(rune.duration, ground.remaining) });
+    rows.push({
+      id: rune.id,
+      sourceId: ground.sourceId,
+      disposition: dispositionFor(ground.sourceId),
+      x: ground.pos.x,
+      z: ground.pos.z,
+      radius: ground.radius,
+      duration: rune.duration,
+      remaining: Math.min(rune.duration, ground.remaining),
+    });
   }
   return rows;
 }
@@ -111,15 +117,22 @@ export function collectActiveConsecrations(groundAoEs: readonly GroundAoE[]): Ac
 }
 
 export function collectActiveBlizzards(
-  groundAoEs: readonly GroundAoE[], isActive: (sourceId: number) => boolean,
+  groundAoEs: readonly GroundAoE[],
+  isActive: (sourceId: number) => boolean,
 ): ActiveBlizzard[] {
   const rows: ActiveBlizzard[] = [];
   for (const ground of groundAoEs) {
     if (!ground.blizzard || ground.remaining <= 0) continue;
-    rows.push({ id: ground.blizzard.id, sourceId: ground.sourceId,
-      active: isActive(ground.sourceId), x: ground.pos.x, z: ground.pos.z,
-      radius: ground.radius, duration: ground.blizzard.duration,
-      remaining: Math.min(ground.blizzard.duration, ground.remaining) });
+    rows.push({
+      id: ground.blizzard.id,
+      sourceId: ground.sourceId,
+      active: isActive(ground.sourceId),
+      x: ground.pos.x,
+      z: ground.pos.z,
+      radius: ground.radius,
+      duration: ground.blizzard.duration,
+      remaining: Math.min(ground.blizzard.duration, ground.remaining),
+    });
   }
   return rows;
 }

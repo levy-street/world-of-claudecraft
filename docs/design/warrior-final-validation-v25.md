@@ -1,7 +1,7 @@
 # Warrior v25 validation checkpoint
 
-The final Warrior visual review is still in progress. This checkpoint closes two
-historical project-check questions; it does not claim complete AAA acceptance.
+The Warrior capture matrix and bounded visual reviews are complete. This checkpoint
+records their scope and the remaining project gate; it does not claim final acceptance.
 
 The test timing table comes from completed successful full-mode GitHub CI run
 34303587318, attempt 1, merge-group commit
@@ -20,5 +20,23 @@ The frozen capture identity, screenshots and performance measurements remain
 unchanged. This is a provenance reseal, not a new visual or performance capture.
 Both existing Eastbrook contract and artifact-integrity suites pass.
 
-Final whole-project gate, complete visual matrix and Warrior review delivery
-remain outstanding. The gate baseline remains 85e9231a54cb5c136c9dc7965f5470b9b287d1a4.
+The final capture matrix covers every canonical Warrior ability at all six graphics
+presets, and every legal review variant at Low and Ultra. Both natural crowded
+rotation runs complete for Arms, Fury and Protection without cast, console or
+asset errors. These controlled dummy scenes do not establish real raid acceptance.
+The matrix, natural rotations, sampled parent review and independent frame review
+are retained under the adjacent studio-contact-pass Warrior final evidence paths.
+
+The final whole-project gate stopped at changed-file Biome checks, before Vitest.
+The failures were formatting and import organization. The constrained repair keeps
+JSON values and TypeScript syntax unchanged apart from import/export organization,
+a paired viewer adapter for the existing ground-telegraph encoder, and two audio
+metadata hashes resealed to their newly formatted JSON bytes. The adapter preserves
+position, range and viewer identity and passes its legal-cast regression. Existing
+monolith limits remain unchanged. No image, audio or shader asset was regenerated.
+Original file bytes and syntax-comparison evidence are preserved externally.
+
+The repaired changed-file Biome preflight passes. The full canonical gate and
+Warrior review delivery remain outstanding. The gate baseline remains
+85e9231a54cb5c136c9dc7965f5470b9b287d1a4. Future production savings and colleague
+handover setup remain subject to Tony's separate approval after Warrior delivery.

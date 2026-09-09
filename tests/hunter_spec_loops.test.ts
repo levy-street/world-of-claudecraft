@@ -221,7 +221,11 @@ describe('Hunter v0.29 baseline specialization loops', () => {
 
     sim.castAbility('bloodhook');
     const arrival = advance(sim, 2);
-    expect(arrival.filter(e=>e.type==='spellfx'&&e.ability==='bloodhook'&&e.fx==='dotApply')).toHaveLength(1);
+    expect(
+      arrival.filter(
+        (e) => e.type === 'spellfx' && e.ability === 'bloodhook' && e.fx === 'dotApply',
+      ),
+    ).toHaveLength(1);
     expect(target.auras.filter((aura) => aura.id === 'bloodhook_bleed')).toHaveLength(1);
     expect(target.auras.find((aura) => aura.id === 'bloodhook_bleed')?.value).toBe(
       expectedBloodhookTick,
@@ -243,16 +247,25 @@ describe('Hunter v0.29 baseline specialization loops', () => {
     ready(sim, 'mongoose_bite');
     sim.castAbility('mongoose_bite');
     const woundrend = advance(sim, 0.1);
-    expect(woundrend.filter(e=>e.type==='spellfx'&&e.ability==='bloodhook'&&e.fx==='dotApply')).toHaveLength(0);
+    expect(
+      woundrend.filter(
+        (e) => e.type === 'spellfx' && e.ability === 'bloodhook' && e.fx === 'dotApply',
+      ),
+    ).toHaveLength(0);
     expect(target.hp).toBeLessThan(before);
     expect(target.auras.filter((aura) => aura.id === 'bloodhook_bleed')).toHaveLength(1);
     expect(target.auras.find((aura) => aura.id === 'bloodhook_bleed')?.remaining).toBeGreaterThan(
       10,
     );
     expect(sim.player.auras.some((aura) => aura.id === 'hunting_momentum')).toBe(false);
-    sim.player.pos.z=target.pos.z-12;
-    ready(sim,'bloodhook');sim.castAbility('bloodhook');
-    const second=advance(sim,2);
-    expect(second.filter(e=>e.type==='spellfx'&&e.ability==='bloodhook'&&e.fx==='dotApply')).toHaveLength(1);
+    sim.player.pos.z = target.pos.z - 12;
+    ready(sim, 'bloodhook');
+    sim.castAbility('bloodhook');
+    const second = advance(sim, 2);
+    expect(
+      second.filter(
+        (e) => e.type === 'spellfx' && e.ability === 'bloodhook' && e.fx === 'dotApply',
+      ),
+    ).toHaveLength(1);
   });
 });

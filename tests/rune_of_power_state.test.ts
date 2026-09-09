@@ -1,13 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
+import { groundTelegraphWireJson, groundTelegraphWorld } from '../server/ground_telegraph_wire';
+import { decodeRunesOfPower } from '../src/net/ground_telegraph_wire';
 import { petOf, summonPet } from '../src/sim/pet/pet_commands';
 import { Sim } from '../src/sim/sim';
-import { EMPTY_TEST_WORLD } from './sim_shared';
 import { bareClient } from './helpers/bare_client';
-import {
-  groundTelegraphWorld,
-  groundTelegraphWireJson,
-} from '../server/ground_telegraph_wire';
-import { decodeRunesOfPower } from '../src/net/ground_telegraph_wire';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 function placed() {
   const sim = new Sim({
@@ -22,8 +19,7 @@ function placed() {
   sim.player.prevPos = { ...sim.player.pos };
   sim.player.resource = sim.player.maxResource;
   sim.castAbility('rune_of_power');
-  for (let i = 0; i < 50 && sim.activeRunesOfPower.length === 0; i++)
-    sim.tick();
+  for (let i = 0; i < 50 && sim.activeRunesOfPower.length === 0; i++) sim.tick();
   expect(sim.activeRunesOfPower).toHaveLength(1);
   return sim;
 }
@@ -47,9 +43,7 @@ describe('Rune of Power authoritative field and benefit eligibility', () => {
     pet.prevPos = { ...pet.pos };
     const sight = vi.spyOn(sim.ctx, 'hasLineOfSight').mockReturnValue(false);
     try {
-      expect(sim.runeOfPowerDispositionFor(sim.playerId, pet.id)).toBe(
-        'eligible',
-      );
+      expect(sim.runeOfPowerDispositionFor(sim.playerId, pet.id)).toBe('eligible');
       for (let i = 0; i < 45; i++) sim.tick();
       expect(pet.auras.find((a) => a.id === 'rune_of_power')?.value).toBe(0.1);
     } finally {
@@ -66,16 +60,11 @@ describe('Rune of Power authoritative field and benefit eligibility', () => {
       duration: 15,
       disposition: 'eligible',
     });
-    expect(sim.player.auras.find((a) => a.id === 'rune_of_power')?.value).toBe(
-      0.1,
-    );
+    expect(sim.player.auras.find((a) => a.id === 'rune_of_power')?.value).toBe(0.1);
     const friend = sim.addPlayer('warrior', 'Friendly');
-    expect(sim.runeOfPowerDispositionFor(sim.playerId, friend)).toBe(
-      'eligible',
-    );
+    expect(sim.runeOfPowerDispositionFor(sim.playerId, friend)).toBe('eligible');
     const snapshot = JSON.stringify(sim.activeRunesOfPower);
-    for (let i = 0; i < 10; i++)
-      expect(JSON.stringify(sim.activeRunesOfPower)).toBe(snapshot);
+    for (let i = 0; i < 10; i++) expect(JSON.stringify(sim.activeRunesOfPower)).toBe(snapshot);
     sim.player.jailed = true;
     sim.entities.get(friend)!.jailed = true;
     expect(wire(sim, 700, friend).runesOfPower[0].disposition).toBe('opponent');
@@ -124,12 +113,7 @@ describe('Rune of Power authoritative field and benefit eligibility', () => {
       disposition: 'unknown',
       remaining: 15,
     });
-    for (const override of [
-      { r: 0 },
-      { rem: NaN },
-      { x: Infinity },
-      { id: '' },
-    ])
+    for (const override of [{ r: 0 }, { rem: NaN }, { x: Infinity }, { id: '' }])
       expect(decodeRunesOfPower([{ ...row, ...override }])).toEqual([]);
   });
 });

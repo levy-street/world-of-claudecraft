@@ -12,26 +12,17 @@
     "pyroblast": {
       "bytes": 1209476,
       "sha256": "c7bd75e5b53a076ee332e2f44d38d03858aabdaaf445717a2fb80ef701a7c2c0",
-      "pivot_uv_content_top_origin": [
-        0.5,
-        0.794500470161438
-      ]
+      "pivot_uv_content_top_origin": [0.5, 0.794500470161438]
     },
     "frost_nova": {
       "bytes": 902993,
       "sha256": "cb132bf5d97cfaeb044c4b6fec26c8833b23f0f7d56edfab03c6a8a2d414a1f9",
-      "pivot_uv_content_top_origin": [
-        0.5,
-        0.6425594389438629
-      ]
+      "pivot_uv_content_top_origin": [0.5, 0.6425594389438629]
     },
     "chain_heal": {
       "bytes": 780709,
       "sha256": "dd7a40c6ffea62d9d7f0b64a1262b40ce7f48ebc3de979f59f4d60a12154e7c8",
-      "pivot_uv_content_top_origin": [
-        0.5,
-        0.693885326385498
-      ]
+      "pivot_uv_content_top_origin": [0.5, 0.693885326385498]
     }
   },
   "runtime_bytes": 2893178

@@ -1,12 +1,12 @@
 import * as THREE from 'three';
-import { expect, it, vi } from 'vitest';
-import { page } from 'vitest/browser';
-import { HunterTrapVisuals } from '../../src/render/hunter_trap_visual';
-import { persistentClassVfxPrewarmGroup } from '../../src/render/ability_vfx/prewarm';
-import { gfxInternalsForTest } from '../../src/render/gfx';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js';
+import { expect, it, vi } from 'vitest';
+import { page } from 'vitest/browser';
+import { persistentClassVfxPrewarmGroup } from '../../src/render/ability_vfx/prewarm';
+import { gfxInternalsForTest } from '../../src/render/gfx';
+import { HunterTrapVisuals } from '../../src/render/hunter_trap_visual';
 
 it('renders readable hinged trap phases and victim restraints with stable warmed programs', async () => {
   await page.viewport(920, 640);

@@ -120,7 +120,18 @@ describe('ground telegraph snapshot decoders', () => {
         { id: 'hg:1', x: 1, z: 2, r: 4, dur: 8, rem: 10 },
         { id: 'hg:2', x: 1, z: 2, r: 0, dur: 8, rem: 4 },
       ]),
-    ).toEqual([{ id: 'hg:1', sourceId: null, disposition: 'unknown', x: 1, z: 2, radius: 4, duration: 8, remaining: 8 }]);
+    ).toEqual([
+      {
+        id: 'hg:1',
+        sourceId: null,
+        disposition: 'unknown',
+        x: 1,
+        z: 2,
+        radius: 4,
+        duration: 8,
+        remaining: 8,
+      },
+    ]);
   });
 
   it('decodes a consecration and drops malformed rows', () => {

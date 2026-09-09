@@ -15,14 +15,14 @@ import type {
 } from '../src/sim/varkhul_cinder_orbs';
 import type { ActiveVarkhulForgestormWarning } from '../src/sim/varkhul_forgestorm';
 import type {
+  ActiveBlizzard,
   ActiveConsecration,
   ActiveFrostRing,
   ActiveHunterTrap,
-  ActiveTemporalHourglass,
   ActiveRuneOfPower,
-  ActiveBlizzard,
-  TemporalHourglassDisposition,
+  ActiveTemporalHourglass,
   RuneOfPowerDisposition,
+  TemporalHourglassDisposition,
 } from '../src/world_api';
 import { type VarkhulEncounterWireWorld, varkhulEncounterWireJson } from './varkhul_wire';
 
@@ -81,7 +81,8 @@ export function groundTelegraphWorld(
       sim.temporalHourglassDispositionFor(sourceId, viewerId),
     activeRunesOfPower: sim.activeRunesOfPower,
     activeBlizzards: sim.activeBlizzards ?? [],
-    runeOfPowerDispositionFor: (sourceId, viewerId) => sim.runeOfPowerDispositionFor(sourceId, viewerId),
+    runeOfPowerDispositionFor: (sourceId, viewerId) =>
+      sim.runeOfPowerDispositionFor(sourceId, viewerId),
     activeHunterTraps: sim.activeHunterTraps,
     activeFrostRings: sim.activeFrostRings,
     activeIgnivarMeteors: sim.activeIgnivarMeteors,
@@ -97,6 +98,15 @@ export function groundTelegraphWorld(
     interestQueryRadius,
     eventRadius,
   };
+}
+
+// Keep the snapshot anchor and disposition identity together for a real viewer.
+export function viewerTelegraphJson(
+  world: GroundTelegraphWireWorld,
+  viewer: { id: number; pos: { x: number; z: number } },
+  aoeBase: number,
+): string {
+  return groundTelegraphWireJson(world, viewer.pos, aoeBase, viewer.id);
 }
 
 // Frost rings and Hourglass are ground effects, independent of caster entity
@@ -203,18 +213,39 @@ export function groundTelegraphWireJson(
     }));
   const hunterTrapsJson = hunterTraps.length ? `,"hunterTraps":${JSON.stringify(hunterTraps)}` : '';
   const runesOfPower = world.activeRunesOfPower
-    .filter(rune => (rune.x - anchorPos.x) ** 2 + (rune.z - anchorPos.z) ** 2 <= world.eventRadius ** 2)
-    .map(rune => ({ id: rune.id, sourceId: rune.sourceId,
-      disposition: viewerId !== undefined && rune.sourceId !== null
-        ? world.runeOfPowerDispositionFor(rune.sourceId, viewerId) : 'unknown',
-      x: round2(rune.x), z: round2(rune.z), r: round2(rune.radius),
-      dur: round2(rune.duration), rem: round2(rune.remaining) }));
-  const runesOfPowerJson = runesOfPower.length ? `,"runesOfPower":${JSON.stringify(runesOfPower)}` : '';
+    .filter(
+      (rune) => (rune.x - anchorPos.x) ** 2 + (rune.z - anchorPos.z) ** 2 <= world.eventRadius ** 2,
+    )
+    .map((rune) => ({
+      id: rune.id,
+      sourceId: rune.sourceId,
+      disposition:
+        viewerId !== undefined && rune.sourceId !== null
+          ? world.runeOfPowerDispositionFor(rune.sourceId, viewerId)
+          : 'unknown',
+      x: round2(rune.x),
+      z: round2(rune.z),
+      r: round2(rune.radius),
+      dur: round2(rune.duration),
+      rem: round2(rune.remaining),
+    }));
+  const runesOfPowerJson = runesOfPower.length
+    ? `,"runesOfPower":${JSON.stringify(runesOfPower)}`
+    : '';
   const blizzards = (world.activeBlizzards ?? [])
-    .filter(row => (row.x - anchorPos.x) ** 2 + (row.z - anchorPos.z) ** 2 <= world.eventRadius ** 2)
-    .map(row => ({ id: row.id, sourceId: row.sourceId, active: row.active,
-      x: round2(row.x), z: round2(row.z), r: round2(row.radius),
-      dur: round2(row.duration), rem: round2(row.remaining) }));
+    .filter(
+      (row) => (row.x - anchorPos.x) ** 2 + (row.z - anchorPos.z) ** 2 <= world.eventRadius ** 2,
+    )
+    .map((row) => ({
+      id: row.id,
+      sourceId: row.sourceId,
+      active: row.active,
+      x: round2(row.x),
+      z: round2(row.z),
+      r: round2(row.radius),
+      dur: round2(row.duration),
+      rem: round2(row.remaining),
+    }));
   return (
     (blizzards.length ? `,"blizzards":${JSON.stringify(blizzards)}` : '') +
     runesOfPowerJson +

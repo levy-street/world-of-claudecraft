@@ -256,7 +256,7 @@ import {
 import { consumeGeneralChatQuota, type GeneralChatRateLimit } from './general_chat_quota_db';
 import { mergedPrsForLogin } from './github_contributors';
 import { githubForAccount } from './github_db';
-import { groundTelegraphWireJson, groundTelegraphWorld } from './ground_telegraph_wire';
+import { groundTelegraphWorld, viewerTelegraphJson } from './ground_telegraph_wire';
 import { forEachGuarded, runGuarded } from './guarded_iter';
 import { createGuildBankLazyLoader, type GuildBankLazyLoader } from './guild_bank_lazy_loader';
 import { bustGuildBankLog, GUILD_BANK_LOG_VISIBLE_OPS } from './guild_bank_log';
@@ -8567,7 +8567,7 @@ export class GameServer {
         if (this.perfDetailActive) this.bcastSelfNs += process.hrtime.bigint() - selfStart;
         const keepJson = keep.length > 0 ? `,"keep":[${keep.join(',')}]` : '';
         const aoeBase = isBgPos(anchorEntity.pos.x) ? BG_MATCH_DROP_RADIUS : INTEREST_QUERY_RADIUS;
-        const telegraphJson = groundTelegraphWireJson(telegraphWorld, anchorEntity.pos, aoeBase, anchorEntity.id);
+        const telegraphJson = viewerTelegraphJson(telegraphWorld, anchorEntity, aoeBase);
         const timerWireJson = stableTimerWire ? `,"tw":${STABLE_TIMER_WIRE_VERSION}` : '';
         const petSpecialWireJson =
           session.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION

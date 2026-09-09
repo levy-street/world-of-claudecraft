@@ -1,4 +1,5 @@
 import type { SeqSlot, SequencerHost } from './sequencer';
+
 const hand = { x: 0, y: 0, z: 0 };
 const chest = { x: 0, y: 0, z: 0 };
 /** Solid grapnel and interlocked steel links. The real charge owns movement. */
@@ -20,18 +21,7 @@ export function drawBloodhook(
   const hx = from.x + (to.x - dx * 0.3 - from.x) * flight;
   const hy = from.y + (to.y - from.y) * flight;
   const hz = from.z + (to.z - dz * 0.3 - from.z) * flight;
-  host.crestAt?.(
-    hx,
-    hy,
-    hz,
-    1.7,
-    1.7,
-    0x555c60,
-    0xc9d4d9,
-    'hook',
-    Math.atan2(dx, dz) + 0.65,
-    0.07,
-  );
+  host.crestAt?.(hx, hy, hz, 1.7, 1.7, 0x555c60, 0xc9d4d9, 'hook', Math.atan2(dx, dz) + 0.65, 0.07);
   const length = Math.hypot(hx - from.x, hy - from.y, hz - from.z);
   if (length > 0.05)
     host.crestAt?.(

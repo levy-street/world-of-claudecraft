@@ -16,9 +16,7 @@ export function impactContact(
   periodic = false,
 ): void {
   const profile = abilityId ? meleeImpactProfile(abilityId) : undefined;
-  const physical = abilityId
-    ? abilityVfxFullSpec(abilityId)?.physical
-    : undefined;
+  const physical = abilityId ? abilityVfxFullSpec(abilityId)?.physical : undefined;
   if (physical) {
     const contact = physicalContactSheet(physical);
     school =
@@ -31,28 +29,14 @@ export function impactContact(
             : school;
   }
   if (profile?.bleeding) school = 'physical-blood';
-  visual?.respondToElement(
-    school,
-    Math.min(0.95, 0.55 + weight * 0.15),
-    profile,
-  );
+  visual?.respondToElement(school, Math.min(0.95, 0.55 + weight * 0.15), profile);
   if (periodic || abilityId === 'deep_wounds') return;
-  if (!reducedMotion)
-    visual?.holdFrame(0.18, Math.min(0.045, 0.018 + weight * 0.01));
-  if (
-    !local ||
-    reducedMotion ||
-    typeof navigator === 'undefined' ||
-    !navigator.vibrate
-  )
-    return;
+  if (!reducedMotion) visual?.holdFrame(0.18, Math.min(0.045, 0.018 + weight * 0.01));
+  if (!local || reducedMotion || typeof navigator === 'undefined' || !navigator.vibrate) return;
   const now = performance.now();
   if (now - lastHaptic < 90) return;
   try {
-    if (
-      typeof localStorage !== 'undefined' &&
-      localStorage.getItem('woc_haptics_on') === '0'
-    )
+    if (typeof localStorage !== 'undefined' && localStorage.getItem('woc_haptics_on') === '0')
       return;
     navigator.vibrate(Math.round(Math.min(28, 8 + weight * 8)));
     lastHaptic = now;
@@ -73,10 +57,7 @@ export function damageContact(
   local: boolean,
   reducedMotion: boolean,
 ): void {
-  const id =
-    event.ability === 'Bloodhook Wound'
-      ? 'bloodhook'
-      : attackAbilityId(event.ability);
+  const id = event.ability === 'Bloodhook Wound' ? 'bloodhook' : attackAbilityId(event.ability);
   impactContact(
     visual,
     event.school,
@@ -84,7 +65,6 @@ export function damageContact(
     local,
     reducedMotion,
     id,
-    isBleedContinuation(id, event.abilityId) ||
-      event.ability === 'Bloodhook Wound',
+    isBleedContinuation(id, event.abilityId) || event.ability === 'Bloodhook Wound',
   );
 }

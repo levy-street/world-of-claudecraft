@@ -4,52 +4,19 @@
   "authoring": "Original authored analytic Blender geometry/volume animation; no fluid simulation",
   "camera": {
     "type": "orthographic",
-    "target_pivot_world": [
-      0,
-      0,
-      0
-    ],
-    "location": [
-      0.0,
-      -14.0,
-      6.399999618530273
-    ],
-    "rotation_euler": [
-      1.221451997756958,
-      -0.0,
-      0.0
-    ],
+    "target_pivot_world": [0, 0, 0],
+    "location": [0.0, -14.0, 6.399999618530273],
+    "rotation_euler": [1.221451997756958, -0.0, 0.0],
     "ortho_scale": 6.300000190734863
   },
-  "pivot_uv_content_top_origin": [
-    0.5,
-    0.693885326385498
-  ],
-  "pivot_uv_tile_top_origin": [
-    0.5,
-    0.6878264099359512
-  ],
+  "pivot_uv_content_top_origin": [0.5, 0.693885326385498],
+  "pivot_uv_tile_top_origin": [0.5, 0.6878264099359512],
   "phase_frames_zero_based": {
-    "onset": [
-      0,
-      6
-    ],
-    "rise": [
-      7,
-      18
-    ],
-    "peak": [
-      19,
-      32
-    ],
-    "breakup": [
-      33,
-      46
-    ],
-    "tail": [
-      47,
-      63
-    ]
+    "onset": [0, 6],
+    "rise": [7, 18],
+    "peak": [19, 32],
+    "breakup": [33, 46],
+    "tail": [47, 63]
   },
   "normal_map": null,
   "motion_vector_map": null,
@@ -68,18 +35,9 @@
   "reference_prompt": "reference_prompt.txt",
   "authoring_script": "bake_hero_assets.py",
   "packaging_script": "package_hero_assets.py",
-  "dimensions_px": [
-    4096,
-    4096
-  ],
-  "tile_px": [
-    512,
-    512
-  ],
-  "content_px": [
-    496,
-    496
-  ],
+  "dimensions_px": [4096, 4096],
+  "tile_px": [512, 512],
+  "content_px": [496, 496],
   "gutter_px": 8,
   "grid": {
     "columns": 8,
@@ -105,17 +63,9 @@
   "lighting_atlas": null,
   "motion_vector_atlas": null,
   "auxiliary_encoding": "No auxiliary maps supplied. Do not infer normal or motion data from beauty RGB.",
-  "union_content_alpha_bounds_px": [
-    80,
-    51,
-    460,
-    463
-  ],
+  "union_content_alpha_bounds_px": [80, 51, 460, 463],
   "camera_plane_bounds_relative_to_origin_world": [
-    -2.1338710323456795,
-    -1.50936926366163,
-    2.692742017007643,
-    3.723695410900394
+    -2.1338710323456795, -1.50936926366163, 2.692742017007643, 3.723695410900394
   ],
   "runtime_bytes": 2220696,
   "webp_quality": 90,
@@ -132,12 +82,7 @@
     },
     {
       "frame": 1,
-      "alpha_bbox_above_4": [
-        221,
-        325,
-        246,
-        351
-      ],
+      "alpha_bbox_above_4": [221, 325, 246, 351],
       "min_content_edge_margin_px": 145,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.001772,
@@ -147,12 +92,7 @@
     },
     {
       "frame": 2,
-      "alpha_bbox_above_4": [
-        200,
-        311,
-        275,
-        356
-      ],
+      "alpha_bbox_above_4": [200, 311, 275, 356],
       "min_content_edge_margin_px": 140,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.008134,
@@ -162,12 +102,7 @@
     },
     {
       "frame": 3,
-      "alpha_bbox_above_4": [
-        185,
-        302,
-        319,
-        359
-      ],
+      "alpha_bbox_above_4": [185, 302, 319, 359],
       "min_content_edge_margin_px": 137,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.019121,
@@ -177,12 +112,7 @@
     },
     {
       "frame": 4,
-      "alpha_bbox_above_4": [
-        175,
-        269,
-        356,
-        359
-      ],
+      "alpha_bbox_above_4": [175, 269, 356, 359],
       "min_content_edge_margin_px": 137,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.031616,
@@ -192,12 +122,7 @@
     },
     {
       "frame": 5,
-      "alpha_bbox_above_4": [
-        169,
-        202,
-        376,
-        360
-      ],
+      "alpha_bbox_above_4": [169, 202, 376, 360],
       "min_content_edge_margin_px": 120,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.042591,
@@ -207,12 +132,7 @@
     },
     {
       "frame": 6,
-      "alpha_bbox_above_4": [
-        166,
-        177,
-        380,
-        361
-      ],
+      "alpha_bbox_above_4": [166, 177, 380, 361],
       "min_content_edge_margin_px": 116,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.05172,
@@ -222,12 +142,7 @@
     },
     {
       "frame": 7,
-      "alpha_bbox_above_4": [
-        165,
-        156,
-        384,
-        362
-      ],
+      "alpha_bbox_above_4": [165, 156, 384, 362],
       "min_content_edge_margin_px": 112,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.05859,
@@ -237,12 +152,7 @@
     },
     {
       "frame": 8,
-      "alpha_bbox_above_4": [
-        165,
-        136,
-        382,
-        361
-      ],
+      "alpha_bbox_above_4": [165, 136, 382, 361],
       "min_content_edge_margin_px": 114,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.063752,
@@ -252,12 +162,7 @@
     },
     {
       "frame": 9,
-      "alpha_bbox_above_4": [
-        164,
-        123,
-        384,
-        361
-      ],
+      "alpha_bbox_above_4": [164, 123, 384, 361],
       "min_content_edge_margin_px": 112,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.067878,
@@ -267,12 +172,7 @@
     },
     {
       "frame": 10,
-      "alpha_bbox_above_4": [
-        159,
-        113,
-        385,
-        360
-      ],
+      "alpha_bbox_above_4": [159, 113, 385, 360],
       "min_content_edge_margin_px": 111,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.071926,
@@ -282,12 +182,7 @@
     },
     {
       "frame": 11,
-      "alpha_bbox_above_4": [
-        154,
-        104,
-        386,
-        361
-      ],
+      "alpha_bbox_above_4": [154, 104, 386, 361],
       "min_content_edge_margin_px": 104,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.075625,
@@ -297,12 +192,7 @@
     },
     {
       "frame": 12,
-      "alpha_bbox_above_4": [
-        150,
-        97,
-        386,
-        361
-      ],
+      "alpha_bbox_above_4": [150, 97, 386, 361],
       "min_content_edge_margin_px": 97,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.079198,
@@ -312,12 +202,7 @@
     },
     {
       "frame": 13,
-      "alpha_bbox_above_4": [
-        147,
-        92,
-        384,
-        362
-      ],
+      "alpha_bbox_above_4": [147, 92, 384, 362],
       "min_content_edge_margin_px": 92,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.082873,
@@ -327,12 +212,7 @@
     },
     {
       "frame": 14,
-      "alpha_bbox_above_4": [
-        144,
-        88,
-        386,
-        363
-      ],
+      "alpha_bbox_above_4": [144, 88, 386, 363],
       "min_content_edge_margin_px": 88,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.085625,
@@ -342,12 +222,7 @@
     },
     {
       "frame": 15,
-      "alpha_bbox_above_4": [
-        142,
-        86,
-        388,
-        363
-      ],
+      "alpha_bbox_above_4": [142, 86, 388, 363],
       "min_content_edge_margin_px": 86,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.088332,
@@ -357,12 +232,7 @@
     },
     {
       "frame": 16,
-      "alpha_bbox_above_4": [
-        139,
-        83,
-        389,
-        364
-      ],
+      "alpha_bbox_above_4": [139, 83, 389, 364],
       "min_content_edge_margin_px": 83,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.090405,
@@ -372,12 +242,7 @@
     },
     {
       "frame": 17,
-      "alpha_bbox_above_4": [
-        137,
-        81,
-        391,
-        364
-      ],
+      "alpha_bbox_above_4": [137, 81, 391, 364],
       "min_content_edge_margin_px": 81,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.092409,
@@ -387,12 +252,7 @@
     },
     {
       "frame": 18,
-      "alpha_bbox_above_4": [
-        134,
-        79,
-        393,
-        364
-      ],
+      "alpha_bbox_above_4": [134, 79, 393, 364],
       "min_content_edge_margin_px": 79,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.094343,
@@ -402,12 +262,7 @@
     },
     {
       "frame": 19,
-      "alpha_bbox_above_4": [
-        132,
-        77,
-        395,
-        364
-      ],
+      "alpha_bbox_above_4": [132, 77, 395, 364],
       "min_content_edge_margin_px": 77,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.095835,
@@ -417,12 +272,7 @@
     },
     {
       "frame": 20,
-      "alpha_bbox_above_4": [
-        129,
-        76,
-        396,
-        367
-      ],
+      "alpha_bbox_above_4": [129, 76, 396, 367],
       "min_content_edge_margin_px": 76,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.097124,
@@ -432,12 +282,7 @@
     },
     {
       "frame": 21,
-      "alpha_bbox_above_4": [
-        127,
-        74,
-        400,
-        370
-      ],
+      "alpha_bbox_above_4": [127, 74, 400, 370],
       "min_content_edge_margin_px": 74,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.098388,
@@ -447,12 +292,7 @@
     },
     {
       "frame": 22,
-      "alpha_bbox_above_4": [
-        125,
-        73,
-        403,
-        374
-      ],
+      "alpha_bbox_above_4": [125, 73, 403, 374],
       "min_content_edge_margin_px": 73,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.099847,
@@ -462,12 +302,7 @@
     },
     {
       "frame": 23,
-      "alpha_bbox_above_4": [
-        122,
-        72,
-        406,
-        378
-      ],
+      "alpha_bbox_above_4": [122, 72, 406, 378],
       "min_content_edge_margin_px": 72,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.101095,
@@ -477,12 +312,7 @@
     },
     {
       "frame": 24,
-      "alpha_bbox_above_4": [
-        120,
-        70,
-        410,
-        382
-      ],
+      "alpha_bbox_above_4": [120, 70, 410, 382],
       "min_content_edge_margin_px": 70,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.101835,
@@ -492,12 +322,7 @@
     },
     {
       "frame": 25,
-      "alpha_bbox_above_4": [
-        118,
-        68,
-        413,
-        387
-      ],
+      "alpha_bbox_above_4": [118, 68, 413, 387],
       "min_content_edge_margin_px": 68,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.102945,
@@ -507,12 +332,7 @@
     },
     {
       "frame": 26,
-      "alpha_bbox_above_4": [
-        116,
-        66,
-        416,
-        391
-      ],
+      "alpha_bbox_above_4": [116, 66, 416, 391],
       "min_content_edge_margin_px": 66,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.103688,
@@ -522,12 +342,7 @@
     },
     {
       "frame": 27,
-      "alpha_bbox_above_4": [
-        114,
-        65,
-        419,
-        396
-      ],
+      "alpha_bbox_above_4": [114, 65, 419, 396],
       "min_content_edge_margin_px": 65,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.104282,
@@ -537,12 +352,7 @@
     },
     {
       "frame": 28,
-      "alpha_bbox_above_4": [
-        112,
-        64,
-        423,
-        400
-      ],
+      "alpha_bbox_above_4": [112, 64, 423, 400],
       "min_content_edge_margin_px": 64,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.1054,
@@ -552,12 +362,7 @@
     },
     {
       "frame": 29,
-      "alpha_bbox_above_4": [
-        110,
-        63,
-        426,
-        405
-      ],
+      "alpha_bbox_above_4": [110, 63, 426, 405],
       "min_content_edge_margin_px": 63,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.106733,
@@ -567,12 +372,7 @@
     },
     {
       "frame": 30,
-      "alpha_bbox_above_4": [
-        108,
-        63,
-        429,
-        410
-      ],
+      "alpha_bbox_above_4": [108, 63, 429, 410],
       "min_content_edge_margin_px": 63,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.107302,
@@ -582,12 +382,7 @@
     },
     {
       "frame": 31,
-      "alpha_bbox_above_4": [
-        105,
-        62,
-        432,
-        416
-      ],
+      "alpha_bbox_above_4": [105, 62, 432, 416],
       "min_content_edge_margin_px": 62,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.108009,
@@ -597,12 +392,7 @@
     },
     {
       "frame": 32,
-      "alpha_bbox_above_4": [
-        103,
-        62,
-        435,
-        421
-      ],
+      "alpha_bbox_above_4": [103, 62, 435, 421],
       "min_content_edge_margin_px": 61,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.108099,
@@ -612,12 +402,7 @@
     },
     {
       "frame": 33,
-      "alpha_bbox_above_4": [
-        101,
-        60,
-        438,
-        427
-      ],
+      "alpha_bbox_above_4": [101, 60, 438, 427],
       "min_content_edge_margin_px": 58,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.108001,
@@ -627,12 +412,7 @@
     },
     {
       "frame": 34,
-      "alpha_bbox_above_4": [
-        99,
-        58,
-        441,
-        432
-      ],
+      "alpha_bbox_above_4": [99, 58, 441, 432],
       "min_content_edge_margin_px": 55,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.107733,
@@ -642,12 +422,7 @@
     },
     {
       "frame": 35,
-      "alpha_bbox_above_4": [
-        97,
-        57,
-        445,
-        438
-      ],
+      "alpha_bbox_above_4": [97, 57, 445, 438],
       "min_content_edge_margin_px": 51,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.106778,
@@ -657,12 +432,7 @@
     },
     {
       "frame": 36,
-      "alpha_bbox_above_4": [
-        95,
-        56,
-        449,
-        444
-      ],
+      "alpha_bbox_above_4": [95, 56, 449, 444],
       "min_content_edge_margin_px": 47,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.105969,
@@ -672,12 +442,7 @@
     },
     {
       "frame": 37,
-      "alpha_bbox_above_4": [
-        93,
-        54,
-        452,
-        450
-      ],
+      "alpha_bbox_above_4": [93, 54, 452, 450],
       "min_content_edge_margin_px": 44,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.104867,
@@ -687,12 +452,7 @@
     },
     {
       "frame": 38,
-      "alpha_bbox_above_4": [
-        91,
-        53,
-        456,
-        457
-      ],
+      "alpha_bbox_above_4": [91, 53, 456, 457],
       "min_content_edge_margin_px": 39,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.103603,
@@ -702,12 +462,7 @@
     },
     {
       "frame": 39,
-      "alpha_bbox_above_4": [
-        89,
-        53,
-        455,
-        463
-      ],
+      "alpha_bbox_above_4": [89, 53, 455, 463],
       "min_content_edge_margin_px": 33,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.102217,
@@ -717,12 +472,7 @@
     },
     {
       "frame": 40,
-      "alpha_bbox_above_4": [
-        87,
-        52,
-        458,
-        409
-      ],
+      "alpha_bbox_above_4": [87, 52, 458, 409],
       "min_content_edge_margin_px": 38,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.100709,
@@ -732,12 +482,7 @@
     },
     {
       "frame": 41,
-      "alpha_bbox_above_4": [
-        85,
-        52,
-        460,
-        412
-      ],
+      "alpha_bbox_above_4": [85, 52, 460, 412],
       "min_content_edge_margin_px": 36,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.099221,
@@ -747,12 +492,7 @@
     },
     {
       "frame": 42,
-      "alpha_bbox_above_4": [
-        83,
-        51,
-        437,
-        416
-      ],
+      "alpha_bbox_above_4": [83, 51, 437, 416],
       "min_content_edge_margin_px": 51,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.097721,
@@ -762,12 +502,7 @@
     },
     {
       "frame": 43,
-      "alpha_bbox_above_4": [
-        81,
-        51,
-        439,
-        420
-      ],
+      "alpha_bbox_above_4": [81, 51, 439, 420],
       "min_content_edge_margin_px": 51,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.096205,
@@ -777,12 +512,7 @@
     },
     {
       "frame": 44,
-      "alpha_bbox_above_4": [
-        80,
-        52,
-        440,
-        394
-      ],
+      "alpha_bbox_above_4": [80, 52, 440, 394],
       "min_content_edge_margin_px": 52,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.094856,
@@ -792,12 +522,7 @@
     },
     {
       "frame": 45,
-      "alpha_bbox_above_4": [
-        140,
-        52,
-        442,
-        399
-      ],
+      "alpha_bbox_above_4": [140, 52, 442, 399],
       "min_content_edge_margin_px": 52,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.093356,
@@ -807,12 +532,7 @@
     },
     {
       "frame": 46,
-      "alpha_bbox_above_4": [
-        139,
-        53,
-        443,
-        404
-      ],
+      "alpha_bbox_above_4": [139, 53, 443, 404],
       "min_content_edge_margin_px": 53,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.092214,
@@ -822,12 +542,7 @@
     },
     {
       "frame": 47,
-      "alpha_bbox_above_4": [
-        139,
-        54,
-        444,
-        410
-      ],
+      "alpha_bbox_above_4": [139, 54, 444, 410],
       "min_content_edge_margin_px": 52,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.091421,
@@ -837,12 +552,7 @@
     },
     {
       "frame": 48,
-      "alpha_bbox_above_4": [
-        138,
-        55,
-        445,
-        376
-      ],
+      "alpha_bbox_above_4": [138, 55, 445, 376],
       "min_content_edge_margin_px": 51,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.090356,
@@ -852,12 +562,7 @@
     },
     {
       "frame": 49,
-      "alpha_bbox_above_4": [
-        138,
-        92,
-        446,
-        380
-      ],
+      "alpha_bbox_above_4": [138, 92, 446, 380],
       "min_content_edge_margin_px": 50,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.089669,
@@ -867,12 +572,7 @@
     },
     {
       "frame": 50,
-      "alpha_bbox_above_4": [
-        137,
-        93,
-        444,
-        385
-      ],
+      "alpha_bbox_above_4": [137, 93, 444, 385],
       "min_content_edge_margin_px": 52,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.089059,
@@ -882,12 +582,7 @@
     },
     {
       "frame": 51,
-      "alpha_bbox_above_4": [
-        137,
-        94,
-        440,
-        389
-      ],
+      "alpha_bbox_above_4": [137, 94, 440, 389],
       "min_content_edge_margin_px": 56,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.088421,
@@ -897,12 +592,7 @@
     },
     {
       "frame": 52,
-      "alpha_bbox_above_4": [
-        137,
-        95,
-        442,
-        394
-      ],
+      "alpha_bbox_above_4": [137, 95, 442, 394],
       "min_content_edge_margin_px": 54,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.088161,
@@ -912,12 +602,7 @@
     },
     {
       "frame": 53,
-      "alpha_bbox_above_4": [
-        137,
-        96,
-        444,
-        361
-      ],
+      "alpha_bbox_above_4": [137, 96, 444, 361],
       "min_content_edge_margin_px": 52,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.087775,
@@ -927,12 +612,7 @@
     },
     {
       "frame": 54,
-      "alpha_bbox_above_4": [
-        137,
-        98,
-        446,
-        365
-      ],
+      "alpha_bbox_above_4": [137, 98, 446, 365],
       "min_content_edge_margin_px": 50,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.087425,
@@ -942,12 +622,7 @@
     },
     {
       "frame": 55,
-      "alpha_bbox_above_4": [
-        168,
-        100,
-        448,
-        368
-      ],
+      "alpha_bbox_above_4": [168, 100, 448, 368],
       "min_content_edge_margin_px": 48,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.087035,
@@ -957,12 +632,7 @@
     },
     {
       "frame": 56,
-      "alpha_bbox_above_4": [
-        168,
-        130,
-        450,
-        372
-      ],
+      "alpha_bbox_above_4": [168, 130, 450, 372],
       "min_content_edge_margin_px": 46,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.086783,
@@ -972,12 +642,7 @@
     },
     {
       "frame": 57,
-      "alpha_bbox_above_4": [
-        168,
-        133,
-        399,
-        360
-      ],
+      "alpha_bbox_above_4": [168, 133, 399, 360],
       "min_content_edge_margin_px": 97,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.08658,
@@ -987,12 +652,7 @@
     },
     {
       "frame": 58,
-      "alpha_bbox_above_4": [
-        168,
-        137,
-        399,
-        360
-      ],
+      "alpha_bbox_above_4": [168, 137, 399, 360],
       "min_content_edge_margin_px": 97,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.086576,
@@ -1002,12 +662,7 @@
     },
     {
       "frame": 59,
-      "alpha_bbox_above_4": [
-        168,
-        148,
-        399,
-        360
-      ],
+      "alpha_bbox_above_4": [168, 148, 399, 360],
       "min_content_edge_margin_px": 97,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.086405,
@@ -1017,12 +672,7 @@
     },
     {
       "frame": 60,
-      "alpha_bbox_above_4": [
-        168,
-        150,
-        400,
-        360
-      ],
+      "alpha_bbox_above_4": [168, 150, 400, 360],
       "min_content_edge_margin_px": 96,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.086031,
@@ -1032,12 +682,7 @@
     },
     {
       "frame": 61,
-      "alpha_bbox_above_4": [
-        168,
-        151,
-        399,
-        359
-      ],
+      "alpha_bbox_above_4": [168, 151, 399, 359],
       "min_content_edge_margin_px": 97,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.083897,
@@ -1047,12 +692,7 @@
     },
     {
       "frame": 62,
-      "alpha_bbox_above_4": [
-        171,
-        156,
-        398,
-        358
-      ],
+      "alpha_bbox_above_4": [171, 156, 398, 358],
       "min_content_edge_margin_px": 98,
       "edge_alpha_max": 0,
       "alpha_coverage": 0.06413,

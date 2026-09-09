@@ -1,11 +1,11 @@
 import * as THREE from 'three';
+import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js';
-import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { expect, it, vi } from 'vitest';
 import { page } from 'vitest/browser';
-import { RunesOfPowerVisuals } from '../../src/render/rune_of_power_visual';
 import { persistentClassVfxCompileTargets } from '../../src/render/ability_vfx/prewarm';
+import { RunesOfPowerVisuals } from '../../src/render/rune_of_power_visual';
 
 it('renders Rune states around the native Mage without first-field shader links', async () => {
   await page.viewport(1040, 740);
@@ -16,12 +16,8 @@ it('renders Rune states around the native Mage without first-field shader links'
   });
   renderer.setSize(1020, 700);
   document.body.appendChild(renderer.domElement);
-  const ktx = new KTX2Loader()
-    .setTranscoderPath('/basis/')
-    .detectSupport(renderer);
-  const loader = new GLTFLoader()
-    .setKTX2Loader(ktx)
-    .setMeshoptDecoder(MeshoptDecoder);
+  const ktx = new KTX2Loader().setTranscoderPath('/basis/').detectSupport(renderer);
+  const loader = new GLTFLoader().setKTX2Loader(ktx).setMeshoptDecoder(MeshoptDecoder);
   const body = await loader.loadAsync('/models/chars/players/mage.glb');
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x1a202b);
@@ -46,8 +42,7 @@ it('renders Rune states around the native Mage without first-field shader links'
   camera.lookAt(0, 0.2, 0);
   // Compile the exact boot targets, including instanced color attributes.
   const warm = new THREE.Group();
-  for (const target of persistentClassVfxCompileTargets())
-    warm.add(target.object.clone());
+  for (const target of persistentClassVfxCompileTargets()) warm.add(target.object.clone());
   warm.traverse((o) => {
     o.visible = true;
   });
@@ -56,12 +51,7 @@ it('renders Rune states around the native Mage without first-field shader links'
   const prepared = renderer.info.programs?.length;
   const fx = new RunesOfPowerVisuals(scene, () => 0);
   try {
-    for (const disposition of [
-      'eligible',
-      'opponent',
-      'inactive',
-      'unknown',
-    ] as const) {
+    for (const disposition of ['eligible', 'opponent', 'inactive', 'unknown'] as const) {
       fx.sync([
         {
           id: 'rune',

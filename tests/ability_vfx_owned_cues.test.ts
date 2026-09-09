@@ -52,9 +52,16 @@ describe('owned physical and ritual event routing', () => {
     expect(deps.triggerAttack).not.toHaveBeenCalled();
   });
   it('holds Aetherwell while actual mana pulses arrive without restarting its action', () => {
-    const {paint,deps,next}=painter();
-    for(let tick=0;tick<6;tick++){
-      paint.handleSpellfx({sourceId:1,targetId:1,school:'arcane',ability:'evocation',fx:'selfCast'});next();
+    const { paint, deps, next } = painter();
+    for (let tick = 0; tick < 6; tick++) {
+      paint.handleSpellfx({
+        sourceId: 1,
+        targetId: 1,
+        school: 'arcane',
+        ability: 'evocation',
+        fx: 'selfCast',
+      });
+      next();
     }
     expect(deps.triggerAttack).not.toHaveBeenCalled();
   });

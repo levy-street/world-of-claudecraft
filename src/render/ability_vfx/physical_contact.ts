@@ -1,5 +1,5 @@
-import { physicalContactSheet } from './physical_choreography_core';
 import { meleeContactPoint, meleeImpactProfile } from '../melee_impact_core';
+import { physicalContactSheet } from './physical_choreography_core';
 import type { SeqSlot, SequencerHost } from './sequencer';
 
 const origin = { x: 0, y: 0, z: 0 };
@@ -52,13 +52,7 @@ export function physicalContact(
       0.23,
       (points) => {
         for (let j = 0; j < points.length; j++) {
-          meleeContactPoint(
-            profile,
-            j / (points.length - 1),
-            beat,
-            strand,
-            point,
-          );
+          meleeContactPoint(profile, j / (points.length - 1), beat, strand, point);
           points[j].set(
             x + dz * point.x + dx * point.z,
             y + point.y,

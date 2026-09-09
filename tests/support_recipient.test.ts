@@ -1,10 +1,7 @@
 import * as THREE from 'three';
-import { syncRigMatrixFreeze } from '../src/render/rig_visibility_freeze';
 import { describe, expect, it, vi } from 'vitest';
-import {
-  supportRecipientBits,
-  type SupportAura,
-} from '../src/render/support_recipient_core';
+import { syncRigMatrixFreeze } from '../src/render/rig_visibility_freeze';
+import { type SupportAura, supportRecipientBits } from '../src/render/support_recipient_core';
 import {
   SupportRecipientVisual,
   syncSupportRecipient,
@@ -99,11 +96,9 @@ describe('actual support benefit presentation', () => {
     const fx = new SupportRecipientVisual();
     const next = new SupportRecipientVisual();
     const shared = vi.spyOn(fx.conduits.geometry, 'dispose');
-    const disposal = vi
-      .spyOn(fx.wards.material, 'dispose')
-      .mockImplementationOnce(() => {
-        throw new Error('driver failure');
-      });
+    const disposal = vi.spyOn(fx.wards.material, 'dispose').mockImplementationOnce(() => {
+      throw new Error('driver failure');
+    });
     expect(() => fx.dispose()).toThrow(AggregateError);
     fx.update(7, 1.8, null);
     expect(fx.group.visible).toBe(false);

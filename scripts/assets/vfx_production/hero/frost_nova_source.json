@@ -4,52 +4,19 @@
   "authoring": "Original authored analytic Blender geometry/volume animation; no fluid simulation",
   "camera": {
     "type": "orthographic",
-    "target_pivot_world": [
-      0,
-      0,
-      0
-    ],
-    "location": [
-      0.0,
-      -14.0,
-      6.199999809265137
-    ],
-    "rotation_euler": [
-      1.2214518785476685,
-      -0.0,
-      0.0
-    ],
+    "target_pivot_world": [0, 0, 0],
+    "location": [0.0, -14.0, 6.199999809265137],
+    "rotation_euler": [1.2214518785476685, -0.0, 0.0],
     "ortho_scale": 7.25
   },
-  "pivot_uv_content_top_origin": [
-    0.5,
-    0.6425594389438629
-  ],
-  "pivot_uv_tile_top_origin": [
-    0.5,
-    0.6381044564768672
-  ],
+  "pivot_uv_content_top_origin": [0.5, 0.6425594389438629],
+  "pivot_uv_tile_top_origin": [0.5, 0.6381044564768672],
   "phase_frames_zero_based": {
-    "onset": [
-      0,
-      6
-    ],
-    "rise": [
-      7,
-      18
-    ],
-    "peak": [
-      19,
-      32
-    ],
-    "breakup": [
-      33,
-      46
-    ],
-    "tail": [
-      47,
-      63
-    ]
+    "onset": [0, 6],
+    "rise": [7, 18],
+    "peak": [19, 32],
+    "breakup": [33, 46],
+    "tail": [47, 63]
   },
   "normal_map": null,
   "motion_vector_map": null,

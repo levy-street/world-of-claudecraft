@@ -47,27 +47,8 @@
         "loopSeamVsAdjacentRms": 2.050060207920183
       },
       "materialReview": {
-        "bandEdgesHz": [
-          25,
-          80,
-          180,
-          450,
-          1000,
-          2500,
-          6000,
-          12000,
-          18000
-        ],
-        "bandEnergyFraction": [
-          0.2537,
-          0.2884,
-          0.3059,
-          0.0646,
-          0.084,
-          0.0016,
-          0.0011,
-          0.0007
-        ],
+        "bandEdgesHz": [25, 80, 180, 450, 1000, 2500, 6000, 12000, 18000],
+        "bandEnergyFraction": [0.2537, 0.2884, 0.3059, 0.0646, 0.084, 0.0016, 0.0011, 0.0007],
         "spectralCentroidHz": 337.2,
         "first20msRms": 0.11912,
         "last20msRms": 0.150103,
@@ -119,27 +100,8 @@
         "loopSeamVsAdjacentRms": null
       },
       "materialReview": {
-        "bandEdgesHz": [
-          25,
-          80,
-          180,
-          450,
-          1000,
-          2500,
-          6000,
-          12000,
-          18000
-        ],
-        "bandEnergyFraction": [
-          0.3312,
-          0.217,
-          0.0633,
-          0.0828,
-          0.1546,
-          0.1487,
-          0.0017,
-          0.0007
-        ],
+        "bandEdgesHz": [25, 80, 180, 450, 1000, 2500, 6000, 12000, 18000],
+        "bandEnergyFraction": [0.3312, 0.217, 0.0633, 0.0828, 0.1546, 0.1487, 0.0017, 0.0007],
         "spectralCentroidHz": 949.9,
         "first20msRms": 0.217546,
         "last20msRms": 0.000145
@@ -188,30 +150,11 @@
         "loopSeamVsAdjacentRms": null
       },
       "materialReview": {
-        "bandEdgesHz": [
-          25,
-          80,
-          180,
-          450,
-          1000,
-          2500,
-          6000,
-          12000,
-          18000
-        ],
-        "bandEnergyFraction": [
-          0.4523,
-          0.1288,
-          0.1479,
-          0.1332,
-          0.1173,
-          0.0152,
-          0.0034,
-          0.0019
-        ],
+        "bandEdgesHz": [25, 80, 180, 450, 1000, 2500, 6000, 12000, 18000],
+        "bandEnergyFraction": [0.4523, 0.1288, 0.1479, 0.1332, 0.1173, 0.0152, 0.0034, 0.0019],
         "spectralCentroidHz": 465.4,
         "first20msRms": 0.22607,
-        "last20msRms": 9.3e-05
+        "last20msRms": 9.3e-5
       }
     },
     {
@@ -257,27 +200,8 @@
         "loopSeamVsAdjacentRms": 3.2525656528943485
       },
       "materialReview": {
-        "bandEdgesHz": [
-          25,
-          80,
-          180,
-          450,
-          1000,
-          2500,
-          6000,
-          12000,
-          18000
-        ],
-        "bandEnergyFraction": [
-          0.0002,
-          0.032,
-          0.0717,
-          0.1012,
-          0.1962,
-          0.4989,
-          0.0999,
-          0.0
-        ],
+        "bandEdgesHz": [25, 80, 180, 450, 1000, 2500, 6000, 12000, 18000],
+        "bandEnergyFraction": [0.0002, 0.032, 0.0717, 0.1012, 0.1962, 0.4989, 0.0999, 0.0],
         "spectralCentroidHz": 3340.9,
         "first20msRms": 0.090043,
         "last20msRms": 0.090862,
@@ -329,30 +253,11 @@
         "loopSeamVsAdjacentRms": null
       },
       "materialReview": {
-        "bandEdgesHz": [
-          25,
-          80,
-          180,
-          450,
-          1000,
-          2500,
-          6000,
-          12000,
-          18000
-        ],
-        "bandEnergyFraction": [
-          0.0093,
-          0.1446,
-          0.0326,
-          0.4541,
-          0.091,
-          0.1489,
-          0.1127,
-          0.0067
-        ],
+        "bandEdgesHz": [25, 80, 180, 450, 1000, 2500, 6000, 12000, 18000],
+        "bandEnergyFraction": [0.0093, 0.1446, 0.0326, 0.4541, 0.091, 0.1489, 0.1127, 0.0067],
         "spectralCentroidHz": 2039.5,
         "first20msRms": 0.19954,
-        "last20msRms": 7.7e-05
+        "last20msRms": 7.7e-5
       }
     },
     {
@@ -398,30 +303,11 @@
         "loopSeamVsAdjacentRms": null
       },
       "materialReview": {
-        "bandEdgesHz": [
-          25,
-          80,
-          180,
-          450,
-          1000,
-          2500,
-          6000,
-          12000,
-          18000
-        ],
-        "bandEnergyFraction": [
-          0.0481,
-          0.0616,
-          0.3848,
-          0.1719,
-          0.0949,
-          0.1578,
-          0.079,
-          0.0018
-        ],
+        "bandEdgesHz": [25, 80, 180, 450, 1000, 2500, 6000, 12000, 18000],
+        "bandEnergyFraction": [0.0481, 0.0616, 0.3848, 0.1719, 0.0949, 0.1578, 0.079, 0.0018],
         "spectralCentroidHz": 1751.4,
         "first20msRms": 0.21968,
-        "last20msRms": 3.9e-05
+        "last20msRms": 3.9e-5
       }
     },
     {
@@ -467,27 +353,8 @@
         "loopSeamVsAdjacentRms": 0.5210145808523179
       },
       "materialReview": {
-        "bandEdgesHz": [
-          25,
-          80,
-          180,
-          450,
-          1000,
-          2500,
-          6000,
-          12000,
-          18000
-        ],
-        "bandEnergyFraction": [
-          0.1873,
-          0.2986,
-          0.2244,
-          0.0008,
-          0.0494,
-          0.1306,
-          0.1065,
-          0.0025
-        ],
+        "bandEdgesHz": [25, 80, 180, 450, 1000, 2500, 6000, 12000, 18000],
+        "bandEnergyFraction": [0.1873, 0.2986, 0.2244, 0.0008, 0.0494, 0.1306, 0.1065, 0.0025],
         "spectralCentroidHz": 1569.7,
         "first20msRms": 0.173368,
         "last20msRms": 0.122097,
@@ -539,30 +406,11 @@
         "loopSeamVsAdjacentRms": null
       },
       "materialReview": {
-        "bandEdgesHz": [
-          25,
-          80,
-          180,
-          450,
-          1000,
-          2500,
-          6000,
-          12000,
-          18000
-        ],
-        "bandEnergyFraction": [
-          0.1824,
-          0.1788,
-          0.0722,
-          0.0368,
-          0.0978,
-          0.2419,
-          0.1731,
-          0.0171
-        ],
+        "bandEdgesHz": [25, 80, 180, 450, 1000, 2500, 6000, 12000, 18000],
+        "bandEnergyFraction": [0.1824, 0.1788, 0.0722, 0.0368, 0.0978, 0.2419, 0.1731, 0.0171],
         "spectralCentroidHz": 2855.9,
         "first20msRms": 0.194947,
-        "last20msRms": 2.5e-05
+        "last20msRms": 2.5e-5
       }
     },
     {
@@ -608,30 +456,11 @@
         "loopSeamVsAdjacentRms": null
       },
       "materialReview": {
-        "bandEdgesHz": [
-          25,
-          80,
-          180,
-          450,
-          1000,
-          2500,
-          6000,
-          12000,
-          18000
-        ],
-        "bandEnergyFraction": [
-          0.4985,
-          0.2355,
-          0.1609,
-          0.0604,
-          0.0106,
-          0.0131,
-          0.0193,
-          0.0017
-        ],
+        "bandEdgesHz": [25, 80, 180, 450, 1000, 2500, 6000, 12000, 18000],
+        "bandEnergyFraction": [0.4985, 0.2355, 0.1609, 0.0604, 0.0106, 0.0131, 0.0193, 0.0017],
         "spectralCentroidHz": 405.4,
         "first20msRms": 0.224817,
-        "last20msRms": 7.4e-05
+        "last20msRms": 7.4e-5
       }
     },
     {
@@ -677,27 +506,8 @@
         "loopSeamVsAdjacentRms": 0.7328127608538896
       },
       "materialReview": {
-        "bandEdgesHz": [
-          25,
-          80,
-          180,
-          450,
-          1000,
-          2500,
-          6000,
-          12000,
-          18000
-        ],
-        "bandEnergyFraction": [
-          0.0,
-          0.0263,
-          0.1472,
-          0.1809,
-          0.3822,
-          0.2351,
-          0.0284,
-          0.0
-        ],
+        "bandEdgesHz": [25, 80, 180, 450, 1000, 2500, 6000, 12000, 18000],
+        "bandEnergyFraction": [0.0, 0.0263, 0.1472, 0.1809, 0.3822, 0.2351, 0.0284, 0.0],
         "spectralCentroidHz": 1893.3,
         "first20msRms": 0.115684,
         "last20msRms": 0.11269,
@@ -749,27 +559,8 @@
         "loopSeamVsAdjacentRms": null
       },
       "materialReview": {
-        "bandEdgesHz": [
-          25,
-          80,
-          180,
-          450,
-          1000,
-          2500,
-          6000,
-          12000,
-          18000
-        ],
-        "bandEnergyFraction": [
-          0.0001,
-          0.017,
-          0.2246,
-          0.1074,
-          0.2078,
-          0.4115,
-          0.0315,
-          0.0
-        ],
+        "bandEdgesHz": [25, 80, 180, 450, 1000, 2500, 6000, 12000, 18000],
+        "bandEnergyFraction": [0.0001, 0.017, 0.2246, 0.1074, 0.2078, 0.4115, 0.0315, 0.0],
         "spectralCentroidHz": 2393.2,
         "first20msRms": 0.161641,
         "last20msRms": 0.000122
@@ -818,30 +609,11 @@
         "loopSeamVsAdjacentRms": null
       },
       "materialReview": {
-        "bandEdgesHz": [
-          25,
-          80,
-          180,
-          450,
-          1000,
-          2500,
-          6000,
-          12000,
-          18000
-        ],
-        "bandEnergyFraction": [
-          0.0,
-          0.055,
-          0.2952,
-          0.1599,
-          0.1656,
-          0.3108,
-          0.0136,
-          0.0
-        ],
+        "bandEdgesHz": [25, 80, 180, 450, 1000, 2500, 6000, 12000, 18000],
+        "bandEnergyFraction": [0.0, 0.055, 0.2952, 0.1599, 0.1656, 0.3108, 0.0136, 0.0],
         "spectralCentroidHz": 1883.6,
         "first20msRms": 0.130126,
-        "last20msRms": 2.5e-05
+        "last20msRms": 2.5e-5
       }
     },
     {
@@ -887,27 +659,8 @@
         "loopSeamVsAdjacentRms": 0.05137673298544909
       },
       "materialReview": {
-        "bandEdgesHz": [
-          25,
-          80,
-          180,
-          450,
-          1000,
-          2500,
-          6000,
-          12000,
-          18000
-        ],
-        "bandEnergyFraction": [
-          0.113,
-          0.0924,
-          0.2668,
-          0.2016,
-          0.1986,
-          0.1125,
-          0.0151,
-          0.0
-        ],
+        "bandEdgesHz": [25, 80, 180, 450, 1000, 2500, 6000, 12000, 18000],
+        "bandEnergyFraction": [0.113, 0.0924, 0.2668, 0.2016, 0.1986, 0.1125, 0.0151, 0.0],
         "spectralCentroidHz": 1052.6,
         "first20msRms": 0.121535,
         "last20msRms": 0.108696,
@@ -959,27 +712,8 @@
         "loopSeamVsAdjacentRms": null
       },
       "materialReview": {
-        "bandEdgesHz": [
-          25,
-          80,
-          180,
-          450,
-          1000,
-          2500,
-          6000,
-          12000,
-          18000
-        ],
-        "bandEnergyFraction": [
-          0.0053,
-          0.3332,
-          0.2383,
-          0.1449,
-          0.1616,
-          0.0999,
-          0.0169,
-          0.0
-        ],
+        "bandEdgesHz": [25, 80, 180, 450, 1000, 2500, 6000, 12000, 18000],
+        "bandEnergyFraction": [0.0053, 0.3332, 0.2383, 0.1449, 0.1616, 0.0999, 0.0169, 0.0],
         "spectralCentroidHz": 946.0,
         "first20msRms": 0.191334,
         "last20msRms": 0.000121
@@ -1028,30 +762,11 @@
         "loopSeamVsAdjacentRms": null
       },
       "materialReview": {
-        "bandEdgesHz": [
-          25,
-          80,
-          180,
-          450,
-          1000,
-          2500,
-          6000,
-          12000,
-          18000
-        ],
-        "bandEnergyFraction": [
-          0.0,
-          0.3341,
-          0.1371,
-          0.2062,
-          0.1916,
-          0.12,
-          0.011,
-          0.0
-        ],
+        "bandEdgesHz": [25, 80, 180, 450, 1000, 2500, 6000, 12000, 18000],
+        "bandEnergyFraction": [0.0, 0.3341, 0.1371, 0.2062, 0.1916, 0.12, 0.011, 0.0],
         "spectralCentroidHz": 1043.7,
         "first20msRms": 0.165668,
-        "last20msRms": 9.4e-05
+        "last20msRms": 9.4e-5
       }
     },
     {
@@ -1097,31 +812,12 @@
         "loopSeamVsAdjacentRms": 0.43455539217329564
       },
       "materialReview": {
-        "bandEdgesHz": [
-          25,
-          80,
-          180,
-          450,
-          1000,
-          2500,
-          6000,
-          12000,
-          18000
-        ],
-        "bandEnergyFraction": [
-          0.0,
-          0.0228,
-          0.4229,
-          0.2561,
-          0.1518,
-          0.0983,
-          0.048,
-          0.0
-        ],
+        "bandEdgesHz": [25, 80, 180, 450, 1000, 2500, 6000, 12000, 18000],
+        "bandEnergyFraction": [0.0, 0.0228, 0.4229, 0.2561, 0.1518, 0.0983, 0.048, 0.0],
         "spectralCentroidHz": 1328.6,
         "first20msRms": 0.123805,
         "last20msRms": 0.112003,
-        "loopPhaseMismatch": 8.363276720046997e-05,
+        "loopPhaseMismatch": 8.363276720046997e-5,
         "loopPhaseMismatchDbfs": -81.55,
         "loopPhaseMismatchVsNormalStep": 0.0022
       }
@@ -1169,30 +865,11 @@
         "loopSeamVsAdjacentRms": null
       },
       "materialReview": {
-        "bandEdgesHz": [
-          25,
-          80,
-          180,
-          450,
-          1000,
-          2500,
-          6000,
-          12000,
-          18000
-        ],
-        "bandEnergyFraction": [
-          0.0643,
-          0.2211,
-          0.1147,
-          0.2884,
-          0.1957,
-          0.1115,
-          0.0042,
-          0.0
-        ],
+        "bandEdgesHz": [25, 80, 180, 450, 1000, 2500, 6000, 12000, 18000],
+        "bandEnergyFraction": [0.0643, 0.2211, 0.1147, 0.2884, 0.1957, 0.1115, 0.0042, 0.0],
         "spectralCentroidHz": 991.5,
         "first20msRms": 0.195884,
-        "last20msRms": 9.4e-05
+        "last20msRms": 9.4e-5
       }
     },
     {
@@ -1238,27 +915,8 @@
         "loopSeamVsAdjacentRms": null
       },
       "materialReview": {
-        "bandEdgesHz": [
-          25,
-          80,
-          180,
-          450,
-          1000,
-          2500,
-          6000,
-          12000,
-          18000
-        ],
-        "bandEnergyFraction": [
-          0.1419,
-          0.0672,
-          0.4909,
-          0.199,
-          0.0651,
-          0.0261,
-          0.0098,
-          0.0
-        ],
+        "bandEdgesHz": [25, 80, 180, 450, 1000, 2500, 6000, 12000, 18000],
+        "bandEnergyFraction": [0.1419, 0.0672, 0.4909, 0.199, 0.0651, 0.0261, 0.0098, 0.0],
         "spectralCentroidHz": 533.7,
         "first20msRms": 0.205497,
         "last20msRms": 0.000102
@@ -1307,27 +965,8 @@
         "loopSeamVsAdjacentRms": 0.06020707348940544
       },
       "materialReview": {
-        "bandEdgesHz": [
-          25,
-          80,
-          180,
-          450,
-          1000,
-          2500,
-          6000,
-          12000,
-          18000
-        ],
-        "bandEnergyFraction": [
-          0.0,
-          0.1421,
-          0.4589,
-          0.2448,
-          0.0727,
-          0.0773,
-          0.0025,
-          0.0017
-        ],
+        "bandEdgesHz": [25, 80, 180, 450, 1000, 2500, 6000, 12000, 18000],
+        "bandEnergyFraction": [0.0, 0.1421, 0.4589, 0.2448, 0.0727, 0.0773, 0.0025, 0.0017],
         "spectralCentroidHz": 741.6,
         "first20msRms": 0.115323,
         "last20msRms": 0.103064,
@@ -1379,30 +1018,11 @@
         "loopSeamVsAdjacentRms": null
       },
       "materialReview": {
-        "bandEdgesHz": [
-          25,
-          80,
-          180,
-          450,
-          1000,
-          2500,
-          6000,
-          12000,
-          18000
-        ],
-        "bandEnergyFraction": [
-          0.1061,
-          0.1505,
-          0.1439,
-          0.1134,
-          0.188,
-          0.1935,
-          0.1044,
-          0.0002
-        ],
+        "bandEdgesHz": [25, 80, 180, 450, 1000, 2500, 6000, 12000, 18000],
+        "bandEnergyFraction": [0.1061, 0.1505, 0.1439, 0.1134, 0.188, 0.1935, 0.1044, 0.0002],
         "spectralCentroidHz": 1987.8,
         "first20msRms": 0.185213,
-        "last20msRms": 5.9e-05
+        "last20msRms": 5.9e-5
       }
     },
     {
@@ -1448,30 +1068,11 @@
         "loopSeamVsAdjacentRms": null
       },
       "materialReview": {
-        "bandEdgesHz": [
-          25,
-          80,
-          180,
-          450,
-          1000,
-          2500,
-          6000,
-          12000,
-          18000
-        ],
-        "bandEnergyFraction": [
-          0.4981,
-          0.2287,
-          0.157,
-          0.0502,
-          0.0258,
-          0.024,
-          0.0142,
-          0.002
-        ],
+        "bandEdgesHz": [25, 80, 180, 450, 1000, 2500, 6000, 12000, 18000],
+        "bandEnergyFraction": [0.4981, 0.2287, 0.157, 0.0502, 0.0258, 0.024, 0.0142, 0.002],
         "spectralCentroidHz": 422.7,
         "first20msRms": 0.219618,
-        "last20msRms": 2.2e-05
+        "last20msRms": 2.2e-5
       }
     },
     {
@@ -1517,31 +1118,12 @@
         "loopSeamVsAdjacentRms": 0.8201222387271132
       },
       "materialReview": {
-        "bandEdgesHz": [
-          25,
-          80,
-          180,
-          450,
-          1000,
-          2500,
-          6000,
-          12000,
-          18000
-        ],
-        "bandEnergyFraction": [
-          0.269,
-          0.2097,
-          0.2088,
-          0.1566,
-          0.1249,
-          0.031,
-          0.0,
-          0.0
-        ],
+        "bandEdgesHz": [25, 80, 180, 450, 1000, 2500, 6000, 12000, 18000],
+        "bandEnergyFraction": [0.269, 0.2097, 0.2088, 0.1566, 0.1249, 0.031, 0.0, 0.0],
         "spectralCentroidHz": 491.4,
         "first20msRms": 0.109088,
         "last20msRms": 0.108027,
-        "loopPhaseMismatch": 8.66428017616272e-05,
+        "loopPhaseMismatch": 8.66428017616272e-5,
         "loopPhaseMismatchDbfs": -81.25,
         "loopPhaseMismatchVsNormalStep": 0.0055
       }
@@ -1589,27 +1171,8 @@
         "loopSeamVsAdjacentRms": null
       },
       "materialReview": {
-        "bandEdgesHz": [
-          25,
-          80,
-          180,
-          450,
-          1000,
-          2500,
-          6000,
-          12000,
-          18000
-        ],
-        "bandEnergyFraction": [
-          0.0151,
-          0.4313,
-          0.2695,
-          0.0559,
-          0.0707,
-          0.1034,
-          0.0518,
-          0.0021
-        ],
+        "bandEdgesHz": [25, 80, 180, 450, 1000, 2500, 6000, 12000, 18000],
+        "bandEnergyFraction": [0.0151, 0.4313, 0.2695, 0.0559, 0.0707, 0.1034, 0.0518, 0.0021],
         "spectralCentroidHz": 1106.8,
         "first20msRms": 0.166603,
         "last20msRms": 0.000137
@@ -1658,30 +1221,11 @@
         "loopSeamVsAdjacentRms": null
       },
       "materialReview": {
-        "bandEdgesHz": [
-          25,
-          80,
-          180,
-          450,
-          1000,
-          2500,
-          6000,
-          12000,
-          18000
-        ],
-        "bandEnergyFraction": [
-          0.3269,
-          0.4077,
-          0.1012,
-          0.0595,
-          0.0751,
-          0.0291,
-          0.0004,
-          0.0
-        ],
+        "bandEdgesHz": [25, 80, 180, 450, 1000, 2500, 6000, 12000, 18000],
+        "bandEnergyFraction": [0.3269, 0.4077, 0.1012, 0.0595, 0.0751, 0.0291, 0.0004, 0.0],
         "spectralCentroidHz": 353.7,
         "first20msRms": 0.22582,
-        "last20msRms": 5.2e-05
+        "last20msRms": 5.2e-5
       }
     }
   ],

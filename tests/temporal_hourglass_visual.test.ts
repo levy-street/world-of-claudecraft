@@ -41,7 +41,18 @@ describe('Temporal Hourglass visual', () => {
   it('mirrors and immediately removes persistent ground hourglasses', () => {
     const scene = new THREE.Scene();
     const visuals = new TemporalHourglassGroundVisuals(scene, () => 4);
-    visuals.sync([{ id: '1:2', sourceId: 1, disposition: 'protective', x: 3, z: 5, radius: 1.75, duration: 30, remaining: 30 }]);
+    visuals.sync([
+      {
+        id: '1:2',
+        sourceId: 1,
+        disposition: 'protective',
+        x: 3,
+        z: 5,
+        radius: 1.75,
+        duration: 30,
+        remaining: 30,
+      },
+    ]);
     const hourglass = scene.getObjectByName('temporal-hourglass-visual');
     expect(hourglass?.position).toMatchObject({ x: 3, y: 4.04, z: 5 });
 
