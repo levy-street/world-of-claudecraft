@@ -3,6 +3,18 @@ import { WARRIOR_CONTROL_SFX } from './warrior_control_sfx.mjs';
 export const WARRIOR_CONTACT_SFX = [
   ...WARRIOR_CONTROL_SFX,
   {
+    key: 'melee_warrior_reaver_release',
+    duration: 0.13,
+    prompt:
+      'One short decisive arming-sword shoulder draw, taut leather grip creak into a narrow descending serrated air whistle. Grounded disciplined knight preparation, compact close dry sound. No impact, voice, music, ambience or ringing.',
+  },
+  {
+    key: 'impact_warrior_reaver',
+    duration: 0.23,
+    prompt:
+      'One immediate diagonal arming-sword cut, bright sharp steel bite over a compact dense leather body thud, followed by a brief dry bronze grit rattle. Satisfying focused starter melee strike with clear physical weight. No explosion, repeated hit, long ringing, voice, music or ambience.',
+  },
+  {
     key: 'melee_warrior_gyre_release',
     duration: 0.13,
     prompt:

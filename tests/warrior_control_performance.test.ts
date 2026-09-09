@@ -43,6 +43,7 @@ it('keeps the native control poses and timing through actual clip preparation', 
   prepareMeleeClips(clips, map.attackByAbility);
   prepareNamedActionClips('player_warrior', clips, knight.scene);
   for (const id of [
+    'heroic_strike',
     'hamstring',
     'sunder_armor',
     'storm_bolt',

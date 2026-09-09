@@ -1380,7 +1380,7 @@ export const VISUALS: Record<string, VisualDef> = {
         revenge: 'Warrior_Revenge',
         thunder_clap: 'Warrior_Quaking_Blow',
         faultline: 'Warrior_Faultline',
-        heroic_strike: '1H_Melee_Attack_Slice_Diagonal',
+        heroic_strike: 'Warrior_Reaver_Strike',
         overpower: 'Warrior_Redhand',
         hamstring: 'Warrior_Hobbling_Cut',
         sunder_armor: 'Warrior_Armor_Shear',

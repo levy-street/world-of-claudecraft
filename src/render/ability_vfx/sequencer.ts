@@ -347,6 +347,8 @@ interface Beat {
 }
 
 export interface SeqSlot {
+  /** One admitted contact owns its local critical-hit feedback. */
+  contactFeedback?: () => void;
   /** Ordered component outcomes: two bits per cut, 0 avoided, 1 wound, 2 absorbed. */
   componentOutcomes?: number;
   componentCount?: number;
@@ -447,7 +449,10 @@ const SHEET_BY_PALETTE: Record<string, string> = {
 export class ArchetypeSequencer {
   cancelOwned(casterId: number, abilityId: string): void {
     for (const slot of this.slots)
-      if (slot.casterId === casterId && slot.abilityId === abilityId) slot.active = false;
+      if (slot.casterId === casterId && slot.abilityId === abilityId) {
+        slot.active = false;
+        slot.contactFeedback = undefined;
+      }
   }
   private slots: SeqSlot[] = [];
   private beats: Beat[] = [];
@@ -576,6 +581,7 @@ export class ArchetypeSequencer {
       }
     }
     if (!slot) return null;
+    slot.contactFeedback = undefined;
     slot.active = true;
     slot.componentOutcomes = componentOutcome;
     slot.componentCount = componentOutcome === undefined ? undefined : 1;
@@ -707,6 +713,7 @@ export class ArchetypeSequencer {
           this.impact(host, slot);
         } else {
           slot.active = false;
+          slot.contactFeedback = undefined;
           continue;
         }
       }
@@ -909,13 +916,17 @@ export class ArchetypeSequencer {
   }
 
   clear(): void {
-    for (const slot of this.slots) slot.active = false;
+    for (const slot of this.slots) {
+      slot.active = false;
+      slot.contactFeedback = undefined;
+    }
     for (const beat of this.beats) beat.active = false;
   }
 
   cancel(slot: SeqSlot): void {
     if (!slot.active) return;
     slot.active = false;
+    slot.contactFeedback = undefined;
   }
 
   // ---- staggered motif beats ----------------------------------------------
@@ -1142,6 +1153,10 @@ export class ArchetypeSequencer {
     }
     if (spec.physical) {
       physicalImpact(host, slot);
+      const feedback = slot.contactFeedback;
+      slot.contactFeedback = undefined;
+      if (feedback && host.anchorOf(slot.casterId, 0.55) && host.anchorOf(slot.targetId, 0.55))
+        feedback();
       return;
     }
     const o = spec.impact ?? {};

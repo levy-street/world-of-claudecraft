@@ -18,6 +18,11 @@ export const FURY_AUDIO = {
 } as const;
 export type FuryAudioId = keyof typeof FURY_AUDIO;
 export const WARRIOR_CONTACT_AUDIO = {
+  heroic_strike: {
+    release: 'melee_warrior_reaver_release',
+    impacts: ['impact_warrior_reaver'],
+    times: [0.15],
+  },
   breachmaker: {
     release: 'melee_warrior_breachmaker_release',
     impacts: ['impact_warrior_breachmaker'],

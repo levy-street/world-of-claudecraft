@@ -7,8 +7,10 @@ import { join } from 'node:path';
 import { FURY_SFX } from './sfx/fury_sfx.mjs';
 import { WARRIOR_CONTACT_SFX } from './sfx/warrior_contact_sfx.mjs';
 
-const contact = process.argv.includes('--warrior-contact');
-const cues = contact ? WARRIOR_CONTACT_SFX : FURY_SFX;
+const reaver = process.argv.includes('--warrior-reaver');
+const contact = reaver || process.argv.includes('--warrior-contact');
+const sourceCues = contact ? WARRIOR_CONTACT_SFX : FURY_SFX;
+const cues = reaver ? sourceCues.filter((cue) => cue.key.includes('_warrior_reaver')) : sourceCues;
 const folder = contact ? 'tmp/warrior-contact-audio' : 'tmp/fury-audio';
 mkdirSync(join(folder, 'raw'), { recursive: true });
 const ledgerPath = join(folder, 'generation-ledger.json');

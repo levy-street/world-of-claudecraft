@@ -14,6 +14,7 @@ interface BladeStyle {
   rising?: boolean;
 }
 export const WARRIOR_BLADE_STYLES: Readonly<Record<string, BladeStyle | undefined>> = {
+  heroic_strike: { span: 4.2, height: 0.95, roll: -0.95 },
   hamstring: { span: 3.5, height: 0.35, roll: 0.015, blood: true },
   slam: { span: 4.8, height: 1.4, roll: -1.35, groundChop: true },
   overpower: { span: 5.1, height: 1.25, roll: 1.05, rising: true },

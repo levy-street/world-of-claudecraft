@@ -1250,6 +1250,23 @@
       }
     ]
   },
+  "impact_warrior_reaver": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "impact_warrior_reaver_1.mp3",
+        "sha256": "a000652b85ebb917ba484b849d51a6366795ec3a572726394a3070fe4d2c2ac0",
+        "size": 6940,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "impact_warrior_reaver_2.mp3",
+        "sha256": "b20993a271ef93a48d328a03d1b30364c964a2ed1a649beb9569aa3bcecde71f",
+        "size": 6940,
+        "peakDb": -6.4
+      }
+    ]
+  },
   "impact_warrior_reckless_tear": {
     "ceilingDb": 5.2,
     "tracks": [
@@ -2145,6 +2162,23 @@
         "sha256": "20cb97926a40b74175efcc1cdde5cb6c19dd7ddac0b1f0257b7ecf19687e52f4",
         "size": 4432,
         "peakDb": -6.4
+      }
+    ]
+  },
+  "melee_warrior_reaver_release": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "melee_warrior_reaver_release_1.mp3",
+        "sha256": "632913dda3106e11a81a9736dc704439fa03223bc520f45e663c5a7138cb01ef",
+        "size": 4432,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "melee_warrior_reaver_release_2.mp3",
+        "sha256": "f1b1900bb9200b3289d2f0121d7df393228e6857210e35909a86fdf3cdccdae1",
+        "size": 4432,
+        "peakDb": -6.3
       }
     ]
   },

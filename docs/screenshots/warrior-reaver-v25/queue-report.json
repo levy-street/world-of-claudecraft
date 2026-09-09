@@ -1,0 +1,4511 @@
+{
+  "purpose": "Unspecialized Reaver Strike: real queue, actual next auto-swing consumption, contact and recovery.",
+  "startedAt": "2026-09-09T01:10:12.867Z",
+  "label": "after-1",
+  "mode": "power-only",
+  "selectedAbilityIds": [
+    "heroic_strike"
+  ],
+  "expectedCastCount": 1,
+  "expectedCaptureCount": 10,
+  "guardSourcePaths": [
+    "src/render/characters/sanguine_weapon_sheath.ts",
+    "src/render/compile_target_readiness.ts",
+    "src/render/ability_vfx/warrior_readiness_cast.ts",
+    "src/render/ability_vfx/warrior_readiness_shapes.ts",
+    "src/render/ability_vfx/warrior_readiness.ts",
+    "src/render/warrior_readiness_core.ts",
+    "src/render/ability_vfx/warrior_guard_geometry.ts",
+    "src/render/ability_vfx/warrior_guard_plates.ts",
+    "src/render/ability_vfx/guard_prewarm.ts",
+    "src/render/ability_vfx/warrior_guard_cast.ts",
+    "src/render/weapon_trail_anchor.ts"
+  ],
+  "viewport": {
+    "width": 1400,
+    "height": 900
+  },
+  "camera": {
+    "yaw": 1.9,
+    "pitch": 0.4,
+    "distance": 18
+  },
+  "graphicsPresets": [
+    4
+  ],
+  "customPreset5": "actual profile recorded",
+  "scene": "sandbox",
+  "environment": "studio",
+  "requestedSeconds": [
+    0.05,
+    0.15,
+    0.6,
+    1,
+    1.1,
+    1.15,
+    1.3,
+    1.45,
+    1.8,
+    3.2
+  ],
+  "deadlineMinutes": 30,
+  "errors": [],
+  "consoleErrors": [],
+  "casts": [
+    {
+      "id": "heroic_strike",
+      "variant": "dummy-null",
+      "preset": 4,
+      "auraId": null,
+      "expectedAuraKind": null,
+      "fixture": {
+        "level": 20,
+        "spec": null,
+        "rows": {
+          "5": "war_row_double_charge",
+          "8": "war_row_second_wind",
+          "11": "war_row_piercing_howl",
+          "14": "war_row_anger_management",
+          "17": "war_row_recklessness",
+          "20": "war_row_colossal_might"
+        }
+      },
+      "name": "Reaver Strike",
+      "status": "complete",
+      "captures": [
+        {
+          "name": "p4-heroic_strike-dummy-null-yaw1.9-tick1.png",
+          "requestedSeconds": 0.05,
+          "weaponAuras": [],
+          "furyStates": [
+            {
+              "name": "warrior-mayhem-weapon-fire",
+              "count": 0,
+              "visible": false
+            },
+            {
+              "name": "warrior-mending-stitches",
+              "count": 0,
+              "visible": false
+            },
+            {
+              "name": "warrior-echo-charges",
+              "count": 0,
+              "visible": false
+            }
+          ],
+          "bubbles": [],
+          "powerGeometry": [
+            {
+              "name": "warrior-avatar-chest",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            },
+            {
+              "name": "warrior-reckless-crown",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            },
+            {
+              "name": "warrior-avatar-bracers",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            },
+            {
+              "name": "warrior-avatar-shins",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            }
+          ],
+          "tick": 58,
+          "simTime": 2.8999999999999977,
+          "relativeSeconds": 0.04999999999999982,
+          "clip": "Idle",
+          "clipTime": 0.05,
+          "bones": {
+            "root": {
+              "worldPosition": [
+                135448,
+                0.0007598884070459094,
+                3.9000000000000004
+              ],
+              "localQuaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            "hips": {
+              "worldPosition": [
+                135448,
+                0.40456208464321525,
+                3.9000000000000004
+              ],
+              "localQuaternion": [
+                0.00005934311798762437,
+                0.043153799845197675,
+                0.000004238794141973169,
+                0.9990684391068249
+              ]
+            },
+            "chest": {
+              "worldPosition": [
+                135447.99999801433,
+                0.9885421544431598,
+                3.90014506473878
+              ],
+              "localQuaternion": [
+                0.001305504432093352,
+                0,
+                0.00011444357031139444,
+                0.9999991412800548
+              ]
+            },
+            "handl": {
+              "worldPosition": [
+                135448.56240222126,
+                0.7236017646742515,
+                3.894370532733486
+              ],
+              "localQuaternion": [
+                -0.2938957689653291,
+                -0.3314002856626133,
+                0.15667235593396256,
+                0.8827510412549189
+              ]
+            },
+            "handslotl": {
+              "worldPosition": [
+                135448.50513732905,
+                0.6245934746705962,
+                3.9104757933414467
+              ],
+              "localQuaternion": [
+                -0.00002543210018207854,
+                -0.00002543210018207854,
+                0.7070209448012341,
+                -0.7071926062387719
+              ]
+            },
+            "handr": {
+              "worldPosition": [
+                135447.4521933341,
+                0.7266190752646419,
+                3.9940360228510383
+              ],
+              "localQuaternion": [
+                -0.29031250318966517,
+                0.32458431656958164,
+                -0.20356602112187608,
+                0.8768896084124336
+              ]
+            },
+            "handslotr": {
+              "worldPosition": [
+                135447.5112674891,
+                0.6280443030336393,
+                4.005670498097284
+              ],
+              "localQuaternion": [
+                0.00002543210018207854,
+                -0.00002543210018207854,
+                0.7070209448012341,
+                0.7071926062387719
+              ]
+            },
+            "footr": {
+              "worldPosition": [
+                135447.803422909,
+                0.15059545229276486,
+                3.878745778700673
+              ],
+              "localQuaternion": [
+                -0.5593712355695262,
+                0.11450260403469749,
+                -0.008683469496673016,
+                0.8209248271578803
+              ]
+            },
+            "footl": {
+              "worldPosition": [
+                135448.216506464,
+                0.14913139209549564,
+                3.8179202391042133
+              ],
+              "localQuaternion": [
+                -0.5343899755140388,
+                -0.12196925931592774,
+                0.05054663676706488,
+                0.83486279792764
+              ]
+            }
+          },
+          "castingAbility": null,
+          "castTotal": 0,
+          "castRemaining": 0,
+          "player": {
+            "id": 994,
+            "kind": "player",
+            "templateId": "warrior",
+            "hp": 822,
+            "maxHp": 822,
+            "resource": 100,
+            "maxResource": 100,
+            "queuedOnSwing": "heroic_strike",
+            "autoAttack": true,
+            "swingTimer": 1.1499999999999992,
+            "equipment": {
+              "mainhand": "worn_sword",
+              "chest": "recruit_tunic",
+              "offhand": "eastbrook_buckler"
+            },
+            "dead": false,
+            "pos": {
+              "x": 135448,
+              "y": 0,
+              "z": 3.9000000000000004
+            },
+            "facing": 0,
+            "targetId": 999,
+            "aggroTargetId": null,
+            "forcedTargetId": null,
+            "forcedTargetTimer": 0,
+            "scale": 1,
+            "chargeTargetId": null,
+            "chargeTimeLeft": 0,
+            "auras": [
+              {
+                "id": "battle_stance",
+                "name": "Battle Stance",
+                "kind": "battle_stance",
+                "remaining": 3597.0999999999894,
+                "duration": 3600,
+                "value": 0,
+                "sourceId": 994,
+                "school": "physical"
+              }
+            ]
+          },
+          "target": {
+            "id": 999,
+            "kind": "mob",
+            "templateId": "training_dummy",
+            "hp": 999978,
+            "maxHp": 999999,
+            "resource": 0,
+            "maxResource": 0,
+            "queuedOnSwing": null,
+            "autoAttack": false,
+            "swingTimer": 0,
+            "equipment": {},
+            "dead": false,
+            "pos": {
+              "x": 135448,
+              "y": 0,
+              "z": 6
+            },
+            "facing": 0,
+            "targetId": null,
+            "aggroTargetId": 994,
+            "forcedTargetId": null,
+            "forcedTargetTimer": 0,
+            "scale": 1.4,
+            "chargeTargetId": null,
+            "chargeTimeLeft": 0,
+            "auras": []
+          },
+          "contextLost": false,
+          "auraDisappearance": null
+        },
+        {
+          "name": "p4-heroic_strike-dummy-null-yaw1.9-tick3.png",
+          "requestedSeconds": 0.15,
+          "weaponAuras": [],
+          "furyStates": [
+            {
+              "name": "warrior-mayhem-weapon-fire",
+              "count": 0,
+              "visible": false
+            },
+            {
+              "name": "warrior-mending-stitches",
+              "count": 0,
+              "visible": false
+            },
+            {
+              "name": "warrior-echo-charges",
+              "count": 0,
+              "visible": false
+            }
+          ],
+          "bubbles": [],
+          "powerGeometry": [
+            {
+              "name": "warrior-avatar-chest",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            },
+            {
+              "name": "warrior-reckless-crown",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            },
+            {
+              "name": "warrior-avatar-bracers",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            },
+            {
+              "name": "warrior-avatar-shins",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            }
+          ],
+          "tick": 60,
+          "simTime": 2.9999999999999973,
+          "relativeSeconds": 0.14999999999999947,
+          "clip": "Idle",
+          "clipTime": 0.15000000000000002,
+          "bones": {
+            "root": {
+              "worldPosition": [
+                135448,
+                0.0007598884070459094,
+                3.9000000000000004
+              ],
+              "localQuaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            "hips": {
+              "worldPosition": [
+                135448,
+                0.4031212062764359,
+                3.9000000000000004
+              ],
+              "localQuaternion": [
+                0.0008443595400710288,
+                0.043153784495726516,
+                0.000044506903715873054,
+                0.9990680837459471
+              ]
+            },
+            "chest": {
+              "worldPosition": [
+                135447.9999884106,
+                0.9870937482378782,
+                3.902703531832924
+              ],
+              "localQuaternion": [
+                0.0022162190529381857,
+                0,
+                0.00019255673699983332,
+                0.999997525644445
+              ]
+            },
+            "handl": {
+              "worldPosition": [
+                135448.513339298,
+                0.6671371582020404,
+                3.9551505934944275
+              ],
+              "localQuaternion": [
+                -0.2384719502060532,
+                -0.342256258098169,
+                0.17723599676408766,
+                0.8913916072453203
+              ]
+            },
+            "handslotl": {
+              "worldPosition": [
+                135448.4560555659,
+                0.5681054245403572,
+                3.971058133833069
+              ],
+              "localQuaternion": [
+                0.0004259920861185481,
+                0.0004259920861185481,
+                -0.7055017920549446,
+                0.7087078795023709
+              ]
+            },
+            "handr": {
+              "worldPosition": [
+                135447.49243711747,
+                0.6659029281211505,
+                3.975199310277778
+              ],
+              "localQuaternion": [
+                -0.23037253265481267,
+                0.3700416809229596,
+                -0.15358863118644492,
+                0.8867969117541147
+              ]
+            },
+            "handslotr": {
+              "worldPosition": [
+                135447.55043970028,
+                0.5671574086608048,
+                3.9902601963279207
+              ],
+              "localQuaternion": [
+                0.0004259920861185481,
+                -0.0004259920861185481,
+                0.7055017920549446,
+                0.7087078795023709
+              ]
+            },
+            "footr": {
+              "worldPosition": [
+                135447.80342732865,
+                0.15045807109667667,
+                3.8787157553478235
+              ],
+              "localQuaternion": [
+                -0.5659517085300378,
+                0.11443093893155369,
+                -0.009705038844171053,
+                0.8164006590199493
+              ]
+            },
+            "footl": {
+              "worldPosition": [
+                135448.2226948242,
+                0.14936793041047716,
+                3.8561803968359056
+              ],
+              "localQuaternion": [
+                -0.5380677411375407,
+                -0.11577180882559183,
+                0.045010637360919696,
+                0.8336990084873311
+              ]
+            }
+          },
+          "castingAbility": null,
+          "castTotal": 0,
+          "castRemaining": 0,
+          "player": {
+            "id": 994,
+            "kind": "player",
+            "templateId": "warrior",
+            "hp": 822,
+            "maxHp": 822,
+            "resource": 100,
+            "maxResource": 100,
+            "queuedOnSwing": "heroic_strike",
+            "autoAttack": true,
+            "swingTimer": 1.0499999999999992,
+            "equipment": {
+              "mainhand": "worn_sword",
+              "chest": "recruit_tunic",
+              "offhand": "eastbrook_buckler"
+            },
+            "dead": false,
+            "pos": {
+              "x": 135448,
+              "y": 0,
+              "z": 3.9000000000000004
+            },
+            "facing": 0,
+            "targetId": 999,
+            "aggroTargetId": null,
+            "forcedTargetId": null,
+            "forcedTargetTimer": 0,
+            "scale": 1,
+            "chargeTargetId": null,
+            "chargeTimeLeft": 0,
+            "auras": [
+              {
+                "id": "battle_stance",
+                "name": "Battle Stance",
+                "kind": "battle_stance",
+                "remaining": 3596.999999999989,
+                "duration": 3600,
+                "value": 0,
+                "sourceId": 994,
+                "school": "physical"
+              }
+            ]
+          },
+          "target": {
+            "id": 999,
+            "kind": "mob",
+            "templateId": "training_dummy",
+            "hp": 999978,
+            "maxHp": 999999,
+            "resource": 0,
+            "maxResource": 0,
+            "queuedOnSwing": null,
+            "autoAttack": false,
+            "swingTimer": 0,
+            "equipment": {},
+            "dead": false,
+            "pos": {
+              "x": 135448,
+              "y": 0,
+              "z": 6
+            },
+            "facing": 0,
+            "targetId": null,
+            "aggroTargetId": 994,
+            "forcedTargetId": null,
+            "forcedTargetTimer": 0,
+            "scale": 1.4,
+            "chargeTargetId": null,
+            "chargeTimeLeft": 0,
+            "auras": []
+          },
+          "contextLost": false,
+          "auraDisappearance": null
+        },
+        {
+          "name": "p4-heroic_strike-dummy-null-yaw1.9-tick12.png",
+          "requestedSeconds": 0.6,
+          "weaponAuras": [],
+          "furyStates": [
+            {
+              "name": "warrior-mayhem-weapon-fire",
+              "count": 0,
+              "visible": false
+            },
+            {
+              "name": "warrior-mending-stitches",
+              "count": 0,
+              "visible": false
+            },
+            {
+              "name": "warrior-echo-charges",
+              "count": 0,
+              "visible": false
+            }
+          ],
+          "bubbles": [],
+          "powerGeometry": [
+            {
+              "name": "warrior-avatar-chest",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            },
+            {
+              "name": "warrior-reckless-crown",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            },
+            {
+              "name": "warrior-avatar-bracers",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            },
+            {
+              "name": "warrior-avatar-shins",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            }
+          ],
+          "tick": 69,
+          "simTime": 3.4499999999999957,
+          "relativeSeconds": 0.5999999999999979,
+          "clip": "Idle",
+          "clipTime": 0.6,
+          "bones": {
+            "root": {
+              "worldPosition": [
+                135448,
+                0.0007598884070459094,
+                3.9000000000000004
+              ],
+              "localQuaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            "hips": {
+              "worldPosition": [
+                135448,
+                0.39661891586368314,
+                3.9000000000000004
+              ],
+              "localQuaternion": [
+                0.00447606804609744,
+                0.043153366816120205,
+                0.00019328475701559453,
+                0.9990584139019514
+              ]
+            },
+            "chest": {
+              "worldPosition": [
+                135448.00000017218,
+                0.9803618906955173,
+                3.9150758822473946
+              ],
+              "localQuaternion": [
+                -0.0062258445872773235,
+                0,
+                -0.0005493392270051309,
+                0.9999804683520517
+              ]
+            },
+            "handl": {
+              "worldPosition": [
+                135448.4955718487,
+                0.6482684688375268,
+                3.972647525529536
+              ],
+              "localQuaternion": [
+                -0.2202547191199544,
+                -0.3432457718616792,
+                0.17810815746774863,
+                0.8955153170370197
+              ]
+            },
+            "handslotl": {
+              "worldPosition": [
+                135448.43830561545,
+                0.5491819308585307,
+                3.9882752842539895
+              ],
+              "localQuaternion": [
+                0.0024872794557677163,
+                0.0024872794557677163,
+                -0.6979184239198114,
+                0.7161686256986579
+              ]
+            },
+            "handr": {
+              "worldPosition": [
+                135447.50569317612,
+                0.6454430534252616,
+                3.9669194878554332
+              ],
+              "localQuaternion": [
+                -0.21068527164870743,
+                0.3795447738409219,
+                -0.1313673856801008,
+                0.8912351490711805
+              ]
+            },
+            "handslotr": {
+              "worldPosition": [
+                135447.56296199534,
+                0.5463571673406472,
+                3.982541900327254
+              ],
+              "localQuaternion": [
+                0.0024872794557677163,
+                -0.0024872794557677163,
+                0.6979184239198114,
+                0.7161686256986579
+              ]
+            },
+            "footr": {
+              "worldPosition": [
+                135447.80340323446,
+                0.1507132657596949,
+                3.87881528318406
+              ],
+              "localQuaternion": [
+                -0.596205653133234,
+                0.1139248469489484,
+                -0.014526714791610381,
+                0.7945746805536883
+              ]
+            },
+            "footl": {
+              "worldPosition": [
+                135448.22378596634,
+                0.1507178847037255,
+                3.867785814510171
+              ],
+              "localQuaternion": [
+                -0.5677608833109545,
+                -0.11221547773180078,
+                0.04837136929639688,
+                0.8140733852496224
+              ]
+            }
+          },
+          "castingAbility": null,
+          "castTotal": 0,
+          "castRemaining": 0,
+          "player": {
+            "id": 994,
+            "kind": "player",
+            "templateId": "warrior",
+            "hp": 822,
+            "maxHp": 822,
+            "resource": 100,
+            "maxResource": 100,
+            "queuedOnSwing": "heroic_strike",
+            "autoAttack": true,
+            "swingTimer": 0.5999999999999988,
+            "equipment": {
+              "mainhand": "worn_sword",
+              "chest": "recruit_tunic",
+              "offhand": "eastbrook_buckler"
+            },
+            "dead": false,
+            "pos": {
+              "x": 135448,
+              "y": 0,
+              "z": 3.9000000000000004
+            },
+            "facing": 0,
+            "targetId": 999,
+            "aggroTargetId": null,
+            "forcedTargetId": null,
+            "forcedTargetTimer": 0,
+            "scale": 1,
+            "chargeTargetId": null,
+            "chargeTimeLeft": 0,
+            "auras": [
+              {
+                "id": "battle_stance",
+                "name": "Battle Stance",
+                "kind": "battle_stance",
+                "remaining": 3596.5499999999874,
+                "duration": 3600,
+                "value": 0,
+                "sourceId": 994,
+                "school": "physical"
+              }
+            ]
+          },
+          "target": {
+            "id": 999,
+            "kind": "mob",
+            "templateId": "training_dummy",
+            "hp": 999978,
+            "maxHp": 999999,
+            "resource": 0,
+            "maxResource": 0,
+            "queuedOnSwing": null,
+            "autoAttack": false,
+            "swingTimer": 0,
+            "equipment": {},
+            "dead": false,
+            "pos": {
+              "x": 135448,
+              "y": 0,
+              "z": 6
+            },
+            "facing": 0,
+            "targetId": null,
+            "aggroTargetId": 994,
+            "forcedTargetId": null,
+            "forcedTargetTimer": 0,
+            "scale": 1.4,
+            "chargeTargetId": null,
+            "chargeTimeLeft": 0,
+            "auras": []
+          },
+          "contextLost": false,
+          "auraDisappearance": null
+        },
+        {
+          "name": "p4-heroic_strike-dummy-null-yaw1.9-tick20.png",
+          "requestedSeconds": 1,
+          "weaponAuras": [],
+          "furyStates": [
+            {
+              "name": "warrior-mayhem-weapon-fire",
+              "count": 0,
+              "visible": false
+            },
+            {
+              "name": "warrior-mending-stitches",
+              "count": 0,
+              "visible": false
+            },
+            {
+              "name": "warrior-echo-charges",
+              "count": 0,
+              "visible": false
+            }
+          ],
+          "bubbles": [],
+          "powerGeometry": [
+            {
+              "name": "warrior-avatar-chest",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            },
+            {
+              "name": "warrior-reckless-crown",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            },
+            {
+              "name": "warrior-avatar-bracers",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            },
+            {
+              "name": "warrior-avatar-shins",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            }
+          ],
+          "tick": 77,
+          "simTime": 3.8499999999999943,
+          "relativeSeconds": 0.9999999999999964,
+          "clip": "Idle",
+          "clipTime": 1.0000000000000002,
+          "bones": {
+            "root": {
+              "worldPosition": [
+                135448,
+                0.0007598884070459094,
+                3.9000000000000004
+              ],
+              "localQuaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            "hips": {
+              "worldPosition": [
+                135448,
+                0.40416387845087265,
+                3.9000000000000004
+              ],
+              "localQuaternion": [
+                0.0002848435399294162,
+                0.04315379816197877,
+                0.000020345967137815443,
+                0.999068400138046
+              ]
+            },
+            "chest": {
+              "worldPosition": [
+                135448.00000372092,
+                0.9881433973108174,
+                3.9007582705996353
+              ],
+              "localQuaternion": [
+                0.004516692970629493,
+                0,
+                0.00039673654471745546,
+                0.9999897209895326
+              ]
+            },
+            "handl": {
+              "worldPosition": [
+                135448.49558049047,
+                0.6537194401810952,
+                3.973719386652698
+              ],
+              "localQuaternion": [
+                -0.22205322900269445,
+                -0.3457145321526016,
+                0.18436277918292765,
+                0.8928517185960564
+              ]
+            },
+            "handslotl": {
+              "worldPosition": [
+                135448.4383116112,
+                0.5546282345582817,
+                3.9893078040943117
+              ],
+              "localQuaternion": [
+                0.00013733326718871807,
+                0.00013733326718871807,
+                -0.7066106834032948,
+                0.7076025045033941
+              ]
+            },
+            "handr": {
+              "worldPosition": [
+                135447.50580621397,
+                0.6508975972012488,
+                3.9684056913731505
+              ],
+              "localQuaternion": [
+                -0.21231460873778313,
+                0.38385699305919907,
+                -0.13980354048714436,
+                0.8877112626655873
+              ]
+            },
+            "handslotr": {
+              "worldPosition": [
+                135447.5630699785,
+                0.5518041014218965,
+                3.983998337613466
+              ],
+              "localQuaternion": [
+                0.00013733326718871807,
+                -0.00013733326718871807,
+                0.7066106834032948,
+                0.7076025045033941
+              ]
+            },
+            "footr": {
+              "worldPosition": [
+                135447.80341830465,
+                0.15050125574634884,
+                3.878710447124317
+              ],
+              "localQuaternion": [
+                -0.5609010194550029,
+                0.11447520428314531,
+                -0.008911426120696236,
+                0.8198817356565311
+              ]
+            },
+            "footl": {
+              "worldPosition": [
+                135448.22378401278,
+                0.15050848646585877,
+                3.8677030591882433
+              ],
+              "localQuaternion": [
+                -0.5320542409985919,
+                -0.11426013358704072,
+                0.042115113341377186,
+                0.8379076463049653
+              ]
+            }
+          },
+          "castingAbility": null,
+          "castTotal": 0,
+          "castRemaining": 0,
+          "player": {
+            "id": 994,
+            "kind": "player",
+            "templateId": "warrior",
+            "hp": 822,
+            "maxHp": 822,
+            "resource": 100,
+            "maxResource": 100,
+            "queuedOnSwing": "heroic_strike",
+            "autoAttack": true,
+            "swingTimer": 0.1999999999999988,
+            "equipment": {
+              "mainhand": "worn_sword",
+              "chest": "recruit_tunic",
+              "offhand": "eastbrook_buckler"
+            },
+            "dead": false,
+            "pos": {
+              "x": 135448,
+              "y": 0,
+              "z": 3.9000000000000004
+            },
+            "facing": 0,
+            "targetId": 999,
+            "aggroTargetId": null,
+            "forcedTargetId": null,
+            "forcedTargetTimer": 0,
+            "scale": 1,
+            "chargeTargetId": null,
+            "chargeTimeLeft": 0,
+            "auras": [
+              {
+                "id": "battle_stance",
+                "name": "Battle Stance",
+                "kind": "battle_stance",
+                "remaining": 3596.149999999986,
+                "duration": 3600,
+                "value": 0,
+                "sourceId": 994,
+                "school": "physical"
+              }
+            ]
+          },
+          "target": {
+            "id": 999,
+            "kind": "mob",
+            "templateId": "training_dummy",
+            "hp": 999978,
+            "maxHp": 999999,
+            "resource": 0,
+            "maxResource": 0,
+            "queuedOnSwing": null,
+            "autoAttack": false,
+            "swingTimer": 0,
+            "equipment": {},
+            "dead": false,
+            "pos": {
+              "x": 135448,
+              "y": 0,
+              "z": 6
+            },
+            "facing": 0,
+            "targetId": null,
+            "aggroTargetId": 994,
+            "forcedTargetId": null,
+            "forcedTargetTimer": 0,
+            "scale": 1.4,
+            "chargeTargetId": null,
+            "chargeTimeLeft": 0,
+            "auras": []
+          },
+          "contextLost": false,
+          "auraDisappearance": null
+        },
+        {
+          "name": "p4-heroic_strike-dummy-null-yaw1.9-tick22.png",
+          "requestedSeconds": 1.1,
+          "weaponAuras": [],
+          "furyStates": [
+            {
+              "name": "warrior-mayhem-weapon-fire",
+              "count": 0,
+              "visible": false
+            },
+            {
+              "name": "warrior-mending-stitches",
+              "count": 0,
+              "visible": false
+            },
+            {
+              "name": "warrior-echo-charges",
+              "count": 0,
+              "visible": false
+            }
+          ],
+          "bubbles": [],
+          "powerGeometry": [
+            {
+              "name": "warrior-avatar-chest",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            },
+            {
+              "name": "warrior-reckless-crown",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            },
+            {
+              "name": "warrior-avatar-bracers",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            },
+            {
+              "name": "warrior-avatar-shins",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            }
+          ],
+          "tick": 79,
+          "simTime": 3.949999999999994,
+          "relativeSeconds": 1.099999999999996,
+          "clip": "Idle",
+          "clipTime": 0.033333277702331854,
+          "bones": {
+            "root": {
+              "worldPosition": [
+                135448,
+                0.0007598884070459094,
+                3.9000000000000004
+              ],
+              "localQuaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            "hips": {
+              "worldPosition": [
+                135448,
+                0.4044153776306332,
+                3.9000000000000004
+              ],
+              "localQuaternion": [
+                0.00014242153450591435,
+                0.04315379948167417,
+                0.000010172966750422452,
+                0.9990684306907673
+              ]
+            },
+            "chest": {
+              "worldPosition": [
+                135447.99998198255,
+                0.9883953912196137,
+                3.9002861879076964
+              ],
+              "localQuaternion": [
+                0.004882903064077702,
+                0,
+                0.0004272539997232981,
+                0.9999879872836906
+              ]
+            },
+            "handl": {
+              "worldPosition": [
+                135448.4955649018,
+                0.6539088164698824,
+                3.9737395906493114
+              ],
+              "localQuaternion": [
+                -0.22209853853987072,
+                -0.3457748404800345,
+                0.18449972090072717,
+                0.8927888058533296
+              ]
+            },
+            "handslotl": {
+              "worldPosition": [
+                135448.43830338534,
+                0.5548125579613141,
+                3.989322934625376
+              ],
+              "localQuaternion": [
+                -0.00006103695837666751,
+                -0.00006103695837666751,
+                0.7069007550992383,
+                -0.7073127419954386
+              ]
+            },
+            "handr": {
+              "worldPosition": [
+                135447.50580367184,
+                0.6510392671184273,
+                3.968464801505284
+              ],
+              "localQuaternion": [
+                -0.21239365842979963,
+                0.3840145632966086,
+                -0.1400494957714607,
+                0.8875854256177713
+              ]
+            },
+            "handslotr": {
+              "worldPosition": [
+                135447.56307542423,
+                0.551949953759006,
+                3.9840546894762676
+              ],
+              "localQuaternion": [
+                0.00006103695837666751,
+                -0.00006103695837666751,
+                0.7069007550992383,
+                0.7073127419954386
+              ]
+            },
+            "footr": {
+              "worldPosition": [
+                135447.80341964005,
+                0.15048480976452477,
+                3.87869747478531
+              ],
+              "localQuaternion": [
+                -0.5595230012285088,
+                0.11450476756798696,
+                -0.008697723444224849,
+                0.8208209420496844
+              ]
+            },
+            "footl": {
+              "worldPosition": [
+                135448.2237860874,
+                0.15048870959386126,
+                3.867712268811657
+              ],
+              "localQuaternion": [
+                -0.5306524391655394,
+                -0.1143521149895763,
+                0.0418711249354981,
+                0.8387957984525853
+              ]
+            }
+          },
+          "castingAbility": null,
+          "castTotal": 0,
+          "castRemaining": 0,
+          "player": {
+            "id": 994,
+            "kind": "player",
+            "templateId": "warrior",
+            "hp": 822,
+            "maxHp": 822,
+            "resource": 100,
+            "maxResource": 100,
+            "queuedOnSwing": "heroic_strike",
+            "autoAttack": true,
+            "swingTimer": 0.0999999999999988,
+            "equipment": {
+              "mainhand": "worn_sword",
+              "chest": "recruit_tunic",
+              "offhand": "eastbrook_buckler"
+            },
+            "dead": false,
+            "pos": {
+              "x": 135448,
+              "y": 0,
+              "z": 3.9000000000000004
+            },
+            "facing": 0,
+            "targetId": 999,
+            "aggroTargetId": null,
+            "forcedTargetId": null,
+            "forcedTargetTimer": 0,
+            "scale": 1,
+            "chargeTargetId": null,
+            "chargeTimeLeft": 0,
+            "auras": [
+              {
+                "id": "battle_stance",
+                "name": "Battle Stance",
+                "kind": "battle_stance",
+                "remaining": 3596.0499999999856,
+                "duration": 3600,
+                "value": 0,
+                "sourceId": 994,
+                "school": "physical"
+              }
+            ]
+          },
+          "target": {
+            "id": 999,
+            "kind": "mob",
+            "templateId": "training_dummy",
+            "hp": 999978,
+            "maxHp": 999999,
+            "resource": 0,
+            "maxResource": 0,
+            "queuedOnSwing": null,
+            "autoAttack": false,
+            "swingTimer": 0,
+            "equipment": {},
+            "dead": false,
+            "pos": {
+              "x": 135448,
+              "y": 0,
+              "z": 6
+            },
+            "facing": 0,
+            "targetId": null,
+            "aggroTargetId": 994,
+            "forcedTargetId": null,
+            "forcedTargetTimer": 0,
+            "scale": 1.4,
+            "chargeTargetId": null,
+            "chargeTimeLeft": 0,
+            "auras": []
+          },
+          "contextLost": false,
+          "auraDisappearance": null
+        },
+        {
+          "name": "p4-heroic_strike-dummy-null-yaw1.9-tick23.png",
+          "requestedSeconds": 1.15,
+          "weaponAuras": [],
+          "furyStates": [
+            {
+              "name": "warrior-mayhem-weapon-fire",
+              "count": 0,
+              "visible": false
+            },
+            {
+              "name": "warrior-mending-stitches",
+              "count": 0,
+              "visible": false
+            },
+            {
+              "name": "warrior-echo-charges",
+              "count": 0,
+              "visible": false
+            }
+          ],
+          "bubbles": [],
+          "powerGeometry": [
+            {
+              "name": "warrior-avatar-chest",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            },
+            {
+              "name": "warrior-reckless-crown",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            },
+            {
+              "name": "warrior-avatar-bracers",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            },
+            {
+              "name": "warrior-avatar-shins",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            }
+          ],
+          "tick": 80,
+          "simTime": 3.999999999999994,
+          "relativeSeconds": 1.149999999999996,
+          "clip": "Idle",
+          "clipTime": 0.08333327770233186,
+          "bones": {
+            "root": {
+              "worldPosition": [
+                135448,
+                0.0007598884070459094,
+                3.9000000000000004
+              ],
+              "localQuaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            "hips": {
+              "worldPosition": [
+                135448,
+                0.40391238060901347,
+                3.9000000000000004
+              ],
+              "localQuaternion": [
+                0.0003560541737477945,
+                0.043153797172212155,
+                0.00002543244098198532,
+                0.9990683772236191
+              ]
+            },
+            "chest": {
+              "worldPosition": [
+                135447.9999974253,
+                0.9878911346916849,
+                3.9011377963945386
+              ],
+              "localQuaternion": [
+                0.004181000177998575,
+                0,
+                0.00036621899770147604,
+                0.9999911925217928
+              ]
+            },
+            "handl": {
+              "worldPosition": [
+                135448.495574346,
+                0.6535306675376636,
+                3.973699010547767
+              ],
+              "localQuaternion": [
+                -0.221981740637597,
+                -0.34563271874711476,
+                0.18416417682095654,
+                0.8929421518389867
+              ]
+            },
+            "handslotl": {
+              "worldPosition": [
+                135448.43830887938,
+                0.5544388803757364,
+                3.989296266015315
+              ],
+              "localQuaternion": [
+                0.0001907425460699172,
+                0.0001907425460699172,
+                -0.7064197550376273,
+                0.7077930890642696
+              ]
+            },
+            "handr": {
+              "worldPosition": [
+                135447.505797308,
+                0.6507031427918528,
+                3.9683846980765267
+              ],
+              "localQuaternion": [
+                -0.21228482650861533,
+                0.38375914760228746,
+                -0.13961327941919013,
+                0.8877906291888825
+              ]
+            },
+            "handslotr": {
+              "worldPosition": [
+                135447.56306491495,
+                0.5516130166357278,
+                3.9839846449345555
+              ],
+              "localQuaternion": [
+                0.0001907425460699172,
+                -0.0001907425460699172,
+                0.7064197550376273,
+                0.7077930890642696
+              ]
+            },
+            "footr": {
+              "worldPosition": [
+                135447.803418837,
+                0.15045545614712677,
+                3.8787373647807892
+              ],
+              "localQuaternion": [
+                -0.5619696118658674,
+                0.11446003686741843,
+                -0.009079284986410648,
+                0.8191499385849766
+              ]
+            },
+            "footl": {
+              "worldPosition": [
+                135448.22379012365,
+                0.15046332863209302,
+                3.8677285266671713
+              ],
+              "localQuaternion": [
+                -0.5331243940895898,
+                -0.11421478479335909,
+                0.04229838000712033,
+                0.8372241100266928
+              ]
+            }
+          },
+          "castingAbility": null,
+          "castTotal": 0,
+          "castRemaining": 0,
+          "player": {
+            "id": 994,
+            "kind": "player",
+            "templateId": "warrior",
+            "hp": 822,
+            "maxHp": 822,
+            "resource": 100,
+            "maxResource": 100,
+            "queuedOnSwing": "heroic_strike",
+            "autoAttack": true,
+            "swingTimer": 0.049999999999998795,
+            "equipment": {
+              "mainhand": "worn_sword",
+              "chest": "recruit_tunic",
+              "offhand": "eastbrook_buckler"
+            },
+            "dead": false,
+            "pos": {
+              "x": 135448,
+              "y": 0,
+              "z": 3.9000000000000004
+            },
+            "facing": 0,
+            "targetId": 999,
+            "aggroTargetId": null,
+            "forcedTargetId": null,
+            "forcedTargetTimer": 0,
+            "scale": 1,
+            "chargeTargetId": null,
+            "chargeTimeLeft": 0,
+            "auras": [
+              {
+                "id": "battle_stance",
+                "name": "Battle Stance",
+                "kind": "battle_stance",
+                "remaining": 3595.9999999999854,
+                "duration": 3600,
+                "value": 0,
+                "sourceId": 994,
+                "school": "physical"
+              }
+            ]
+          },
+          "target": {
+            "id": 999,
+            "kind": "mob",
+            "templateId": "training_dummy",
+            "hp": 999978,
+            "maxHp": 999999,
+            "resource": 0,
+            "maxResource": 0,
+            "queuedOnSwing": null,
+            "autoAttack": false,
+            "swingTimer": 0,
+            "equipment": {},
+            "dead": false,
+            "pos": {
+              "x": 135448,
+              "y": 0,
+              "z": 6
+            },
+            "facing": 0,
+            "targetId": null,
+            "aggroTargetId": 994,
+            "forcedTargetId": null,
+            "forcedTargetTimer": 0,
+            "scale": 1.4,
+            "chargeTargetId": null,
+            "chargeTimeLeft": 0,
+            "auras": []
+          },
+          "contextLost": false,
+          "auraDisappearance": null
+        },
+        {
+          "name": "p4-heroic_strike-dummy-null-yaw1.9-tick26.png",
+          "requestedSeconds": 1.3,
+          "weaponAuras": [],
+          "furyStates": [
+            {
+              "name": "warrior-mayhem-weapon-fire",
+              "count": 0,
+              "visible": false
+            },
+            {
+              "name": "warrior-mending-stitches",
+              "count": 0,
+              "visible": false
+            },
+            {
+              "name": "warrior-echo-charges",
+              "count": 0,
+              "visible": false
+            }
+          ],
+          "bubbles": [],
+          "powerGeometry": [
+            {
+              "name": "warrior-avatar-chest",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            },
+            {
+              "name": "warrior-reckless-crown",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            },
+            {
+              "name": "warrior-avatar-bracers",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            },
+            {
+              "name": "warrior-avatar-shins",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            }
+          ],
+          "tick": 83,
+          "simTime": 4.149999999999993,
+          "relativeSeconds": 1.2999999999999954,
+          "clip": "Signature_heroic_strike",
+          "clipTime": 0.15000000000000002,
+          "bones": {
+            "root": {
+              "worldPosition": [
+                135448,
+                0.0007598884070459094,
+                3.9000000000000004
+              ],
+              "localQuaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            "hips": {
+              "worldPosition": [
+                135448,
+                0.3584942325633351,
+                3.9515069322638348
+              ],
+              "localQuaternion": [
+                0.0027711016591638327,
+                0.043153636157512665,
+                0.00012207499821670353,
+                0.9990646243095398
+              ]
+            },
+            "chest": {
+              "worldPosition": [
+                135448.0295649936,
+                0.9410783798720153,
+                3.9667484066657437
+              ],
+              "localQuaternion": [
+                0.042157989856330784,
+                0.16456862527396923,
+                0.0633857256111379,
+                0.9834236589369492
+              ]
+            },
+            "handl": {
+              "worldPosition": [
+                135448.5334948883,
+                1.015759071547873,
+                3.777970406808313
+              ],
+              "localQuaternion": [
+                -0.23868407309055328,
+                -0.5062689781188965,
+                0.10156509280204773,
+                0.8224391341209412
+              ]
+            },
+            "handslotl": {
+              "worldPosition": [
+                135448.55750274457,
+                0.9695114392515214,
+                3.8810556639804754
+              ],
+              "localQuaternion": [
+                -0.25910255312919617,
+                -0.23627468943595886,
+                -0.66078782081604,
+                0.6636260747909546
+              ]
+            },
+            "handr": {
+              "worldPosition": [
+                135447.64774010034,
+                0.8096004415272698,
+                4.5920564087948685
+              ],
+              "localQuaternion": [
+                0.045808865756927754,
+                0.0736878019107901,
+                -0.12153294768712843,
+                0.9887878347850759
+              ]
+            },
+            "handslotr": {
+              "worldPosition": [
+                135447.63194166153,
+                0.7210792284968364,
+                4.664556038045456
+              ],
+              "localQuaternion": [
+                0.03976217556190174,
+                0.012265480524981923,
+                0.6465158712315197,
+                0.7617648952451306
+              ]
+            },
+            "footr": {
+              "worldPosition": [
+                135447.80343144122,
+                0.1507103560341028,
+                3.8787681206721003
+              ],
+              "localQuaternion": [
+                -0.7377758535496441,
+                0.10890395307739098,
+                -0.03812054377289253,
+                0.6651116771382612
+              ]
+            },
+            "footl": {
+              "worldPosition": [
+                135448.22377312317,
+                0.15070689274197863,
+                3.8677804025299656
+              ],
+              "localQuaternion": [
+                -0.7201146426814624,
+                -0.09973488260297297,
+                0.0746058216144615,
+                0.6825846657881732
+              ]
+            }
+          },
+          "castingAbility": null,
+          "castTotal": 0,
+          "castRemaining": 0,
+          "player": {
+            "id": 994,
+            "kind": "player",
+            "templateId": "warrior",
+            "hp": 822,
+            "maxHp": 822,
+            "resource": 100,
+            "maxResource": 100,
+            "queuedOnSwing": null,
+            "autoAttack": true,
+            "swingTimer": 1.9,
+            "equipment": {
+              "mainhand": "worn_sword",
+              "chest": "recruit_tunic",
+              "offhand": "eastbrook_buckler"
+            },
+            "dead": false,
+            "pos": {
+              "x": 135448,
+              "y": 0,
+              "z": 3.9000000000000004
+            },
+            "facing": 0,
+            "targetId": 999,
+            "aggroTargetId": null,
+            "forcedTargetId": null,
+            "forcedTargetTimer": 0,
+            "scale": 1,
+            "chargeTargetId": null,
+            "chargeTimeLeft": 0,
+            "auras": [
+              {
+                "id": "battle_stance",
+                "name": "Battle Stance",
+                "kind": "battle_stance",
+                "remaining": 3595.849999999985,
+                "duration": 3600,
+                "value": 0,
+                "sourceId": 994,
+                "school": "physical"
+              }
+            ]
+          },
+          "target": {
+            "id": 999,
+            "kind": "mob",
+            "templateId": "training_dummy",
+            "hp": 999914,
+            "maxHp": 999999,
+            "resource": 0,
+            "maxResource": 0,
+            "queuedOnSwing": null,
+            "autoAttack": false,
+            "swingTimer": 0,
+            "equipment": {},
+            "dead": false,
+            "pos": {
+              "x": 135448,
+              "y": 0,
+              "z": 6
+            },
+            "facing": 0,
+            "targetId": null,
+            "aggroTargetId": 994,
+            "forcedTargetId": null,
+            "forcedTargetTimer": 0,
+            "scale": 1.4,
+            "chargeTargetId": null,
+            "chargeTimeLeft": 0,
+            "auras": []
+          },
+          "contextLost": false,
+          "auraDisappearance": null
+        },
+        {
+          "name": "p4-heroic_strike-dummy-null-yaw1.9-tick29.png",
+          "requestedSeconds": 1.45,
+          "weaponAuras": [],
+          "furyStates": [
+            {
+              "name": "warrior-mayhem-weapon-fire",
+              "count": 0,
+              "visible": false
+            },
+            {
+              "name": "warrior-mending-stitches",
+              "count": 0,
+              "visible": false
+            },
+            {
+              "name": "warrior-echo-charges",
+              "count": 0,
+              "visible": false
+            }
+          ],
+          "bubbles": [],
+          "powerGeometry": [
+            {
+              "name": "warrior-avatar-chest",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            },
+            {
+              "name": "warrior-reckless-crown",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            },
+            {
+              "name": "warrior-avatar-bracers",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            },
+            {
+              "name": "warrior-avatar-shins",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            }
+          ],
+          "tick": 86,
+          "simTime": 4.299999999999993,
+          "relativeSeconds": 1.4499999999999948,
+          "clip": "Signature_heroic_strike",
+          "clipTime": 0.3,
+          "bones": {
+            "root": {
+              "worldPosition": [
+                135448,
+                0.0007598884070459094,
+                3.9000000000000004
+              ],
+              "localQuaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            "hips": {
+              "worldPosition": [
+                135448,
+                0.37301832149791353,
+                3.9224587491727885
+              ],
+              "localQuaternion": [
+                0.0027711016591638327,
+                0.043153636157512665,
+                0.00012207499821670353,
+                0.9990646243095398
+              ]
+            },
+            "chest": {
+              "worldPosition": [
+                135448.01113575613,
+                0.9494089721507945,
+                3.9989191833706226
+              ],
+              "localQuaternion": [
+                0.0583399607184739,
+                0.2289442606285642,
+                0.01720904599978875,
+                0.9715373504113901
+              ]
+            },
+            "handl": {
+              "worldPosition": [
+                135448.53020919065,
+                1.021902227717214,
+                3.855855644710987
+              ],
+              "localQuaternion": [
+                -0.23868407309055328,
+                -0.5062689781188965,
+                0.10156509280204773,
+                0.8224391341209412
+              ]
+            },
+            "handslotl": {
+              "worldPosition": [
+                135448.54463980763,
+                0.9611604287758464,
+                3.9530357975486465
+              ],
+              "localQuaternion": [
+                -0.25910255312919617,
+                -0.23627468943595886,
+                -0.66078782081604,
+                0.6636260747909546
+              ]
+            },
+            "handr": {
+              "worldPosition": [
+                135447.44178746268,
+                0.6988251219274192,
+                4.2849101671179985
+              ],
+              "localQuaternion": [
+                0.028518304387155493,
+                0.13998305786118878,
+                -0.33144352754899453,
+                0.9325967177041701
+              ]
+            },
+            "handslotr": {
+              "worldPosition": [
+                135447.37483393116,
+                0.6136973291669365,
+                4.244757033191083
+              ],
+              "localQuaternion": [
+                0.07950952880574584,
+                0.02450032047702625,
+                0.5799790397795848,
+                0.8103716940651136
+              ]
+            },
+            "footr": {
+              "worldPosition": [
+                135447.80343141468,
+                0.15071002081183643,
+                3.8787678711518856
+              ],
+              "localQuaternion": [
+                -0.6866923012269086,
+                0.11136602243910297,
+                -0.029513182076180876,
+                0.7177605900058347
+              ]
+            },
+            "footl": {
+              "worldPosition": [
+                135448.22377319206,
+                0.15070652978245733,
+                3.8677801297288057
+              ],
+              "localQuaternion": [
+                -0.6640966787013781,
+                -0.10521323297359358,
+                0.06536101492602318,
+                0.7373152071352408
+              ]
+            }
+          },
+          "castingAbility": null,
+          "castTotal": 0,
+          "castRemaining": 0,
+          "player": {
+            "id": 994,
+            "kind": "player",
+            "templateId": "warrior",
+            "hp": 822,
+            "maxHp": 822,
+            "resource": 100,
+            "maxResource": 100,
+            "queuedOnSwing": null,
+            "autoAttack": true,
+            "swingTimer": 1.7499999999999998,
+            "equipment": {
+              "mainhand": "worn_sword",
+              "chest": "recruit_tunic",
+              "offhand": "eastbrook_buckler"
+            },
+            "dead": false,
+            "pos": {
+              "x": 135448,
+              "y": 0,
+              "z": 3.9000000000000004
+            },
+            "facing": 0,
+            "targetId": 999,
+            "aggroTargetId": null,
+            "forcedTargetId": null,
+            "forcedTargetTimer": 0,
+            "scale": 1,
+            "chargeTargetId": null,
+            "chargeTimeLeft": 0,
+            "auras": [
+              {
+                "id": "battle_stance",
+                "name": "Battle Stance",
+                "kind": "battle_stance",
+                "remaining": 3595.6999999999844,
+                "duration": 3600,
+                "value": 0,
+                "sourceId": 994,
+                "school": "physical"
+              }
+            ]
+          },
+          "target": {
+            "id": 999,
+            "kind": "mob",
+            "templateId": "training_dummy",
+            "hp": 999914,
+            "maxHp": 999999,
+            "resource": 0,
+            "maxResource": 0,
+            "queuedOnSwing": null,
+            "autoAttack": false,
+            "swingTimer": 0,
+            "equipment": {},
+            "dead": false,
+            "pos": {
+              "x": 135448,
+              "y": 0,
+              "z": 6
+            },
+            "facing": 0,
+            "targetId": null,
+            "aggroTargetId": 994,
+            "forcedTargetId": null,
+            "forcedTargetTimer": 0,
+            "scale": 1.4,
+            "chargeTargetId": null,
+            "chargeTimeLeft": 0,
+            "auras": []
+          },
+          "contextLost": false,
+          "auraDisappearance": null
+        },
+        {
+          "name": "p4-heroic_strike-dummy-null-yaw1.9-tick36.png",
+          "requestedSeconds": 1.8,
+          "weaponAuras": [],
+          "furyStates": [
+            {
+              "name": "warrior-mayhem-weapon-fire",
+              "count": 0,
+              "visible": false
+            },
+            {
+              "name": "warrior-mending-stitches",
+              "count": 0,
+              "visible": false
+            },
+            {
+              "name": "warrior-echo-charges",
+              "count": 0,
+              "visible": false
+            }
+          ],
+          "bubbles": [],
+          "powerGeometry": [
+            {
+              "name": "warrior-avatar-chest",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            },
+            {
+              "name": "warrior-reckless-crown",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            },
+            {
+              "name": "warrior-avatar-bracers",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            },
+            {
+              "name": "warrior-avatar-shins",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            }
+          ],
+          "tick": 93,
+          "simTime": 4.6499999999999915,
+          "relativeSeconds": 1.7999999999999936,
+          "clip": "Idle",
+          "clipTime": 0,
+          "bones": {
+            "root": {
+              "worldPosition": [
+                135448,
+                0.0007598884070459094,
+                3.9000000000000004
+              ],
+              "localQuaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            "hips": {
+              "worldPosition": [
+                135448,
+                0.399699775693218,
+                3.9000000000000004
+              ],
+              "localQuaternion": [
+                0.0027711016591638327,
+                0.043153636157512665,
+                0.00012207499821670353,
+                0.9990646243095398
+              ]
+            },
+            "chest": {
+              "worldPosition": [
+                135447.99999490276,
+                0.983588744339357,
+                3.9093454526639277
+              ],
+              "localQuaternion": [
+                -0.001970615005120635,
+                0,
+                -0.00016131140000652522,
+                0.9999980330467224
+              ]
+            },
+            "handl": {
+              "worldPosition": [
+                135448.49554950884,
+                0.6505323437010768,
+                3.973173629440155
+              ],
+              "localQuaternion": [
+                -0.22096385061740875,
+                -0.34426799416542053,
+                0.18076640367507935,
+                0.8944149017333984
+              ]
+            },
+            "handslotl": {
+              "worldPosition": [
+                135448.43827060945,
+                0.5514516442733235,
+                3.9887920187865524
+              ],
+              "localQuaternion": [
+                0.0015412105713039637,
+                0.0015412105713039637,
+                -0.701442301273346,
+                0.712722897529602
+              ]
+            },
+            "handr": {
+              "worldPosition": [
+                135447.50576622316,
+                0.6476672257482967,
+                3.967620500884965
+              ],
+              "localQuaternion": [
+                -0.21132251620292664,
+                0.3812960982322693,
+                -0.13481611013412476,
+                0.8898205757141113
+              ]
+            },
+            "handslotr": {
+              "worldPosition": [
+                135447.56305132405,
+                0.548591474800825,
+                3.9832475633755613
+              ],
+              "localQuaternion": [
+                0.0015412105713039637,
+                -0.0015412105713039637,
+                0.701442301273346,
+                0.712722897529602
+              ]
+            },
+            "footr": {
+              "worldPosition": [
+                135447.80343144052,
+                0.15071033146722448,
+                3.878768118722436
+              ],
+              "localQuaternion": [
+                -0.5830653309822083,
+                0.11417154967784882,
+                -0.012421229854226112,
+                0.8042669892311096
+              ]
+            },
+            "footl": {
+              "worldPosition": [
+                135448.2237731238,
+                0.15070690795954717,
+                3.86778040416087
+              ],
+              "localQuaternion": [
+                -0.5544847249984741,
+                -0.11303931474685669,
+                0.04599088802933693,
+                0.8231972455978394
+              ]
+            }
+          },
+          "castingAbility": null,
+          "castTotal": 0,
+          "castRemaining": 0,
+          "player": {
+            "id": 994,
+            "kind": "player",
+            "templateId": "warrior",
+            "hp": 822,
+            "maxHp": 822,
+            "resource": 100,
+            "maxResource": 100,
+            "queuedOnSwing": null,
+            "autoAttack": true,
+            "swingTimer": 1.3999999999999995,
+            "equipment": {
+              "mainhand": "worn_sword",
+              "chest": "recruit_tunic",
+              "offhand": "eastbrook_buckler"
+            },
+            "dead": false,
+            "pos": {
+              "x": 135448,
+              "y": 0,
+              "z": 3.9000000000000004
+            },
+            "facing": 0,
+            "targetId": 999,
+            "aggroTargetId": null,
+            "forcedTargetId": null,
+            "forcedTargetTimer": 0,
+            "scale": 1,
+            "chargeTargetId": null,
+            "chargeTimeLeft": 0,
+            "auras": [
+              {
+                "id": "battle_stance",
+                "name": "Battle Stance",
+                "kind": "battle_stance",
+                "remaining": 3595.349999999983,
+                "duration": 3600,
+                "value": 0,
+                "sourceId": 994,
+                "school": "physical"
+              }
+            ]
+          },
+          "target": {
+            "id": 999,
+            "kind": "mob",
+            "templateId": "training_dummy",
+            "hp": 999914,
+            "maxHp": 999999,
+            "resource": 0,
+            "maxResource": 0,
+            "queuedOnSwing": null,
+            "autoAttack": false,
+            "swingTimer": 0,
+            "equipment": {},
+            "dead": false,
+            "pos": {
+              "x": 135448,
+              "y": 0,
+              "z": 6
+            },
+            "facing": 0,
+            "targetId": null,
+            "aggroTargetId": 994,
+            "forcedTargetId": null,
+            "forcedTargetTimer": 0,
+            "scale": 1.4,
+            "chargeTargetId": null,
+            "chargeTimeLeft": 0,
+            "auras": []
+          },
+          "contextLost": false,
+          "auraDisappearance": null
+        },
+        {
+          "name": "p4-heroic_strike-dummy-null-yaw1.9-tick64.png",
+          "requestedSeconds": 3.2,
+          "weaponAuras": [],
+          "furyStates": [
+            {
+              "name": "warrior-mayhem-weapon-fire",
+              "count": 0,
+              "visible": false
+            },
+            {
+              "name": "warrior-mending-stitches",
+              "count": 0,
+              "visible": false
+            },
+            {
+              "name": "warrior-echo-charges",
+              "count": 0,
+              "visible": false
+            }
+          ],
+          "bubbles": [],
+          "powerGeometry": [
+            {
+              "name": "warrior-avatar-chest",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            },
+            {
+              "name": "warrior-reckless-crown",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            },
+            {
+              "name": "warrior-avatar-bracers",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            },
+            {
+              "name": "warrior-avatar-shins",
+              "count": 0,
+              "visible": false,
+              "pieces": []
+            }
+          ],
+          "tick": 121,
+          "simTime": 6.0499999999999865,
+          "relativeSeconds": 3.1999999999999886,
+          "clip": "1H_Melee_Attack_Slice_Diagonal",
+          "clipTime": 0.065,
+          "bones": {
+            "root": {
+              "worldPosition": [
+                135448,
+                0.0007598884070459094,
+                3.9000000000000004
+              ],
+              "localQuaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            "hips": {
+              "worldPosition": [
+                135448,
+                0.40183751838178855,
+                3.8878903247339713
+              ],
+              "localQuaternion": [
+                0.001583657634273356,
+                0.10235065822319195,
+                0.00006878821921607641,
+                0.9947508051092461
+              ]
+            },
+            "chest": {
+              "worldPosition": [
+                135448.0005231776,
+                0.9857877070607557,
+                3.8932167239568196
+              ],
+              "localQuaternion": [
+                0.0028080449111550876,
+                0,
+                0.00447733920023135,
+                0.9999860340612078
+              ]
+            },
+            "handl": {
+              "worldPosition": [
+                135448.54746880612,
+                0.702388793436956,
+                3.8943036725832494
+              ],
+              "localQuaternion": [
+                -0.26300894888384796,
+                -0.35410018970034973,
+                0.20445689491923116,
+                0.8738621818287626
+              ]
+            },
+            "handslotl": {
+              "worldPosition": [
+                135448.494082493,
+                0.6013721738542683,
+                3.9112569453997037
+              ],
+              "localQuaternion": [
+                0.0008850546602420979,
+                0.0008850546602420979,
+                -0.7038657176867555,
+                0.7103319539636417
+              ]
+            },
+            "handr": {
+              "worldPosition": [
+                135447.5192437762,
+                0.7163962993275843,
+                4.041816494673376
+              ],
+              "localQuaternion": [
+                -0.1739708916231532,
+                0.2989700794482638,
+                -0.1382690377960358,
+                0.9280259842851
+              ]
+            },
+            "handslotr": {
+              "worldPosition": [
+                135447.5712389735,
+                0.6169190464986186,
+                4.069068093029815
+              ],
+              "localQuaternion": [
+                0.0008850546602420979,
+                -0.0008850546602420979,
+                0.7038657176867555,
+                0.7103319539636417
+              ]
+            },
+            "footr": {
+              "worldPosition": [
+                135447.8033358078,
+                0.1502474461940249,
+                3.8787511390844482
+              ],
+              "localQuaternion": [
+                -0.5746044694303896,
+                0.113808535925016,
+                -0.01698405925041859,
+                0.8103017108414636
+              ]
+            },
+            "footl": {
+              "worldPosition": [
+                135448.21443942795,
+                0.14912495771697273,
+                3.802506030395409
+              ],
+              "localQuaternion": [
+                -0.5501936933312229,
+                -0.1439891096260218,
+                0.03973247390253266,
+                0.8215712713509082
+              ]
+            }
+          },
+          "castingAbility": null,
+          "castTotal": 0,
+          "castRemaining": 0,
+          "player": {
+            "id": 994,
+            "kind": "player",
+            "templateId": "warrior",
+            "hp": 822,
+            "maxHp": 822,
+            "resource": 100,
+            "maxResource": 100,
+            "queuedOnSwing": null,
+            "autoAttack": true,
+            "swingTimer": 2,
+            "equipment": {
+              "mainhand": "worn_sword",
+              "chest": "recruit_tunic",
+              "offhand": "eastbrook_buckler"
+            },
+            "dead": false,
+            "pos": {
+              "x": 135448,
+              "y": 0,
+              "z": 3.9000000000000004
+            },
+            "facing": 0,
+            "targetId": 999,
+            "aggroTargetId": null,
+            "forcedTargetId": null,
+            "forcedTargetTimer": 0,
+            "scale": 1,
+            "chargeTargetId": null,
+            "chargeTimeLeft": 0,
+            "auras": [
+              {
+                "id": "battle_stance",
+                "name": "Battle Stance",
+                "kind": "battle_stance",
+                "remaining": 3593.949999999978,
+                "duration": 3600,
+                "value": 0,
+                "sourceId": 994,
+                "school": "physical"
+              }
+            ]
+          },
+          "target": {
+            "id": 999,
+            "kind": "mob",
+            "templateId": "training_dummy",
+            "hp": 999914,
+            "maxHp": 999999,
+            "resource": 0,
+            "maxResource": 0,
+            "queuedOnSwing": null,
+            "autoAttack": false,
+            "swingTimer": 0,
+            "equipment": {},
+            "dead": false,
+            "pos": {
+              "x": 135448,
+              "y": 0,
+              "z": 6
+            },
+            "facing": 0,
+            "targetId": null,
+            "aggroTargetId": 994,
+            "forcedTargetId": null,
+            "forcedTargetTimer": 0,
+            "scale": 1.4,
+            "chargeTargetId": null,
+            "chargeTimeLeft": 0,
+            "auras": []
+          },
+          "contextLost": false,
+          "auraDisappearance": null
+        }
+      ],
+      "events": [
+        {
+          "type": "damage",
+          "sourceId": 994,
+          "targetId": 999,
+          "amount": 21,
+          "crit": false,
+          "school": "physical",
+          "ability": null,
+          "abilityId": null,
+          "kind": "hit"
+        },
+        {
+          "type": "aura",
+          "targetId": 994,
+          "name": "Battle Trance",
+          "gained": true,
+          "sourceId": 994,
+          "abilityId": "battle_trance"
+        },
+        {
+          "type": "aura",
+          "targetId": 994,
+          "name": "Battle Trance",
+          "gained": false,
+          "auraKind": "battle_trance"
+        },
+        {
+          "type": "damage",
+          "sourceId": 994,
+          "targetId": 999,
+          "amount": 64,
+          "crit": false,
+          "school": "physical",
+          "ability": "Reaver Strike",
+          "abilityId": "heroic_strike",
+          "kind": "hit"
+        },
+        {
+          "type": "heal",
+          "targetId": 1000,
+          "amount": 0,
+          "source": "food",
+          "sfxTick": true
+        },
+        {
+          "type": "heal",
+          "targetId": 1001,
+          "amount": 0,
+          "source": "food",
+          "sfxTick": true
+        },
+        {
+          "type": "heal",
+          "targetId": 1002,
+          "amount": 0,
+          "source": "food",
+          "sfxTick": true
+        },
+        {
+          "type": "heal",
+          "targetId": 1003,
+          "amount": 0,
+          "source": "food",
+          "sfxTick": true
+        },
+        {
+          "type": "heal",
+          "targetId": 1004,
+          "amount": 0,
+          "source": "food",
+          "sfxTick": true
+        },
+        {
+          "type": "damage",
+          "sourceId": 994,
+          "targetId": 999,
+          "amount": 0,
+          "crit": false,
+          "school": "physical",
+          "ability": null,
+          "kind": "dodge"
+        }
+      ],
+      "eventRows": [
+        {
+          "tick": 41,
+          "simTime": 2.0500000000000007,
+          "event": {
+            "type": "damage",
+            "sourceId": 994,
+            "targetId": 999,
+            "amount": 21,
+            "crit": false,
+            "school": "physical",
+            "ability": null,
+            "abilityId": null,
+            "kind": "hit"
+          }
+        },
+        {
+          "tick": 41,
+          "simTime": 2.0500000000000007,
+          "event": {
+            "type": "aura",
+            "targetId": 994,
+            "name": "Battle Trance",
+            "gained": true,
+            "sourceId": 994,
+            "abilityId": "battle_trance"
+          }
+        },
+        {
+          "tick": 57,
+          "simTime": 2.849999999999998,
+          "event": {
+            "type": "aura",
+            "targetId": 994,
+            "name": "Battle Trance",
+            "gained": false,
+            "auraKind": "battle_trance"
+          }
+        },
+        {
+          "tick": 81,
+          "simTime": 4.049999999999994,
+          "event": {
+            "type": "damage",
+            "sourceId": 994,
+            "targetId": 999,
+            "amount": 64,
+            "crit": false,
+            "school": "physical",
+            "ability": "Reaver Strike",
+            "abilityId": "heroic_strike",
+            "kind": "hit"
+          }
+        },
+        {
+          "tick": 120,
+          "simTime": 5.999999999999987,
+          "event": {
+            "type": "heal",
+            "targetId": 1000,
+            "amount": 0,
+            "source": "food",
+            "sfxTick": true
+          }
+        },
+        {
+          "tick": 120,
+          "simTime": 5.999999999999987,
+          "event": {
+            "type": "heal",
+            "targetId": 1001,
+            "amount": 0,
+            "source": "food",
+            "sfxTick": true
+          }
+        },
+        {
+          "tick": 120,
+          "simTime": 5.999999999999987,
+          "event": {
+            "type": "heal",
+            "targetId": 1002,
+            "amount": 0,
+            "source": "food",
+            "sfxTick": true
+          }
+        },
+        {
+          "tick": 120,
+          "simTime": 5.999999999999987,
+          "event": {
+            "type": "heal",
+            "targetId": 1003,
+            "amount": 0,
+            "source": "food",
+            "sfxTick": true
+          }
+        },
+        {
+          "tick": 120,
+          "simTime": 5.999999999999987,
+          "event": {
+            "type": "heal",
+            "targetId": 1004,
+            "amount": 0,
+            "source": "food",
+            "sfxTick": true
+          }
+        },
+        {
+          "tick": 121,
+          "simTime": 6.0499999999999865,
+          "event": {
+            "type": "damage",
+            "sourceId": 994,
+            "targetId": 999,
+            "amount": 0,
+            "crit": false,
+            "school": "physical",
+            "ability": null,
+            "kind": "dodge"
+          }
+        }
+      ],
+      "trace": [
+        {
+          "tick": 58,
+          "simTime": 2.8999999999999977,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3597.0999999999894,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 59,
+          "simTime": 2.9499999999999975,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3597.0499999999893,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 60,
+          "simTime": 2.9999999999999973,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3596.999999999989,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 61,
+          "simTime": 3.049999999999997,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3596.949999999989,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 62,
+          "simTime": 3.099999999999997,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3596.8999999999887,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 63,
+          "simTime": 3.149999999999997,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3596.8499999999885,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 64,
+          "simTime": 3.1999999999999966,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3596.7999999999884,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 65,
+          "simTime": 3.2499999999999964,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3596.749999999988,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 66,
+          "simTime": 3.2999999999999963,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3596.699999999988,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 67,
+          "simTime": 3.349999999999996,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3596.649999999988,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 68,
+          "simTime": 3.399999999999996,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3596.5999999999876,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 69,
+          "simTime": 3.4499999999999957,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3596.5499999999874,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 70,
+          "simTime": 3.4999999999999956,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3596.4999999999873,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 71,
+          "simTime": 3.5499999999999954,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3596.449999999987,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 72,
+          "simTime": 3.599999999999995,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3596.399999999987,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 73,
+          "simTime": 3.649999999999995,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3596.3499999999867,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 74,
+          "simTime": 3.699999999999995,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3596.2999999999865,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 75,
+          "simTime": 3.7499999999999947,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3596.2499999999864,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 76,
+          "simTime": 3.7999999999999945,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3596.199999999986,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 77,
+          "simTime": 3.8499999999999943,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3596.149999999986,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 78,
+          "simTime": 3.899999999999994,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3596.099999999986,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 79,
+          "simTime": 3.949999999999994,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3596.0499999999856,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 80,
+          "simTime": 3.999999999999994,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3595.9999999999854,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 81,
+          "simTime": 4.049999999999994,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3595.9499999999853,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 82,
+          "simTime": 4.099999999999993,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3595.899999999985,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 83,
+          "simTime": 4.149999999999993,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3595.849999999985,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 84,
+          "simTime": 4.199999999999993,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3595.7999999999847,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 85,
+          "simTime": 4.249999999999993,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3595.7499999999845,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 86,
+          "simTime": 4.299999999999993,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3595.6999999999844,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 87,
+          "simTime": 4.3499999999999925,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3595.649999999984,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 88,
+          "simTime": 4.399999999999992,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3595.599999999984,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 89,
+          "simTime": 4.449999999999992,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3595.549999999984,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 90,
+          "simTime": 4.499999999999992,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3595.4999999999836,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 91,
+          "simTime": 4.549999999999992,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3595.4499999999834,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 92,
+          "simTime": 4.599999999999992,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3595.3999999999833,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 93,
+          "simTime": 4.6499999999999915,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3595.349999999983,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 94,
+          "simTime": 4.699999999999991,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3595.299999999983,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 95,
+          "simTime": 4.749999999999991,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3595.2499999999827,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 96,
+          "simTime": 4.799999999999991,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3595.1999999999825,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 97,
+          "simTime": 4.849999999999991,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3595.1499999999824,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 98,
+          "simTime": 4.899999999999991,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3595.099999999982,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 99,
+          "simTime": 4.94999999999999,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3595.049999999982,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 100,
+          "simTime": 4.99999999999999,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3594.999999999982,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 101,
+          "simTime": 5.04999999999999,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3594.9499999999816,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 102,
+          "simTime": 5.09999999999999,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3594.8999999999814,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 103,
+          "simTime": 5.14999999999999,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3594.8499999999813,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 104,
+          "simTime": 5.1999999999999895,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3594.799999999981,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 105,
+          "simTime": 5.249999999999989,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3594.749999999981,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 106,
+          "simTime": 5.299999999999989,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3594.6999999999807,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 107,
+          "simTime": 5.349999999999989,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3594.6499999999805,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 108,
+          "simTime": 5.399999999999989,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3594.5999999999804,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 109,
+          "simTime": 5.449999999999989,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3594.54999999998,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 110,
+          "simTime": 5.4999999999999885,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3594.49999999998,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 111,
+          "simTime": 5.549999999999988,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3594.44999999998,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 112,
+          "simTime": 5.599999999999988,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3594.3999999999796,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 113,
+          "simTime": 5.649999999999988,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3594.3499999999794,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 114,
+          "simTime": 5.699999999999988,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3594.2999999999793,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 115,
+          "simTime": 5.749999999999988,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3594.249999999979,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 116,
+          "simTime": 5.799999999999987,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3594.199999999979,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 117,
+          "simTime": 5.849999999999987,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3594.1499999999787,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 118,
+          "simTime": 5.899999999999987,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3594.0999999999785,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 119,
+          "simTime": 5.949999999999987,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3594.0499999999784,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 120,
+          "simTime": 5.999999999999987,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3593.999999999978,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        },
+        {
+          "tick": 121,
+          "simTime": 6.0499999999999865,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3593.949999999978,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "hp": 822,
+          "resource": 100,
+          "dead": false
+        }
+      ],
+      "errors": [],
+      "start": {
+        "tick": 57,
+        "simTime": 2.849999999999998,
+        "DT": 0.05,
+        "targetId": 999,
+        "playerId": 994,
+        "config": {
+          "cls": "warrior",
+          "spec": null,
+          "scene": "sandbox",
+          "seed": 20061,
+          "rows": {
+            "5": "war_row_double_charge",
+            "8": "war_row_second_wind",
+            "11": "war_row_piercing_howl",
+            "14": "war_row_anger_management",
+            "17": "war_row_recklessness",
+            "20": "war_row_colossal_might"
+          },
+          "environment": "studio",
+          "graphicsPreset": 4
+        },
+        "actualGfxProfile": {
+          "settings": {
+            "graphicsConfigVersion": 21,
+            "tier": "ultra",
+            "effectsTier": "ultra",
+            "bucketBands": {
+              "resolution": {
+                "min": 0.68,
+                "baseline": 1,
+                "max": 1,
+                "roi": 0.88,
+                "cost": "gpu",
+                "governable": true
+              },
+              "grass": {
+                "min": 0.78,
+                "baseline": 1,
+                "max": 1,
+                "roi": 0.86,
+                "cost": "gpu",
+                "governable": true
+              },
+              "foliage": {
+                "min": 0.78,
+                "baseline": 1,
+                "max": 1,
+                "roi": 0.72,
+                "cost": "gpu",
+                "governable": true
+              },
+              "props": {
+                "min": 0.86,
+                "baseline": 1,
+                "max": 1,
+                "roi": 0.58,
+                "cost": "mixed",
+                "governable": false
+              },
+              "lighting": {
+                "min": 0.78,
+                "baseline": 1,
+                "max": 1,
+                "roi": 0.7,
+                "cost": "gpu",
+                "governable": true
+              },
+              "materials": {
+                "min": 0.86,
+                "baseline": 1,
+                "max": 1,
+                "roi": 0.78,
+                "cost": "gpu",
+                "governable": false
+              },
+              "waterSky": {
+                "min": 0.86,
+                "baseline": 1,
+                "max": 1,
+                "roi": 0.82,
+                "cost": "gpu",
+                "governable": false
+              },
+              "vfx": {
+                "min": 0.86,
+                "baseline": 1,
+                "max": 1,
+                "roi": 0.7,
+                "cost": "mixed",
+                "governable": true
+              },
+              "characters": {
+                "min": 0.94,
+                "baseline": 1,
+                "max": 1,
+                "roi": 1,
+                "cost": "mixed",
+                "governable": false
+              },
+              "weapons": {
+                "min": 1,
+                "baseline": 1,
+                "max": 1,
+                "roi": 1,
+                "cost": "mixed",
+                "governable": false
+              },
+              "worldStreaming": {
+                "min": 0.7,
+                "baseline": 1,
+                "max": 1,
+                "roi": 0.62,
+                "cost": "cpu",
+                "governable": true
+              },
+              "ui": {
+                "min": 0.9,
+                "baseline": 1,
+                "max": 1,
+                "roi": 0.86,
+                "cost": "cpu",
+                "governable": false
+              }
+            },
+            "bucketBaselines": {
+              "resolution": 1,
+              "grass": 1,
+              "foliage": 1,
+              "props": 1,
+              "lighting": 1,
+              "materials": 1,
+              "waterSky": 1,
+              "vfx": 1,
+              "characters": 1,
+              "weapons": 1,
+              "worldStreaming": 1,
+              "ui": 1
+            },
+            "budget": {
+              "targetFps": 60,
+              "minRenderScaleDesktop": 0.78,
+              "minRenderScaleMobile": 0.68,
+              "maxRenderScale": 1,
+              "dropFrameMs": 30,
+              "urgentFrameMs": 44,
+              "recoverFrameMs": 15,
+              "dropStep": 0.08,
+              "urgentDropStep": 0.12,
+              "recoverStep": 0.04,
+              "recoverStableSeconds": 3,
+              "cooldownSeconds": 0.85
+            },
+            "autoGovernor": true,
+            "composer": true,
+            "gradePass": true,
+            "ao": true,
+            "msaaSamples": 0,
+            "pixelRatioCap": 1.75,
+            "dynamicShadows": true,
+            "shadowMap": 4096,
+            "standardMaterials": true,
+            "surfaceDetail": true,
+            "surfaceDetailTaps": 3,
+            "surfaceDetailClampK": 0.85,
+            "bladeCarpetRadius": 34,
+            "cliffScree": true,
+            "canopyDetail": true,
+            "terrainRelief": 3,
+            "aoFullRes": true,
+            "smaa": true,
+            "fxaa": false,
+            "bloom": true,
+            "terrainCastShadows": true,
+            "lowPlus": false,
+            "leanFoliage": false,
+            "denseDressing": false,
+            "grassRadius": 82,
+            "grassStep": 1.8,
+            "farGrassDensityFloor": 0.75,
+            "terrainSplat": true,
+            "windSway": true,
+            "maxPointLights": 6,
+            "constrainedMemory": false,
+            "iosMemoryProfile": false,
+            "tightMemory": false,
+            "maxPooledCharacterVisuals": 128,
+            "maxPooledObjects": null,
+            "farCharacterAnimScale": 1.3,
+            "vistaTier": "ultra",
+            "waterTier": "ultra"
+          },
+          "fingerprint": "{\"ao\":true,\"aoFullRes\":true,\"autoGovernor\":true,\"bladeCarpetRadius\":34,\"bloom\":true,\"bucketBands\":{\"characters\":{\"baseline\":1,\"cost\":\"mixed\",\"governable\":false,\"max\":1,\"min\":0.94,\"roi\":1},\"foliage\":{\"baseline\":1,\"cost\":\"gpu\",\"governable\":true,\"max\":1,\"min\":0.78,\"roi\":0.72},\"grass\":{\"baseline\":1,\"cost\":\"gpu\",\"governable\":true,\"max\":1,\"min\":0.78,\"roi\":0.86},\"lighting\":{\"baseline\":1,\"cost\":\"gpu\",\"governable\":true,\"max\":1,\"min\":0.78,\"roi\":0.7},\"materials\":{\"baseline\":1,\"cost\":\"gpu\",\"governable\":false,\"max\":1,\"min\":0.86,\"roi\":0.78},\"props\":{\"baseline\":1,\"cost\":\"mixed\",\"governable\":false,\"max\":1,\"min\":0.86,\"roi\":0.58},\"resolution\":{\"baseline\":1,\"cost\":\"gpu\",\"governable\":true,\"max\":1,\"min\":0.68,\"roi\":0.88},\"ui\":{\"baseline\":1,\"cost\":\"cpu\",\"governable\":false,\"max\":1,\"min\":0.9,\"roi\":0.86},\"vfx\":{\"baseline\":1,\"cost\":\"mixed\",\"governable\":true,\"max\":1,\"min\":0.86,\"roi\":0.7},\"waterSky\":{\"baseline\":1,\"cost\":\"gpu\",\"governable\":false,\"max\":1,\"min\":0.86,\"roi\":0.82},\"weapons\":{\"baseline\":1,\"cost\":\"mixed\",\"governable\":false,\"max\":1,\"min\":1,\"roi\":1},\"worldStreaming\":{\"baseline\":1,\"cost\":\"cpu\",\"governable\":true,\"max\":1,\"min\":0.7,\"roi\":0.62}},\"bucketBaselines\":{\"characters\":1,\"foliage\":1,\"grass\":1,\"lighting\":1,\"materials\":1,\"props\":1,\"resolution\":1,\"ui\":1,\"vfx\":1,\"waterSky\":1,\"weapons\":1,\"worldStreaming\":1},\"budget\":{\"cooldownSeconds\":0.85,\"dropFrameMs\":30,\"dropStep\":0.08,\"maxRenderScale\":1,\"minRenderScaleDesktop\":0.78,\"minRenderScaleMobile\":0.68,\"recoverFrameMs\":15,\"recoverStableSeconds\":3,\"recoverStep\":0.04,\"targetFps\":60,\"urgentDropStep\":0.12,\"urgentFrameMs\":44},\"canopyDetail\":true,\"cliffScree\":true,\"composer\":true,\"constrainedMemory\":false,\"denseDressing\":false,\"dynamicShadows\":true,\"effectsTier\":\"ultra\",\"farCharacterAnimScale\":1.3,\"farGrassDensityFloor\":0.75,\"fxaa\":false,\"gradePass\":true,\"graphicsConfigVersion\":21,\"grassRadius\":82,\"grassStep\":1.8,\"iosMemoryProfile\":false,\"leanFoliage\":false,\"lowPlus\":false,\"maxPointLights\":6,\"maxPooledCharacterVisuals\":128,\"maxPooledObjects\":Infinity,\"msaaSamples\":0,\"pixelRatioCap\":1.75,\"shadowMap\":4096,\"smaa\":true,\"standardMaterials\":true,\"surfaceDetail\":true,\"surfaceDetailClampK\":0.85,\"surfaceDetailTaps\":3,\"terrainCastShadows\":true,\"terrainRelief\":3,\"terrainSplat\":true,\"tier\":\"ultra\",\"tightMemory\":false,\"vistaTier\":\"ultra\",\"waterTier\":\"ultra\",\"windSway\":true}",
+          "forcedTier": null,
+          "softwareRendering": false,
+          "epoch": 2
+        },
+        "resolved": {
+          "id": "heroic_strike",
+          "name": "Reaver Strike",
+          "effects": [
+            {
+              "type": "weaponDamage",
+              "bonus": 44
+            }
+          ]
+        },
+        "preCast": {
+          "hp": 822,
+          "maxHp": 822,
+          "resource": 100,
+          "maxResource": 100,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3597.1499999999896,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            },
+            {
+              "id": "battle_trance",
+              "name": "Battle Trance",
+              "kind": "battle_trance",
+              "remaining": 9.149999999999988,
+              "duration": 10,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ],
+          "position": {
+            "x": 135448,
+            "y": 0,
+            "z": 3.9000000000000004
+          }
+        },
+        "target": {
+          "id": 999,
+          "kind": "mob",
+          "templateId": "training_dummy",
+          "dummy": true,
+          "forcedTargetId": null,
+          "forcedTargetTimer": 0
+        },
+        "openingAuto": {
+          "events": [
+            {
+              "type": "damage",
+              "sourceId": 994,
+              "targetId": 999,
+              "amount": 21,
+              "crit": false,
+              "school": "physical",
+              "ability": null,
+              "abilityId": null,
+              "kind": "hit"
+            }
+          ],
+          "swingTimer": 1.1999999999999993,
+          "equipment": {
+            "mainhand": "worn_sword",
+            "chest": "recruit_tunic",
+            "offhand": "eastbrook_buckler"
+          }
+        },
+        "postCast": {
+          "hp": 822,
+          "resource": 100,
+          "auras": [
+            {
+              "id": "battle_stance",
+              "name": "Battle Stance",
+              "kind": "battle_stance",
+              "remaining": 3597.1499999999896,
+              "duration": 3600,
+              "value": 0,
+              "sourceId": 994,
+              "school": "physical"
+            }
+          ]
+        },
+        "initialAura": null,
+        "nominalExpirySimTime": null
+      },
+      "commands": [
+        {
+          "tick": 57,
+          "command": {
+            "kind": "cast",
+            "abilityId": "heroic_strike",
+            "targetId": 999
+          }
+        }
+      ],
+      "disappearance": null,
+      "castErrors": [],
+      "reaverHits": [
+        {
+          "type": "damage",
+          "sourceId": 994,
+          "targetId": 999,
+          "amount": 64,
+          "crit": false,
+          "school": "physical",
+          "ability": "Reaver Strike",
+          "abilityId": "heroic_strike",
+          "kind": "hit"
+        }
+      ],
+      "queueProof": {
+        "waitSeconds": 1.1999999999999957,
+        "waitingFrames": 6,
+        "actualHit": {
+          "tick": 81,
+          "simTime": 4.049999999999994,
+          "event": {
+            "type": "damage",
+            "sourceId": 994,
+            "targetId": 999,
+            "amount": 64,
+            "crit": false,
+            "school": "physical",
+            "ability": "Reaver Strike",
+            "abilityId": "heroic_strike",
+            "kind": "hit"
+          }
+        }
+      }
+    }
+  ],
+  "limitations": [
+    "One actual queued attack in the legal unspecialized loadout; contact must be observed from the actual damage event.",
+    "Studio staging restores resources and cooldowns before each isolated cast. No state or resource reset occurs during a take.",
+    "Uses normal Studio preparation, then no state resets during the cast. Queue consumption and actual damage remain recorded.",
+    "All poses are sampled, not continuous collision proof. Native death, incoming damage, recipient auras and action errors remain recorded.",
+    "Single setting baseline; later matrix must include every setting and world backgrounds. Full source hashes detect mid-take edits."
+  ],
+  "baseline": null,
+  "sourceAtStart": {
+    "scripts/anim/warrior_reaver_pose.mjs": "096a723ea4e4f8fa49dc36df6fd7380b3753ff75dcc55ee5eb2fb4ee291e9efe",
+    "src/render/character_effects.ts": "6b598bc1ca8258c0063dbbda36d62f826eb5b65d4ae25f031493d1ebe573f50d",
+    "src/render/characters/visual.ts": "5cebb7d3f2a09edf348e19b209a23edffd461ad6ba71b38bc13c9de01e8a076f",
+    "src/render/ability_vfx/overlay_sprites.ts": "29dee3c0cbd0a75b996f2f7dc523e487b8be525acc9e528a08ea64dd453c63a7",
+    "src/warrior_control_audio.ts": "6740e64581d2f13f55e25392254b320efc96606727a021dabc3a4bfb79a4b831",
+    "src/render/characters/named_action_clips.ts": "a2830572f5c895055a7f928d71d224757f28a3dda81ad8e5ae8dbcfb29b2b312",
+    "src/render/characters/action_props.ts": "b0b51b7f830a6738604f951b9bc47a4b0b0565bd7eb6b9066eaa6b4b47a85d73",
+    "src/render/ability_vfx/warrior_control.ts": "10c79dd557ff44a23dbba16f341ac319d59fbbf9c44583431594de9a2a8bf220",
+    "src/render/ability_vfx/warrior_control_marks.ts": "05546b2340f5a99f08d60e278859b4adc4ed1d8fe0ff9cc6d4ab9904ee9f5a3f",
+    "src/render/ability_vfx/warrior_control_atlas.ts": "74b413460bb4720d112e6b8dda937d030d12e3f120152bdbdb3489bd8d1b239e",
+    "src/render/ability_vfx/warrior_hammer.ts": "0427f21c581c0de820cc0652cc5dadc7475f449830f99e9b790d3189db6d2d84",
+    "src/render/ability_vfx/warrior_blades.ts": "e431115b5565d60b81624b16614763886c03143fbdde2bb0a436bea4ad5b2f48",
+    "scripts/anim/warrior_control_poses.mjs": "117e0d2ab9449950c60acc7b99e9a206cfde2cbb5a38f1c3697f76f8c83daf48",
+    "scripts/build_warrior_contact_anims.mjs": "254c26fa340bc41007573156a61d0f0b116449c515fd6b61f36f276b3a33608b",
+    "src/render/ability_vfx/decals.ts": "e03c11cfe05498918e419272b71f8bcf50eb5a098db2a238b7f75b0c4580c636",
+    "src/render/ability_vfx/warrior_fracture_atlas.ts": "f3eb364de2eecd08c714434f23ed93af26f2e9fcbf4afc1ad28e2c0eb3c171d9",
+    "src/render/ability_vfx/warrior_mobility.ts": "44dec1c71f2cd5f1d2b2300605baa5a27a85094db6a8d865a92d8b6cf12a0408",
+    "src/render/characters/warrior_rush_pose.ts": "4b9e4c6f73f12fb596404845774857583be552f8098a7c91f51b9961ed9aacf5",
+    "scripts/anim/warrior_rush.mjs": "fc3ad82708f398ec95a42e0d05ef02628a2f1c3d8705d0e17db50e1a88b06ba7",
+    "scripts/build_warrior_ability_anims.mjs": "6c4675fbd0c43012de31329bdae2f5b48bc2b1d510bfe1849fc0b686efac0260",
+    "public/models/chars/players/warrior_ability_anims.glb": "8aefecd84783b12220f87a09df76d9ea11d1b6c919f362742619b76f1d487edd",
+    "src/render/ability_vfx/sequencer.ts": "3a582a775e60759d0a0aba906c463bb90939407361c683bff17438b6f96eca3b",
+    "src/render/ability_vfx/warrior_fury_states.ts": "0baf02a251eb0c67442bd53c6a7c0b7f4330358126c7541767e8599ea5976ecb",
+    "src/render/ability_vfx/warrior_fury_state_shapes.ts": "a9925d6cea199ca374f957d894aeb7277b48cd78625f01125b75ad7a83143ec6",
+    "src/render/ability_vfx/warrior_fury_feedback.ts": "4569c307e1353077b6533293400a51eb685388b899c4f4568b61f47bd84aa003",
+    "src/render/warrior_fury_state_core.ts": "72bf1081690cc906d03996dc5ed766c3fdda58e03d6da08f6d408f3db0b08e92",
+    "src/warrior_recovery_core.ts": "5f2eb1c2d1a190e45f9dead83c7e47839add3b234e8f5284ddf8d4a453e5f871",
+    "src/vfx_studio/studio.css": "b7282517130c9c027768f45b745be59e01b03a39f96bd62cbabc9e7e5b1f5fec",
+    "src/render/ability_vfx/warrior_attention_core.ts": "8b172951d67627a9589d962b92f8f8a09db326dbee7e8825d4580b5e17341d22",
+    "src/render/ability_vfx/warrior_attention_atlas.ts": "5034a79823303222878493a1aeba71f5431e70e93488a753de78d8e5b4468639",
+    "src/render/ability_vfx/warrior_attention.ts": "4b6e458fbf6754b99da0dfb3c6bca4e413f3393f33b06be6687942c22c61b932",
+    "src/render/ability_vfx/warrior_goad.ts": "c7f433bec6156f8c6b533d1a518005f211cbdd75789eff6d3a89a716ecf0c97f",
+    "src/render/ability_vfx/warrior_gyre.ts": "8313cf991d9f11ce6aecaa6779b82664e532b745667e33f321925c543930effa",
+    "src/render/ability_vfx/warrior_gyre_shape.ts": "976000c2227fec12dcc74d434cffb690d4b83c16a5f9a0dc74dd50f6942a01d8",
+    "src/render/ability_vfx/warrior_area.ts": "004789475d7980ceb952f50ce521e4fff4fc1595d9ddafffcc73ad6844e5ff10",
+    "src/render/ability_vfx/fx_textures.ts": "3d83ad262c36a322393047d6b3bdb9d7b62adbd5769a4ffd3e83dd9994b400e4",
+    "src/render/ability_vfx/warrior_avatar_bracer.ts": "6720b62db8269f4ebc148c865c7792cd35a3f64dd699ccd2527e6d20619f8fd7",
+    "src/render/ability_vfx/warrior_avatar_rupture.ts": "ebe5ac0abf1037c8646607066cb74ce57630301c097f300e0c01cf37239fc5ca",
+    "src/render/ability_vfx/signature_shapes.ts": "ac592327f6641d931d549b1d14ed8e6a07c8de848c88dc10f954ed879ccc6ee4",
+    "src/render/ability_vfx/signature_crests.ts": "97853517bee59743d31e3b3cdafa21ef3ceb4c8f99d89b74b8561ff4283db0a7",
+    "src/render/warrior_power_anchor.ts": "4d7d09da549f7346ea56a68cbebf99af671884b0c742691b0fa1a2c3c8521242",
+    "src/render/ability_vfx/warrior_rage_material.ts": "834e02a106f093951bce881fbc6ca42e0635dc923472cf1ee1496d950934fa99",
+    "src/render/ability_vfx/primitive_prewarm.ts": "b6c52af07a19145be6e3865441af548bf7ed33f47dd9545d017a581b75f9858b",
+    "src/render/ability_vfx/production_assets.ts": "7e32e8555510172faeb02bf7945a1ead40942a984f5f8abc0c6d3a4eb46bada2",
+    "src/render/ability_vfx/baked_impact_layers.ts": "ee2ac653cbc4c7b31775cf9fc21336f98a5b399e7afe77f28e19245b4a1386be",
+    "src/render/ability_vfx/active_kit_prewarm.ts": "e5d52fbe57a557072545ba312b6ae0862ed8e2192faa5779d73546d0f7642aa3",
+    "src/render/ability_vfx/prewarm.ts": "9e94eba55400e0e6987220340ff6f50ebd939495e9ca62dbdba45ea298d91f23",
+    "public/textures/vfx/production/warrior_power.webp": "68450efac5cc151da9592de459cf7b0b06994759fb85f2e68b1a3775794684ef",
+    "src/render/ability_vfx/warrior_avatar_shape.ts": "3c4ae1b3dc983945c7fcec594bb7ed6734041d7877b5cca62de4ef50d56be306",
+    "src/render/warrior_power_core.ts": "81053c4a37aec9ad05c27751721fb8a0222584590ea141d5f7422ad25f9485d0",
+    "src/render/ability_vfx/warrior_power_geometry.ts": "3fc2a0f51e4f83eb530088e853b6ce58d70c87936724f4d9baf7538fd8d564d5",
+    "src/render/ability_vfx/warrior_power_forms.ts": "fa913d46f9ba68f72103da3741bb184064f2bc8518bb4f0f3fa2d6edc60bbce0",
+    "src/render/ability_vfx/warrior_power_cast.ts": "2db69c34dd44a8876c545156dd81c25a8c2143253c1d0d822653f0c7696f64e7",
+    "src/render/ability_vfx/ribbons.ts": "9619707b14cdfb8a9d0ad1229a426e8ab42e4c5573e2d3252bc707dc26b58ab7",
+    "src/render/characters/damage_attack_animation.ts": "9f9088e458574106137182eacd965da04b6f0adc40264b8a9ca169b1e03f420c",
+    "src/fury_audio_core.ts": "327888ecc23436565e3e939b7eab11763845299fdd791097674f13c0f66592da",
+    "src/render/warrior_vfx_specs.ts": "e92b394394f8d37b8ded7418d1a8a65f620325b62b2d6d421ae164337dd860bc",
+    "src/render/ability_vfx/physical_choreography.ts": "4b049e7e615a8818397fa655bba6e60a35ff2d604aa7ac1dcb6cb0e31fa6fb99",
+    "src/render/ability_vfx/painter.ts": "efb4dc6d72509d4aa190098613efe891459df7dc20c6a5f6058af8576a99cbad",
+    "src/render/ability_vfx/fx.ts": "401420b1572df50f9516e157a4337019699ee4b1310828c76af2355d2412941d",
+    "src/render/renderer.ts": "a18e25fa4a34c5eacfc1aadbd1ef95ccda4cc6fc335aa750a52b4de789ec3afe",
+    "src/render/characters/manifest.ts": "99443958d861cd00f4ca56e73a0c5c13eb2355af665a583a1c5005018db77758",
+    "src/render/characters/signature_clips.ts": "9a0c6150bb12efa342d72044a533f66c2681e1ea5b82d8ff7281362cee50bcfe",
+    "src/render/characters/cast_performance.ts": "d11e6f0c458355b2cd8d06f48ac9cd4037d1045a57ecc09dfc5a7c7185c9e6f2",
+    "src/vfx_studio/stage_cast.ts": "4694f2fbd5eee4c566ef786129f3a6eb57f93748dbeba6f1cc2c9d93b512c16d",
+    "src/vfx_studio/stage_prerequisites.ts": "c1ae6aeeef8e88dde24803e647baf180a740fac593605d598cbc9fdd72c8cdf0",
+    "src/vfx_studio/session.ts": "32f4285ed102c6dc153fe8fedd03578cfa2b30a5297760ce0720e6f602f79722",
+    "src/vfx_studio/loadout.ts": "2b8d442b11a7f9c6ef845ea7635d9f0974f7ecf60698b7d5309092cfb3c79f90",
+    "src/sim/content/classes.ts": "afcd0d765d530ce4f0cd6a7ac3b5b66a0a8eba3842460939df84309d9dae2e60",
+    "src/sim/content/warrior_rows.ts": "0a1c8127c31e317be6f35408409b99a03eb711fa8b0a1865b08eaccec2c69eec",
+    "src/sim/combat/effect_dispatch.ts": "39cef13ee9811a09de9ce0b75e277036a7dca0a301550671e132deb1552bc9db",
+    "public/models/chars/players/warrior_contact_anims.glb": "62cb2c30ca0c87fe810371a98c0c97f8bf40df8a10b0775479af83a5dd91beb1",
+    "src/render/characters/sanguine_weapon_sheath.ts": "5cb88e8d78946253235c007d1ca3dff934bdb3062011d59aa2913ac306303aa9",
+    "src/render/compile_target_readiness.ts": "754c3523912f7fc4c09b913b5fde92b5e695f60b745dd851d802d0acfe7afa6e",
+    "src/render/ability_vfx/warrior_readiness_cast.ts": "4762a35ebbc0eaef4ab12fedd1452b4360e5efb1f51f4f7886afca11561aa527",
+    "src/render/ability_vfx/warrior_readiness_shapes.ts": "0dc713be8fe67d2bc0f7edb83bcfda368dea9130e77d24be2fda9065905f7e22",
+    "src/render/ability_vfx/warrior_readiness.ts": "273a64639b175e64206626727f0b587dbaddfd83856525a61c35ca0e1b856b2e",
+    "src/render/warrior_readiness_core.ts": "34e8f2d1f801e15c82fd902ff159b18b924acf158da07d001518439287873e1d",
+    "src/render/ability_vfx/warrior_guard_geometry.ts": "3e72a2d30252775375e65107cf2ec11c42a43cf33b38226b6e31987f7dfc3458",
+    "src/render/ability_vfx/warrior_guard_plates.ts": "3b1421accdaa2067369b739d858eabfbf84cb43238175a52cbc45cccb0753d8d",
+    "src/render/ability_vfx/guard_prewarm.ts": "34aa91d73b554016f540affff1705b7b34bca6b9c4ccdf850ff06fa2a77e1d18",
+    "src/render/ability_vfx/warrior_guard_cast.ts": "70dc9659acf84b16fd872943a250c449bddf40efaa98399e88ed87c1e478789c",
+    "src/render/weapon_trail_anchor.ts": "e2b4d8cc9dde304db761965fc16f28939d018e863a5c82b76e5f317dbe9d2eaa"
+  },
+  "scriptSha256": "426725fdb4c7924bd7640c0e6d9758a249f4b3930e3db43765814b6ebb41378c",
+  "catalogueSha256": "5dd3c7023c00f2087ba4d661d4bf5a57ec7bc8d57783a3b007046cf6a9294b40",
+  "sourceAtEnd": {
+    "scripts/anim/warrior_reaver_pose.mjs": "096a723ea4e4f8fa49dc36df6fd7380b3753ff75dcc55ee5eb2fb4ee291e9efe",
+    "src/render/character_effects.ts": "6b598bc1ca8258c0063dbbda36d62f826eb5b65d4ae25f031493d1ebe573f50d",
+    "src/render/characters/visual.ts": "5cebb7d3f2a09edf348e19b209a23edffd461ad6ba71b38bc13c9de01e8a076f",
+    "src/render/ability_vfx/overlay_sprites.ts": "29dee3c0cbd0a75b996f2f7dc523e487b8be525acc9e528a08ea64dd453c63a7",
+    "src/warrior_control_audio.ts": "6740e64581d2f13f55e25392254b320efc96606727a021dabc3a4bfb79a4b831",
+    "src/render/characters/named_action_clips.ts": "a2830572f5c895055a7f928d71d224757f28a3dda81ad8e5ae8dbcfb29b2b312",
+    "src/render/characters/action_props.ts": "b0b51b7f830a6738604f951b9bc47a4b0b0565bd7eb6b9066eaa6b4b47a85d73",
+    "src/render/ability_vfx/warrior_control.ts": "10c79dd557ff44a23dbba16f341ac319d59fbbf9c44583431594de9a2a8bf220",
+    "src/render/ability_vfx/warrior_control_marks.ts": "05546b2340f5a99f08d60e278859b4adc4ed1d8fe0ff9cc6d4ab9904ee9f5a3f",
+    "src/render/ability_vfx/warrior_control_atlas.ts": "74b413460bb4720d112e6b8dda937d030d12e3f120152bdbdb3489bd8d1b239e",
+    "src/render/ability_vfx/warrior_hammer.ts": "0427f21c581c0de820cc0652cc5dadc7475f449830f99e9b790d3189db6d2d84",
+    "src/render/ability_vfx/warrior_blades.ts": "e431115b5565d60b81624b16614763886c03143fbdde2bb0a436bea4ad5b2f48",
+    "scripts/anim/warrior_control_poses.mjs": "117e0d2ab9449950c60acc7b99e9a206cfde2cbb5a38f1c3697f76f8c83daf48",
+    "scripts/build_warrior_contact_anims.mjs": "254c26fa340bc41007573156a61d0f0b116449c515fd6b61f36f276b3a33608b",
+    "src/render/ability_vfx/decals.ts": "e03c11cfe05498918e419272b71f8bcf50eb5a098db2a238b7f75b0c4580c636",
+    "src/render/ability_vfx/warrior_fracture_atlas.ts": "f3eb364de2eecd08c714434f23ed93af26f2e9fcbf4afc1ad28e2c0eb3c171d9",
+    "src/render/ability_vfx/warrior_mobility.ts": "44dec1c71f2cd5f1d2b2300605baa5a27a85094db6a8d865a92d8b6cf12a0408",
+    "src/render/characters/warrior_rush_pose.ts": "4b9e4c6f73f12fb596404845774857583be552f8098a7c91f51b9961ed9aacf5",
+    "scripts/anim/warrior_rush.mjs": "fc3ad82708f398ec95a42e0d05ef02628a2f1c3d8705d0e17db50e1a88b06ba7",
+    "scripts/build_warrior_ability_anims.mjs": "6c4675fbd0c43012de31329bdae2f5b48bc2b1d510bfe1849fc0b686efac0260",
+    "public/models/chars/players/warrior_ability_anims.glb": "8aefecd84783b12220f87a09df76d9ea11d1b6c919f362742619b76f1d487edd",
+    "src/render/ability_vfx/sequencer.ts": "3a582a775e60759d0a0aba906c463bb90939407361c683bff17438b6f96eca3b",
+    "src/render/ability_vfx/warrior_fury_states.ts": "0baf02a251eb0c67442bd53c6a7c0b7f4330358126c7541767e8599ea5976ecb",
+    "src/render/ability_vfx/warrior_fury_state_shapes.ts": "a9925d6cea199ca374f957d894aeb7277b48cd78625f01125b75ad7a83143ec6",
+    "src/render/ability_vfx/warrior_fury_feedback.ts": "4569c307e1353077b6533293400a51eb685388b899c4f4568b61f47bd84aa003",
+    "src/render/warrior_fury_state_core.ts": "72bf1081690cc906d03996dc5ed766c3fdda58e03d6da08f6d408f3db0b08e92",
+    "src/warrior_recovery_core.ts": "5f2eb1c2d1a190e45f9dead83c7e47839add3b234e8f5284ddf8d4a453e5f871",
+    "src/vfx_studio/studio.css": "b7282517130c9c027768f45b745be59e01b03a39f96bd62cbabc9e7e5b1f5fec",
+    "src/render/ability_vfx/warrior_attention_core.ts": "8b172951d67627a9589d962b92f8f8a09db326dbee7e8825d4580b5e17341d22",
+    "src/render/ability_vfx/warrior_attention_atlas.ts": "5034a79823303222878493a1aeba71f5431e70e93488a753de78d8e5b4468639",
+    "src/render/ability_vfx/warrior_attention.ts": "4b6e458fbf6754b99da0dfb3c6bca4e413f3393f33b06be6687942c22c61b932",
+    "src/render/ability_vfx/warrior_goad.ts": "c7f433bec6156f8c6b533d1a518005f211cbdd75789eff6d3a89a716ecf0c97f",
+    "src/render/ability_vfx/warrior_gyre.ts": "8313cf991d9f11ce6aecaa6779b82664e532b745667e33f321925c543930effa",
+    "src/render/ability_vfx/warrior_gyre_shape.ts": "976000c2227fec12dcc74d434cffb690d4b83c16a5f9a0dc74dd50f6942a01d8",
+    "src/render/ability_vfx/warrior_area.ts": "004789475d7980ceb952f50ce521e4fff4fc1595d9ddafffcc73ad6844e5ff10",
+    "src/render/ability_vfx/fx_textures.ts": "3d83ad262c36a322393047d6b3bdb9d7b62adbd5769a4ffd3e83dd9994b400e4",
+    "src/render/ability_vfx/warrior_avatar_bracer.ts": "6720b62db8269f4ebc148c865c7792cd35a3f64dd699ccd2527e6d20619f8fd7",
+    "src/render/ability_vfx/warrior_avatar_rupture.ts": "ebe5ac0abf1037c8646607066cb74ce57630301c097f300e0c01cf37239fc5ca",
+    "src/render/ability_vfx/signature_shapes.ts": "ac592327f6641d931d549b1d14ed8e6a07c8de848c88dc10f954ed879ccc6ee4",
+    "src/render/ability_vfx/signature_crests.ts": "97853517bee59743d31e3b3cdafa21ef3ceb4c8f99d89b74b8561ff4283db0a7",
+    "src/render/warrior_power_anchor.ts": "4d7d09da549f7346ea56a68cbebf99af671884b0c742691b0fa1a2c3c8521242",
+    "src/render/ability_vfx/warrior_rage_material.ts": "834e02a106f093951bce881fbc6ca42e0635dc923472cf1ee1496d950934fa99",
+    "src/render/ability_vfx/primitive_prewarm.ts": "b6c52af07a19145be6e3865441af548bf7ed33f47dd9545d017a581b75f9858b",
+    "src/render/ability_vfx/production_assets.ts": "7e32e8555510172faeb02bf7945a1ead40942a984f5f8abc0c6d3a4eb46bada2",
+    "src/render/ability_vfx/baked_impact_layers.ts": "ee2ac653cbc4c7b31775cf9fc21336f98a5b399e7afe77f28e19245b4a1386be",
+    "src/render/ability_vfx/active_kit_prewarm.ts": "e5d52fbe57a557072545ba312b6ae0862ed8e2192faa5779d73546d0f7642aa3",
+    "src/render/ability_vfx/prewarm.ts": "9e94eba55400e0e6987220340ff6f50ebd939495e9ca62dbdba45ea298d91f23",
+    "public/textures/vfx/production/warrior_power.webp": "68450efac5cc151da9592de459cf7b0b06994759fb85f2e68b1a3775794684ef",
+    "src/render/ability_vfx/warrior_avatar_shape.ts": "3c4ae1b3dc983945c7fcec594bb7ed6734041d7877b5cca62de4ef50d56be306",
+    "src/render/warrior_power_core.ts": "81053c4a37aec9ad05c27751721fb8a0222584590ea141d5f7422ad25f9485d0",
+    "src/render/ability_vfx/warrior_power_geometry.ts": "3fc2a0f51e4f83eb530088e853b6ce58d70c87936724f4d9baf7538fd8d564d5",
+    "src/render/ability_vfx/warrior_power_forms.ts": "fa913d46f9ba68f72103da3741bb184064f2bc8518bb4f0f3fa2d6edc60bbce0",
+    "src/render/ability_vfx/warrior_power_cast.ts": "2db69c34dd44a8876c545156dd81c25a8c2143253c1d0d822653f0c7696f64e7",
+    "src/render/ability_vfx/ribbons.ts": "9619707b14cdfb8a9d0ad1229a426e8ab42e4c5573e2d3252bc707dc26b58ab7",
+    "src/render/characters/damage_attack_animation.ts": "9f9088e458574106137182eacd965da04b6f0adc40264b8a9ca169b1e03f420c",
+    "src/fury_audio_core.ts": "327888ecc23436565e3e939b7eab11763845299fdd791097674f13c0f66592da",
+    "src/render/warrior_vfx_specs.ts": "e92b394394f8d37b8ded7418d1a8a65f620325b62b2d6d421ae164337dd860bc",
+    "src/render/ability_vfx/physical_choreography.ts": "4b049e7e615a8818397fa655bba6e60a35ff2d604aa7ac1dcb6cb0e31fa6fb99",
+    "src/render/ability_vfx/painter.ts": "efb4dc6d72509d4aa190098613efe891459df7dc20c6a5f6058af8576a99cbad",
+    "src/render/ability_vfx/fx.ts": "401420b1572df50f9516e157a4337019699ee4b1310828c76af2355d2412941d",
+    "src/render/renderer.ts": "a18e25fa4a34c5eacfc1aadbd1ef95ccda4cc6fc335aa750a52b4de789ec3afe",
+    "src/render/characters/manifest.ts": "99443958d861cd00f4ca56e73a0c5c13eb2355af665a583a1c5005018db77758",
+    "src/render/characters/signature_clips.ts": "9a0c6150bb12efa342d72044a533f66c2681e1ea5b82d8ff7281362cee50bcfe",
+    "src/render/characters/cast_performance.ts": "d11e6f0c458355b2cd8d06f48ac9cd4037d1045a57ecc09dfc5a7c7185c9e6f2",
+    "src/vfx_studio/stage_cast.ts": "4694f2fbd5eee4c566ef786129f3a6eb57f93748dbeba6f1cc2c9d93b512c16d",
+    "src/vfx_studio/stage_prerequisites.ts": "c1ae6aeeef8e88dde24803e647baf180a740fac593605d598cbc9fdd72c8cdf0",
+    "src/vfx_studio/session.ts": "32f4285ed102c6dc153fe8fedd03578cfa2b30a5297760ce0720e6f602f79722",
+    "src/vfx_studio/loadout.ts": "2b8d442b11a7f9c6ef845ea7635d9f0974f7ecf60698b7d5309092cfb3c79f90",
+    "src/sim/content/classes.ts": "afcd0d765d530ce4f0cd6a7ac3b5b66a0a8eba3842460939df84309d9dae2e60",
+    "src/sim/content/warrior_rows.ts": "0a1c8127c31e317be6f35408409b99a03eb711fa8b0a1865b08eaccec2c69eec",
+    "src/sim/combat/effect_dispatch.ts": "39cef13ee9811a09de9ce0b75e277036a7dca0a301550671e132deb1552bc9db",
+    "public/models/chars/players/warrior_contact_anims.glb": "62cb2c30ca0c87fe810371a98c0c97f8bf40df8a10b0775479af83a5dd91beb1",
+    "src/render/characters/sanguine_weapon_sheath.ts": "5cb88e8d78946253235c007d1ca3dff934bdb3062011d59aa2913ac306303aa9",
+    "src/render/compile_target_readiness.ts": "754c3523912f7fc4c09b913b5fde92b5e695f60b745dd851d802d0acfe7afa6e",
+    "src/render/ability_vfx/warrior_readiness_cast.ts": "4762a35ebbc0eaef4ab12fedd1452b4360e5efb1f51f4f7886afca11561aa527",
+    "src/render/ability_vfx/warrior_readiness_shapes.ts": "0dc713be8fe67d2bc0f7edb83bcfda368dea9130e77d24be2fda9065905f7e22",
+    "src/render/ability_vfx/warrior_readiness.ts": "273a64639b175e64206626727f0b587dbaddfd83856525a61c35ca0e1b856b2e",
+    "src/render/warrior_readiness_core.ts": "34e8f2d1f801e15c82fd902ff159b18b924acf158da07d001518439287873e1d",
+    "src/render/ability_vfx/warrior_guard_geometry.ts": "3e72a2d30252775375e65107cf2ec11c42a43cf33b38226b6e31987f7dfc3458",
+    "src/render/ability_vfx/warrior_guard_plates.ts": "3b1421accdaa2067369b739d858eabfbf84cb43238175a52cbc45cccb0753d8d",
+    "src/render/ability_vfx/guard_prewarm.ts": "34aa91d73b554016f540affff1705b7b34bca6b9c4ccdf850ff06fa2a77e1d18",
+    "src/render/ability_vfx/warrior_guard_cast.ts": "70dc9659acf84b16fd872943a250c449bddf40efaa98399e88ed87c1e478789c",
+    "src/render/weapon_trail_anchor.ts": "e2b4d8cc9dde304db761965fc16f28939d018e863a5c82b76e5f317dbe9d2eaa"
+  },
+  "sourceUnchanged": true,
+  "actualCaptureCount": 10,
+  "finishedAt": "2026-09-09T01:10:49.837Z"
+}

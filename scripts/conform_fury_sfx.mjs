@@ -9,9 +9,11 @@ import { FURY_SFX } from './sfx/fury_sfx.mjs';
 import { WARRIOR_CONTACT_SFX } from './sfx/warrior_contact_sfx.mjs';
 import { WARRIOR_CONTROL_SFX } from './sfx/warrior_control_sfx.mjs';
 
+const reaver = process.argv.includes('--warrior-reaver');
 const controls = process.argv.includes('--warrior-control');
-const contact = controls || process.argv.includes('--warrior-contact');
-const cues = controls ? WARRIOR_CONTROL_SFX : contact ? WARRIOR_CONTACT_SFX : FURY_SFX;
+const contact = reaver || controls || process.argv.includes('--warrior-contact');
+const sourceCues = controls ? WARRIOR_CONTROL_SFX : contact ? WARRIOR_CONTACT_SFX : FURY_SFX;
+const cues = reaver ? sourceCues.filter((cue) => cue.key.includes('_warrior_reaver')) : sourceCues;
 const root = contact ? 'tmp/warrior-contact-audio' : 'tmp/fury-audio';
 mkdirSync(join(root, 'curated'), { recursive: true });
 const review = [];
@@ -75,7 +77,14 @@ for (const cue of cues)
     });
   }
 writeFileSync(
-  join(root, controls ? 'control-conformance-review.json' : 'conformance-review.json'),
+  join(
+    root,
+    reaver
+      ? 'reaver-conformance-review.json'
+      : controls
+        ? 'control-conformance-review.json'
+        : 'conformance-review.json',
+  ),
   JSON.stringify(review, null, 2) + '\n',
 );
 console.log(`Conformed ${review.length} Fury takes; onset choices retained for auditory review`);

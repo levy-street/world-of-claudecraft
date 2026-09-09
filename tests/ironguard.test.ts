@@ -33,6 +33,7 @@ function fixture() {
       ),
       disposed: false,
       sequencer: seq,
+      sequenceInstant: vi.fn().mockReturnValue(true),
     } as unknown as SequencerHost & Pick<AbilityVfxFx, 'orbit' | 'sequenceInstant'>,
     {
       get(target, key) {

@@ -1,0 +1,137 @@
+{
+  "before": {
+    "captureSource": "warrior-reaver-before-1",
+    "images": [
+      {
+        "file": "before-p4-heroic_strike-dummy-null-yaw1.9-tick1.png",
+        "sha256": "b82f2c8f5d811633d6f0bc57c68a12ec988e366a1793b6f7767c3e776a045f97"
+      },
+      {
+        "file": "before-p4-heroic_strike-dummy-null-yaw1.9-tick3.png",
+        "sha256": "130bf61ba784f255682b953c825a36e9a7c49d81f9caae7883949971d3aefcbe"
+      },
+      {
+        "file": "before-p4-heroic_strike-dummy-null-yaw1.9-tick6.png",
+        "sha256": "3398fb23a3f214c09e7d59b1573139409852006fad6ef899fada38a8921dadda"
+      },
+      {
+        "file": "before-p4-heroic_strike-dummy-null-yaw1.9-tick10.png",
+        "sha256": "7810c8e9c8dfb0b43f5b3afae3866f1135abc3765f2723f7e21f60fdf952367d"
+      },
+      {
+        "file": "before-p4-heroic_strike-dummy-null-yaw1.9-tick12.png",
+        "sha256": "2e577071cd2042acb59c6789a0ded0fc9309ff6e652c2fa7771026e9ba25ad7d"
+      },
+      {
+        "file": "before-p4-heroic_strike-dummy-null-yaw1.9-tick13.png",
+        "sha256": "ee8dd4faf5dfd26971e268b8857bd26aa25baed68cfe3ab79180871d0a5b9df6"
+      },
+      {
+        "file": "before-p4-heroic_strike-dummy-null-yaw1.9-tick17.png",
+        "sha256": "cd627b0afdac3d0a503a6a8ca8343940f0d31267f89f75ff711541c4ea6e8f12"
+      },
+      {
+        "file": "before-p4-heroic_strike-dummy-null-yaw1.9-tick30.png",
+        "sha256": "64ed0b092ed2573064d61d1abd06f8129fb95a2e889a6f184ad5d5f0ccdce00b"
+      },
+      {
+        "file": "before-p4-heroic_strike-dummy-null-yaw1.9-tick64.png",
+        "sha256": "4929d826b26630834e3cdf50cf27538ea071e0ab0510f50503d5d7de355564a6"
+      },
+      {
+        "file": "before-p4-heroic_strike-dummy-null-yaw1.9-tick122.png",
+        "sha256": "83b9fb28c61ce12c2a070663d48881b7fd0cb095974eadc88b07aea33abe1c45"
+      }
+    ]
+  },
+  "after": {
+    "captureSource": "warrior-reaver-after-3",
+    "images": [
+      {
+        "file": "after-p4-heroic_strike-dummy-null-yaw1.9-tick1.png",
+        "sha256": "3c461f2938fd24427c09eec7554ed9e2daf03308be15a2f11b34b6338fda13fa"
+      },
+      {
+        "file": "after-p4-heroic_strike-dummy-null-yaw1.9-tick3.png",
+        "sha256": "65fd21ad7e508b2145372fea4da40d34c33c8b6841fca18d4dd8d409414c3753"
+      },
+      {
+        "file": "after-p4-heroic_strike-dummy-null-yaw1.9-tick6.png",
+        "sha256": "1ea1798f87c5cf453b4845ec2929f12cdd0fb96e2073d6f6e849edc3a60e0858"
+      },
+      {
+        "file": "after-p4-heroic_strike-dummy-null-yaw1.9-tick10.png",
+        "sha256": "7656ade2fd365760f956a0da0fa29e99edaa7064e01db4f4d23046b9c881639a"
+      },
+      {
+        "file": "after-p4-heroic_strike-dummy-null-yaw1.9-tick12.png",
+        "sha256": "5f5d59af225b1103a6824038c033271bf4c4e249a5f7c4b57d79d393a334874f"
+      },
+      {
+        "file": "after-p4-heroic_strike-dummy-null-yaw1.9-tick13.png",
+        "sha256": "eb4a1c3dd057dc9eca425bf9d3c337b0c55d8a4f1b278fca91df86a6173515dc"
+      },
+      {
+        "file": "after-p4-heroic_strike-dummy-null-yaw1.9-tick17.png",
+        "sha256": "fdb8797cad55c6b4bee7faa3ce7a04d4680469115501bc1f06d4ef92662719c5"
+      },
+      {
+        "file": "after-p4-heroic_strike-dummy-null-yaw1.9-tick30.png",
+        "sha256": "d68ebd12f694517fda93a660baf9310f9723a0f5efaafb4578821d6be19a17f1"
+      },
+      {
+        "file": "after-p4-heroic_strike-dummy-null-yaw1.9-tick64.png",
+        "sha256": "d168098189a424f09d1dd8546dddc29d90ee265017a1a86491af4ef943047e22"
+      },
+      {
+        "file": "after-p4-heroic_strike-dummy-null-yaw1.9-tick122.png",
+        "sha256": "ceecb4d5e7c250e7c033ec223562f18f01acfac52881ad9f4bf213cf207b57db"
+      }
+    ]
+  },
+  "queue": {
+    "captureSource": "warrior-reaver-queue-after-1",
+    "images": [
+      {
+        "file": "queue-p4-heroic_strike-dummy-null-yaw1.9-tick1.png",
+        "sha256": "6a8866222695f76353f88dc12d04482136f5c127390d008c036c8655c4e285d3"
+      },
+      {
+        "file": "queue-p4-heroic_strike-dummy-null-yaw1.9-tick3.png",
+        "sha256": "5a2c989aac4d385d2f48ddba17db9e14d9c975a3afe3b9a1f8a9f60770990f8c"
+      },
+      {
+        "file": "queue-p4-heroic_strike-dummy-null-yaw1.9-tick12.png",
+        "sha256": "66a6ff6846c0d7966b2811b7e8d915341137053f88b453237625f899e022a6c7"
+      },
+      {
+        "file": "queue-p4-heroic_strike-dummy-null-yaw1.9-tick20.png",
+        "sha256": "1c396b17d6861a0ab362836d2d98c492184d4f5fd77e70f15ca29f096d593204"
+      },
+      {
+        "file": "queue-p4-heroic_strike-dummy-null-yaw1.9-tick22.png",
+        "sha256": "ed7da33aa6853a65862e177661d07798e7e0908baf5b3790f6c35b4dbd26fc9d"
+      },
+      {
+        "file": "queue-p4-heroic_strike-dummy-null-yaw1.9-tick23.png",
+        "sha256": "11f27209a6a5b26d5b405357afbacf85ffdd61c14ac7629bbc72b9d79012d64c"
+      },
+      {
+        "file": "queue-p4-heroic_strike-dummy-null-yaw1.9-tick26.png",
+        "sha256": "f9df79559e7392ed0ba6ce2b20c8b5197fbad729708f3dfd43a002eaa4e50a3b"
+      },
+      {
+        "file": "queue-p4-heroic_strike-dummy-null-yaw1.9-tick29.png",
+        "sha256": "67ca75c20c8b8fc1db857beb7f6a73514e98b2718820c889eeee5fd629744472"
+      },
+      {
+        "file": "queue-p4-heroic_strike-dummy-null-yaw1.9-tick36.png",
+        "sha256": "4704b1e7859503555fc90c87951e11df35f9fd0dc133734bef8dadf97445828f"
+      },
+      {
+        "file": "queue-p4-heroic_strike-dummy-null-yaw1.9-tick64.png",
+        "sha256": "fc6195ad45a8ca7f1faeee1048100b8050a74f6f8c8dce1c1c89be857d8b29da"
+      }
+    ]
+  }
+}

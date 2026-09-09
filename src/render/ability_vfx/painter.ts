@@ -1482,11 +1482,28 @@ export class AbilityVfx {
       !physicalProjectile &&
       abilityId !== 'heroic_leap' &&
       (arch === 'strike' || arch === 'dash' || arch === 'buff' || full.damageCue === true);
+    const authoredWarriorContact =
+      appearance === abilityId &&
+      !!full?.physical &&
+      !!(
+        WARRIOR_BLADE_STYLES[abilityId] ||
+        abilityId === 'shield_slam' ||
+        abilityId === 'breachmaker'
+      );
+    const contactFeedback =
+      local && ev.crit && authoredWarriorContact
+        ? () => {
+            this.deps.animHold?.(ev.targetId, 0.1, 0.14);
+            this.deps.screenFlash?.(0.25);
+            const kickAt = this.deps.anchor(ev.targetId, 0.55);
+            if (kickAt) this.deps.fx.shakeAt(kickAt.x, kickAt.y, kickAt.z, 0.12);
+          }
+        : undefined;
     // Local-player crit hitstop + screen pop (gallery critHit feel): body and
     // screen feedback, not a particle spawn, so it rides OUTSIDE the accent
     // window - your own crit reads even in a saturated fight. The visual's
     // refractory, the flash clamp, and the shake budget keep chains calm.
-    if (local && ev.crit) {
+    if (local && ev.crit && !authoredWarriorContact) {
       this.deps.animHold?.(ev.targetId, 0.1, 0.14);
       this.deps.screenFlash?.(0.25);
       const kickAt = this.deps.anchor(ev.targetId, 0.55);
@@ -1494,7 +1511,12 @@ export class AbilityVfx {
     }
     // The melee contact frame bites (gallery hold: timeScale ~0.07 for
     // ~0.11s): the local player's strike/dash contact briefly holds both rigs.
-    if (local && isCastMoment && (arch === 'strike' || arch === 'dash')) {
+    if (
+      local &&
+      isCastMoment &&
+      !authoredWarriorContact &&
+      (arch === 'strike' || arch === 'dash')
+    ) {
       const dur = ev.crit ? 0.16 : 0.1;
       // Signature clips already hold their authored contact pose at 150ms.
       if (!SIGNATURE_ABILITIES[abilityId] && !meleeImpactProfile(abilityId))
@@ -1512,7 +1534,10 @@ export class AbilityVfx {
     if ((abilityId === 'breachmaker' || abilityId === 'hamstring') && tier === 2) tier = 1;
     const plan = planImpact(spec, ev.crit, this.quality, tier);
     const at = this.deps.anchor(ev.targetId, 0.55);
-    if (!at) return;
+    if (!at || (authoredWarriorContact && !this.deps.anchor(ev.sourceId, 0.55))) {
+      contactFeedback?.();
+      return;
+    }
     // crit sting layered over the impact: the sequencer's impact recipe plays
     // the palette identity; the sting is the crit's own extra layer (the
     // damage event is the only place crit is known)
@@ -1532,18 +1557,32 @@ export class AbilityVfx {
       this.deps.vfx.burst(at, ev.school, plan.burstCount, plan.burstPower, plan.color);
       this.spawned++;
     }
+    let contactOwned = false;
     if (isCastMoment && full && tier < 2) {
       // The contact moment runs the full archetype sequence (authored slash
       // arc, impact stack, motifs). Buff-archetype self-hits (Blood Toll's
       // health price) run the buff sequence too: shell pop plus the red
       // body-glow pulse.
-      this.deps.fx.sequenceInstant(abilityId, full, ev.sourceId, ev.targetId, plan.color, tier);
+      contactOwned = contactFeedback
+        ? this.deps.fx.sequenceInstant(
+            abilityId,
+            full,
+            ev.sourceId,
+            ev.targetId,
+            plan.color,
+            tier,
+            0,
+            undefined,
+            contactFeedback,
+          )
+        : this.deps.fx.sequenceInstant(abilityId, full, ev.sourceId, ev.targetId, plan.color, tier);
     } else if (!isCastMoment && full?.impact?.vRing !== false && (ev.crit || spec.fin === 1)) {
       this.deps.fx.impactRing(ev.targetId, plan.color, ev.crit);
       this.spawned++;
     }
     this.recordStat(abilityId, false);
-    if (abilityId === 'breachmaker') return true;
+    if (authoredWarriorContact && contactOwned) return true;
+    contactFeedback?.();
   }
 
   // Spec-colored buff swirl for an aura gain. Only an exact ability id (from

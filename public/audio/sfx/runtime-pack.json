@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "94d33a4d09d34c22d490e93fff54f3cbbac2ca92ff6314c1f55a4ad419423d96",
-  "catalogHash": "30d131f2a210bffb36bdb30d9bfd0837752e39496f60d12b26fbc85707a52ce7",
+  "bundleId": "45b210e3dde2c88cb94a4387357ded22518e6ba770f6855c871bcdafd0867dc4",
+  "catalogHash": "1dd6712880426cac661a9c28056e91df495429c2645764fcafcec54b6232733f",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -1516,6 +1516,24 @@
       "gain": 1,
       "playbackRate": 1
     },
+    "impact_warrior_reaver": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/impact_warrior_reaver_1.mp3?v=a000652b85eb",
+          "bytes": 6940,
+          "sha256": "a000652b85ebb917ba484b849d51a6366795ec3a572726394a3070fe4d2c2ac0"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/impact_warrior_reaver_2.mp3?v=b20993a271ef",
+          "bytes": 6940,
+          "sha256": "b20993a271ef93a48d328a03d1b30364c964a2ed1a649beb9569aa3bcecde71f"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
     "impact_warrior_reckless_tear": {
       "variants": [
         {
@@ -2459,6 +2477,24 @@
           "url": "/audio/sfx/melee_warrior_quake_release_2.mp3?v=20cb97926a40",
           "bytes": 4432,
           "sha256": "20cb97926a40b74175efcc1cdde5cb6c19dd7ddac0b1f0257b7ecf19687e52f4"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "melee_warrior_reaver_release": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/melee_warrior_reaver_release_1.mp3?v=632913dda310",
+          "bytes": 4432,
+          "sha256": "632913dda3106e11a81a9736dc704439fa03223bc520f45e663c5a7138cb01ef"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/melee_warrior_reaver_release_2.mp3?v=f1b1900bb920",
+          "bytes": 4432,
+          "sha256": "f1b1900bb9200b3289d2f0121d7df393228e6857210e35909a86fdf3cdccdae1"
         }
       ],
       "gain": 1,

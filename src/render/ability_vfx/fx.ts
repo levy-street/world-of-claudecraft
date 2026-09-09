@@ -922,9 +922,10 @@ export class AbilityVfxFx implements SequencerHost {
     tier: number,
     windupDelay = 0,
     componentOutcome?: 0 | 1 | 2,
-  ): void {
-    if (this.disposed) return;
-    this.sequencer.start(
+    contactFeedback?: () => void,
+  ): boolean {
+    if (this.disposed) return false;
+    const slot = this.sequencer.start(
       this,
       abilityId,
       spec,
@@ -937,6 +938,8 @@ export class AbilityVfxFx implements SequencerHost {
       undefined,
       componentOutcome,
     );
+    if (!slot) return false;
+    slot.contactFeedback = contactFeedback;
     if (wantsScreenFx(spec, tier)) {
       // fire with the sequence's compressed impact; self-centered archetypes
       // land on the caster (mirrors the sequencer's impactAnchor rule)
@@ -953,6 +956,7 @@ export class AbilityVfxFx implements SequencerHost {
         screenFxStrengthOf(spec),
       );
     }
+    return true;
   }
 
   sequenceWarriorAreaContact(
