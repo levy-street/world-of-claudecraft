@@ -1,5 +1,8 @@
+import { AURA_CUE_NONE, sanitizeAuraCueId } from '../game/aura_cue_catalog';
+import { type HapticShape, sanitizeHapticShape } from '../game/haptic_pulse_core';
 import type { AuraOverlayProcId, MageProcId, WarriorProcId } from './aura_overlay_view';
 import { auraOverlayDefaultMeta } from './aura_overlay_view';
+import { sanitizeWatchedIds } from './aura_watchlist_core';
 
 export interface AuraOverlayConfig {
   enabled: boolean;
@@ -16,6 +19,19 @@ export interface AuraOverlayConfig {
   groundScale: number;
   groundOrder: number;
   color: string;
+  /** The alert sound this proc plays when it fires, or AURA_CUE_NONE for silence
+   *  (the default: nobody gets a new noise without asking for it). */
+  soundId: string;
+  /** Per-proc playback gain, 0.1 to 1. Only reachable once a cue is chosen, and
+   *  multiplied by the player's master SFX volume like every other cue. */
+  soundVolume: number;
+  /** Light this spell's hotbar button while its aura is up. Additive only: it can
+   *  never suppress the action bar's own authored proc glow. */
+  showReadyGlow: boolean;
+  /** Give this spell a slot on the reticle tick ring at screen centre. */
+  showReticleTick: boolean;
+  /** Rumble or vibrate when this spell procs. 'none' is off. */
+  haptic: HapticShape | 'none';
 }
 
 export type AuraOverlayPatch = Partial<AuraOverlayConfig>;
@@ -112,6 +128,20 @@ const GENERIC_PALETTES: Readonly<Record<string, readonly string[]>> = {
   druid: ['#22c55e', '#f59e0b', '#60a5fa', '#16a34a', '#84cc16', '#a78bfa', '#eab308'],
 };
 
+// Warrior and Mage carry bespoke per-proc tables above instead of a GENERIC_PALETTES
+// row, so a watchlist proc on those classes has no palette to index. Rotate the same
+// hues their authored tables already use, rather than collapsing every watched spell
+// on those two classes onto one gold.
+const FALLBACK_PALETTE: readonly string[] = [
+  '#ffe14d',
+  '#3dc7ff',
+  '#bd63ff',
+  '#ff4b2b',
+  '#59d8ff',
+  '#8b5cf6',
+  '#d946ef',
+];
+
 function genericDefaultLayout(id: AuraOverlayProcId): AuraOverlayDefaultLayout {
   const meta = auraOverlayDefaultMeta(id);
   if (!meta) return { arcsScale: 1, color: '#ffe14d' };
@@ -126,13 +156,31 @@ function defaultLayout(id: AuraOverlayProcId): AuraOverlayDefaultLayout {
   return ALL_DEFAULT_LAYOUT[id] ?? genericDefaultLayout(id);
 }
 
+/** The spread of default icon X positions a proc with no authored slot falls into.
+ *  Exported so a freshly picked watchlist spell can be parked on the next FREE
+ *  slot instead of stacking on top of the one before it (every watched proc
+ *  resolves to the same generic default otherwise). */
+/** The class palette an authored proc with no bespoke color falls into, indexed by
+ *  slot. Exported for the same reason as genericIconPosX: every watchlist proc
+ *  otherwise resolves to ONE fallback gold, so a player watching four spells gets
+ *  four identical rings and cannot tell at a glance which one lit. */
+export function genericPaletteColor(playerClass: string, slot: number): string {
+  const palette = GENERIC_PALETTES[playerClass] ?? FALLBACK_PALETTE;
+  const safe = Number.isFinite(slot) ? Math.max(0, Math.round(slot)) : 0;
+  return palette[safe % palette.length];
+}
+
+export function genericIconPosX(slot: number): number {
+  const safe = Number.isFinite(slot) ? Math.max(0, Math.round(slot)) : 0;
+  return GENERIC_ICON_X[safe % GENERIC_ICON_X.length];
+}
+
 function defaultIconX(id: AuraOverlayProcId): number {
   const warriorX = WARRIOR_ICON_X[id as WarriorProcId];
   if (warriorX !== undefined) return warriorX;
   const mageX = MAGE_ICON_X[id as MageProcId];
   if (mageX !== undefined) return mageX;
-  const slot = auraOverlayDefaultMeta(id)?.slot ?? 3;
-  return GENERIC_ICON_X[Math.min(GENERIC_ICON_X.length - 1, Math.max(0, slot))];
+  return genericIconPosX(auraOverlayDefaultMeta(id)?.slot ?? 3);
 }
 
 function defaultGroundOrder(id: AuraOverlayProcId): number {
@@ -160,6 +208,11 @@ export function defaultAuraOverlayConfig(id: AuraOverlayProcId): AuraOverlayConf
     groundScale: 1,
     groundOrder: defaultGroundOrder(id),
     color: layout.color,
+    soundId: AURA_CUE_NONE,
+    soundVolume: 0.7,
+    showReadyGlow: false,
+    showReticleTick: false,
+    haptic: 'none',
   };
 }
 
@@ -194,14 +247,33 @@ export function sanitizeAuraOverlayConfig(id: AuraOverlayProcId, raw: unknown): 
     groundScale: numberIn(value.groundScale, 0.65, 1.6, fallback.groundScale),
     groundOrder: Math.round(numberIn(value.groundOrder, 0, 100, fallback.groundOrder)),
     color: colorOr(value.color, fallback.color),
+    soundId: sanitizeAuraCueId(value.soundId),
+    soundVolume: numberIn(value.soundVolume, 0.1, 1, fallback.soundVolume),
+    showReadyGlow: boolOr(value.showReadyGlow, fallback.showReadyGlow),
+    showReticleTick: boolOr(value.showReticleTick, fallback.showReticleTick),
+    // 'none' is the stored off state and is NOT a shape, so it has to survive the
+    // shape sanitizer rather than being coerced to the default tap.
+    haptic:
+      value.haptic === 'none' || value.haptic === undefined
+        ? 'none'
+        : sanitizeHapticShape(value.haptic),
   };
 }
 
 type StoredConfigs = {
-  [id: string]: AuraOverlayConfig | AuraOverlayLayoutConfig | number | undefined;
+  [id: string]: AuraOverlayConfig | AuraOverlayLayoutConfig | string[] | number | undefined;
   __layoutVersion?: number;
   __layout?: AuraOverlayLayoutConfig;
+  // The player-chosen extra spells to put aura vision on (aura_watchlist_core).
+  // Additive on purpose: a store written before the watchlist shipped simply has
+  // no key here and reads back as an empty list, so no LAYOUT_VERSION bump (which
+  // would wipe every placement the player already tuned).
+  __watched?: string[];
 };
+
+// Reserved keys in the stored map, so a proc-id lookup can never mistake one of
+// them for a saved per-proc config.
+const RESERVED_KEYS: ReadonlySet<string> = new Set(['__layoutVersion', '__layout', '__watched']);
 
 export class AuraOverlayConfigStore {
   private readonly key: string;
@@ -244,6 +316,26 @@ export class AuraOverlayConfigStore {
 
   get(id: AuraOverlayProcId): AuraOverlayConfig {
     return sanitizeAuraOverlayConfig(id, this.configs[id]);
+  }
+
+  /** Whether this proc has a SAVED config, as opposed to reading back defaults.
+   *  The watchlist uses it to seed a freshly picked spell (enabled, ordered last)
+   *  exactly once, and never to re-seed one the player has already tuned. */
+  has(id: AuraOverlayProcId): boolean {
+    return !RESERVED_KEYS.has(id) && this.configs[id] !== undefined;
+  }
+
+  /** The persisted watchlist (proc ids), sanitized. */
+  getWatched(): string[] {
+    return sanitizeWatchedIds(this.configs.__watched);
+  }
+
+  /** Replace the persisted watchlist. */
+  setWatched(ids: readonly string[]): string[] {
+    const next = sanitizeWatchedIds(ids);
+    this.configs = { ...this.configs, __watched: next };
+    this.save();
+    return [...next];
   }
 
   getLayout(): AuraOverlayLayoutConfig {

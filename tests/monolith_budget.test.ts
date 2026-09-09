@@ -113,6 +113,11 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned from 19177 after the v0.38.0 sync merge: the release's map
     // overhaul extracted marker interaction out of the coordinator, so the
     // merged file landed SMALLER and the ratchet follows it down.
+    // Re-pinned DOWN from 18472 by the aura watchlist change: standing the
+    // feature up inline would have added 14 lines here, so the controller
+    // build and the Options > Auras projection both moved out to
+    // src/ui/aura_overlay_wiring.ts. The coordinator ends 9 lines SMALLER
+    // than it started, and the pin follows it down. Extract, then lower.
     file: 'src/ui/hud.ts',
     // Lowered from 19600 at the Phase 07 review round (craft-denial key
     // ternary out to craft_denial_line_view), then from 19500 at the Phase 07
@@ -445,7 +450,7 @@ const MONOLITHS: MonolithRow[] = [
     // measured combined count is below both parent pins (18574 / 18489).
     // Compose the mount cosmetics and practice lesson extractions.
     // Measured combined size; retain zero headroom after the release merge.
-    ceiling: 18472,
+    ceiling: 18463,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

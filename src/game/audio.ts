@@ -4,7 +4,13 @@
 // playback, loading, voice limits, and volume control to the sampled SFX engine.
 
 import type { GatherNodeType } from '../sim/types';
+import { isAuraCueId } from './aura_cue_catalog';
 import { sfx } from './sfx';
+
+// One proc cannot restate itself faster than its own cue is long. The longest cue
+// in the palette runs ~2s; half of that keeps a fast re-proc audible as a repeat
+// without letting it stutter over its own tail.
+const AURA_CUE_COOLDOWN = 1;
 
 // Minimum seconds between repeats of the SAME error cue: spamming an ability
 // on cooldown, or holding a cast with no mana, would otherwise refire the
@@ -223,6 +229,25 @@ export class GameAudio {
    *  the gameplay-timing cues (ready check, duel countdown) call `play` directly. */
   private playFeedback(key: UiCue, opts?: { cooldown?: number }): void {
     if (this.feedbackOn) this.play(key, opts);
+  }
+
+  /**
+   * An aura proc alert (src/game/aura_cue_catalog.ts). Unlike every other method
+   * here the key is chosen by the PLAYER at runtime rather than fixed at the call
+   * site, so it is validated against the catalog before reaching the engine and an
+   * unknown id is a silent no-op rather than a missing-clip fetch.
+   *
+   * Routed through `play`, not `playFeedback`: this cue is opt-in per proc and the
+   * player asked for it specifically, so the general interface-feedback toggle does
+   * not silence it. The per-proc volume multiplies the master SFX volume like any
+   * other gain. The cooldown is per key, so one spell re-proccing faster than its
+   * own cue is long cannot stutter.
+   */
+  auraCue(cueId: string, volume: number): void {
+    if (!isAuraCueId(cueId)) return;
+    const gain = Math.min(1, Math.max(0, volume));
+    if (gain <= 0) return;
+    this.play(cueId as UiCue, { cooldown: AURA_CUE_COOLDOWN, gain });
   }
 
   bagOpen(): void {

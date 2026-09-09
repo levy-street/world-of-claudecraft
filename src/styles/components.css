@@ -15963,6 +15963,92 @@
   .aura-bulk-actions .btn {
     flex: 1;
   }
+  /* Reticle tick ring: one mark per proc routed to the screen-centre channel.
+     Pointer-events none throughout, so it can never eat a click on the world. */
+  #reticle-ticks {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    z-index: 3;
+  }
+  .reticle-tick {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 3px;
+    height: 12px;
+    margin: 0 0 0 -1.5px;
+    border-radius: 2px;
+    background: var(--color-text-muted);
+    opacity: 0;
+    transform-origin: 50% var(--tick-radius, 96px);
+    rotate: var(--tick-angle, 0deg);
+    translate: 0 calc(-1 * var(--tick-radius, 96px));
+    transition:
+      opacity 120ms linear,
+      background-color 120ms linear;
+  }
+  .reticle-tick.present {
+    opacity: 0.42;
+  }
+  .reticle-tick.lit {
+    opacity: 1;
+    background: var(--tick-color, var(--color-aura-rpg-gold));
+    box-shadow: 0 0 8px var(--tick-color, var(--color-aura-rpg-gold));
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .reticle-tick {
+      transition: none;
+    }
+  }
+  /* Watchlist picker: pick any known self-buff spell to give it its own aura. */
+  .aura-watch-section {
+    margin-bottom: 14px;
+  }
+  .aura-watch-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    color: var(--color-text-light);
+  }
+  .aura-watch-count {
+    color: var(--color-text-muted);
+  }
+  .aura-watch-hint {
+    margin: 4px 0 8px;
+  }
+  .aura-watch-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .aura-watch-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 4px 10px 4px 4px;
+    text-align: left;
+  }
+  .aura-watch-chip img {
+    width: 32px;
+    height: 32px;
+    border: 1px solid currentColor;
+    border-radius: 5px;
+    opacity: 0.55;
+  }
+  .aura-watch-chip[aria-pressed="true"] {
+    border-color: var(--color-aura-rpg-gold);
+    color: var(--color-aura-rpg-gold);
+  }
+  .aura-watch-chip[aria-pressed="true"] img {
+    border-width: 2px;
+    opacity: 1;
+  }
   .aura-settings-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -16032,6 +16118,32 @@
   }
   .aura-settings-chip.aura-overlay-victory {
     --aura-color: var(--color-aura-rpg-gold);
+  }
+  .aura-haptic-row {
+    align-items: center;
+    gap: 8px;
+  }
+  .aura-haptic-select {
+    flex: 1;
+    min-width: 0;
+    min-height: 40px;
+  }
+  .aura-sound-row {
+    align-items: center;
+    gap: 8px;
+  }
+  .aura-sound-select {
+    flex: 1;
+    min-width: 0;
+    min-height: 40px;
+  }
+  .aura-sound-hint {
+    margin: 6px 0 2px;
+  }
+  .aura-sound-preview {
+    width: 100%;
+    min-height: 40px;
+    margin-top: 6px;
   }
   .aura-position-label {
     margin-top: 8px;

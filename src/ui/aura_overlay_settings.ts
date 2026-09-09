@@ -1,3 +1,5 @@
+import { AURA_CUE_NONE, AURA_CUES } from '../game/aura_cue_catalog';
+import { HAPTIC_SHAPES } from '../game/haptic_pulse_core';
 import { ABILITIES } from '../sim/content/classes';
 import type { PlayerClass } from '../sim/types';
 import { abilityDisplayName } from './ability_display_name';
@@ -9,6 +11,7 @@ import type {
 } from './aura_overlay_config';
 import type { AuraOverlayPart } from './aura_overlay_controller';
 import type { AuraOverlayProcDef, AuraOverlayProcId } from './aura_overlay_view';
+import type { AuraWatchOption } from './aura_watchlist_core';
 import { classDisplayName } from './entity_i18n';
 import type { FocusTrapHandle } from './focus_manager';
 import { restoreFirstEnabled } from './focus_restore';
@@ -24,6 +27,13 @@ export interface AuraOverlayHooks {
   patch(id: AuraOverlayProcId, patch: AuraOverlayPatch): void;
   getLayout(): AuraOverlayLayoutConfig;
   patchLayout(patch: AuraOverlayLayoutPatch): void;
+  /** Every known spell that parks an aura on the player and is not already an
+   *  authored proc, flagged with whether the player watches it. */
+  watchOptions(): readonly AuraWatchOption[];
+  setWatched(id: AuraOverlayProcId, on: boolean): void;
+  /** Audition one cue at the volume the proc is configured for, so the player can
+   *  choose by ear instead of by name. */
+  previewCue(cueId: string, volume: number): void;
   reset(id: AuraOverlayProcId): void;
   nudge(id: AuraOverlayProcId, part: AuraOverlayPart, deltaX: number, deltaY: number): void;
   setAll(enabled: boolean): void;
@@ -44,13 +54,17 @@ export interface AuraOverlaySettingsHost {
 
 const percent = (value: number): string =>
   formatNumber(value, { style: 'percent', maximumFractionDigits: 0 });
+const count = (value: number): string => formatNumber(value, { maximumFractionDigits: 0 });
+function abilityIdDisplayName(abilityId: string): string {
+  const ability = ABILITIES[abilityId];
+  return ability ? abilityDisplayName(ability) : abilityId;
+}
 function procDisplayName(def: AuraOverlayProcDef): string {
   if (def.labelKey) return t(def.labelKey);
   if (def.talentChoice) {
     return tTalent({ kind: 'talentChoice', choice: def.talentChoice, field: 'name' });
   }
-  const ability = ABILITIES[def.iconAbilityId];
-  return ability ? abilityDisplayName(ability) : def.iconAbilityId;
+  return abilityIdDisplayName(def.iconAbilityId);
 }
 
 export class AuraOverlaySettingsPanel {
@@ -77,6 +91,18 @@ export class AuraOverlaySettingsPanel {
     parent.appendChild(intro);
 
     const defs = hooks.defs();
+    const refresh = (focusKeys: readonly string[] = []): void => {
+      this.render(parent);
+      const controls = Array.from(parent.querySelectorAll<HTMLButtonElement>('[data-focus-key]'));
+      restoreFirstEnabled(
+        focusKeys.map((key) => controls.find((control) => control.dataset.focusKey === key)),
+      );
+    };
+    // The watchlist picker stays available even for a character with no authored
+    // proc: picking a spell here is exactly how such a character gets any aura at
+    // all, so the old "no supported proc" dead end would lock them out of the
+    // whole feature.
+    this.buildWatchlist(parent, refresh);
     if (defs.length === 0) {
       const empty = document.createElement('div');
       empty.className = 'set-note';
@@ -85,13 +111,6 @@ export class AuraOverlaySettingsPanel {
       return;
     }
 
-    const refresh = (focusKeys: readonly string[] = []): void => {
-      this.render(parent);
-      const controls = Array.from(parent.querySelectorAll<HTMLButtonElement>('[data-focus-key]'));
-      restoreFirstEnabled(
-        focusKeys.map((key) => controls.find((control) => control.dataset.focusKey === key)),
-      );
-    };
     const actions = document.createElement('div');
     actions.className = 'aura-bulk-actions';
     const allOn = document.createElement('button');
@@ -132,6 +151,73 @@ export class AuraOverlaySettingsPanel {
     for (const { def } of orderedDefs) {
       this.buildProcCard(grid, def, positionById.get(def.id) ?? 1, defs.length, refresh);
     }
+  }
+
+  /** The watchlist picker: one toggle chip per known spell that buffs the player
+   *  and has no authored proc of its own. Picking one adds a full proc card to the
+   *  grid below, so the customization surface is identical to a curated proc. */
+  private buildWatchlist(
+    parent: HTMLElement,
+    refresh: (focusKeys?: readonly string[]) => void,
+  ): void {
+    const hooks = this.host.auras;
+    const options = hooks.watchOptions();
+    const section = document.createElement('div');
+    section.className = 'aura-watch-section';
+    const head = document.createElement('div');
+    head.className = 'aura-watch-head';
+    const title = document.createElement('strong');
+    title.textContent = t('hudChrome.auraOverlay.watchlist');
+    const tally = document.createElement('span');
+    tally.className = 'aura-watch-count';
+    tally.textContent = t('hudChrome.auraOverlay.watchlistCount', {
+      count: count(options.reduce((total, option) => total + (option.watched ? 1 : 0), 0)),
+    });
+    head.append(title, tally);
+    const hint = document.createElement('div');
+    hint.className = 'set-note aura-watch-hint';
+    hint.textContent = t('hudChrome.auraOverlay.watchlistHint');
+    section.append(head, hint);
+    if (options.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'set-note aura-watch-empty';
+      empty.textContent = t('hudChrome.auraOverlay.watchlistEmpty');
+      section.appendChild(empty);
+      parent.appendChild(section);
+      return;
+    }
+    const list = document.createElement('div');
+    list.className = 'aura-watch-list';
+    for (const option of options) {
+      const spell = abilityIdDisplayName(option.abilityId);
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'btn aura-watch-chip';
+      chip.dataset.focusKey = `aura-watch:${option.procId}`;
+      chip.setAttribute('aria-pressed', String(option.watched));
+      const action = t(
+        option.watched
+          ? 'hudChrome.auraOverlay.watchlistUnwatch'
+          : 'hudChrome.auraOverlay.watchlistWatch',
+        { spell },
+      );
+      chip.setAttribute('aria-label', action);
+      chip.title = action;
+      const icon = document.createElement('img');
+      icon.src = iconDataUrl('ability', option.abilityId);
+      icon.alt = '';
+      const label = document.createElement('span');
+      label.textContent = spell;
+      chip.append(icon, label);
+      chip.addEventListener('click', () => {
+        this.host.click();
+        hooks.setWatched(option.procId, !option.watched);
+        refresh([`aura-watch:${option.procId}`]);
+      });
+      list.appendChild(chip);
+    }
+    section.appendChild(list);
+    parent.appendChild(section);
   }
 
   private buildProcCard(
@@ -269,6 +355,8 @@ export class AuraOverlaySettingsPanel {
       step: 0.05,
       format: percent,
     });
+    this.buildChannelControls(card, def);
+    this.buildSoundControls(card, def, refresh);
     const reset = document.createElement('button');
     reset.type = 'button';
     reset.className = 'btn aura-reset-btn';
@@ -280,6 +368,136 @@ export class AuraOverlaySettingsPanel {
       refresh([`aura-reset:${def.id}`]);
     });
     card.appendChild(reset);
+  }
+
+  /**
+   * The alternative notification channels: hotbar glow, reticle tick, and rumble.
+   * Each is independent of the visual overlay and of the others, so a player can
+   * route a proc to any combination, or to one of these INSTEAD of the on-screen
+   * aura by switching Show Aura off.
+   */
+  private buildChannelControls(card: HTMLElement, def: AuraOverlayProcDef): void {
+    const hooks = this.host.auras;
+    toggleControl({
+      parent: card,
+      label: t('hudChrome.auraOverlay.readyGlow'),
+      get: () => hooks.get(def.id).showReadyGlow,
+      set: (showReadyGlow) => hooks.patch(def.id, { showReadyGlow }),
+      onLabel: t('hud.options.on'),
+      offLabel: t('hud.options.off'),
+      onActivate: () => this.host.click(),
+    });
+    toggleControl({
+      parent: card,
+      label: t('hudChrome.auraOverlay.reticleTick'),
+      get: () => hooks.get(def.id).showReticleTick,
+      set: (showReticleTick) => hooks.patch(def.id, { showReticleTick }),
+      onLabel: t('hud.options.on'),
+      offLabel: t('hud.options.off'),
+      onActivate: () => this.host.click(),
+    });
+    const row = document.createElement('div');
+    row.className = 'set-row aura-haptic-row';
+    const name = document.createElement('span');
+    name.className = 'set-name';
+    name.textContent = t('hudChrome.auraOverlay.haptic');
+    const select = document.createElement('select');
+    select.className = 'hud-select aura-haptic-select';
+    select.setAttribute('aria-label', t('hudChrome.auraOverlay.haptic'));
+    const off = document.createElement('option');
+    off.value = 'none';
+    off.textContent = t('hudChrome.auraOverlay.hapticNone');
+    select.appendChild(off);
+    for (const shape of HAPTIC_SHAPES) {
+      const option = document.createElement('option');
+      option.value = shape;
+      option.textContent = t(`hudChrome.auraOverlay.haptics.${shape}` as never);
+      select.appendChild(option);
+    }
+    select.value = hooks.get(def.id).haptic;
+    select.addEventListener('change', () => {
+      this.host.click();
+      hooks.patch(def.id, { haptic: select.value as 'none' });
+    });
+    row.append(name, select);
+    card.appendChild(row);
+  }
+
+  /**
+   * The per-proc alert sound: a cue picker, a preview button, and a volume slider.
+   * The slider and the preview only exist once a cue is chosen, so a proc with no
+   * sound shows one control rather than three dead ones.
+   */
+  private buildSoundControls(
+    card: HTMLElement,
+    def: AuraOverlayProcDef,
+    refresh: (focusKeys?: readonly string[]) => void,
+  ): void {
+    const hooks = this.host.auras;
+    const current = hooks.get(def.id);
+    const row = document.createElement('div');
+    row.className = 'set-row aura-sound-row';
+    const name = document.createElement('span');
+    name.className = 'set-name';
+    name.textContent = t('hudChrome.auraOverlay.sound');
+    const select = document.createElement('select');
+    select.className = 'hud-select aura-sound-select';
+    const silence = document.createElement('option');
+    silence.value = AURA_CUE_NONE;
+    silence.textContent = t('hudChrome.auraOverlay.soundNone');
+    select.appendChild(silence);
+    for (const cue of AURA_CUES) {
+      const option = document.createElement('option');
+      option.value = cue.id;
+      option.textContent = t(cue.labelKey);
+      select.appendChild(option);
+    }
+    select.value = current.soundId;
+    select.setAttribute('aria-label', t('hudChrome.auraOverlay.sound'));
+    select.addEventListener('change', () => {
+      this.host.click();
+      const soundId = select.value;
+      hooks.patch(def.id, { soundId });
+      // Audition on pick: choosing by name alone is guesswork across twenty cues.
+      if (soundId !== AURA_CUE_NONE) hooks.previewCue(soundId, hooks.get(def.id).soundVolume);
+      refresh([`aura-sound:${def.id}`]);
+    });
+    row.append(name, select);
+    card.appendChild(row);
+    if (current.soundId === AURA_CUE_NONE) return;
+
+    const hint = document.createElement('div');
+    hint.className = 'set-note aura-sound-hint';
+    hint.textContent = t('hudChrome.auraOverlay.soundHint');
+    card.appendChild(hint);
+    const volume = sliderControl({
+      parent: card,
+      label: t('hudChrome.auraOverlay.soundVolume'),
+      get: () => hooks.get(def.id).soundVolume,
+      set: (soundVolume) => hooks.patch(def.id, { soundVolume }),
+      min: 0.1,
+      max: 1,
+      step: 0.05,
+      format: percent,
+    });
+    volume.row.classList.add('aura-sound-volume');
+    const preview = document.createElement('button');
+    preview.type = 'button';
+    preview.className = 'btn aura-sound-preview';
+    preview.dataset.focusKey = `aura-sound:${def.id}`;
+    preview.textContent = t('hudChrome.auraOverlay.soundPreview');
+    const cueName = AURA_CUES.find((cue) => cue.id === current.soundId);
+    preview.setAttribute(
+      'aria-label',
+      t('hudChrome.auraOverlay.soundPreviewAria', {
+        sound: cueName ? t(cueName.labelKey) : current.soundId,
+      }),
+    );
+    preview.addEventListener('click', () => {
+      const config = hooks.get(def.id);
+      hooks.previewCue(config.soundId, config.soundVolume);
+    });
+    card.appendChild(preview);
   }
 
   private openPlacement(

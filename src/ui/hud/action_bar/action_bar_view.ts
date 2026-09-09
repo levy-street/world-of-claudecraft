@@ -195,6 +195,11 @@ export interface ActionBarDeps {
   /** Localized integer formatter (the item stack count and cooldown digits go
    *  through this, per the "numbers go through formatNumber" invariant). */
   formatCount(n: number): string;
+  /** Ability ids a WATCHED aura proc is lighting right now (the Auras panel's
+   *  hotbar channel, src/ui/proc_ready_glow_core.ts). Purely ADDITIVE: it only
+   *  ever turns a glow on, so it can never mask an authored class proc. Absent on
+   *  a host that does not drive the aura overlay. */
+  watchedGlowAbilityIds?(): ReadonlySet<string>;
 }
 
 /** The player fields the bar reads; a structural subset both worlds mirror. */
@@ -767,7 +772,11 @@ export function createActionBarView(
         // Radiant Chorus's proc: Mending Light turns instant and Dawn's Embrace
         // halves its cost, so both light up while Radiant Resonance is worn.
         const radiantResonanceActive = radiantResonanceAbilityGlowActive(player, def.id);
+        // The player's own pick from the Auras panel, ORed in last so it can only
+        // add to the authored glows above, never replace one.
+        const watchedGlow = deps.watchedGlowAbilityIds?.().has(def.id) === true;
         slot.procGlow =
+          watchedGlow ||
           reflectionReady ||
           freeByProc ||
           dawnsWrathActive ||

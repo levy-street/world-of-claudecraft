@@ -8441,6 +8441,148 @@ export const TARGETS = [
     },
   },
   {
+    // The three alternative proc-notification channels the Auras panel can route a
+    // spell to: the hotbar ready glow, the reticle tick ring, and rumble. Drives
+    // the real controls and then holds a live proc so the glow and a lit tick are
+    // both on screen at the shutter.
+    key: 'proc-signal-channels',
+    label: 'Aura proc channels: hotbar glow and reticle tick, live',
+    when: ['ui/reticle_ticks', 'ui/proc_ready_glow_core', 'game/haptic'],
+    variants: [{ key: 'desktop' }],
+    async capture(page) {
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const hud = window.__game?.hud;
+        if (!sim || !hud) return;
+        sim.setPlayerLevel?.(20);
+        const win = document.querySelector('#options-menu');
+        if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
+        hud.toggleOptionsMenu();
+        const buttons = Array.from(document.querySelectorAll('#options-menu .opt-btn'));
+        buttons[4]?.click();
+      });
+      const open = await pollForSize(page, '#options-menu .aura-settings-intro');
+      if (!open) return {};
+      // Route the first proc to both on-screen channels through the real controls.
+      await page.evaluate(() => {
+        const rows = Array.from(document.querySelectorAll('#options-menu .set-row'));
+        for (const row of rows) {
+          const name = row.querySelector('.set-name');
+          if (!name) continue;
+          const label = (name.textContent || '').trim();
+          if (label !== 'Hotbar Glow' && label !== 'Reticle Tick') continue;
+          const toggle = row.querySelector('button');
+          if (toggle instanceof HTMLButtonElement && !/On/.test(toggle.textContent || '')) {
+            toggle.click();
+          }
+        }
+      });
+      await wait(200);
+      // Keep the panel open and framed on the three new rows: the controls ARE
+      // the change, and the lit tick is 3px wide at rest, so a world shot shows
+      // a reviewer nothing.
+      await page.evaluate(() => {
+        const row = Array.from(document.querySelectorAll('#options-menu .set-row')).find(
+          (r) => (r.querySelector('.set-name')?.textContent || '').trim() === 'Hotbar Glow',
+        );
+        row?.scrollIntoView({ block: 'center' });
+      });
+      await wait(300);
+      return { clip: '#options-menu' };
+    },
+  },
+  {
+    // The Auras panel, where the Watched Spells picker lets a player put an
+    // aura overlay on any known spell that buffs them, on top of the curated
+    // class procs. Polls the proc GRID rather than the picker itself, so the
+    // same target also captures the BEFORE frame on a base commit that has no
+    // picker at all.
+    key: 'aura-watchlist',
+    label: 'Auras options: the Watched Spells picker above the proc cards',
+    when: [
+      'ui/aura_watchlist_core',
+      'ui/aura_overlay_settings',
+      'ui/aura_overlay_controller',
+      'ui/aura_overlay_config',
+    ],
+    variants: [
+      // Warrior is the class with the richest AUTHORED proc list, so its frame
+      // shows the picker sitting on top of curated cards.
+      { key: 'warrior-desktop', charClass: 'warrior', charName: 'Thorgar' },
+      // Shaman is the case that motivated the feature: exactly ONE authored proc,
+      // so before the picker its Auras panel was nearly empty.
+      { key: 'shaman-desktop', charClass: 'shaman', charName: 'Stormcaller' },
+      { key: 'shaman-mobile', charClass: 'shaman', charName: 'Stormcaller', mobile: true },
+    ],
+    async capture(page) {
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const hud = window.__game?.hud;
+        if (!sim || !hud) return;
+        // A level-1 spellbook holds almost nothing to watch. setPlayerLevel is the
+        // sim's own dev/test level jump: it re-learns the abilities and recalcs
+        // stats, so the picker derives from a REAL level-60 spellbook. Setting
+        // entity.level directly is not enough, since meta.known is a stored field
+        // the level-up path recomputes.
+        sim.setPlayerLevel?.(60);
+        const win = document.querySelector('#options-menu');
+        if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
+        hud.toggleOptionsMenu();
+        // Offline has no Report a Bug row, so Auras is the fifth button.
+        const buttons = Array.from(document.querySelectorAll('#options-menu .opt-btn'));
+        buttons[4]?.click();
+      });
+      // Poll the panel INTRO, not the proc grid: a class with no authored proc
+      // (Shaman, the case this feature exists for) renders no grid at all, and a
+      // base commit with no picker renders only the intro. The intro is the one
+      // node present in every arm, so one target covers before and after.
+      const open = await pollForSize(page, '#options-menu .aura-settings-intro');
+      if (!open) return {};
+      // Pick two spells, so the frame shows both chip states and the cards the
+      // picks add. Driving the real chip click, not the controller hook.
+      //
+      // Drive to a TARGET STATE rather than blind-toggling. The watchlist is
+      // persisted per character (localStorage, key woc_aura_overlays:<class>:<name>),
+      // so the shaman-desktop variant's pick is still stored when shaman-mobile
+      // runs against the same browser profile: a bare click there UNWATCHES it and
+      // the second frame silently reads "0 watched" with no cards, which is a lie
+      // about the feature rather than a fact about it. aria-pressed carries the
+      // real state, so only click a chip that is not already pressed. Each call
+      // re-reads the list because picking re-renders it.
+      const watchChip = (index) =>
+        page.evaluate((i) => {
+          const chip = Array.from(document.querySelectorAll('.aura-watch-chip'))[i];
+          if (chip instanceof HTMLButtonElement && chip.getAttribute('aria-pressed') !== 'true') {
+            chip.click();
+          }
+        }, index);
+      await watchChip(0);
+      await wait(150);
+      await watchChip(2);
+      await wait(250);
+      // Give the first picked spell an alert sound, so the frame shows the cue
+      // picker with its volume slider and preview revealed (they only exist once
+      // a cue is chosen).
+      await page.evaluate(() => {
+        const select = document.querySelector('.aura-sound-select');
+        if (!(select instanceof HTMLSelectElement)) return;
+        select.value = 'ui_aura_cat_meow';
+        select.dispatchEvent(new Event('change'));
+      });
+      await wait(250);
+      // Choosing a cue grows the card, which scrolls the Watched Spells chip row
+      // out of frame: the picker IS the feature, so pin the panel back to the top
+      // before the shutter.
+      await page.evaluate(() => {
+        for (const el of document.querySelectorAll('#options-menu, #options-menu *')) {
+          if (el instanceof HTMLElement && el.scrollTop > 0) el.scrollTop = 0;
+        }
+      });
+      await wait(200);
+      return { clip: '#options-menu' };
+    },
+  },
+  {
     // The Key Bindings panel with the per-slot action-bar rows replaced by a
     // single "Edit action bar keys" entry (issue #1238).
     key: 'actionbar-keybind-menu-entry',

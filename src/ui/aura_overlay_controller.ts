@@ -1,3 +1,5 @@
+import { AURA_CUE_NONE } from '../game/aura_cue_catalog';
+import type { HapticShape } from '../game/haptic_pulse_core';
 import type { TalentAllocation } from '../sim/content/talents';
 import type { ResolvedAbility } from '../sim/sim';
 import type { Aura, PlayerClass } from '../sim/types';
@@ -8,6 +10,8 @@ import {
   type AuraOverlayLayoutPatch,
   type AuraOverlayPatch,
   auraOverlayVisualSlot,
+  genericIconPosX,
+  genericPaletteColor,
 } from './aura_overlay_config';
 import {
   type AuraOverlayPaintAura,
@@ -20,7 +24,15 @@ import {
   auraOverlayProcIsActive,
   availableAuraProcDefs,
 } from './aura_overlay_view';
+import {
+  type AuraWatchOption,
+  auraWatchOptions,
+  toggleWatchedId,
+  watchedAuraProcDefs,
+} from './aura_watchlist_core';
 import type { PainterHostWriters } from './painter_host';
+import { createReadyGlowPlan, type ReadyGlowSignal } from './proc_ready_glow_core';
+import { createReticleTicksView, type ReticleTickInput } from './reticle_ticks_core';
 
 const clampPosition = (value: number): number =>
   Math.round(Math.min(1, Math.max(0, value)) * 10_000) / 10_000;
@@ -49,6 +61,13 @@ export interface AuraOverlayControllerDeps {
   talents?(): TalentAllocation;
   iconUrl(abilityId: string): string;
   paintGroundRings?(rings: readonly AuraGroundRingState[]): void;
+  /** Paint the reticle tick ring. Injected like paintGroundRings. */
+  paintReticleTicks?(state: { slots: readonly unknown[]; count: number }): void;
+  /** Play one alert cue at this gain. Injected so the controller stays testable
+   *  without an AudioContext; the Hud wires it to the shared sfx engine. */
+  playCue?(cueId: string, volume: number): void;
+  /** Fire one rumble/vibration pulse. Injected for the same reason as playCue. */
+  playHaptic?(shape: HapticShape): void;
 }
 
 export class AuraOverlayController {
@@ -61,6 +80,11 @@ export class AuraOverlayController {
   private readonly painter: AuraOverlayPainter;
   private knownIds: string[] = [];
   private talentAllocation: TalentAllocation | undefined;
+  private watchedIds: readonly string[] = [];
+  // Set whenever the watchlist changes, so syncLoadout rebuilds even though the
+  // known list and the talent allocation are both untouched.
+  private watchlistDirty = false;
+  private currentWatchOptions: readonly AuraWatchOption[] = [];
   private currentDefs: readonly AuraOverlayProcDef[] = [];
   private orderedGroundDefs: readonly AuraOverlayProcDef[] = [];
   private readonly groundRingStates: AuraGroundRingState[] = [];
@@ -72,6 +96,18 @@ export class AuraOverlayController {
     (id: AuraOverlayProcId, part: AuraOverlayPart) => void
   >();
   private placement: { id: AuraOverlayProcId; part: AuraOverlayPart } | null = null;
+  // Last painted active state per proc, for the RISING EDGE the alert cue fires
+  // on. A proc absent from this map has never been painted, so its first frame
+  // only RECORDS: logging in with a buff already up, or picking a spell whose
+  // aura is live, is not a proc and must not announce itself.
+  private readonly cueActive = new Map<AuraOverlayProcId, boolean>();
+  // Per-frame scratch for the two ALWAYS-ON channels (hotbar glow, reticle ticks).
+  // Both are rebuilt in place each paint so a steady frame allocates nothing.
+  private readonly glowSignals: ReadyGlowSignal[] = [];
+  private readonly tickInputs: ReticleTickInput[] = [];
+  private readonly readyGlowPlan = createReadyGlowPlan();
+  private readonly reticleTicks = createReticleTicksView();
+  private glowIds: ReadonlySet<string> = new Set();
   private previewGroundRings = false;
   private readonly counterfangAura: AuraOverlayPaintAura = {
     id: 'counterfang_window',
@@ -85,6 +121,7 @@ export class AuraOverlayController {
     const doc = deps.doc ?? document;
     this.store = new AuraOverlayConfigStore(`${deps.playerClass}:${deps.playerName}`);
     this.layout = this.store.getLayout();
+    this.watchedIds = this.store.getWatched();
     this.root = doc.createElement('div');
     this.root.id = 'aura-overlays';
     this.root.setAttribute('aria-hidden', 'true');
@@ -122,10 +159,20 @@ export class AuraOverlayController {
       }
     }
     if (!changed && talents !== this.talentAllocation) changed = true;
+    if (!changed && this.watchlistDirty) changed = true;
     if (!changed) return;
     this.knownIds = known.map((ability) => ability.def.id);
     this.talentAllocation = talents;
-    this.currentDefs = availableAuraProcDefs(this.deps.playerClass, known, talents);
+    this.watchlistDirty = false;
+    // Authored (curated + talent) procs first, then the spells the player picked
+    // vision on. Watched defs are ordinary AuraOverlayProcDefs from here down, so
+    // every frame, config, placement, and ground-ring path treats them the same.
+    const authored = availableAuraProcDefs(this.deps.playerClass, known, talents);
+    this.currentWatchOptions = auraWatchOptions(known, authored, this.watchedIds);
+    this.currentDefs = [
+      ...authored,
+      ...watchedAuraProcDefs(this.deps.playerClass, this.currentWatchOptions),
+    ];
     this.refreshGroundOrder();
     const activeIds = new Set(this.currentDefs.map((def) => def.id));
     for (const target of this.targets) {
@@ -414,6 +461,7 @@ export class AuraOverlayController {
       this.counterfangAura.remaining = Math.min(COUNTERFANG_WINDOW_DURATION, counterfangRemaining);
     }
     this.painter.paint(auras, supplementalAuras);
+    this.fireCues(auras, supplementalAuras);
     if (!this.deps.paintGroundRings) return;
     const scale = this.layout.groundRingBlockScale;
     let changed = this.groundRingStates.length !== this.orderedGroundDefs.length;
@@ -450,9 +498,104 @@ export class AuraOverlayController {
     }
   }
 
+  /**
+   * Announce every proc that just came up. The cue is INDEPENDENT of the visual
+   * toggles by design: setting a sound and switching Show Aura off is how a player
+   * asks for the sound INSTEAD of the overlay, which is the whole point of the
+   * feature. Silence stays the default, so a player who picks nothing hears nothing.
+   */
+  private fireCues(auras: readonly Aura[], supplemental: readonly AuraOverlayPaintAura[]): void {
+    const play = this.deps.playCue;
+    const haptic = this.deps.playHaptic;
+    let index = 0;
+    for (const def of this.currentDefs) {
+      const active =
+        auraOverlayProcIsActive(def, auras) || auraOverlayProcIsActive(def, supplemental);
+      const previous = this.cueActive.get(def.id);
+      this.cueActive.set(def.id, active);
+      const config = this.config(def.id);
+      // Always-on channels: rebuilt every frame from the live active state.
+      if (index >= this.glowSignals.length) {
+        this.glowSignals.push({ abilityId: '', active: false, enabled: false });
+        this.tickInputs.push({ id: '', color: '', active: false, enabled: false });
+      }
+      const glow = this.glowSignals[index];
+      glow.abilityId = def.iconAbilityId;
+      glow.active = active;
+      glow.enabled = config.showReadyGlow;
+      const tick = this.tickInputs[index];
+      tick.id = def.id;
+      tick.color = config.color;
+      tick.active = active;
+      tick.enabled = config.showReticleTick;
+      index++;
+      // Edge-triggered channels below this line.
+      if (!active || previous !== false) continue;
+      if (play && config.soundId !== AURA_CUE_NONE) play(config.soundId, config.soundVolume);
+      if (haptic && config.haptic !== 'none') haptic(config.haptic);
+    }
+    this.glowSignals.length = index;
+    this.tickInputs.length = index;
+    this.glowIds = this.readyGlowPlan.tick(this.glowSignals);
+    this.deps.paintReticleTicks?.(this.reticleTicks.tick(this.tickInputs));
+  }
+
+  /** Ability ids whose hotbar button a watched proc is lighting this frame. */
+  readyGlowAbilityIds(): ReadonlySet<string> {
+    return this.glowIds;
+  }
+
   defs(): readonly AuraOverlayProcDef[] {
     this.syncLoadout();
     return this.currentDefs;
+  }
+
+  /** Every known spell that parks an aura on the player and is not already an
+   *  authored proc, each flagged with whether the player watches it. The settings
+   *  picker renders exactly this. */
+  watchOptions(): readonly AuraWatchOption[] {
+    this.syncLoadout();
+    return this.currentWatchOptions;
+  }
+
+  /**
+   * Add or drop one spell from the watchlist. Picking a spell also switches its
+   * overlay ON (picking it IS the request to see it) and, the first time, parks it
+   * last in the spell order so it never lands on top of an already-placed proc.
+   * Dropping one keeps its stored placement and colors, so re-picking it restores
+   * the tuning the player already did instead of starting over.
+   */
+  setWatched(id: AuraOverlayProcId, on: boolean): void {
+    const next = toggleWatchedId(this.watchedIds, id, on);
+    if (next === this.watchedIds) return;
+    const seedOrder = on && !this.store.has(id);
+    this.watchedIds = this.store.setWatched(next);
+    this.watchlistDirty = true;
+    this.syncLoadout();
+    if (!on) return;
+    if (!seedOrder) {
+      const kept = this.patchConfig(id, { enabled: true });
+      const keptTarget = this.targetById.get(id);
+      if (keptTarget) this.apply(id, keptTarget.el, kept);
+      return;
+    }
+    // First pick: park it last in the spell order and on the next free generic
+    // icon slot. Every watched proc resolves to the SAME generic default, so
+    // without this a second pick would land exactly on top of the first.
+    let order = 0;
+    for (const def of this.currentDefs) {
+      if (def.id === id) continue;
+      order = Math.max(order, this.config(def.id).groundOrder + 1);
+    }
+    const cfg = this.patchConfig(id, {
+      enabled: true,
+      groundOrder: order,
+      iconPosX: genericIconPosX(order),
+      color: genericPaletteColor(this.deps.playerClass, order),
+    });
+    const target = this.targetById.get(id);
+    if (target) this.apply(id, target.el, cfg);
+    this.refreshGroundOrder();
   }
 
   onPositionChange(

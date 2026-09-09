@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import {
   AuraOverlayConfigStore,
   defaultAuraOverlayConfig,
+  genericPaletteColor,
   sanitizeAuraOverlayConfig,
 } from '../src/ui/aura_overlay_config';
 
@@ -255,5 +256,79 @@ describe('aura overlay config', () => {
     expect(JSON.parse(localStorage.getItem('woc_aura_overlays:warrior:Raido') ?? '{}')).toEqual({
       __layoutVersion: 8,
     });
+  });
+});
+
+describe('AuraOverlayConfigStore watchlist', () => {
+  it('persists the picked spells and reads them back on the next session', () => {
+    const store = new AuraOverlayConfigStore('warrior:Raido');
+    expect(store.getWatched()).toEqual([]);
+
+    store.setWatched(['watch:recklessness', 'watch:die_by_sword']);
+
+    expect(new AuraOverlayConfigStore('warrior:Raido').getWatched()).toEqual([
+      'watch:recklessness',
+      'watch:die_by_sword',
+    ]);
+  });
+
+  it('scopes the watchlist per character, like every other aura setting', () => {
+    new AuraOverlayConfigStore('warrior:Raido').setWatched(['watch:recklessness']);
+    expect(new AuraOverlayConfigStore('warrior:Other').getWatched()).toEqual([]);
+  });
+
+  it('keeps the watchlist through a per-proc write and vice versa', () => {
+    const store = new AuraOverlayConfigStore('warrior:Raido');
+    store.setWatched(['watch:recklessness']);
+    store.patch('watch:recklessness', { color: '#123456' });
+    store.patchLayout({ crescentBlockScale: 1.2 });
+
+    const reloaded = new AuraOverlayConfigStore('warrior:Raido');
+    expect(reloaded.getWatched()).toEqual(['watch:recklessness']);
+    expect(reloaded.get('watch:recklessness').color).toBe('#123456');
+    expect(reloaded.getLayout().crescentBlockScale).toBe(1.2);
+  });
+
+  it('drops junk out of a corrupted watchlist instead of failing the boot', () => {
+    localStorage.setItem(
+      'woc_aura_overlays:warrior:Raido',
+      JSON.stringify({ __layoutVersion: 8, __watched: ['watch:a', 'revenge_free', 3, 'watch:a'] }),
+    );
+    expect(new AuraOverlayConfigStore('warrior:Raido').getWatched()).toEqual(['watch:a']);
+  });
+
+  it('reports a saved config apart from a defaulted one, and never for a reserved key', () => {
+    const store = new AuraOverlayConfigStore('warrior:Raido');
+    expect(store.has('watch:recklessness')).toBe(false);
+    store.patch('watch:recklessness', { enabled: true });
+    expect(store.has('watch:recklessness')).toBe(true);
+    store.setWatched(['watch:recklessness']);
+    store.patchLayout({ crescentBlockScale: 1.2 });
+    expect(store.has('__watched')).toBe(false);
+    expect(store.has('__layout')).toBe(false);
+    expect(store.has('__layoutVersion')).toBe(false);
+  });
+});
+
+describe('genericPaletteColor', () => {
+  it('walks the class palette so consecutive watched spells differ', () => {
+    const shaman = [0, 1, 2, 3].map((slot) => genericPaletteColor('shaman', slot));
+    expect(new Set(shaman).size).toBe(4);
+    expect(shaman[0]).toBe('#22d3ee');
+  });
+
+  it('gives Warrior and Mage a rotating fallback, since neither has a generic row', () => {
+    // Both carry bespoke per-proc tables instead, so an unhandled lookup used to
+    // collapse every watched spell on those classes onto one gold.
+    for (const playerClass of ['warrior', 'mage']) {
+      const colors = [0, 1, 2, 3].map((slot) => genericPaletteColor(playerClass, slot));
+      expect(new Set(colors).size).toBe(4);
+    }
+  });
+
+  it('wraps past the end of a palette and survives a junk slot', () => {
+    expect(genericPaletteColor('shaman', 7)).toBe(genericPaletteColor('shaman', 0));
+    expect(genericPaletteColor('shaman', -3)).toBe(genericPaletteColor('shaman', 0));
+    expect(genericPaletteColor('shaman', Number.NaN)).toBe(genericPaletteColor('shaman', 0));
   });
 });
