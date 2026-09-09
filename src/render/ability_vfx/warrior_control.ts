@@ -96,6 +96,13 @@ export function drawWarriorControlSuccess(
   const direction = from ? Math.atan2(at.x - from.x, at.z - from.z) : 0;
   const dx = Math.sin(direction),
     dz = Math.cos(direction);
+  if (!armor) {
+    // Depth-tested contact belongs on the receiving jaw surface. A centre
+    // anchor puts the authored sprite's bright core inside the skull.
+    const surface = Math.max(0.18, Math.min(0.65, (at.y - host.groundYAt(at.x, at.z)) * 0.24));
+    at.x -= dx * surface;
+    at.z -= dz * surface;
+  }
   if (armor) {
     host.flipbookAt(at.x, at.y, at.z, 2.7, 0xe5c9a0, 'contact_cut', 1.25, 0.22);
     for (const side of [-1, 1])
@@ -112,7 +119,9 @@ export function drawWarriorControlSuccess(
         0.34,
       );
   } else {
-    // A split, collapsing spell filament. No blood, flinch or extra stun stars.
+    // A compact jaw compression earns its fractured spell core only after
+    // the real lockout. No blood, flinch or extra stun stars.
+    host.flipbookAt(at.x, at.y, at.z, 2.4, 0xc6e6f5, 'contact_crush', 1.3, 0.23, 0, 0.65);
     for (const side of [-1, 1])
       host.pathRibbon(
         0xa5d5f2,
@@ -142,6 +151,6 @@ export function drawWarriorControlSuccess(
     abilityId,
     sample: WARRIOR_CONTROL_AUDIO[abilityId].impacts[0],
   });
-  host.countPrimitive(abilityId, 3);
+  host.countPrimitive(abilityId, armor ? 3 : tier === 0 ? 4 : 3);
   return true;
 }

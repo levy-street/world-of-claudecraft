@@ -55,8 +55,8 @@ export function drawWarriorPowerCast(host: SequencerHost, slot: SeqSlot, beat: n
     const side = strand % 2 ? 1 : -1,
       band = Math.floor(strand / 2);
     host.pathRibbon(
-      stone ? 0xdac6a3 : toll ? 0xc0203c : strand % 2 ? 0xf9495a : 0xa71132,
-      stone ? 0.2 : toll ? 0.16 : 0.25,
+      stone ? 0xdac6a3 : toll ? 0xff5975 : strand % 2 ? 0xf9495a : 0xa71132,
+      stone ? 0.2 : toll ? 0.28 : 0.25,
       duration,
       (points) => {
         for (let i = 0; i < points.length; i++) {
@@ -68,8 +68,8 @@ export function drawWarriorPowerCast(host: SequencerHost, slot: SeqSlot, beat: n
             forward = -0.5 + u * 0.12;
           } else if (toll) {
             across = side * (2.0 * (1 - u) + Math.sin(u * 5) * 0.12);
-            rise = 0.55 + u * 0.75 + band * 0.1;
-            forward = 0.25 + Math.sin(u * Math.PI) * 0.2;
+            rise = 0.85 + u * 0.75 + band * 0.1;
+            forward = 0.25 + Math.sin(u * Math.PI) * 0.48;
           } else {
             // Shoulder-rooted, jagged flame tongues, not full-body fire or
             // circular shockwaves. Seething spreads; Recklessness climbs.
@@ -111,7 +111,7 @@ export function drawWarriorPowerCast(host: SequencerHost, slot: SeqSlot, beat: n
     }
     // A compact animated sprite gives the conversion/release a textured hot
     // core. Blood Toll stays inward; the two rage bursts split at shoulders.
-    const sides = toll ? [0] : [-1, 1];
+    const sides = toll ? [-0.6, 0.6] : [-1, 1];
     for (const side of sides) {
       const sx = x + dz * side * 1.05,
         sz = z - dx * side * 1.05;
@@ -119,9 +119,9 @@ export function drawWarriorPowerCast(host: SequencerHost, slot: SeqSlot, beat: n
         sx,
         y + 1.25,
         sz,
-        toll ? 1.8 : 2.7,
-        toll ? 0xd63149 : 0xff5260,
-        'flame',
+        toll ? 2.8 : 2.7,
+        toll ? 0xff5975 : 0xff5260,
+        toll ? 'contact_crush' : 'flame',
         1.25,
         duration,
         side * 0.6,

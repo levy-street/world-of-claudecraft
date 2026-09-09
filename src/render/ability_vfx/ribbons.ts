@@ -317,6 +317,8 @@ export class AbilityVfxRibbons {
           float filament = pow(max(0.0, 1.0 - crossSection), 10.0);
           float edge = 1.0 - smoothstep(0.72, 1.0, crossSection);
           gl_FragColor = vec4(vColor * (0.48 + flow * 0.46 + filament * 0.38), base.a * edge * min(flow, 1.0));
+          #include <tonemapping_fragment>
+          #include <colorspace_fragment>
         }`,
       transparent: true,
       blending: THREE.AdditiveBlending,

@@ -27,9 +27,12 @@ export function warriorPressurePoint(
     band = layer - 1;
   out.z = u * 9.2;
   if (kind === 'rally_pressure') {
-    out.x = across * (0.2 + u * 5.8);
-    out.y = swell * (1.1 + Math.sin(v * Math.PI) * (3.5 + layer * 0.5));
-    out.z -= Math.abs(across) * swell * 0.8;
+    // Three open vaults keep the party visible between travelling standards.
+    // The outer span and crown height retain the full rallying reach.
+    const vault = band * 0.78 + across * 0.22;
+    out.x = vault * (0.2 + u * 5.8);
+    out.y = swell * (1.1 + Math.sin((vault + 1) * Math.PI * 0.5) * 4.5);
+    out.z -= Math.abs(vault) * swell * 0.8;
   } else if (kind === 'dread_pressure') {
     out.x = across * (0.2 + u * 5.8);
     out.y = (1 - u) * (1.2 + layer * 0.6) + swell * 0.25 - u * Math.abs(across) * 0.2;

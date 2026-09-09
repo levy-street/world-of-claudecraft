@@ -5,7 +5,7 @@ import { warriorAvatarShape } from './warrior_avatar_shape';
  * Local Y runs from the rooted base to the point; Z is the exposed face. */
 export function warriorPowerGeometry(blood: boolean): THREE.BufferGeometry {
   if (!blood) return warriorAvatarShape();
-  const outline = [
+  const control = [
     [-0.1, 0],
     [0.12, -0.04],
     [0.32, 0.42],
@@ -17,26 +17,38 @@ export function warriorPowerGeometry(blood: boolean): THREE.BufferGeometry {
     [0.14, 1.01],
     [-0.12, 0.49],
   ];
-  const face = new THREE.Color(0xa9152d);
-  const edge = new THREE.Color(0xff7763);
+  const curve = new THREE.CatmullRomCurve3(
+    control.map(([x, y]) => new THREE.Vector3(x, y, 0)),
+    true,
+    'centripetal',
+  );
+  const outline = curve
+    .getPoints(40)
+    .slice(0, -1)
+    .map((p) => [p.x, p.y]);
+  const face = new THREE.Color(0xcb1838);
+  // A continuous emissive body: bright hard bevels read as gemstone facets.
+  const edge = face;
   const dark = new THREE.Color(0x490913);
   const positions: number[] = [],
     colors: number[] = [],
     uv: number[] = [];
   // Concave hooks require a true inward edge offset. Scaling toward a centre
   // folds the bevel across the open notch and exposes backwards triangles.
-  const inset = [
-    [-0.08067, 0.016813],
-    [0.10798, -0.017487],
-    [0.300935, 0.426311],
-    [0.439027, 1.018134],
-    [0.163694, 1.6573],
-    [-0.112945, 1.869389],
-    [-0.24305, 1.609178],
-    [0.057371, 1.463813],
-    [0.161088, 1.007455],
-    [-0.099806, 0.485666],
-  ];
+  const inset = outline.map((point, index) => {
+    const before = outline[(index + outline.length - 1) % outline.length];
+    const after = outline[(index + 1) % outline.length];
+    const ax = point[0] - before[0],
+      ay = point[1] - before[1];
+    const bx = after[0] - point[0],
+      by = after[1] - point[1];
+    const al = Math.hypot(ax, ay),
+      bl = Math.hypot(bx, by);
+    const nx = -ay / al - by / bl,
+      ny = ax / al + bx / bl;
+    const denominator = nx * (-ay / al) + ny * (ax / al);
+    return [point[0] + (nx * 0.014) / denominator, point[1] + (ny * 0.014) / denominator];
+  });
   const depth = 0.08;
   const tri = (a: number[], b: number[], c: number[], color: THREE.Color) => {
     for (const p of [a, b, c]) {

@@ -30,9 +30,11 @@ export function animateWarriorRage(
         #ifdef USE_INSTANCING
           ragePhase=instanceMatrix[3].x*1.7+instanceMatrix[3].z*.9;
         #endif
-        transformed.x+=sin(position.y*5.8-uWarriorRageTime*8.+ragePhase)*.15*rageLift;
-        transformed.z+=sin(position.y*4.3-uWarriorRageTime*6.+ragePhase)*.21*rageLift;
-        transformed.y+=sin(position.y*7.-uWarriorRageTime*9.+ragePhase)*.09*rageLift;`,
+        // Coherent shear preserves the curved sheet: per-vertex sine folds
+        // its broad triangulated face into bright overlapping crystal facets.
+        transformed.x+=sin(-uWarriorRageTime*3.4+ragePhase)*.15*rageLift;
+        transformed.z+=sin(-uWarriorRageTime*2.7+ragePhase)*.21*rageLift;
+        transformed.y+=sin(-uWarriorRageTime*3.9+ragePhase)*.09*rageLift;`,
       );
     shader.fragmentShader = `uniform float uWarriorRageTime; varying vec3 vRagePosition;
       float rageHash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
@@ -44,18 +46,20 @@ export function animateWarriorRage(
         vec2 rageUv=vec2(vRagePosition.x*6.+sin(vRagePosition.y*3.-uWarriorRageTime*4.)*.7,vRagePosition.y*1.8-uWarriorRageTime*3.2);
         float rageField=rageNoise(rageUv)*.72+rageNoise(rageUv*2.3)*.28;
         float rageTip=clamp(vRagePosition.y/1.9,0.,1.);
-        float rageDensity=smoothstep(.12+rageTip*.2,.68,rageField)*.78+pow(1.-rageTip,2.)*.22;
+        float rageRoot=smoothstep(0.,.2,rageTip);
+        float rageDensity=smoothstep(.3+rageTip*.22,.76,rageField)*rageRoot;
         diffuseColor.a*=rageDensity*.87;
         if(diffuseColor.a<.025)discard;
-        diffuseColor.rgb*=vec3(1.7,.72,.6);
+        diffuseColor.rgb*=vec3(1.15,.42,.5);
         #include <alphatest_fragment>`,
       )
       .replace(
         '#include <emissivemap_fragment>',
         `#include <emissivemap_fragment>
-        totalEmissiveRadiance+=vec3(1.,.055,.018)*rageDensity*.55;`,
+        totalEmissiveRadiance*=.18+rageTip*.62;
+        totalEmissiveRadiance+=vec3(1.,.028,.045)*rageDensity*pow(rageTip,2.)*.35;`,
       );
   };
-  material.customProgramCacheKey = () => `${cacheKey()}|warrior-rage-flame-v2`;
+  material.customProgramCacheKey = () => `${cacheKey()}|warrior-rage-flame-v4`;
   material.needsUpdate = true;
 }

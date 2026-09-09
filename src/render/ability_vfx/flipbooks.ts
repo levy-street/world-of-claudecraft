@@ -77,6 +77,8 @@ export class ImpactFlipbooks {
           vec4 b = cell(fi + 1.0);
           vec4 s = mix(a, b, fract(uFrame));
           gl_FragColor = vec4(s.rgb * uTint * uHdr, s.a) * uOpacity;
+          #include <tonemapping_fragment>
+          #include <colorspace_fragment>
         }`,
       transparent: true,
       blending: THREE.AdditiveBlending,

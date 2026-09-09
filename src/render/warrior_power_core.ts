@@ -84,9 +84,9 @@ export function warriorPowerPiece(
   } else {
     out.color = BLOOD_TINT[intent];
     const band = Math.floor(piece / 2);
-    out.x = side * (band === 0 ? 0.72 : band === 1 ? 1.15 : 0.95);
+    out.x = side * (band === 0 ? 1.05 : band === 1 ? 1.35 : 1.15);
     out.y = band === 0 ? 0.15 : band === 1 ? -0.2 : 0.35;
-    out.z = band === 0 ? 0.18 : band === 1 ? -0.25 : -0.7;
+    out.z = band === 0 ? -0.15 : band === 1 ? -0.45 : -0.85;
     out.yaw = (side < 0 ? Math.PI : 0) + side * (band === 0 ? 0.7 : band === 1 ? 1 : 0.2);
     out.roll = -side * (0.24 + band * 0.22);
     out.sy = 0.95 - band * 0.14;
