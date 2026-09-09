@@ -34,6 +34,38 @@ export function isStunDrCategory(category: CrowdControlDrCategory): boolean {
   return category === 'openerStun' || category === 'controlledStun' || category === 'randomStun';
 }
 
+/**
+ * For diminishing-return purposes, ANY entity with a player owner resolves to
+ * that player: hunter/warlock pets, temporary summons, guardians, and every
+ * future player-owned entity type alike. The loophole this closes is about
+ * OWNERSHIP, not persistence: pets are entity kind 'mob', so before this
+ * resolution their crowd control on a player read as a non-hostile pair, took
+ * the early return below, and bypassed diminishing returns entirely. Scoping
+ * the fix to a whitelist of entity subtypes would just move the exploit to the
+ * next owned entity type, so the rule is a single ownership walk instead.
+ *
+ * The walk is transitive (a summon's summon still resolves to the player) and
+ * guarded against ownership cycles and despawned owners: a broken link stops
+ * the walk and yields the deepest entity reached, so an orphaned minion simply
+ * behaves as the unowned mob it now is. `getEntity` is passed in rather than
+ * read off a host for the same reason `isHostileTo` is: this stays a leaf
+ * module a Vitest can drive directly.
+ */
+export function resolveCrowdControlSource(
+  source: Entity,
+  getEntity: (id: number) => Entity | undefined,
+): Entity {
+  let resolved = source;
+  const visited = new Set<number>([resolved.id]);
+  while (resolved.ownerId !== null) {
+    const owner = getEntity(resolved.ownerId);
+    if (!owner || visited.has(owner.id)) break;
+    visited.add(owner.id);
+    resolved = owner;
+  }
+  return resolved;
+}
+
 // PvP-only diminishing-returns tuning for the resolvers below: the reset
 // window per category (how long until a fresh application starts the ladder
 // over), the shared 100/50/25/immune multiplier ladder that root and lockout
@@ -62,11 +94,17 @@ const PVP_FEAR_DR_MULTIPLIERS = [1, 0.5, 0.25, 0.125] as const;
  * duration outside hostile player-versus-player combat, a fixed staged
  * schedule for polymorph, the duration-scaled fear ladder, the shared
  * 100/50/25/immune multiplier ladder for root/lockout, and null once that
- * ladder is exhausted (DR-immune, apply nothing). `now` and `isHostileTo` are
- * passed in rather than read off a host: this keeps the resolver a leaf module
- * with no `SimContext` dependency, so a Vitest can import and exercise it
- * directly. It is NOT a pure function of its arguments: three of its exits
- * write the new DR stage to `target.ccDr`.
+ * ladder is exhausted (DR-immune, apply nothing). `now`, `isHostileTo`, and
+ * `getEntity` are passed in rather than read off a host: this keeps the
+ * resolver a leaf module with no `SimContext` dependency, so a Vitest can
+ * import and exercise it directly. It is NOT a pure function of its arguments:
+ * three of its exits write the new DR stage to `target.ccDr`.
+ *
+ * The source is first resolved through `resolveCrowdControlSource`, so a
+ * player-owned minion's crowd control is treated exactly as if the owner cast
+ * it: same hostility evaluation, same DR category, and, because the DR chain
+ * lives on `target.ccDr` keyed by category alone, the same diminishing chain
+ * as the owner's own casts and every other minion of theirs.
  *
  * Balance pass (maintainer): player stuns are exempt from PvP diminishing
  * returns. They operate differently from fear: short flat durations behind
@@ -76,12 +114,14 @@ const PVP_FEAR_DR_MULTIPLIERS = [1, 0.5, 0.25, 0.125] as const;
 export function crowdControlDurationAfterDr(
   now: number,
   isHostileTo: (a: Entity, b: Entity) => boolean,
+  getEntity: (id: number) => Entity | undefined,
   source: Entity,
   target: Entity,
   category: CrowdControlDrCategory,
   duration: number,
 ): number | null {
-  if (source.kind !== 'player' || target.kind !== 'player' || !isHostileTo(source, target)) {
+  const caster = resolveCrowdControlSource(source, getEntity);
+  if (caster.kind !== 'player' || target.kind !== 'player' || !isHostileTo(caster, target)) {
     return duration;
   }
   if (isStunDrCategory(category)) return duration;
@@ -111,36 +151,51 @@ export function crowdControlDurationAfterDr(
 }
 
 /**
- * The one funnel every PLAYER-sourced crowd-control application passes
- * through: the diminishing-returns ladder above, then the item-set duration
- * reduction on top of it.
+ * The one funnel every crowd-control application passes through: source
+ * ownership resolution (a player's minion counts as that player), then the
+ * diminishing-returns ladder above, then the item-set duration reduction on
+ * top of it.
  *
- * The two are layered rather than fused because they are separate mechanisms.
- * The ladder has five distinct exits inside its hostile branch and they do not
- * all want the same treatment: stuns take an early return that exempts them
- * from the ladder (see the balance-pass comment on `crowdControlDurationAfterDr`)
- * but NOT from the set reduction, and a DR-immune target returns null, which
- * means "apply nothing" and must pass through untouched rather than being
- * multiplied. Applying the reduction at the generic ladder exit alone would
- * silently miss stuns, which is the category the bonus most exists for, so it
- * is applied here once, over whatever the ladder decided.
+ * The ladder and the reduction are layered rather than fused because they are
+ * separate mechanisms. The ladder has five distinct exits inside its hostile
+ * branch and they do not all want the same treatment: stuns take an early
+ * return that exempts them from the ladder (see the balance-pass comment on
+ * `crowdControlDurationAfterDr`) but NOT from the set reduction, and a
+ * DR-immune target returns null, which means "apply nothing" and must pass
+ * through untouched rather than being multiplied. Applying the reduction at
+ * the generic ladder exit alone would silently miss stuns, which is the
+ * category the bonus most exists for, so it is applied here once, over
+ * whatever the ladder decided.
  *
  * The player/hostile gate is duplicated from the inner function on purpose: it
- * is three cheap reads, it leaves the ladder's shape byte-identical to what
- * shipped, and it makes the PvE-untouched property readable at one glance.
+ * is three cheap reads and it makes the PvE-untouched property readable at one
+ * glance. The source is resolved ONCE here and the resolved caster is what the
+ * inner function receives (its own resolution walk is then a no-op), so both
+ * gates judge the same entity and the set reduction applies to a hostile
+ * player's pet exactly as it does to the player.
  */
 export function diminishedCrowdControlDuration(
   now: number,
   isHostileTo: (a: Entity, b: Entity) => boolean,
+  getEntity: (id: number) => Entity | undefined,
   source: Entity,
   target: Entity,
   category: CrowdControlDrCategory,
   duration: number,
 ): number | null {
-  const base = crowdControlDurationAfterDr(now, isHostileTo, source, target, category, duration);
+  const caster = resolveCrowdControlSource(source, getEntity);
+  const base = crowdControlDurationAfterDr(
+    now,
+    isHostileTo,
+    getEntity,
+    caster,
+    target,
+    category,
+    duration,
+  );
   if (base === null) return null; // already DR-immune: apply nothing at all
-  if (source.kind !== 'player' || target.kind !== 'player') return base;
-  if (!isHostileTo(source, target)) return base;
+  if (caster.kind !== 'player' || target.kind !== 'player') return base;
+  if (!isHostileTo(caster, target)) return base;
   const reduction = target.ccDurationReduction ?? 0;
   return reduction > 0 ? base * (1 - reduction) : base;
 }
