@@ -302,8 +302,10 @@ describe('isHarvestableCorpse', () => {
     // derelict mech, Varkhul, the three crucible automatons, the herald and
     // the Heart of the End): all elemental-family forge constructs, and a
     // construct corpse carries no skinnable or butcherable components.)
+    // Plus Asmon and his two encounter-only summons. The adds carry
+    // neither loot nor harvest tags, so repeated summons cannot farm yields.
     const untagged = Object.values(MOBS).filter((m) => !m.componentTags?.length);
-    expect(untagged).toHaveLength(194);
+    expect(untagged).toHaveLength(197);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read

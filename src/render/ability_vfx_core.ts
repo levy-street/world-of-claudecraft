@@ -147,6 +147,8 @@ export interface AbilityVfxFullSpec {
   archetype: AbilityVfxArchetype;
   palette: string;
   power?: number;
+  /** Scale the cosmetic whole-body rim independently from the impact spectacle. */
+  bodyGlowScale?: number;
   /** Frequent rotational fillers opt out of gallery-scale crescendo multipliers. */
   filler?: boolean;
   /** Authored resource streams that converge during windup/release, capped at three. */

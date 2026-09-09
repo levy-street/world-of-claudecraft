@@ -38,7 +38,7 @@ export const RIFT_THEMES: readonly RiftTheme[] = [
     wallTint: 0x9fc4e6,
     floorTint: 0xb0cfe6,
     trash: ['rift_frost_revenant', 'rift_rime_elemental'],
-    boss: 'rift_boss_frost',
+    boss: 'rift_boss_asmon',
   },
   {
     id: 'ember',
@@ -51,7 +51,7 @@ export const RIFT_THEMES: readonly RiftTheme[] = [
     floorTint: 0xc26a4a,
     daisRaised: true,
     trash: ['rift_ember_fiend', 'rift_magma_brute'],
-    boss: 'rift_boss_ember',
+    boss: 'rift_boss_asmon',
   },
   {
     id: 'venom',
@@ -63,7 +63,7 @@ export const RIFT_THEMES: readonly RiftTheme[] = [
     wallTint: 0x8fae6a,
     floorTint: 0x7a9a55,
     trash: ['rift_venom_weaver', 'rift_thornback'],
-    boss: 'rift_boss_venom',
+    boss: 'rift_boss_asmon',
   },
   {
     id: 'bone',
@@ -74,7 +74,7 @@ export const RIFT_THEMES: readonly RiftTheme[] = [
     fog: { color: 0x0d0c0a, near: 18, far: 84 },
     wallTint: 0xd8cfb0,
     trash: ['rift_boneclad', 'rift_marrow_troll'],
-    boss: 'rift_boss_necro',
+    boss: 'rift_boss_asmon',
   },
   {
     id: 'brute',
@@ -86,7 +86,7 @@ export const RIFT_THEMES: readonly RiftTheme[] = [
     wallTint: 0xc0a878,
     daisRaised: true,
     trash: ['rift_stone_ogre', 'rift_marrow_troll'],
-    boss: 'rift_boss_brute',
+    boss: 'rift_boss_asmon',
   },
   {
     id: 'void',
@@ -98,7 +98,7 @@ export const RIFT_THEMES: readonly RiftTheme[] = [
     wallTint: 0x9a7ac0,
     floorTint: 0x8a6ab0,
     trash: ['rift_void_acolyte', 'rift_dread_stalker'],
-    boss: 'rift_boss_arcane',
+    boss: 'rift_boss_asmon',
   },
   {
     id: 'storm',
@@ -110,7 +110,7 @@ export const RIFT_THEMES: readonly RiftTheme[] = [
     wallTint: 0x7aa8d8,
     floorTint: 0x6a98c8,
     trash: ['rift_storm_caller', 'rift_stormscale'],
-    boss: 'rift_boss_storm',
+    boss: 'rift_boss_asmon',
   },
   {
     id: 'tide',
@@ -122,6 +122,6 @@ export const RIFT_THEMES: readonly RiftTheme[] = [
     wallTint: 0x6aae9e,
     floorTint: 0x5a9e8e,
     trash: ['rift_tide_thrall', 'rift_deep_lurker'],
-    boss: 'rift_boss_tide',
+    boss: 'rift_boss_asmon',
   },
 ];

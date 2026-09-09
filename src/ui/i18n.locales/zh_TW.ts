@@ -13136,7 +13136,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.riftsPage.groupHeading': '誰能進去',
   'guide.riftsPage.heading': '裂隙',
   'guide.riftsPage.intro':
-    '裂隙是世界本身被撕開的一道口子，而不是一扇你走過去的門。踏進去，你會得到一趟從沒有人跑過的下潛之路：樓層、怪物，以及等在最底下的那個東西，全都是專為那一道裂隙現場生成的，因此同樣的等級絕不會有兩次相同的過程。',
+    '裂隙是世界本身被撕開的一道口子，而不是一扇你走過去的門。踏進去，你會得到一趟從沒有人跑過的下潛之路：每道裂隙的樓層與居民都會變化，但每場最終戰鬥都由同一位君王佔據。即使等級相同，每次也仍可能走過不同的下潛之路。',
   'guide.riftsPage.levelNote':
     '裂隙屬於終局內容。你必須達到等級上限，也就是 {n} 級，才能踏進任何一個等級的裂隙。',
   'guide.riftsPage.openBody':
@@ -13492,7 +13492,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.formLine.form_bear':
     '坦克型態：厚實的皮毛、以怒氣取代法力，還有額外威脅值，好讓敵人繼續朝你揮拳。',
   'guide.riftsPage.floorsBody':
-    '一道裂隙有數層樓，每一層都是現場生成的，而通往下層的路要等這一層放你走才會開啟：清掉層上還活著的東西，解開它橫在你路上的一切封鎖，向下的通道便會撕裂開來。最後一層以一場首領戰作結。每一層都有自己的性格，因此單單一趟旅程就可能帶你從嚴霜走進餘燼，而每當你抵達新的一層，聊天視窗都會念出它的名字。你螢幕上的追蹤條，正是你得知這一道有幾層的地方。有少數裂隙開啟的不是生成出來的下潛之路，而是一座手工打造的場景，它自有一段固定的長度。',
+    '一道裂隙有數層樓，每一層都是現場生成的，而通往下層的路要等這一層放你走才會開啟：清掉層上還活著的東西，解開它橫在你路上的一切封鎖，向下的通道便會撕裂開來。最後一層都由同一位君王鎮守，他的力量隨裂隙等級提升。他的蟲害大軍會跟隨他穿越不同場景，因此最終戰鬥中還要應付他的隨從。每一層都有自己的性格，因此單單一趟旅程就可能帶你從嚴霜走進餘燼，而每當你抵達新的一層，聊天視窗都會念出它的名字。你螢幕上的追蹤條，正是你得知這一道有幾層的地方。有少數裂隙開啟的不是生成出來的下潛之路，而是一座手工打造的場景，它自有一段固定的長度。',
   // Performance diagnostics panel chrome. Technical report prose remains English.
   'hudChrome.perf.diagnostics.panelAria': 'World of ClaudeCraft 效能診斷',
   'hudChrome.perf.diagnostics.title': 'ClaudeCraft 效能醫生',
@@ -14328,4 +14328,18 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.springtouched_crozier.name': '泉息牧杖',
   'entities.items.wand_of_quenched_sparks.name': '熄火花魔杖',
   'crucibleShop.balanceEntry': '{name} x{count}',
+  'sim.rift.roachKing.coronation': '污穢加冕',
+  'sim.rift.roachKing.tributeFeast': '貢品盛宴',
+  'sim.rift.roachKing.crown': '蟑螂王之冠',
+  'sim.rift.roachKing.crownWarning': '隱士起身。蟑螂王戴上了王冠！',
+  'sim.rift.roachKing.filthWarning': '污穢之山：離開標記區域！',
+  'sim.rift.roachKing.tributeWarning': '貢品盛宴：中斷引導，或擊殺貢品甲蟲！',
+  'sim.rift.roachKing.ringWarning': '蟑螂王正在蓄力：快到圓環外！',
+  'sim.rift.roachKing.filthDetonate': '污穢之山爆發了！',
+  'sim.rift.roachKing.swarmDetonate': '王室蟲群爆發了！',
+  'sim.rift.roachKing.mountainOfFilth': '污穢之山',
+  'sim.rift.roachKing.royalSwarm': '王室蟲群',
+  'entities.mobs.rift_boss_asmon.name': 'Asmon，蟑螂王',
+  'entities.mobs.rift_roachling.name': '王室小蟑螂',
+  'entities.mobs.rift_garbage_beetle.name': '貢品甲蟲',
 };

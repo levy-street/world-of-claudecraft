@@ -13519,7 +13519,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.riftsPage.groupBody': '파티를 데려가세요. 균열은 들어온 인원이 적다고 해서 무르게 굴지 않습니다. 안에 있는 무엇도 몇 명이 서 있는지 세지 않으므로, 포털에 붙은 등급이 곧 당신이 맞설 등급입니다. 다섯이든 혼자든 마찬가지입니다. 문은 혼자 들어가는 것도 막지 않고 실제로 시도하는 사람도 있지만, 균열은 모든 등급에서 파티 콘텐츠이며 첫 방부터 그 점을 숨기지 않습니다. 파티는 균열의 사본을 따로 받으므로 다른 파티가 당신의 공략에 끼어들 수 없습니다. 쓰러지더라도 유령으로 다시 걸어 들어와, 안의 싸움이 멎으면 몸을 되찾을 수 있습니다.',
   'guide.riftsPage.groupHeading': '누가 들어가나',
   'guide.riftsPage.heading': '균열',
-  'guide.riftsPage.intro': '균열은 걸어서 찾아가는 문이 아니라, 세계 그 자체에 난 찢김입니다. 하나를 지나면 아무도 밟아 본 적 없는 하강로가 펼쳐집니다. 층도, 괴물도, 맨 아래에서 기다리는 것도 모두 그 균열만을 위해 새로 지어지므로, 같은 등급이라도 두 번 다시 같은 방식으로 흘러가지 않습니다.',
+  'guide.riftsPage.intro':
+    '균열은 걸어서 찾아가는 문이 아니라, 세계 그 자체에 난 찢김입니다. 하나를 지나면 아무도 밟아 본 적 없는 하강로가 펼쳐집니다. 층과 그곳의 주민은 균열마다 달라지지만, 마지막 전투에는 언제나 같은 군주가 기다립니다. 같은 등급이라도 매번 다른 하강로를 지나갈 수 있습니다.',
   'guide.riftsPage.levelNote': '균열은 최종 단계 콘텐츠입니다. 어느 등급이든 균열에 들어서려면 최고 레벨인 {n} 레벨에 도달해야 합니다.',
   'guide.riftsPage.openBody': '균열은 초반의 골짜기가 아니라 왕국의 더 넓은 지역에서 찢겨 열리며, 그 소식은 왕국 전체가 듣습니다. 하나가 나타나는 순간 채팅에 등급과 지역을 알리는 한 줄이 뜹니다. 조건을 갖춘 각 지역은 대략 한 시간에 한 번씩 균열의 차례를 맞고, 이미 균열이 서 있는 지역은 두 번째를 열지 않고 차례를 기다립니다. 아무도 닫지 않은 균열은 두어 시간 뒤 스스로 무너지며, 그 소식 또한 왕국이 듣습니다. 균열이 봉인된 지역은 다음 차례가 돌아올 때까지 조용하니, 알림이 뜨면 소식이 신선할 때 그리로 걸어갈 값어치가 있습니다.',
   'guide.riftsPage.openHeading': '균열은 어디에, 얼마나 자주 열리나',
@@ -13816,7 +13817,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.home.world.subCount': '{zones}개 지역이 하나로 이어진 대지. 고요한 골짜기와 물에 잠긴 늪지부터 잿빛 황야, 얼어붙은 고지, 산울타리 미로 정원까지 펼쳐집니다.',
   'guide.combat.threatBody': '모든 적은 누가 자신을 가장 성가시게 했는지 속으로 셈합니다. 피해도 거기에 쌓이고, 치유도 마찬가지입니다. 치유는 치유받은 사람과 이미 싸우고 있는 적들에게 나뉘어 위협 수준으로 얹히므로, 가장 안전한 치유는 탱커가 이미 붙잡아 둔 사람에게 거는 치유입니다. 탱커는 자신이 만들어 내는 모든 위협 수준을 몇 배로 불려 주는 방어 태세나 보호 형태를 켜고, 반대로 드루이드의 늑대 변신은 위협 수준을 덜어 냅니다. 도발은 시전자를 단숨에 셈의 맨 위로 올리고 몇 초 동안 적을 그에게 붙들어 둡니다. 적은 누군가가 탱커를 앞지르는 순간 곧바로 돌아서지는 않습니다. 하나를 떼어 내려면 뚜렷한 차이가 필요하고, 근접보다 원거리에서 더 큰 차이가 필요합니다. 그러니 몰이 초반에 조금만 참으면 싸움은 있어야 할 자리에 머무릅니다.',
   'guide.classPage.formLine.form_bear': '방어를 맡는 형태입니다. 두꺼운 가죽을 두르고, 마나 대신 분노를 쓰며, 위협 수준을 더 쌓아 적이 계속 당신을 때리게 합니다.',
-  'guide.riftsPage.floorsBody': '균열은 몇 개 층으로 이어지며 각 층은 새로 지어집니다. 그리고 그 층이 당신을 놓아줄 때까지 아래로 향하는 길은 열리지 않습니다. 층에 살아 있는 것을 정리하고, 길을 가로막아 잠가 둔 것을 풀어내면 비로소 하강로가 찢겨 열립니다. 마지막 층은 우두머리로 끝납니다. 층마다 저마다의 성격이 있어 한 번의 공략이 당신을 서리 속에서 잉걸불 속으로 데려가기도 하며, 새 층에 들어설 때마다 채팅에 그 이름이 뜹니다. 이번 균열이 몇 층짜리인지는 화면의 추적기에서 알 수 있습니다. 어떤 균열은 생성된 하강로 대신 손으로 빚은 특별한 무대를 열며, 그런 곳은 정해진 자기 길이대로 진행됩니다.',
+  'guide.riftsPage.floorsBody':
+    '균열은 몇 개 층으로 이어지며 각 층은 새로 지어집니다. 그리고 그 층이 당신을 놓아줄 때까지 아래로 향하는 길은 열리지 않습니다. 층에 살아 있는 것을 정리하고, 길을 가로막아 잠가 둔 것을 풀어내면 비로소 하강로가 찢겨 열립니다. 마지막 층에는 언제나 같은 군주가 기다리며, 그의 힘은 균열과 함께 강해집니다. 그의 벌레 떼는 환경이 달라져도 따라오므로 마지막 전투에서는 부하들도 상대할 준비를 하세요. 층마다 저마다의 성격이 있어 한 번의 공략이 당신을 서리 속에서 잉걸불 속으로 데려가기도 하며, 새 층에 들어설 때마다 채팅에 그 이름이 뜹니다. 이번 균열이 몇 층짜리인지는 화면의 추적기에서 알 수 있습니다. 어떤 균열은 생성된 하강로 대신 손으로 빚은 특별한 무대를 열며, 그런 곳은 정해진 자기 길이대로 진행됩니다.',
   // Performance diagnostics panel chrome. Technical report prose remains English.
   'hudChrome.perf.diagnostics.panelAria': 'World of ClaudeCraft 성능 진단',
   'hudChrome.perf.diagnostics.title': 'ClaudeCraft 성능 진단',
@@ -14637,4 +14639,19 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.springtouched_crozier.name': '샘닿은 홀장',
   'entities.items.wand_of_quenched_sparks.name': '꺼진 불꽃의 마법봉',
   'crucibleShop.balanceEntry': '{name} x{count}',
+  'sim.rift.roachKing.coronation': '오물의 대관식',
+  'sim.rift.roachKing.tributeFeast': '공물의 향연',
+  'sim.rift.roachKing.crown': '바퀴벌레 왕의 왕관',
+  'sim.rift.roachKing.crownWarning': '은둔자가 일어납니다. 바퀴벌레 왕이 왕관을 씁니다!',
+  'sim.rift.roachKing.filthWarning': '오물의 산: 표시된 바닥에서 벗어나세요!',
+  'sim.rift.roachKing.tributeWarning':
+    '공물의 향연: 정신 집중을 차단하거나 공물 딱정벌레를 처치하세요!',
+  'sim.rift.roachKing.ringWarning': '바퀴벌레 왕이 힘을 모읍니다. 원 밖으로 나가세요!',
+  'sim.rift.roachKing.filthDetonate': '오물의 산이 폭발합니다!',
+  'sim.rift.roachKing.swarmDetonate': '왕실 벌레 떼가 터져 나옵니다!',
+  'sim.rift.roachKing.mountainOfFilth': '오물의 산',
+  'sim.rift.roachKing.royalSwarm': '왕실 벌레 떼',
+  'entities.mobs.rift_boss_asmon.name': '바퀴벌레 왕 Asmon',
+  'entities.mobs.rift_roachling.name': '왕실 새끼 바퀴벌레',
+  'entities.mobs.rift_garbage_beetle.name': '공물 딱정벌레',
 };

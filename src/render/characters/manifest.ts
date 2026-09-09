@@ -35,6 +35,8 @@ import { ITEM_WEAPON_VARIANTS } from '../../ui/weapon_variants';
 import type { OverheadEmoteId } from '../../world_api';
 import { VARKHUL_FORGING_STRIKE_TIMESCALE } from '../varkhul_forge_hammer';
 import { NPC_PROP_SET_IDS, type NpcPropSet } from './npc_looks';
+import { ROACH_KING_VISUALS } from './roach_king_manifest';
+import { roachKingVisualKey } from './roach_king_visual_core';
 
 export interface EmoteClipSpec {
   clips: readonly string[];
@@ -82,6 +84,8 @@ export interface ClipMap {
    *  cast differing from the rig's generic channel; the one-shot route in
    *  attackByAbility cannot cover held cast states). */
   castByAbility?: Record<string, string>;
+  /** Authored cast gestures that hold their last pose until the cast ends. */
+  castOnce?: readonly string[];
   /** Playback rate for per-ability cast clips whose authored length must land
    *  its key pose inside the cast window. Also re-applied every frame, since
    *  actions are cached per clip and a clip shared with attackByAbility would
@@ -1280,6 +1284,7 @@ const VELOCIRAPTOR: ClipMap = {
 // ---------------------------------------------------------------------------
 
 export const VISUALS: Record<string, VisualDef> = {
+  ...ROACH_KING_VISUALS,
   // -- player classes ------------------------------------------------------
   player_warrior: swims({
     url: `${PLAYERS}/knight.glb`,
@@ -3696,7 +3701,7 @@ export function visualKeyFor(e: Entity): string {
     return VISUALS[`player_${e.templateId}`] ? `player_${e.templateId}` : 'player_warrior';
   }
   if (e.kind === 'mob') {
-    const override = MOB_KEYS[e.templateId];
+    const override = roachKingVisualKey(e) ?? MOB_KEYS[e.templateId];
     if (override) return override;
     const family = MOBS[e.templateId]?.family;
     return (family && FAMILY_KEYS[family]) || 'mob_bandit';

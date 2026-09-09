@@ -6,6 +6,7 @@ import {
 } from '../src/sim/content/rift/items';
 import { RIFT_BOSS_IDS, RIFT_TRASH_IDS } from '../src/sim/content/rift/mobs';
 import { BUILTIN_WORLD, ITEMS, MOBS, riftInstanceOrigin } from '../src/sim/data';
+import { createMob } from '../src/sim/entity';
 import { RIFT_MECHANIC_SPACING_SEC } from '../src/sim/mob/mechanic_spacing';
 import { RIFT_MECHANIC_WINDUP_SEC } from '../src/sim/mob/rift_escape_window';
 import { riftHeroicClearPool, riftNormalClearPool } from '../src/sim/rift/loot_pools';
@@ -35,6 +36,7 @@ import {
   riftFloorLevel,
   riftMechanicSuppressed,
   riftRankForBaseLevel,
+  riftRankTemplate,
   riftRankTuningFor,
   riftRoleDamageMultiplier,
   riftRoleHealthMultiplier,
@@ -92,6 +94,10 @@ function killTrash(sim: Sim): void {
   }
 }
 
+// Legacy mechanics remain covered by explicit fixtures; generated guardians are
+// always Asmon now (tests/roach_king.test.ts covers the live encounter).
+const legacyGuardianFixtures = new Map<number, string>();
+
 /** Enter a rift and descend to its boss floor (the rift_sim.test.ts recipe). */
 function enterAtBossFloor(seed: number, baseLevel: number): Sim {
   const sim = makeSim(seed);
@@ -110,18 +116,33 @@ function enterAtBossFloor(seed: number, baseLevel: number): Sim {
   }
   expect(inst.floorIndex).toBe(inst.floorCount - 1);
   expect(inst.bossId).not.toBeNull();
+  const legacyId = legacyGuardianFixtures.get(seed);
+  if (legacyId) {
+    const original = sim.entities.get(inst.bossId!)!;
+    const replacement = createMob(
+      original.id,
+      riftRankTemplate(MOBS[legacyId], riftRankTuningFor(baseLevel), 'boss'),
+      original.level,
+      { ...original.pos },
+    );
+    replacement.riftMechanicLimit = original.riftMechanicLimit;
+    replacement.riftMechanicSpacing = original.riftMechanicSpacing;
+    replacement.mechanicDamageMult = original.mechanicDamageMult;
+    replacement.mechanicHealMult = original.mechanicHealMult;
+    replacement.facing = original.facing;
+    const ctx = (sim as unknown as { ctx: SimContext }).ctx;
+    ctx.dropEntity(original.id);
+    ctx.addEntity(replacement);
+  }
   return sim;
 }
 
-/** A procedural (non-set-piece) seed whose final-floor boss is `bossId`. */
+/** A deterministic procedural arena seed for a hand-placed legacy guardian. */
 function seedWithFinalBoss(bossId: string): number {
-  for (let s = 1; s < 800; s++) {
-    if (isSetPieceSeed(s)) continue;
-    const fc = riftFloorCount(s);
-    const boss = generateRiftFloor(s, 20, fc - 1).spawns.find((sp) => sp.boss);
-    if (boss?.templateId === bossId) return s;
-  }
-  throw new Error(`no seed found whose final boss is ${bossId}`);
+  let seed = [...bossId].reduce((sum, character) => sum + character.charCodeAt(0), 0);
+  while (isSetPieceSeed(seed)) seed++;
+  legacyGuardianFixtures.set(seed, bossId);
+  return seed;
 }
 
 describe('rift ranks: derivation and level bands', () => {
@@ -496,6 +517,9 @@ describe('rift ranks: lethal boss death zone (deathZoneCast / deathZoneStrike)',
     }
     expect(inst.floorIndex).toBe(inst.floorCount - 1);
     const boss = sim.entities.get(inst.bossId!)!;
+    // Explicit legacy driver fixture; generated content is always Asmon.
+    boss.templateId = 'rift_boss_frost';
+    boss.roachKing = undefined;
     // Aggro warm-up in melee reach (mechanics tick in chase/attack only); both
     // members must survive it (heroic_s hits one-shot a naked 20), so the boss
     // floor's trash is culled and both get big absorb shields.
@@ -781,18 +805,19 @@ describe('rift loot: every rift creature pays out', () => {
   it('every boss carries a fat rare chance plus guaranteed essence', () => {
     for (const id of RIFT_BOSS_IDS) {
       const loot = MOBS[id].loot;
-      const rare = loot.find((e) => e.itemId !== undefined && e.itemId !== 'rift_essence');
-      expect(rare, `${id} drops a signature item`).toBeDefined();
-      expect(rare!.chance, id).toBeGreaterThanOrEqual(0.35);
+      const rares = loot.filter((e) => e.itemId !== undefined && e.itemId !== 'rift_essence');
+      expect(rares.length, `${id} drops signature items`).toBeGreaterThan(0);
+      expect(
+        rares.reduce((sum, rare) => sum + rare.chance, 0),
+        id,
+      ).toBeGreaterThanOrEqual(0.35);
       expect(
         loot.filter((e) => e.itemId === 'rift_essence' && e.chance === 1).length,
         `${id} guarantees essence`,
       ).toBeGreaterThanOrEqual(1);
     }
-    expect(MOBS.rift_boss_ritualist.loot.some((e) => e.itemId === 'pactbound_vestments')).toBe(
-      true,
-    );
-    expect(MOBS.rift_boss_pitlord.loot.some((e) => e.itemId === 'pitlords_cleaver')).toBe(true);
+    expect(MOBS.rift_boss_asmon.loot.some((e) => e.itemId === 'pactbound_vestments')).toBe(true);
+    expect(MOBS.rift_boss_asmon.loot.some((e) => e.itemId === 'pitlords_cleaver')).toBe(true);
   });
 
   it('a killed non-main boss (the citadel ritualist) leaves a lootable corpse with items', () => {
@@ -1558,6 +1583,10 @@ describe('rift ranks: budget escape and citadel exemption', () => {
         minCastTime: 5.0,
       },
     ];
+    cases.push(
+      { id: 'rift_boss_asmon', ccMult: 1, zone: 'deathZoneCast', minCastTime: 5 },
+      { id: 'rift_boss_asmon', ccMult: 1, zone: 'deathZoneStrike', minCastTime: 5 },
+    );
     for (const { id, ccMult, zone, minCastTime, stunDuration } of cases) {
       const tmpl = MOBS[id] as unknown as Record<string, { castTime: number; radius: number }>;
       const def = tmpl[zone];

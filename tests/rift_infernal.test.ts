@@ -152,7 +152,26 @@ describe('infernal citadel: seed selection', () => {
     for (const s of SEEDS) {
       h.update(`${s}:${riftFloorCount(s)}`);
       for (let f = 0; f < riftFloorCount(s); f++) {
-        h.update(JSON.stringify(generateRiftFloor(s, 20, f)));
+        const floor = generateRiftFloor(s, 20, f);
+        const legacyBossByTheme: Record<string, string> = {
+          frost: 'rift_boss_frost',
+          ember: 'rift_boss_ember',
+          venom: 'rift_boss_venom',
+          bone: 'rift_boss_necro',
+          brute: 'rift_boss_brute',
+          void: 'rift_boss_arcane',
+          storm: 'rift_boss_storm',
+          tide: 'rift_boss_tide',
+        };
+        const themeId = generateRiftPlan(s, 20).themeId;
+        h.update(
+          JSON.stringify({
+            ...floor,
+            spawns: floor.spawns.map((spawn) =>
+              spawn.boss ? { ...spawn, templateId: legacyBossByTheme[themeId] } : spawn,
+            ),
+          }),
+        );
       }
     }
     expect(h.digest('hex')).toBe(
@@ -422,11 +441,11 @@ describe('infernal citadel: content', () => {
     expect(floor.spawns.filter((s) => s.boss).length).toBe(0);
     const minis = floor.spawns.filter((s) => s.miniboss);
     expect(minis.length).toBe(1);
-    expect(minis[0].templateId).toBe('rift_boss_ritualist');
+    expect(minis[0].templateId).toBe('rift_boss_asmon');
     expect(minis[0].boss).toBeUndefined();
     const bosses = pitFloor.spawns.filter((s) => s.boss);
     expect(bosses.length).toBe(1);
-    expect(bosses[0].templateId).toBe('rift_boss_pitlord');
+    expect(bosses[0].templateId).toBe('rift_boss_asmon');
     expect(pitFloor.spawns.filter((s) => s.miniboss).length).toBe(0);
   });
 
@@ -660,7 +679,7 @@ describe('infernal citadel: lifecycle', () => {
     expect(i.cacheId).toBeNull();
 
     const boss = sim.entities.get(i.bossId as number) as Entity;
-    expect(boss.name).toContain('Azgorath');
+    expect(boss.name).toContain('Asmon');
     boss.hp = 0;
     boss.dead = true;
     tickSeconds(1.1);

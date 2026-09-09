@@ -13,6 +13,7 @@ export const VARKHUL_CRUCIBLE_QUAKE_CAST_ID = 'crucible_quake';
 // ability def; the matching school-lockout then breaks the channelHeal in
 // updateBossMechanics, so the bar is not a lie.
 export const SCRIPTED_INTERRUPTIBLE_CHANNELS: Record<string, { school: Aura['school'] }> = {
+  rift_asmon_tribute: { school: 'nature' },
   [NYTHRAXIS_SPIRIT_MENDING_CAST_ID]: { school: 'shadow' },
   [VARKHUL_CRUCIBLE_QUAKE_CAST_ID]: { school: 'fire' },
   [VARKHUL_CINDER_REPAIR_CAST_ID]: { school: 'fire' },

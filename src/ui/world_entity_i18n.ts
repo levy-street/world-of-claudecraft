@@ -135,6 +135,9 @@ const MOB_IDS = [
   'stable_horse',
   // Procedural Rift creature pool (src/sim/content/rift/mobs.ts). Dev/endless
   // content; English names come from the MOBS table like every other id here.
+  'rift_boss_asmon',
+  'rift_roachling',
+  'rift_garbage_beetle',
   'rift_spawnling',
   'rift_bonewalker',
   'rift_frost_revenant',

@@ -6012,7 +6012,7 @@ export const cs_CZ: EnTranslations = {
     },
     "riftsPage": {
       "heading": "Trhliny",
-      "intro": "Trhlina je průrva v samotném světě, ne dveře, ke kterým dojdeš. Projdi jí a čeká tě sestup, kterým ještě nikdo neprošel: patra, nestvůry i to, co čeká na dně, jsou postavené znovu jen pro tuto jedinou trhlinu, takže stejný stupeň nikdy neproběhne dvakrát stejně.",
+      "intro": "Trhlina je průrva v samotném světě, ne dveře, ke kterým dojdeš. Projdi jí a čeká tě sestup, kterým ještě nikdo neprošel: patra a jejich obyvatelé se s každou trhlinou mění, ale každý závěrečný střet si nárokuje tentýž vládce. I stejný stupeň tě tak může pokaždé vést jiným sestupem.",
       "whatHeading": "Co je trhlina",
       "whatBody": "Dungeony jsou místa. Stojí tam, kde vždycky stály, a naučíš se je, dokud neznáš každý kout. Výprava je krátký soukromý sestup, který spustíš z tabule, ušitý pro jednoho nebo dva. Trhlina není ani jedno z toho: otevře se sama, venku ve světě, bez varování, a všechno uvnitř vzniká v okamžiku, kdy se otevře. Nikdo ti nemůže poradit s trasou, protože touhle ještě nikdo neprošel. Je instancovaná jako ty druhé dvě, takže to, co uvnitř najdeš, patří jen tobě a tvojí skupině, ale je to jediný instancovaný obsah ve hře, který si tě najde sám, místo aby čekal, až ho najdeš ty.",
       "openHeading": "Kde se trhliny otevírají a jak často",
@@ -6024,7 +6024,7 @@ export const cs_CZ: EnTranslations = {
       "groupBody": "Vezmi s sebou skupinu. Trhlina nezměkne jen proto, že jí prošlo méně lidí: nic uvnitř nepočítá, kolik vás tam stojí, takže stupeň na portálu je stupeň, se kterým bojuješ, ať už je vás pět, nebo jen jeden. Dveře tě pustí dovnitř i samotného, a lidé to zkoušejí, ale trhlina je skupinový obsah na každém stupni a poctivě to přiznává už od první místnosti. Tvoje parta dostane vlastní kopii trhliny, takže do vašeho běhu nemůže vpadnout žádná jiná skupina. Pokud padneš, můžeš se vrátit dovnitř jako duch a oživit se, jakmile boj uvnitř skončí.",
       "levelNote": "Trhliny jsou endgame obsah. Abys mohl projít kteroukoli z nich, na jakémkoli stupni, musíš být na maximální úrovni, úrovni {n}.",
       "floorsHeading": "Dolů skrz patra",
-      "floorsBody": "Trhlina má hrstku pater, každé postavené znovu, a cesta dolů se neotevře, dokud s tebou patro neskončí: vyčisti, co na něm žije, vyřeš, co ti zamklo cestu, a sestup se protrhne. Poslední patro končí u bosse. Každé patro má svůj vlastní ráz, takže tě jeden běh dokáže provést od mrazu až po žár, a tvůj chat pojmenuje každé patro, jakmile na něj dorazíš. Na trackeru na obrazovce zjistíš, kolik pater tahle trhlina má. Pár trhlin místo generovaného sestupu otevírá ručně postavenou scénu s vlastní pevnou délkou.",
+      "floorsBody": "Trhlina má hrstku pater, každé postavené znovu, a cesta dolů se neotevře, dokud s tebou patro neskončí: vyčisti, co na něm žije, vyřeš, co ti zamklo cestu, a sestup se protrhne. Poslední patro končí u téhož vládce, jehož síla roste s trhlinou. Jeho havěť ho následuje napříč prostředími, takže v závěrečném boji čekej společnost. Každé patro má svůj vlastní ráz, takže tě jeden běh dokáže provést od mrazu až po žár, a tvůj chat pojmenuje každé patro, jakmile na něj dorazíš. Na trackeru na obrazovce zjistíš, kolik pater tahle trhlina má. Pár trhlin místo generovaného sestupu otevírá ručně postavenou scénu s vlastní pevnou délkou.",
       "boundHeading": "Jakmile poteče krev",
       "boundBody": "První zabití, které tvá skupina v trhlině provede, uzamkne váš běh, a totéž udělá první vedlejší skrýš, kterou otevřeš. Od té chvíle jsi k té kopii vázán: vyjdi ven z jakéhokoli důvodu a návrat tě vrátí přesně do běhu, který jsi opustil, nikdy do běhu jiné skupiny a nikdy do nového, dokud vstup ve světě stále stojí. Před tím prvním zabitím a před tou první skrýší není nic uzamčeno, takže skupina, která se ještě schází, se může přeskupit a vejít dovnitř společně, aniž by za sebou nechala napůl rozdělané kopie.",
       "raceHeading": "Závod o první čistku",
@@ -7892,6 +7892,20 @@ export const cs_CZ: EnTranslations = {
   },
   "sim": {
     "rift": {
+      "roachKing": {
+        "coronation": "Coronation of Filth",
+        "tributeFeast": "Tribute Feast",
+        "crown": "Roach King's Crown",
+        "crownWarning": "The hermit rises. The Roach King claims his crown!",
+        "filthWarning": "Mountain of Filth: leave the marked ground!",
+        "tributeWarning": "Tribute Feast: interrupt the channel or kill the tribute beetles!",
+        "ringWarning": "The Roach King winds up: get outside the ring!",
+        "filthDetonate": "The mountain of filth erupts!",
+        "swarmDetonate": "The royal swarm erupts!",
+        "deskSlam": "Desk Slam",
+        "mountainOfFilth": "Mountain of Filth",
+        "royalSwarm": "Royal Swarm"
+      },
       "allUnstable": "Všechny trhliny jsou právě nestabilní. Zkus to znovu brzy.",
       "enterFloor": "Vstupuješ skrz trhlinu do {name}.",
       "descendFloor": "Sestupuješ hlouběji do {name}.",
@@ -14980,6 +14994,15 @@ export const cs_CZ: EnTranslations = {
       },
       "stable_horse": {
         "name": "Stájový kůň"
+      },
+      "rift_boss_asmon": {
+        "name": "Asmon, the Roach King"
+      },
+      "rift_roachling": {
+        "name": "Royal Roachling"
+      },
+      "rift_garbage_beetle": {
+        "name": "Tribute Beetle"
       },
       "rift_spawnling": {
         "name": "Trhlinové plůdě"

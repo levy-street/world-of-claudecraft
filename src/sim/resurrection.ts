@@ -13,6 +13,7 @@
 // social/fiesta) can share the "which auras survive this wipe" predicates and the
 // level-scaled duration WITHOUT an import cycle (spirit <-> entity_roster both need it).
 
+import { ROACH_CROWN_AURA } from './content/rift/roach_king';
 import { CHEATER_MARK_AURA_ID } from './moderation';
 import { type Aura, MAX_LEVEL } from './types';
 
@@ -93,6 +94,7 @@ export function aurasSurvivingDeath(auras: readonly Aura[]): Aura[] {
   return auras.filter(
     (a) =>
       SICKNESS_AURA_IDS.has(a.id) ||
+      a.id === ROACH_CROWN_AURA ||
       a.kind === 'cauterize_fatigue' ||
       a.id === CHEATER_MARK_AURA_ID ||
       a.unbreakableControl === true,

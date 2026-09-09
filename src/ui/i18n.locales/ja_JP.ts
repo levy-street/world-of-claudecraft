@@ -13530,7 +13530,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.riftsPage.groupBody': 'グループで挑みましょう。人数が少ないからといってリフトが手加減してくれることはありません。中にいるものは誰も人数を数えていないので、ポータルに記されたランクがそのまま相手の強さです。五人でも一人でも同じです。入口はひとりでも通してくれますし、実際に試す人もいますが、リフトはどのランクでもグループ向けの内容で、最初の部屋からそのことを正直に突きつけてきます。パーティにはリフトの写しがひとつ与えられるので、他のグループがあなたの挑戦に紛れ込むことはありません。倒れてしまっても、ゴーストのまま歩いて戻り、中の戦いが収まったところで身を起こせます。',
   'guide.riftsPage.groupHeading': '誰が入るのか',
   'guide.riftsPage.heading': 'リフト',
-  'guide.riftsPage.intro': 'リフトは世界そのものに走った裂け目であり、歩いて訪れる扉ではありません。くぐった先には、誰ひとり踏破したことのない下降が待っています。フロアも、そこに巣くうものも、底で待ち構えるものも、すべてそのリフトのためだけに新しく組み上げられるので、同じランクでも二度と同じ展開にはなりません。',
+  'guide.riftsPage.intro':
+    'リフトは世界そのものに走った裂け目であり、歩いて訪れる扉ではありません。くぐった先には、誰ひとり踏破したことのない下降が待っています。フロアとその住人はリフトごとに変わりますが、最後の戦いにはいつも同じ君主が待ち構えています。同じランクでも、毎回異なる下降をたどることがあります。',
   'guide.riftsPage.levelNote': 'リフトはエンドゲームの内容です。どのランクであっても、くぐるにはレベル上限、すなわちレベル{n}に達している必要があります。',
   'guide.riftsPage.openBody': 'リフトが裂け開くのは、始まりの谷ではなくレルムの広いゾーンの側です。そして開いた瞬間、レルム全体がそれを知ります。チャットに一行流れ、ランクとゾーンが告げられるのです。対象となる各ゾーンには、およそ一時間に一度リフトの順番が回ってきます。すでにリフトが立っているゾーンは、二つめを開かずに順番を待ちます。誰も閉じないままのリフトは数時間で自ら崩れ落ち、そのこともレルムに伝わります。リフトが封印されたゾーンは次の順番が回ってくるまで静かなままなので、告知は新しいうちに向かう価値があります。',
   'guide.riftsPage.openHeading': 'リフトが開く場所と、その頻度',
@@ -13827,7 +13828,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.home.world.subCount': 'ひと続きの大地に広がる{zones}のゾーン。静かな谷や沈んだ湿地から、燃え殻の荒野、凍てつく高地、生垣迷路の庭園まで。',
   'guide.combat.threatBody': '敵はそれぞれ、誰に最も苛立たされたかという密かな帳簿をつけています。ダメージはそこに加算され、回復も同じです。回復は、癒した相手とすでに戦っている敵たちに、分け合う形で脅威を乗せるので、最も安全な回復はタンクがすでに捕まえている相手への回復です。タンクは自分の生み出す脅威をすべて増幅する防御スタンスや守りの姿に切り替え、逆にドルイドのウルフフォームは脅威を削ぎ落とします。挑発は使った者を帳簿の一番上まで押し上げ、数秒のあいだ敵をその場に縛りつけます。敵は誰かがタンクを追い越した瞬間に矛先を変えるわけではありません。引き剥がすにははっきりとした差が必要で、近接よりも遠距離のほうが大きな差を求められます。ですから仕掛けの最初にほんの少し我慢するだけで、戦いはあるべき場所に留まります。',
   'guide.classPage.formLine.form_bear': 'タンクの姿です。分厚い毛皮をまとい、マナの代わりにレイジを使い、追加の脅威で敵の矛先を自分に引きつけ続けます。',
-  'guide.riftsPage.floorsBody': 'リフトはいくつかのフロアで構成され、そのどれもがその場で新しく組み上げられます。下への道は、そのフロアがあなたを解放するまで開きません。フロアに居座るものを片づけ、行く手をふさぐ仕掛けを解いてはじめて、下りの道が裂け開きます。最後のフロアはボスで終わります。フロアごとに固有の性格があるので、ひとつの挑戦の中で霜の世界から燃え殻の世界へ移ることもあり、到着するたびにチャットがそのフロアの名を告げます。今回のリフトが何フロアあるのかは、画面のトラッカーでわかります。なお、一部のリフトは生成された下降のかわりに、手作りの舞台を開きます。こちらは決まった長さで進みます。',
+  'guide.riftsPage.floorsBody':
+    'リフトはいくつかのフロアで構成され、そのどれもがその場で新しく組み上げられます。下への道は、そのフロアがあなたを解放するまで開きません。フロアに居座るものを片づけ、行く手をふさぐ仕掛けを解いてはじめて、下りの道が裂け開きます。最後のフロアにはいつも同じ君主が待ち構え、その力はリフトとともに増していきます。彼の蟲の群れはさまざまな環境へついてくるので、最後の戦いでは取り巻きにも備えましょう。フロアごとに固有の性格があるので、ひとつの挑戦の中で霜の世界から燃え殻の世界へ移ることもあり、到着するたびにチャットがそのフロアの名を告げます。今回のリフトが何フロアあるのかは、画面のトラッカーでわかります。なお、一部のリフトは生成された下降のかわりに、手作りの舞台を開きます。こちらは決まった長さで進みます。',
   // Performance diagnostics panel chrome. Technical report prose remains English.
   'hudChrome.perf.diagnostics.panelAria': 'World of ClaudeCraft パフォーマンス診断',
   'hudChrome.perf.diagnostics.title': 'ClaudeCraft パフォーマンス診断',
@@ -14632,4 +14634,18 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.springtouched_crozier.name': '泉触れの司教杖',
   'entities.items.wand_of_quenched_sparks.name': '消えた火花のワンド',
   'crucibleShop.balanceEntry': '{name} x{count}',
+  'sim.rift.roachKing.coronation': '汚穢の戴冠',
+  'sim.rift.roachKing.tributeFeast': '貢物の饗宴',
+  'sim.rift.roachKing.crown': 'ゴキブリ王の王冠',
+  'sim.rift.roachKing.crownWarning': '隠者が立ち上がる。ゴキブリ王が王冠を戴く！',
+  'sim.rift.roachKing.filthWarning': '汚穢の山：地面の印から離れろ！',
+  'sim.rift.roachKing.tributeWarning': '貢物の饗宴：チャネリングを中断するか、貢物の甲虫を倒せ！',
+  'sim.rift.roachKing.ringWarning': 'ゴキブリ王が力を溜めている。円の外へ逃げろ！',
+  'sim.rift.roachKing.filthDetonate': '汚穢の山が噴き出す！',
+  'sim.rift.roachKing.swarmDetonate': '王家の蟲群が噴き出す！',
+  'sim.rift.roachKing.mountainOfFilth': '汚穢の山',
+  'sim.rift.roachKing.royalSwarm': '王家の蟲群',
+  'entities.mobs.rift_boss_asmon.name': 'ゴキブリ王Asmon',
+  'entities.mobs.rift_roachling.name': '王家の幼ゴキブリ',
+  'entities.mobs.rift_garbage_beetle.name': '貢物の甲虫',
 };

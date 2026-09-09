@@ -6012,7 +6012,7 @@ export const sv_SE: EnTranslations = {
     },
     "riftsPage": {
       "heading": "Revor",
-      "intro": "En reva är bokstavligen en reva i själva världen, inte en dörr du går fram till. Kliv igenom en och du får en nedstigning ingen någonsin gått förut: våningarna, monstren och det som väntar längst ner byggs alla på nytt just för den revan, så samma grad spelar aldrig ut sig likadant två gånger.",
+      "intro": "En reva är bokstavligen en reva i själva världen, inte en dörr du går fram till. Kliv igenom en och du får en nedstigning ingen någonsin gått förut: våningarna och deras invånare ändras med varje reva, medan samma härskare gör anspråk på varje slutstrid. Samma grad kan fortfarande föra dig genom en annan nedstigning varje gång.",
       "whatHeading": "Vad en reva är",
       "whatBody": "Fängelsehålor är platser. De ligger där de alltid har legat, och ni lär er dem tills ni känner varje hörn. En delve är en kort privat nedstigning ni startar från en tavla, gjord för en eller två. En reva är varken det ena eller det andra: den öppnas av sig själv, ute i världen, utan förvarning, och allt därinne genereras i samma stund. Ingen kan ge er en rutt, för ingen har gått ner i just den här. Den är instansierad som de andra två, så det ni hittar därinne tillhör bara er och er grupp, men det är det enda instansierade innehållet i spelet som kommer och letar upp er i stället för att vänta på att hittas.",
       "openHeading": "Var revor rivs upp, och hur ofta",
@@ -6024,7 +6024,7 @@ export const sv_SE: EnTranslations = {
       "groupBody": "Ta med en grupp. En reva mjuknar inte för att färre av er gick igenom den: ingenting därinne räknar hur många som står där, så portalens grad är den grad ni möter, vare sig ni är fem eller en. Dörren släpper in er ensamma också, och folk provar faktiskt det, men en reva är gruppinnehåll på varje grad, och den är ärlig med det redan från det första rummet. Er grupp får sin egen kopia av revan, så ingen annan grupp kan blanda sig i den. Om ni faller kan ni gå tillbaka in som spöke och samla ihop er själva när striden därinne har lagt sig.",
       "levelNote": "Revor är slutspelsinnehåll. Du måste ha nått maxnivån, nivå {n}, för att kliva igenom en, oavsett grad.",
       "floorsHeading": "Ner genom våningarna",
-      "floorsBody": "En reva rymmer en handfull våningar, var och en nybyggd, och vägen ner öppnas inte förrän våningen är färdig med er: rensa det som lever där, lös vad den än har låst över er väg, och nedstigningen river upp sig. Den sista våningen slutar vid en boss. Varje våning bär sin egen karaktär, så en och samma reva kan föra er från frosten rakt in i glöden, och er chatt namnger varje våning när ni når den. Spåraren på skärmen är där ni ser hur många våningar just den här har. Ett fåtal revor öppnar mot ett handbyggt scenarium i stället för en genererad nedstigning, och det har sin egen fasta längd.",
+      "floorsBody": "En reva rymmer en handfull våningar, var och en nybyggd, och vägen ner öppnas inte förrän våningen är färdig med er: rensa det som lever där, lös vad den än har låst över er väg, och nedstigningen river upp sig. Den sista våningen slutar vid samma härskare, vars styrka växer med revan. Hans ohyra följer honom mellan miljöerna, så räkna med sällskap i slutstriden. Varje våning bär sin egen karaktär, så en och samma reva kan föra er från frosten rakt in i glöden, och er chatt namnger varje våning när ni når den. Spåraren på skärmen är där ni ser hur många våningar just den här har. Ett fåtal revor öppnar mot ett handbyggt scenarium i stället för en genererad nedstigning, och det har sin egen fasta längd.",
       "boundHeading": "Så snart blod flutit",
       "boundBody": "Gruppens första dråp inne i en reva avgör vilken kopia ni är bundna till, och detsamma gör det första förrådet utanför vägen som ni bryter upp. Från det ögonblicket är ni bundna till just den kopian: kliver ni ut av någon anledning och kommer tillbaka hamnar ni i samma kopia ni lämnade, aldrig i en annan grupps och aldrig i en ny, så länge ingången ute i världen fortfarande står kvar. Före det första dråpet, och före det första förrådet, är ingenting avgjort, så en grupp som fortfarande samlas kan gruppera om och gå in tillsammans utan att lämna halvpåbörjade kopior bakom sig.",
       "raceHeading": "Kapplöpningen om den första rensningen",
@@ -7892,6 +7892,20 @@ export const sv_SE: EnTranslations = {
   },
   "sim": {
     "rift": {
+      "roachKing": {
+        "coronation": "Coronation of Filth",
+        "tributeFeast": "Tribute Feast",
+        "crown": "Roach King's Crown",
+        "crownWarning": "The hermit rises. The Roach King claims his crown!",
+        "filthWarning": "Mountain of Filth: leave the marked ground!",
+        "tributeWarning": "Tribute Feast: interrupt the channel or kill the tribute beetles!",
+        "ringWarning": "The Roach King winds up: get outside the ring!",
+        "filthDetonate": "The mountain of filth erupts!",
+        "swarmDetonate": "The royal swarm erupts!",
+        "deskSlam": "Desk Slam",
+        "mountainOfFilth": "Mountain of Filth",
+        "royalSwarm": "Royal Swarm"
+      },
       "allUnstable": "Alla revor är instabila just nu. Försök igen snart.",
       "enterFloor": "Du kliver genom revan in i {name}.",
       "descendFloor": "Du stiger djupare ner i {name}.",
@@ -14980,6 +14994,15 @@ export const sv_SE: EnTranslations = {
       },
       "stable_horse": {
         "name": "Stallhäst"
+      },
+      "rift_boss_asmon": {
+        "name": "Asmon, the Roach King"
+      },
+      "rift_roachling": {
+        "name": "Royal Roachling"
+      },
+      "rift_garbage_beetle": {
+        "name": "Tribute Beetle"
       },
       "rift_spawnling": {
         "name": "Revyngel"

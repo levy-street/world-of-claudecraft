@@ -6012,7 +6012,7 @@ export const de_DE: EnTranslations = {
     },
     "riftsPage": {
       "heading": "Risse",
-      "intro": "Ein Riss ist ein Spalt in der Welt selbst, keine Tür, zu der du hinläufst. Tritt hindurch, und du bekommst einen Abstieg, den zuvor niemand gelaufen ist: Die Ebenen, die Monster und das, was am Grund wartet, werden allesamt frisch für genau diesen Riss erschaffen, sodass derselbe Rang nie zweimal gleich verläuft.",
+      "intro": "Ein Riss ist ein Spalt in der Welt selbst, keine Tür, zu der du hinläufst. Tritt hindurch, und du bekommst einen Abstieg, den zuvor niemand gelaufen ist: Die Ebenen und ihre Bewohner ändern sich mit jedem Riss, während derselbe Herrscher jeden Endkampf beansprucht. Derselbe Rang kann dich also weiterhin jedes Mal durch einen anderen Abstieg führen.",
       "whatHeading": "Was ein Riss ist",
       "whatBody": "Dungeons sind Orte. Sie liegen dort, wo sie immer gelegen haben, und du lernst sie, bis du jede Ecke kennst. Ein Tiefgang ist ein kurzer, privater Abstieg, den du an einer Tafel beginnst, zugeschnitten auf eine oder zwei Personen. Ein Riss ist keins von beidem: Er öffnet sich von selbst, draußen in der Welt, ohne Vorwarnung, und alles darin wird in dem Moment erschaffen, in dem er sich öffnet. Niemand kann dir eine Route in die Hand drücken, denn niemand ist diesen hier schon gelaufen. Er ist instanziert wie die anderen beiden, also gehört, was du darin findest, nur dir und deiner Gruppe, aber er ist der einzige instanzierte Inhalt im Spiel, der dich sucht, statt darauf zu warten, gefunden zu werden.",
       "openHeading": "Wo Risse sich öffnen, und wie oft",
@@ -6024,7 +6024,7 @@ export const de_DE: EnTranslations = {
       "groupBody": "Bring eine Gruppe mit. Ein Riss wird nicht milder, nur weil weniger von euch hindurchgegangen sind: Nichts darin zählt, wie viele dort stehen, also ist der Rang am Portal der Rang, gegen den ihr kämpft, ob zu fünft oder allein. Der Eingang lässt dich auch allein hinein, und manche versuchen es, doch ein Riss ist auf jedem Rang Gruppeninhalt, und das macht er ab dem ersten Raum unmissverständlich klar. Deine Gruppe erhält eine eigene Kopie des Risses, sodass keine andere Gruppe in euren Lauf hineinplatzen kann. Fällst du, kannst du als Geist zurückgehen und dich selbst bergen, sobald der Kampf dort drinnen vorüber ist.",
       "levelNote": "Risse sind Endgame-Inhalt. Du musst die Höchststufe erreicht haben, Stufe {n}, um durch einen zu treten, ganz gleich welcher Rang.",
       "floorsHeading": "Ebene für Ebene hinab",
-      "floorsBody": "Ein Riss durchläuft eine Handvoll Ebenen, jede frisch erschaffen, und der Weg nach unten öffnet sich erst, wenn die Ebene mit dir fertig ist: Räume, was dort haust, löse, was sie dir versperrt hat, und der Abstieg reißt sich auf. Die letzte Ebene endet bei einem Boss. Jede Ebene trägt einen eigenen Charakter, sodass ein einziger Lauf dich aus dem Frost mitten in die Glut führen kann, und dein Chat nennt dir jede Ebene, sobald du sie erreichst. Die Anzeige auf deinem Bildschirm verrät dir, wie viele Ebenen dieser Riss hat. Manche Risse öffnen sich zu einem handgefertigten Schauplatz statt zu einem generierten Abstieg, der eine eigene, feste Länge hat.",
+      "floorsBody": "Ein Riss durchläuft eine Handvoll Ebenen, jede frisch erschaffen, und der Weg nach unten öffnet sich erst, wenn die Ebene mit dir fertig ist: Räume, was dort haust, löse, was sie dir versperrt hat, und der Abstieg reißt sich auf. Die letzte Ebene endet bei demselben Herrscher, dessen Stärke mit dem Riss wächst. Sein Ungeziefer folgt ihm durch alle Umgebungen, also rechne im letzten Kampf mit Gesellschaft. Jede Ebene trägt einen eigenen Charakter, sodass ein einziger Lauf dich aus dem Frost mitten in die Glut führen kann, und dein Chat nennt dir jede Ebene, sobald du sie erreichst. Die Anzeige auf deinem Bildschirm verrät dir, wie viele Ebenen dieser Riss hat. Manche Risse öffnen sich zu einem handgefertigten Schauplatz statt zu einem generierten Abstieg, der eine eigene, feste Länge hat.",
       "boundHeading": "Sobald Blut fließt",
       "boundBody": "Die erste Tötung, die deine Gruppe in einem Riss erzielt, bindet den Lauf fest, und dasselbe gilt für den ersten abseits des Pfades gelegenen Hort, den ihr knackt. Von diesem Moment an seid ihr an genau diese Kopie gebunden: Verlasst ihr sie aus irgendeinem Grund, führt die Rückkehr euch immer in den Lauf zurück, den ihr verlassen habt, nie in den einer anderen Gruppe und nie in einen frischen, solange der Eingang draußen in der Welt noch steht. Vor dieser ersten Tötung und vor diesem ersten Hort ist noch nichts festgelegt, sodass eine Gruppe, die sich noch sammelt, sich neu formieren und gemeinsam hineingehen kann, ohne halb begonnene Kopien zurückzulassen.",
       "raceHeading": "Das Rennen um den ersten Abschluss",
@@ -7892,6 +7892,20 @@ export const de_DE: EnTranslations = {
   },
   "sim": {
     "rift": {
+      "roachKing": {
+        "coronation": "Coronation of Filth",
+        "tributeFeast": "Tribute Feast",
+        "crown": "Roach King's Crown",
+        "crownWarning": "The hermit rises. The Roach King claims his crown!",
+        "filthWarning": "Mountain of Filth: leave the marked ground!",
+        "tributeWarning": "Tribute Feast: interrupt the channel or kill the tribute beetles!",
+        "ringWarning": "The Roach King winds up: get outside the ring!",
+        "filthDetonate": "The mountain of filth erupts!",
+        "swarmDetonate": "The royal swarm erupts!",
+        "deskSlam": "Desk Slam",
+        "mountainOfFilth": "Mountain of Filth",
+        "royalSwarm": "Royal Swarm"
+      },
       "allUnstable": "Alle Risse sind gerade instabil. Versuche es bald noch einmal.",
       "enterFloor": "Du trittst durch den Riss nach {name}.",
       "descendFloor": "Du steigst tiefer hinab in {name}.",
@@ -14980,6 +14994,15 @@ export const de_DE: EnTranslations = {
       },
       "stable_horse": {
         "name": "Stallpferd"
+      },
+      "rift_boss_asmon": {
+        "name": "Asmon, the Roach King"
+      },
+      "rift_roachling": {
+        "name": "Royal Roachling"
+      },
+      "rift_garbage_beetle": {
+        "name": "Tribute Beetle"
       },
       "rift_spawnling": {
         "name": "Riss-Brutling"

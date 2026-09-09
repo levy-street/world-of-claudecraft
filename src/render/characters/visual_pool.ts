@@ -35,6 +35,9 @@ export interface PoolableVisual {
 export function characterVisualPoolKey(
   e: Pick<Entity, 'kind' | 'templateId' | 'skin'>,
 ): string | null {
+  // This boss swaps its base rig during combat. A template-only pool key
+  // would hand the next fresh encounter a crowned corpse's transformed body.
+  if (e.kind === 'mob' && e.templateId === 'rift_boss_asmon') return null;
   if (e.kind === 'mob') return `mob:${e.templateId}`;
   if (e.kind === 'npc') return `npc:${e.templateId}:${e.skin}`;
   return null;

@@ -275,7 +275,8 @@ const MONOLITHS: MonolithRow[] = [
     // the composite is the honest size. Exact count, zero slack.
     // Minus 1 for promptModalOpen(): its modal matcher moved to
     // prompt_dialog.ts (the family home), hud.ts keeps a delegator.
-    ceiling: 18904,
+    // Rift cast labels moved to rift_cast_display_name.ts.
+    ceiling: 18884,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

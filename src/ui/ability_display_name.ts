@@ -9,14 +9,17 @@
 import { ABILITIES } from '../sim/data';
 import type { AbilityDef } from '../sim/types';
 import { tEntity } from './entity_i18n';
+import { riftCastDisplayName } from './rift_cast_display_name';
 import { localizeSimAuraName } from './sim_i18n';
 
 export function abilityDisplayName(def: AbilityDef): string {
   return tEntity({ kind: 'ability', id: def.id, field: 'name' });
 }
 
-/** Localize an ability by the English NAME a combat event carries, not its id. */
+/** Localize combat-event names and scripted rift cast ids used by target bars. */
 export function abilityDisplayNameFromSource(name: string): string {
+  const riftName = riftCastDisplayName(name);
+  if (riftName) return riftName;
   const ability = Object.values(ABILITIES).find((candidate) => candidate.name === name);
   if (ability) return abilityDisplayName(ability);
   // Boss/mob mechanic names (War Stomp, etc.) surface as a damage-log ability label but

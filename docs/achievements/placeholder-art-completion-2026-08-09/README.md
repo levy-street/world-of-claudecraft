@@ -64,7 +64,11 @@ real source or output change, the real renderer must run with `PORTRAIT_RECEIPT=
 that receipt must be passed to
 `node scripts/build_mob_portrait_source_manifest.mjs --write --receipt <path>`.
 The renderer and ledger share `scripts/lib/mob_portrait_jobs.mjs`; partial, stale, or
-mismatched receipts are rejected, and a renderer-contract change requires all 230 rows.
+mismatched receipts are rejected, and a renderer-contract change requires every live row.
+The 2026-09-09 Asmon animation refresh rendered all 245 live portraits after the
+final king landing correction; the guarded receipt accepted the source ledger, including Asmon,
+the Royal Roachling, and the Tribute Beetle. Their final portraits were visually
+reviewed, and the enclosing `accepted-art.json` pins the refreshed ledger bytes.
 Absolute paths into `/Users/fernando/.codex/generated_images/` and the worktree are
 generation-time evidence, not runtime dependencies. High-resolution masters and review
 sheets remain in the ignored workspace, while accepted shipping assets live under

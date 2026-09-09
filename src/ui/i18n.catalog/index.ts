@@ -884,6 +884,20 @@ export const en = {
     // as sim.delve below: the sim emits English, sim_i18n.ts re-localizes. The
     // {name} value is the generated floor name (spliced verbatim, like build names).
     rift: {
+      roachKing: {
+        coronation: 'Coronation of Filth',
+        tributeFeast: 'Tribute Feast',
+        crown: "Roach King's Crown",
+        crownWarning: 'The hermit rises. The Roach King claims his crown!',
+        filthWarning: 'Mountain of Filth: leave the marked ground!',
+        tributeWarning: 'Tribute Feast: interrupt the channel or kill the tribute beetles!',
+        ringWarning: 'The Roach King winds up: get outside the ring!',
+        filthDetonate: 'The mountain of filth erupts!',
+        swarmDetonate: 'The royal swarm erupts!',
+        deskSlam: 'Desk Slam',
+        mountainOfFilth: 'Mountain of Filth',
+        royalSwarm: 'Royal Swarm',
+      },
       allUnstable: 'All rifts are unstable right now. Try again soon.',
       enterFloor: 'You step through the rift into {name}.',
       descendFloor: 'You descend deeper into {name}.',

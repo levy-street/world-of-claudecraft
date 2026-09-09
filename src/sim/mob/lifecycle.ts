@@ -36,6 +36,7 @@ import * as deedsMod from '../deeds';
 import { resetIgnivarEncounter } from '../encounters/ignivar';
 import { resetVarkhulEncounter, VARKHUL_BOSS_ID } from '../encounters/varkhul';
 import { releasePin } from '../instances/instance_combat_hold';
+import { resetRoachKing } from '../rift/roach_king';
 import type { SimContext } from '../sim_context';
 import { clearThreat } from '../threat';
 import { dist2d, type Entity, IGNIVAR_BOSS_ID, NYTHRAXIS_BOSS_ID } from '../types';
@@ -48,6 +49,7 @@ import { resetRiftMechanicWindups } from './rift_escape_window';
 const PACK_FRENZY_AURA_ID = 'pack_frenzy'; // attack-speed buff granted to surviving packmates
 
 export function respawnMob(ctx: SimContext, mob: Entity): void {
+  resetRoachKing(ctx, mob);
   if (mob.ownerId !== null) {
     ctx.despawnPersistentPet(mob);
     return;

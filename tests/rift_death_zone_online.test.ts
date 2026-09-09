@@ -24,6 +24,8 @@ vi.mock('../server/db', () => ({
 
 import { type ClientSession, GameServer } from '../server/game';
 import { ClientWorld } from '../src/net/online';
+import { clearRiftBossDeathZones } from '../src/sim/rift/runs';
+import type { SimContext } from '../src/sim/sim_context';
 import type { Entity, SimEvent } from '../src/sim/types';
 
 interface FakeClient {
@@ -72,6 +74,56 @@ function bareClient(): ClientWorld {
 }
 
 describe('rift boss death zone wire mirror', () => {
+  it.each([undefined, Number.NaN, Number.POSITIVE_INFINITY, -1, 1, '5'])(
+    'source-only replay falls back for absent or invalid total %s',
+    (totalSecs) => {
+      const client = bareClient();
+      (client as any).activeBossDeathZones = [];
+      (client as any).applyRiftDeathZoneSpawnEvent({
+        type: 'riftDeathZoneSpawn',
+        x: 0,
+        z: 0,
+        radius: 7,
+        durationSecs: 2,
+        totalSecs,
+      });
+      expect(client.riftBossDeathZones()[0].total).toBe(2);
+    },
+  );
+
+  it('source-only replay preserves the retained online warning total and elapsed sweep', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Alpha');
+    server.sim.enterRift(42, 28, session.pid);
+    const ctx = (server.sim as unknown as { ctx: SimContext }).ctx;
+    const inst = ctx.riftInstances.find((candidate) => candidate.partyKey !== null)!;
+    const player = ctx.entities.get(session.pid)!;
+    inst.bossDeathZones = [
+      { x: player.pos.x, z: player.pos.z, radius: 8, remaining: 1, total: 5, sourceId: 11 },
+      { x: player.pos.x + 10, z: player.pos.z, radius: 7, remaining: 2, total: 5, sourceId: 22 },
+    ];
+    const events: SimEvent[] = [];
+    ctx.emit = (event) => events.push(event);
+    clearRiftBossDeathZones(ctx, inst, 11);
+    clearSent(fc);
+    route(server, events);
+    const replay = deliveredEvents(fc).find((event) => event.type === 'riftDeathZoneSpawn')!;
+    const client = bareClient();
+    (client as any).activeBossDeathZones = [];
+    const clock = vi.spyOn(performance, 'now').mockReturnValue(1000);
+    try {
+      (client as any).applyRiftDeathZoneSpawnEvent(replay);
+      const mirrored = client.riftBossDeathZones()[0];
+      expect(mirrored).toMatchObject({ radius: 7, remaining: 2, total: 5 });
+      expect(1 - mirrored.remaining / mirrored.total).toBeCloseTo(0.6);
+      expect(mirrored.total).toBe(inst.bossDeathZones[0].total);
+      expect(mirrored.remaining).toBe(inst.bossDeathZones[0].remaining);
+    } finally {
+      clock.mockRestore();
+    }
+  });
+
   it('riftDeathZoneSpawn event reaches a nearby player and counts down via riftBossDeathZones()', () => {
     const server = new GameServer();
     const fc = fakeWs();

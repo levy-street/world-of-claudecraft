@@ -210,6 +210,7 @@ import { createNativeAttestationProof } from './native_attestation';
 import { createNetPipelineStats, type NetPipelineStats } from './net_pipeline_stats';
 import { optimisticQuestState } from './quest_state_optimistic';
 import { isTransientReconnectRejection, isTransientTimeoutRejection } from './reconnect_policy';
+import { appendRiftDeathZone, type MirroredRiftDeathZone } from './rift_death_zone_wire';
 import { isInputSendBackpressured } from './send_backpressure';
 import { snapshotAlpha } from './snapshot_alpha';
 import {
@@ -1464,13 +1465,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // scale). riftBossDeathZones() converts these to RiftBossDeathZoneView on demand.
   // Cleared on riftState(active:false) so stale zones from a previous run never
   // bleed into a new floor. Late joiners missing an in-flight zone are accepted.
-  private activeBossDeathZones: Array<{
-    x: number;
-    z: number;
-    radius: number;
-    expiresAtMs: number;
-    totalSecs: number;
-  }> = [];
+  private activeBossDeathZones: MirroredRiftDeathZone[] = [];
   // Lockpicking: rebuilt from the lockpick* events (there is no snapshot field).
   // Holds only the fog-windowed cells the server discloses.
   lockpickState: LockpickView | null = null;
@@ -5285,19 +5280,11 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // tick dependency needed. Expired entries are lazily dropped by the reader.
   private applyRiftDeathZoneSpawnEvent(ev: SimEvent): void {
     if (ev.type !== 'riftDeathZoneSpawn') return;
-    const now = performance.now();
-    // Drop expired rings HERE, not just in the reader's return value: the
-    // reader filters its output but left the backing array to grow for the
-    // whole floor, a per-frame walk over dead entries on a long boss fight.
-    // Spawn cadence bounds the cost of the filter itself.
-    this.activeBossDeathZones = this.activeBossDeathZones.filter((z) => z.expiresAtMs > now);
-    this.activeBossDeathZones.push({
-      x: ev.x,
-      z: ev.z,
-      radius: ev.radius,
-      expiresAtMs: now + ev.durationSecs * 1000,
-      totalSecs: ev.durationSecs,
-    });
+    this.activeBossDeathZones = appendRiftDeathZone(
+      this.activeBossDeathZones,
+      ev,
+      performance.now(),
+    );
   }
 
   // The sim cancelled every pending death zone before its fuse ran out (boss

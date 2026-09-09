@@ -172,6 +172,7 @@ function requiredClipNames(clips: ClipMap): string[] {
     // cast-exit play-out entries name clips: a typo would silently disable
     // the recovery and bring the snap-to-idle back
     ...(clips.castPlayOut ?? []),
+    ...(clips.castOnce ?? []),
   ].filter((name): name is string => !!name);
 }
 
@@ -210,6 +211,7 @@ const COVERED_CLIP_FIELDS = new Set<keyof ClipMap>([
   'castTimeScaleByAbility',
   'castHoldPointSeconds',
   'castPlayOut',
+  'castOnce',
   'attackByHand',
   'emote',
 ]);

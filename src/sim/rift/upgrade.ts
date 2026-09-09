@@ -197,7 +197,11 @@ export function validateRiftUpgrade(
       synopsis,
       lore,
       floors,
-      boss: { templateId: bossTemplateId, name: bossName, concept: bossConcept },
+      boss: {
+        templateId: 'rift_boss_asmon',
+        name: RIFT_MOBS.rift_boss_asmon.name,
+        concept: bossConcept,
+      },
       rewards: {
         lootMultiplier,
         craftingMaterialBias,
@@ -249,8 +253,8 @@ export function applyRiftUpgrade(
     if (spawn.boss) {
       return {
         ...spawn,
-        templateId: manifest.boss.templateId,
-        name: manifest.boss.name,
+        templateId: 'rift_boss_asmon',
+        name: RIFT_MOBS.rift_boss_asmon.name,
       };
     }
     if (spawn.miniboss || trash.length === 0) return { ...spawn };

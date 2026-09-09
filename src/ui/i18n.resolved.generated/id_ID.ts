@@ -6012,7 +6012,7 @@ export const id_ID: EnTranslations = {
     },
     "riftsPage": {
       "heading": "Rift",
-      "intro": "Sebuah rift adalah robekan pada dunia itu sendiri, bukan pintu yang kamu datangi. Melangkahlah melalui satu dan kamu mendapatkan jalan turun yang belum pernah dilalui siapa pun: lantai-lantainya, monster-monsternya, dan sosok yang menunggu di dasarnya semua dibangun baru khusus untuk rift itu saja, sehingga peringkat yang sama tidak pernah berjalan dengan cara yang sama dua kali.",
+      "intro": "Sebuah rift adalah robekan pada dunia itu sendiri, bukan pintu yang kamu datangi. Melangkahlah melalui satu dan kamu mendapatkan jalan turun yang belum pernah dilalui siapa pun: lantai dan penghuninya berubah di setiap rift, sementara satu penguasa yang sama menguasai setiap pertempuran terakhir. Peringkat yang sama pun masih bisa membawamu melalui jalan turun yang berbeda setiap kali.",
       "whatHeading": "Apa itu rift",
       "whatBody": "Dungeon adalah tempat. Ia selalu berada di sana, dan kamu mempelajarinya sampai hafal setiap sudutnya. Delve adalah jalan turun pribadi yang singkat, yang kamu mulai dari sebuah papan, dirancang untuk satu atau dua orang. Rift bukan keduanya: ia terbuka dengan sendirinya, di luar sana di dunia, tanpa peringatan, dan segala sesuatu di dalamnya dihasilkan tepat pada saat itu terjadi. Tak seorang pun punya rute untuk diberikan kepadamu, karena belum ada yang pernah menjelajahi rift ini. Ia bersifat instans seperti dua yang lain, sehingga apa yang kamu temukan di dalamnya hanya menjadi milikmu dan kelompokmu, tetapi ia satu-satunya konten instans dalam permainan ini yang mendatangimu sendiri alih-alih menunggu untuk ditemukan.",
       "openHeading": "Di mana rift terbuka, dan seberapa sering",
@@ -6024,7 +6024,7 @@ export const id_ID: EnTranslations = {
       "groupBody": "Bawalah kelompok. Sebuah rift tidak melunak hanya karena lebih sedikit dari kalian yang melangkah masuk: tidak ada apa pun di dalamnya yang menghitung berapa banyak orang yang berdiri di sana, jadi peringkat pada portalnya adalah peringkat yang kamu hadapi, entah itu berlima atau sendirian. Pintunya akan membiarkanmu masuk sendirian, dan orang-orang memang mencobanya, tetapi sebuah rift adalah konten kelompok pada setiap peringkat, dan ia jujur soal itu sejak ruangan pertama. Party-mu mendapat salinan rift-nya sendiri, jadi tidak ada kelompok lain yang bisa menyerobot masuk ke dalam larimu. Jika kamu tumbang, kamu bisa berjalan kembali masuk sebagai hantu dan membangkitkan dirimu begitu pertarungan di dalam sudah berhenti.",
       "levelNote": "Rift adalah konten endgame. Kamu harus berada di level maks, level {n}, untuk bisa melangkah melaluinya, pada peringkat apa pun.",
       "floorsHeading": "Turun melewati lantai-lantainya",
-      "floorsBody": "Sebuah rift memiliki beberapa lantai, masing-masing dibangun baru, dan jalan turunnya tidak terbuka sampai lantai itu selesai denganmu: bersihkan apa yang hidup di sana, pecahkan apa pun yang mengunci jalanmu, dan jalan turunnya pun terkoyak terbuka. Lantai terakhir berakhir pada seorang bos. Setiap lantai punya wataknya sendiri, jadi satu lari saja bisa membawamu keluar dari salju dan masuk ke bara api, dan obrolanmu menyebut nama tiap lantai begitu kamu tiba di sana. Pelacak di layarmu adalah tempat kamu mengetahui berapa banyak lantai yang dimiliki rift ini. Beberapa rift membuka ke sebuah rangkaian buatan tangan alih-alih jalan turun yang dihasilkan otomatis, yang berjalan pada panjang tetapnya sendiri.",
+      "floorsBody": "Sebuah rift memiliki beberapa lantai, masing-masing dibangun baru, dan jalan turunnya tidak terbuka sampai lantai itu selesai denganmu: bersihkan apa yang hidup di sana, pecahkan apa pun yang mengunci jalanmu, dan jalan turunnya pun terkoyak terbuka. Lantai terakhir berakhir pada penguasa yang sama, yang kekuatannya meningkat bersama rift. Gerombolan hamanya mengikuti ke berbagai lingkungan, jadi bersiaplah menghadapi pengikutnya dalam pertempuran terakhir. Setiap lantai punya wataknya sendiri, jadi satu lari saja bisa membawamu keluar dari salju dan masuk ke bara api, dan obrolanmu menyebut nama tiap lantai begitu kamu tiba di sana. Pelacak di layarmu adalah tempat kamu mengetahui berapa banyak lantai yang dimiliki rift ini. Beberapa rift membuka ke sebuah rangkaian buatan tangan alih-alih jalan turun yang dihasilkan otomatis, yang berjalan pada panjang tetapnya sendiri.",
       "boundHeading": "Begitu kamu menumpahkan darah pertama",
       "boundBody": "Bunuhan pertama yang diraih kelompokmu di dalam sebuah rift mengunci larianmu, begitu pula peti tersembunyi pertama yang kamu bongkar di luar jalur utama. Sejak saat itu kamu terikat pada salinan rift itu: keluar karena alasan apa pun dan kembali akan menempatkanmu di lari yang sama yang kamu tinggalkan, tidak pernah di lari kelompok lain dan tidak pernah di lari yang baru, selama pintu masuknya di dunia luar masih berdiri. Sebelum bunuhan pertama itu, dan sebelum peti pertama itu, belum ada yang terkunci, sehingga kelompok yang masih berkumpul bisa menyusun ulang dan masuk bersama tanpa meninggalkan salinan-salinan setengah jalan di belakang mereka.",
       "raceHeading": "Balapan menuju penuntasan pertama",
@@ -7892,6 +7892,20 @@ export const id_ID: EnTranslations = {
   },
   "sim": {
     "rift": {
+      "roachKing": {
+        "coronation": "Coronation of Filth",
+        "tributeFeast": "Tribute Feast",
+        "crown": "Roach King's Crown",
+        "crownWarning": "The hermit rises. The Roach King claims his crown!",
+        "filthWarning": "Mountain of Filth: leave the marked ground!",
+        "tributeWarning": "Tribute Feast: interrupt the channel or kill the tribute beetles!",
+        "ringWarning": "The Roach King winds up: get outside the ring!",
+        "filthDetonate": "The mountain of filth erupts!",
+        "swarmDetonate": "The royal swarm erupts!",
+        "deskSlam": "Desk Slam",
+        "mountainOfFilth": "Mountain of Filth",
+        "royalSwarm": "Royal Swarm"
+      },
       "allUnstable": "Semua rift sedang tidak stabil saat ini. Coba lagi nanti.",
       "enterFloor": "Kamu melangkah melalui rift menuju {name}.",
       "descendFloor": "Kamu turun lebih dalam ke {name}.",
@@ -14980,6 +14994,15 @@ export const id_ID: EnTranslations = {
       },
       "stable_horse": {
         "name": "Kuda Kandang"
+      },
+      "rift_boss_asmon": {
+        "name": "Asmon, the Roach King"
+      },
+      "rift_roachling": {
+        "name": "Royal Roachling"
+      },
+      "rift_garbage_beetle": {
+        "name": "Tribute Beetle"
       },
       "rift_spawnling": {
         "name": "Anak Rift"

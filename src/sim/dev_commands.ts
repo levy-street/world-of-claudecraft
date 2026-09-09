@@ -22,6 +22,7 @@ import { completeAllQuestsForDev } from './quests/dev_quest_commands';
 import { riftFx } from './rift/fx';
 import { RIFT_RANK_BASE_LEVEL, riftRankForBaseLevel } from './rift/ranks';
 import { generateRiftFloor, generateRiftPlan, isSetPieceSeed } from './rift/rift_gen';
+import { handleRoachKingDevCommand } from './rift/roach_king_dev';
 import type { SentChat } from './sim';
 import type { SimContext } from './sim_context';
 import { bgQueueJoin, bgQueueSize, devEndBg, devStartBg } from './social/battleground';
@@ -140,6 +141,7 @@ export function handleDevChat(
   raw: string,
   pid: number,
 ): SentChat | null | undefined {
+  if (handleRoachKingDevCommand(ctx, raw, pid)) return null;
   const levelMatch = /^\/(?:dev\s+level|devlevel)\s+(\d+)\s*$/i.exec(raw);
   if (levelMatch) {
     const level = Number(levelMatch[1]);

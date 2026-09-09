@@ -747,55 +747,54 @@ export const RELIQUARY_HEROIC_GEAR = {
 // its doors are authored. Each row follows the 13a every-door standard: it
 // names EVERY mob whose static loot really carries the item (theme wiring
 // src/sim/content/rift/themes.ts, loot rows src/sim/content/rift/mobs.ts):
-// the theme boss's fat roll first, then its trash's slim ones in mobs.ts
+// the Roach King's roll first, then the theme trash's slim ones in mobs.ts
 // table order. graskbreaker_girdle has one trash carrier (the Warcamp theme
 // shares rift_marrow_troll with Boneyard, whose loot stays bonelord_mantle),
-// pactbound_vestments spans both citadel bosses plus both citadel trash, and
-// pitlords_cleaver is the pit lord's alone.
+// pactbound_vestments also spans both citadel trash, and pitlords_cleaver
+// now belongs to the Roach King. Retired boss templates are not live sources.
 const RIFT_RARE_SOURCES = {
   hoarfrost_edge: [
-    fromBoss('rift_boss_frost'),
+    fromBoss('rift_boss_asmon'),
     fromBoss('rift_frost_revenant'),
     fromBoss('rift_rime_elemental'),
   ],
   emberforge_gauntlets: [
-    fromBoss('rift_boss_ember'),
+    fromBoss('rift_boss_asmon'),
     fromBoss('rift_ember_fiend'),
     fromBoss('rift_magma_brute'),
   ],
   broodmother_carapace: [
-    fromBoss('rift_boss_venom'),
+    fromBoss('rift_boss_asmon'),
     fromBoss('rift_venom_weaver'),
     fromBoss('rift_thornback'),
   ],
   bonelord_mantle: [
-    fromBoss('rift_boss_necro'),
+    fromBoss('rift_boss_asmon'),
     fromBoss('rift_boneclad'),
     fromBoss('rift_marrow_troll'),
   ],
-  graskbreaker_girdle: [fromBoss('rift_boss_brute'), fromBoss('rift_stone_ogre')],
+  graskbreaker_girdle: [fromBoss('rift_boss_asmon'), fromBoss('rift_stone_ogre')],
   voidscar_handwraps: [
-    fromBoss('rift_boss_arcane'),
+    fromBoss('rift_boss_asmon'),
     fromBoss('rift_void_acolyte'),
     fromBoss('rift_dread_stalker'),
   ],
   stormscale_treads: [
-    fromBoss('rift_boss_storm'),
+    fromBoss('rift_boss_asmon'),
     fromBoss('rift_storm_caller'),
     fromBoss('rift_stormscale'),
   ],
   abyssal_loop: [
-    fromBoss('rift_boss_tide'),
+    fromBoss('rift_boss_asmon'),
     fromBoss('rift_tide_thrall'),
     fromBoss('rift_deep_lurker'),
   ],
   pactbound_vestments: [
-    fromBoss('rift_boss_ritualist'),
-    fromBoss('rift_boss_pitlord'),
+    fromBoss('rift_boss_asmon'),
     fromBoss('rift_hellguard'),
     fromBoss('rift_pact_acolyte'),
   ],
-  pitlords_cleaver: fromBoss('rift_boss_pitlord'),
+  pitlords_cleaver: fromBoss('rift_boss_asmon'),
 } as const satisfies Record<(typeof RIFT_RARE_ITEM_IDS)[number], ReliquarySourceHints>;
 
 // ---------------------------------------------------------------------------

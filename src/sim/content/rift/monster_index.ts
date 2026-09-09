@@ -116,6 +116,9 @@ function abilitiesFor(template: MobTemplate): string[] {
 }
 
 function themesFor(templateId: string): string[] {
+  if (['rift_boss_asmon', 'rift_roachling', 'rift_garbage_beetle'].includes(templateId)) {
+    return Object.keys(THEME_ROSTERS);
+  }
   return Object.entries(THEME_ROSTERS)
     .filter(([, ids]) => ids.includes(templateId))
     .map(([theme]) => theme);
@@ -165,6 +168,7 @@ export interface RiftMonsterQuery {
 
 export function queryRiftMonsters(query: RiftMonsterQuery): RiftMonsterIndexEntry[] {
   return RIFT_MONSTER_INDEX.filter((entry) => {
+    if (entry.id.startsWith('rift_boss_') && entry.id !== 'rift_boss_asmon') return false;
     if (query.themeId && !entry.themes.includes(query.themeId)) return false;
     if (query.biome && !entry.biomes.includes(query.biome)) return false;
     if (query.role && entry.role !== query.role) return false;

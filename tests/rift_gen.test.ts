@@ -145,14 +145,14 @@ describe('rift generator: variety', () => {
     }
   });
 
-  it('uses varied boss types across seeds', () => {
+  it('uses Asmon across every seed', () => {
     const bosses = new Set<string>();
     for (let s = 0; s < 200; s++) {
       const n = riftFloorCount(s);
       const boss = generateRiftFloor(s, 15, n - 1).spawns.find((sp) => sp.boss);
       if (boss) bosses.add(boss.templateId);
     }
-    expect(bosses.size).toBeGreaterThan(4);
+    expect([...bosses]).toEqual(['rift_boss_asmon']);
   });
 });
 

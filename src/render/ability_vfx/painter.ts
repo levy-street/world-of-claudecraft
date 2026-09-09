@@ -1191,7 +1191,7 @@ export class AbilityVfx {
         const full = abilityVfxFullSpecFor(e.castingAbility);
         const style = full?.windupStyle ?? 'orb';
         glowColor = rimColorOf(full, spec);
-        glowStrength = 1.2 * (full?.power ?? 1);
+        glowStrength = 1.2 * (full?.power ?? 1) * (full?.bodyGlowScale ?? 1);
         // the local player is priority: guaranteed a windup slot even when
         // a crowded hub saturates the pool
         const windupStarted = fx.windup(
@@ -1286,7 +1286,10 @@ export class AbilityVfx {
       ) {
         if (isTransformativeBuff(full)) {
           const strength =
-            TRANSFORMATIVE_RIM_SCALE * (full.buff?.shellDur ? 2 : 1.3) * (full.power ?? 1);
+            TRANSFORMATIVE_RIM_SCALE *
+            (full.buff?.shellDur ? 2 : 1.3) *
+            (full.power ?? 1) *
+            (full.bodyGlowScale ?? 1);
           if (strength > glowStrength) {
             glowStrength = strength;
             glowColor = rimColorOf(full, spec);
