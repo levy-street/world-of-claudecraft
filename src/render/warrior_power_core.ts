@@ -42,7 +42,7 @@ export interface WarriorPowerPiece {
   color: number;
 }
 export const WARRIOR_POWER_COUNTS = [5, 6] as const;
-const STONE_TINT = [0xe1d2b8, 0xe2b5ac, 0xbad3e3];
+const STONE_TINT = [0xc6cecc, 0xd2bdbe, 0xbbc9d2];
 const BLOOD_TINT = [0xff9a81, 0xff6471, 0xe78995];
 
 /** Sparse rooted monoliths versus a torn six-hook crown. No body scaling.

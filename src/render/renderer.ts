@@ -22,6 +22,7 @@ import {
   delveOrigin,
   delveSlotAt,
   INSTANCE_SLOT_COUNT,
+  ITEMS,
   instanceOrigin,
   isArenaPos,
   isBgPos,
@@ -2975,9 +2976,7 @@ export class Renderer {
       this.camera,
       vfxAnchor,
       (x, z) => groundHeight(x, z, this.sim.cfg.seed),
-      // the DISPLAYED facing, not e.facing: the view group carries the smoothed
-      // yaw actually on screen, so a stationary spirit lines up with the body it
-      // is rising out of instead of with a pose one frame ahead of the draw
+      // The displayed yaw keeps stationary spirits aligned with the smoothed body.
       (id) => this.views.get(id)?.group.rotation.y ?? this.sim.entities.get(id)?.facing ?? null,
       (id, hand) => {
         const root = this.views.get(id)?.group;
@@ -2986,6 +2985,7 @@ export class Renderer {
       (id, hand, out) => { const view = this.views.get(id), root = view ? this.activeVisual(view)?.root : null; return root ? sampleHandAnchor(root, hand, out) : false; },
       (texture) => this.gpuReadyTextures.has(texture),
       (id, piece, out) => { const view = this.views.get(id), root = view ? this.activeVisual(view)?.root : null; return root ? sampleWarriorPowerBone(root, piece, out) : false; },
+      (id, hand) => { const entity = this.sim.entities.get(id), itemId = hand === 0 ? entity?.mainhandItemId : entity?.offhandItemId; return !!itemId && ITEMS[itemId]?.kind === 'weapon'; },
     );
     this.abilityVfxFx.setViewportScale(
       this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(),

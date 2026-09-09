@@ -25,9 +25,10 @@ export function warriorAvatarChestShape(): THREE.BufferGeometry {
   // whose sidewalls become rectangular panels from the gameplay camera.
   const shoulders = [-1, 1].map((side) =>
     warriorAvatarShape()
-      .scale(0.55, 0.6, 0.7)
+      .scale(0.9, 0.32, 0.72)
       .rotateY(side * 0.45)
-      .translate(side * 0.9, 0.17, -0.38),
+      .rotateZ(-side * 0.38)
+      .translate(side * 0.66, 0.08, -0.1),
   );
   const geometry = mergeGeometries([chest, ...shoulders]);
   chest.dispose();
@@ -129,7 +130,7 @@ export function warriorAvatarShape(): THREE.BufferGeometry {
   const p: number[] = [],
     colors: number[] = [],
     uv: number[] = [];
-  const palette = [0xb6b1a0, 0x8e948d, 0xc0b59c, 0x939d99, 0xa4a492, 0xc3bca8, 0x8e9790, 0xb0b4a3];
+  const palette = [0xa7b2bb, 0x819099, 0xbec8cc, 0x929fa7, 0xa1acb3, 0xc1ccd1, 0x84939c, 0xafbbc2];
   const color = new THREE.Color();
   function tri(a: THREE.Vector3, b: THREE.Vector3, c: THREE.Vector3, tint: number) {
     color.setHex(tint);
@@ -147,7 +148,8 @@ export function warriorAvatarShape(): THREE.BufferGeometry {
         b = vertices[ring][next],
         c = vertices[ring + 1][next],
         d = vertices[ring + 1][side];
-      const tint = ring === 2 || ring === 3 ? 0x596962 : palette[(side + ring) % palette.length];
+      const tint =
+        ring === 2 ? 0xd3e1e6 : ring === 3 ? 0x536672 : palette[(side + ring) % palette.length];
       tri(a, c, b, tint);
       tri(a, d, c, tint);
     }

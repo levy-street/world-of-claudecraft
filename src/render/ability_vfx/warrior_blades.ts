@@ -64,7 +64,7 @@ export function drawWarriorBlade(host: SequencerHost, slot: SeqSlot, beat: numbe
   const count = slot.tier > 0 ? 1 : 3;
   for (let strand = 0; strand < count; strand++) {
     host.pathRibbon(
-      strand === 0 ? (style.blood ? 0xff9caa : 0xf1f6ff) : style.blood ? 0xb31831 : 0xbc8666,
+      strand === 0 ? (style.blood ? 0xff9caa : 0xf1f6ff) : style.blood ? 0xb31831 : 0x8e9ca5,
       (strand === 0 ? 0.19 : 0.1) * (style.heavy ? 1.4 : 1),
       duration,
       (points) => {
@@ -94,7 +94,7 @@ export function drawWarriorBlade(host: SequencerHost, slot: SeqSlot, beat: numbe
     scale,
     style.height,
     style.blood ? 0x8f1028 : 0x8296a6,
-    style.blood ? 0xf24e59 : 0xd6b19a,
+    style.blood ? 0xf24e59 : 0xdde7ed,
     style.blood ? 'blood_cut' : (style.shape ?? 'steel_cut'),
     facing,
     duration,
@@ -120,7 +120,7 @@ export function drawWarriorBlade(host: SequencerHost, slot: SeqSlot, beat: numbe
         at.x,
         at.y,
         at.z,
-        0xe4c7a5,
+        0xd7e2e8,
         style.heavy ? 24 : 16,
         style.heavy ? 1.5 : 1.05,
         'sparks',
@@ -152,7 +152,7 @@ export function drawWarriorBlade(host: SequencerHost, slot: SeqSlot, beat: numbe
           at.x + dz * side * 0.22,
           at.y + 0.35,
           at.z - dx * side * 0.22,
-          0xd8aa80,
+          0xc2d0da,
           6,
           1.25,
           dx + dz * side * 0.4,

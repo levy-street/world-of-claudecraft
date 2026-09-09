@@ -153,8 +153,12 @@ it('samples independent rotated terrain grids once per pressure birth', () => {
   ) as THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial>;
   const grid = mesh.material.uniforms.uPressureGround.value as Float32Array;
   expect(grid[12]).toBeCloseTo(2);
-  expect(grid[14]).toBeCloseTo(0.8);
+  expect(grid[14]).toBeCloseTo(-0.2);
   expect(grid[22]).toBeCloseTo(4);
+  // The rotated grid covers the full widened compression front, including its open ends.
+  const sampledZ = ground.mock.calls.map((call) => call[1]);
+  expect(Math.min(...sampledZ)).toBeCloseTo(-16);
+  expect(Math.max(...sampledZ)).toBeCloseTo(28);
   const samples = ground.mock.calls.length;
   crests.update(0.2, false);
   expect(ground).toHaveBeenCalledTimes(samples);
@@ -163,7 +167,7 @@ it('samples independent rotated terrain grids once per pressure birth', () => {
     (child) => child.name === 'signatureCrest' && child.visible,
   )[1] as typeof mesh;
   expect(other.material.uniforms.uPressureGround.value).not.toBe(grid);
-  expect(grid[14]).toBeCloseTo(0.8);
+  expect(grid[14]).toBeCloseTo(-0.2);
   crests.dispose();
 });
 
@@ -207,16 +211,23 @@ it('keeps a full-size directed primary silhouette when its sculpture is cold', (
   drawWarriorShout(host, slot, 0);
   const primary = vi.mocked(host.pathRibbon).mock.calls.filter((call) => call[7] === 1);
   expect(primary).toHaveLength(3);
+  let previousFront = 0;
   for (const call of primary) {
     const points = Array.from({ length: 24 }, () => new THREE.Vector3());
     call[3](points);
-    expect(points[0].x).toBe(0);
-    // The slowing rake originates at the ankles and follows sloping terrain.
-    expect(points[0].y).toBeCloseTo(0.146, 12);
-    expect(points[0].z).toBe(0);
-    expect(points.at(-1)!.z).toBeCloseTo(22.08);
+    // Compression crosses the direction of travel. Its open ends lie on
+    // opposite sides, unlike the old longitudinal liquid plumes.
+    expect(points[0].x).toBeLessThan(-4);
+    expect(points.at(-1)!.x).toBeGreaterThan(4);
+    expect(points[0].x).toBeCloseTo(-points.at(-1)!.x, 10);
+    expect(points[0].z).toBeCloseTo(points.at(-1)!.z, 10);
+    expect(points[0].y - host.groundYAt(points[0].x, points[0].z)).toBeCloseTo(0.146, 12);
+    const front = Math.max(...points.map((p) => p.z));
+    expect(front).toBeGreaterThan(previousFront + 4);
+    previousFront = front;
     expect(points.every((p) => p.y >= host.groundYAt(p.x, p.z))).toBe(true);
   }
+  expect(previousFront).toBeGreaterThan(22.08);
   expect(crests.preparation.ready('piercing_pressure')).toBe(false);
   crests.dispose();
 });

@@ -80,6 +80,14 @@ interface ProvenSafeBase {
 /** Bases that are non-negative by provenance rather than by syntax. */
 const PROVEN_SAFE_BASES: ProvenSafeBase[] = [
   {
+    file: 'src/render/ability_vfx/warrior_rage_material.ts',
+    base: 'rageTip',
+    sites: 1,
+    anchor:
+      /float rageTip=clamp\(vRagePosition\.y\/1\.9,0\.,1\.\);(?:(?!rageTip\s*(?:[+*/-]?=|\+\+|--))[\s\S])*?pow\(rageTip,2\.\)/,
+    why: 'rageTip is clamped to [0, 1] and is not reassigned before its single pow() use',
+  },
+  {
     file: 'src/render/weapon_vfx.ts',
     base: 'w',
     sites: 1,
@@ -124,6 +132,7 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/battleground_ward.ts': 1,
   'scripts/asset_pipeline/weapon_vfx.js': 4,
   'src/render/ability_vfx/rings.ts': 1,
+  'src/render/ability_vfx/warrior_rage_material.ts': 1,
   'src/render/ability_vfx/shells.ts': 1,
   'src/render/ability_vfx/elemental_forms.ts': 6,
   'src/render/ability_vfx/baked_impact_layers.ts': 2,

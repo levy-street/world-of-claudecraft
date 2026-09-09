@@ -8,7 +8,6 @@ const EMPTY_HANDS = new Set([
   'pack_rally',
   'venom_dart',
   'melting_acid',
-  'pummel',
   'storm_bolt',
   'pack_command',
   'unleash_beast',

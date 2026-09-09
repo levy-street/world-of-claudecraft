@@ -480,11 +480,11 @@ const performances = [
     'Warrior_Bladed_Gyre',
     [
       [0, idle],
-      [0.085, bladePose(4, 0.54, [0, -0.025, 0.02], 0, 0)],
-      [0.15, bladePose(4, 0.46, [0, -0.025, 0.02], 0, 0)],
-      [0.18, bladePose(4, 0.5, [0, -0.025, 0.02], 0, 0)],
-      [0.29, bladePose(4, 0.54, [0, -0.025, 0.02], 0, 0)],
-      [0.46, bladePose(4, 1.2, [0, -0.025, 0.02], 0, 0)],
+      [0.085, bladePose(5, 0.1, [0, -0.035, 0], -18, -3, 0, true)],
+      [0.15, openAvatarArms(bladePose(5, 0.24, [0, -0.025, 0], 0, 3, 0, true), 1)],
+      [0.29, openAvatarArms(bladePose(5, 0.24, [0, -0.025, 0], 0, 3, 0, true), 1)],
+      [0.46, openAvatarArms(bladePose(5, 0.24, [0, -0.025, 0], 0, 3, 0, true), 1)],
+      [0.56, bladePose(5, 0.5, [0, -0.02, 0], 12, 3, 0, true)],
       [0.72, idle],
     ],
   ],
@@ -713,6 +713,18 @@ for (const [name, beats] of performances) {
       let pose = plantFeet(
         new Map(keys.map((key) => [key, blendValue(key, from.get(key), to.get(key), weight)])),
       );
+      if (name === 'Warrior_Bladed_Gyre') {
+        // Bake the complete pivot into the native root after solving the
+        // local stance. Translation stays fixed; both hands and feet turn
+        // with the fighter, and recovery returns to the exact starting yaw.
+        const time = start + (end - start) * t;
+        const phase = Math.min(1, Math.max(0, (time - 0.085) / 0.475));
+        const spin = new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), phase * Math.PI * 2);
+        pose.set(
+          'root|rotation',
+          spin.multiply(new Quaternion().fromArray(pose.get('root|rotation'))).toArray(),
+        );
+      }
       if (name === 'Warrior_Breachmaker' || name === 'Warrior_Sword_Guard') {
         const time = start + (end - start) * t;
         const blend = Math.min(

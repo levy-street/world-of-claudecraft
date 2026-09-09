@@ -2714,6 +2714,7 @@ export class CharacterVisual {
     }
     this.rebuildCasters();
     this.applyVisualMaterials();
+    if (this.weaponAuraSanguine) this.rebuildWeaponAura();
     return payloads;
   }
 
@@ -2896,7 +2897,7 @@ export class CharacterVisual {
 
     // Structural channel: Stonebound sheathes EVERY held weapon in a wireframe
     // stone shell and plates the body with shards. Independent of the imbue
-    // color below, which only ever soaks the mainhand.
+    // color below, whose Sanguine channel also coats an equipped second weapon.
     if (stonebound) {
       for (const holder of weaponHolders) {
         holder?.traverse((o) => {
@@ -2930,35 +2931,45 @@ export class CharacterVisual {
     const auraColor = this.weaponAuraColor;
     const mainhand = weaponHolders.find((o) => o.userData.heldSlot === 0) ?? weaponHolders[0];
     if (!mainhand) return;
-    mainhand.traverse((o) => {
-      const mesh = o as THREE.Mesh;
-      if (!mesh.isMesh || !mesh.userData.weaponMesh || !mesh.parent) return;
-      const tipGeometry = this.weaponAuraTip ? tipFadedWeaponGeometry(mesh, mainhand) : null;
-      const aura = new THREE.Mesh(
-        tipGeometry ?? mesh.geometry,
-        new THREE.MeshBasicMaterial({
-          // Additive translucent clone of the weapon mesh in the spec-authored
-          // soak color. Brightness class is fixed here; only the hue is data.
-          // Tip scope rides a vertex-alpha ramp baked into the cloned geometry.
-          color: auraColor,
-          transparent: true,
-          opacity: 0.42,
-          depthWrite: false,
-          blending: THREE.AdditiveBlending,
-          side: THREE.DoubleSide,
-          vertexColors: tipGeometry !== null,
-        }),
-      );
-      aura.position.copy(mesh.position);
-      aura.quaternion.copy(mesh.quaternion);
-      aura.scale.copy(mesh.scale).multiplyScalar(1.08);
-      aura.renderOrder = 3;
-      aura.userData.weaponVfxMesh = true;
-      if (tipGeometry) aura.userData.ownsAuraGeometry = true;
-      mesh.parent.add(aura);
-      this.weaponAuraMeshes.push(aura);
-      if (this.weaponAuraSanguine && !this.weaponAuraTip) this.sanguineSheath.stage(aura);
-    });
+    const imbuedHolders = [mainhand];
+    if (
+      this.weaponAuraSanguine &&
+      weaponAttackStyle(this.weaponItemId, this.offhandItemId) === 'dualwield'
+    ) {
+      this.model.traverse((o) => {
+        if (o.userData.heldPropHolder && o.userData.heldSlot === 1) imbuedHolders.push(o);
+      });
+    }
+    for (const holder of imbuedHolders)
+      holder.traverse((o) => {
+        const mesh = o as THREE.Mesh;
+        if (!mesh.isMesh || !mesh.userData.weaponMesh || !mesh.parent) return;
+        const tipGeometry = this.weaponAuraTip ? tipFadedWeaponGeometry(mesh, holder) : null;
+        const aura = new THREE.Mesh(
+          tipGeometry ?? mesh.geometry,
+          new THREE.MeshBasicMaterial({
+            // Additive translucent clone of the weapon mesh in the spec-authored
+            // soak color. Brightness class is fixed here; only the hue is data.
+            // Tip scope rides a vertex-alpha ramp baked into the cloned geometry.
+            color: auraColor,
+            transparent: true,
+            opacity: 0.42,
+            depthWrite: false,
+            blending: THREE.AdditiveBlending,
+            side: THREE.DoubleSide,
+            vertexColors: tipGeometry !== null,
+          }),
+        );
+        aura.position.copy(mesh.position);
+        aura.quaternion.copy(mesh.quaternion);
+        aura.scale.copy(mesh.scale).multiplyScalar(1.08);
+        aura.renderOrder = 3;
+        aura.userData.weaponVfxMesh = true;
+        if (tipGeometry) aura.userData.ownsAuraGeometry = true;
+        mesh.parent.add(aura);
+        this.weaponAuraMeshes.push(aura);
+        if (this.weaponAuraSanguine && !this.weaponAuraTip) this.sanguineSheath.stage(aura);
+      });
   }
 
   private buildStoneboundArmorShards(): void {

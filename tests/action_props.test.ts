@@ -19,6 +19,12 @@ it('borrows only required hands and restores them on recovery, interruption and 
   expect(blade.visible).toBe(false);
   props.action('Death');
   expect(main.visible && off.visible).toBe(true);
+  // Jawcrack strikes with the sword guard: neither held weapon disappears.
+  props.action('Signature_pummel');
+  expect(main.visible && off.visible).toBe(true);
+  expect(blade.visible).toBe(false);
+  props.action('Warrior_Jawcrack');
+  expect(main.visible && off.visible).toBe(true);
   props.action('Signature_mongoose_bite');
   expect(main.visible).toBe(false);
   expect(blade.visible).toBe(true);

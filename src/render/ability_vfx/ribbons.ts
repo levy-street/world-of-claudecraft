@@ -14,8 +14,10 @@ import { warriorHammerCel } from './warrior_control_atlas';
 
 // Preserve the former 4096-vertex allowance in full and reserve 768 more for
 // two complete three-point power outlines on each of 64 visible Warriors.
+// A further 640 retain Iron Resolve's second five-point shield on all 64
+// cold wearers without displacing authored attack ribbons.
 // Fixed constructor allocation; no resize or GPU allocation during combat.
-const MAX_VERTS = 4864;
+const MAX_VERTS = 5504;
 const MAX_INDICES = MAX_VERTS * 3;
 const BOLT_SLOTS = 10;
 const BOLT_PTS = 17; // 4 midpoint-displacement passes on a 2-point seed

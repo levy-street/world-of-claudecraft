@@ -43,13 +43,15 @@ export class SignatureCrests {
         uSunWorld: sceneKeyLightUniform(scene),
         uKind: { value: 0 },
         uMotion: { value: 1 },
+        uStorm: { value: 0 },
+        uFlow: { value: 0 },
         uPressureGround: { value: new Float32Array(25) },
         uTint: { value: new THREE.Color() },
         uAccent: { value: new THREE.Color() },
       },
       vertexShader: `uniform float uAge,uKind,uMotion,uPressureGround[25]; varying vec2 vUv,vSurface; varying vec3 vNormal,vView,vLocal,vLocalNormal;
         float pressureGround(vec2 p){
-          vec2 uv=uKind>22.5?p/12.0+0.5:(uKind>20.5 && uKind<21.5)?p/8.0+0.5:uKind>16.5?p/16.0+0.5:vec2(p.x/12.0+0.5,p.y/10.0);
+          vec2 uv=uKind>22.5?p/12.0+0.5:(uKind>20.5 && uKind<21.5)?p/8.0+0.5:uKind>16.5?p/16.0+0.5:vec2(p.x/22.0+0.5,p.y/10.0);
           vec2 grid=clamp(uv*4.0,vec2(0.0),vec2(3.9999));
           ivec2 cell=ivec2(floor(grid));vec2 f=fract(grid);int i=cell.y*5+cell.x;
           return mix(mix(uPressureGround[i],uPressureGround[i+1],f.x),
@@ -71,10 +73,9 @@ export class SignatureCrests {
             p.y-=uAge*uAge*uv.y*(0.35+uv.y*0.45)*uMotion;
           }
           if(uKind>12.5 && uKind<13.5){
-            float advance=mix(0.72,0.38+0.62*(1.0-pow(max(0.0,1.0-uAge),3.0)),uMotion);
+            float advance=mix(0.85,0.12+0.88*(1.0-pow(max(0.0,1.0-uAge),2.0)),uMotion);
             p.xz*=advance;
-            p.y*=mix(1.0,0.62+0.38*sin(min(1.0,uAge*1.3)*3.14159265),uMotion);
-            p.y+=sin(uv.x*19.0+uv.y*8.0-uAge*7.0)*uv.y*0.045*uMotion;
+            p.y*=mix(1.0,0.6+0.4*advance,uMotion);
             p.y+=pressureGround(p.xz);
           }
           if(uKind>13.5 && uKind<14.5){
@@ -93,7 +94,7 @@ export class SignatureCrests {
             p.y+=pressureGround(p.xz);
           }
           if(uKind>21.5 && uKind<22.5){
-            float turn=(-0.28+0.56*smoothstep(0.0,0.75,uAge))*uMotion;
+            float turn=(0.137+0.842*min(1.0,uAge))*6.2831853*uMotion;
             p.xz=mat2(cos(turn),-sin(turn),sin(turn),cos(turn))*p.xz;
           }
           if(uKind>22.5){
@@ -107,7 +108,7 @@ export class SignatureCrests {
         }`,
       fragmentShader: `${SCENE_SAMPLE_GLSL}
         ${STEEL_SWEEP_GLSL}
-        uniform sampler2D uPressureMap,uBloodMap,uSteelMap; uniform float uAge,uKind,uMotion; uniform vec3 uTint,uAccent,uSunWorld;
+        uniform sampler2D uPressureMap,uBloodMap,uSteelMap; uniform float uAge,uKind,uMotion,uStorm,uFlow; uniform vec3 uTint,uAccent,uSunWorld;
         varying vec2 vUv,vSurface; varying vec3 vNormal,vView,vLocal,vLocalNormal;
         vec2 groundSteelUv(vec2 p){return 1.0-abs(mod(p*0.24+0.37,2.0)-1.0);}
         void main(){
@@ -159,15 +160,13 @@ export class SignatureCrests {
             alpha=0.97*coverage*dissolve*smoothstep(0.0,0.1,taper)*(1.0-smoothstep(0.68,1.0,uAge));
           }
           if(uKind>12.5 && uKind<13.5){
-            vec2 flowUv=vUv;
-            // Each authored sheet owns one plume; sampling all three painted
-            // branches on every sheet duplicates them into fine spoke bundles.
-            flowUv.y=0.5+(flowUv.y-0.5)*0.28;
-            flowUv.y+=sin(vUv.x*13.0-uAge*4.0)*0.012*uMotion*uAge;
-            float density=pow(texture2D(uPressureMap,clamp(flowUv,vec2(0.0),vec2(1.0))).r,0.65);
-            float dissolution=smoothstep(uAge*0.9-0.35,uAge*0.9+0.1,density);
-            colour=mix(uTint*(0.8+density*0.6),uAccent*1.3,pow(max(0.0,density),2.5));
-            alpha=density*0.72*dissolution*(1.0-smoothstep(0.55,1.0,uAge));
+            float grain=texture2D(uPressureMap,vec2(vUv.x,0.46+vUv.y*0.08)).r;
+            float compression=exp(-vUv.y*9.0);
+            float air=exp(-vUv.y*3.0)*0.12;
+            float ends=smoothstep(0.0,0.08,vUv.x)*(1.0-smoothstep(0.92,1.0,vUv.x));
+            float crackle=0.72+0.28*smoothstep(0.04,0.3,grain);
+            colour=mix(uTint,uAccent,0.8+compression*0.2)*(1.1+compression*0.25);
+            alpha=(compression*0.76+air)*ends*crackle*(1.0-smoothstep(0.35,1.0,uAge));
           }
           if(uKind>13.5){
             float bevel=1.0-smoothstep(0.18,0.3,vUv.y);
@@ -215,6 +214,19 @@ export class SignatureCrests {
             alpha*=mix(1.0,min(1.0,gain),uMotion);
             colour+=uAccent*max(0.0,gain-0.8)*0.24*uMotion;
           }
+          if(uStorm>0.5){
+            // Directional air dragged by the cutting edge. Broken textured
+            // tails leave the fighter visible through the full-radius sweep.
+            float lengthFade=smoothstep(0.0,0.16,vUv.x)*(1.0-smoothstep(0.91,1.0,vUv.x));
+            float edge=1.0-smoothstep(0.015,0.10,vUv.y);
+            vec2 streamUv=vec2(fract(vUv.x-uFlow*0.32*uMotion),0.46+vUv.y*0.13);
+            float grain=texture2D(uPressureMap,streamUv).r;
+            float striation=sin(vUv.y*43.0+vUv.x*7.0+grain*7.0);
+            float strands=smoothstep(0.36,0.9,striation)*(1.0-vUv.y);
+            float body=(0.07+grain*0.18+strands*0.24)*(1.0-smoothstep(0.55,1.0,vUv.y));
+            colour=mix(uTint,uAccent,edge*0.75+strands*0.2)*(0.85+grain*0.55)+uAccent*edge*0.5;
+            alpha=lengthFade*(edge*0.55+body)*(1.0-smoothstep(0.7,1.0,uAge));
+          }
           if(uKind>13.5 && uKind<14.5){
             float bevel=1.0-smoothstep(0.18,0.3,vUv.y);
             colour=mix(uTint*0.55,colour,0.6)+uAccent*bevel*0.08;
@@ -238,9 +250,10 @@ export class SignatureCrests {
             vec3 blood=texture2D(uBloodMap,clamp(vec2(vUv.x,vUv.y),vec2(.01),vec2(.99))).rgb;
             float grain=dot(blood,vec3(.333333));
             float edge=1.0-smoothstep(.06,.24,vUv.y);
-            colour=mix(uTint*(.55+grain*1.2),colour,edge*.82)+uAccent*edge*.22;
-            float sweep=smoothstep(vUv.x-.24,vUv.x+.12,uAge*1.55);
-            alpha*=mix(1.0,sweep,uMotion)*(1.0-smoothstep(.4,.98,uAge));
+            colour=mix(uTint*(.55+grain*1.2),uAccent*(.85+grain*.45),edge);
+            float tail=(1.0-smoothstep(.25,1.0,vUv.y))*(.2+grain*.45);
+            float cut=smoothstep(.0,.12,vUv.x)*(1.0-smoothstep(.9,1.0,vUv.x));
+            alpha=cut*(edge*.85+tail)*(1.0-smoothstep(.62,1.0,uAge));
           }
           gl_FragColor=vec4(colour,alpha*sceneSoftness(vView.z,0.12));
           #include <tonemapping_fragment>
@@ -351,7 +364,7 @@ export class SignatureCrests {
         sourceFloor = this.groundY(x, z);
       for (let row = 0; row < 5; row++)
         for (let column = 0; column < 5; column++) {
-          const lx = (column / 4 - 0.5) * (ironGround ? groundSpan : 12) * s.mesh.scale.x;
+          const lx = (column / 4 - 0.5) * (ironGround ? groundSpan : 22) * s.mesh.scale.x;
           const lz = (ironGround ? (row / 4 - 0.5) * groundSpan : (row / 4) * 10) * s.mesh.scale.z;
           const heightAt = this.groundY(x + lx * cosine + lz * sine, z + lz * cosine - lx * sine);
           ground[row * 5 + column] =
@@ -411,6 +424,8 @@ export class SignatureCrests {
                                               ? 6
                                               : 2;
     u.uAge.value = 0;
+    u.uStorm.value = kind === 'steel_storm' ? 1 : 0;
+    u.uFlow.value = 0;
     u.uMotion.value = this.reducedMotion ? 0 : 1;
     return true;
   }
@@ -434,7 +449,7 @@ export class SignatureCrests {
     if (!slot) {
       const available = this.slots.find((s) => !s.active);
       if (!available) return false;
-      if (!this.spawn(x, y, z, 1, 1, 0x8197a8, 0xd9af89, 'steel_storm', 0, 1)) return false;
+      if (!this.spawn(x, y, z, 1, 1, 0x9ca9a8, 0xd8e1e3, 'steel_storm', 0, 1)) return false;
       slot = available;
       slot.heldId = entityId;
     }
@@ -461,6 +476,7 @@ export class SignatureCrests {
         s.mesh.visible = s.active;
         s.mesh.rotation.y = reducedMotion ? 0 : s.phase * 14;
         s.mesh.material.uniforms.uAge.value = 0.18;
+        s.mesh.material.uniforms.uFlow.value = s.phase;
         s.mesh.material.uniforms.uMotion.value = reducedMotion ? 0 : 1;
         continue;
       }

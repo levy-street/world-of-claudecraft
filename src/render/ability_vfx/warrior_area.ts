@@ -27,7 +27,7 @@ export function drawReapingArc(host: SequencerHost, slot: SeqSlot, beat: number)
     cosine = Math.cos(angle);
   for (let strand = 0; strand < (slot.tier > 0 ? 1 : 3); strand++)
     host.pathRibbon(
-      strand === 0 ? 0xf4d1ad : 0x829caf,
+      strand === 0 ? 0xe2edf2 : 0x8799a4,
       strand === 0 ? 0.2 : 0.1,
       0.28,
       (points) => {
@@ -46,7 +46,7 @@ export function drawReapingArc(host: SequencerHost, slot: SeqSlot, beat: number)
       false,
       strand === 0 ? 1 : 0,
     );
-  host.crestAt?.(at.x, at.y, at.z, 1, 1, 0x8c9fae, 0xdeaf8a, 'steel_reap', angle, 0.28);
+  host.crestAt?.(at.x, at.y, at.z, 1, 1, 0x8c9fae, 0xe4edf2, 'steel_reap', angle, 0.28);
   host.countPrimitive('cleave', slot.tier > 0 ? 2 : 4);
   return true;
 }
@@ -95,7 +95,7 @@ export function drawWarriorAreaContact(
     at.y,
     at.z,
     outcome === 2 ? 2.4 : 2.8,
-    outcome === 2 ? 0xcadce8 : 0xeac6a4,
+    outcome === 2 ? 0xcadce8 : id === 'cleave' ? 0xe2edf2 : 0xeac6a4,
     outcome === 2 || id === 'heroic_leap' || id === 'thunder_clap' || id === 'faultline'
       ? 'contact_crush'
       : 'contact_cut',
@@ -109,7 +109,7 @@ export function drawWarriorAreaContact(
   const dx = Math.sin(angle),
     dz = Math.cos(angle);
   host.pathRibbon(
-    0xf1cbaa,
+    id === 'cleave' ? 0xe2edf2 : 0xf1cbaa,
     0.18,
     0.2,
     (points) => {
@@ -134,7 +134,7 @@ export function drawWarriorAreaContact(
       at.x,
       at.y,
       at.z,
-      0xc6aa8f,
+      id === 'cleave' ? 0xc6d2da : 0xc6aa8f,
       8,
       0.9,
       dx,

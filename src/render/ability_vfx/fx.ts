@@ -714,6 +714,7 @@ export class AbilityVfxFx implements SequencerHost {
     ) => boolean,
     textureReady?: (texture: THREE.Texture) => boolean,
     private bodyAnchor?: WarriorPowerAnchor,
+    private weaponHand?: (id: number, hand: 0 | 1) => boolean,
   ) {
     const tex = abilityVfxTextures();
     this.ribbons = new AbilityVfxRibbons(scene, anchor, tex);
@@ -814,6 +815,10 @@ export class AbilityVfxFx implements SequencerHost {
         beat?: number,
       ) => void)
     | null = null;
+  isWeaponHand(id: number, hand: 0 | 1): boolean {
+    return this.weaponHand?.(id, hand) ?? hand === 0;
+  }
+
   handPoint(id: number, hand: 0 | 1, out: { x: number; y: number; z: number }): typeof out | null {
     return this.handSample?.(id, hand, out) ? out : null;
   }

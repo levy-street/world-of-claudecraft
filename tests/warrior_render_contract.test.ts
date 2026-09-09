@@ -42,13 +42,13 @@ describe('winning Warrior attack animation routing', () => {
       revenge: 'Warrior_Revenge',
       thunder_clap: 'Warrior_Quaking_Blow',
       faultline: 'Warrior_Faultline',
-      heroic_strike: '1H_Melee_Attack_Slice_Diagonal',
+      heroic_strike: 'Warrior_Reaver_Strike',
       overpower: 'Warrior_Redhand',
       hamstring: 'Warrior_Hobbling_Cut',
       pummel: 'Warrior_Jawcrack',
       sunder_armor: 'Warrior_Armor_Shear',
       storm_bolt: 'Warrior_Storm_Bolt',
-      sanguine_aura: 'Spellcast_Raise',
+      sanguine_aura: 'Warrior_Sanguine_Aura',
       raised_guard: 'Warrior_Raised_Guard',
     });
   });

@@ -62,11 +62,11 @@ it('composes simultaneous protections within one wearer allowance and uploads on
   h.pool.dispose();
 });
 
-it('shows actual reserve chunks and removes them on actual exhaustion', () => {
+it('retains two Iron Resolve shields at every positive reserve and removes both on exhaustion', () => {
   const h = fixture();
   h.pool.hold(1, 1, resolve(160), 0, true);
   h.draw(0);
-  expect(h.pool.mesh.count).toBe(6);
+  expect(h.pool.mesh.count).toBe(2);
   h.pool.hold(1, 1, resolve(40, 9.95), 1, true);
   h.draw(1);
   expect(h.pool.mesh.count).toBe(2);
@@ -76,20 +76,165 @@ it('shows actual reserve chunks and removes them on actual exhaustion', () => {
   h.pool.dispose();
 });
 
-it('shows the same absolute reserve for late or immediate observation and keeps the primary at tiny values', () => {
+it('retains paired Iron Resolve and Intervene with all four guards inside six solid instances', () => {
+  const h = fixture();
+  h.pool.hold(1, 0, raised, 0, true);
+  h.pool.hold(1, 1, resolve(1), 0, true);
+  h.pool.hold(1, 2, sword, 0, true);
+  h.pool.hold(1, 3, { id: 'intervene', kind: 'absorb', remaining: 6, value: 1 }, 0, true);
+  h.draw(0);
+  expect(h.pool.mesh.count).toBe(6);
+  expect(h.lines).toHaveLength(5);
+  const first = new THREE.Matrix4(),
+    second = new THREE.Matrix4();
+  h.pool.mesh.getMatrixAt(1, first);
+  h.pool.mesh.getMatrixAt(2, second);
+  expect(first.elements[12] + second.elements[12]).toBeCloseTo(8);
+  expect(first.elements[14] + second.elements[14]).toBeCloseTo(0);
+  h.pool.dispose();
+});
+
+it('orbits two opposing Iron Resolve shields outside the body and below the face', () => {
+  const h = fixture();
+  h.pool.hold(1, 1, resolve(160), 0, true);
+  h.draw(0);
+  const matrix = new THREE.Matrix4();
+  const geometry = h.pool.mesh.geometry;
+  geometry.computeBoundingBox();
+  const centers: THREE.Vector3[] = [];
+  for (let i = 0; i < h.pool.mesh.count; i++) {
+    h.pool.mesh.getMatrixAt(i, matrix);
+    const center = new THREE.Vector3().setFromMatrixPosition(matrix);
+    centers.push(center);
+    const bounds = geometry.boundingBox!.clone().applyMatrix4(matrix);
+    expect(Math.hypot(center.x - 4, center.z)).toBeCloseTo(1.65);
+    expect(bounds.min.y).toBeGreaterThan(0.3);
+    expect(bounds.max.y).toBeLessThan(1.43);
+  }
+  expect(centers[0].x + centers[1].x).toBeCloseTo(8);
+  expect(centers[0].z + centers[1].z).toBeCloseTo(0);
+  expect(centers[0].distanceTo(centers[1])).toBeCloseTo(3.3);
+  h.pool.hold(1, 1, resolve(160, 9.7), 1, true);
+  h.draw(1);
+  h.pool.mesh.getMatrixAt(0, matrix);
+  const moved = new THREE.Vector3().setFromMatrixPosition(matrix);
+  expect(moved.distanceTo(centers[0])).toBeCloseTo(2 * 1.65 * Math.sin((0.3 * 0.65) / 2), 5);
+  expect(h.pool.mesh.count).toBe(2);
+  h.pool.dispose();
+});
+
+it.each(['x', 'y'] as const)(
+  'binds Die by the Sword to the measured native %s blade span',
+  (axis) => {
+    const h = fixture();
+    const sampler = Object.assign(
+      (out: THREE.Vector3) => {
+        out.set(4, 1, 0);
+        out[axis] += 0.6;
+        return true;
+      },
+      {
+        frame: (out: THREE.Matrix4) => {
+          out.identity().setPosition(4, 1, 0);
+          return true;
+        },
+      },
+    );
+    h.pool.hold(1, 2, sword, 0, true);
+    const anchor: RibbonAnchor = (_id, _frac, out = new THREE.Vector3()) => out.set(4, 1, 0);
+    h.pool.draw(
+      0,
+      0.3,
+      false,
+      anchor,
+      () => 0,
+      () => sampler,
+      h.ribbons,
+    );
+    expect(h.pool.mesh.count).toBe(2);
+    const matrix = new THREE.Matrix4();
+    h.pool.mesh.geometry.computeBoundingBox();
+    for (let i = 0; i < 2; i++) {
+      h.pool.mesh.getMatrixAt(i, matrix);
+      const bounds = h.pool.mesh.geometry.boundingBox!.clone().applyMatrix4(matrix);
+      const center = axis === 'x' ? 4 : 1;
+      const other = axis === 'x' ? 'y' : 'x';
+      expect(bounds.min[axis]).toBeGreaterThan(center - 0.6);
+      expect(bounds.max[axis]).toBeLessThan(center + 0.6);
+      expect(bounds.max[other] - bounds.min[other]).toBeLessThan(0.25);
+      expect(bounds.min.z).toBeGreaterThan(-0.04);
+      expect(bounds.max.z).toBeLessThan(0.08);
+    }
+    h.pool.dispose();
+  },
+);
+
+it.each([1, 2] as const)(
+  'keeps guard %s still in reduced motion and preserves its cold outline frame',
+  (kind) => {
+    const warm = fixture(),
+      cold = fixture(false);
+    for (const h of [warm, cold]) {
+      h.pool.hold(1, kind, kind === 1 ? resolve(160) : sword, 0, true);
+      h.draw(0, 0.01, true);
+    }
+    expect(warm.lines[0]).toEqual(cold.lines[0].slice(0, 3));
+    expect(cold.lines[0]).toHaveLength(5);
+    if (kind === 1) {
+      expect(cold.lines).toHaveLength(2);
+      expect(warm.lines[1]).toEqual(cold.lines[1].slice(0, 3));
+    }
+    const settled = new THREE.Matrix4(),
+      initial = new THREE.Matrix4();
+    warm.pool.mesh.getMatrixAt(0, initial);
+    warm.pool.hold(1, kind, kind === 1 ? resolve(160, 9.9) : { ...sword, remaining: 7.9 }, 1, true);
+    warm.draw(1, 0.3, true);
+    warm.pool.mesh.getMatrixAt(0, settled);
+    expect(settled.elements).toEqual(initial.elements);
+    warm.pool.dispose();
+    cold.pool.dispose();
+  },
+);
+
+it('retains real absorb contact compression and warmth without moving reduced-motion shields', () => {
+  for (const reduced of [false, true]) {
+    const h = fixture();
+    h.pool.hold(1, 1, resolve(160), 0, true);
+    h.draw(0, 0.3, reduced);
+    const before = new THREE.Matrix4(),
+      after = new THREE.Matrix4();
+    const base = new THREE.Color(),
+      hit = new THREE.Color();
+    h.pool.mesh.getMatrixAt(0, before);
+    h.pool.mesh.getColorAt(0, base);
+    h.pool.hold(1, 1, resolve(159, 9.95), 1, true);
+    h.draw(1, 0.02, reduced);
+    h.pool.mesh.getMatrixAt(0, after);
+    h.pool.mesh.getColorAt(0, hit);
+    if (reduced) expect(after.elements).toEqual(before.elements);
+    else
+      expect(Math.hypot(after.elements[12] - 4, after.elements[14])).toBeLessThan(
+        Math.hypot(before.elements[12] - 4, before.elements[14]),
+      );
+    expect(hit.equals(base)).toBe(false);
+    h.pool.dispose();
+  }
+});
+
+it('keeps both shields for late or immediate observation at tiny reserve values', () => {
   const h = fixture();
   h.pool.hold(1, 1, resolve(40, 5), 0, false);
   h.draw(0);
   expect(h.pool.mesh.count).toBe(2);
   h.pool.hold(1, 1, resolve(1, 4.95), 1, false);
   h.draw(1);
-  expect(h.pool.mesh.count).toBe(1);
+  expect(h.pool.mesh.count).toBe(2);
   h.pool.sleep(1);
   h.pool.hold(1, 1, resolve(160), 2, false);
   h.draw(2);
   h.pool.hold(1, 1, resolve(1, 9.95), 3, false);
   h.draw(3);
-  expect(h.pool.mesh.count).toBe(1);
+  expect(h.pool.mesh.count).toBe(2);
   h.pool.dispose();
 });
 
@@ -97,12 +242,12 @@ it('keeps the local player in the solid pool and outlines the seventeenth defend
   const h = fixture();
   for (let id = 1; id <= 17; id++) h.pool.hold(id, 1, resolve(160), 0, id === 17);
   h.draw(0);
-  expect(h.pool.mesh.count).toBe(96);
+  expect(h.pool.mesh.count).toBe(32);
   const matrix = new THREE.Matrix4();
   h.pool.mesh.getMatrixAt(0, matrix);
   expect(matrix.elements[12]).toBeGreaterThan(67);
   expect(
-    h.lines.some((points) => points.length === 5 && points[0].x > 63 && points[0].x < 65),
+    h.lines.some((points) => points.length === 5 && points[0].x > 62 && points[0].x < 66),
   ).toBe(true);
   h.pool.dispose();
 });
@@ -115,7 +260,7 @@ it('keeps every distinct primary outline while GPU preparation is cold', () => {
   h.draw(0);
   expect(h.pool.mesh.count).toBe(0);
   expect(h.pool.mesh.visible).toBe(false);
-  expect(h.lines).toHaveLength(3);
+  expect(h.lines).toHaveLength(4);
   expect(h.lines.every((line) => line.length === 5)).toBe(true);
   h.pool.clear();
   h.lines.length = 0;
@@ -237,7 +382,7 @@ it('leaves real ribbon room for a complete storm and attack even with 64 cold tr
   });
   const geo = (ribbons as unknown as { geo: THREE.BufferGeometry }).geo;
   const used = Math.max(...Array.from(geo.getIndex()!.array).slice(0, geo.drawRange.count)) + 1;
-  expect(used).toBe(3 * 22 * 2 + 64 * 3 * 5 * 2 + 136);
+  expect(used).toBe(3 * 22 * 2 + 64 * 4 * 5 * 2 + 136);
   const position = geo.getAttribute('position');
   const attackX: number[] = [];
   for (let i = 0; i < used; i++)
@@ -359,6 +504,13 @@ it.each(['raging_gale', 'red_harvest'])(
           h.pool.hold(entity, 0, raised, 0, entity === 1);
           h.pool.hold(entity, 1, resolve(160), 0, entity === 1);
           h.pool.hold(entity, 2, sword, 0, entity === 1);
+          h.pool.hold(
+            entity,
+            3,
+            { id: 'intervene', kind: 'absorb', remaining: 6, value: 40 },
+            0,
+            entity === 1,
+          );
         }
       const anchor: RibbonAnchor = (entity, _frac, out = new THREE.Vector3()) =>
         out.set(entity * 4, 1, 0);
@@ -369,7 +521,7 @@ it.each(['raging_gale', 'red_harvest'])(
       });
       const geo = (ribbons as unknown as { geo: THREE.BufferGeometry }).geo;
       const used = Math.max(...Array.from(geo.getIndex()!.array).slice(0, geo.drawRange.count)) + 1;
-      const prefix = 132 + (crowded ? 1920 : 0);
+      const prefix = 132 + (crowded ? 3200 : 0);
       const result = {
         vertices: used - prefix,
         positions: Array.from(geo.getAttribute('position').array).slice(prefix * 3, used * 3),

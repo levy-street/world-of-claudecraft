@@ -13,18 +13,21 @@ export function drawWarriorGyre(host: SequencerHost, slot: SeqSlot, beat: number
   const angle = host.facingAt?.(slot.casterId) ?? 0,
     dx = Math.sin(angle),
     dz = Math.cos(angle);
+  const contactAngle = angle + 0.137 * Math.PI * 2,
+    contactX = Math.sin(contactAngle),
+    contactZ = Math.cos(contactAngle);
   for (let blade = 0; blade < 2; blade++)
     host.pathRibbon(
-      0xffaaa6,
+      0xe8edf0,
       0.22,
-      0.34,
+      0.08,
       (points) => {
         for (let i = 0; i < points.length; i++) {
           warriorGyrePoint(blade, i / (points.length - 1), 0, point);
           points[i].set(
-            at.x + point.x * dz + point.z * dx,
+            at.x + point.x * contactZ + point.z * contactX,
             at.y + point.y,
-            at.z - point.x * dx + point.z * dz,
+            at.z - point.x * contactX + point.z * contactZ,
           );
         }
         return points.length;
@@ -34,7 +37,7 @@ export function drawWarriorGyre(host: SequencerHost, slot: SeqSlot, beat: number
       false,
       1,
     );
-  host.crestAt?.(at.x, at.y, at.z, 1, 1, 0x9f1933, 0xffbac0, 'blood_gyre', angle, 0.4);
+  host.crestAt?.(at.x, at.y, at.z, 1, 1, 0x941d32, 0xe7eff2, 'blood_gyre', angle, 0.4);
   for (const side of [-1, 1]) {
     const x = at.x + dz * side * 3.6,
       z = at.z - dx * side * 3.6,

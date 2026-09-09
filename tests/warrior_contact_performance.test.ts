@@ -36,6 +36,26 @@ const position = (bone: THREE.Object3D) => bone.getWorldPosition(new THREE.Vecto
 const rotation = (bone: THREE.Object3D) =>
   bone.getWorldQuaternion(new THREE.Quaternion()).normalize();
 
+it('Bladed Gyre completes a native full-body pivot without translating the player', async () => {
+  const f = await fixture('Warrior_Bladed_Gyre');
+  const root = f.bone('root');
+  f.pose(0);
+  const start = position(root),
+    forward = new THREE.Vector3();
+  let previous = 0,
+    total = 0;
+  for (let i = 0; i <= 72; i++) {
+    f.pose(i * 0.01);
+    expect(position(root).distanceTo(start)).toBeLessThan(1e-6);
+    forward.set(0, 0, 1).applyQuaternion(rotation(root));
+    const angle = Math.atan2(forward.x, forward.z);
+    if (i > 0) total += Math.atan2(Math.sin(angle - previous), Math.cos(angle - previous));
+    previous = angle;
+  }
+  expect(total).toBeCloseTo(Math.PI * 2, 3);
+  expect(f.clip.duration).toBeLessThan(0.75);
+});
+
 it('holds a seamless native Bladestorm loop with planted feet and no repeated chop', async () => {
   const f = await fixture('Warrior_Bladestorm_Loop');
   expect(VISUALS.player_warrior.clips.castByAbility?.bladestorm).toBe(f.clip.name);
@@ -147,9 +167,15 @@ it.each([
   const initial = bones.map((b) => ({ position: position(b), rotation: rotation(b) }));
   for (let i = 0; i <= Math.ceil(f.clip.duration / 0.005); i++) {
     f.pose(Math.min(f.clip.duration, i * 0.005));
+    // Gyre deliberately pivots the entire stance. Feet must stay locked in
+    // that pivot frame, while its root translation remains fixed in world space.
+    const pivot = id === 'whirlwind' ? rotation(f.bone('root')) : new THREE.Quaternion();
+    expect(position(f.bone('root')).distanceTo(initial[4].position)).toBeLessThan(0.0005);
     bones.forEach((b, j) => {
-      expect(position(b).distanceTo(initial[j].position)).toBeLessThan(0.0005);
-      expect(rotation(b).angleTo(initial[j].rotation)).toBeLessThan(0.005);
+      const expectedPosition = initial[j].position.clone().applyQuaternion(pivot);
+      const expectedRotation = pivot.clone().multiply(initial[j].rotation);
+      expect(position(b).distanceTo(expectedPosition)).toBeLessThan(0.0005);
+      expect(rotation(b).angleTo(expectedRotation)).toBeLessThan(0.005);
     });
   }
   for (const track of f.clip.tracks) {

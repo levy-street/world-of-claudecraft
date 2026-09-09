@@ -7,8 +7,6 @@ import type { AbilityVfxRibbons } from './ribbons';
 // Coordinates run across and along the actual blade. Open, asymmetric edges
 // replace body halos; a prepared execution and a calm free spender do not share
 // the same silhouette. Arrays and transformed points are retained once.
-const STEEL_EDGE = [-0.08, -0.8, -0.08, 0.28, -0.04, 0.48, -0.08, 0.65, -0.04, 1.05];
-const RED_EDGE = [0.08, -0.65, 0.09, -0.1, 0.17, 0.04, 0.08, 0.14, 0.08, 0.95];
 const WIDE_EDGE = [-0.18, -0.55, -0.36, 0.05, -0.38, 0.6, -0.2, 1.25, 0.02, 1.45];
 const WIDE_RETURN = [0.14, -0.4, 0.28, 0.2, 0.24, 0.75, 0.04, 1.22];
 const EXECUTION = [-0.28, 0.76, -0.18, 1.3, 0, 1.55, 0.19, 1.16, 0.27, 0.96];
@@ -50,11 +48,11 @@ export class WarriorReadinessShapes {
     this.across.crossVectors(this.along, this.normal).normalize();
     const pulse = reducedMotion ? 1 : 0.9 + 0.1 * Math.sin(time * 5);
     if (hand === 0) {
-      if (bits & R.battle) this.line(ribbons, STEEL_EDGE, 0xdcb66d, 0.072, 1.25);
+      if (bits & R.battle) this.sheen(ribbons, overlay, 0xdde3e2, time, reducedMotion, false);
       if (bits & R.wideningArc) {
-        this.line(ribbons, WIDE_EDGE, 0x9c7652, 0.095, 0.7);
-        this.line(ribbons, WIDE_EDGE, 0xe8d6af, 0.035, 1.25);
-        this.line(ribbons, WIDE_RETURN, 0xc7d9e5, 0.035, 0.8);
+        this.line(ribbons, WIDE_EDGE, 0x8b969a, 0.095, 0.7);
+        this.line(ribbons, WIDE_EDGE, 0xe5ecea, 0.035, 1.25);
+        this.line(ribbons, WIDE_RETURN, 0xc9cecb, 0.035, 0.8);
       }
       if (bits & R.suddenDeath) {
         this.line(ribbons, EXECUTION, 0x971d26, 0.12, 1);
@@ -66,7 +64,8 @@ export class WarriorReadinessShapes {
         this.line(ribbons, TRANCE_B, 0xfcdf9e, 0.035, 1.2);
       }
     }
-    if (bits & R.berserker) this.line(ribbons, RED_EDGE, 0xeb3244, 0.078, 1.25);
+    if (bits & R.berserker)
+      this.sheen(ribbons, overlay, 0xd92b40, time + hand * 0.37, reducedMotion, true);
     if ((hand === 1 || !offhandReady) && bits & (R.guarded | R.revenge)) {
       // Use the real equipment face even when the permitted loadout has no shield.
       this.along.setFromMatrixColumn(frame, 1).normalize();
@@ -78,6 +77,36 @@ export class WarriorReadinessShapes {
         this.line(ribbons, COUNTER_CUT, 0xe1f1ef, 0.045, 1.3 * pulse);
       }
     }
+  }
+
+  private sheen(
+    ribbons: AbilityVfxRibbons,
+    overlay: OverlaySprites,
+    color: number,
+    time: number,
+    reduced: boolean,
+    blood: boolean,
+  ): void {
+    // Three short reflections lie on the equipment face. There is no drawn
+    // outline, bolt, or line extending past the tip of the actual weapon.
+    for (let facet = 0; facet < 3; facet++) {
+      const along = -0.35 + facet * 0.43;
+      const light = reduced ? 0.72 : 0.58 + 0.24 * Math.sin(time * 2.2 - facet * 1.7) ** 4;
+      this.points[0].copy(this.center).addScaledVector(this.along, along * this.length);
+      this.points[1].copy(this.points[0]).addScaledVector(this.along, this.length * 0.15);
+      ribbons.appendHeld(this.points, 2, blood ? 0.085 : 0.065, color, light);
+    }
+    this.points[0].copy(this.center).addScaledVector(this.along, this.length * 0.66);
+    overlay.push(
+      this.points[0].x,
+      this.points[0].y,
+      this.points[0].z,
+      blood ? 0xee4951 : 0xe2e8e4,
+      blood ? 0.28 : 0.2,
+      OVERLAY_CELL.glow,
+      0.38,
+      0.8,
+    );
   }
 
   private line(

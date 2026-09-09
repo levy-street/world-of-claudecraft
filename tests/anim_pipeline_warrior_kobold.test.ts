@@ -1,12 +1,8 @@
-// Warrior/kobold batch of the large-scale animation authoring initiative
-// (issue #2889): a bespoke warrior movement clip (Heroic Leap) plus six more
-// attackByAbility entries added to the class's existing extensive coverage,
-// each verified to actually reach CharacterVisual.playAttack at runtime (see
-// scripts/build_warrior_ability_anims.mjs's header for the render-dispatch
-// trace: whirlwind/bladestorm/storm_bolt/the six castFx:'shout' abilities are
-// deliberately left out because no attackByAbility entry for them is ever
-// read), plus the kobold family's own attack clip off the ENEMY7-sharing
-// goblin.glb. Authored by pose-sample-and-blend (scripts/anim/pose_blend.mjs,
+// Warrior movement and native ability dispatch, plus the kobold family's own
+// attack clip off the ENEMY7-sharing goblin.glb. Heroic Leap and Rush share
+// the movement library; Gyre and Storm Bolt have native attack overrides.
+// Shouts support authored gestures and retain an emote fallback when unmapped.
+// Authored by pose-sample-and-blend (scripts/anim/pose_blend.mjs,
 // scripts/build_warrior_ability_anims.mjs, scripts/build_kobold_anims.mjs),
 // the same technique documented in
 // .claude/skills/blender-anim-pipeline/SKILL.md. Follows the shipped-GLB-
@@ -46,7 +42,7 @@ function manifestBlock(startAnchor: string, endAnchor: string): string {
 }
 
 describe('warrior bespoke movement clip (issue #2889 warrior/kobold batch)', () => {
-  const WARRIOR_NEW_CLIPS = ['Warrior_Heroic_Leap'];
+  const WARRIOR_NEW_CLIPS = ['Warrior_Heroic_Leap', 'Warrior_Rush_Loop'];
 
   it('ships the new clip in a mesh-free donor GLB', () => {
     const glbPath = 'public/models/chars/players/warrior_ability_anims.glb';
@@ -122,11 +118,14 @@ describe('warrior bespoke movement clip (issue #2889 warrior/kobold batch)', () 
     expect(map.taunt).toBe('Warrior_Goad');
     expect(map.furious_mending).toBe('Warrior_Furious_Mending');
     expect(map.piercing_howl).toBe('Spellcast_Raise');
-    // Gyre now has an authored playWhirl branch; these other traps still have no
-    // an entry, because no attackByAbility lookup for them is ever reached.
-    for (const deadId of [
+    expect(map.storm_bolt).toBe('Warrior_Storm_Bolt');
+    expect(map.charge).toBe('Warrior_Rush_Loop');
+    expect(map.intervene).toBe('Warrior_Rush_Loop');
+    // Bladestorm belongs to castByAbility; the current six shout performances
+    // use the emote fallback. The painter also supports a native shout override.
+    expect(VISUALS.player_warrior.clips.castByAbility?.bladestorm).toBe('Warrior_Bladestorm_Loop');
+    for (const unmappedId of [
       'bladestorm',
-      'storm_bolt',
       'battle_shout',
       'demoralizing_shout',
       'emboldening_roar',
@@ -134,9 +133,10 @@ describe('warrior bespoke movement clip (issue #2889 warrior/kobold batch)', () 
       'rallying_cry',
       'intimidating_shout',
     ]) {
-      expect(map[deadId], `${deadId} must stay unmapped (never reaches attackByAbility)`).toBe(
-        undefined,
-      );
+      expect(
+        map[unmappedId],
+        `${unmappedId} currently uses its channel or emote path`,
+      ).toBeUndefined();
     }
   });
 });
@@ -150,8 +150,11 @@ describe('heroic_leap and piercing_howl reach triggerAttack through the real sel
   // so both fell through unclaimed and triggerAttack was never called, i.e.
   // no attackByAbility gesture ever played (heroic_leap's leap, piercing_howl's
   // Spellcast_Raise).
-  function makePainter() {
+  function makePainter(hasGestureClip = true) {
     const triggerAttack = vi.fn();
+    const playShoutAnim = vi.fn();
+    const bakedAt = vi.fn();
+    const fragmentsAt = vi.fn();
     const deps = {
       vfx: {
         shoutwave: vi.fn(),
@@ -164,6 +167,10 @@ describe('heroic_leap and piercing_howl reach triggerAttack through the real sel
         beam: vi.fn(),
       },
       fx: {
+        anchorOf: () => ({ x: 0, y: 0, z: 0 }),
+        groundYAt: () => 0,
+        bakedAt,
+        fragmentsAt,
         setDelegates: vi.fn(),
         warmSpiritsForClass: vi.fn(),
         windup: vi.fn().mockReturnValue(false),
@@ -178,14 +185,15 @@ describe('heroic_leap and piercing_howl reach triggerAttack through the real sel
       anchor: () => ({ x: 0, y: 0, z: 0 }),
       spawnAoeRing: vi.fn(),
       triggerAttack,
-      hasGestureClip: () => true,
+      playShoutAnim,
+      hasGestureClip: () => hasGestureClip,
     } as unknown as AbilityVfxDeps;
     const painter = new AbilityVfx(deps, () => 0);
-    return { painter, triggerAttack };
+    return { painter, triggerAttack, playShoutAnim, bakedAt, fragmentsAt };
   }
 
   it('claims heroic_leap selfCast and triggers its attack clip', () => {
-    const { painter, triggerAttack } = makePainter();
+    const { painter, triggerAttack, bakedAt, fragmentsAt } = makePainter();
 
     const claimed = painter.handleSpellfx({
       type: 'spellfx',
@@ -198,6 +206,54 @@ describe('heroic_leap and piercing_howl reach triggerAttack through the real sel
 
     expect(claimed).toBe(true);
     expect(triggerAttack).toHaveBeenCalledWith(1, 'heroic_leap');
+    expect(bakedAt).toHaveBeenCalledTimes(2);
+    expect(fragmentsAt).toHaveBeenCalledTimes(2);
+  });
+
+  it('dispatches Storm Bolt windup to its mapped native attack', () => {
+    const { painter, triggerAttack } = makePainter();
+    expect(
+      painter.handleSpellfx({
+        type: 'spellfx',
+        sourceId: 1,
+        targetId: 2,
+        school: 'physical',
+        fx: 'windup',
+        ability: 'storm_bolt',
+      } as never),
+    ).toBe(true);
+    expect(triggerAttack).toHaveBeenCalledExactlyOnceWith(1, 'storm_bolt');
+  });
+
+  it.each([
+    'battle_shout',
+    'demoralizing_shout',
+    'emboldening_roar',
+    'defiant_bellow',
+    'rallying_cry',
+    'intimidating_shout',
+  ])('dispatches %s to its gesture or emote, never both', (ability) => {
+    expect(ABILITIES[ability].castFx).toBe('shout');
+    for (const hasGesture of [false, true]) {
+      const { painter, triggerAttack, playShoutAnim } = makePainter(hasGesture);
+      expect(
+        painter.handleSpellfx({
+          type: 'spellfx',
+          sourceId: 1,
+          targetId: 1,
+          school: 'physical',
+          fx: 'shout',
+          ability,
+        } as never),
+      ).toBe(true);
+      if (hasGesture) {
+        expect(triggerAttack).toHaveBeenCalledExactlyOnceWith(1, ability);
+        expect(playShoutAnim).not.toHaveBeenCalled();
+      } else {
+        expect(playShoutAnim).toHaveBeenCalledExactlyOnceWith(1);
+        expect(triggerAttack).not.toHaveBeenCalled();
+      }
+    }
   });
 
   it('claims piercing_howl selfCast and triggers its attack clip', () => {

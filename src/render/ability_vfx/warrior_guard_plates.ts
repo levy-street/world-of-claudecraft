@@ -57,6 +57,9 @@ export class WarriorGuardPlates {
   private readonly at = new THREE.Vector3();
   private readonly position = new THREE.Vector3();
   private readonly color = new THREE.Color();
+  private readonly bladeTip = new THREE.Vector3();
+  private readonly inverseFrame = new THREE.Matrix4();
+  private readonly bladeRotation = new THREE.Matrix4();
   private readonly points = Array.from({ length: 6 }, () => new THREE.Vector3());
   private used = 0;
   private disposed = false;
@@ -218,17 +221,25 @@ export class WarriorGuardPlates {
             if (kind === 0) wearer.shield = null;
             if (kind === 2) wearer.blade = null;
           }
-          // Plates represent absolute reserve chunks, NOT percentage of an
-          // inferred initial pool. A first snapshot may already include damage.
-          // Four concurrent states divide as 1/1/2/2. The two paired
-          // protections keep their silhouette without exceeding six plates.
-          const available = kinds === 4 ? (kind < 2 ? 1 : 2) : Math.floor(PLATES / kinds);
+          // The face frame intentionally removes equipment scale. Recover the
+          // actual blade span from its live tip instead of inventing long rails.
+          let bladeHalf = 0.42;
+          if (kind === 2 && attached && sample?.(this.bladeTip)) {
+            this.bladeTip.applyMatrix4(this.inverseFrame.copy(this.frameMatrix).invert());
+            const span = Math.hypot(this.bladeTip.x, this.bladeTip.y);
+            if (span > 0.04) {
+              bladeHalf = Math.min(0.85, span);
+              this.bladeRotation.makeRotationZ(-Math.atan2(this.bladeTip.x, this.bladeTip.y));
+              this.frameMatrix.multiply(this.bladeRotation);
+            }
+          }
+          // Iron Resolve always keeps its two opposing shields while reserve
+          // remains. Four concurrent states divide as 1/2/1/2; the sword keeps
+          // its primary spine and both paired protections retain their shape.
+          const available =
+            kinds === 4 ? (kind === 0 || kind === 2 ? 1 : 2) : Math.floor(PLATES / kinds);
           const count =
-            kind === 1
-              ? Math.min(available, Math.max(1, Math.ceil(state.value / 30)))
-              : kind === 0
-                ? Math.min(available, kinds === 1 ? 3 : 2)
-                : Math.min(available, 2);
+            kind === 0 ? Math.min(available, kinds === 1 ? 3 : 2) : Math.min(available, 2);
           const assembly = reduced ? 1 : Math.min(1, state.age / 0.24);
           for (let plate = 0; plate < count; plate++) {
             let x = 0,
@@ -251,20 +262,19 @@ export class WarriorGuardPlates {
                 z += 0.62;
               }
             } else if (kind === 1) {
-              // Open collar: no enclosing sphere and no plates across the face.
-              const side = plate % 2 ? -1 : 1;
-              const band = Math.floor(plate / 2);
-              const arc = side * (0.65 + band * 0.91);
-              x = Math.sin(arc) * 0.84;
-              z = Math.cos(arc) * 0.84;
-              y = -0.12 + (band === 1 ? 0.08 : 0);
+              // Two opposing shields orbit outside the body with a readable
+              // gap. Reduced motion parks the same pair beside the shoulders.
+              const arc = Math.PI / 2 + plate * Math.PI + (reduced ? 0 : state.age * 0.65);
+              const contact = reduced ? 0 : Math.max(0, 1 - state.hitAge / 0.16) * 0.055;
+              x = Math.sin(arc) * (1.65 - contact);
+              z = Math.cos(arc) * (1.65 - contact);
+              y = -0.15;
               yaw = arc;
-              sx = 0.64;
-              sy = 0.91;
-              if (!reduced) z += Math.max(0, 1 - state.hitAge / 0.16) * 0.12;
+              sx = 0.95;
+              sy = 0.82;
             } else if (kind === 3) {
               // A companion's two broad shoulder guards reach forward around
-              // the wearer. This is separate from Iron Resolve's open collar.
+              // the wearer, separate from Iron Resolve's orbiting pair.
               const side = plate ? 1 : -1;
               x = side * 0.78;
               y = 0.26;
@@ -275,25 +285,33 @@ export class WarriorGuardPlates {
               sy = 1.25;
               if (!reduced) z += Math.max(0, 1 - state.hitAge / 0.16) * 0.12;
             } else {
-              x = (plate ? 1 : -1) * 0.35;
-              // Long parallel cutting rails extend beyond the tip. Avoid the
-              // splayed kite fan that reads as another shield from the side.
-              y = 0.4;
-              z = 0.08;
-              roll = (plate ? 1 : -1) * 0.1;
-              sx = 0.23;
-              sy = 2.2;
-              if (!attached) z += 0.74;
+              // Steel locks onto the real blade: one bright central spine and
+              // a short overlapping heel, never two detached parallel weapons.
+              y = plate ? -bladeHalf * 0.5 : 0;
+              z = plate ? 0.04 : 0.012;
+              sx = plate ? 0.24 : 0.15;
+              sy = plate ? bladeHalf * 0.55 : bladeHalf * 1.42;
+              if (!attached) {
+                x = 0.34;
+                y -= 0.12;
+                z += 0.32;
+                roll = -0.35;
+              }
             }
             const settle = 1 - (1 - assembly) ** 3;
+            const fitted = kind === 1 || kind === 2;
             this.position.set(
-              x * (1.55 - settle * 0.55),
-              y - (1 - settle) * 0.35,
-              z + (1 - settle) * 0.26,
+              fitted ? x : x * (1.55 - settle * 0.55),
+              y - (1 - settle) * (fitted ? 0.06 : 0.35),
+              z + (1 - settle) * (fitted ? 0.025 : 0.26),
             );
             this.rotation.setFromAxisAngle(UP, yaw);
             if (roll) this.rotation.multiply(this.rollRotation(roll));
-            this.scale.set(sx * Math.max(0.03, settle), sy, 1);
+            this.scale.set(
+              sx * Math.max(0.03, settle),
+              sy,
+              kind === 2 ? 0.18 : kind === 1 ? 0.45 : 1,
+            );
             this.matrix
               .compose(this.position, this.rotation, this.scale)
               .premultiply(this.frameMatrix);
@@ -306,9 +324,9 @@ export class WarriorGuardPlates {
             }
             // A quiet bright seam keeps the material legible against dark scenery.
             // Cold/overflow uses a complete kite outline in the same exact frame.
-            // One representative full outline per aura bounds all 64 cold
-            // wearers to 2560 vertices with all four protections active.
-            if (plate === 0) this.outline(ribbons, solid, COLORS[kind]);
+            // Both orbiting shields remain readable while cold. Five full
+            // outlines bound all 64 four-protection wearers to 3200 vertices.
+            if (plate === 0 || kind === 1) this.outline(ribbons, solid, COLORS[kind]);
           }
         }
         if (wearer.retry <= 0) wearer.retry = 0.5;

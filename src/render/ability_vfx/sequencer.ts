@@ -66,6 +66,8 @@ export interface SeqPoint {
 
 // The host surface fx.ts implements: every primitive the sequences drive.
 export interface SequencerHost {
+  /** Actual item classification: shields and empty hands are not weapons. */
+  isWeaponHand?(id: number, hand: 0 | 1): boolean;
   handPoint?(id: number, hand: 0 | 1, out: SeqPoint): SeqPoint | null;
   weaponFace?(id: number, hand: 0 | 1, out: SeqPoint, normal: SeqPoint): boolean;
   contact?(

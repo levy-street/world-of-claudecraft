@@ -8,13 +8,13 @@ export function warriorGyrePoint(
   v: number,
   out: { x: number; y: number; z: number },
 ): void {
-  const angle = blade * Math.PI + u * 2.65 - 1.1;
+  const angle = blade * Math.PI + u * 2.2 - 0.65;
   const taper = Math.max(0, Math.sin(u * Math.PI)) ** 0.55;
   const radius =
     1.6 + 6.4 * Math.sin(u * Math.PI * 0.5) - v * taper * (1.55 + 0.18 * Math.sin(u * 23));
   out.x = Math.sin(angle) * radius;
   out.z = Math.cos(angle) * radius;
-  out.y = 0.62 + blade * 0.24 + Math.sin(u * Math.PI) * 0.85 - v * taper * 0.28;
+  out.y = 0.82 + blade * 0.24 + Math.sin(u * Math.PI) * 0.35 - v * taper * 0.18;
 }
 export function warriorGyreShape(): THREE.BufferGeometry {
   const pos: number[] = [],
@@ -38,7 +38,7 @@ export function warriorGyreShape(): THREE.BufferGeometry {
             point.y + side * (edge ? 0.009 : 0.043) * Math.sin(u * Math.PI),
             point.z,
           );
-          uv.push(u, edge ? 0 : rows[r]);
+          uv.push(u, rows[r]);
           if (r < rows.length - 1 && c < columns) {
             const a = base + r * (columns + 1) + c,
               b = a + 1,

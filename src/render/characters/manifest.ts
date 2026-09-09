@@ -1392,8 +1392,8 @@ export const VISUALS: Record<string, VisualDef> = {
         berserker_stance: 'Warrior_Berserker_Stance',
         raised_guard: 'Warrior_Raised_Guard',
         iron_resolve: 'Warrior_Iron_Resolve',
-        // Jawcrack is a bare-fist interrupt: the synthesized punch
-        // donor is rebaked with planted feet and a compact contact hold.
+        // Jawcrack drives the held weapon's guard into the interrupt:
+        // planted feet and a compact contact hold preserve both grips.
         pummel: 'Warrior_Jawcrack',
         // Heroic Leap is a position-targeted jump, not a swing: the bespoke
         // pose-sample-and-blend clip (coil, airborne, driven two-hand slam on

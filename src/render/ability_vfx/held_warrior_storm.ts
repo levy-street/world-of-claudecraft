@@ -9,7 +9,7 @@ import { warriorAreaPoint } from './warrior_area_shapes';
 export class HeldWarriorStorm {
   private readonly points = Array.from({ length: 36 }, () => new THREE.Vector3());
   private readonly point = new THREE.Vector3();
-  private readonly primary = Array.from({ length: 22 }, () => new THREE.Vector3());
+  private readonly primary = Array.from({ length: 33 }, () => new THREE.Vector3());
 
   drawPrimary(
     ribbons: AbilityVfxRibbons,
@@ -20,7 +20,7 @@ export class HeldWarriorStorm {
     const angle = reducedMotion ? 0 : elapsed * 14,
       cosine = Math.cos(angle),
       sine = Math.sin(angle);
-    for (let blade = 0; blade < 3; blade++) {
+    for (let blade = 0; blade < 2; blade++) {
       for (let i = 0; i < this.primary.length; i++) {
         warriorAreaPoint('steel_storm', blade, i / (this.primary.length - 1), 0, this.point);
         this.primary[i].set(
@@ -29,7 +29,7 @@ export class HeldWarriorStorm {
           at.z + this.point.z * cosine - this.point.x * sine,
         );
       }
-      ribbons.appendHeld(this.primary, this.primary.length, 0.22, 0xcbd8df, 1.4);
+      ribbons.appendHeld(this.primary, this.primary.length, 0.24, 0xd9d3be, 1.4);
     }
   }
 
@@ -43,21 +43,26 @@ export class HeldWarriorStorm {
     const angle = reducedMotion ? 0 : elapsed * 14;
     const cosine = Math.cos(angle),
       sine = Math.sin(angle);
-    for (let blade = 0; blade < 3; blade++) {
+    for (let blade = 0; blade < 2; blade++) {
       for (let i = 0; i < this.points.length; i++) {
-        warriorAreaPoint('steel_storm', blade, i / (this.points.length - 1), 0, this.point);
+        warriorAreaPoint(
+          'steel_storm',
+          blade,
+          0.52 + (0.34 * i) / (this.points.length - 1),
+          0,
+          this.point,
+        );
         this.points[i].set(
           at.x + this.point.x * cosine + this.point.z * sine,
           at.y + this.point.y,
           at.z + this.point.z * cosine - this.point.x * sine,
         );
       }
-      ribbons.appendHeld(this.points, this.points.length, 0.22, 0xc29876, 0.95);
-      ribbons.appendHeld(this.points, this.points.length, 0.065, 0xdce9f1, 1.2);
-      // Swept spokes connect the weapon's centre to each hooked outer wake.
+      ribbons.appendHeld(this.points, this.points.length, 0.11, 0xecd5b7, 1.15);
+      // Short inner wakes emerge at weapon reach and dissolve outward.
       for (let i = 0; i < this.points.length; i++) {
         const u = i / (this.points.length - 1);
-        const a = (blade * Math.PI * 2) / 3 + angle + u * 1.65;
+        const a = blade * Math.PI + angle + u * 1.65;
         const radius = 1.15 + u * 4.6;
         this.points[i].set(
           at.x + Math.sin(a) * radius,
@@ -65,7 +70,7 @@ export class HeldWarriorStorm {
           at.z + Math.cos(a) * radius,
         );
       }
-      ribbons.appendHeld(this.points, this.points.length, 0.12, 0x718ca1, 0.7);
+      ribbons.appendHeld(this.points, this.points.length, 0.07, 0xb3ada0, 0.45);
     }
     const time = reducedMotion ? 0 : elapsed;
     for (let chip = 0; chip < 18; chip++) {

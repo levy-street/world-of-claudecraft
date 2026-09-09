@@ -17,28 +17,31 @@ export function drawWarriorReadinessCast(
   if (!sanguine && !wide && !fury && !guarded && id !== 'battle_stance') return false;
   if (slot.physicalSecondary) return true;
   if (sanguine) {
-    const at = host.handPoint?.(slot.casterId, 0, hand);
-    if (!at) return true;
-    // Baked sprite filaments gather at the hilt and release along the blade.
-    // They add fine liquid detail without recoloring the body for the buff.
-    host.bakedAt?.(
-      'warrior_power',
-      at.x,
-      at.y,
-      at.z,
-      beat === 0 ? 1.7 : 2.1,
-      0x9b1830,
-      0xff7869,
-      beat === 0 ? 0.25 : 0.3,
-      0,
-      0,
-      (host.facingAt?.(slot.casterId) ?? 0) + Math.PI / 2,
-      beat === 0,
-      0.3,
-      0.7,
-    );
-    host.weaponTrail?.(slot.casterId, 0, beat === 0 ? 0x9b2333 : 0xff8c70, 0.1, 0.28);
-    host.countPrimitive(id, 2);
+    for (const handIndex of [0, 1] as const) {
+      if (!(host.isWeaponHand?.(slot.casterId, handIndex) ?? handIndex === 0)) continue;
+      const at = host.handPoint?.(slot.casterId, handIndex, hand);
+      if (!at) continue;
+      // Baked sprite filaments gather at the hilt and release along the blade.
+      // They add fine liquid detail without recoloring the body for the buff.
+      host.bakedAt?.(
+        'warrior_power',
+        at.x,
+        at.y,
+        at.z,
+        beat === 0 ? 1.7 : 2.1,
+        0x9b1830,
+        0xff7869,
+        beat === 0 ? 0.25 : 0.3,
+        0,
+        0,
+        (host.facingAt?.(slot.casterId) ?? 0) + Math.PI / 2,
+        beat === 0,
+        0.3,
+        0.7,
+      );
+      host.weaponTrail?.(slot.casterId, handIndex, beat === 0 ? 0x9b2333 : 0xff8c70, 0.1, 0.28);
+      host.countPrimitive(id, 2);
+    }
     return true;
   }
   const color = wide ? 0xe9d8b1 : fury ? 0xc44336 : guarded ? 0xa8cedc : 0xe3e8df;

@@ -21,9 +21,9 @@ function motion(
  * shared silhouette, timing, contact height, weapon, or aftermath. */
 export const WARRIOR_CHOREOGRAPHY: Readonly<Record<string, PhysicalChoreography>> = {
   heroic_strike: motion('cut', 1.9, 0.085, 0.8, -1.4, 0.7, 'steel', one, 0),
-  slam: motion('plunge', 2.25, 0.13, 0.1, 0.22, 1.15, 'stone', one, 0),
+  slam: motion('plunge', 2.25, 0.13, 0.1, 0.22, 1.15, 'steel', one, 0),
   mortal_strike: motion('plunge', 2.75, 0.16, 0.05, -0.5, 1.35, 'steel', one, 0),
-  execute: motion('plunge', 3.2, 0.21, 0.02, 0.8, 1.6, 'blood', one, 0),
+  execute: motion('plunge', 3.2, 0.21, 0.02, 0.8, 1.6, 'steel', one, 0),
   breachmaker: motion('thrust', 3.9, 0.17, 1.05, 0.35, 1.6, 'steel', one, 0),
   overpower: motion('rise', 2.1, 0.095, 0.2, -1.7, 0.8, 'steel', one, 0),
   victory_rush: motion('rise', 2.45, 0.12, 0.15, 1.3, 1, 'blood', [0, 0.36], 0),

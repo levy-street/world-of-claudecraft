@@ -131,7 +131,9 @@ it.each([
       });
       const geo = (ribbons as unknown as { geo: THREE.BufferGeometry }).geo;
       const used = Math.max(...Array.from(geo.getIndex()!.array).slice(0, geo.drawRange.count)) + 1;
-      const prefix = 1056 + (crowded ? 1920 + 768 : 0) + (avatar ? 272 : 0);
+      // Every cold wearer retains one Raised Guard outline, both Iron Resolve
+      // shields and one Sword Guard outline: 64 * 4 * 5 points * 2 vertices.
+      const prefix = 1056 + (crowded ? 2560 + 768 : 0) + (avatar ? 272 : 0);
       const result = {
         vertices: used - prefix,
         positions: Array.from(geo.getAttribute('position').array).slice(prefix * 3, used * 3),
