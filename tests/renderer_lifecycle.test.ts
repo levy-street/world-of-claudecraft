@@ -88,8 +88,15 @@ describe('Renderer lifecycle wiring', () => {
       '\n  private beginRendererShutdown(): void',
     );
     expect(constructorSource).toContain('options: RendererCreateOptions = {}');
-    expect(constructorSource).toContain('context: options.context');
-    expect(constructorSource).toContain('this.webgl.getContext() !== options.context');
+    expect(constructorSource).toContain(
+      'this.webgl = createWorldRenderer(canvas, options.context);',
+    );
+    const factory = readFileSync(
+      new URL('../src/render/world_renderer.ts', import.meta.url),
+      'utf8',
+    );
+    expect(factory).toContain('context && renderer.getContext() !== context');
+    expect(factory).toContain('new THREE.WebGLRenderer({\n    canvas,\n    context,');
     expect(constructorSource).toContain('if (options.initializeGfx !== false)');
     expect(constructorSource).toContain('initGfxTier(this.webgl)');
   });

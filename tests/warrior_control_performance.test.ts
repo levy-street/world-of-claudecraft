@@ -42,7 +42,17 @@ it('keeps the native control poses and timing through actual clip preparation', 
   prepareSignatureClips(clips, map.attackByAbility);
   prepareMeleeClips(clips, map.attackByAbility);
   prepareNamedActionClips('player_warrior', clips, knight.scene);
-  for (const id of ['hamstring', 'sunder_armor', 'storm_bolt', 'pummel']) {
+  for (const id of [
+    'hamstring',
+    'sunder_armor',
+    'storm_bolt',
+    'pummel',
+    'sanguine_aura',
+    'sweeping_strikes',
+    'battle_stance',
+    'defensive_stance',
+    'berserker_stance',
+  ]) {
     const source = gltf.animations.find((clip) => clip.name === map.attackByAbility?.[id]);
     const prepared = clips.get(`Signature_${id}`);
     expect(source, id).toBeDefined();

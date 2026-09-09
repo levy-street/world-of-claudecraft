@@ -199,6 +199,7 @@ import {
   compileMayStartBeforeInitialPaint,
   compilePriorityForTarget,
 } from './compile_priority_core';
+import { compileTargetPrepared } from './compile_target_readiness';
 import { preflightWebGL2ContextRecycle, type RecycledRendererContext } from './context_recycle';
 import { trackWebGLContext } from './context_release';
 import {
@@ -4843,8 +4844,17 @@ export class Renderer {
   // prod 100-160 ms far-crossing stalls). The visual owns that reveal through
   // per-frame flags, so it gets the gate as a callback, one bake at a time.
   private readonly farBakeLane = new SerialGateLane();
-  private readonly farBakeGate: FarBakeGate = (target, onSettled) =>
-    this.farBakeLane.enqueue((settled) => this.gateSwapFlagOnCompile(target, settled), onSettled);
+  private readonly farBakeGate: FarBakeGate = (target, onSettled) => {
+    let prepared = false;
+    this.farBakeLane.enqueue(
+      (settled) =>
+        this.gateSwapFlagOnCompile(target, (ready) => {
+          prepared = ready;
+          settled();
+        }),
+      () => onSettled(prepared),
+    );
+  };
 
   /** Build one lazy FORM rig into its view slot. A null build leaves the slot
    *  unset; the shared gate retries after its cooldown. A freshly built form
@@ -7875,7 +7885,8 @@ export class Renderer {
       }
       case 'aura': {
         const tgt = this.sim.entities.get(ev.targetId);
-        if (isWarriorFuryAuraEvent(ev, tgt) || this.abilityVfx.onWarriorControlAura(ev, tgt?.auras)) break;
+        if (isWarriorFuryAuraEvent(ev, tgt) || this.abilityVfx.onWarriorControlAura(ev, tgt?.auras))
+          break;
         // Set-proc auras announce themselves with a themed swirl: on the wearer
         // for the self buffs, on the struck mob for the bleeds (so this arm is
         // NOT player-gated). Everything else keeps the generic player swirl.
@@ -8607,7 +8618,7 @@ export class Renderer {
   // crowd of composed players arriving in a live frame: 500 to 711 ms on the
   // first `live-gate` unit); the queue paces between units, never inside one,
   // and its released-tail cap now bounds the gate's links on the driver too.
-  private compileGate(target: THREE.Object3D, requiredForEntry = false): Promise<unknown> {
+  private compileGate(target: THREE.Object3D, requiredForEntry = false): Promise<boolean> {
     const lookup = (id: number) => this.sim.entities.get(id);
     const isCasting = castingAtPlayerPredicate(lookup, this.sim.player.id);
     const priority = compilePriorityForTarget(target, this.sim.player.targetId, isCasting);
@@ -8640,7 +8651,12 @@ export class Renderer {
     // a gated reveal is no earlier than it was before.
     return linked
       .then((gate) => this.uploadGateTexturesGated(target, priority).then(() => gate))
-      .then((gate) => this.touchLinkedProgramsGated(target, priority, gate));
+      .then(async (gate) => {
+        await this.touchLinkedProgramsGated(target, priority, gate);
+        return (
+          !gate.failed && !gate.timedOut && compileTargetPrepared(this.webgl.properties, target)
+        );
+      });
   }
 
   /** The gate's upload step: one budgeted queue unit per cold texture under
@@ -8750,18 +8766,21 @@ export class Renderer {
   // sets its pending flag to true BEFORE calling this, so onSettled MUST still
   // run when the gate is a no-op (unsupported browser): otherwise the flag is
   // permanently stuck true and the target stays hidden forever.
-  private gateSwapFlagOnCompile(target: THREE.Object3D, onSettled: () => void): void {
+  private gateSwapFlagOnCompile(
+    target: THREE.Object3D,
+    onSettled: (prepared: boolean) => void,
+  ): void {
     if (!this.asyncCompileSupported) {
-      onSettled();
+      onSettled(false);
       return;
     }
     const generation = this.lifecycleGeneration;
     void this.compileGate(target).then(
-      () => {
-        if (!this.shutdownStarted && generation === this.lifecycleGeneration) onSettled();
+      (prepared) => {
+        if (!this.shutdownStarted && generation === this.lifecycleGeneration) onSettled(prepared);
       },
       (error) => {
-        this.recoverRejectedCompileGate(error, generation, onSettled);
+        this.recoverRejectedCompileGate(error, generation, () => onSettled(false));
       },
     );
   }
@@ -10898,7 +10917,11 @@ export class Renderer {
         }
       }
       const weaponAura = characterWeaponAuraInto(e, this.weaponAuraScratch);
-      v.visual.setWeaponAura(weaponAura ? weaponAura.color : null, weaponAura?.tip ?? false);
+      v.visual.setWeaponAura(
+        weaponAura ? weaponAura.color : null,
+        weaponAura?.tip ?? false,
+        weaponAura?.sanguine ?? false,
+      );
       v.visual.setWeaponAuraMode(characterWeaponAuraMode(e));
       const petOwner = e.ownerId === null ? null : (sim.entities.get(e.ownerId) ?? null);
       const ferocityStage = hunterPetFerocityStage(e, petOwner);

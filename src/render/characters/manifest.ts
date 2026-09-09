@@ -1385,7 +1385,11 @@ export const VISUALS: Record<string, VisualDef> = {
         hamstring: 'Warrior_Hobbling_Cut',
         sunder_armor: 'Warrior_Armor_Shear',
         storm_bolt: 'Warrior_Storm_Bolt',
-        sanguine_aura: 'Spellcast_Raise',
+        sanguine_aura: 'Warrior_Sanguine_Aura',
+        sweeping_strikes: 'Warrior_Widening_Arc',
+        battle_stance: 'Warrior_Battle_Stance',
+        defensive_stance: 'Warrior_Guarded_Stance',
+        berserker_stance: 'Warrior_Berserker_Stance',
         raised_guard: 'Warrior_Raised_Guard',
         iron_resolve: 'Warrior_Iron_Resolve',
         // Jawcrack is a bare-fist interrupt: the synthesized punch

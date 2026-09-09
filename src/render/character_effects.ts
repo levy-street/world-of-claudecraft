@@ -52,6 +52,8 @@ export interface CharacterWeaponAura {
   color: number;
   /** true = the overlay scopes to the blade tip (buff.weaponAuraScope 'tip') */
   tip: boolean;
+  /** Detail belongs to the selected imbue, not an unrelated overlapping aura. */
+  sanguine?: boolean;
 }
 
 /** The held weapon's imbued-overlay color + scope, filled into the caller's
@@ -73,6 +75,7 @@ export function characterWeaponAuraInto(
     if (tint !== undefined) {
       out.color = abilityHexColor(tint);
       out.tip = buff?.weaponAuraScope === 'tip';
+      out.sanguine = a.id === 'sanguine_aura' && a.kind === 'sanguine';
       return out;
     }
   }

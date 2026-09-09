@@ -89,6 +89,7 @@ import {
   PALADIN_TEMPLARS_VERDICT_DURATION,
 } from './paladin_templars_verdict_clip';
 import { PaladinTemplarsVerdictFx } from './paladin_templars_verdict_fx';
+import { SanguineWeaponSheath } from './sanguine_weapon_sheath';
 import { attachSharedDepthMaterials } from './shadow_depth_materials';
 import { characterMeshCastsShadow } from './shadow_policy';
 import {
@@ -124,7 +125,7 @@ export type { AnimState, BaseState } from './anim_state';
  *  the view's own creation gate ran: compile `target` hidden, off-thread, and
  *  call `onSettled` once its programs are linked (or immediately when async
  *  compile is unsupported). Mirrors renderer `gateSwapFlagOnCompile`. */
-export type FarBakeGate = (target: THREE.Object3D, onSettled: () => void) => void;
+export type FarBakeGate = (target: THREE.Object3D, onSettled: (prepared?: boolean) => void) => void;
 
 // Current canvas height in device pixels, pushed by the renderer on resolution
 // changes so newly created weapon-skin VFX rigs size their point sprites right.
@@ -650,6 +651,8 @@ export class CharacterVisual {
   private weaponAuraMeshes: THREE.Mesh[] = [];
   private weaponAuraColor: number | null = null;
   private weaponAuraTip = false;
+  private weaponAuraSanguine = false;
+  private readonly sanguineSheath = new SanguineWeaponSheath();
   private weaponAuraMode: WeaponAuraMode = 'none';
   private bastionSweepFx: PaladinBastionSweepFx | null = null;
   private bastionSweepAction: THREE.AnimationAction | null = null;
@@ -2049,6 +2052,8 @@ export class CharacterVisual {
    *  keep a superseded far set's tinted lease. */
   setFarBakeGate(gate: FarBakeGate | null): void {
     this.farBakeGate = gate;
+    this.sanguineSheath.setGate(gate);
+    if (this.weaponAuraSanguine) this.rebuildWeaponAura();
     this.dropPendingFarMaterials();
     this.farCompilePending = false;
     // Same reason as the far arm: a settle the old renderer generation dropped
@@ -2857,8 +2862,14 @@ export class CharacterVisual {
    *  (Sanguine Blade's blood red, Pyrebrand's flame lick, Rimebound's rime).
    *  `tip` scopes the overlay to the blade's far end (Adder's Bite's green
    *  tip against Festering Venom's full-blade wash). */
-  setWeaponAura(colorHex: number | null, tip = false): void {
-    if (colorHex === this.weaponAuraColor && tip === this.weaponAuraTip) return;
+  setWeaponAura(colorHex: number | null, tip = false, sanguine = false): void {
+    if (
+      colorHex === this.weaponAuraColor &&
+      tip === this.weaponAuraTip &&
+      sanguine === this.weaponAuraSanguine
+    )
+      return;
+    this.weaponAuraSanguine = sanguine;
     this.weaponAuraColor = colorHex;
     this.weaponAuraTip = tip;
     this.rebuildWeaponAura();
@@ -2946,6 +2957,7 @@ export class CharacterVisual {
       if (tipGeometry) aura.userData.ownsAuraGeometry = true;
       mesh.parent.add(aura);
       this.weaponAuraMeshes.push(aura);
+      if (this.weaponAuraSanguine && !this.weaponAuraTip) this.sanguineSheath.stage(aura);
     });
   }
 
@@ -2977,6 +2989,7 @@ export class CharacterVisual {
   }
 
   private disposeWeaponAura(): void {
+    this.sanguineSheath.clear();
     for (const mesh of this.weaponAuraMeshes) {
       mesh.removeFromParent();
       (mesh.material as THREE.Material).dispose();

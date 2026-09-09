@@ -73,6 +73,7 @@ import {
 } from './warrior_guard_plates';
 import { launchWarriorHammer } from './warrior_hammer';
 import { WarriorPowerForms } from './warrior_power_forms';
+import { WarriorReadiness } from './warrior_readiness';
 import { drawWarriorWornMark } from './warrior_worn_marks';
 import { RestorativeWaterVolumes } from './water_volumes';
 
@@ -577,6 +578,7 @@ export class AbilityVfxFx implements SequencerHost {
   private heldConduction = new HeldConduction();
   private heldWarriorStorm = new HeldWarriorStorm();
   private readonly warriorAttention = new WarriorAttention();
+  private readonly warriorReadiness = new WarriorReadiness();
   private warriorStorms = new Map<
     number,
     { stamp: number; elapsed: number; nextDust: number; surface: boolean }
@@ -626,6 +628,16 @@ export class AbilityVfxFx implements SequencerHost {
     );
   };
   private drawHeldConduction = (): void => {
+    this.warriorReadiness.draw(
+      this.frame,
+      this.time,
+      this.reducedMotionActive,
+      this.qualityLevel,
+      this,
+      this.ribbons,
+      this.overlay,
+      this.weaponAnchor,
+    );
     for (const [id, storm] of this.warriorStorms) {
       const at = this.anchor(id, 0, anchorScratchA);
       if (at)
@@ -2298,7 +2310,12 @@ export class AbilityVfxFx implements SequencerHost {
     return true;
   }
 
-  /** Held readiness cue, sharing the original 24-slot pool and frame cleanup. */
+  /** Held readiness shares attack buffers and the same frame cleanup. */
+  holdWarriorReadiness(entityId: number, bit: number, local: boolean): void {
+    if (this.disposed) return;
+    this.warriorReadiness.hold(entityId, bit, this.frame, local);
+  }
+
   holdQueuedWeapon(entityId: number, colorHex: number, tier = 0): boolean {
     return this.orbit(entityId, 'weaponGlow', colorHex, QUEUED_WEAPON_DNA, tier);
   }
@@ -2588,6 +2605,7 @@ export class AbilityVfxFx implements SequencerHost {
     this.powerForms.clear();
     this.furyStates.clear();
     this.warriorAttention.clear();
+    this.warriorReadiness.clear();
     this.warriorStorms.clear();
     this.furyAudio.clear();
     this.ribbons.clear();

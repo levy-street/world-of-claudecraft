@@ -136,6 +136,28 @@ describe('Renderer live shader compile rejection recovery', () => {
     expect(onSettled).toHaveBeenCalledOnce();
   });
 
+  it.each([true, false])(
+    'passes the actual preparation result %s to an opt-in reveal',
+    async (prepared) => {
+      const renderer = harness();
+      renderer.compileGate = () => Promise.resolve(prepared);
+      const onSettled = vi.fn();
+      renderer.gateSwapFlagOnCompile(new THREE.Group(), onSettled);
+      await flushGate();
+      expect(onSettled).toHaveBeenCalledExactlyOnceWith(prepared);
+    },
+  );
+
+  it('reports unsupported preparation without stranding the legacy reveal callback', () => {
+    const renderer = harness();
+    renderer.asyncCompileSupported = false;
+    renderer.compileGate = vi.fn();
+    const onSettled = vi.fn();
+    renderer.gateSwapFlagOnCompile(new THREE.Group(), onSettled);
+    expect(onSettled).toHaveBeenCalledExactlyOnceWith(false);
+    expect(renderer.compileGate).not.toHaveBeenCalled();
+  });
+
   it('restores a live material-swap target after rejection', async () => {
     const renderer = harness();
     const failure = new Error('swap link rejected');
@@ -211,14 +233,15 @@ describe('Renderer live shader compile rejection recovery', () => {
     const mesh = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial());
     target.add(mesh);
 
-    await renderer.compileGate(target);
+    const prepared = await renderer.compileGate(target);
 
     expect(order).toEqual(['color:false', 'shadow']);
-    // Twice for the one material: the piece's variant settle (which finds no
-    // program to poll here), then the tail's collect walk. No marking walk:
+    expect(prepared).toBe(false); // No linked programs exist in this fixture.
+    // Three reads of the one material: the piece's variant settle (which finds no
+    // program to poll here), the tail collect walk, and the opt-in readiness proof. No marking walk:
     // the settle is the only proof (runWorldGateTouchLane). None of them asks
     // the driver anything.
-    expect(properties.get).toHaveBeenCalledTimes(2);
+    expect(properties.get).toHaveBeenCalledTimes(3);
     // The arms compile the material carrier itself, in place, never the root:
     // three prepares materials only under the node it is handed, so this is
     // exactly the mesh's programs, and one queue unit per material group.
@@ -853,9 +876,15 @@ describe('the far-bake compile gate handed to character visuals', () => {
     );
     // ...and one crowd bake links at a time: the gate is enqueued on the
     // renderer's SerialGateLane, the caller's settle riding the lane's.
-    expect(rendererSource).toContain(
-      'private readonly farBakeGate: FarBakeGate = (target, onSettled) =>\n' +
-        '    this.farBakeLane.enqueue((settled) => this.gateSwapFlagOnCompile(target, settled), onSettled);',
+    const gate = rendererSource.slice(
+      rendererSource.indexOf('private readonly farBakeGate:'),
+      rendererSource.indexOf('  /** Build one lazy FORM'),
+    );
+    expect(gate.replace(/\s+/g, '')).toContain(
+      'private readonly farBakeGate: FarBakeGate = (target, onSettled) => { let prepared = false; this.farBakeLane.enqueue( (settled) => this.gateSwapFlagOnCompile(target, (ready) => { prepared = ready; settled(); }), () => onSettled(prepared), ); };'.replace(
+        /\s+/g,
+        '',
+      ),
     );
     expect(rendererSource).toContain('private readonly farBakeLane = new SerialGateLane();');
     // Both live build paths install it: fresh builds and pool re-acquires.

@@ -354,12 +354,36 @@ describe('character visual effects', () => {
     // The mechanically bigger coat (14 damage/swing) wears the bigger read:
     // the full-blade sickly-green wash for the aura's whole 30 min.
     const deadly = characterWeaponAuraInto(entity({ auras: [coat('deadly_poison')] }), scratch);
-    expect(deadly).toEqual({ color: 0x58d63c, tip: false });
+    expect(deadly).toEqual({ color: 0x58d63c, tip: false, sanguine: false });
 
     // The lesser coat (8 damage/swing) reads as a green-TIPPED weapon.
     const instant = characterWeaponAuraInto(entity({ auras: [coat('instant_poison')] }), scratch);
-    expect(instant).toEqual({ color: 0x8fd455, tip: true });
+    expect(instant).toEqual({ color: 0x8fd455, tip: true, sanguine: false });
 
+    expect(characterWeaponAuraInto(entity({ auras: [] }), scratch)).toBe(null);
+  });
+
+  it('selects Sanguine detail only when Sanguine wins the actual weapon imbue', () => {
+    const sanguine = {
+      id: 'sanguine_aura',
+      name: 'Sanguine Aura',
+      kind: 'sanguine',
+      remaining: 20,
+      duration: 20,
+      value: 0.1,
+      sourceId: 1,
+      school: 'physical',
+    } as const;
+    const poison = { ...sanguine, id: 'deadly_poison', kind: 'imbue', school: 'nature' } as const;
+    const scratch: CharacterWeaponAura = { color: 0, tip: false };
+    expect(characterWeaponAuraInto(entity({ auras: [sanguine, poison] }), scratch)?.sanguine).toBe(
+      true,
+    );
+    expect(characterWeaponAuraInto(entity({ auras: [poison, sanguine] }), scratch)).toEqual({
+      color: 0x58d63c,
+      tip: false,
+      sanguine: false,
+    });
     expect(characterWeaponAuraInto(entity({ auras: [] }), scratch)).toBe(null);
   });
 
@@ -409,25 +433,26 @@ describe('character visual effects', () => {
     expect(renderer).toContain(
       'const hasSoulRend = hasCharacterEffect(characterEffects, CHARACTER_EFFECT_SOUL_REND);',
     );
-    expect(renderer).toContain(
-      'const hasRecklessness = hasCharacterEffect(characterEffects, CHARACTER_EFFECT_RECKLESSNESS);',
+    // Recklessness now follows actual power auras through the bounded equipment owner.
+    const painter = readFileSync(
+      new URL('../src/render/ability_vfx/painter.ts', import.meta.url),
+      'utf8',
     );
+    expect(painter).toContain('fx.holdWarriorPower?.(');
+    expect(renderer).not.toContain('const hasRecklessness =');
     // The sanguine FLAG no longer drives the weapon overlay: the spec-driven
     // characterWeaponAuraInto supersedes it (it carries a color and a tip
     // scope, and covers the shaman imbues and the rogue poisons too), so the
     // flag and its bit are gone from the renderer rather than left computed
     // and unread. The overlay's own coverage lives in the cases above.
     expect(renderer).not.toContain('hasSanguineAura');
-    expect(renderer).toContain(
-      'v.visual.setWeaponAura(weaponAura ? weaponAura.color : null, weaponAura?.tip ?? false);',
+    expect(renderer.replace(/\s+/g, '')).toContain(
+      'v.visual.setWeaponAura(weaponAura?weaponAura.color:null,weaponAura?.tip??false,weaponAura?.sanguine??false,);',
     );
     expect(renderer).toContain('active.setSoulRend(hasSoulRend);');
     expect(renderer).toContain('this.abilityVfx.syncEntity(e, runCharacterPresentation);');
     expect(renderer).toContain("if (hasSoulRend) {\n          this.vfx.castSparkle(e.id, 'shadow'");
-    expect(renderer).toContain(
-      'if (hasRecklessness) {\n          this.vfx.recklessFlame(e.id, dt);',
-    );
-    expect(renderer).toContain('const nextRecklessSkullsLatch = nextRecklessnessSkullsLatch(');
-    expect(renderer).toContain('v.recklessSkullsSpawned = nextRecklessSkullsLatch;');
+    expect(renderer).not.toContain('this.vfx.recklessFlame(e.id, dt);');
+    expect(renderer).not.toContain('nextRecklessnessSkullsLatch(');
   });
 });

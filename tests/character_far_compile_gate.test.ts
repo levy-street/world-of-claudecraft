@@ -22,6 +22,7 @@ import { resolve } from 'node:path';
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import * as assets from '../src/render/characters/assets';
+import { SanguineWeaponSheath } from '../src/render/characters/sanguine_weapon_sheath';
 import { CharacterSurfaceResponse } from '../src/render/characters/surface_response';
 import { CharacterVisual, type FarBakeGate } from '../src/render/characters/visual';
 
@@ -44,6 +45,8 @@ function fakeVisual(overrides: Record<string, unknown> = {}): AnyVisual {
     farBakePending: false,
     farCompilePending: false,
     farBakeGate: null,
+    sanguineSheath: new SanguineWeaponSheath(),
+    weaponAuraSanguine: false,
     farWrap: null,
     farSkinScratch: null,
     pendingFarClaims: null,

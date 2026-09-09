@@ -21,6 +21,7 @@ import { drawWarriorGuardCast } from './warrior_guard_cast';
 import { drawWarriorGyre } from './warrior_gyre';
 import { drawWarriorRushArrival, drawWarriorRushWake } from './warrior_mobility';
 import { drawWarriorPowerCast, warriorPowerRelease } from './warrior_power_cast';
+import { drawWarriorReadinessCast } from './warrior_readiness_cast';
 import { drawWarriorShield } from './warrior_shield';
 import { drawWarriorShout } from './warrior_shouts';
 
@@ -205,6 +206,7 @@ export function physicalFollowThrough(host: SequencerHost, slot: SeqSlot): void 
 }
 
 function physicalBeat(host: SequencerHost, slot: SeqSlot, beat: number): void {
+  if (drawWarriorReadinessCast(host, slot, beat)) return;
   if (drawWarriorControlAttempt(host, slot, beat)) return;
   if (drawWarriorRushArrival(host, slot, beat)) return;
   if (drawFuriousMending(host, slot, beat)) return;

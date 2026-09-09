@@ -12,6 +12,7 @@ import { DAMAGE_CAST_RELEASES } from '../characters/cast_performance';
 import { isBleedContinuation, meleeImpactProfile } from '../melee_impact_core';
 import { warriorFuryStateKind } from '../warrior_fury_state_core';
 import { warriorPowerIntent, warriorPowerKind } from '../warrior_power_core';
+import { warriorReadinessBit } from '../warrior_readiness_core';
 import { SIGNATURE_ABILITIES } from './signature_core';
 import {
   drawWarriorAreaContact,
@@ -1682,6 +1683,11 @@ export class AbilityVfx {
     for (let i = 0; i < e.auras.length; i++) {
       const aura = e.auras[i];
       const auraWasHeld = held.auraStamps.has(aura.id);
+      const readiness = this.deps.isLivingWarrior?.(e.id) ? warriorReadinessBit(aura) : 0;
+      if (readiness) {
+        fx.holdWarriorReadiness?.(e.id, readiness, this.deps.localPlayerId?.() === e.id);
+        continue;
+      }
       const furyState = warriorFuryStateKind(aura);
       if (furyState !== null) {
         if (!isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 }))
